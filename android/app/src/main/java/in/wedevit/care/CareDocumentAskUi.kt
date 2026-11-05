@@ -82,16 +82,16 @@ import kotlinx.coroutines.withContext
         job = scope.launch {
             message = ""; notice = ""; answer = null; local = null; askedText = asked
             try {
-                val sources = picked.mapIndexedNotNull { index, report ->
+                val sources = picked.mapNotNull { report ->
                     try {
-                    progress = t("Reading ${report.name} on this phone (${index + 1} of ${picked.size})", "इस फ़ोन पर ${report.name} पढ़ रहे हैं (${picked.size} में से ${index + 1})")
+                    progress = t("Searching…", "खोज रहे हैं…")
                     val text = withContext(Dispatchers.IO) {
                         store.loadVerified(report, vm.reportFiles.file(report)) ?: CareDocumentReader(context).read(vm.reportFiles.file(report), report).also(store::save)
                     }
                     DocumentQuestionSource(report.id, report.name, text.pages, text.reviewedAt > 0, report.created, folders[report.id]?.folder.orEmpty())
                     } catch (cancel: CancellationException) { throw cancel } catch (error: Exception) { if (searchAll) null else throw error }
                 }
-                progress = t("Finding matching lines on this phone…", "इस फ़ोन पर मिलती पंक्तियाँ ढूँढ रहे हैं…")
+                progress = t("Searching…", "खोज रहे हैं…")
                 val found = withContext(Dispatchers.Default) { DocumentQuestionRules.matchLines(asked, sources) }
                 if (remote == null || cloud == null) { local = found; return@launch }
                 progress = t("Asking ${remote.provider}…", "${remote.provider} से पूछ रहे हैं…")
@@ -100,11 +100,11 @@ import kotlinx.coroutines.withContext
                     answer = client.ask(request, cloud.transcriptionToken(), true)
                 } catch (cancel: CancellationException) { throw cancel }
                 catch (error: Exception) {
-                    notice = run { val detail = error.message?.let { " (${it.trimEnd('.')})" }.orEmpty(); t("The online answer did not work this time$detail. Below are the matching lines found on this phone instead.", "ऑनलाइन जवाब इस बार नहीं मिला$detail। इसकी जगह इस फ़ोन पर मिली पंक्तियाँ नीचे हैं।") }
+                    notice = run { val detail = error.message?.let { " (${it.trimEnd('.')})" }.orEmpty(); t("Online answer failed$detail.", "ऑनलाइन जवाब नहीं मिला$detail।") }
                 }
                 local = found
-            } catch (cancel: CancellationException) { message = t("Stopped. Nothing else was sent.", "रोक दिया। और कुछ नहीं भेजा गया।"); throw cancel }
-            catch (error: Exception) { message = error.message ?: t("Could not get an answer. Your documents are safe.", "जवाब नहीं मिल सका। आपके कागज़ सुरक्षित हैं।") }
+            } catch (cancel: CancellationException) { message = t("Stopped", "रोक दिया"); throw cancel }
+            catch (error: Exception) { message = error.message ?: t("Something went wrong. Try again.", "कुछ गड़बड़ हुई। फिर कोशिश करें।") }
             finally { progress = ""; consent = false; job = null }
         }
     }
@@ -124,8 +124,8 @@ import kotlinx.coroutines.withContext
             IconButton(onClick = { job?.cancel(); onClose() }, modifier = Modifier.size(48.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back to documents", "कागज़ात पर वापस")) }
             Heading(t("Ask your documents", "अपने कागज़ों से पूछें"), 26)
         } }
-        if (checked && service == null) item { DocumentAskPill(t("Offline · matching lines only", "ऑफ़लाइन · सिर्फ़ मिलती पंक्तियाँ"), Mint, Modifier.testTag("document-ask-off")) }
-        if (!checked) item { SurfaceCard { LinearProgressIndicator(Modifier.fillMaxWidth(), color = DoctorAccent, trackColor = DoctorHairline); Spacer(Modifier.height(8.dp)); Text(t("Checking if this is ready…", "देख रहे हैं कि यह तैयार है या नहीं…"), fontSize = 14.sp, color = DoctorCardSub) } }
+        if (checked && service == null) item { DocumentAskPill(t("Offline", "ऑफ़लाइन"), Mint, Modifier.testTag("document-ask-off")) }
+        if (!checked) item { LinearProgressIndicator(Modifier.fillMaxWidth(), color = DoctorAccent, trackColor = DoctorHairline) }
         else {
             item { OutlinedTextField(question, { question = it.take(DocumentQuestionRules.MAX_QUESTION); clear() }, label = { Text(t("Your question", "आपका सवाल")) }, minLines = 2, enabled = job == null, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag("document-ask-question")) }
             if (reports.isNotEmpty()) item { FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.testTag("document-ask-suggestions")) {
@@ -160,12 +160,12 @@ import kotlinx.coroutines.withContext
                     Spacer(Modifier.width(8.dp)); DocumentAskTypeBadge(folders[report.id]?.folder)
                 }
             }
-            if (service != null) item { val count = chosen.size; val sendWhat = if (searchAll) t("the matching lines from my documents", "मेरे कागज़ों की मिलती पंक्तियाँ") else t("the text of these $count documents", "इन $count कागज़ों की लिखाई"); val sendTo = service.provider; CheckLine(consent, { consent = it }, t("Send my question and $sendWhat to $sendTo, this time only. Photos and files stay on this phone.", "मेरा सवाल और $sendWhat सिर्फ़ इस बार $sendTo को भेजें। फ़ोटो और फ़ाइलें इसी फ़ोन पर रहती हैं।")) }
+            if (service != null) item { val count = chosen.size; val sendWhat = if (searchAll) t("the matching lines from my documents", "मेरे कागज़ों की मिलती पंक्तियाँ") else t("the text of these $count documents", "इन $count कागज़ों की लिखाई"); val sendTo = service.provider; CheckLine(consent, { consent = it }, t("Send my question and $sendWhat to $sendTo", "मेरा सवाल और $sendWhat $sendTo को भेजें")) }
             item { val ready = (if (searchAll) scoped.isNotEmpty() else chosen.isNotEmpty()) && question.isNotBlank() && job == null
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (service != null) Button(onClick = { ask(true) }, enabled = consent && ready, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.heightIn(min = 48.dp).testTag("document-ask-send")) { Icon(Icons.AutoMirrored.Filled.Send, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Ask", "पूछें"), fontWeight = FontWeight.SemiBold) }
-                if (service == null) Button(onClick = { ask(false) }, enabled = ready, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.heightIn(min = 48.dp).testTag("document-ask-local")) { Icon(Icons.Default.Search, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Find in my documents", "मेरे कागज़ों में ढूँढें")) }
-                else OutlinedButton(onClick = { ask(false) }, enabled = ready, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("document-ask-local")) { Text(t("Find on this phone only", "सिर्फ़ इस फ़ोन पर ढूँढें")) }
+                if (service == null) Button(onClick = { ask(false) }, enabled = ready, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.heightIn(min = 48.dp).testTag("document-ask-local")) { Icon(Icons.Default.Search, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Search", "खोजें")) }
+                else OutlinedButton(onClick = { ask(false) }, enabled = ready, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("document-ask-local")) { Text(t("Search", "खोजें")) }
                 if (job != null) TextButton(onClick = { job?.cancel() }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Stop", "रोकें")) }
             } }
             if (progress.isNotBlank()) item { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { LinearProgressIndicator(Modifier.fillMaxWidth(), color = DoctorAccent, trackColor = DoctorHairline); Text(progress, fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.announce()) } }
@@ -177,7 +177,7 @@ import kotlinx.coroutines.withContext
         // The question just asked, as the person's own message, so the answer reads like a reply.
         if (askedText.isNotBlank() && (answer != null || local != null)) item { DocumentAskBubble(mine = true) { Text(askedText, color = DoctorCardInk, fontSize = 16.sp) } }
         answer?.let { result ->
-            if (!result.found) item { DocumentAskBubble(mine = false) { Text(t("Not found in the chosen documents", "चुने गए कागज़ों में नहीं मिला"), fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.testTag("document-ask-not-found")); Text(t("Try other documents or other words.", "दूसरे कागज़ या दूसरे शब्द आज़माएँ।"), fontSize = 14.sp, color = DoctorCardSub) } }
+            if (!result.found) item { DocumentAskBubble(mine = false) { Text(t("Not found in the chosen documents", "चुने गए कागज़ों में नहीं मिला"), fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.testTag("document-ask-not-found")) } }
             else {
                 item { DocumentAskBubble(mine = false) {
                     Text(t("Answer", "जवाब"), style = MaterialTheme.typography.labelLarge, color = DoctorCardSub)
@@ -199,12 +199,11 @@ import kotlinx.coroutines.withContext
         local?.let { found ->
             val online = answer?.found == true
             if (!found.found) { if (answer == null) item { DocumentAskBubble(mine = false) {
-                Text(t("No matching lines on this phone", "इस फ़ोन पर मिलती पंक्तियाँ नहीं मिलीं"), fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.testTag("document-ask-local-none"))
-                Text(t("Try other words, for example the test name as it is printed on the report.", "दूसरे शब्द आज़माएँ, जैसे रिपोर्ट पर छपा जाँच का नाम।"), fontSize = 14.sp, color = DoctorCardSub)
+                Text(t("Nothing found", "कुछ नहीं मिला"), fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.testTag("document-ask-local-none"))
             } } }
             else {
                 if (answer == null && found.values.isNotEmpty()) item { DocumentAskBubble(mine = false) {
-                    Text(t("Value found · newest document first", "मिला हुआ मान · सबसे नया कागज़ पहले"), style = MaterialTheme.typography.labelLarge, color = DoctorCardSub)
+                    Text(t("Value found", "मिला हुआ मान"), style = MaterialTheme.typography.labelLarge, color = DoctorCardSub)
                     found.values.forEach { value -> val hit = value.match
                         Spacer(Modifier.height(6.dp))
                         Text(marked(hit.text, hit.marks), fontWeight = FontWeight.Medium, color = DoctorCardInk); if (hit.next.isNotBlank()) Text(hit.next, fontWeight = FontWeight.Medium, color = DoctorCardInk)
@@ -215,7 +214,7 @@ import kotlinx.coroutines.withContext
                     }
                 } }
                 item { Row(verticalAlignment = Alignment.CenterVertically, modifier = if (answer == null) Modifier.testTag("document-ask-local-answer") else Modifier) {
-                    SectionTitle(if (online) t("Lines this is based on", "जिन पंक्तियों पर यह आधारित है") else t("Matching lines", "मिलती पंक्तियाँ"))
+                    SectionTitle(if (online) t("Sources", "स्रोत") else t("Matching lines", "मिलती पंक्तियाँ"))
                 } }
                 itemsIndexed(found.groups, key = { _, it -> "local:${it.reportId}" }) { index, group ->
                     DocumentAskSource(index + 1, group.reportName, folders[group.reportId]?.folder, dayText(group.date), group.reviewed,
@@ -228,13 +227,6 @@ import kotlinx.coroutines.withContext
                 }
             }
         }
-        item { InfoDisclosure(t("How answers work", "जवाब कैसे बनते हैं")) {
-            Text(t("Answers come only from your documents. Not medical advice. Ask your care team.", "जवाब सिर्फ़ आपके कागज़ों से आते हैं। यह डॉक्टरी सलाह नहीं है। अपनी देखभाल टीम से पूछें।"), fontSize = 14.sp, color = DoctorCardSub)
-            Text(t("The phone sorts your documents into bills, lab reports, prescriptions and discharge summaries from their words. You can move a document to another folder on the Documents screen.", "फ़ोन आपके कागज़ों को उनके शब्दों से बिल, लैब रिपोर्ट, पर्चे और डिस्चार्ज सारांश में छाँटता है। आप कागज़ात वाली स्क्रीन पर किसी कागज़ को दूसरे फ़ोल्डर में डाल सकते हैं।"), fontSize = 14.sp, color = DoctorCardSub)
-            if (service == null) Text(t("You can still find the lines in your documents that match your question. This works on this phone, without internet. Nothing is sent.", "आप फिर भी अपने कागज़ों में सवाल से मिलती पंक्तियाँ ढूँढ सकते हैं। यह इसी फ़ोन पर, बिना इंटरनेट के चलता है। कुछ नहीं भेजा जाता।"), fontSize = 14.sp, color = DoctorCardSub)
-            else Text(t("Nothing is sent until you tap Ask, and you are asked again each time. Only your question, the matching lines and each document's type are sent, never file names.", "‘पूछें’ दबाने तक कुछ नहीं भेजा जाता, और हर बार फिर पूछा जाता है। सिर्फ़ आपका सवाल, मिलती पंक्तियाँ और हर कागज़ का प्रकार भेजा जाता है, फ़ाइल के नाम कभी नहीं।"), fontSize = 14.sp, color = DoctorCardSub)
-            Text(t("Matching lines are found on this phone, not explained. Best match first.", "मिलती पंक्तियाँ इसी फ़ोन पर ढूँढी जाती हैं, समझाई नहीं जातीं। सबसे अच्छी पहले।"), fontSize = 14.sp, color = DoctorCardSub)
-        } }
     }
 }
 
@@ -251,9 +243,9 @@ import kotlinx.coroutines.withContext
         Spacer(Modifier.height(8.dp))
         Column(verticalArrangement = Arrangement.spacedBy(4.dp), content = lines)
         Row(verticalAlignment = Alignment.CenterVertically) {
-            if (!reviewed) Text(t("Not checked yet · compare with the paper", "अभी जाँचा नहीं · असली कागज़ से मिलाएँ"), Modifier.weight(1f), fontSize = 14.sp, color = RustText)
+            if (!reviewed) Text(t("Not checked yet", "अभी जाँचा नहीं"), Modifier.weight(1f), fontSize = 14.sp, color = RustText)
             else Spacer(Modifier.weight(1f))
-            onOpen?.let { TextButton(onClick = it, colors = ButtonDefaults.textButtonColors(contentColor = RustText), modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Open this document", "यह कागज़ खोलें"), fontWeight = FontWeight.SemiBold) } }
+            onOpen?.let { TextButton(onClick = it, colors = ButtonDefaults.textButtonColors(contentColor = RustText), modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Open", "खोलें"), fontWeight = FontWeight.SemiBold) } }
         }
     } }
 }

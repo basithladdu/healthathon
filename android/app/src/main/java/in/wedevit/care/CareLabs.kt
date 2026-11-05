@@ -55,14 +55,13 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
     LazyColumn(Modifier.fillMaxSize().testTag("lab-history"), contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Heading(t("Lab history", "जाँच रिपोर्टें")); Spacer(Modifier.weight(1f)); if (canEdit) FilledTonalIconButton(onClick = { adding = true }, modifier = Modifier.size(48.dp), colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = DoctorAccent, contentColor = Paper)) { Icon(Icons.Default.Add, t("Add a lab result", "जाँच का नतीजा जोड़ें")) } } }
         item { OutlinedTextField(query, { query = it }, placeholder = { Text(t("Find a test", "जाँच खोजें")) }, leadingIcon = { Icon(Icons.Default.Search, null) }, trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { query = "" }) { Icon(Icons.Default.Close, t("Clear search", "खोज मिटाएँ")) } }, singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) }
-        if (groups.isEmpty()) item { SurfaceCard { Surface(shape = androidx.compose.foundation.shape.CircleShape, color = Mint) { Icon(Icons.Default.Science, null, Modifier.padding(12.dp).size(28.dp), tint = DoctorAccent) }; Spacer(Modifier.height(12.dp)); Text(if (query.isBlank()) t("Keep results together", "सारे नतीजे एक जगह रखें") else t("No matching results", "कोई नतीजा नहीं मिला"), fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk); if (query.isBlank()) { Text(t("Copy the value, unit and date from the report.", "रिपोर्ट से मान, इकाई और तारीख़ लिखें।"), fontSize = 16.sp, color = DoctorCardSub); if (canEdit) TextButton(onClick = { adding = true }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Add a result", "नतीजा जोड़ें")) } } else TextButton(onClick = { query = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Clear search", "खोज मिटाएँ")) } } }
+        if (groups.isEmpty()) item { SurfaceCard { Surface(shape = androidx.compose.foundation.shape.CircleShape, color = Mint) { Icon(Icons.Default.Science, null, Modifier.padding(12.dp).size(28.dp), tint = DoctorAccent) }; Spacer(Modifier.height(12.dp)); Text(if (query.isBlank()) t("No results yet", "अभी कोई नतीजा नहीं") else t("No matching results", "कोई नतीजा नहीं मिला"), fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk); if (query.isBlank()) { if (canEdit) TextButton(onClick = { adding = true }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Add a result", "नतीजा जोड़ें")) } } else TextButton(onClick = { query = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Clear search", "खोज मिटाएँ")) } } }
         item { SurfaceCard {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Surface(shape = androidx.compose.foundation.shape.CircleShape, color = SaharaApricot) { Icon(Icons.Default.Event, null, Modifier.padding(8.dp).size(18.dp), tint = DoctorAccent) }
                 Spacer(Modifier.width(12.dp))
                 Text(t("Treatment days", "इलाज के दिन"), Modifier.weight(1f).a11yHeading(), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, fontSize = 18.sp, color = DoctorCardInk)
             }
-            Text(if (treatmentDays.isEmpty()) t("Add chemo or radiotherapy days to see them marked on the charts.", "कीमो या रेडियोथेरेपी के दिन जोड़ें, ताकि वे चार्ट पर दिखें।") else t("Marked on the charts below with dashed lines.", "नीचे के चार्ट पर डैश वाली लाइन से दिखाए गए हैं।"), Modifier.padding(top = 4.dp), fontSize = 14.sp, color = DoctorCardSub)
             treatmentDays.take(6).forEach { day -> Row(Modifier.fillMaxWidth().then(if (canEdit) Modifier.clickable { editingDay = day } else Modifier).heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text("${date(day.item.due)} · ${TreatmentDayRules.label(day.category)}", Modifier.weight(1f), color = if (day.category == "Chemotherapy") DoctorStatusWarn else DoctorCardInk)
                 if (canEdit) Icon(Icons.Default.Edit, t("Edit ${day.category} day ${date(day.item.due)}", "${date(day.item.due)} का दिन बदलें"), Modifier.size(18.dp), tint = DoctorCardSub)
@@ -71,7 +70,6 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
             if (canEdit) TextButton(onClick = { addingDay = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("add-treatment-day")) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Add a treatment day", "इलाज का दिन जोड़ें")) }
         } }
         items(groups, key = { values -> "${values.first().first.title.lowercase()}:${values.first().second.unit}" }) { values -> LabHistoryCard(vm, values, treatmentDays, onEdit = { editing = it }) }
-        if (groups.isNotEmpty()) item { Text(t("Results and normal ranges are copied from reports. Ask your doctor what they mean for you.", "मान और सामान्य सीमा रिपोर्ट से लिखे गए हैं। इनका आपकी देखभाल के लिए क्या मतलब है, डॉक्टर से पूछें।"), fontSize = 14.sp, color = DoctorCardSub) }
     }
     if (adding) CareLabEditor(vm) { adding = false }
     editing?.let { item -> CareLabEditor(vm, item) { editing = null } }
@@ -221,7 +219,7 @@ private fun labRange(data: CareEntry): Pair<Double?, Double?> {
             }
             CareDateButton(due, t("Report date", "रिपोर्ट की तारीख़"), { due = it }, latest = LocalDate.now())
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text(t("Printed reference range (optional)", "छपी सामान्य सीमा (चाहें तो)"), Modifier.padding(top = 8.dp), style = MaterialTheme.typography.labelLarge, color = DoctorCardSub)
+                Text(t("Printed range", "छपी सीमा"), Modifier.padding(top = 8.dp), style = MaterialTheme.typography.labelLarge, color = DoctorCardSub)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(low, { low = it }, label = { Text(t("Lower", "निचली")) }, modifier = Modifier.weight(1f), singleLine = true, shape = RoundedCornerShape(14.dp), keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal))
                     OutlinedTextField(high, { high = it }, label = { Text(t("Upper", "ऊपरी")) }, modifier = Modifier.weight(1f), singleLine = true, shape = RoundedCornerShape(14.dp), keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal))
@@ -234,7 +232,6 @@ private fun labRange(data: CareEntry): Pair<Double?, Double?> {
                         FilterChip(selected = reportId == report.id, onClick = { reportId = report.id; reportName = report.name }, label = { Text(report.name, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp))
                     }
                 }
-                if (reports.none { it.personId == captured }) Text(t("Add report files in Documents to link them here.", "यहाँ जोड़ने के लिए कागज़ात में रिपोर्ट की फ़ाइलें डालें।"), fontSize = 14.sp, color = DoctorCardSub)
                 OutlinedTextField(detail, { detail = it }, label = { Text(t("Report notes (optional)", "रिपोर्ट पर नोट (चाहें तो)")) }, modifier = Modifier.fillMaxWidth(), maxLines = 3, shape = RoundedCornerShape(14.dp))
             }
             (error.ifBlank { saveError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }

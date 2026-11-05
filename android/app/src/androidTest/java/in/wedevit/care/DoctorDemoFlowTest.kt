@@ -84,8 +84,6 @@ class DoctorDemoFlowTest {
         val exited = mutableStateOf(false)
         try {
             ui.setContent { CareTheme { if (!exited.value) DoctorDemo(onExit = { exited.value = true }, store = store) } }
-            ui.onNodeWithTag("demo-preview-disclosure").performScrollTo()
-                .assertTextEquals("No account is created and nothing is sent.")
             ui.onNodeWithText("Demo only").assertDoesNotExist()
             ui.onNodeWithContentDescription("Show password").performScrollTo().performClick()
             ui.onNodeWithContentDescription("Hide password").assertIsDisplayed().performClick()

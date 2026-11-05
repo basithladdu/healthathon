@@ -232,7 +232,7 @@ private fun visitColours(s: CareVisitSpeciality?): Pair<Color, Color> = when (s)
             Text(t("Prescription", "पर्चा"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
             if (prescription.isEmpty) Row(Modifier.fillMaxWidth().testTag("care-visit-no-prescription"), verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.Description, null, Modifier.size(20.dp), tint = DoctorCardSub); Spacer(Modifier.width(12.dp))
-                Text(t("No prescription saved for this day.", "इस दिन का कोई पर्चा सहेजा नहीं गया।"), fontSize = 14.sp, color = DoctorCardSub)
+                Text(t("No prescription", "कोई पर्चा नहीं"), fontSize = 14.sp, color = DoctorCardSub)
             }
             else Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("care-visit-prescription")) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -248,7 +248,6 @@ private fun visitColours(s: CareVisitSpeciality?): Pair<Color, Color> = when (s)
                             CareEntryCodec.readable(m.detail).takeIf(String::isNotBlank)?.let { Text(it, fontSize = 14.sp, color = DoctorCardSub, maxLines = 2, overflow = TextOverflow.Ellipsis) }
                         }
                     } }
-                    Text(t("Saved in Sahara on this day.", "इस दिन Sahara में सहेजा गया।"), fontSize = 14.sp, color = DoctorCardSub)
                 }
             }
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {

@@ -110,10 +110,7 @@ internal object GoalsScreening {
     Surface(shape = RoundedCornerShape(20.dp), color = DoctorCardReport, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("goals-screening")) {
         Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button, onClickLabel = if (open) t("Collapse", "बंद करें") else t("Expand", "खोलें")) { open = !open }, verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
-                    Text(t("Optional · Does this patient need a goals-of-care discussion?", "वैकल्पिक · क्या इस मरीज़ से देखभाल के लक्ष्यों पर बात करनी चाहिए?"), fontSize = 16.sp, lineHeight = 22.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
-                    Text(t(tool.titleEn, tool.titleHi), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
-                }
+                Text(t("Screening", "जाँच"), Modifier.weight(1f), fontSize = 16.sp, lineHeight = 22.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
                 Icon(if (open) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, null, tint = RustText, modifier = Modifier.size(48.dp).padding(12.dp))
             }
             if (open) {
@@ -128,14 +125,13 @@ internal object GoalsScreening {
                             Text(t(option.en, option.hi), fontSize = 15.sp, lineHeight = 21.sp, color = if (option.selectable) DoctorCardInk else DoctorCardFaint, modifier = Modifier.weight(1f))
                         }
                     }
-                    if (q.noteEn.isNotBlank()) Text(t(q.noteEn, q.noteHi), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardFaint)
                 }
                 if (suggestion != null) Surface(shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, if (suggestion.consider) DoctorStatusWarn.copy(alpha = .35f) else DoctorHairline), color = if (suggestion.consider) DoctorStatusWarnBg else DoctorStatusRestBg, modifier = Modifier.fillMaxWidth().testTag("goals-screening-suggestion")) {
                     Text(t(suggestion.en, suggestion.hi), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk, modifier = Modifier.padding(12.dp).announce())
                 }
-                Text(t("A suggestion, not a decision. Your clinical judgement decides. Answers are not saved.", "यह सिर्फ़ सुझाव है, फ़ैसला नहीं। फ़ैसला आपकी डॉक्टरी समझ से होगा। जवाब सहेजे नहीं जाते।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
                 InfoDisclosure(t("Sources", "स्रोत")) {
-                    tool.sources.forEach { Text(t("Source: ", "स्रोत: ") + it, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub) }
+                    tool.sources.forEach { Text(it, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub) }
+                    tool.questions.filter { it.noteEn.isNotBlank() }.forEach { q -> Text(t(q.noteEn, q.noteHi), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub) }
                 }
                 Spacer(Modifier.height(4.dp))
             }

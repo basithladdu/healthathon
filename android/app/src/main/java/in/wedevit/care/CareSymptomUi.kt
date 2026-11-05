@@ -89,7 +89,7 @@ import java.time.format.DateTimeFormatter
         if (person != null && hasPainHistory) item {
             // Opens past pain notes on the body model (read only); new pain is added with "How are you feeling?".
             OutlinedButton(onClick = { showingPainHistory = true }, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, DoctorAccent.copy(alpha = 0.5f)), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("symptom-pain-history")) {
-                Icon(Icons.Default.AccessibilityNew, null, Modifier.size(18.dp), tint = DoctorAccent); Spacer(Modifier.width(8.dp)); Text(t("See past pain on the body", "पहले का दर्द शरीर पर देखें"), color = RustText)
+                Icon(Icons.Default.AccessibilityNew, null, Modifier.size(18.dp), tint = DoctorAccent); Spacer(Modifier.width(8.dp)); Text(t("Pain map", "दर्द का नक्शा"), color = RustText)
             }
         }
         // Friendly empty state: a calm picture and one line; the "How are you feeling?" button above is its action.
@@ -221,8 +221,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
     if (followingUp) SymptomNoteEditor(vm, hindi, followup = item, onClose = { followingUp = false })
     if (showingTrend && note != null) SymptomHistorySheet(entries, item, note, hindi, onClose = { showingTrend = false })
     if (painGone && note != null) AlertDialog(onDismissRequest = { painGone = false }, title = { Text(t("Has the pain gone?", "क्या दर्द चला गया?")) },
-        text = { val where = note.painBodySites.joinToString { PainBodyMapRules.label(it, hindi) }.ifBlank { SymptomDiaryRules.symptomLabel(note.symptom, hindi) }
-            Text(t("A new note with 0 (no pain) is saved for $where. Earlier notes stay as they were.", "$where के लिए 0 (कोई दर्द नहीं) वाला नया नोट सहेजा जाएगा। पहले के नोट जैसे थे वैसे रहेंगे।")) },
+        text = { Text(note.painBodySites.joinToString { PainBodyMapRules.label(it, hindi) }.ifBlank { SymptomDiaryRules.symptomLabel(note.symptom, hindi) }) },
         confirmButton = { TextButton(onClick = { painGone = false; vm.saveSymptomNote(item.personId, newId(), SymptomDiaryRules.painGone(note), null) }, enabled = !busy, modifier = Modifier.testTag("symptom-pain-gone-confirm-${item.id}")) { Text(t("Save 0", "0 सहेजें")) } },
         dismissButton = { TextButton(onClick = { painGone = false }) { Text(t("Keep", "रखें")) } })
     if (showingPainHistory && note != null) PainBodyHistorySheet(entries, item.personId, hindi, initialId = item.id, onClose = { showingPainHistory = false })
@@ -347,12 +346,11 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
                     if (!fullDetails) SurfaceCard(Mint) {
                         Text(SymptomDiaryRules.symptomLabel(symptom, hindi), fontWeight = FontWeight.SemiBold)
                         Text("${SymptomDiaryRules.label(SymptomDiaryRules.recalls, recall, hindi)} · ${SymptomDiaryRules.label(SymptomDiaryRules.respondents, respondent, hindi)} · ${value.author}")
-                        Text(t("Check the same context; open Full details if anything changed.", "यही जानकारी सही है तो नया अंक लिखें। कुछ बदला है तो पूरी जानकारी खोलें।"), fontSize = 14.sp, color = DoctorCardSub)
                         if (location.isNotBlank() || value.painBodySites.isNotEmpty()) Text(listOf(location, value.painBodySites.joinToString { PainBodyMapRules.label(it, hindi) }).filter(String::isNotBlank).joinToString(" · "))
                         if (startedOn.isNotBlank()) Text("${t("Started", "शुरू हुआ")}: $startedOn")
                     }
                 }
-                if (!quick && cur == "what") SymptomSection(null, t("What would you like to note?", "किस बारे में नोट लिखना है?"), t("Tap one to continue.", "एक चुनें, अगला पन्ना खुलेगा।")) {
+                if (!quick && cur == "what") SymptomSection(null, t("What would you like to note?", "किस बारे में नोट लिखना है?")) {
                     SymptomDiaryRules.symptoms.entries.chunked(if (largeText) 1 else 2).forEach { pair ->
                         Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             pair.forEach { (en, _) -> SymptomTile(if (en == "Other") otherSymptom else !otherSymptom && symptom == en, SymptomDiaryRules.symptomLabel(en, hindi), symptomIcon(en), "symptom-choice-$en", Modifier.weight(1f).fillMaxHeight()) {
@@ -411,7 +409,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
                     }
                     SymptomPill(rating == -1, t("Not rated / unable to rate", "अंक नहीं बताया / बता नहीं सकते"), "symptom-unrated", Modifier.fillMaxWidth()) { rating = -1; change = "" }
                 }
-                if (quick || cur == "how") SymptomSection(null, t("When was this?", "यह कब हुआ?"), t("Change the date or time if it was earlier.", "पहले का हो तो तारीख या समय बदलें।")) {
+                if (quick || cur == "how") SymptomSection(null, t("When was this?", "यह कब हुआ?")) {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedButton(onClick = { val d = LocalDate.parse(observedDate); DatePickerDialog(context, { _, y, m, day -> observedDate = LocalDate.of(y, m + 1, day).toString() }, d.year, d.monthValue - 1, d.dayOfMonth).apply { datePicker.maxDate = System.currentTimeMillis() }.show() }, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Icon(Icons.Default.CalendarMonth, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(observedDate, color = DoctorCardInk) }
                         OutlinedButton(onClick = { val time = LocalTime.parse(observedTime); TimePickerDialog(context, { _, h, m -> observedTime = "%02d:%02d".format(h, m) }, time.hour, time.minute, true).show() }, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Icon(Icons.Default.Schedule, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(observedTime, color = DoctorCardInk) }
@@ -443,8 +441,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
                     if (localError.isBlank()) onSave(id, saved)
                 }
                 (localError.takeIf { it.isNotBlank() } ?: actionError)?.let { Text(if (hindi && it == SymptomDiaryRules.SAVE_CONFLICT) "यह नोट बदल गया है या हटा दिया गया है। आपके जवाब यहीं हैं। सहेजने से पहले यह फ़ॉर्म बंद करके मौजूदा नोट फिर खोलें।" else if (hindi) "नोट सहेजा नहीं गया। जवाब यहीं हैं। तारीख, नाम और चुने हुए जवाब जाँचें।" else careTr(false, it, it), color = MaterialTheme.colorScheme.error, fontSize = 15.sp, fontWeight = FontWeight.SemiBold) }
-                if (!quick && !stepValid && cur == "how") Text(if (ratingMissing) t("Choose a rating or Not rated.", "अंक चुनें या अंक नहीं बताया चुनें।") else t("Answer the questions above to continue.", "आगे बढ़ने के लिए ऊपर के सवाल भरें।"), color = DoctorCardSub, fontSize = 14.sp)
-                if (sharedOnline && (quick || pos == steps.lastIndex || (cur == "how" && stepValid))) Text(t(CarePrivacy.SYMPTOM_NOTICE_EN, CarePrivacy.SYMPTOM_NOTICE_HI), color = DoctorCardSub, fontSize = 13.sp, modifier = Modifier.testTag("symptom-privacy-notice"))
+                if (!quick && !stepValid && cur == "how" && ratingMissing) Text(t("Choose a rating or Not rated.", "अंक चुनें या अंक नहीं बताया चुनें।"), color = DoctorCardSub, fontSize = 14.sp)
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
                     OutlinedButton(onClick = goBack, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, DoctorHairline), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp), modifier = Modifier.weight(1f).heightIn(min = 56.dp).testTag("symptom-step-back")) { Text(if (quick || pos <= 0) t("Cancel", "रद्द करें") else t("Back", "पीछे"), color = DoctorCardSub, fontSize = 16.sp) }
                     if (quick || pos == steps.lastIndex) Button(onClick = saveNow, enabled = !busy && canEdit && personId == capturedPerson && (quick || stepValid), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = Color.White), modifier = Modifier.weight(if (largeText) 1f else 2f).heightIn(min = 56.dp).testTag("symptom-save")) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Save note", "नोट सहेजें"), fontSize = 17.sp, fontWeight = FontWeight.SemiBold) }

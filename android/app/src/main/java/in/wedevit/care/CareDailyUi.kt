@@ -69,14 +69,14 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
     val items by vm.items.collectAsStateWithLifecycle(); val person by vm.selected.collectAsStateWithLifecycle()
     val dayStart = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
     val today = CheckInMood.today(items, person, dayStart)
-    val subtitle = today?.let { val label = checkInMoodLabel(it.title, hindi); t("Saved: $label. Tap to change.", "सहेजा: $label। बदलने के लिए टैप करें।") } ?: t("Tap to check in", "दिन का हाल लिखने के लिए टैप करें")
+    val subtitle = today?.let { checkInMoodLabel(it.title, hindi) }
     ActionCard(Paper, Modifier.fillMaxWidth().testTag("today-checkin"), onOpen) {
         Row(Modifier.fillMaxWidth().heightIn(min = 68.dp).padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
             Surface(shape = androidx.compose.foundation.shape.CircleShape, color = if (today != null) Mint else Peach) { Icon(Icons.Default.WbSunny, null, Modifier.padding(9.dp).size(24.dp), tint = DoctorAccent) }
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
                 Text(t("How was today?", "आज का दिन कैसा रहा?"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-                Text(subtitle, fontSize = 14.sp, color = DoctorCardSub)
+                if (subtitle != null) Text(subtitle, fontSize = 14.sp, color = DoctorCardSub)
             }
             Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(20.dp), tint = Rust)
         }
@@ -92,7 +92,6 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
     Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("today-checkin")) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(t("How was today?", "आज का दिन कैसा रहा?"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
-            Text(if (today != null) t("Saved for today. Tap another to change it.", "आज के लिए सहेजा। बदलना हो तो दूसरा चुनें।") else t("One tap saves today's check-in.", "एक बार छूने से आज का हाल सहेज जाता है।"), fontSize = 14.sp, color = DoctorCardSub)
             Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 CareDailyFlow.moods.forEach { mood ->
                     FilterChip(selected = today?.title == mood, enabled = !busy, onClick = {
@@ -111,8 +110,6 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
                 TextButton(onClick = onAddWords, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("today-checkin-words")) { Text(if (today?.detail.isNullOrBlank()) t("Add a few words", "कुछ शब्द लिखें") else t("Change the words", "शब्द बदलें"), color = RustText) }
                 TextButton(onClick = onSymptom, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("today-symptom-note")) { Text(t("Note a symptom", "तबीयत का नोट लिखें"), color = RustText) }
             }
-            Text(if (vm.cloud != null) t("Signed in: check-ins and symptom notes reach the family and doctor you invited.", "साइन इन है: आज का हाल और तबीयत के नोट आपके जोड़े परिवार और डॉक्टर तक पहुँचते हैं।")
-                else t("Saved on this phone only. Sign in to share it with your doctor.", "सिर्फ़ इस फ़ोन पर सहेजा। डॉक्टर के साथ साझा करने के लिए साइन इन करें।"), fontSize = 14.sp, lineHeight = 19.sp, color = DoctorCardFaint)
         }
     }
 }
@@ -179,15 +176,12 @@ internal object CareModules {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Surface(shape = androidx.compose.foundation.shape.CircleShape, color = Paper) { Icon(Icons.Default.DocumentScanner, null, tint = DoctorAccent, modifier = Modifier.padding(10.dp).size(24.dp)) }
                 Spacer(Modifier.width(12.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(t("Scan a prescription", "पर्चा स्कैन करें"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
-                    Text(t("Read the medicines from a photo, then check each one.", "फ़ोटो से दवाइयाँ पढ़ें, फिर हर एक जाँचें।"), fontSize = 14.sp, color = DoctorCardSub)
-                }
+                Text(t("Scan a prescription", "पर्चा स्कैन करें"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.weight(1f))
             }
             // Wraps instead of squeezing when the screen is narrow or the text is large.
             FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = onScan, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.heightIn(min = 48.dp).testTag("care-module-medicines-scan")) {
-                    Icon(Icons.Default.DocumentScanner, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Scan & organize", "स्कैन करके जोड़ें"))
+                    Icon(Icons.Default.DocumentScanner, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Scan", "स्कैन करें"))
                 }
                 OutlinedButton(onClick = onManual, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, DoctorAccent.copy(alpha = 0.5f)), modifier = Modifier.heightIn(min = 48.dp)) {
                     Icon(Icons.Default.Add, null, Modifier.size(18.dp), tint = DoctorAccent); Spacer(Modifier.width(6.dp)); Text(t("Add manually", "ख़ुद लिखें"), color = DoctorAccent)
@@ -236,11 +230,11 @@ private const val BENTO_SMALL = 2
         @Composable fun title() = Text(tile.title, fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 1, modifier = Modifier.a11yHeading())
         when (layout) {
             BENTO_WIDE -> Row(Modifier.fillMaxSize().padding(start = 18.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) { title(); Text(tile.subtitle, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis); Spacer(Modifier.height(10.dp)); number() }
+                Column(Modifier.weight(1f)) { title(); Spacer(Modifier.height(10.dp)); number() }
                 art(100.dp)
             }
             BENTO_TALL -> Box(Modifier.fillMaxSize().padding(14.dp)) {
-                Column(Modifier.align(Alignment.TopStart)) { title(); Text(tile.subtitle, fontSize = 13.sp, lineHeight = 17.sp, color = DoctorCardSub, maxLines = 2, overflow = TextOverflow.Ellipsis) }
+                Column(Modifier.align(Alignment.TopStart)) { title() }
                 Box(Modifier.align(Alignment.BottomStart)) { number() }
                 art(if (tile.name == "Medicines") 112.dp else 72.dp, Modifier.align(Alignment.BottomEnd).offset(x = 6.dp, y = 6.dp))
             }

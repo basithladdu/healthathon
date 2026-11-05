@@ -67,7 +67,7 @@ internal object CareCommunitySample {
         item { Surface(shape = RoundedCornerShape(50), color = SaharaSoftGold, contentColor = DoctorCardInk, modifier = Modifier.testTag("community-sample-label")) {
             Row(Modifier.padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Outlined.Info, null, Modifier.size(16.dp), tint = RustText); Spacer(Modifier.width(6.dp))
-                Text(t("Sample: not real people", "नमूना: असली लोग नहीं"), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
+                Text(t("Sample", "नमूना"), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
             }
         } }
         item { Column { Spacer(Modifier.height(8.dp)); SectionTitle(t("Support groups", "सहायता समूह")) } }
@@ -102,14 +102,7 @@ internal object CareCommunitySample {
                 }
                 Spacer(Modifier.height(8.dp))
                 Text(t(post.text, post.textHindi), fontSize = 16.sp, lineHeight = 23.sp, color = DoctorCardInk)
-                Spacer(Modifier.height(8.dp))
-                Text(t("Sample post", "नमूना पोस्ट"), style = MaterialTheme.typography.labelMedium, color = DoctorCardSub)
             }
         }
-        item { InfoDisclosure(t("About this page", "इस पेज के बारे में")) {
-            Text(t("This is an example of how families could find each other. The groups and posts are written by the Sahara team. They are not real people.", "यह एक उदाहरण है कि परिवार एक-दूसरे को कैसे ढूँढ सकते हैं। समूह और पोस्ट सहारा टीम ने लिखे हैं। ये असली लोग नहीं हैं।"), style = MaterialTheme.typography.bodySmall)
-            Text(t("Real groups will be added only after your doctors check them.", "असली समूह आपके डॉक्टरों की जाँच के बाद ही जोड़े जाएँगे।"), style = MaterialTheme.typography.bodySmall)
-            Text(t("If you need help now, talk to your care team.", "अभी मदद चाहिए तो अपनी देखभाल टीम से बात करें।"), style = MaterialTheme.typography.bodySmall)
-        } }
     }
 }

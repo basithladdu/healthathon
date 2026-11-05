@@ -91,9 +91,9 @@ internal class GocSpeechEngine(context: Context) {
             OfflineSpeechRules.requireRecording(file, app.filesDir, clip.consent, personId)
             require(models.ready()) { careTr(false, "Download the speech pack first.", "पहले स्पीच पैक डाउनलोड करें।") }
             val memory = ActivityManager.MemoryInfo().also { (app.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(it) }
-            require(!memory.lowMemory && memory.availMem >= OfflineWhisperModel.minimumAvailableMemory) { careTr(false, "Too little free memory. Close other apps and retry. Your recording is safe.", "मेमोरी कम है। दूसरे ऐप बंद करके फिर कोशिश करें। आपकी रिकॉर्डिंग सुरक्षित है।") }
+            require(!memory.lowMemory && memory.availMem >= OfflineWhisperModel.minimumAvailableMemory) { careTr(false, "Low memory. Close other apps and retry.", "मेमोरी कम है। दूसरे ऐप बंद करके फिर कोशिश करें।") }
             // 16 kHz floats are 64 000 bytes a second; the recording is 8 000 bytes a second.
-            require(app.cacheDir.usableSpace > file.length() * 8 + 64L * 1024 * 1024) { careTr(false, "Too little free storage to read this recording. Free some space and retry.", "इस रिकॉर्डिंग को पढ़ने के लिए जगह कम है। जगह ख़ाली करके फिर कोशिश करें।") }
+            require(app.cacheDir.usableSpace > file.length() * 8 + 64L * 1024 * 1024) { careTr(false, "Low storage. Free some space and retry.", "जगह कम है। जगह ख़ाली करके फिर कोशिश करें।") }
             currentCoroutineContext().ensureActive()
             val hash = OfflineSpeechRules.sha256(file)
             val saved = runCatching { progressFile(clip).takeIf { it.isFile }?.readText() }.getOrNull()?.let { GocSpeechProgress.decode(it) }?.takeIf { it.audioSha256 == hash && it.language == language.code }
@@ -115,7 +115,7 @@ internal class GocSpeechEngine(context: Context) {
                     modelType = "whisper", numThreads = 2, provider = "cpu", debug = false,
                 )
                 val recognizer = try { OfflineRecognizer(config = OfflineRecognizerConfig(modelConfig = config)) }
-                catch (error: UnsatisfiedLinkError) { throw IllegalStateException(careTr(false, "Speech reading is not available on this phone. Type or paste the words instead.", "इस फ़ोन पर बोली पढ़ना उपलब्ध नहीं है। शब्द लिखें या चिपकाएँ।"), error) }
+                catch (error: UnsatisfiedLinkError) { throw IllegalStateException(careTr(false, "Not available on this phone. Type instead.", "इस फ़ोन पर उपलब्ध नहीं। टाइप करें।"), error) }
                 try {
                     var consumed = 0L; var chars = segments.sumOf { it.text.length }
                     val segmenter = OfflineSpeechSegmenter(GOC_MIN_WINDOW_SAMPLES, GOC_MAX_WINDOW_SAMPLES)
@@ -156,7 +156,7 @@ internal class GocSpeechEngine(context: Context) {
                 require(OfflineSpeechRules.sha256(file) == hash) { careTr(false, "The recording changed while being read. Open it again.", "पढ़ते समय रिकॉर्डिंग बदल गई। इसे फिर खोलें।") }
                 segments.toList()
             } catch (error: OutOfMemoryError) {
-                throw IllegalStateException(careTr(false, "Too little free memory. Close other apps and retry. Your recording is safe.", "मेमोरी कम है। दूसरे ऐप बंद करके फिर कोशिश करें। आपकी रिकॉर्डिंग सुरक्षित है।"), error)
+                throw IllegalStateException(careTr(false, "Low memory. Close other apps and retry.", "मेमोरी कम है। दूसरे ऐप बंद करके फिर कोशिश करें।"), error)
             } finally { pcm.delete() }
         }
     }

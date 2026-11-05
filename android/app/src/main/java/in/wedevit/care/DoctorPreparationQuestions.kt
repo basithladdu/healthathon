@@ -129,12 +129,9 @@ private class PrepModel(val store: DoctorPreparationStore, val scope: String, va
 @Composable private fun PrepCard(tag: String, title: String, intro: String, m: PrepModel, content: @Composable ColumnScope.() -> Unit) { val t = careText();
     Card(Modifier.fillMaxWidth().testTag(tag), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = DoctorCardReport), border = BorderStroke(1.dp, DoctorHairline)) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(title, fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
-                DoctorInfoIcon(title, intro, "$tag-info")
-            }
+            Text(title, fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
             m.error?.let { Text(t(it, DoctorPreparationErrorsHindi[it] ?: it), fontSize = 15.sp, lineHeight = 21.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag("$tag-error").announce()) }
-            if (!m.loaded) TextButton(onClick = { m.load() }, modifier = Modifier.heightIn(min = 48.dp).testTag("$tag-retry")) { Text(t("Retry questions", "सवाल फिर से लाएँ"), color = RustText, fontSize = 16.sp) }
+            if (!m.loaded) TextButton(onClick = { m.load() }, modifier = Modifier.heightIn(min = 48.dp).testTag("$tag-retry")) { Text(t("Retry", "फिर कोशिश करें"), color = RustText, fontSize = 16.sp) }
             content()
         }
     }
@@ -158,16 +155,14 @@ private class PrepModel(val store: DoctorPreparationStore, val scope: String, va
     confirmRemove?.let { id ->
         AlertDialog(onDismissRequest = { confirmRemove = null },
             title = { Text(t("Remove this question?", "यह सवाल हटाएँ?")) },
-            text = { Text(t("It is only your own preparation note. Removing it does not change any saved conversation or published note.", "यह सिर्फ़ आपकी अपनी तैयारी का नोट है। इसे हटाने से कोई सहेजी बातचीत या प्रकाशित नोट नहीं बदलता।")) },
             confirmButton = { TextButton(onClick = { if (m.persist(m.rows.filterNot { it.id == id })) drafts = drafts - id; confirmRemove = null }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Remove question", "सवाल हटाएँ"), color = DoctorAccent) } },
-            dismissButton = { TextButton(onClick = { confirmRemove = null }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Keep it", "रहने दें")) } })
+            dismissButton = { TextButton(onClick = { confirmRemove = null }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें")) } })
     }
     val callback by rememberUpdatedState(onInteraction)
     val busy = drafts.isNotEmpty() || newText.isNotEmpty()
     DisposableEffect(busy) { callback(busy); onDispose { callback(false) } }
-    PrepCard("doctor-preparation-questions", t("Goals of care discussion", "देखभाल के लक्ष्यों पर बातचीत"), t("Your own questions to cover, saved on this device. Preparation only: not transcript evidence, not from the patient, and not part of a published note.", "आपके अपने सवाल, जिन पर बात करनी है, इसी फ़ोन पर सहेजे। सिर्फ़ तैयारी: न बातचीत का सबूत, न मरीज़ की ओर से, और न किसी प्रकाशित नोट का हिस्सा।"), m) {
-        if (m.rows.isEmpty()) Text(t("No questions yet. Add as many as you need.", "अभी कोई सवाल नहीं। जितने चाहें जोड़ें।"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardSub, modifier = Modifier.testTag("doctor-preparation-empty"))
-        else Text(t("${m.rows.size} of $DOCTOR_PREPARATION_MAX_QUESTIONS questions", "$DOCTOR_PREPARATION_MAX_QUESTIONS में से ${m.rows.size} सवाल"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.testTag("doctor-preparation-count"))
+    PrepCard("doctor-preparation-questions", t("Questions", "सवाल"), "", m) {
+        if (m.rows.isEmpty()) Text(t("No questions yet", "अभी कोई सवाल नहीं"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardSub, modifier = Modifier.testTag("doctor-preparation-empty"))
         m.rows.forEachIndexed { index, row ->
             val shown = drafts[row.id] ?: row.text
             HorizontalDivider(color = DoctorHairline)
@@ -187,9 +182,8 @@ private class PrepModel(val store: DoctorPreparationStore, val scope: String, va
         }
         if (editable) {
             HorizontalDivider(color = DoctorHairline)
-            Text(t("Add question", "सवाल जोड़ें"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
             OutlinedTextField(newText, { newText = it.take(DOCTOR_PREPARATION_MAX_QUESTION_CHARS) }, label = { Text(t("New question", "नया सवाल")) }, minLines = 2, enabled = m.loaded, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-preparation-question-input"))
-            TextButton(onClick = { if (m.persist(m.rows + DoctorPreparationQuestion(newId(), newText.trim(), DOCTOR_PREPARATION_DEFAULT_SECTION))) newText = "" }, enabled = m.loaded && m.rows.size < DOCTOR_PREPARATION_MAX_QUESTIONS && newText.isNotBlank(), shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-add-preparation-question")) { Text(t("+ Add question", "+ सवाल जोड़ें"), color = RustText, fontSize = 16.sp) }
+            TextButton(onClick = { if (m.persist(m.rows + DoctorPreparationQuestion(newId(), newText.trim(), DOCTOR_PREPARATION_DEFAULT_SECTION))) newText = "" }, enabled = m.loaded && m.rows.size < DOCTOR_PREPARATION_MAX_QUESTIONS && newText.isNotBlank(), shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-add-preparation-question")) { Text(t("Add question", "सवाल जोड़ें"), color = RustText, fontSize = 16.sp) }
         }
     }
 }
@@ -204,8 +198,8 @@ private class PrepModel(val store: DoctorPreparationStore, val scope: String, va
     val m = rememberPrepModel(store, scope, emptyList(), editable, canSave, onChange, reload)
     var drafts by rememberSaveable(scope) { mutableStateOf(emptyMap<String, String>()) }
     val unanswered = doctorUnansweredQuestions(m.rows).size
-    PrepCard("doctor-preparation-answers", t("Answers to your questions", "आपके सवालों के जवाब"), t("Typed answers are your own notes, kept on this device and outside any published note. Unanswered questions are listed so you can fill them in.", "लिखे गए जवाब आपके अपने नोट हैं, इसी फ़ोन पर रहते हैं और किसी प्रकाशित नोट में नहीं जाते। बिना जवाब वाले सवाल यहाँ दिखते हैं ताकि आप उन्हें भर सकें।"), m) {
-        Text(if (m.rows.isEmpty()) t("No questions were prepared.", "कोई सवाल तैयार नहीं किया गया।") else if (unanswered == 0) t("Every question has an answer.", "हर सवाल का जवाब है।") else t("$unanswered of ${m.rows.size} still need an answer.", "${m.rows.size} में से $unanswered का जवाब अभी बाक़ी है।"), fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, color = if (m.rows.isNotEmpty() && unanswered == 0) DoctorStatusGood else DoctorStatusWarn, modifier = Modifier.testTag("doctor-preparation-answers-status"))
+    PrepCard("doctor-preparation-answers", t("Answers", "जवाब"), "", m) {
+        Text(if (m.rows.isEmpty()) t("No questions yet", "अभी कोई सवाल नहीं") else if (unanswered == 0) t("All answered", "सबके जवाब मिले") else t("$unanswered unanswered", "$unanswered के जवाब बाक़ी"), fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, color = if (m.rows.isNotEmpty() && unanswered == 0) DoctorStatusGood else DoctorStatusWarn, modifier = Modifier.testTag("doctor-preparation-answers-status"))
         NoteRules.labels.indices.forEach { s ->
             val group = m.rows.filter { it.section == s }
             if (group.isNotEmpty()) {

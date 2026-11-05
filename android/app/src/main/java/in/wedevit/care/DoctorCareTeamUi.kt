@@ -34,7 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
             Box(Modifier.size(40.dp).background(DoctorCardConversation, CircleShape), contentAlignment = Alignment.Center) { Icon(Icons.Default.Groups, null, tint = DoctorAccent, modifier = Modifier.size(22.dp)) }
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(t("Family & care team", "परिवार और देखभाल टीम"), fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-                Text(if (readable) t("${contacts.count { it.personId == personId }} linked contacts", "${contacts.count { it.personId == personId }} जुड़े संपर्क") else t("Contacts aren't shared with this account.", "संपर्क इस खाते के साथ साझा नहीं हैं।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
+                Text(if (readable) t("${contacts.count { it.personId == personId }} linked contacts", "${contacts.count { it.personId == personId }} जुड़े संपर्क") else t("Contacts not shared", "संपर्क साझा नहीं"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
             }
             Icon(Icons.Default.ChevronRight, null, tint = DoctorAccent)
         }
@@ -60,8 +60,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
         }
         if (loading) LinearProgressIndicator(Modifier.fillMaxWidth(), color = DoctorAccent)
         error?.let { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Text(it, Modifier.weight(1f).announce(), color = MaterialTheme.colorScheme.error); TextButton(onClick = onRefresh, enabled = !loading, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Refresh contacts", "संपर्क ताज़ा करें"), color = RustText) } } }
-        if (!readable && !loading) CareTeamEmpty(Icons.Default.Lock, t("The owner has not shared care-team contacts with this account.", "मालिक ने देखभाल टीम के संपर्क इस खाते से साझा नहीं किए।"))
-        if (readable && contacts.isEmpty() && !loading) CareTeamEmpty(Icons.Default.Groups, t("No contacts have been added yet.", "अभी कोई संपर्क नहीं जोड़ा गया।"))
+        if (!readable && !loading) CareTeamEmpty(Icons.Default.Lock, t("Contacts not shared", "संपर्क साझा नहीं"))
+        if (readable && contacts.isEmpty() && !loading) CareTeamEmpty(Icons.Default.Groups, t("No contacts yet", "अभी कोई संपर्क नहीं"))
         if (readable && contacts.isNotEmpty()) Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), color = DoctorCardReport, border = BorderStroke(1.dp, DoctorHairline)) { Column {
             contacts.forEachIndexed { index, contact ->
                 if (index > 0) HorizontalDivider(Modifier.padding(horizontal = 16.dp), color = DoctorHairline)
@@ -117,13 +117,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
         var phone by remember(contact) { mutableStateOf(contact.phone) }
         AlertDialog(onDismissRequest = { if (!busy) editing = null }, title = { Text(t("Care-team contact", "देखभाल टीम का संपर्क")) }, text = {
             Column(Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()).imePadding(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                CareField(name, { name = it }, "Name", singleLine = true)
+                CareField(name, { name = it }, t("Name", "नाम"), singleLine = true)
                 CareField(relationship, { relationship = it }, t("Relationship or care role", "रिश्ता या देखभाल में भूमिका"), singleLine = true)
                 CareContactRules.roles.forEach { value -> Row { RadioButton(role == value, { role = value }); Text(value.replaceFirstChar { it.uppercase() }, Modifier.padding(top = 12.dp)) } }
-                CareField(phone, { phone = it }, "Phone (optional)", singleLine = true)
+                CareField(phone, { phone = it }, t("Phone", "फ़ोन"), singleLine = true)
                 error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
             }
-        }, confirmButton = { TextButton(onClick = { vm.saveCareContact(contact.copy(name = name, relationship = relationship, role = role, phone = phone), account) { editing = null } }, enabled = !busy && name.isNotBlank() && relationship.isNotBlank()) { Text(t("Save contact", "संपर्क सहेजें")) } }, dismissButton = { TextButton(onClick = { editing = null }, enabled = !busy) { Text(t("Cancel", "रद्द करें")) } })
+        }, confirmButton = { TextButton(onClick = { vm.saveCareContact(contact.copy(name = name, relationship = relationship, role = role, phone = phone), account) { editing = null } }, enabled = !busy && name.isNotBlank() && relationship.isNotBlank()) { Text(t("Save", "सहेजें")) } }, dismissButton = { TextButton(onClick = { editing = null }, enabled = !busy) { Text(t("Cancel", "रद्द करें")) } })
     }
-    removing?.let { contact -> AlertDialog(onDismissRequest = { if (!busy) removing = null }, title = { Text(t("Remove ${contact.name}?", "${contact.name} को हटाएँ?")) }, text = { Text(t("This removes the contact from this care profile. It does not change anyone's account access or sharing permissions.", "इससे संपर्क इस देखभाल प्रोफ़ाइल से हट जाएगा। किसी के खाते की पहुँच या साझा करने की अनुमति नहीं बदलेगी।")) }, confirmButton = { TextButton(onClick = { vm.removeCareContact(contact, account) { removing = null } }, enabled = !busy) { Text(t("Remove contact", "संपर्क हटाएँ"), color = MaterialTheme.colorScheme.error) } }, dismissButton = { TextButton(onClick = { removing = null }, enabled = !busy) { Text(t("Keep contact", "संपर्क रखें")) } }) }
+    removing?.let { contact -> AlertDialog(onDismissRequest = { if (!busy) removing = null }, title = { Text(t("Remove ${contact.name}?", "${contact.name} को हटाएँ?")) }, confirmButton = { TextButton(onClick = { vm.removeCareContact(contact, account) { removing = null } }, enabled = !busy) { Text(t("Remove", "हटाएँ"), color = MaterialTheme.colorScheme.error) } }, dismissButton = { TextButton(onClick = { removing = null }, enabled = !busy) { Text(t("Cancel", "रद्द करें")) } }) }
 }

@@ -26,7 +26,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -148,13 +147,11 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
             contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 28.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            // The how-it-works paragraphs sit behind the "?" in the header (less text on screen).
-            item { ScannerHeader(t("Scan prescription", "पर्चा स्कैन करें"), "1 / 2", info = t("Add a clear prescription. Read and check the words before saving. Medicine packaging is optional for your own comparison.", "साफ़ पर्चा जोड़ें। सहेजने से पहले शब्द पढ़कर जाँचें। मिलान के लिए दवा के पैकेट की फ़ोटो चाहें तो जोड़ें।") + "\n\n" +
-                t("Your phone reads the page. It can read printed English letters. You may need to type handwriting yourself. The app does not decide any dose or treatment.", "पढ़ाई आपके फ़ोन पर ही होती है। छपे अंग्रेज़ी अक्षर पढ़े जाते हैं। हाथ की लिखाई आपको ख़ुद लिखनी पड़ सकती है। ऐप ख़ुराक या इलाज तय नहीं करता।")) { cleanAndClose() } }
+            item { ScannerHeader(t("Scan prescription", "पर्चा स्कैन करें"), "1 / 2") { cleanAndClose() } }
             item {
                 PhotoSelectionCard(
                     title = t("Prescription pages", "पर्चे के पेज"),
-                    subtitle = t("Add in page order · up to 5", "पेज के क्रम से जोड़ें · ज़्यादा से ज़्यादा 5"),
+                    subtitle = "",
                     tint = Mint,
                     uris = prescriptionUris,
                     chooseLabel = t("Choose pages", "पेज चुनें"),
@@ -172,7 +169,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
             item {
                 PhotoSelectionCard(
                     title = t("Medicine strips or boxes", "दवा के पत्ते या डिब्बे"),
-                    subtitle = t("One clear photo per medicine · up to 10", "हर दवा की एक साफ़ फ़ोटो · ज़्यादा से ज़्यादा 10"),
+                    subtitle = "",
                     tint = SaharaApricot,
                     uris = medicineUris,
                     chooseLabel = t("Choose photos", "फ़ोटो चुनें"),
@@ -200,7 +197,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                                 }
                                 val medicines = copiedPrescriptionMedicines(pages)
                                 drafts = medicines.mapIndexed { index, medicine -> MedicineDraft(stableMedicineDraftId(scanId, medicine, index), medicine) }
-                                warnings = listOf(t("Compare every copied line with the paper. The app has not matched brands, chosen doses or confirmed treatment.", "हर कॉपी की गई पंक्ति को असली पेज से मिलाएँ। ऐप ने ब्रांड नहीं मिलाए, ख़ुराक नहीं चुनी और इलाज पक्का नहीं किया।")) + if (medicines.isEmpty()) listOf(t("No medicine lines could be read clearly. Look at the prescription and type the medicines yourself.", "दवा की कोई पंक्ति ठीक से नहीं पढ़ी जा सकी। असली पर्चा देखकर दवाएँ ख़ुद लिखें।")) else emptyList()
+                                warnings = if (medicines.isEmpty()) listOf(t("No medicines found", "कोई दवा नहीं मिली")) else emptyList()
                                 unmatched = medicineUris.indices.toList()
                                 unmatchedReviewed = unmatched.isEmpty()
                                 phase = MedicineScannerPhase.Review
@@ -233,7 +230,6 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                     Surface(shape = RoundedCornerShape(50), color = Mint) { Text(t("${value.completed.coerceAtMost(value.total)} of ${value.total}", "${value.completed.coerceAtMost(value.total)} / ${value.total}"), Modifier.padding(horizontal = 14.dp, vertical = 6.dp), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk) }
                     if (value.fileName.isNotBlank()) Text(value.fileName, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 } else Text(t("Reading the selected pages…", "चुने गए पेज पढ़ रहे हैं…"), fontSize = 16.sp, color = DoctorCardInk)
-                Text(t("Keep this screen open until review appears. You can cancel without changing saved medicines.", "जाँच की सूची आने तक यह स्क्रीन खुली रखें। रोकने से सहेजी दवाएँ नहीं बदलेंगी।"), fontSize = 14.sp, color = DoctorCardSub, textAlign = TextAlign.Center)
                 OutlinedButton(onClick = { returnToImages() }, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें"), fontSize = 15.sp) }
             }
         }
@@ -244,10 +240,6 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             item { ScannerHeader(t("Review medicine list", "दवा की सूची जाँचें"), "2 / 2") { returnToImages() } }
-            item { SurfaceCard(Sage) { Row(verticalAlignment = Alignment.Top) {
-                Icon(Icons.Default.FactCheck, null, Modifier.size(22.dp), tint = DoctorCardInk); Spacer(Modifier.width(12.dp))
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) { Text(t("Check before saving", "सहेजने से पहले जाँचें"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, fontSize = 18.sp, color = DoctorCardInk); Text(t("The phone can read words wrongly. Check each medicine with the prescription and the packet. Sahara does not diagnose, prescribe or suggest treatment.", "पढ़ाई में ग़लती हो सकती है। हर दवा को पर्चे और पैकेट से मिलाएँ। सहारा बीमारी नहीं बताता, दवा नहीं लिखता और इलाज की सलाह नहीं देता।"), fontSize = 15.sp, color = DoctorCardInk) }
-            } } }
             if (prescriptionUris.isNotEmpty()) item { SurfaceCard {
                 Text(t("Original pages", "असली पेज"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
                 prescriptionUris.forEachIndexed { index, uri -> TextButton(onClick = { runCatching {
@@ -267,7 +259,6 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
             if (unmatched.isNotEmpty()) item {
                 SurfaceCard(Peach) {
                     Text(run { val n = unmatched.size; if (n == 1) t("1 medicine photo was not matched", "दवा की 1 फ़ोटो नहीं मिली") else t("$n medicine photos were not matched", "दवा की $n फ़ोटो नहीं मिलीं") }, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
-                    Text(fontSize = 15.sp, color = DoctorCardInk, text = run { val photos = unmatched.joinToString { val k = it + 1; t("photo $k", "फ़ोटो $k") }; t("Review $photos. Add any missing medicine manually or leave it out only after checking the original prescription.", "$photos जाँचें। छूटी दवा ख़ुद लिखें, या असली पर्चा देखने के बाद ही उसे छोड़ें।") })
                     unmatched.filter { it in medicineUris.indices }.forEach { index -> TextButton(onClick = { runCatching {
                         context.startActivity(Intent(Intent.ACTION_VIEW).setDataAndType(Uri.parse(medicineUris[index]), "image/*").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION))
                     }.onFailure { scanError = t("No image viewer is available. Open this photo in Files to compare it.", "फ़ोटो देखने वाला ऐप नहीं मिला। मिलान के लिए यह फ़ोटो Files में खोलें।") } }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("View medicine photo ${index + 1}", "दवा की फ़ोटो ${index + 1} देखें")) } }
@@ -311,9 +302,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                 }, enabled = valid && !busy && !savingSources, modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp), shape = RoundedCornerShape(14.dp)) {
                     Text(fontSize = 16.sp, fontWeight = FontWeight.SemiBold, text = if (busy || savingSources) t("Saving…", "सहेज रहे हैं…") else if(onReviewedMedicines != null) t("Use ${drafts.size} reviewed medicines", "जाँची गई ${drafts.size} दवाएँ लें") else run { val n = drafts.size; if (n == 1) t("Save 1 medicine", "1 दवा सहेजें") else t("Save $n medicines", "$n दवा सहेजें") })
                 }
-                if (!valid) Text(t("Before saving, add a medicine name and dose, check photos that did not match, and confirm every medicine.", "सहेजने से पहले दवा का नाम और ख़ुराक लिखें, बिना मिली फ़ोटो देखें और हर दवा की पुष्टि करें।"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.padding(top = 8.dp))
                 Spacer(Modifier.height(8.dp))
-                TextButton(onClick = { returnToImages() }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Back to photos", "फ़ोटो पर वापस"), fontSize = 15.sp) }
                 TextButton(onClick = { cleanAndClose() }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें"), fontSize = 15.sp) }
             }
         }
@@ -371,7 +360,7 @@ private fun PhotoSelectionCard(
     val context = LocalContext.current; val t = careText(); val hindi = careHindi()
     SurfaceCard(tint) {
         Row(verticalAlignment = Alignment.Top) {
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) { Text(title, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = DoctorCardInk); Text(subtitle, fontSize = 14.sp, color = DoctorCardSub) }
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) { Text(title, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = DoctorCardInk); if (subtitle.isNotBlank()) Text(subtitle, fontSize = 14.sp, color = DoctorCardSub) }
             // Count as a round badge, green once something is added.
             Surface(color = if (uris.isEmpty()) Paper else DoctorStatusGoodBg, shape = RoundedCornerShape(50)) { Text(uris.size.toString(), Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = if (uris.isEmpty()) DoctorCardSub else DoctorStatusGood) }
         }
@@ -418,12 +407,10 @@ private fun MedicineReviewCard(draft: MedicineDraft, storage: String, personId: 
         }
         medicine.uncertainties.forEach { Text("• $it", color = RustText, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp)) }
         Spacer(Modifier.height(12.dp))
-        CareField(medicine.medicineName, { change(medicine.copy(medicineName = it.take(120))) }, t("Medicine name", "दवा का नाम"), singleLine = true,
-            supporting = t("Strip cut or name missing? Type it, or pick from the list as you type.", "पत्ता कटा है या नाम नहीं दिखता? नाम लिखें, या लिखते समय सूची से चुनें।"))
+        CareField(medicine.medicineName, { change(medicine.copy(medicineName = it.take(120))) }, t("Medicine name", "दवा का नाम"), singleLine = true)
         MedicineNameSuggestions(medicine.medicineName) { change(medicine.copy(medicineName = it.take(120))) }
         CareField(medicine.strength, { change(medicine.copy(strength = it.take(80))) }, t("Strength", "ताक़त"), singleLine = true, placeholder = t("e.g. 500 mg, 5 mg/5 ml", "जैसे 500 mg, 5 mg/5 ml"))
         CareField(medicine.form, { change(medicine.copy(form = it.take(60))) }, t("Form", "रूप"), singleLine = true, placeholder = t("e.g. tablet, capsule, syrup, injection, patch", "जैसे गोली, कैप्सूल, सिरप, इंजेक्शन, पैच"))
-        Text(t("Type the rest by hand from the prescription. A photo never fills these.", "बाक़ी पर्चे से देखकर ख़ुद लिखें। फ़ोटो से ये कभी नहीं भरे जाते।"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.padding(top = 8.dp))
         CareField(medicine.quantity, { change(medicine.copy(quantity = it.take(80))) }, t("How much each time", "हर बार कितनी"), singleLine = true, placeholder = t("e.g. 1 tablet, 1½ tablets, 5 ml", "जैसे 1 गोली, 1½ गोली, 5 ml"))
         CareField(medicine.frequency, { change(medicine.copy(frequency = it.take(120))) }, t("How often", "कितनी बार"), singleLine = true, placeholder = t("e.g. twice a day, only when needed", "जैसे दिन में दो बार, ज़रूरत होने पर ही"))
         CareField(medicine.instructions, { change(medicine.copy(instructions = it.take(500))) }, t("Directions", "तरीक़ा"), minLines = 2, placeholder = t("e.g. as written: dissolve in water", "जैसे पर्चे में लिखा: पानी में घोलकर"))
@@ -444,7 +431,7 @@ private fun MedicineReviewCard(draft: MedicineDraft, storage: String, personId: 
             t("For how many days", "कितने दिन"), singleLine = true, placeholder = t("e.g. 5 · leave empty if ongoing", "जैसे 5 · चलती रहे तो ख़ाली छोड़ें"),
         )
         StripPhotoRow(storage, personId, draft.id) { reading -> change(MedicinePhotoFields.fillBlanks(medicine, reading)) }
-        CheckLine(draft.confirmed, { onChange(draft.copy(confirmed = it)) }, t("I checked this medicine, dose and directions against the original prescription and packaging.", "मैंने यह दवा, ख़ुराक और तरीक़ा असली पर्चे और पैकेट से मिला लिया है।"))
+        CheckLine(draft.confirmed, { onChange(draft.copy(confirmed = it)) }, t("I checked this with the prescription", "मैंने इसे पर्चे से मिला लिया है"))
     }
 }
 
@@ -456,9 +443,9 @@ private fun manualMedicine() = OrganizedMedicine(
 )
 
 private fun matchLabel(medicine: OrganizedMedicine, hindi: Boolean): String = when (medicine.matchQuality) {
-    MedicineMatchQuality.MATCHED -> (careTr(hindi, "Matched to prescription and packaging", "पर्चे और पैकेट से मिली")) + medicine.confidence?.let { " · ${(it * 100).toInt()}%" }.orEmpty()
-    MedicineMatchQuality.POSSIBLE -> careTr(hindi, "Possible packaging match · check carefully", "पैकेट से शायद मिली · ध्यान से जाँचें")
-    MedicineMatchQuality.PRESCRIPTION_ONLY -> careTr(hindi, "Found on prescription · no safe package match", "पर्चे में मिली · पैकेट से पक्का मिलान नहीं")
+    MedicineMatchQuality.MATCHED -> careTr(hindi, "Matched", "मिली") + medicine.confidence?.let { " · ${(it * 100).toInt()}%" }.orEmpty()
+    MedicineMatchQuality.POSSIBLE -> careTr(hindi, "Possible match", "शायद मिली")
+    MedicineMatchQuality.PRESCRIPTION_ONLY -> careTr(hindi, "Prescription only", "सिर्फ़ पर्चे में")
     MedicineMatchQuality.MANUAL -> careTr(hindi, "Entered manually", "ख़ुद लिखी गई")
 }
 

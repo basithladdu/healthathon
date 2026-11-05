@@ -257,10 +257,7 @@ private val SosRedText = Color(0xFF8C1D18)
         Button(onClick = onSos, shape = RoundedCornerShape(20.dp), colors = ButtonDefaults.buttonColors(containerColor = SosRed, contentColor = Color.White),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp), modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = 64.dp).testTag("today-sos")) {
             Icon(Icons.Default.Call, null, Modifier.size(26.dp)); Spacer(Modifier.width(10.dp))
-            Column(Modifier.weight(1f)) {
-                Text(t("SOS", "SOS मदद"), fontSize = 22.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-                Text(t("Emergency numbers and plan", "आपातकालीन नंबर और योजना"), fontSize = 14.sp, lineHeight = 18.sp, maxLines = 2)
-            }
+            Text(t("SOS", "SOS मदद"), Modifier.weight(1f), fontSize = 22.sp, fontWeight = FontWeight.Bold, maxLines = 1)
         }
         OutlinedButton(onClick = onQr, shape = RoundedCornerShape(20.dp), border = BorderStroke(2.dp, SosRed), colors = ButtonDefaults.outlinedButtonColors(containerColor = Paper, contentColor = SosRedText),
             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 10.dp), modifier = Modifier.fillMaxHeight().heightIn(min = 64.dp).testTag("today-qr")) {

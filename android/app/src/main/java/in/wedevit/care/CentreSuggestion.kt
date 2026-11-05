@@ -9,7 +9,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -56,11 +55,11 @@ object CentreSuggestionRules {
 
     /** The person-facing line for a suggestion's state. Nothing is shown to anyone else until the Sahara team approves it. */
     fun statusText(status: String): Pair<String, String> = when (status) {
-        "waiting" -> "Saved on this phone. It will be sent when you're online. Not checked yet." to "फ़ोन पर सहेजा गया। इंटरनेट मिलने पर भेजा जाएगा। अभी जाँचा नहीं गया।"
-        "kept" -> "Not sent yet. It is kept on this phone and will be tried again. Not checked yet." to "अभी नहीं भेजा गया। यह फ़ोन पर रखा है, फिर से भेजा जाएगा। अभी जाँचा नहीं गया।"
-        "approved" -> "Approved by the Sahara team." to "Sahara टीम ने मंज़ूर किया।"
-        "rejected" -> "Checked by the Sahara team and not added." to "Sahara टीम ने जाँचा, सूची में नहीं जोड़ा गया।"
-        else -> "Sent for review, not checked yet." to "समीक्षा के लिए भेजा गया, अभी जाँचा नहीं गया।"
+        "waiting" -> "Waiting to send" to "भेजने का इंतज़ार"
+        "kept" -> "Not sent yet" to "अभी नहीं भेजा गया"
+        "approved" -> "Approved" to "मंज़ूर"
+        "rejected" -> "Not added" to "नहीं जोड़ा गया"
+        else -> "Sent for review" to "समीक्षा के लिए भेजा गया"
     }
 }
 
@@ -123,10 +122,10 @@ internal suspend fun CareCloud.myCentreSuggestions(account: String): List<Centre
         val fieldShape = RoundedCornerShape(14.dp)
         val fieldColors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper, focusedBorderColor = Rust, focusedLabelColor = RustText, cursorColor = Rust)
         Column(Modifier.padding(horizontal = 16.dp).padding(bottom = 32.dp).verticalScroll(rememberScrollState()).testTag("centre-suggestion-sheet"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(t("Suggest a centre that's missing", "छूटा हुआ केंद्र सुझाएँ"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 22.sp, color = DoctorCardInk, modifier = Modifier.a11yHeading())
+            Text(t("Suggest a centre", "केंद्र सुझाएँ"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 22.sp, color = DoctorCardInk, modifier = Modifier.a11yHeading())
             when {
                 vm.cloud == null -> {
-                    Text(t("Sign in to send a suggestion. The Sahara team checks every suggestion before anyone else sees it.", "सुझाव भेजने के लिए साइन इन करें। हर सुझाव दूसरों को दिखने से पहले Sahara टीम जाँचती है।"), color = DoctorCardInk)
+                    Text(t("Sign in to suggest a centre", "केंद्र सुझाने के लिए साइन इन करें"), color = DoctorCardInk)
                     OutlinedButton(onClick = onDismiss, shape = fieldShape, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Close", "बंद करें")) }
                 }
                 result.isNotBlank() -> {
@@ -135,14 +134,9 @@ internal suspend fun CareCloud.myCentreSuggestions(account: String): List<Centre
                         Icon(Icons.Outlined.CheckCircle, null, Modifier.size(24.dp), tint = DoctorStatusGood); Spacer(Modifier.width(8.dp))
                         Text(t(en, hi), fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.weight(1f).testTag("centre-suggestion-result").announce())
                     }
-                    Text(t("It is not shown to anyone else until the Sahara team checks it.", "Sahara टीम की जाँच से पहले यह किसी और को नहीं दिखेगा।"), color = DoctorCardSub)
                     Button(onClick = onDismiss, shape = fieldShape, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(t("Done", "हो गया"), fontWeight = FontWeight.SemiBold) }
                 }
                 else -> {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Outlined.Info, null, Modifier.size(18.dp), tint = DoctorCardSub); Spacer(Modifier.width(8.dp))
-                        Text(t("Please don't add patient details.", "मरीज़ की जानकारी न लिखें।"), color = DoctorCardSub, fontSize = 14.sp)
-                    }
                     OutlinedTextField(name, { name = it.take(CentreSuggestionRules.NAME_MAX) }, label = { Text(t("Centre name", "केंद्र का नाम")) }, singleLine = true, shape = fieldShape, colors = fieldColors, modifier = Modifier.fillMaxWidth().testTag("suggest-name"))
                     OutlinedTextField(city, { city = it.take(CentreSuggestionRules.PLACE_MAX) }, label = { Text(t("Town or city", "शहर या क़स्बा")) }, singleLine = true, shape = fieldShape, colors = fieldColors, modifier = Modifier.fillMaxWidth().testTag("suggest-city"))
                     OutlinedTextField(state, { state = it.take(CentreSuggestionRules.PLACE_MAX) }, label = { Text(t("State", "राज्य")) }, singleLine = true, shape = fieldShape, colors = fieldColors, modifier = Modifier.fillMaxWidth().testTag("suggest-state"))
@@ -151,9 +145,9 @@ internal suspend fun CareCloud.myCentreSuggestions(account: String): List<Centre
                         OutlinedTextField(address, { address = it.take(CentreSuggestionRules.ADDRESS_MAX) }, label = { Text(t("Address (optional)", "पता (ज़रूरी नहीं)")) }, shape = fieldShape, colors = fieldColors, modifier = Modifier.fillMaxWidth())
                         OutlinedTextField(phone, { phone = it.take(20) }, label = { Text(t("Centre phone (optional)", "केंद्र का फ़ोन (ज़रूरी नहीं)")) }, singleLine = true, shape = fieldShape, colors = fieldColors, modifier = Modifier.fillMaxWidth(),
                             keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Phone))
-                        OutlinedTextField(note, { note = it.take(CentreSuggestionRules.NOTE_MAX) }, label = { Text(t("What care do they offer? (optional)", "वहाँ कौन-सी देखभाल मिलती है? (ज़रूरी नहीं)")) }, shape = fieldShape, colors = fieldColors, modifier = Modifier.fillMaxWidth())
+                        OutlinedTextField(note, { note = it.take(CentreSuggestionRules.NOTE_MAX) }, label = { Text(t("Services (optional)", "सेवाएँ (ज़रूरी नहीं)")) }, shape = fieldShape, colors = fieldColors, modifier = Modifier.fillMaxWidth())
                     } else TextButton(onClick = { more = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("suggest-more")) {
-                        Icon(Icons.Default.Add, null, Modifier.size(18.dp), tint = RustText); Spacer(Modifier.width(8.dp)); Text(t("Add address, phone or services", "पता, फ़ोन या सेवाएँ जोड़ें"), color = RustText)
+                        Icon(Icons.Default.Add, null, Modifier.size(18.dp), tint = RustText); Spacer(Modifier.width(8.dp)); Text(t("More details", "और जानकारी"), color = RustText)
                     }
                     problem?.let { (en, hi) -> Text(t(en, hi), color = MaterialTheme.colorScheme.error, fontSize = 14.sp, modifier = Modifier.announce()) }
                     Button(onClick = {
@@ -162,7 +156,7 @@ internal suspend fun CareCloud.myCentreSuggestions(account: String): List<Centre
                         if (problem == null) vm.suggestCentre(draft) { status -> result = status }
                     }, enabled = !sending, shape = fieldShape, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("suggest-send")) {
                         if (sending) { CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary); Spacer(Modifier.width(8.dp)) }
-                        Text(t("Send for review", "जाँच के लिए भेजें"), fontWeight = FontWeight.SemiBold)
+                        Text(t("Send", "भेजें"), fontWeight = FontWeight.SemiBold)
                     }
                 }
             }

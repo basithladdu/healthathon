@@ -82,7 +82,7 @@ private fun doctorRecordedTime(at: Long, zone: ZoneId) = if (at <= 0) "Date not 
         item { DoctorDayTopCards(todayCheck, checks.firstOrNull(), zone, onOverview, onCheckIns, onCalendar, onCareTeam, onLabs) }
         item { DistressHistoryCard(entries, person.id) }
         careTeamSummary?.let { summary -> item { summary() } }
-        latestNote?.let { note -> item { Card(onClick = { onReadNote(note) }, colors = CardDefaults.cardColors(containerColor = DoctorCardReport), border = BorderStroke(1.dp, DoctorHairline), shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().testTag("doctor-latest-note")) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) { Text(t("Latest care note", "नया केयर नोट"), fontSize = 19.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk); Text(doctorRecordedTime(note.published, zone), fontSize = 14.sp, color = DoctorCardSub); Text(ReviewWorkflow.label(note), fontSize = 14.sp, color = DoctorCardSub); Text(note.topics.ifBlank { t("Read the recorded discussion.", "दर्ज चर्चा पढ़ें।") }, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk, maxLines = 3); Text(t("Read exact version ${note.version}", "संस्करण ${note.version} पढ़ें"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = RustText, modifier = Modifier.heightIn(min = 32.dp)) } } } }
+        latestNote?.let { note -> item { Card(onClick = { onReadNote(note) }, colors = CardDefaults.cardColors(containerColor = DoctorCardReport), border = BorderStroke(1.dp, DoctorHairline), shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().testTag("doctor-latest-note")) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) { Text(t("Latest care note", "नया केयर नोट"), fontSize = 19.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk); Text(doctorRecordedTime(note.published, zone), fontSize = 14.sp, color = DoctorCardSub); Text(ReviewWorkflow.label(note), fontSize = 14.sp, color = DoctorCardSub); Text(note.topics.ifBlank { t("Read the recorded discussion.", "दर्ज चर्चा पढ़ें।") }, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk, maxLines = 3); Text(t("Read", "पढ़ें"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = RustText, modifier = Modifier.heightIn(min = 32.dp)) } } } }
         item { Row(Modifier.fillMaxWidth().padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically) { Text(t("Up next", "आगे क्या है"), fontSize = 21.sp, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f), fontFamily = SaharaTitleFont, color = DoctorCardInk); TextButton(onClick = onAddVisit, enabled = canEdit, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-add-visit")) { Icon(Icons.Default.Add, null); Text(t("Add visit", "विज़िट जोड़ें")) } } }
         if (visits.isEmpty()) item { SurfaceCard { Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) { Icon(Icons.Default.EventAvailable, null, tint = DoctorAccent); Text(t("No upcoming visits recorded", "आगे की कोई विज़िट दर्ज नहीं"), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardSub) } } }
         items(visits.take(3), key = { it.id }) { visit -> DoctorVisitSummary(visit, zone, onCalendar) }
@@ -94,8 +94,8 @@ private fun doctorRecordedTime(at: Long, zone: ZoneId) = if (at <= 0) "Date not 
     val visitValue = nextVisit?.let { v -> if (v.due > 0) Instant.ofEpochMilli(v.due).atZone(zone).toLocalDate().format(DateTimeFormatter.ofPattern("d MMM")) else t("Date not recorded", "तारीख़ दर्ज नहीं") } ?: t("None recorded", "कुछ दर्ज नहीं")
     val tiles: List<@Composable (Modifier) -> Unit> = listOf(
         { m -> DoctorGlanceTile(t("Next visit", "अगली विज़िट"), visitValue, nextVisit?.title ?: t("No upcoming visit", "आगे कोई विज़िट नहीं"), DoctorCardOverview, onVisit, m.testTag("doctor-glance-visit")) },
-        { m -> DoctorGlanceTile(t("Medicines today", "आज की दवाइयाँ"), if (medicines.total == 0) t("None recorded", "कुछ दर्ज नहीं") else "${medicines.markedToday} of ${medicines.total}", if (medicines.total == 0) t("No medicines listed", "कोई दवा दर्ज नहीं") else t("marked as taken", "ली गई बताई"), DoctorCardReport, onMedicines, m.testTag("doctor-glance-medicines")) },
-        { m -> DoctorGlanceTile(t("Open questions", "खुले सवाल"), "$questions", if (questions == 1) t("in the latest care note", "नए केयर नोट में") else t("in the latest care note", "नए केयर नोट में"), DoctorCardReport, onQuestions, m.testTag("doctor-glance-questions")) },
+        { m -> DoctorGlanceTile(t("Medicines today", "आज की दवाइयाँ"), if (medicines.total == 0) t("None recorded", "कुछ दर्ज नहीं") else "${medicines.markedToday} of ${medicines.total}", if (medicines.total == 0) "" else t("taken", "ली गई"), DoctorCardReport, onMedicines, m.testTag("doctor-glance-medicines")) },
+        { m -> DoctorGlanceTile(t("Open questions", "खुले सवाल"), "$questions", "", DoctorCardReport, onQuestions, m.testTag("doctor-glance-questions")) },
     )
     if (LocalDensity.current.fontScale > 1.15f) Column(verticalArrangement = Arrangement.spacedBy(12.dp)) { tiles.forEach { it(Modifier.fillMaxWidth()) } }
     else Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) { tiles.forEach { it(Modifier.weight(1f).fillMaxHeight()) } }
@@ -106,7 +106,7 @@ private fun doctorRecordedTime(at: Long, zone: ZoneId) = if (at <= 0) "Date not 
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
             Text(label, fontSize = 13.sp, lineHeight = 17.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub)
             Text(value, fontSize = 19.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk)
-            Text(note, fontSize = 13.sp, lineHeight = 17.sp, color = DoctorCardSub, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            if (note.isNotBlank()) Text(note, fontSize = 13.sp, lineHeight = 17.sp, color = DoctorCardSub, maxLines = 2, overflow = TextOverflow.Ellipsis)
         }
     }
 }
@@ -134,8 +134,7 @@ private fun doctorRecordedTime(at: Long, zone: ZoneId) = if (at <= 0) "Date not 
         Row(Modifier.fillMaxWidth().heightIn(min = 120.dp).padding(18.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(t("Care overview", "देखभाल का सार"), fontSize = 21.sp, lineHeight = 27.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, fontFamily = SaharaTitleFont)
-                Text(t("Care story and next steps", "देखभाल की कहानी और अगले क़दम"), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk)
-                Row(Modifier.heightIn(min = 32.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) { Text(t("Read overview", "सार पढ़ें"), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorAccent); Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(20.dp), tint = DoctorAccent) }
+                Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(20.dp), tint = DoctorAccent)
             }
             Image(saharaImage(R.drawable.care_notes_illustration, 72.dp), null, Modifier.size(72.dp), contentScale = ContentScale.Fit)
         }
@@ -179,7 +178,7 @@ private fun doctorRecordedTime(at: Long, zone: ZoneId) = if (at <= 0) "Date not 
 
 @Composable internal fun DoctorVisitSummary(item: CareItem, zone: ZoneId = ZoneId.systemDefault(), onOpen: () -> Unit) { val t = careText();
     val entry = CareEntryCodec.decode(item.detail)
-    Card(onClick = onOpen, colors = CardDefaults.cardColors(containerColor = DoctorCardReport), border = BorderStroke(1.dp, DoctorHairline), shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 84.dp).testTag("doctor-visit-${item.id}")) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { Text(item.title, fontSize = 18.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk); Text(if (item.due > 0) { if (entry?.timed == true) doctorRecordedTime(item.due, zone) else Instant.ofEpochMilli(item.due).atZone(zone).toLocalDate().format(DateTimeFormatter.ofPattern("d MMM yyyy")) } else t("Date not recorded", "तारीख़ दर्ज नहीं"), fontSize = 16.sp); if (entry != null) { Text(t("Doctor: ", "डॉक्टर: ") + entry.sender.ifBlank { t("Not recorded", "दर्ज नहीं") }, fontSize = 16.sp); if (entry.location.isNotBlank()) Text(entry.location); if (DoctorVisitDetails.readable(entry.detail).isNotBlank()) Text(DoctorVisitDetails.readable(entry.detail)); Text(entry.statusLabel(careHindi()) + t(" · saved plan, not a confirmed booking", " · सहेजी योजना, पक्की बुकिंग नहीं"), fontSize = 14.sp, color = DoctorCardSub) } else if (item.detail.isNotBlank()) Text(item.detail) } }
+    Card(onClick = onOpen, colors = CardDefaults.cardColors(containerColor = DoctorCardReport), border = BorderStroke(1.dp, DoctorHairline), shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 84.dp).testTag("doctor-visit-${item.id}")) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { Text(item.title, fontSize = 18.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk); Text(if (item.due > 0) { if (entry?.timed == true) doctorRecordedTime(item.due, zone) else Instant.ofEpochMilli(item.due).atZone(zone).toLocalDate().format(DateTimeFormatter.ofPattern("d MMM yyyy")) } else t("Date not recorded", "तारीख़ दर्ज नहीं"), fontSize = 16.sp); if (entry != null) { Text(t("Doctor: ", "डॉक्टर: ") + entry.sender.ifBlank { t("Not recorded", "दर्ज नहीं") }, fontSize = 16.sp); if (entry.location.isNotBlank()) Text(entry.location); if (DoctorVisitDetails.readable(entry.detail).isNotBlank()) Text(DoctorVisitDetails.readable(entry.detail)); Text(entry.statusLabel(careHindi()), fontSize = 14.sp, color = DoctorCardSub) } else if (item.detail.isNotBlank()) Text(item.detail) } }
 }
 
 @Composable internal fun DoctorCareStory(person: Person, versions: List<CareVersion>, onRead: (CareVersion) -> Unit) { val t = careText();
@@ -342,7 +341,6 @@ private fun doctorToolLabel(label: String, hindi: Boolean) = careTr(hindi, label
             }
             Column(Modifier.fillMaxWidth().testTag("doctor-checkin-body-${check.id}"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(CareEntryCodec.readable(check.detail).ifBlank { t("No additional details recorded.", "और कोई जानकारी दर्ज नहीं।") }, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk, maxLines = 3, overflow = TextOverflow.Ellipsis)
-                Text(t("View full update", "पूरा अपडेट देखें"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = RustText)
             }
         }
     }

@@ -73,7 +73,7 @@ object PatientWalkthrough {
 
 /** Two ready-made users. Choosing one enters the walkthrough as that user. */
 @Composable fun PatientWalkthroughChooser(onPick: (String) -> Unit, onDismiss: () -> Unit) { val t = careText();
-    AlertDialog(onDismissRequest = onDismiss, modifier = Modifier.testTag("patient-walkthrough-chooser"), title = { Text(t("Try the walkthrough", "डेमो देखें")) },
+    AlertDialog(onDismissRequest = onDismiss, modifier = Modifier.testTag("patient-walkthrough-chooser"), title = { Text(t("Try a demo", "डेमो देखें")) },
         text = { Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             PatientWalkthrough.users.forEach { user ->
                 val patient = user.role == "Patient"
@@ -82,10 +82,7 @@ object PatientWalkthrough {
                     Row(Modifier.padding(16.dp).heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
                         Surface(shape = CircleShape, color = Paper) { Icon(if (patient) Icons.Default.PersonOutline else Icons.Default.PeopleOutline, null, Modifier.padding(10.dp).size(22.dp), tint = RustText) }
                         Spacer(Modifier.width(12.dp))
-                        Column(Modifier.weight(1f)) {
-                            Text("${user.name} — " + if (patient) t("Patient", "मरीज़") else t("Family", "परिवार"), fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = Ink)
-                            Text(if (user.key == "rahul") t(user.summary, "अपना देखभाल रिकॉर्ड देखते हैं") else t(user.summary, "राहुल के भाई · परिवार को दिखने वाली जानकारी देखते हैं"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
-                        }
+                        Text("${user.name} — " + if (patient) t("Patient", "मरीज़") else t("Family", "परिवार"), Modifier.weight(1f), fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = Ink)
                         Icon(Icons.Default.ChevronRight, null, tint = RustText)
                     }
                 }
@@ -109,7 +106,7 @@ object PatientWalkthrough {
     DisposableEffect(vm) { onDispose { vm.closeDoctorDemo() } }
     LaunchedEffect(vm, attempt) {
         try { PatientWalkthrough.seed(vm, context); vm.select(PatientWalkthrough.personId); vm.refreshCareContacts(); vm.refreshMedicineHistory(); ready = true }
-        catch (e: Exception) { if (e is CancellationException) throw e; android.util.Log.e("SaharaSeed", "patient walkthrough load failed", e); error = t("The walkthrough could not load. Your own profiles were not changed.", "डेमो नहीं खुल सका। आपकी अपनी प्रोफ़ाइल नहीं बदलीं।") }
+        catch (e: Exception) { if (e is CancellationException) throw e; android.util.Log.e("SaharaSeed", "patient walkthrough load failed", e); error = t("Couldn't load the demo.", "डेमो नहीं खुल सका।") }
     }
     val person = PatientWalkthrough.visiblePeople(people).firstOrNull()
     val state = when {
@@ -126,6 +123,6 @@ object PatientWalkthrough {
         "error" -> Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.Center) { SaharaEmpty(error ?: "", icon = Icons.Default.ErrorOutline, actionLabel = t("Retry", "फिर कोशिश करें"), onAction = { error = null; attempt++ }, secondaryLabel = t("Leave walkthrough", "डेमो से बाहर जाएँ"), onSecondary = ::leave) }
         "removed" -> Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.Center) { SaharaEmpty(t("Rahul's walkthrough record was removed. It will not be recreated automatically.", "राहुल का डेमो रिकॉर्ड हटा दिया गया। यह अपने-आप दोबारा नहीं बनेगा।"), secondaryLabel = t("Leave walkthrough", "डेमो से बाहर जाएँ"), onSecondary = ::leave) }
         "opening" -> SaharaLoading(t("Opening care records…", "देखभाल रिकॉर्ड खुल रहे हैं…"))
-        else -> CareApp(vm, onAccount = { vm.message.value = t("Account and sharing are unavailable in the walkthrough.", "डेमो में खाता और साझा करना उपलब्ध नहीं है।") }, walkthrough = user, onLeaveWalkthrough = ::leave, onSwitchWalkthrough = ::switchTo)
+        else -> CareApp(vm, onAccount = { vm.message.value = t("Not available in the demo.", "डेमो में उपलब्ध नहीं।") }, walkthrough = user, onLeaveWalkthrough = ::leave, onSwitchWalkthrough = ::switchTo)
     } }
 }

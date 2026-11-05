@@ -55,11 +55,10 @@ import kotlinx.coroutines.withContext
     // Nothing is offered until the server says online transcription is set up; on-device transcription stays above.
     val ready = capabilities?.takeIf { it.audioReady } ?: return
     SurfaceCard(Mint) {
-        CareAssistTitle(Icons.Default.GraphicEq, t("Turn one person's speech into text", "एक व्यक्ति की बात को लिखाई में बदलें"),
-            t("One person at a time. Up to 30 seconds and 2 MB. Listen to the recording and check who spoke.", "एक बार में एक व्यक्ति। 30 सेकंड और 2 MB तक। रिकॉर्डिंग सुनें और जाँचें कि कौन बोला।"))
+        CareAssistTitle(Icons.Default.GraphicEq, t("Speech to text", "बोली से लिखाई"))
         run {
             CareLanguageMenu(language, enabled = !busy) { language = it }
-            CheckLine(consent, { consent = it }, t("Everyone here separately agrees to send this recording to ${ready.provider} to turn speech into text. Nothing is sent until you tap the button. The words and who spoke will be checked before use.", "यहाँ मौजूद सभी इस रिकॉर्डिंग को ${ready.provider} को भेजने के लिए अलग से राज़ी हैं, ताकि बात लिखाई में बदले। बटन दबाने तक कुछ नहीं भेजा जाता। इस्तेमाल से पहले शब्द और बोलने वाले की जाँच होगी।"))
+            CheckLine(consent, { consent = it }, t("Everyone here agrees to send this recording to ${ready.provider}.", "यहाँ मौजूद सभी यह रिकॉर्डिंग ${ready.provider} को भेजने पर राज़ी हैं।"))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Button(onClick = {
                     val originalSource = source
@@ -88,7 +87,7 @@ import kotlinx.coroutines.withContext
         }
         result?.let { transcript ->
             HorizontalDivider(Modifier.padding(vertical = 8.dp), color = DoctorHairline)
-            CareAssistChip(t("Text from the recording · not checked yet", "रिकॉर्डिंग से बनी लिखाई · अभी जाँची नहीं"))
+            CareAssistChip(t("Not checked", "जाँचा नहीं"))
             SelectionContainerText(transcript.original)
             CareField(words, { words = it; checked = false }, t("Checked words", "जाँचे गए शब्द"), minLines = 3)
             Text(t("Speaker", "बोलने वाले"), style = MaterialTheme.typography.labelLarge)
@@ -96,7 +95,7 @@ import kotlinx.coroutines.withContext
                 // The stored value stays English; only the label follows the language.
                 FilterChip(selected = speaker == role, onClick = { speaker = role; checked = false }, label = { Text(careSpeakerLabel(role)) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp))
             } }
-            CheckLine(checked, { checked = it }, t("I listened and checked these words and who spoke, including any “no” or “not sure”.", "मैंने सुनकर ये शब्द और कौन बोला, जाँच लिया है। ‘नहीं’ और ‘पक्का नहीं’ वाली बातें भी।"))
+            CheckLine(checked, { checked = it }, t("I checked the words and who spoke.", "मैंने शब्द और बोलने वाले जाँच लिए हैं।"))
             Button(onClick = {
                 try { latestAppend(CareDraftAssist.appendReviewedTranscript(latestSource, transcript.original, words, speaker, transcript.language, checked)); result = null; checked = false }
                 catch (error: IllegalArgumentException) { message = error.message.orEmpty() }
@@ -133,12 +132,11 @@ import kotlinx.coroutines.withContext
     DisposableEffect(identity, source) { onDispose { job?.cancel() } }
     if (!asked) return
     val service = capabilities?.takeIf { it.ready }
-    if (service == null) { CareAiOffNotice(); return }
+    if (service == null) return
     SurfaceCard(Mint) {
-        CareAssistTitle(Icons.Default.AutoAwesome, t("Make a draft note from this talk", "इस बातचीत से नोट का ड्राफ़्ट बनाएँ"),
-            t("${service.provider} picks lines from this talk for each section. It cannot add new words. Every line is copied as it was said.", "${service.provider} हर हिस्से के लिए इस बातचीत से पंक्तियाँ चुनता है। यह नए शब्द नहीं जोड़ सकता। हर पंक्ति वैसी ही ली जाती है जैसी कही गई।"))
+        CareAssistTitle(Icons.Default.AutoAwesome, t("Draft note", "नोट का ड्राफ़्ट"))
         run {
-            CheckLine(consent, { consent = it }, t("Everyone here agrees to send these words to ${service.provider} to make a draft. Nothing is sent until you tap the button. A person will check it before use.", "यहाँ मौजूद सभी इन शब्दों को ड्राफ़्ट बनाने के लिए ${service.provider} को भेजने पर राज़ी हैं। बटन दबाने तक कुछ नहीं भेजा जाता। इस्तेमाल से पहले कोई व्यक्ति इसे जाँचेगा।"))
+            CheckLine(consent, { consent = it }, t("Everyone here agrees to send these words to ${service.provider}.", "यहाँ मौजूद सभी ये शब्द ${service.provider} को भेजने पर राज़ी हैं।"))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Button(onClick = {
                     val snapshot = source
@@ -157,7 +155,7 @@ import kotlinx.coroutines.withContext
         }
         result?.let { draft ->
             HorizontalDivider(Modifier.padding(vertical = 8.dp), color = DoctorHairline)
-            CareAssistChip(t("Draft · check each line with the talk", "ड्राफ़्ट · हर पंक्ति बातचीत से मिलाएँ"))
+            CareAssistChip(t("Not checked", "जाँचा नहीं"))
             careAssistFieldKeys.forEachIndexed { index, key ->
                 val words = draft.fields[key].orEmpty()
                 Text(NoteRules.labels[index], style = MaterialTheme.typography.labelLarge, color = DoctorCardSub)
@@ -165,7 +163,7 @@ import kotlinx.coroutines.withContext
                 CareSourceLinks(source, words)
                 Spacer(Modifier.height(6.dp))
             }
-            CheckLine(checked, { checked = it }, t("I checked the chosen words and who said them against the talk, including any “no” or “not sure”.", "मैंने चुने शब्द और किसने कहे, बातचीत से मिला लिए हैं। ‘नहीं’ और ‘पक्का नहीं’ वाली बातें भी।"))
+            CheckLine(checked, { checked = it }, t("I checked the words and who spoke.", "मैंने शब्द और बोलने वाले जाँच लिए हैं।"))
             Button(onClick = {
                 if (draft.sourceHash == careAssistSourceHash(latestSource)) { latestUse(draft); result = null; checked = false }
                 else message = t("The conversation changed. Prepare a fresh draft.", "बातचीत बदल गई। नया ड्राफ़्ट बनाएँ।")
@@ -199,14 +197,13 @@ import kotlinx.coroutines.withContext
     DisposableEffect(versionId, source, from, to) { onDispose { job?.cancel() } }
     val service = capabilities?.takeIf { it.translationReady } ?: return
     SurfaceCard(Mint) {
-        CareAssistTitle(Icons.Default.Translate, t("Read in another language", "दूसरी भाषा में पढ़ें"),
-            t("This does not replace the signed note. It does not confirm a new version.", "यह हस्ताक्षर वाले नोट की जगह नहीं लेता। यह नए संस्करण की पुष्टि नहीं करता।"))
+        CareAssistTitle(Icons.Default.Translate, t("Read in another language", "दूसरी भाषा में पढ़ें"))
         run {
             Text(t("Original language", "मूल भाषा"), style = MaterialTheme.typography.labelLarge, color = DoctorCardSub)
             CareLanguageMenu(from, enabled = !busy) { from = it }
             Text(t("Translate to", "किस भाषा में"), style = MaterialTheme.typography.labelLarge, color = DoctorCardSub)
             CareLanguageMenu(to, enabled = !busy) { to = it }
-            CheckLine(consent, { consent = it }, t("I agree to send this note to ${service.provider} to translate it. Nothing is sent until you tap the button. The original stays the same.", "मैं यह नोट अनुवाद के लिए ${service.provider} को भेजने पर राज़ी हूँ। बटन दबाने तक कुछ नहीं भेजा जाता। मूल नोट नहीं बदलेगा।"))
+            CheckLine(consent, { consent = it }, t("I agree to send this note to ${service.provider}.", "मैं यह नोट ${service.provider} को भेजने पर राज़ी हूँ।"))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Button(onClick = {
                     val original = source; val selectedVersion = versionId
@@ -225,9 +222,9 @@ import kotlinx.coroutines.withContext
         }
         result?.let { translated ->
             HorizontalDivider(Modifier.padding(vertical = 8.dp), color = DoctorHairline)
-            CareAssistChip(t("Translation · check it with the original", "अनुवाद · मूल से मिलाएँ"))
+            CareAssistChip(t("Not checked", "जाँचा नहीं"))
             SelectionContainerText(translated.translation)
-            CheckLine(reviewed, { reviewed = it }, t("Someone who knows both languages checked this translation, including names, numbers and any “no” or “not sure”.", "दोनों भाषाएँ जानने वाले किसी व्यक्ति ने यह अनुवाद जाँचा है, नाम, अंक, ‘नहीं’ और ‘पक्का नहीं’ वाली बातें भी।"))
+            CheckLine(reviewed, { reviewed = it }, t("A bilingual person checked this.", "दोनों भाषाएँ जानने वाले ने यह जाँचा है।"))
             if (reviewed) CareReadAloudControl(translated.translation, "translation-${translated.versionId}-${translated.sourceHash}-${translated.targetLanguage}", translated.targetLanguage)
         }
         if (message.isNotBlank()) Text(message, fontSize = 14.sp, color = DoctorCardInk, modifier = Modifier.announce())
@@ -251,11 +248,11 @@ internal object CareAiOffCopy {
 }
 
 /** Panel title row: icon, title, and a "?" holding the one-line explanation that used to sit under it. */
-@Composable internal fun CareAssistTitle(icon: ImageVector, title: String, help: String) {
+@Composable internal fun CareAssistTitle(icon: ImageVector, title: String, help: String = "") {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Icon(icon, null, Modifier.size(20.dp), tint = RustText); Spacer(Modifier.width(8.dp))
         Text(title, Modifier.weight(1f).a11yHeading(), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, fontSize = 17.sp, color = DoctorCardInk)
-        CareHelpIcon(title, help)
+        if (help.isNotBlank()) CareHelpIcon(title, help)
     }
 }
 

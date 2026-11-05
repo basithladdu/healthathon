@@ -28,33 +28,33 @@ private fun conversationDate(at: Long?, hindi: Boolean) = at?.takeIf { it > 0 }?
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                     Icon(Icons.Default.Forum, null, tint = DoctorAccent, modifier = Modifier.size(24.dp))
-                    Text(t("Conversation workspace", "बातचीत की जगह"), fontFamily = SaharaTitleFont, fontSize = 21.sp, lineHeight = 27.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+                    Text(t("Conversations", "बातचीत"), fontFamily = SaharaTitleFont, fontSize = 21.sp, lineHeight = 27.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
                 }
                 if (model.currentDraft != null) {
                     Column(Modifier.testTag("conversation-draft"), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Surface(color = DoctorStatusWarnBg, contentColor = DoctorStatusWarn, shape = RoundedCornerShape(50)) { Text(t("Saved draft · not a published Care Note", "सहेजा ड्राफ़्ट · प्रकाशित केयर नोट नहीं"), fontWeight = FontWeight.Medium, fontSize = 14.sp, lineHeight = 18.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)) }
+                        Surface(color = DoctorStatusWarnBg, contentColor = DoctorStatusWarn, shape = RoundedCornerShape(50)) { Text(t("Draft", "ड्राफ़्ट"), fontWeight = FontWeight.Medium, fontSize = 14.sp, lineHeight = 18.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)) }
                     }
                 }
                 Button(onClick = onContinue, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("workflow-open-conversation"), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = Paper), shape = RoundedCornerShape(14.dp)) {
-                    Text(if (model.currentDraft != null) t("Continue discussion draft", "चर्चा का ड्राफ़्ट जारी रखें") else t("Open conversation workspace", "बातचीत की जगह खोलें"), fontSize = 16.sp)
+                    Text(if (model.currentDraft != null) t("Continue", "जारी रखें") else t("New conversation", "नई बातचीत"), fontSize = 16.sp)
                 }
             }
         }
         model.latestPublished?.let { discussion ->
             Column(Modifier.testTag("conversation-latest"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                ConversationHeading(t("Most recent published discussion", "सबसे नई प्रकाशित चर्चा"))
+                ConversationHeading(t("Latest", "सबसे नई"))
                 DiscussionReadingCard(discussion, highlighted = true)
             }
         }
         if (model.earlierPublished.isNotEmpty()) {
             Column(Modifier.testTag("conversation-earlier"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                ConversationHeading(t("Earlier published discussions", "पहले प्रकाशित चर्चाएँ"))
+                ConversationHeading(t("Earlier", "पहले की"))
                 model.earlierPublished.forEach { discussion -> key(model.patientId, discussion.id) { DiscussionReadingCard(discussion, highlighted = false) } }
             }
         }
         model.priorSample?.let { discussion ->
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                ConversationHeading(t("Previous discussion on record", "रिकॉर्ड में पिछली चर्चा"))
+                ConversationHeading(t("Previous", "पिछली"))
                 DiscussionReadingCard(discussion, highlighted = false)
             }
         }
@@ -62,7 +62,7 @@ private fun conversationDate(at: Long?, hindi: Boolean) = at?.takeIf { it > 0 }?
             Surface(color = DoctorCardReport, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
                 Row(Modifier.padding(16.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Icon(Icons.Default.Forum, null, tint = RustText, modifier = Modifier.size(24.dp))
-                    Text(t("No saved discussion is recorded yet. You can prepare one in the workspace.", "अभी कोई सहेजी चर्चा दर्ज नहीं है। आप बातचीत की जगह में एक तैयार कर सकते हैं।"), fontSize = 16.sp, lineHeight = 23.sp, color = DoctorCardSub, modifier = Modifier.weight(1f))
+                    Text(t("No conversations yet", "अभी कोई बातचीत नहीं"), fontSize = 16.sp, lineHeight = 23.sp, color = DoctorCardSub, modifier = Modifier.weight(1f))
                 }
             }
         }
@@ -95,7 +95,7 @@ private fun conversationDate(at: Long?, hindi: Boolean) = at?.takeIf { it > 0 }?
                     }
                     HorizontalDivider(color = DoctorHairline)
                 }
-                Text(t("Original words", "मूल शब्द"), fontSize = 19.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, fontFamily = SaharaTitleFont)
+                Text(t("Transcript", "लिखाई"), fontSize = 19.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, fontFamily = SaharaTitleFont)
                 Text(discussion.sourceLabel, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
                 SelectionContainer { Text(discussion.sourceText, fontSize = 16.sp, lineHeight = 25.sp, color = DoctorCardInk, modifier = Modifier.testTag("conversation-source-${discussion.id}")) }
             }

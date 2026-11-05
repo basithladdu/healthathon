@@ -61,11 +61,11 @@ internal object DoctorConnectedHome {
     }
 
     fun verificationTitle(state: Verification, hindi: Boolean): String = when (state) {
-        Verification.UNKNOWN -> careTr(hindi, "Checking verification", "सत्यापन की स्थिति देखी जा रही है")
-        Verification.NOT_SUBMITTED -> careTr(hindi, "Registration not submitted", "पंजीकरण अभी जमा नहीं हुआ")
+        Verification.UNKNOWN -> careTr(hindi, "Checking…", "देखा जा रहा है…")
+        Verification.NOT_SUBMITTED -> careTr(hindi, "Not verified", "सत्यापित नहीं")
         Verification.PENDING -> careTr(hindi, "Waiting for approval", "मंज़ूरी का इंतज़ार")
-        Verification.APPROVED -> careTr(hindi, "Approved as a doctor", "डॉक्टर के रूप में मंज़ूर")
-        Verification.REJECTED -> careTr(hindi, "Registration not approved", "पंजीकरण मंज़ूर नहीं हुआ")
+        Verification.APPROVED -> careTr(hindi, "Verified", "सत्यापित")
+        Verification.REJECTED -> careTr(hindi, "Not approved", "मंज़ूर नहीं")
         Verification.SUSPENDED -> careTr(hindi, "Approval on hold", "मंज़ूरी रोकी गई है")
     }
 
@@ -99,18 +99,16 @@ private fun doctorWhen(item: CareItem, hindi: Boolean, zone: ZoneId = ZoneId.sys
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Icon(icon, null, tint = ink, modifier = Modifier.size(22.dp))
                 Text(DoctorConnectedHome.verificationTitle(state, hindi), Modifier.weight(1f).testTag("doctor-verification-status"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
-                DoctorInfoIcon(DoctorConnectedHome.verificationTitle(state, hindi), DoctorConnectedHome.verificationBody(state, hindi), "doctor-verification-about")
             }
             if (note.isNotBlank() && state in setOf(DoctorConnectedHome.Verification.REJECTED, DoctorConnectedHome.Verification.SUSPENDED)) Text(t("Reviewer note: ", "जाँचने वाले की टिप्पणी: ") + note, style = MaterialTheme.typography.bodyMedium)
             error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
-            if (checkedAt > 0) Text(DoctorConnectedHome.checkedAt(checkedAt, hindi), fontSize = 14.sp, color = DoctorCardSub)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(onClick = onCheck, enabled = !checking, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-verification-check")) {
                     Icon(Icons.Default.Refresh, null); Spacer(Modifier.width(6.dp)); Text(if (checking) t("Checking…", "देखा जा रहा है…") else t("Check again", "फिर से देखें"))
                 }
                 if (state != DoctorConnectedHome.Verification.PENDING && state != DoctorConnectedHome.Verification.UNKNOWN)
                     TextButton(onClick = onOpenForm, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-verification-form")) {
-                        Text(if (state == DoctorConnectedHome.Verification.APPROVED) t("View details", "विवरण देखें") else t("Submit details", "विवरण जमा करें"))
+                        Text(if (state == DoctorConnectedHome.Verification.APPROVED) t("Details", "विवरण") else t("Verify", "सत्यापित करें"))
                     }
             }
         }
@@ -121,7 +119,7 @@ private fun doctorWhen(item: CareItem, hindi: Boolean, zone: ZoneId = ZoneId.sys
     val focus = LocalFocusManager.current
     OutlinedTextField(query, { onQuery(it.take(80)) }, Modifier.fillMaxWidth().testTag("doctor-patient-search"), singleLine = true,
         colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper),
-        placeholder = { Text(careTr(hindi, "Name or patient ID (e.g. SH-1A2B3C4D)", "नाम या मरीज़ ID (जैसे SH-1A2B3C4D)")) },
+        placeholder = { Text(careTr(hindi, "Search", "खोजें")) },
         leadingIcon = { Icon(Icons.Default.Search, null) },
         trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { onQuery("") }, Modifier.size(48.dp)) { Icon(Icons.Default.Clear, careTr(hindi, "Clear search", "खोज साफ़ करें")) } },
         shape = RoundedCornerShape(14.dp), keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), keyboardActions = KeyboardActions(onSearch = { focus.clearFocus() }))
@@ -135,21 +133,21 @@ internal fun LazyListScope.doctorConnectedHomeItems(people: List<Person>, items:
     item(key = "home-patients") {
         Surface(onClick = onPatients, color = DoctorCardOverview, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(if (people.isEmpty()) t("No patient has shared their care with you yet.", "अभी किसी मरीज़ ने अपनी देखभाल आपसे साझा नहीं की है।")
+                Text(if (people.isEmpty()) t("No patients yet", "अभी कोई मरीज़ नहीं")
                     else "${people.size}", fontFamily = SaharaTitleFont, fontSize = if (people.isEmpty()) 17.sp else 30.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.testTag("doctor-home-patient-count"))
-                Text(if (people.isEmpty()) t("Join with an invitation code", "निमंत्रण कोड से जुड़ें") else t("Your patients", "आपके मरीज़"), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = if (people.isEmpty()) RustText else DoctorCardSub)
+                Text(if (people.isEmpty()) t("Add a patient", "मरीज़ जोड़ें") else t("Patients", "मरीज़"), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = if (people.isEmpty()) RustText else DoctorCardSub)
             }
-            Icon(Icons.Default.ChevronRight, if (people.isEmpty()) t("Join with an invitation code", "निमंत्रण कोड से जुड़ें") else t("Open patients", "मरीज़ खोलें"), tint = DoctorAccent)
+            Icon(Icons.Default.ChevronRight, if (people.isEmpty()) t("Add a patient", "मरीज़ जोड़ें") else t("Patients", "मरीज़"), tint = DoctorAccent)
         } }
     }
     if (people.isEmpty()) return
-    item(key = "home-visits-title") { DoctorHomeSection(t("Upcoming visits", "आने वाली मुलाक़ातें"), visits.size) }
-    if (visits.isEmpty()) item(key = "home-visits-empty") { DoctorHomeEmpty(Icons.Default.EventAvailable, t("No open visits are planned for your patients.", "आपके मरीज़ों की कोई मुलाक़ात तय नहीं है।")) }
+    item(key = "home-visits-title") { DoctorHomeSection(t("Visits", "मुलाक़ातें"), visits.size) }
+    if (visits.isEmpty()) item(key = "home-visits-empty") { DoctorHomeEmpty(Icons.Default.EventAvailable, t("No visits", "कोई विज़िट नहीं")) }
     items(visits.take(5), key = { "home-visit-${it.item.id}" }) { visit ->
         DoctorPatientListCard(visit.person.name, "${doctorWhen(visit.item, hindi)} · ${visit.item.title}", { onVisit(visit.person.id) })
     }
-    item(key = "home-checks-title") { DoctorHomeSection(t("Check-ins this week", "इस हफ़्ते के हालचाल"), checks.size) }
-    if (checks.isEmpty()) item(key = "home-checks-empty") { DoctorHomeEmpty(Icons.Default.Favorite, t("No check-ins reported in the last 7 days.", "पिछले 7 दिनों में कोई हालचाल दर्ज नहीं हुआ।")) }
+    item(key = "home-checks-title") { DoctorHomeSection(t("Check-ins", "हालचाल"), checks.size) }
+    if (checks.isEmpty()) item(key = "home-checks-empty") { DoctorHomeEmpty(Icons.Default.Favorite, t("No check-ins", "कोई हालचाल नहीं")) }
     items(checks, key = { "home-check-${it.second.id}" }) { (person, check) ->
         DoctorPatientListCard(person.name, "${checkInMoodLabel(check.title, hindi)} · ${DateTimeFormatter.ofPattern("d MMM, h:mm a", careLocale(hindi)).withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(check.created))}", { onProgress(person.id) })
     }
@@ -178,11 +176,11 @@ internal fun LazyListScope.doctorConnectedScheduleItems(people: List<Person>, it
     val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     val visits = DoctorConnectedHome.upcomingVisits(people, items, now)
     item(key = "schedule-title") { Text(t("Schedule", "समय-सारणी"), style = MaterialTheme.typography.headlineMedium) }
-    if (people.isEmpty()) item(key = "schedule-no-people") { Text(t("No connected patients yet.", "अभी कोई जुड़ा हुआ मरीज़ नहीं है।"), fontWeight = FontWeight.Medium) }
-    else if (visits.isEmpty()) item(key = "schedule-empty") { Text(t("No open visits. Open a patient's Visits to plan one.", "कोई खुली मुलाक़ात नहीं। मुलाक़ात तय करने के लिए मरीज़ की मुलाक़ातें खोलें।")) }
+    if (people.isEmpty()) item(key = "schedule-no-people") { Text(t("No patients yet", "अभी कोई मरीज़ नहीं"), fontWeight = FontWeight.Medium) }
+    else if (visits.isEmpty()) item(key = "schedule-empty") { Text(t("No visits", "कोई विज़िट नहीं")) }
     items(visits, key = { "schedule-${it.item.id}" }) { visit -> DoctorPatientListCard(visit.person.name, "${doctorWhen(visit.item, hindi)} · ${visit.item.title}", { onVisit(visit.person.id) }) }
     if (people.isNotEmpty()) {
-        item(key = "schedule-by-patient") { Text(t("Plan a visit for", "इनके लिए मुलाक़ात तय करें"), style = MaterialTheme.typography.titleMedium) }
+        item(key = "schedule-by-patient") { Text(t("Plan a visit", "विज़िट तय करें"), style = MaterialTheme.typography.titleMedium) }
         items(people, key = { "schedule-person-${it.id}" }) { person -> DoctorPatientListCard(person.name, t("Visits", "मुलाक़ातें"), { onVisit(person.id) }) }
     }
 }
@@ -194,11 +192,10 @@ internal fun LazyListScope.doctorConnectedScheduleItems(people: List<Person>, it
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.School, null, tint = DoctorAccent, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(8.dp))
-                Text(careTr(hindi, "Practice walkthrough · not real patients", "अभ्यास वॉकथ्रू · असली मरीज़ नहीं"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.weight(1f))
-                DoctorInfoIcon(careTr(hindi, "Practice walkthrough · not real patients", "अभ्यास वॉकथ्रू · असली मरीज़ नहीं"), careTr(hindi, "Made-up patients for practice, not real people. They stay on this phone and never mix with a real patient's records.", "अभ्यास के लिए बनाए गए मरीज़, असली नहीं। ये सिर्फ़ इस फ़ोन पर रहते हैं और किसी असली मरीज़ के रिकॉर्ड में नहीं जाते।"), "doctor-walkthrough-about")
+                Text(careTr(hindi, "Practice patients", "अभ्यास मरीज़"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.weight(1f))
             }
             DoctorTestProfiles.profiles.forEach { profile ->
-                TextButton(onClick = { onOpen(profile) }, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-walkthrough-${profile.key}")) { Text((careTr(hindi, "Practice: ", "अभ्यास: ")) + profile.name, color = RustText, fontSize = 15.sp); Spacer(Modifier.width(4.dp)); Icon(Icons.Default.ChevronRight, null, Modifier.size(18.dp), tint = RustText) }
+                TextButton(onClick = { onOpen(profile) }, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-walkthrough-${profile.key}")) { Text(profile.name, color = RustText, fontSize = 15.sp); Spacer(Modifier.width(4.dp)); Icon(Icons.Default.ChevronRight, null, Modifier.size(18.dp), tint = RustText) }
             }
         }
     }

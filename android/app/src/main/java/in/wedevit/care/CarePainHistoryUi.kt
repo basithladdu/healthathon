@@ -69,15 +69,13 @@ object PainHistoryRules {
             Text("${friendlyWhen(note.observedDate, note.observedTime, hindi)} · ${SymptomDiaryRules.ratingLabel(note.rating, hindi)}${note.rating?.let { " · ${ChartBands.word(it, hindi)}" }.orEmpty()}", fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.testTag("pain-history-observation"))
             Text("${SymptomDiaryRules.label(SymptomDiaryRules.recalls, note.recall, hindi)} · ${SymptomDiaryRules.label(SymptomDiaryRules.respondents, note.respondent, hindi)} · ${note.author}", fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.testTag("pain-history-context"))
             when (PainHistoryRules.locationKind(note)) {
-                "points" -> Text(if (note.painBodyRatings.isNotEmpty()) t("Dots show where it hurt. Each colour shows how strong.", "बिंदु दिखाते हैं कहाँ दर्द था। रंग दिखाता है कितना तेज़।") else t("Dots show where it hurt. Colour shows how strong.", "बिंदु दिखाते हैं कहाँ दर्द था। रंग दिखाता है कितना तेज़।"), fontSize = 14.sp, color = DoctorCardSub)
-                "regions" -> Text(t("Shaded parts show where it hurt.", "रंगे हुए हिस्से दिखाते हैं कहाँ दर्द था।"), fontSize = 14.sp, color = DoctorCardSub)
-                "text" -> Text(t("The place was written in words, not marked on the body.", "जगह शब्दों में लिखी थी, शरीर पर नहीं दिखाई गई।"), fontSize = 14.sp, color = DoctorCardSub)
-                "unsupported-model" -> Text(t("This body picture can't be shown here. The note is still saved.", "यह शरीर की तस्वीर यहाँ नहीं दिख सकती। नोट सुरक्षित है।"), fontSize = 14.sp, color = DoctorCardSub)
-                else -> Text(t("No place on the body was marked for this entry.", "इस नोट में शरीर पर दर्द की जगह नहीं बताई थी।"), fontSize = 14.sp, color = DoctorCardSub)
+                "points", "regions", "text" -> {}
+                "unsupported-model" -> Text(t("Can't show this picture", "यह तस्वीर यहाँ नहीं दिख सकती"), fontSize = 14.sp, color = DoctorCardSub)
+                else -> Text(t("No place marked", "जगह नहीं बताई"), fontSize = 14.sp, color = DoctorCardSub)
             }
             if (note.painLocation.isNotBlank()) Text(note.painLocation, modifier = Modifier.testTag("pain-history-location"))
             if (PainHistoryRules.locationKind(note) != "unsupported-model") CarePainBodyMap(note.painBodySites, note.painBodyPoints, note.rating, hindi, readOnly = true, ratings = note.painBodyRatings, onFocus = { part = it }) { _, _ -> }
-            part?.let { SymptomPartTrend(entries, personId, it, hindi) } ?: Text(t("Tap a body part to see its pain day by day.", "किसी हिस्से को छुएँ, उसका रोज़ का दर्द दिखेगा।"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.testTag("pain-part-trend-hint"))
+            part?.let { SymptomPartTrend(entries, personId, it, hindi) }
             if (note.startedOn.isNotBlank()) Text("${t("Started", "शुरू हुआ")}: ${note.startedOn}", fontSize = 14.sp, color = DoctorCardSub)
             if (note.painTriggers.isNotEmpty()) Text(note.painTriggers.joinToString { SymptomDiaryRules.label(SymptomDiaryRules.triggers, it, hindi) }, fontSize = 14.sp, color = DoctorCardSub)
             if (note.note.isNotBlank()) Text(note.note, fontSize = 16.sp, color = DoctorCardInk)

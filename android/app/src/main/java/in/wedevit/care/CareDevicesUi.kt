@@ -58,7 +58,7 @@ import java.time.LocalDate
         if (CareDeviceRules.tellCareTeam(devices, today)) item { DevicesTellTeam(phone) { open(context, Intent(Intent.ACTION_DIAL, Uri.parse(NearbyHelp.dialUri(phone)))) } }
         if (saveError) item { Row(Modifier.fillMaxWidth().announce(), verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.ErrorOutline, null, Modifier.size(20.dp), tint = RustText); Spacer(Modifier.width(8.dp))
-            Text(t("Could not save on this phone. Please try again.", "इस फ़ोन पर सहेजा नहीं जा सका। फिर से कोशिश करें।"), color = RustText, fontWeight = FontWeight.Medium)
+            Text(t("Couldn't save. Try again.", "सहेजा नहीं जा सका। फिर कोशिश करें।"), color = RustText, fontWeight = FontWeight.Medium)
         } }
         // Empty state: icon, one line, and the one action (the add button sits inside it, so it is never shown twice).
         if (devices.isEmpty()) item { Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("devices-empty")) {
@@ -70,12 +70,6 @@ import java.time.LocalDate
         items(CareDeviceRules.sorted(devices), key = { it.id }) { d -> DevicesCard(d, today, hindi, onCheck = { checking = d }, onEdit = { editing = d }) }
         item { Button(onClick = { editing = CareDevice() }, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("devices-add"), shape = RoundedCornerShape(14.dp)) {
             Icon(Icons.Default.Add, null); Spacer(Modifier.width(8.dp)); Text(t("Add tube or line", "नली या लाइन जोड़ें"), fontWeight = FontWeight.SemiBold)
-        } }
-        item { Surface(shape = RoundedCornerShape(50), color = SaharaSoftGold, contentColor = DoctorCardInk, modifier = Modifier.testTag("devices-v2-note")) {
-            Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.AutoAwesome, null, Modifier.size(18.dp), tint = RustText); Spacer(Modifier.width(8.dp))
-                Text(t("More coming in v2.0: device-specific care guides and alerts", "v2.0 में और: हर नली के लिए देखभाल गाइड और अलर्ट"), fontSize = 14.sp)
-            }
         } }
     }
     editing?.let { d ->

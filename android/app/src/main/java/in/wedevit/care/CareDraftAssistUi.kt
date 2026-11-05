@@ -25,15 +25,13 @@ import androidx.compose.ui.unit.sp
     val lines = remember(draft.source) { CareDraftAssist.lines(draft.source) }
     Surface(shape = RoundedCornerShape(20.dp), color = DoctorCardReport, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(noteSectionLabel(NoteRules.labels[section], careHindi()), fontFamily = SaharaTitleFont, fontSize = 21.sp, lineHeight = 26.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.testTag("build-section-heading"))
-        Text(NoteRules.values(draft)[section].ifBlank { t("Nothing added yet. Leave blank if it was not discussed.", "अभी कुछ नहीं जोड़ा। अगर इस पर बात नहीं हुई तो ख़ाली छोड़ें।") }, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk)
-        Text(t("Add the words from the conversation that belong in this section.", "बातचीत से वे शब्द जोड़ें जो इस हिस्से के हैं।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
+        Text(NoteRules.values(draft)[section].ifBlank { t("Nothing added yet", "अभी कुछ नहीं जोड़ा") }, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk)
         if (lines.isEmpty()) Text(t("Add the conversation first.", "पहले बातचीत जोड़ें।"), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk)
         val picks = remember(draft.source, section) { LocalDraftSuggestions.suggest(draft.source).bySection.getOrNull(section).orEmpty() }
             .filterNot { s -> NoteRules.values(draft)[section].lines().any { it.trim() == s.line.words } }
         if (picks.isNotEmpty()) Surface(shape = RoundedCornerShape(20.dp), color = DoctorStatusWarnBg, modifier = Modifier.fillMaxWidth().testTag("build-suggestions-$section")) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(t("Suggested for this section · same words found", "इस हिस्से के लिए सुझाव · एक जैसे शब्द मिले"), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorStatusWarn)
-                Text(t("These lines are copied from the written conversation. Nothing new is written. Check each one before you add it.", "ये पंक्तियाँ बातचीत की लिखाई से ली गई हैं। कुछ नया नहीं लिखा जाता। जोड़ने से पहले हर एक जाँचें।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
+                Text(t("Suggested", "सुझाव"), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorStatusWarn)
                 picks.forEach { s ->
                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         Text(t("Line ${s.line.number}", "पंक्ति ${s.line.number}"), fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub)
@@ -68,7 +66,7 @@ import androidx.compose.ui.unit.sp
     if (references.isNotEmpty()) Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         references.distinctBy { it.line.id }.forEach { reference -> AssistChip(onClick = { chosen = reference }, shape = RoundedCornerShape(50), label = { Text(t("Source line ${reference.line.number}", "स्रोत पंक्ति ${reference.line.number}")) }, leadingIcon = { Icon(Icons.Default.Link, null, Modifier.size(16.dp)) }) }
     }
-    if (unlinked.isNotEmpty()) Text(run { val n = unlinked.size; if (n == 1) t("1 line uses edited wording. Check against the original conversation.", "1 पंक्ति में बदले हुए शब्द हैं। मूल बातचीत से मिलाएँ।") else t("$n lines use edited wording. Check against the original conversation.", "$n पंक्तियों में बदले हुए शब्द हैं। मूल बातचीत से मिलाएँ।") }, color = DoctorCardSub, fontSize = 14.sp)
+    if (unlinked.isNotEmpty()) Text(run { val n = unlinked.size; if (n == 1) t("1 edited line", "1 बदली हुई पंक्ति") else t("$n edited lines", "$n बदली हुई पंक्तियाँ") }, color = DoctorCardSub, fontSize = 14.sp)
     chosen?.let { reference -> AlertDialog(onDismissRequest = { chosen = null }, title = { Text(t("Original words · line ${reference.line.number}", "मूल शब्द · पंक्ति ${reference.line.number}")) }, text = { SelectionContainerText(reference.line.text) }, confirmButton = { TextButton(onClick = { chosen = null }) { Text(t("Close", "बंद करें")) } }) }
 }
 

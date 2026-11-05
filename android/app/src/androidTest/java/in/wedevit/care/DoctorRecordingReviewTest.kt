@@ -69,9 +69,9 @@ class DoctorRecordingReviewTest {
                 DoctorCoverageItem("Not yet assessed"))))
         var reviewed = -1
         render(state, onCoverage = { reviewed = it })
-        ui.onNodeWithTag("record-transcript-origin").performScrollTo().assertTextEquals("Prepared transcript · not taken from this recording")
+        ui.onNodeWithTag("record-transcript-origin").performScrollTo().assertTextEquals("Sample transcript")
         ui.onNodeWithTag("record-coverage-0").performScrollTo().assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "Needs review"))
-        ui.onNodeWithTag("record-coverage-1").performScrollTo().assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "Discussed · source linked"))
+        ui.onNodeWithTag("record-coverage-1").performScrollTo().assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "Discussed"))
         ui.onNodeWithTag("record-coverage-2").performScrollTo().assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "Not assessed")).performClick()
         assertEquals(2, reviewed)
         ui.runOnIdle { state.value = state.value.copy(sourceText = "", coverage = listOf(DoctorCoverageItem("No source yet", DoctorCoverageStatus.NOT_FOUND_IN_TRANSCRIPT, manuallyReviewed = true))) }
@@ -80,7 +80,7 @@ class DoctorRecordingReviewTest {
         androidx.test.espresso.Espresso.closeSoftKeyboard()
         assertEquals(DoctorTranscriptKind.MANUAL, state.value.sourceKind)
         assertTrue(state.value.coverage.all { it.status == DoctorCoverageStatus.NOT_ASSESSED })
-        ui.onNodeWithTag("record-transcript-origin").assertTextEquals("Manually entered · check wording and speakers")
+        ui.onNodeWithTag("record-transcript-origin").assertTextEquals("Typed")
     }
 
     @Test fun busyAndUnavailableControlsCannotInvokeAnyTransportOrChangeSource() {

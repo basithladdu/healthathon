@@ -92,7 +92,8 @@ class CareHeaderUiTest {
         var walkthroughs = 0
         ui.setContent { CareTheme { Welcome({ accounts++ }, { started++ }, { workspaces++ }, { walkthroughs++ }) } }
         ui.onNodeWithText("Explore what Sahara can help with").assertDoesNotExist()
-        ui.onNodeWithText("Care notes, medicines and visits.").assertIsDisplayed()
+        ui.onNodeWithText("Care notes, medicines and visits.").assertDoesNotExist()
+        ui.onNodeWithText("Get started").assertIsDisplayed()
         ui.onNodeWithTag("doctor-demo-entry").assertDoesNotExist()
         ui.onNodeWithTag("welcome-patient-family").performScrollTo().performClick()
         ui.onNodeWithTag("welcome-add-person").performScrollTo().performClick()

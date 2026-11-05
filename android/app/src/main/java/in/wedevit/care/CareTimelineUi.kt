@@ -13,7 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -82,7 +81,6 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
     val notes by vm.versions.collectAsStateWithLifecycle()
     val person by vm.selected.collectAsStateWithLifecycle()
     var filterName by rememberSaveable { mutableStateOf(TimelineFilter.ALL.name) }
-    var about by rememberSaveable { mutableStateOf(false) }
     var toggled by rememberSaveable { mutableStateOf("") }; var showAllMonths by rememberSaveable { mutableStateOf("") }
     fun flip(set: String, key: String) = set.split(',').filter { it.isNotBlank() }.let { if (key in it) it - key else it + key }.joinToString(",")
     val shortFormat = DateTimeFormatter.ofPattern("d MMM", careLocale(careHindi()))
@@ -111,23 +109,8 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onClose, modifier = Modifier.size(48.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back to documents", "कागज़ात पर वापस")) }
             Column(Modifier.weight(1f)) { Heading(t("Care timeline", "देखभाल की समय-रेखा"), 28) }
-            // Where the dates come from sits behind this button instead of a paragraph under the list.
-            IconButton(onClick = { about = !about }, modifier = Modifier.size(48.dp).testTag("timeline-about")) { Icon(Icons.Outlined.Info, t("Where these dates come from", "ये तारीख़ें कहाँ से हैं"), tint = DoctorAccent) }
-        } }
-        if (about) item { Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("timeline-about-text")) {
-            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(t("Dates come from reports you added, Calendar days and results you copied. A Calendar day marks a day you noted; it does not confirm a treatment was given. Everything stays on this phone.", "तारीख़ें आपकी जोड़ी रिपोर्टों, कैलेंडर के दिनों और कॉपी किए नतीजों से हैं। कैलेंडर का दिन आपका नोट किया दिन है; इससे इलाज दिए जाने की पुष्टि नहीं होती। सब कुछ इसी फ़ोन पर रहता है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
-                if (shown.any { it.dateIsFileDate && it.isFile }) Text(t("(date added): Report date not recorded. This is the day the file was added.", "(जोड़ने की तारीख़): रिपोर्ट की तारीख़ दर्ज नहीं। यह फ़ाइल जोड़ने का दिन है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.testTag("timeline-date-footnote"))
-            }
-        } }
-        if (vm.demoMode) item { Surface(shape = RoundedCornerShape(20.dp), color = SaharaSoftGold, modifier = Modifier.fillMaxWidth()) {
-            Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Info, null, Modifier.size(18.dp), tint = DoctorAccent); Spacer(Modifier.width(8.dp))
-                Text(t("Practice record: these dates are sample data, not a real person's treatment.", "अभ्यास रिकॉर्ड: ये तारीख़ें नमूना हैं, किसी असली व्यक्ति का इलाज नहीं।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardInk)
-            }
         } }
         item { Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            SectionTitle(t("At a glance", "एक नज़र में"))
             val tiles = listOf(
                 GlanceTile(t("Last chemotherapy", "आख़िरी कीमो"), summary.chemo, "chemo", Icons.Default.Vaccines, Peach),
                 GlanceTile(t("Last radiotherapy", "आख़िरी रेडियोथेरेपी"), summary.radio, "radio", Icons.Default.Healing, SaharaLavender),
@@ -161,7 +144,6 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
             Surface(shape = CircleShape, color = SaharaApricot) { Icon(Icons.Default.Timeline, null, Modifier.padding(12.dp).size(28.dp), tint = DoctorAccent) }
             Spacer(Modifier.height(12.dp))
             Text(if (all.isEmpty()) t("Nothing on the timeline yet", "समय-रेखा में अभी कुछ नहीं") else t("Nothing here", "यहाँ कुछ नहीं"), fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk)
-            Text(if (all.isEmpty()) t("Add reports, lab results and chemo or radiotherapy days. They appear here with where they came from.", "रिपोर्टें, जाँच के नतीजे और कीमो या रेडियोथेरेपी के दिन जोड़ें। वे यहाँ अपने स्रोत के साथ दिखेंगे।") else t("Try another filter.", "कोई और फ़िल्टर चुनें।"), Modifier.padding(top = 4.dp), fontSize = 16.sp, color = DoctorCardSub)
             if (all.isNotEmpty()) TextButton(onClick = { filterName = TimelineFilter.ALL.name }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Show all", "सब दिखाएँ")) }
         } }
         items(months, key = { "month-${it.first}" }) { (month, events) ->

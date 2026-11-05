@@ -115,7 +115,7 @@ class CareFlowTest {
         val monitor = instrumentation.addMonitor(filter, android.app.Instrumentation.ActivityResult(android.app.Activity.RESULT_OK, android.content.Intent().setData(uri)), true)
         try {
             ui.onNodeWithContentDescription("Documents").performClick()
-            ui.onNodeWithContentDescription("Add a report").performClick()
+            ui.onNodeWithTag("document-add").performClick(); ui.onNodeWithTag("document-upload").performClick()
             ui.waitUntil(15000) { vm.reports.value.size == 1 }
             assertEquals(1, monitor.hits)
         } finally { instrumentation.removeMonitor(monitor) }
@@ -259,7 +259,7 @@ class CareFlowTest {
         ui.onNodeWithTag("nearby-option-${NearbyHelp.ALL_INDIA}").performClick()
         screenshot("nearby")
         ui.onNode(hasSetTextAction()).performTextInput("No such hospital xyz")
-        ui.onNodeWithText("No centres match that search.").assertIsDisplayed()
+        ui.onNodeWithText("No centres found").assertIsDisplayed()
         ui.onNodeWithTag("nav-Today").performClick()
         ui.onNodeWithTag("nav-Nearby").performClick()
         ui.onNode(hasSetTextAction()).assertTextContains("No such hospital xyz")
@@ -310,7 +310,7 @@ class CareFlowTest {
         ui.onNodeWithTag("care-module-medicines-toggle").performClick()
         ui.onNodeWithTag("care-list").performScrollToNode(hasText("Scan a prescription"))
         ui.onNodeWithText("Scan a prescription").assertIsDisplayed()
-        ui.onNodeWithText("Scan & organize").performClick()
+        ui.onNodeWithTag("care-module-medicines-scan").performClick()
         ui.onNodeWithTag("medicine-scanner-select").assertIsDisplayed()
         ui.onNodeWithText("Choose pages").assertIsDisplayed()
         ui.onNodeWithText("Choose photos").assertIsDisplayed()
@@ -328,7 +328,7 @@ class CareFlowTest {
         screenshot("medicine-review")
         ui.onNodeWithTag("medicine-scanner-review").performScrollToNode(hasText("Save 1 medicine"))
         ui.onNodeWithText("Save 1 medicine").assertIsNotEnabled()
-        ui.onNodeWithText("I checked this medicine, dose and directions against the original prescription and packaging.", substring = true).performScrollTo().performClick()
+        ui.onNodeWithText("I checked this with the prescription", substring = true).performScrollTo().performClick()
         ui.onNodeWithTag("medicine-scanner-review").performScrollToNode(hasText("Save 1 medicine"))
         ui.onNodeWithText("Save 1 medicine").performClick()
         ui.waitUntil(15000) { vm.items.value.any { it.kind == "medicine" && it.title == "Test medicine" } }
@@ -375,8 +375,6 @@ class CareFlowTest {
         screenshot("more-privacy-before")
         ui.onRoot(useUnmergedTree = true).printToLog("SaharaPrivacy")
         screenshot("more-privacy-visible")
-        ui.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("You choose which notes to share and with whom.", substring = true))
-        ui.onNodeWithText("You choose which notes to share and with whom.", substring = true).assertIsDisplayed()
         screenshot("more")
     }
     @Test fun signInLoadsAccountRecordsOnToday() {
@@ -394,7 +392,7 @@ class CareFlowTest {
                 cloud.signOut()
             }
             ui.onNodeWithTag("nav-More").performClick()
-            ui.onNodeWithText("Sign in to share care").performClick()
+            ui.onNodeWithText("Sign in").performClick()
             ui.onNode(hasSetTextAction() and hasText("Email")).performTextInput(email!!)
             ui.onNode(hasSetTextAction() and hasText("Password")).performTextInput(password!!)
             ui.onNodeWithText("Forgot password?").performScrollTo().assertIsDisplayed().assertIsEnabled()

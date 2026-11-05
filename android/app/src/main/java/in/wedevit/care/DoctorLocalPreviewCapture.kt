@@ -46,8 +46,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
     var coverage by remember(controller,sourceText,clip?.id,state.recording) {mutableStateOf(defaultDoctorCoverage())}
     var reviewing by remember(controller,sourceText,clip?.id,state.recording) {mutableStateOf<Int?>(null)}
     var quote by remember(reviewing) {mutableStateOf("")}
-    Text("Practice recording—on this device, not linked to a real patient. Use only non-confidential speech, never real patient information. The recording stays on this device, does not upload audio and does not create a transcript.",style=MaterialTheme.typography.bodySmall)
-    if(clip!=null && sourceText.isNotBlank()) Text("Existing text below was not generated from this recording. It is kept unchanged.",color=Rust,style=MaterialTheme.typography.bodySmall)
     DoctorRecordingReview(
         state=DoctorRecordingReviewState(recording=state.recording,paused=state.paused,seconds=state.seconds,levels=state.levels,
             clipLabel=clip?.let {"Practice recording"},playing=clip!=null && state.playing==clip.id,
@@ -58,16 +56,15 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
         onPlayPause={clip?.let(controller::togglePlayback)},onSeek={position->clip?.let {controller.seekPlayback(it,position)}},
         onTranscribe={},onSourceEdit=onSourceEdit,onCoverageReview={reviewing=it},
     )
-    Text("Goals of Care review selections apply only to this review session and are reset when the source or recording changes.",style=MaterialTheme.typography.bodySmall)
     if(consentOpen) AlertDialog(containerColor=Paper,onDismissRequest={consentOpen=false},title={Text("Before recording")},text={
         Column(Modifier.heightIn(max=500.dp).verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(10.dp)) {
-            Text("Every participant must agree before recording. Record only non-confidential content that is not real patient information.")
-            OutlinedTextField(participants,{participants=it.take(600)},label={Text("Participant names")},supportingText={Text("Separate names with commas or new lines")},modifier=Modifier.testTag("preview-record-participants"))
+            Text("Everyone must agree. Practice only.")
+            OutlinedTextField(participants,{participants=it.take(600)},label={Text("Names")},placeholder={Text("Separate with commas")},modifier=Modifier.testTag("preview-record-participants"))
             names.forEachIndexed {i,name -> PreviewRecordingCheck(agreements[name]==true,{agreements[name]=it},"$name agrees to recording","preview-record-person-$i")}
             PreviewRecordingCheck(purpose,{purpose=it},"We understand this recording is for care-conversation practice.","preview-record-purpose")
             PreviewRecordingCheck(storage,{storage=it},"Audio is saved only on this device for practice; no upload or transcription runs.","preview-record-storage")
             PreviewRecordingCheck(access,{access=it},"Anyone with access to this device may access its local recordings.","preview-record-access")
-            Text("Maximum 5 minutes, including pauses, or 3 MB. Leaving the app or this conversation stops and saves recording.",style=MaterialTheme.typography.bodySmall)
+            Text("Up to 5 minutes.",style=MaterialTheme.typography.bodySmall)
         }
     },confirmButton={TextButton(onClick={
         consentOpen=false
@@ -79,12 +76,11 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
     },enabled=names.isNotEmpty() && names.all {agreements[it]==true} && purpose && storage && access,modifier=Modifier.testTag("preview-record-start")) {Text("Start recording")}},dismissButton={TextButton(onClick={consentOpen=false}) {Text("Cancel")}})
     reviewing?.let {index -> AlertDialog(containerColor=Paper,onDismissRequest={reviewing=null},title={Text(coverage[index].question)},text={
         Column(verticalArrangement=Arrangement.spacedBy(12.dp)) {
-            Text("Manual review only—not an AI judgement. Missing words do not establish that a topic was not discussed.")
-            OutlinedTextField(quote,{quote=it.take(2000)},label={Text("Exact source quote (optional)")},minLines=2)
-            if(quote.isNotBlank() && !isDoctorSourceQuote(sourceText,quote)) Text("Use one complete, exact line from the current source text.",color=Rust)
+            OutlinedTextField(quote,{quote=it.take(2000)},label={Text("Quote (optional)")},minLines=2)
+            if(quote.isNotBlank() && !isDoctorSourceQuote(sourceText,quote)) Text("Use one exact line from the text.",color=Rust)
             DoctorCoverageStatus.entries.filter {it!=DoctorCoverageStatus.NOT_ASSESSED}.forEach {status ->
                 TextButton(onClick={coverage=coverage.mapIndexed {i,item -> if(i==index) item.copy(status=status,quote=quote,manuallyReviewed=true) else item};reviewing=null},enabled=(quote.isBlank() || isDoctorSourceQuote(sourceText,quote)) && (status!=DoctorCoverageStatus.NOT_FOUND_IN_TRANSCRIPT || sourceText.isNotBlank())) {
-                    Text(when(status) {DoctorCoverageStatus.REVIEWED_DISCUSSED->"Discussed · manually reviewed";DoctorCoverageStatus.NOT_FOUND_IN_TRANSCRIPT->"Not found in transcript · manually checked";else->"Needs review"})
+                    Text(when(status) {DoctorCoverageStatus.REVIEWED_DISCUSSED->"Discussed";DoctorCoverageStatus.NOT_FOUND_IN_TRANSCRIPT->"Not found";else->"Needs review"})
                 }
             }
         }

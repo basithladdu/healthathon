@@ -86,11 +86,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                     }
                     NearbyInfoButton(t("About this list", "इस सूची के बारे में"), Modifier.testTag("nearby-about")) {
                         Text(t("Directory listings. Call to confirm services, availability and cost.", "यह सूची से ली गई जानकारी है। सेवा, उपलब्धता और ख़र्च फ़ोन करके पक्का करें।"))
-                        Text(t("Blue pins and tags: the directory also lists morphine. Call to confirm.", "नीले निशान और टैग: सूची में मॉर्फ़ीन भी लिखा है। फ़ोन करके पक्का करें।"))
-                        Text(t("Hollow pins mark only the PIN, town or district area. Numbered circles are groups: tap to zoom.", "खाली गोले सिर्फ़ पिन, शहर या ज़िले का इलाक़ा दिखाते हैं। संख्या वाले गोले कई केंद्र हैं: ज़ूम के लिए दबाएँ।"))
                         val coverage = CentreLocation.coverage(visible)
-                        if (coverage.listOnly > 0) Text(t("${coverage.listOnly} centres have no map spot and are in the list only.", "${coverage.listOnly} केंद्र नक्शे पर नहीं, सिर्फ़ सूची में हैं।"))
-                        Text(t("Your location stays on this phone. It only centres the map and sorts the list.", "आपकी लोकेशन इसी फ़ोन पर रहती है। इससे सिर्फ़ नक्शा और सूची आपके पास से दिखती है।"))
                         if (coverage.approximate > 0) Text(t("Approximate locations © GeoNames (CC BY 4.0)", "अनुमानित जगहें © GeoNames (CC BY 4.0)"), style = MaterialTheme.typography.labelSmall)
                     }
                 }
@@ -124,14 +120,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
         if (visible.isEmpty()) item(key = "nearby-empty") { SurfaceCard {
             Column(Modifier.fillMaxWidth().testTag("nearby-empty"), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Icon(Icons.Default.SearchOff, null, Modifier.size(32.dp), tint = DoctorCardSub)
-                Text(t("No centres match that search.", "इस खोज से कोई केंद्र नहीं मिला।"), fontSize = 16.sp, color = DoctorCardInk)
+                Text(t("No centres found", "कोई केंद्र नहीं मिला"), fontSize = 16.sp, color = DoctorCardInk)
                 if (filtersOn) OutlinedButton(onClick = clear, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Clear filters", "सभी चुनाव हटाएँ"), color = RustText) }
             }
         } }
         items(visible, key = { it.id }) { c -> Box(Modifier.animateItem()) { NearbyCentreCard(c, here) } }
         if (vm != null) item(key = "nearby-suggest") {
             OutlinedButton(onClick = { suggesting = true }, shape = RoundedCornerShape(14.dp), border = androidx.compose.foundation.BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("nearby-suggest-centre")) {
-                Icon(Icons.Default.Add, null, Modifier.size(18.dp), tint = RustText); Spacer(Modifier.width(8.dp)); Text(t("Suggest a centre that's missing", "छूटा हुआ केंद्र सुझाएँ"), color = RustText)
+                Icon(Icons.Default.Add, null, Modifier.size(18.dp), tint = RustText); Spacer(Modifier.width(8.dp)); Text(t("Suggest a centre", "केंद्र सुझाएँ"), color = RustText)
             }
         }
         if (suggestions.isNotEmpty()) item { CentreSuggestionList(suggestions) }
@@ -169,9 +165,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
             }
             Spacer(Modifier.width(12.dp))
             Text(t("Call 112", "112 पर फ़ोन करें"), fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Ink, modifier = Modifier.weight(1f))
-            Surface(shape = RoundedCornerShape(50), color = Paper, contentColor = RustText) {
-                Text(t("Emergency", "आपातकाल"), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp))
-            }
         }
     }
 }
@@ -259,9 +252,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                 if (c.address.isNotBlank()) Text(c.address)
                 if (c.sourceListedMorphine == "available") Text(t("Directory lists morphine · call to confirm", "सूची में मॉर्फ़ीन लिखा है · फ़ोन करके पक्का करें"), color = Color(NearbyHelp.layerColor(NearbyHelp.LAYER_MORPHINE)))
                 Text(listOf(c.sourceName, c.checkedOn.takeIf { it.isNotBlank() }?.let { t("Source retrieved $it", "जानकारी ली गई $it") }).filterNotNull().filter(String::isNotBlank).joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub)
-                if (c.latitude == null || c.longitude == null) Text(t("No map location · Directions searches the address", "नक्शे पर जगह नहीं · रास्ता पते से खोजा जाएगा"), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub)
                 CentreLocation.note(c)?.let { (en, hi) -> Text(t(en, hi), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub, modifier = Modifier.testTag("centre-approximate-location")) }
-                Text(t("Call to confirm services, availability and cost.", "सेवा, उपलब्धता और ख़र्च फ़ोन करके पक्का करें।"), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub)
                 TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(c.url))) }, contentPadding = PaddingValues(0.dp), modifier = Modifier.testTag("centre-source-${c.id}")) { Text(t("Open the source listing", "मूल सूची खोलें")) }
             }
         }

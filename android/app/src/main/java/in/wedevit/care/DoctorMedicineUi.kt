@@ -43,7 +43,6 @@ fun doctorMedicinePresentation(dose:SampleMedicineDose,asOf:Long,zone:ZoneId):Do
 @Composable fun DoctorMedicineContent(doses:List<SampleMedicineDose>,asOf:Long,zone:ZoneId=ZoneId.systemDefault()) { val t = careText();
     Column(Modifier.fillMaxWidth().testTag("doctor-medicine-content"),verticalArrangement=Arrangement.spacedBy(12.dp)) {
         Text(t("Medicine reports", "दवा की सूचनाएँ"),Modifier.a11yHeading(),fontSize=22.sp,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont,color=DoctorCardInk)
-        Surface(color=DoctorStatusWarnBg,shape=RoundedCornerShape(50)) {Text(t("Practice data, not a real patient's reports", "उदाहरण डेटा, असली मरीज़ नहीं"),Modifier.padding(horizontal=12.dp,vertical=6.dp),fontSize=14.sp,lineHeight=20.sp,fontWeight=FontWeight.Medium,color=DoctorStatusWarn)}
         Text("As of ${DateTimeFormatter.ofPattern("dd MMM yyyy · h:mm a",Locale.ENGLISH).withZone(zone).format(Instant.ofEpochMilli(asOf))} · ${zone.id}",fontSize=14.sp,lineHeight=20.sp,color=DoctorCardSub)
         if(doses.isEmpty()) Surface(color=Paper,shape=RoundedCornerShape(20.dp),border=BorderStroke(1.dp,DoctorHairline),modifier=Modifier.fillMaxWidth()) {
             Row(Modifier.padding(16.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(12.dp)) {Icon(Icons.Outlined.Schedule,null,tint=Rust,modifier=Modifier.size(24.dp));Text(t("No medicine reports recorded.", "दवा की कोई सूचना दर्ज नहीं।"),fontSize=16.sp,color=DoctorCardInk)}

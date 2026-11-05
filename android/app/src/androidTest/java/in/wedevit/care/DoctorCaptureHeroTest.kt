@@ -28,7 +28,7 @@ class DoctorCaptureHeroTest {
         ui.onNodeWithText("Conversation").assertExists()
         ui.onNodeWithText("Conversation transcript").assertExists()
         listOf("1 Capture", "2 Review draft", "3 Publish").forEach { ui.onNodeWithText(it).assertDoesNotExist() }
-        ui.onNodeWithText("Back to conversations").performClick()
+        ui.onNodeWithText("Back").performClick()
         assertTrue(back)
         ui.onNodeWithTag("doctor-capture-mode").performClick()
         ui.onNodeWithText("Record · unavailable").assertIsNotEnabled()

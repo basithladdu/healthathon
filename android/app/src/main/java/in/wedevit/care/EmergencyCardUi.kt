@@ -268,7 +268,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
         if (uri != null && c != null && password != null) scope.launch {
             try {
                 withContext(Dispatchers.IO) { val locked = PdfPasswordLock.lock(ensurePdf(c).readBytes(), password); (context.contentResolver.openOutputStream(uri) ?: error("File unavailable")).use { it.write(locked) } }
-                vm.message.value = t("Locked PDF saved. It opens only with your password.", "पासवर्ड वाला PDF सहेजा गया")
+                vm.message.value = t("Locked PDF saved", "पासवर्ड वाला PDF सहेजा गया")
             } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; vm.message.value = t("Couldn't save the locked PDF. Try again.", "PDF सहेजा नहीं जा सका।") }
         }
     }
@@ -277,7 +277,6 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
             val file = withContext(Dispatchers.IO) { val plain = ensurePdf(c); if (password == null) plain else store.lockedPdf(c).also { it.writeBytes(PdfPasswordLock.lock(plain.readBytes(), password)) } }
             val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
             context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("application/pdf").putExtra(Intent.EXTRA_STREAM, uri).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), t("Share the emergency card", "आपातकालीन कार्ड साझा करें")))
-            vm.message.value = t("Share screen opened", "साझा करने की स्क्रीन खुली")
         } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; vm.message.value = t("No app is available to share the PDF.", "PDF साझा करने के लिए कोई ऐप नहीं है।") }
     }
     fun print(c: EmergencyCardRecord) = scope.launch {
@@ -285,7 +284,6 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
             val file = withContext(Dispatchers.IO) { ensurePdf(c) }
             val manager = context.getSystemService(Context.PRINT_SERVICE) as PrintManager
             manager.print("Sahara emergency card ${c.number}", PdfFilePrintAdapter(file, "Sahara-emergency-card-${c.number}.pdf"), null)
-            vm.message.value = t("Print screen opened: pick a printer or Save as PDF", "प्रिंट स्क्रीन खुली")
         } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; vm.message.value = t("Printing isn't available on this phone. Use Save PDF.", "प्रिंट उपलब्ध नहीं है।") }
     }
     fun remake(sections: Set<EmergencySection>, previous: EmergencyCardRecord?) = scope.launch {
@@ -294,9 +292,8 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
         try {
             val made = withContext(Dispatchers.IO) { EmergencyCardRecord.make(selected, source, sections, previous, System.currentTimeMillis()).also(::keep) }
             record = made; setup = false
-            val linkNote = if (blocked != null) blocked else try { record = syncLink(made, fresh = made.link == null); null } catch (e: EmergencyLinkException) { linkProblem = e.problem; e.problem } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; linkProblem = EmergencyLinkProblem.OFFLINE; EmergencyLinkProblem.OFFLINE }
-            val first = if (previous == null) t("Card ready and saved on this phone", "कार्ड तैयार है और इस फ़ोन पर सहेजा गया") else t("Card ${made.number} saved. Old card ${previous.number} is outdated", "कार्ड ${made.number} सहेजा गया। पुराना कार्ड ${previous.number} अब मान्य नहीं")
-            vm.message.value = if (linkNote == null) "$first. " + t("Web link is up to date.", "वेब लिंक अपडेट है।") else "$first. " + t(linkNote.en, linkNote.hi)
+            if (blocked == null) try { record = syncLink(made, fresh = made.link == null) } catch (e: EmergencyLinkException) { linkProblem = e.problem } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; linkProblem = EmergencyLinkProblem.OFFLINE }
+            vm.message.value = if (previous == null) t("Card ready", "कार्ड तैयार") else t("Card updated", "कार्ड अपडेट हुआ")
         } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; vm.message.value = e.message ?: t("Couldn't make the card. Try again.", "कार्ड नहीं बना।") }
         finally { busy = false }
     }
@@ -308,9 +305,6 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
                 Icon(Icons.Default.QrCode, null, Modifier.size(36.dp), tint = Rust); Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
                     Text(t("Emergency card", "आपातकालीन कार्ड"), fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Ink)
-                    Text(t("Make a QR card the hospital can scan. You choose what goes on it.", "आप चुनें कि उसमें क्या हो।"), fontSize = 14.sp, color = Ink)
-                    Spacer(Modifier.height(4.dp))
-                    Surface(color = Paper, shape = RoundedCornerShape(50)) { Text(t("Web link plus an offline copy", "वेब लिंक और ऑफ़लाइन कॉपी"), Modifier.padding(horizontal = 10.dp, vertical = 2.dp), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = RustText) }
                 }
                 Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(19.dp))
             }
@@ -323,14 +317,12 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
             Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(t("Emergency card", "आपातकालीन कार्ड"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, modifier = Modifier.fillMaxWidth().a11yHeading())
                 QrImage(shownQr, if (link != null) t("Emergency web link QR code", "आपातकालीन वेब लिंक QR कोड") else t("Emergency card offline QR code", "आपातकालीन कार्ड ऑफ़लाइन QR कोड"), Modifier.fillMaxWidth(.86f).widthIn(max = 320.dp).border(2.dp, Ink).clickable(onClickLabel = t("Show full screen", "पूरी स्क्रीन पर दिखाएँ")) { fullScreen = true }.testTag("emergency-card-qr"))
-                Text(t("Tap the code to show it full screen", "बड़ा दिखाने के लिए छुएँ"), fontSize = 14.sp, color = DoctorCardSub, textAlign = TextAlign.Center)
                 Text(t("Card ${card.number} · ID ${card.id} · made ${cardDay(card.madeAt)}", "कार्ड ${card.number} · ID ${card.id} · बना ${cardDay(card.madeAt)}"), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Ink, textAlign = TextAlign.Center)
                 if (link != null) {
-                    Text(t("Opens a read-only web page with this card. Works until ${cardDay(link.expiresAt)}.", "स्कैन करने पर केवल पढ़ने वाला वेब पेज खुलता है।"), fontSize = 14.sp, color = RustText, textAlign = TextAlign.Center, modifier = Modifier.testTag("emergency-link-live"))
                     linkStatus?.takeIf { it.live }?.let { s -> Text(if (s.views == 0) t("Not opened yet", "अभी तक नहीं खोला गया") else { val views = s.views; val last = s.lastViewedAt?.let { val day = cardDay(it); t(", last on $day", ", आख़िरी बार $day") }.orEmpty(); if (views == 1) t("Opened once$last", "एक बार खोला गया$last") else t("Opened $views times$last", "$views बार खोला गया$last") }, fontSize = 14.sp, color = DoctorCardSub) }
-                } else Text(t(EmergencyCardRules.OFFLINE_EN, EmergencyCardRules.OFFLINE_HI), fontSize = 14.sp, color = RustText, textAlign = TextAlign.Center)
-                val problem = linkProblem ?: blocked?.takeIf { link == null }
-                if (linkBusy) Row(verticalAlignment = Alignment.CenterVertically) { CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = Rust); Spacer(Modifier.width(8.dp)); Text(t("Checking the web link…", "वेब लिंक जाँचा जा रहा है…"), fontSize = 14.sp, color = DoctorCardSub) }
+                }
+                val problem = linkProblem
+                if (linkBusy) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = Rust)
                 else if (problem != null) Column(Modifier.fillMaxWidth().background(DoctorStatusWarnBg, RoundedCornerShape(14.dp)).padding(12.dp).testTag("emergency-link-problem")) {
                     Text(t(problem.en, problem.hi), fontSize = 14.sp, color = DoctorStatusWarn)
                     if (problem == EmergencyLinkProblem.OFFLINE || problem == EmergencyLinkProblem.NOT_SET_UP || problem == EmergencyLinkProblem.LINK_OFF) TextButton(onClick = {
@@ -344,12 +336,11 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
                     }, enabled = !linkBusy, modifier = Modifier.heightIn(min = 48.dp)) { Text(if (problem == EmergencyLinkProblem.LINK_OFF) t("Make a new link", "नया लिंक बनाएँ") else t("Try again", "फिर कोशिश करें")) }
                 }
                 if (stale) Column(Modifier.fillMaxWidth().background(DoctorStatusWarnBg, RoundedCornerShape(14.dp)).padding(12.dp).testTag("emergency-card-stale")) {
-                    Text(t("Your records changed after this card was made. Update it so the code and the web page match.", "रिकॉर्ड बदल गए हैं, कार्ड अपडेट करें।"), fontSize = 14.sp, color = DoctorStatusWarn)
+                    Text(t("Card out of date", "कार्ड पुराना है"), fontSize = 14.sp, color = DoctorStatusWarn)
                     TextButton(onClick = { remake(card.sections, card) }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp).testTag("emergency-card-update")) { Text(t("Update card", "कार्ड अपडेट करें")) }
                 }
-                if (card.leftOut.isNotEmpty()) Text(t("Not on the offline code: ", "ऑफ़लाइन कोड में नहीं: ") + card.leftOut.joinToString("; "), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.fillMaxWidth())
                 source.goals?.let { g -> versions.firstOrNull { it.version == g.version && it.personId == selected } }?.takeIf { EmergencySection.GOALS in card.sections }?.let { note ->
-                    OutlinedButton(onClick = { onRead(note) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("emergency-card-note")) { Icon(Icons.Default.Description, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Read the confirmed note (v${note.version})", "नोट पढ़ें")) }
+                    OutlinedButton(onClick = { onRead(note) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("emergency-card-note")) { Icon(Icons.Default.Description, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Read note", "नोट पढ़ें")) }
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(onClick = { share(card) }, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("emergency-card-share")) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Share", "साझा करें")) }
@@ -359,22 +350,21 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
                     OutlinedButton(onClick = { savePdf.launch("Sahara-emergency-card-${card.number}.pdf") }, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("emergency-card-save")) { Icon(Icons.Default.FileDownload, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Save PDF", "PDF सहेजें")) }
                     OutlinedButton(onClick = { lockFor = "" }, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("emergency-card-lock")) { Icon(Icons.Default.Lock, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Locked PDF", "लॉक PDF")) }
                 }
-                OutlinedButton(onClick = { setup = true }, enabled = !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("emergency-card-replace")) { Icon(Icons.Default.Refresh, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Change what's on the card", "कार्ड बदलें")) }
-                if (link != null && blocked == null) TextButton(onClick = { confirmNewLink = true }, enabled = !linkBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("emergency-link-replace")) { Text(t("Link shared by mistake? Replace the link", "लिंक बदलें"), color = RustText) }
-                if (card.replaced.isNotEmpty()) Text(t("Outdated offline codes (do not use): ", "पुराने ऑफ़लाइन कोड (इस्तेमाल न करें): ") + card.replaced.joinToString(", ") { "${t("card", "कार्ड")} ${it.number} · ID ${it.id}" }, fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.fillMaxWidth().testTag("emergency-card-outdated"))
+                OutlinedButton(onClick = { setup = true }, enabled = !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("emergency-card-replace")) { Icon(Icons.Default.Refresh, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Edit card", "कार्ड बदलें")) }
+                if (link != null && blocked == null) TextButton(onClick = { confirmNewLink = true }, enabled = !linkBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("emergency-link-replace")) { Text(t("Replace link", "लिंक बदलें"), color = RustText) }
             }
         }
         if (fullScreen) EmergencyQrFullScreen(linkQr, qr, card) { fullScreen = false }
         if (confirmNewLink) AlertDialog(onDismissRequest = { confirmNewLink = false },
             title = { Text(t("Replace the web link?", "लिंक बदलें?")) },
-            text = { Text(t("The old link stops working at once, on every printed card and every message it was sent in. Print or share the new card afterwards.", "पुराना लिंक तुरंत बंद हो जाएगा।")) },
+            text = { Text(t("The old link will stop working.", "पुराना लिंक बंद हो जाएगा।")) },
             confirmButton = { TextButton(onClick = {
                 confirmNewLink = false
                 scope.launch {
                     linkBusy = true
-                    try { record = syncLink(record ?: return@launch, fresh = true); vm.message.value = t("New link is live. The old link no longer opens. Print or share the new card.", "नया लिंक चालू, पुराना बंद") }
-                    catch (e: EmergencyLinkException) { linkProblem = e.problem; vm.message.value = t("The link was not replaced. ${e.problem.en}", "लिंक नहीं बदला। ${e.problem.hi}") }
-                    catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; vm.message.value = t("The link was not replaced. ${EmergencyLinkProblem.OFFLINE.en}", "लिंक नहीं बदला। ${EmergencyLinkProblem.OFFLINE.hi}") }
+                    try { record = syncLink(record ?: return@launch, fresh = true); vm.message.value = t("Link replaced", "लिंक बदल दिया गया") }
+                    catch (e: EmergencyLinkException) { linkProblem = e.problem; vm.message.value = t(e.problem.en, e.problem.hi) }
+                    catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; vm.message.value = t(EmergencyLinkProblem.OFFLINE.en, EmergencyLinkProblem.OFFLINE.hi) }
                     finally { linkBusy = false }
                 }
             }, modifier = Modifier.testTag("emergency-link-replace-confirm")) { Text(t("Replace link", "लिंक बदलें")) } },
@@ -388,9 +378,8 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
     var password by rememberSaveable { mutableStateOf("") }; val t = careText()
     val error = PdfPasswordLock.passwordError(password)
     AlertDialog(onDismissRequest = onDismiss,
-        title = { Text(t("Lock the PDF with a password", "PDF पर पासवर्ड")) },
+        title = { Text(t("Locked PDF", "लॉक PDF")) },
         text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(t("Any PDF reader will ask for this password before showing the card. Sahara does not keep it: tell it to the person you send the file to, separately.", "यह पासवर्ड Sahara में नहीं रखा जाता।"), style = MaterialTheme.typography.bodyMedium)
             OutlinedTextField(password, { password = it }, label = { Text(t("Password", "पासवर्ड")) }, singleLine = true, visualTransformation = PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password), isError = password.isNotEmpty() && error != null, supportingText = { if (password.isNotEmpty() && error != null) Text(error) }, modifier = Modifier.fillMaxWidth().testTag("emergency-pdf-password"))
         } },
         confirmButton = { Row { TextButton(onClick = { onShare(password) }, enabled = error == null) { Text(t("Share", "साझा करें")) }; TextButton(onClick = { onSave(password) }, enabled = error == null, modifier = Modifier.testTag("emergency-pdf-password-save")) { Text(t("Save", "सहेजें")) } } },
@@ -414,11 +403,8 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
                 QrImage(if (offline || linkQr == null) offlineQr else linkQr, if (offline || linkQr == null) t("Emergency card offline QR code", "आपातकालीन कार्ड ऑफ़लाइन QR कोड") else t("Emergency web link QR code", "आपातकालीन वेब लिंक QR कोड"), Modifier.fillMaxWidth().widthIn(max = 480.dp).border(3.dp, Color.Black))
                 Spacer(Modifier.height(16.dp))
                 Text(t("Card ${card.number} · ID ${card.id} · made ${cardDay(card.madeAt)}", "कार्ड ${card.number} · ID ${card.id} · बना ${cardDay(card.madeAt)}"), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black, textAlign = TextAlign.Center)
-                Spacer(Modifier.height(8.dp))
-                Text(if (offline || linkQr == null) t(EmergencyCardRules.OFFLINE_EN, EmergencyCardRules.OFFLINE_HI) else t("Scan to open the read-only emergency page (needs internet).", "स्कैन करके पेज खोलें।"), fontSize = 17.sp, lineHeight = 23.sp, color = Color.Black, textAlign = TextAlign.Center)
                 Spacer(Modifier.height(12.dp))
-                if (linkQr != null) OutlinedButton(onClick = { offline = !offline }, shape = RoundedCornerShape(14.dp), border = androidx.compose.foundation.BorderStroke(1.5.dp, RustText), modifier = Modifier.heightIn(min = 48.dp).testTag("emergency-fullscreen-toggle")) { Text(if (offline) t("Show the web link code", "वेब लिंक कोड") else t("No internet? Show the offline code", "ऑफ़लाइन कोड"), color = RustText) }
-                Spacer(Modifier.height(12.dp)); Text(t("Tap anywhere to close", "बंद करने के लिए कहीं भी छुएँ"), fontSize = 15.sp, color = DoctorCardSub)
+                if (linkQr != null) OutlinedButton(onClick = { offline = !offline }, shape = RoundedCornerShape(14.dp), border = androidx.compose.foundation.BorderStroke(1.5.dp, RustText), modifier = Modifier.heightIn(min = 48.dp).testTag("emergency-fullscreen-toggle")) { Text(if (offline) t("Web link code", "वेब लिंक कोड") else t("Offline code", "ऑफ़लाइन कोड"), color = RustText) }
             }
         }
     }
@@ -431,30 +417,26 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
     val preview = remember(source, sections, previous) { if (sections.isEmpty()) null else runCatching { EmergencyCardRules.build(source, sections, (previous?.number ?: 0) + 1, "NEW", System.currentTimeMillis()) }.getOrNull() }
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         LazyColumn(Modifier.fillMaxWidth().testTag("emergency-card-setup"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            item { Heading(if (previous == null) t("Emergency card", "आपातकालीन कार्ड") else t("Change the card", "कार्ड बदलें"), 26) }
-            item { Text(if (blocked == null) t("The QR opens a read-only web page with what you tick below. You can replace the link if it is shared by mistake. The PDF also carries an offline code.", "QR एक केवल-पढ़ने वाला वेब पेज खोलता है।") else t(blocked.en, blocked.hi), fontWeight = FontWeight.SemiBold, color = RustText) }
-            item { Text(t("Anyone who scans the code can read what you put on it. Tick only what you are happy to share.", "कोड स्कैन करने वाला इसे पढ़ सकता है। जो साझा करना ठीक लगे, वही चुनें।"), style = MaterialTheme.typography.bodyMedium) }
+            item { Heading(if (previous == null) t("Emergency card", "आपातकालीन कार्ड") else t("Edit card", "कार्ड बदलें"), 26) }
+            item { Text(t("Anyone who scans can see this.", "स्कैन करने वाला इसे देख सकता है।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub) }
             item {
                 val goals = source.goals
                 EmergencySection.entries.forEach { section ->
                     val detail = when (section) {
                         EmergencySection.NAME -> name.ifBlank { t("No name saved", "नाम नहीं है") }
-                        EmergencySection.GOALS -> goals?.let { t("Note v${it.version}, confirmed ${cardDay(it.confirmedAt)}", "नोट v${it.version}, पुष्टि ${cardDay(it.confirmedAt)}") + (it.newerUnconfirmedVersion?.let { v -> t(" (newer note v$v not confirmed yet)", " (नया नोट v$v अभी पुष्टि नहीं हुआ)") } ?: "") } ?: t("No confirmed note yet. The patient confirms a note in Read notes first.", "अभी कोई पुष्टि किया गया नोट नहीं है।")
-                        EmergencySection.CONTACTS -> if (source.contacts.isEmpty()) t("No contacts saved. Add them in Your care team.", "कोई संपर्क नहीं है।") else t("${source.contacts.size} saved", "${source.contacts.size} सहेजे गए")
+                        EmergencySection.GOALS -> goals?.let { t("Note v${it.version}, confirmed ${cardDay(it.confirmedAt)}", "नोट v${it.version}, पुष्टि ${cardDay(it.confirmedAt)}") + (it.newerUnconfirmedVersion?.let { v -> t(" (newer note v$v not confirmed yet)", " (नया नोट v$v अभी पुष्टि नहीं हुआ)") } ?: "") } ?: t("No confirmed note", "पुष्टि किया गया नोट नहीं")
+                        EmergencySection.CONTACTS -> if (source.contacts.isEmpty()) t("No contacts saved", "कोई संपर्क नहीं है") else t("${source.contacts.size} saved", "${source.contacts.size} सहेजे गए")
                         EmergencySection.MEDICINES -> if (source.medicines.isEmpty()) t("No current medicines listed", "कोई दवा नहीं है") else t("${source.medicines.size} current", "${source.medicines.size} दवाएँ")
                     }
                     CheckLine(section.name in chosen, { on -> chosen = if (on) chosen + section.name else chosen - section.name }, "${t(section.en, section.hi)}\n$detail")
                 }
             }
-            item { Text(t("Age, conditions and allergies are not recorded in Sahara, so they are not on the card. The card says so.", "उम्र, बीमारियाँ और एलर्जी ऐप में दर्ज नहीं हैं।"), fontSize = 14.sp, color = DoctorCardSub) }
-            if (previous != null) item { Text(t("The web link stays the same and shows the new card. The old offline code (card ${previous.number}, ID ${previous.id}) is marked outdated; a printed copy cannot be switched off, so tear up old copies.", "वेब लिंक वही रहेगा।"), fontSize = 14.sp, color = DoctorCardSub) }
             if (preview != null) item { SurfaceCard {
-                Text(t("What the offline code will contain", "ऑफ़लाइन कोड में क्या होगा"), fontWeight = FontWeight.Bold)
+                Text(t("Preview", "झलक"), fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(6.dp)); Text(preview.text, fontFamily = FontFamily.Monospace, fontSize = 12.sp, lineHeight = 16.sp, modifier = Modifier.testTag("emergency-card-preview"))
-                Spacer(Modifier.height(6.dp)); Text(t("${EmergencyCardRules.bytes(preview.text)} of ${EmergencyCardRules.MAX_BYTES} bytes used", "${EmergencyCardRules.MAX_BYTES} में से ${EmergencyCardRules.bytes(preview.text)} बाइट"), style = MaterialTheme.typography.labelSmall, color = DoctorCardSub)
                 if (preview.leftOut.isNotEmpty()) Text(t("Left out: ", "छोड़ा गया: ") + preview.leftOut.joinToString("; "), style = MaterialTheme.typography.bodySmall, color = RustText)
             } }
-            item { Button(onClick = { onMake(sections) }, enabled = ready && preview != null, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("emergency-card-make")) { Text(if (!ready) t("Loading records…", "लोड हो रहा है…") else if (sections.isEmpty()) t("Choose what to include", "क्या शामिल करें चुनें") else if (previous == null) t("Make card", "कार्ड बनाएँ") else t("Save new card", "नया कार्ड सहेजें")) } }
+            item { Button(onClick = { onMake(sections) }, enabled = ready && preview != null, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("emergency-card-make")) { Text(if (!ready) t("Loading…", "लोड हो रहा है…") else if (sections.isEmpty()) t("Choose what to include", "क्या शामिल करें चुनें") else if (previous == null) t("Make card", "कार्ड बनाएँ") else t("Save", "सहेजें")) } }
         }
     }
 }

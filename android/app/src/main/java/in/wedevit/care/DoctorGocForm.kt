@@ -107,7 +107,7 @@ internal object DoctorGocPdf {
 }
 
 @Composable internal fun doctorGocStatus(d: DoctorGocDiscussion): String { val t = careText()
-    return d.signOff?.let { t("Signed and locked", "साइन होकर बंद") + (if (it.signers.isNotEmpty()) ": " + it.signers.joinToString(", ") else "") } ?: t("The note is not signed yet.", "नोट पर अभी हस्ताक्षर नहीं हुए।")
+    return d.signOff?.let { t("Signed and locked", "साइन होकर बंद") + (if (it.signers.isNotEmpty()) ": " + it.signers.joinToString(", ") else "") } ?: t("Not signed yet", "अभी साइन नहीं")
 }
 
 /** Signed or not, as a small pill: green with a lock when signed, amber otherwise. The full status (with signers) is the accessibility text. */

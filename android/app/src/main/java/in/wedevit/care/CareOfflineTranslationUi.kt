@@ -44,14 +44,12 @@ import kotlinx.coroutines.launch
     DisposableEffect(versionId, source) { onDispose { job?.cancel() } }
     SurfaceCard(Mint) {
         Text("हिन्दी / English", Modifier.a11yHeading(), fontWeight = FontWeight.SemiBold, fontFamily = SaharaTitleFont, fontSize = 18.sp, color = DoctorCardInk)
-        Text(t("Read alongside the original", "मूल के साथ पढ़ें"), fontSize = 14.sp, color = DoctorCardSub)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf("hi" to "हिन्दी", "en" to "English").forEach { (code, label) ->
                 FilterChip(selected = target == code, onClick = { target = code; result = emptyList(); checked = false }, enabled = !busy, label = { Text(label) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp))
             }
         }
         if (available != true) {
-            Text(t("Download the language pack once (about 30 MB). Reading then works offline.", "भाषा पैक एक बार डाउनलोड करें (लगभग 30 MB)। फिर बिना इंटरनेट पढ़ सकेंगे।"), fontSize = 14.sp, color = DoctorCardSub)
             CheckLine(wifiOnly, { wifiOnly = it }, t("Download over Wi-Fi only", "सिर्फ़ Wi-Fi पर डाउनलोड करें"))
             OutlinedButton(onClick = {
                 downloadBusy = true; error = ""
@@ -81,7 +79,6 @@ import kotlinx.coroutines.launch
                     SelectionContainerText(line.translated)
                 }
             }
-            Text(t("Check names, medicines, numbers and words such as ‘not’. Mixed or Roman Hindi may need correction by a bilingual person. This reading aid does not change the care note.", "नाम, दवाएँ, अंक और ‘नहीं’ जैसे शब्द जाँचें। मिली-जुली या रोमन में लिखी हिन्दी को दोनों भाषाएँ जानने वाला व्यक्ति ठीक करे। यह पढ़ने की मदद केयर नोट नहीं बदलती।"), fontSize = 14.sp, color = DoctorCardSub)
             CheckLine(checked, { checked = it }, careBilingual("A Hindi/English reader checked this translation", "अनुवाद जाँच लिया"))
             if (checked) {
                 val translated = result.joinToString("\n") { it.translated }

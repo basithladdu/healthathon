@@ -21,14 +21,12 @@ internal object CareTodayRules {
     fun todayCheckIn(items: List<CareItem>, dayStart: Long): CareItem? =
         items.firstOrNull { it.kind == "checkin" && it.created >= dayStart && !SymptomNoteCodec.isStructured(it.detail) && !DistressCodec.isStructured(it.detail) }
 
-    /** Empty Today sections say what to do next; read-only family members are not told to tap an add button. */
+    /** Empty Today sections: a few words only. The section's own add button sits beside the title, so [canEdit] changes nothing here. */
+    @Suppress("UNUSED_PARAMETER")
     fun emptyText(section: String, canEdit: Boolean): String = when (section) {
-        "visits" -> if (canEdit) careBilingual("No upcoming visits. Tap Add visit to plan the next one.", "कोई आने वाली मुलाक़ात नहीं। अगली मुलाक़ात जोड़ने के लिए “मुलाक़ात जोड़ें” दबाएँ।")
-            else careBilingual("No upcoming visits yet.", "अभी कोई आने वाली मुलाक़ात नहीं।")
-        "tasks" -> if (canEdit) careBilingual("Nothing to do yet. Tap Add task for anything to remember.", "अभी कोई काम नहीं। याद रखने वाली बात के लिए “काम जोड़ें” दबाएँ।")
-            else careBilingual("Nothing to do yet.", "अभी कोई काम नहीं।")
-        else -> if (canEdit) careBilingual("No notes yet. Tap Write a note to record how the day went.", "अभी कोई नोट नहीं। दिन कैसा रहा, लिखने के लिए “नोट लिखें” दबाएँ।")
-            else careBilingual("No notes yet.", "अभी कोई नोट नहीं।")
+        "visits" -> careBilingual("No upcoming visits yet.", "अभी कोई आने वाली मुलाक़ात नहीं।")
+        "tasks" -> careBilingual("Nothing to do yet.", "अभी कोई काम नहीं।")
+        else -> careBilingual("No notes yet.", "अभी कोई नोट नहीं।")
     }
 
     /** The half of [emptyText] for the chosen app language. */

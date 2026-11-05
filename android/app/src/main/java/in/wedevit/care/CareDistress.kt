@@ -210,7 +210,7 @@ internal object DistressCodec {
             CareChartInfoButton(t("About this", "इसके बारे में"), distressAbout(t), "distress")
             CareLanguageMenu(compact = true)
         }
-        Text(t("How much distress have you felt in the past week, including today? Tap a number.", "पिछले एक हफ़्ते में, आज समेत, आपको कितनी परेशानी रही है? एक अंक दबाएँ।"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk)
+        Text(t("How much distress have you felt in the past week, including today?", "पिछले एक हफ़्ते में, आज समेत, आपको कितनी परेशानी रही है?"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk)
         // The thermometer on the left, the six concern groups beside it, so the whole check fits one screen.
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             DistressThermometer(score, Modifier.width(112.dp)) { score = it }
@@ -250,7 +250,7 @@ internal object DistressCodec {
             val change = DistressRules.change(today, check)
             when { change == null -> onClose(); !canEditCareContext(vm, person, capturedAccount) -> onClose(); today != null -> vm.updateItem(change, onClose); else -> vm.saveItem("checkin", change.title, change.detail, 0, onClose) }
         }, enabled = !busy && score in 0..10, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust, contentColor = Color.White), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("distress-save")) {
-            Text(if (score in 0..10) t("Save", "सहेजें") else t("Choose a number to save", "सहेजने के लिए अंक चुनें"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+            Text(t("Save", "सहेजें"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
         }
     }
 }
@@ -362,11 +362,10 @@ private val DistressRowHeight = 24.dp
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (check != null) DistressScoreChip(check)
-                Text(check?.let { DistressRules.shownTitle(it, hindi) } ?: t("This distress answer could not be read.", "यह परेशानी वाला जवाब पढ़ा नहीं जा सका।"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.weight(1f))
+                Text(check?.let { DistressRules.shownTitle(it, hindi) } ?: t("Couldn't read this note.", "यह नोट पढ़ा नहीं जा सका।"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.weight(1f))
             }
             check?.let { DistressRules.summary(it, hindi) }?.takeIf { it.isNotBlank() }?.let { Text(it, fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardInk) }
             Text(date(item.created), fontSize = 14.sp, color = DoctorCardSub)
-            DistressSource()
         }
     }
 }
@@ -399,7 +398,6 @@ private val DistressRowHeight = 24.dp
                     }
                 }
             }
-            Text(t("Self-reported. Not a diagnosis.", "अपनी बताई सूचना। यह निदान नहीं है।"), fontSize = 14.sp, color = DoctorCardFaint)
             DistressSource()
         }
     }

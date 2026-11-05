@@ -4415,3 +4415,388 @@ Add a report, then choose “Cancer document?” in its menu.	رپورٹ جوڑ�
 ${values.size} results	${values.size} نتائج
 How this works	یہ کیسے کام کرتا ہے
 Not sure who	پکا نہیں کون
+Not signed	دستخط نہیں ہوئے
+Stopped	روک دیا
+Didn't work. Try again.	نہیں ہوا۔ دوبارہ کوشش کریں۔
+Transcribing	لکھا جا رہا ہے
+Downloading	ڈاؤن لوڈ ہو رہا ہے
+Finding speakers	بولنے والوں کو پہچانا جا رہا ہے
+No words heard. Pick a language.	کوئی الفاظ نہیں سنے۔ زبان چنیں۔
+Sign	دستخط
+Who's present	کون موجود ہے
+Upload	اپ لوڈ
+Use	استعمال کریں
+Tap their line	ان کی لائن دبائیں
+Suggestions	تجاویز
+Confirm all	سب کی تصدیق کریں
+All confirmed	سب کی تصدیق ہو گئی
+Note changed. Sign again.	نوٹ بدل گیا۔ دوبارہ دستخط کریں۔
+Couldn't save. Try again.	محفوظ نہیں ہوا۔ دوبارہ کوشش کریں۔
+Note read to them	نوٹ انہیں پڑھ کر سنایا گیا
+Lock	لاک کریں
+Start over	دوبارہ شروع کریں
+Locked	لاک ہو گیا
+Couldn't read photo. Try again.	تصویر نہیں پڑھی جا سکی۔ دوبارہ کوشش کریں۔
+Remove photo	تصویر ہٹائیں
+No camera app	کیمرہ ایپ نہیں ملی
+Photo	تصویر
+Signature missing	دستخط نہیں ملا
+Screening	جانچ
+Low memory. Close other apps and retry.	میموری کم ہے۔ دوسری ایپس بند کر کے دوبارہ کوشش کریں۔
+Low storage. Free some space and retry.	جگہ کم ہے۔ کچھ جگہ خالی کر کے دوبارہ کوشش کریں۔
+Not available on this phone. Type instead.	اس فون پر دستیاب نہیں۔ ٹائپ کریں۔
+Patient side	مریض کی طرف
+Invite link not valid.	دعوت کا لنک درست نہیں ہے۔
+Sign in to join ${it.possessive} care	${it.possessive} دیکھ بھال میں شامل ہونے کے لیے سائن ان کریں
+Stop recording first.	پہلے ریکارڈنگ روکیں۔
+I'm a doctor	میں ڈاکٹر ہوں
+Signed in	سائن ان ہو گیا
+Wrong email or password.	ای میل یا پاس ورڈ غلط ہے۔
+At least 10 characters	کم از کم 10 حروف
+Check your email to confirm, then sign in.	تصدیق کے لیے اپنی ای میل دیکھیں، پھر سائن ان کریں۔
+Email sent again.	ای میل دوبارہ بھیج دی گئی۔
+Resend email	ای میل دوبارہ بھیجیں
+Check your email for a reset link.	پاس ورڈ بدلنے کے لنک کے لیے اپنی ای میل دیکھیں۔
+Invite saved. Sign in to join.	دعوت محفوظ ہو گئی۔ شامل ہونے کے لیے سائن ان کریں۔
+No invite copied.	کوئی دعوت کاپی نہیں ہوئی۔
+Refresh	تازہ کریں
+Sharing	شیئر کرنا
+Invite doctor	ڈاکٹر کو بلائیں
+Access	رسائی
+Medicines & calendar	دوائیں اور کیلنڈر
+Can edit	تبدیلی کر سکتے ہیں
+Days	دن
+Create invite	دعوت بنائیں
+Expires in 3 days	3 دن میں ختم ہو جائے گی
+Invitation cancelled.	دعوت منسوخ ہو گئی۔
+People	لوگ
+access ended ${day(it)}	${day(it)} کو رسائی ختم ہوئی
+Not available yet.	ابھی دستیاب نہیں ہے۔
+Make view only	صرف دیکھنے کی اجازت دیں
+Allow editing	تبدیلی کی اجازت دیں
+Invite code	دعوت کا کوڈ
+Delete account	اکاؤنٹ مٹائیں
+Delete account?	اکاؤنٹ مٹائیں؟
+Your account and the care records you set up will be deleted for everyone.	آپ کا اکاؤنٹ اور آپ کے بنائے ہوئے دیکھ بھال کے ریکارڈ سب کے لیے مٹ جائیں گے۔
+Couldn't delete. Request deletion by email below.	مٹا نہیں سکے۔ نیچے ای میل سے درخواست بھیجیں۔
+Your data was deleted and the account closed.	آپ کی معلومات مٹا دی گئیں اور اکاؤنٹ بند ہو گیا۔
+Confirm your email first.	پہلے اپنی ای میل کی تصدیق کریں۔
+This email already has an account. Sign in.	اس ای میل کا اکاؤنٹ پہلے سے ہے۔ سائن ان کریں۔
+Email couldn't be sent. Write to workwithdevit@gmail.com.	ای میل نہیں بھیجی جا سکی۔ workwithdevit@gmail.com پر لکھیں۔
+Too many emails. Try again in an hour.	بہت زیادہ ای میلز۔ ایک گھنٹے بعد دوبارہ کوشش کریں۔
+No internet. Try again.	انٹرنیٹ نہیں ہے۔ دوبارہ کوشش کریں۔
+Only the owner can invite.	صرف مالک ہی بلا سکتے ہیں۔
+Relationship	رشتہ
+Send on WhatsApp	WhatsApp پر بھیجیں
+Other apps	دوسری ایپس
+Invite didn't work. Ask for a new one.	دعوت کام نہیں آئی۔ نئی مانگیں۔
+No connection. Open the link again.	کنکشن نہیں ہے۔ لنک دوبارہ کھولیں۔
+Sign in again, then reopen the link.	دوبارہ سائن ان کریں، پھر لنک کھولیں۔
+Join from their own account, not this one.	اس اکاؤنٹ سے نہیں، ان کے اپنے اکاؤنٹ سے شامل ہوں۔
+Invite expired or was already used.	دعوت ختم ہو گئی یا پہلے استعمال ہو چکی ہے۔
+Invited · 	دعوت بھیجی · 
+Used or cancelled	استعمال ہوئی یا منسوخ
+Expired	ختم ہو گئی
+Sent	بھیج دی گئی
+Not available in the demo.	ڈیمو میں دستیاب نہیں ہے۔
+View only	صرف دیکھنے کے لیے
+Profile unavailable	پروفائل دستیاب نہیں
+Loading…	لوڈ ہو رہا ہے…
+This can't be undone.	یہ واپس نہیں ہو سکتا۔
+Care plan	دیکھ بھال کا منصوبہ
+Feedback	رائے
+Tools	ٹولز
+Tell your care team how you are.	اپنی دیکھ بھال کی ٹیم کو اپنا حال بتائیں۔
+Tip of the day	آج کا مشورہ
+No medicines found	کوئی دوا نہیں ملی
+I checked this with the prescription	میں نے اسے نسخے سے ملا لیا ہے
+Matched	مل گئی
+Possible match	شاید مل گئی
+Prescription only	صرف نسخے میں
+No name found. Type it.	نام نہیں ملا۔ خود لکھیں۔
+Strip photos	پتے کی تصاویر
+Dose times	خوراک کے اوقات
+Speech to text	بات سے تحریر
+Not checked	جانچا نہیں گیا
+Everyone here agrees to send this recording to ${ready.provider}.	یہاں موجود سب یہ ریکارڈنگ ${ready.provider} کو بھیجنے پر راضی ہیں۔
+I checked the words and who spoke.	میں نے الفاظ اور بولنے والے کو جانچ لیا ہے۔
+Draft note	نوٹ کا مسودہ
+Everyone here agrees to send these words to ${service.provider}.	یہاں موجود سب یہ الفاظ ${service.provider} کو بھیجنے پر راضی ہیں۔
+I agree to send this note to ${service.provider}.	میں یہ نوٹ ${service.provider} کو بھیجنے پر راضی ہوں۔
+A bilingual person checked this.	دونوں زبانیں جاننے والے نے اسے جانچا ہے۔
+Too long: ${words.length} / ${NoteRules.MAX_SOURCE_CHARS}	بہت لمبا: ${words.length} / ${NoteRules.MAX_SOURCE_CHARS}
+$filled of $total treatments	$total میں سے $filled علاج
+$ok of $compared	$compared میں سے $ok
+Add representative	نمائندہ شامل کریں
+Add signed scan	دستخط شدہ اسکین شامل کریں
+Audit log	آڈٹ لاگ
+Board process	بورڈ کا طریقۂ کار
+Cancelled on $on	$on کو منسوخ
+Copy acknowledged	نقل کی رسید مل گئی
+Could not read file. Try another.	فائل نہیں پڑھی جا سکی۔ دوسری آزمائیں۔
+Days to sign	دستخط تک دن
+Delete draft	ڈرافٹ مٹائیں
+Delete the unsigned draft? This cannot be undone.	بغیر دستخط کا ڈرافٹ مٹائیں؟ اسے واپس نہیں لایا جا سکتا۔
+Download failed. Try again.	ڈاؤن لوڈ نہیں ہوا۔ دوبارہ کوشش کریں۔
+Draft deleted.	ڈرافٹ مٹ گیا۔
+ED arrival	ED پہنچنا
+ED visit	ED کا دورہ
+Found within $target min	$target منٹ میں ملا
+Incident	واقعہ
+Link ABHA	ABHA جوڑیں
+Make PDF	PDF بنائیں
+Mark as signed	دستخط شدہ درج کریں
+New living will	نئی لیونگ وِل
+New version	نیا ورژن
+No ED access after this time.	اس وقت کے بعد ED کی کوئی رسائی نہیں۔
+No connection. Please phone them.	کنکشن نہیں ہے۔ براہ کرم انہیں فون کریں۔
+No draft to delete.	مٹانے کے لیے کوئی ڈرافٹ نہیں۔
+No living will	کوئی لیونگ وِل نہیں
+No mobile number.	کوئی موبائل نمبر نہیں۔
+No signed plan at this time.	اس وقت کوئی دستخط شدہ منصوبہ نہیں تھا۔
+None yet.	ابھی کچھ نہیں۔
+Not sent. Please phone them.	نہیں بھیجا گیا۔ براہ کرم انہیں فون کریں۔
+Not signed. Not valid.	دستخط نہیں۔ درست نہیں۔
+Opened after $minutes min	$minutes منٹ بعد کھلا
+Outcome	نتیجہ
+Over target	ہدف سے زیادہ
+Printed. Not valid until signed.	پرنٹ ہو گیا۔ دستخط تک درست نہیں۔
+Ready. Keep the file safe.	تیار۔ فائل محفوظ رکھیں۔
+Record not opened	ریکارڈ نہیں کھلا
+Record opened	ریکارڈ کھلنے کا وقت
+Relation	رشتہ
+Representative $n	نمائندہ $n
+SMS is off. Please phone them.	SMS بند ہے۔ براہ کرم انہیں فون کریں۔
+Saved.	محفوظ ہو گیا۔
+Scan missing or changed. Ask for the signed paper.	اسکین نہیں ملا یا بدلا ہوا ہے۔ دستخط شدہ کاغذ مانگیں۔
+Send reminder	یاد دہانی بھیجیں
+Sign in front of two adult witnesses.	دو بالغ گواہوں کے سامنے دستخط کریں۔
+Start	شروع کریں
+To $name	$name کو
+Too many reminders. Try later.	بہت زیادہ یاد دہانیاں۔ بعد میں کوشش کریں۔
+Use access log	رسائی لاگ سے بھریں
+Values filled	اقدار بھری گئیں
+View scan	اسکین دیکھیں
+Your data	آپ کا ڈیٹا
+v$v: differs from the plan	v$v: منصوبے سے مختلف
+v$v: matches the plan	v$v: منصوبے کے مطابق
+v$v: nothing to compare	v$v: موازنے کے لیے کچھ نہیں
+${it.name} added	${it.name} شامل ہو گئے
+Add dose	خوراک شامل کریں
+Add file	فائل شامل کریں
+Add profile	پروفائل شامل کریں
+Calendars	کیلنڈر
+Care profiles	نگہداشت پروفائل
+Change file	فائل بدلیں
+Couldn't load visits	ملاقاتیں نہیں کھل سکیں
+Couldn't save	محفوظ نہیں ہو سکا
+Details	تفصیلات
+Drafts	ڈرافٹ
+Everyone agreed to upload	سب نے اپ لوڈ کی اجازت دی
+File selected	فائل منتخب ہو گئی
+I checked this text	میں نے یہ تحریر جانچ لی
+I have permission to upload	مجھے اپ لوڈ کی اجازت ہے
+Manage account	اکاؤنٹ سنبھالیں
+No check-ins	کوئی حال احوال نہیں
+No requests	کوئی درخواست نہیں
+No visits	کوئی ملاقات نہیں
+Not approved	منظور نہیں ہوا
+Not available	دستیاب نہیں
+Open file	فائل کھولیں
+Opening…	کھل رہا ہے…
+Practice patients	مشق کے مریض
+Practice records	مشق کے ریکارڈ
+Published	شائع ہو گیا
+Reported by others	دوسروں نے بتایا
+Save as copy	کاپی کے طور پر محفوظ کریں
+Save draft	ڈرافٹ محفوظ کریں
+Sharing & access	شیئرنگ اور رسائی
+Something went wrong	کچھ غلط ہو گیا
+Upload failed	اپ لوڈ نہیں ہوا
+Upload incomplete	اپ لوڈ نامکمل
+Upload recording	ریکارڈنگ اپ لوڈ کریں
+Uploaded	اپ لوڈ ہو گیا
+Verified	تصدیق شدہ
+Verify	تصدیق کریں
+Visits this week	اس ہفتے کی ملاقاتیں
+Wrong email or password	غلط ای میل یا پاس ورڈ
+Pain map	درد کا نقشہ
+How much distress have you felt in the past week, including today?	آج سمیت پچھلے ایک ہفتے میں آپ نے کتنی پریشانی محسوس کی؟
+Couldn't read this note.	یہ نوٹ پڑھا نہیں جا سکا۔
+No entries yet	ابھی کوئی اندراج نہیں
+Can't show this picture	یہ تصویر دکھائی نہیں جا سکتی
+No place marked	کوئی جگہ نشان زد نہیں
+Side effects to raise	بتانے والے مضر اثرات
+Side effects	مضر اثرات
+Nothing since last visit	پچھلی ملاقات کے بعد کچھ نہیں
+Notifications are off.	اطلاعات بند ہیں۔
+On	چالو
+Allow notifications in Settings.	سیٹنگز میں اطلاعات کی اجازت دیں۔
+No reminders yet	ابھی کوئی یاد دہانی نہیں
+Add other	اور شامل کریں
+Plan withdrawn	منصوبہ واپس لے لیا گیا
+Couldn't read the saved plan.	محفوظ منصوبہ پڑھا نہیں جا سکا۔
+Draft v${draft.version}, not signed	مسودہ v${draft.version}، دستخط نہیں
+Discard draft	مسودہ ہٹائیں
+Step ${step + 1} of ${steps.size}	مرحلہ ${step + 1} از ${steps.size}
+Ready to sign	دستخط کے لیے تیار
+Still needed:	ابھی ضرورت ہے:
+Sign plan	منصوبے پر دستخط کریں
+Can't save yet	ابھی محفوظ نہیں ہو سکتا
+Discard changes	تبدیلیاں چھوڑیں
+Main treating doctor	علاج کرنے والے مرکزی ڈاکٹر
+Only if withdrawal or withholding has been decided (Common Cause v Union of India, 2018 and 2023).	صرف تب، جب علاج روکنے یا شروع نہ کرنے کا فیصلہ ہو چکا ہو (Common Cause v Union of India، 2018 اور 2023)۔
+Locked: confirm Understanding first (V4)	بند ہے: پہلے 'سمجھ' کی تصدیق کریں (V4)
+Locked: decision-maker must confirm first (V5)	بند ہے: پہلے فیصلہ کرنے والے تصدیق کریں (V5)
+No preference = standard care	کوئی ترجیح نہیں = معمول کا علاج
+Wish to remove feeding tube: needs the medical board process	کھانے کی نلی ہٹانے کی خواہش: میڈیکل بورڈ کا عمل ضروری ہے
+Give full standard emergency care.	مکمل معمول کا ہنگامی علاج دیں۔
+Card ready	کارڈ تیار
+Not uploaded yet	ابھی اپ لوڈ نہیں ہوا
+Old QR may still open until the phone is online.	فون آن لائن ہونے تک پرانا QR کھل سکتا ہے۔
+Online QR	آن لائن QR
+Offline QR	آف لائن QR
+Living will changed. Issue a new card.	لیونگ وِل بدل گئی ہے۔ نیا کارڈ جاری کریں۔
+New card	نیا کارڈ
+Print or share	پرنٹ یا شیئر کریں
+All doctors	تمام ڈاکٹر
+No matches	کچھ نہیں ملا
+Update the app to open this.	اسے کھولنے کے لیے ایپ اپ ڈیٹ کریں۔
+Family access	خاندان کی رسائی
+Only the owner can share	صرف مالک شیئر کر سکتے ہیں
+Couldn't load. Try again.	نہیں کھل سکا۔ دوبارہ کوشش کریں۔
+Choose family	خاندان چنیں
+No family accounts	خاندان کا کوئی اکاؤنٹ نہیں
+From version ${CarriedForward.version(goal.origin)}	ورژن ${CarriedForward.version(goal.origin)} سے
+Dictating…	بول کر لکھوا رہے ہیں…
+Ready	تیار
+From transcript	تحریر سے
+Typed	ٹائپ کیا گیا
+New conversation	نئی بات چیت
+Earlier	پہلے کی
+Previous	پچھلی
+No conversations yet	ابھی کوئی بات چیت نہیں
+More options	مزید اختیارات
+Start new	نیا شروع کریں
+Transcribing…	تحریر بن رہی ہے…
+Transcribe	تحریر بنائیں
+Sample transcript	نمونہ تحریر
+Online transcript	آن لائن تحریر
+Type or paste here	یہاں لکھیں یا چسپاں کریں
+Not found	نہیں ملا
+No audio yet	ابھی کوئی آڈیو نہیں
+Not answered	جواب نہیں ملا
+No transcript	کوئی تحریر نہیں
+Can't play this audio	یہ آڈیو نہیں چل سکی
+Agreed	راضی ہیں
+Not agreed	راضی نہیں
+Role	کردار
+Daughter, nurse…	بیٹی، نرس…
+Everyone agreed	سب راضی ہیں
+Everyone must agree	سب کی رضامندی ضروری ہے
+${list.covered} of ${list.rows.size} covered	${list.rows.size} میں سے ${list.covered} پر بات ہوئی
+No questions yet	ابھی کوئی سوال نہیں
+Line ${answerLine.number}	سطر ${answerLine.number}
+Suggested · line ${suggestion.line.number}	تجویز · سطر ${suggestion.line.number}
+Suggested	تجویز
+All answered	سب کے جواب مل گئے
+$unanswered unanswered	$unanswered کے جواب باقی
+Practice transcript	مشق کی تحریر
+Transcript · $model	تحریر · $model
+Get started	شروع کریں
+Try a demo	ڈیمو دیکھیں
+Choose a person first.	پہلے کسی شخص کو چنیں۔
+Verification	تصدیق
+Pending review	جائزہ باقی ہے
+Submit	بھیجیں
+Open on website	ویب سائٹ پر کھولیں
+Clinical review	طبی جائزہ
+Couldn't load the demo.	ڈیمو نہیں کھل سکا۔
+Web link not available yet.	ویب لنک ابھی دستیاب نہیں ہے۔
+Sign in to add a web link.	ویب لنک شامل کرنے کے لیے سائن ان کریں۔
+Only the profile owner can make a web link.	صرف پروفائل کا مالک ویب لنک بنا سکتا ہے۔
+Web links are off in the walkthrough.	واک تھرو میں ویب لنک بند ہیں۔
+This link is off or expired.	یہ لنک بند ہے یا اس کی مدت ختم ہو گئی ہے۔
+Couldn't connect. Try again.	رابطہ نہیں ہو سکا۔ دوبارہ کوشش کریں۔
+Locked PDF saved	لاک شدہ PDF محفوظ ہو گئی
+Card updated	کارڈ اپ ڈیٹ ہو گیا
+Card out of date	کارڈ پرانا ہو گیا ہے
+Edit card	کارڈ میں ترمیم کریں
+The old link will stop working.	پرانا لنک کام کرنا بند کر دے گا۔
+Link replaced	لنک بدل دیا گیا
+Web link code	ویب لنک کوڈ
+Offline code	آف لائن کوڈ
+Anyone who scans can see this.	اسکین کرنے والا کوئی بھی اسے دیکھ سکتا ہے۔
+No confirmed note	کوئی تصدیق شدہ نوٹ نہیں
+No contacts saved	کوئی رابطہ محفوظ نہیں
+Preview	پیش نظارہ
+No centres found	کوئی مرکز نہیں ملا
+Suggest a centre	مرکز تجویز کریں
+Waiting to send	بھیجنے کا انتظار
+Not sent yet	ابھی نہیں بھیجا گیا
+Approved	منظور
+Not added	شامل نہیں کیا گیا
+Sent for review	جائزے کے لیے بھیجا گیا
+Sign in to suggest a centre	مرکز تجویز کرنے کے لیے سائن ان کریں
+Services (optional)	خدمات (اختیاری)
+Sample	نمونہ
+Saved on this phone, not sent yet$detail	اس فون پر محفوظ، ابھی بھیجا نہیں گیا$detail
+No camera app found.	کیمرا ایپ نہیں ملی۔
+Something went wrong. Try again.	کچھ غلط ہو گیا۔ دوبارہ کوشش کریں۔
+No documents yet	ابھی کوئی کاغذات نہیں
+Searching…	تلاش ہو رہی ہے…
+Online answer failed$detail.	آن لائن جواب نہیں ملا$detail۔
+Offline	آف لائن
+Send my question and $sendWhat to $sendTo	میرا سوال اور $sendWhat، $sendTo کو بھیجیں
+Nothing found	کچھ نہیں ملا
+Value found	ملی ہوئی قدر
+Not checked yet	ابھی جانچا نہیں
+No readable text found.	پڑھنے لائق تحریر نہیں ملی۔
+Couldn't read this document.	یہ کاغذ پڑھا نہیں جا سکا۔
+Couldn't open this file.	یہ فائل نہیں کھل سکی۔
+${document.pages.size} of ${document.pageCount} pages read	${document.pageCount} میں سے ${document.pages.size} صفحات پڑھے گئے
+I checked this against the original.	میں نے اسے اصل فائل سے ملا لیا ہے۔
+Added to Calendar	کیلنڈر میں شامل ہو گیا
+Choose a shorter line.	چھوٹی سطر چنیں۔
+No results yet	ابھی کوئی نتیجہ نہیں
+Printed range	چھپی ہوئی حد
+1 edited line	1 بدلی ہوئی سطر
+$n edited lines	$n بدلی ہوئی سطریں
+Approve doctors	ڈاکٹروں کو منظور کریں
+${request.name} approved	${request.name} منظور ہو گئے
+${request.name} not approved	${request.name} منظور نہیں ہوئے
+Register name or link	رجسٹر کا نام یا لنک
+No prescription	کوئی نسخہ نہیں
+1 change not sent	1 تبدیلی نہیں بھیجی گئی
+$n changes not sent	$n تبدیلیاں نہیں بھیجی گئیں
+1 change not sent. Someone else edited it first.	1 تبدیلی نہیں بھیجی گئی۔ کسی اور نے پہلے بدل دی۔
+$n changes not sent. Someone else edited them first.	$n تبدیلیاں نہیں بھیجی گئیں۔ کسی اور نے پہلے بدل دیں۔
+“${document.name}” has no readable text yet.	“${document.name}” میں ابھی پڑھنے لائق تحریر نہیں ہے۔
+Your documents have no readable text yet.	آپ کے کاغذات میں ابھی پڑھنے لائق تحریر نہیں ہے۔
+Too much text. Choose fewer documents.	تحریر بہت زیادہ ہے۔ کم کاغذات چنیں۔
+Care note v${previous.number}	کیئر نوٹ v${previous.number}
+Consent	رضامندی
+Transcript added	تحریر شامل ہو گئی
+Couldn't add transcript	تحریر شامل نہیں ہو سکی
+Sample draft loaded	نمونہ ڈرافٹ لوڈ ہو گیا
+Load sample draft	نمونہ ڈرافٹ لوڈ کریں
+Sample draft · not AI	نمونہ ڈرافٹ · AI نہیں
+Reviewer name	جائزہ لینے والے کا نام
+Save version	ورژن محفوظ کریں
+Records	ریکارڈ
+Activity	سرگرمی
+Reviewer: ${version.reviewerName}	جائزہ کار: ${version.reviewerName}
+PDF created	PDF بن گئی
+Locked PDF created	لاک PDF بن گئی
+Couldn't create PDF	PDF نہیں بن سکی
+Create PDF	PDF بنائیں
+taken	لی گئی
+Confirm	تصدیق کریں
+Date (YYYY-MM-DD)	تاریخ (YYYY-MM-DD)
+Replace current prescription	موجودہ نسخہ بدلیں
+Checked against the prescription	نسخے سے ملا لیا
+Add a name for each medicine	ہر دوا کا نام لکھیں
+Linked records	منسلک ریکارڈ
+Reviewer: 	جائزہ کار: 
+Contacts not shared	رابطے شیئر نہیں کیے گئے
+No contacts yet	ابھی کوئی رابطہ نہیں

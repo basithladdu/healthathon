@@ -126,13 +126,13 @@ fun EmbeddedPatientCare(
         vm.accountNamespace == account && (if (vm.cloud == null) allowDeviceLocal else vm.cloud.session.value?.userId == account)
     fun leaveTool() { if (!navigating) { vm.stopRecording(); tool = "" } }
     fun openTool(next: String) { if (samePerson() && !navigating) {
-        if(vm.demoMode && next in listOf("nearby","feedback","reminders","shared","resources")) vm.message.value=t("This online, account or device action is unavailable in the walkthrough. Your own care profiles are unchanged.", "यह ऑनलाइन, खाते या फ़ोन का काम डेमो में उपलब्ध नहीं है। आपकी अपनी देखभाल प्रोफ़ाइल नहीं बदलीं।")
+        if(vm.demoMode && next in listOf("nearby","feedback","reminders","shared","resources")) vm.message.value=t("Not available in the demo.", "डेमो में उपलब्ध नहीं है।")
         else {vm.stopRecording(); tool = next}
     } }
     fun changeSection(next: String) { if (samePerson() && !navigating) { vm.stopRecording(); tool = ""; onSection(next) } }
     fun add(kind: String) {
         if (samePerson() && vm.canEdit.value && !navigating) dialog = kind
-        else vm.message.value = t("Ask the person who invited you to allow changes.", "बदलाव करने की अनुमति के लिए उस व्यक्ति से कहें जिसने आपको जोड़ा है।")
+        else vm.message.value = t("View only", "सिर्फ़ देखने के लिए")
     }
     fun read(note: CareVersion) { if (samePerson() && note.personId == personId && !navigating) reading = note }
     val currentHeaderBackChange by rememberUpdatedState(onHeaderBackChange)
@@ -166,8 +166,8 @@ fun EmbeddedPatientCare(
             Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 32.dp).testTag(if (unavailable) "embedded-care-unavailable" else "embedded-care-loading"), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (unavailable) Icon(Icons.Default.PersonOff, null, Modifier.size(40.dp), tint = DoctorCardSub)
                 else CircularProgressIndicator(Modifier.size(32.dp), color = Rust)
-                Text(if (unavailable) t("This care profile is unavailable", "यह देखभाल प्रोफ़ाइल उपलब्ध नहीं है") else t("Opening this person's care…", "इस व्यक्ति की देखभाल खुल रही है…"), fontFamily = SaharaTitleFont, fontSize = 20.sp, color = DoctorCardInk, textAlign = TextAlign.Center)
-                OutlinedButton(onClick = onExit, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Back to patients", "मरीज़ों पर वापस")) }
+                Text(if (unavailable) t("Profile unavailable", "प्रोफ़ाइल उपलब्ध नहीं") else t("Loading…", "लोड हो रहा है…"), fontFamily = SaharaTitleFont, fontSize = 20.sp, color = DoctorCardInk, textAlign = TextAlign.Center)
+                OutlinedButton(onClick = onExit, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Back", "वापस")) }
                 refreshError?.let { Text(it, color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center, modifier = Modifier.announce()); TextButton(onClick = vm::refresh, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Retry", "फिर कोशिश करें"), color = RustText) } }
             }
         } else {
@@ -175,19 +175,19 @@ fun EmbeddedPatientCare(
             val demoLabel = vm.demoMode && !DoctorTestProfiles.contains(personId)
             if ((section != "Conversations" || tool.isNotEmpty() || !conversationCapture) && (demoLabel || !canEdit)) Surface(color = if (vm.cloud == null) Peach.copy(alpha = .5f) else Paper) {
                 Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    if (!canEdit) { Icon(Icons.Default.Lock, null, Modifier.size(16.dp), tint = DoctorCardSub); Spacer(Modifier.width(8.dp)); Text(t("Read-only access · changes need the patient's permission", "सिर्फ़ पढ़ने की पहुँच · बदलाव के लिए मरीज़ की अनुमति चाहिए"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.weight(1f).padding(vertical = 8.dp).testTag("embedded-read-only")) }
+                    if (!canEdit) { Icon(Icons.Default.Lock, null, Modifier.size(16.dp), tint = DoctorCardSub); Spacer(Modifier.width(8.dp)); Text(t("View only", "सिर्फ़ देखने के लिए"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.weight(1f).padding(vertical = 8.dp).testTag("embedded-read-only")) }
                     else Spacer(Modifier.weight(1f))
                     if (demoLabel) DoctorInfoIcon(t("Demo care record · not saved to an account", "डेमो देखभाल रिकॉर्ड · किसी खाते में सेव नहीं"), t("No prescription is issued and no appointment is booked.", "न कोई पर्चा जारी होता है, न कोई अपॉइंटमेंट बुक होती है।"), "embedded-care-source")
                 }
             }
             if (tool.isNotEmpty() && tool !in listOf("scanner", "feedback", "reminders", "symptoms")) Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                TextButton(onClick = ::leaveTool, enabled = !navigating, modifier = Modifier.heightIn(min = 48.dp).testTag("embedded-care-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = RustText); Spacer(Modifier.width(8.dp)); Text(color = RustText, fontWeight = FontWeight.SemiBold, text = if (section == "Tools") t("Back to tools", "टूल पर वापस") else t("Back to patient care", "मरीज़ की देखभाल पर वापस")) }
+                TextButton(onClick = ::leaveTool, enabled = !navigating, modifier = Modifier.heightIn(min = 48.dp).testTag("embedded-care-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = RustText); Spacer(Modifier.width(8.dp)); Text(color = RustText, fontWeight = FontWeight.SemiBold, text = t("Back", "वापस")) }
             }
             Box(Modifier.weight(1f).fillMaxWidth()) {
-                if (refreshing) Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) { LinearProgressIndicator(Modifier.fillMaxWidth(), color = Rust); Text(t("Refreshing this person's access and records…", "इस व्यक्ति की पहुँच और रिकॉर्ड ताज़ा हो रहे हैं…"), color = DoctorCardSub) }
+                if (refreshing) Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) { LinearProgressIndicator(Modifier.fillMaxWidth(), color = Rust) }
                 else key(account, personId, section, tool) { screens.SaveableStateProvider("$account:$personId:$section:$tool") {
                     when (tool) {
-                        "scanner" -> if (canEdit) MedicineScanner(vm, onClose = { tool = "" }, onAccount = onAccount) else Text(t("Editing access is no longer available.", "बदलाव की पहुँच अब नहीं है।"), Modifier.padding(20.dp))
+                        "scanner" -> if (canEdit) MedicineScanner(vm, onClose = { tool = "" }, onAccount = onAccount) else Text(t("View only", "सिर्फ़ देखने के लिए"), Modifier.padding(20.dp))
                         "daily" -> CareList(vm, ::add, { openTool("scanner") }, { openTool("calendar") }, { openTool("workflows") }, { openTool("labs") }, onReadNote = ::read, onSymptoms = { openTool("symptoms") })
                         "symptoms" -> CareSymptomDiary(vm, onBack = ::leaveTool) // has its own back arrow, so no extra "Back to" row
                         "calendar" -> CareCalendar(vm, onWorkflow = { openTool("workflows") }, onAddDoctorVisit = { add("doctor-visit") })
@@ -223,7 +223,7 @@ fun EmbeddedPatientCare(
     }
     if (ready && dialog in listOf("medicine", "visit", "task", "journal") && canEdit) AddCareItem(dialog, vm, onDismiss = { dialog = "" })
     if (ready && dialog == "doctor-visit" && canEdit) DoctorVisitEditor(vm, personId, onDismiss = { dialog = "" })
-    if (ready && dialog == "delete" && isOwner) AlertDialog(onDismissRequest = { if (!busy) dialog = "" }, title = { Text(t("Remove ${person?.name}'s records?", "${person?.name} के रिकॉर्ड हटाएँ?")) }, text = { Text(t("This removes their notes, reports, recordings and care entries. Export anything you want to keep first.", "इससे उनके नोट, रिपोर्ट, रिकॉर्डिंग और देखभाल की सारी जानकारी हट जाएगी। जो रखना है, उसे पहले भेजकर सँभाल लें।")) }, confirmButton = { TextButton(onClick = { if (samePerson() && vm.isOwner.value && !vm.busy.value) vm.removePerson { dialog = ""; onExit() } }, enabled = !busy) { Text(t("Remove records", "रिकॉर्ड हटाएँ")) } }, dismissButton = { TextButton(onClick = { dialog = "" }, enabled = !busy) { Text(t("Keep records", "रिकॉर्ड रखें")) } })
+    if (ready && dialog == "delete" && isOwner) AlertDialog(onDismissRequest = { if (!busy) dialog = "" }, title = { Text(t("Remove ${person?.name}'s records?", "${person?.name} के रिकॉर्ड हटाएँ?")) }, text = { Text(t("This can't be undone.", "यह वापस नहीं होगा।")) }, confirmButton = { TextButton(onClick = { if (samePerson() && vm.isOwner.value && !vm.busy.value) vm.removePerson { dialog = ""; onExit() } }, enabled = !busy) { Text(t("Remove records", "रिकॉर्ड हटाएँ")) } }, dismissButton = { TextButton(onClick = { dialog = "" }, enabled = !busy) { Text(t("Keep records", "रिकॉर्ड रखें")) } })
     if (ready) reading?.takeIf { it.personId == personId }?.let { NoteReader(vm, it, onDismiss = { reading = null }) }
 }
 
@@ -237,20 +237,20 @@ fun EmbeddedSharedCare(vm: CareModel, onAccount: () -> Unit, onClose: () -> Unit
 internal fun EmbeddedCareTools(onOpen: (String) -> Unit) { val t = careText();
     val tools = listOf(
         "daily" to t("Daily care", "रोज़ की देखभाल"),
-        "care-plan" to t("Emergency plan & living will", "आपातकालीन योजना और लिविंग विल"),
+        "care-plan" to t("Care plan", "देखभाल योजना"),
         "calendar" to t("Calendar", "कैलेंडर"),
-        "workflows" to t("Care team & requests", "देखभाल टीम और अनुरोध"),
-        "labs" to t("Lab history", "जाँच रिपोर्टें"),
-        "nearby" to t("Find care", "देखभाल केंद्र खोजें"),
-        "documents" to t("Documents & care notes", "कागज़ात और देखभाल नोट"),
+        "workflows" to t("Care team", "देखभाल टीम"),
+        "labs" to t("Labs", "जाँच"),
+        "nearby" to t("Nearby", "आस-पास"),
+        "documents" to t("Documents", "कागज़ात"),
         "reminders" to t("Reminders", "रिमाइंडर"),
-        "shared" to t("Shared care & clinical review", "साझा देखभाल और क्लिनिकल समीक्षा"),
-        "resources" to t("Privacy, exports & more", "निजता, एक्सपोर्ट और बाक़ी"),
-        "feedback" to t("App feedback", "ऐप पर राय"),
+        "shared" to t("Review", "समीक्षा"),
+        "resources" to t("More", "और"),
+        "feedback" to t("Feedback", "राय"),
     )
     // One grouped surface: each tool is its own lazy row (so tests and TalkBack can scroll to it), drawn as one card with dividers.
     LazyColumn(Modifier.fillMaxSize().testTag("embedded-care-tools"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp)) {
-        item { Box(Modifier.padding(bottom = 12.dp)) { Heading(t("Daily care & tools", "रोज़ की देखभाल और टूल"), 26) } }
+        item { Box(Modifier.padding(bottom = 12.dp)) { Heading(t("Tools", "टूल"), 26) } }
         itemsIndexed(tools, key = { _, tool -> tool.first }) { index, (key, title) ->
             val top = if (index == 0) 20.dp else 0.dp; val bottom = if (index == tools.lastIndex) 20.dp else 0.dp
             Surface(shape = RoundedCornerShape(topStart = top, topEnd = top, bottomStart = bottom, bottomEnd = bottom), color = Paper, modifier = Modifier.fillMaxWidth()) { Column {

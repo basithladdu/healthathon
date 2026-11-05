@@ -77,7 +77,7 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
     LazyColumn(Modifier.fillMaxSize().testTag("care-calendar"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         // Title first, then the doctor's extra entry link under it.
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Heading(t("Calendar", "कैलेंडर")); Spacer(Modifier.weight(1f)); if (canEdit) FilledTonalIconButton(onClick = { if (onAddDoctorVisit != null) onAddDoctorVisit() else adding = true }, modifier = Modifier.size(48.dp), colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = Gold)) { Icon(Icons.Default.Add, t("Add to calendar", "कैलेंडर में जोड़ें")) } } }
-        if (onAddDoctorVisit != null && canEdit) item { TextButton(onClick = { adding = true }, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Add a test or other calendar entry", "जाँच या कोई और तारीख़ जोड़ें")) } }
+        if (onAddDoctorVisit != null && canEdit) item { TextButton(onClick = { adding = true }, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Add other", "और जोड़ें")) } }
         item { CareCalendarGrid(entries.filter { it.personId == person }, day, weekView, { weekView = it }, { dayString = it.toString() }) }
         // The picked day and "Back to today" share one row.
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -91,20 +91,19 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
                 Spacer(Modifier.width(12.dp))
                 Text(day.format(careDateFormat("d MMM", hindi)).let { t("Nothing dated for $it", "$it के लिए कुछ तय नहीं") }, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
             }
-            if (canEdit) TextButton(onClick = { if (onAddDoctorVisit != null) onAddDoctorVisit() else adding = true }, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(if (onAddDoctorVisit != null) t("Add a visit", "मुलाक़ात जोड़ें") else t("Add a visit, test or follow-up", "मुलाक़ात, जाँच या अगली मुलाक़ात जोड़ें")) }
+            if (canEdit) TextButton(onClick = { if (onAddDoctorVisit != null) onAddDoctorVisit() else adding = true }, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Add", "जोड़ें")) }
         } }
         items(visible, key = { it.id }) { item ->
             val data = CareEntryCodec.decode(item.detail)
             if (data != null && data.type in setOf("task", "conversation")) Card(onClick = onWorkflow, colors = CardDefaults.cardColors(containerColor = Mint), shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth()) {
                 Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) { Text(item.title, fontWeight = FontWeight.SemiBold, color = DoctorCardInk); Text(listOf(careCategoryLabel(calendarCategory(item), hindi), data.statusLabel(hindi), data.assignee).filter(String::isNotBlank).joinToString(" · "), fontSize = 14.sp, color = DoctorCardSub); Text(t("Open care team", "देखभाल टीम खोलें"), color = RustText, style = MaterialTheme.typography.labelLarge) }
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) { Text(item.title, fontWeight = FontWeight.SemiBold, color = DoctorCardInk); Text(listOf(careCategoryLabel(calendarCategory(item), hindi), data.statusLabel(hindi), data.assignee).filter(String::isNotBlank).joinToString(" · "), fontSize = 14.sp, color = DoctorCardSub) }
                     Icon(Icons.Default.ChevronRight, null, tint = Rust)
                 }
             } else CalendarEntryCard(vm, item, day, onEdit = { editing = item })
         }
         if (undated.isNotEmpty() && filter in setOf("All", "Medicine")) {
             item { SectionTitle(t("Medicines without a date", "बिना तारीख़ की दवाएँ")) }
-            item { Text(t("Follow the prescription. Add a date to place a medicine in this calendar.", "पर्चे के अनुसार दें। दवा को कैलेंडर में रखने के लिए तारीख़ जोड़ें।"), fontSize = 14.sp, color = DoctorCardSub) }
             items(undated, key = { "undated-${it.id}" }) { item -> CalendarEntryCard(vm, item, day, onEdit = { editing = item }) }
         }
     }
@@ -191,7 +190,7 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
                 if (initial == null) vm.saveItem("task", title, text, due, done = onDismiss, id = entryId)
                 else vm.updateItem(initial.copy(title = title, detail = text, due = due), onDismiss)
             }.onFailure { error = it.message.orEmpty() } }, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp), shape = RoundedCornerShape(14.dp), enabled = !busy && canEdit && title.isNotBlank()) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Save to calendar", "कैलेंडर में सहेजें")) }
-            if (initial != null && canEdit) TextButton(onClick = { remove = true }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Icon(Icons.Default.DeleteOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Remove entry", "हटाएँ")) }
+            if (initial != null && canEdit) TextButton(onClick = { remove = true }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Icon(Icons.Default.DeleteOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Remove", "हटाएँ")) }
         }
     }
     if (remove && initial != null) AlertDialog(onDismissRequest = { remove = false }, title = { Text(t("Remove this entry?", "इसे हटाएँ?")) }, text = { Text(initial.title) }, confirmButton = { TextButton(onClick = { if (canEditCareContext(vm, initial.personId, capturedAccount)) vm.remove(initial); remove = false; onDismiss() }, enabled = !busy) { Text(t("Remove", "हटाएँ")) } }, dismissButton = { TextButton(onClick = { remove = false }) { Text(t("Keep", "रखें")) } })

@@ -4415,3 +4415,388 @@ Add a report, then choose “Cancer document?” in its menu.	ಒಂದು ವ�
 ${values.size} results	${values.size} ಫಲಿತಾಂಶಗಳು
 How this works	ಇದು ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ
 Not sure who	ಯಾರು ಎಂದು ಖಚಿತವಿಲ್ಲ
+Not signed	ಸಹಿ ಆಗಿಲ್ಲ
+Stopped	ನಿಲ್ಲಿಸಲಾಗಿದೆ
+Didn't work. Try again.	ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Transcribing	ಬರೆಯಲಾಗುತ್ತಿದೆ
+Downloading	ಡೌನ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ
+Finding speakers	ಮಾತನಾಡುವವರನ್ನು ಗುರುತಿಸಲಾಗುತ್ತಿದೆ
+No words heard. Pick a language.	ಯಾವ ಮಾತೂ ಕೇಳಿಸಲಿಲ್ಲ. ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ.
+Sign	ಸಹಿ
+Who's present	ಯಾರು ಇದ್ದಾರೆ
+Upload	ಅಪ್‌ಲೋಡ್
+Use	ಬಳಸಿ
+Tap their line	ಅವರ ಸಾಲನ್ನು ಒತ್ತಿ
+Suggestions	ಸಲಹೆಗಳು
+Confirm all	ಎಲ್ಲವನ್ನೂ ದೃಢೀಕರಿಸಿ
+All confirmed	ಎಲ್ಲವೂ ದೃಢೀಕರಿಸಲಾಗಿದೆ
+Note changed. Sign again.	ಟಿಪ್ಪಣಿ ಬದಲಾಗಿದೆ. ಮತ್ತೆ ಸಹಿ ಮಾಡಿ.
+Couldn't save. Try again.	ಉಳಿಸಲಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Note read to them	ಟಿಪ್ಪಣಿಯನ್ನು ಅವರಿಗೆ ಓದಿ ಹೇಳಲಾಯಿತು
+Lock	ಲಾಕ್ ಮಾಡಿ
+Start over	ಮತ್ತೆ ಪ್ರಾರಂಭಿಸಿ
+Locked	ಲಾಕ್ ಆಗಿದೆ
+Couldn't read photo. Try again.	ಫೋಟೋ ಓದಲಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Remove photo	ಫೋಟೋ ತೆಗೆದುಹಾಕಿ
+No camera app	ಕ್ಯಾಮೆರಾ ಆ್ಯಪ್ ಇಲ್ಲ
+Photo	ಫೋಟೋ
+Signature missing	ಸಹಿ ಸಿಗಲಿಲ್ಲ
+Screening	ಸ್ಕ್ರೀನಿಂಗ್
+Low memory. Close other apps and retry.	ಮೆಮೊರಿ ಕಡಿಮೆ ಇದೆ. ಬೇರೆ ಆ್ಯಪ್‌ಗಳನ್ನು ಮುಚ್ಚಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Low storage. Free some space and retry.	ಸ್ಥಳ ಕಡಿಮೆ ಇದೆ. ಸ್ವಲ್ಪ ಜಾಗ ಖಾಲಿ ಮಾಡಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Not available on this phone. Type instead.	ಈ ಫೋನ್‌ನಲ್ಲಿ ಲಭ್ಯವಿಲ್ಲ. ಟೈಪ್ ಮಾಡಿ.
+Patient side	ರೋಗಿಯ ಕಡೆ
+Invite link not valid.	ಆಹ್ವಾನ ಲಿಂಕ್ ಸರಿಯಿಲ್ಲ.
+Sign in to join ${it.possessive} care	${it.possessive} ಆರೈಕೆಗೆ ಸೇರಲು ಸೈನ್ ಇನ್ ಮಾಡಿ
+Stop recording first.	ಮೊದಲು ರೆಕಾರ್ಡಿಂಗ್ ನಿಲ್ಲಿಸಿ.
+I'm a doctor	ನಾನು ವೈದ್ಯ
+Signed in	ಸೈನ್ ಇನ್ ಆಗಿದೆ
+Wrong email or password.	ಇಮೇಲ್ ಅಥವಾ ಪಾಸ್‌ವರ್ಡ್ ತಪ್ಪಾಗಿದೆ.
+At least 10 characters	ಕನಿಷ್ಠ 10 ಅಕ್ಷರಗಳು
+Check your email to confirm, then sign in.	ದೃಢೀಕರಿಸಲು ನಿಮ್ಮ ಇಮೇಲ್ ನೋಡಿ, ನಂತರ ಸೈನ್ ಇನ್ ಮಾಡಿ.
+Email sent again.	ಇಮೇಲ್ ಮತ್ತೆ ಕಳುಹಿಸಲಾಗಿದೆ.
+Resend email	ಇಮೇಲ್ ಮತ್ತೆ ಕಳುಹಿಸಿ
+Check your email for a reset link.	ಪಾಸ್‌ವರ್ಡ್ ಬದಲಿಸುವ ಲಿಂಕ್‌ಗಾಗಿ ನಿಮ್ಮ ಇಮೇಲ್ ನೋಡಿ.
+Invite saved. Sign in to join.	ಆಹ್ವಾನ ಉಳಿಸಲಾಗಿದೆ. ಸೇರಲು ಸೈನ್ ಇನ್ ಮಾಡಿ.
+No invite copied.	ಯಾವುದೇ ಆಹ್ವಾನ ಕಾಪಿ ಆಗಿಲ್ಲ.
+Refresh	ರಿಫ್ರೆಶ್ ಮಾಡಿ
+Sharing	ಹಂಚಿಕೆ
+Invite doctor	ವೈದ್ಯರನ್ನು ಆಹ್ವಾನಿಸಿ
+Access	ಪ್ರವೇಶ
+Medicines & calendar	ಔಷಧಿಗಳು & ಕ್ಯಾಲೆಂಡರ್
+Can edit	ಬದಲಿಸಬಹುದು
+Days	ದಿನಗಳು
+Create invite	ಆಹ್ವಾನ ರಚಿಸಿ
+Expires in 3 days	3 ದಿನಗಳಲ್ಲಿ ಮುಗಿಯುತ್ತದೆ
+Invitation cancelled.	ಆಹ್ವಾನ ರದ್ದಾಗಿದೆ.
+People	ಜನರು
+access ended ${day(it)}	${day(it)} ರಂದು ಪ್ರವೇಶ ಮುಗಿದಿದೆ
+Not available yet.	ಇನ್ನೂ ಲಭ್ಯವಿಲ್ಲ.
+Make view only	ನೋಡಲು ಮಾತ್ರ ಮಾಡಿ
+Allow editing	ಬದಲಿಸಲು ಅನುಮತಿಸಿ
+Invite code	ಆಹ್ವಾನ ಕೋಡ್
+Delete account	ಖಾತೆ ಅಳಿಸಿ
+Delete account?	ಖಾತೆ ಅಳಿಸಬೇಕೆ?
+Your account and the care records you set up will be deleted for everyone.	ನಿಮ್ಮ ಖಾತೆ ಮತ್ತು ನೀವು ರಚಿಸಿದ ಆರೈಕೆ ದಾಖಲೆಗಳು ಎಲ್ಲರಿಗೂ ಅಳಿಸಲ್ಪಡುತ್ತವೆ.
+Couldn't delete. Request deletion by email below.	ಅಳಿಸಲಾಗಲಿಲ್ಲ. ಕೆಳಗೆ ಇಮೇಲ್ ಮೂಲಕ ವಿನಂತಿಸಿ.
+Your data was deleted and the account closed.	ನಿಮ್ಮ ಮಾಹಿತಿ ಅಳಿಸಲಾಗಿದೆ ಮತ್ತು ಖಾತೆ ಮುಚ್ಚಲಾಗಿದೆ.
+Confirm your email first.	ಮೊದಲು ನಿಮ್ಮ ಇಮೇಲ್ ದೃಢೀಕರಿಸಿ.
+This email already has an account. Sign in.	ಈ ಇಮೇಲ್‌ಗೆ ಈಗಾಗಲೇ ಖಾತೆ ಇದೆ. ಸೈನ್ ಇನ್ ಮಾಡಿ.
+Email couldn't be sent. Write to workwithdevit@gmail.com.	ಇಮೇಲ್ ಕಳುಹಿಸಲಾಗಲಿಲ್ಲ. workwithdevit@gmail.com ಗೆ ಬರೆಯಿರಿ.
+Too many emails. Try again in an hour.	ತುಂಬಾ ಇಮೇಲ್‌ಗಳು. ಒಂದು ಗಂಟೆಯ ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+No internet. Try again.	ಇಂಟರ್ನೆಟ್ ಇಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Only the owner can invite.	ಮಾಲೀಕರು ಮಾತ್ರ ಆಹ್ವಾನಿಸಬಹುದು.
+Relationship	ಸಂಬಂಧ
+Send on WhatsApp	WhatsApp ನಲ್ಲಿ ಕಳುಹಿಸಿ
+Other apps	ಇತರ ಆ್ಯಪ್‌ಗಳು
+Invite didn't work. Ask for a new one.	ಆಹ್ವಾನ ಕೆಲಸ ಮಾಡಲಿಲ್ಲ. ಹೊಸದನ್ನು ಕೇಳಿ.
+No connection. Open the link again.	ಸಂಪರ್ಕವಿಲ್ಲ. ಲಿಂಕ್ ಮತ್ತೆ ತೆರೆಯಿರಿ.
+Sign in again, then reopen the link.	ಮತ್ತೆ ಸೈನ್ ಇನ್ ಮಾಡಿ, ನಂತರ ಲಿಂಕ್ ತೆರೆಯಿರಿ.
+Join from their own account, not this one.	ಈ ಖಾತೆಯಿಂದ ಅಲ್ಲ, ಅವರ ಸ್ವಂತ ಖಾತೆಯಿಂದ ಸೇರಬೇಕು.
+Invite expired or was already used.	ಆಹ್ವಾನ ಮುಗಿದಿದೆ ಅಥವಾ ಈಗಾಗಲೇ ಬಳಸಲಾಗಿದೆ.
+Invited · 	ಆಹ್ವಾನಿಸಲಾಗಿದೆ · 
+Used or cancelled	ಬಳಸಲಾಗಿದೆ ಅಥವಾ ರದ್ದಾಗಿದೆ
+Expired	ಮುಗಿದಿದೆ
+Sent	ಕಳುಹಿಸಲಾಗಿದೆ
+Not available in the demo.	ಡೆಮೊದಲ್ಲಿ ಲಭ್ಯವಿಲ್ಲ.
+View only	ನೋಡಲು ಮಾತ್ರ
+Profile unavailable	ಪ್ರೊಫೈಲ್ ಲಭ್ಯವಿಲ್ಲ
+Loading…	ಲೋಡ್ ಆಗುತ್ತಿದೆ…
+This can't be undone.	ಇದನ್ನು ಹಿಂತೆಗೆಯಲಾಗದು.
+Care plan	ಆರೈಕೆ ಯೋಜನೆ
+Feedback	ಅಭಿಪ್ರಾಯ
+Tools	ಸಾಧನಗಳು
+Tell your care team how you are.	ನೀವು ಹೇಗಿದ್ದೀರಿ ಎಂದು ನಿಮ್ಮ ಆರೈಕೆ ತಂಡಕ್ಕೆ ತಿಳಿಸಿ.
+Tip of the day	ಇಂದಿನ ಸಲಹೆ
+No medicines found	ಯಾವುದೇ ಔಷಧ ಸಿಗಲಿಲ್ಲ
+I checked this with the prescription	ಇದನ್ನು ಪ್ರಿಸ್ಕ್ರಿಪ್ಷನ್ ಜೊತೆ ಪರಿಶೀಲಿಸಿದ್ದೇನೆ
+Matched	ಹೊಂದಿಕೆಯಾಯಿತು
+Possible match	ಹೊಂದಿಕೆಯಾಗಿರಬಹುದು
+Prescription only	ಪ್ರಿಸ್ಕ್ರಿಪ್ಷನ್‌ನಲ್ಲಿ ಮಾತ್ರ
+No name found. Type it.	ಹೆಸರು ಸಿಗಲಿಲ್ಲ. ಟೈಪ್ ಮಾಡಿ.
+Strip photos	ಸ್ಟ್ರಿಪ್ ಫೋಟೋಗಳು
+Dose times	ಡೋಸ್ ಸಮಯಗಳು
+Speech to text	ಮಾತಿನಿಂದ ಬರಹ
+Not checked	ಪರಿಶೀಲಿಸಿಲ್ಲ
+Everyone here agrees to send this recording to ${ready.provider}.	ಈ ರೆಕಾರ್ಡಿಂಗ್ ಅನ್ನು ${ready.provider} ಗೆ ಕಳುಹಿಸಲು ಇಲ್ಲಿರುವ ಎಲ್ಲರೂ ಒಪ್ಪುತ್ತಾರೆ.
+I checked the words and who spoke.	ಮಾತುಗಳನ್ನು ಮತ್ತು ಯಾರು ಮಾತಾಡಿದರು ಎಂಬುದನ್ನು ಪರಿಶೀಲಿಸಿದ್ದೇನೆ.
+Draft note	ಟಿಪ್ಪಣಿ ಕರಡು
+Everyone here agrees to send these words to ${service.provider}.	ಈ ಮಾತುಗಳನ್ನು ${service.provider} ಗೆ ಕಳುಹಿಸಲು ಇಲ್ಲಿರುವ ಎಲ್ಲರೂ ಒಪ್ಪುತ್ತಾರೆ.
+I agree to send this note to ${service.provider}.	ಈ ಟಿಪ್ಪಣಿಯನ್ನು ${service.provider} ಗೆ ಕಳುಹಿಸಲು ಒಪ್ಪುತ್ತೇನೆ.
+A bilingual person checked this.	ಎರಡೂ ಭಾಷೆ ಬಲ್ಲವರು ಇದನ್ನು ಪರಿಶೀಲಿಸಿದ್ದಾರೆ.
+Too long: ${words.length} / ${NoteRules.MAX_SOURCE_CHARS}	ತುಂಬಾ ಉದ್ದ: ${words.length} / ${NoteRules.MAX_SOURCE_CHARS}
+$filled of $total treatments	$total ರಲ್ಲಿ $filled ಚಿಕಿತ್ಸೆಗಳು
+$ok of $compared	$compared ರಲ್ಲಿ $ok
+Add representative	ಪ್ರತಿನಿಧಿಯನ್ನು ಸೇರಿಸಿ
+Add signed scan	ಸಹಿ ಮಾಡಿದ ಸ್ಕ್ಯಾನ್ ಸೇರಿಸಿ
+Audit log	ಆಡಿಟ್ ಲಾಗ್
+Board process	ಬೋರ್ಡ್ ಪ್ರಕ್ರಿಯೆ
+Cancelled on $on	$on ರಂದು ರದ್ದಾಗಿದೆ
+Copy acknowledged	ಪ್ರತಿಯ ಸ್ವೀಕೃತಿ ದೊರೆತಿದೆ
+Could not read file. Try another.	ಫೈಲ್ ಓದಲಾಗಲಿಲ್ಲ. ಬೇರೊಂದನ್ನು ಪ್ರಯತ್ನಿಸಿ.
+Days to sign	ಸಹಿಯವರೆಗಿನ ದಿನಗಳು
+Delete draft	ಡ್ರಾಫ್ಟ್ ಅಳಿಸಿ
+Delete the unsigned draft? This cannot be undone.	ಸಹಿ ಇಲ್ಲದ ಡ್ರಾಫ್ಟ್ ಅಳಿಸಬೇಕೆ? ಇದನ್ನು ಹಿಂಪಡೆಯಲಾಗುವುದಿಲ್ಲ.
+Download failed. Try again.	ಡೌನ್‌ಲೋಡ್ ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Draft deleted.	ಡ್ರಾಫ್ಟ್ ಅಳಿಸಲಾಗಿದೆ.
+ED arrival	ED ಗೆ ಆಗಮನ
+ED visit	ED ಭೇಟಿ
+Found within $target min	$target ನಿಮಿಷಗಳಲ್ಲಿ ಸಿಕ್ಕಿತು
+Incident	ಘಟನೆ
+Link ABHA	ABHA ಜೋಡಿಸಿ
+Make PDF	PDF ಮಾಡಿ
+Mark as signed	ಸಹಿ ಮಾಡಲಾಗಿದೆ ಎಂದು ದಾಖಲಿಸಿ
+New living will	ಹೊಸ ಲಿವಿಂಗ್ ವಿಲ್
+New version	ಹೊಸ ಆವೃತ್ತಿ
+No ED access after this time.	ಈ ಸಮಯದ ನಂತರ ED ಪ್ರವೇಶ ಇಲ್ಲ.
+No connection. Please phone them.	ಸಂಪರ್ಕ ಇಲ್ಲ. ದಯವಿಟ್ಟು ಅವರಿಗೆ ಫೋನ್ ಮಾಡಿ.
+No draft to delete.	ಅಳಿಸಲು ಯಾವುದೇ ಡ್ರಾಫ್ಟ್ ಇಲ್ಲ.
+No living will	ಲಿವಿಂಗ್ ವಿಲ್ ಇಲ್ಲ
+No mobile number.	ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ಇಲ್ಲ.
+No signed plan at this time.	ಆ ಸಮಯದಲ್ಲಿ ಸಹಿ ಮಾಡಿದ ಯೋಜನೆ ಇರಲಿಲ್ಲ.
+None yet.	ಇನ್ನೂ ಏನೂ ಇಲ್ಲ.
+Not sent. Please phone them.	ಕಳುಹಿಸಲಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಅವರಿಗೆ ಫೋನ್ ಮಾಡಿ.
+Not signed. Not valid.	ಸಹಿ ಇಲ್ಲ. ಮಾನ್ಯವಲ್ಲ.
+Opened after $minutes min	$minutes ನಿಮಿಷಗಳ ನಂತರ ತೆರೆಯಲಾಯಿತು
+Outcome	ಫಲಿತಾಂಶ
+Over target	ಗುರಿಗಿಂತ ಹೆಚ್ಚು
+Printed. Not valid until signed.	ಮುದ್ರಿಸಲಾಗಿದೆ. ಸಹಿ ಆಗುವವರೆಗೆ ಮಾನ್ಯವಲ್ಲ.
+Ready. Keep the file safe.	ಸಿದ್ಧ. ಫೈಲ್ ಅನ್ನು ಸುರಕ್ಷಿತವಾಗಿ ಇಡಿ.
+Record not opened	ದಾಖಲೆ ತೆರೆಯಲಿಲ್ಲ
+Record opened	ದಾಖಲೆ ತೆರೆದ ಸಮಯ
+Relation	ಸಂಬಂಧ
+Representative $n	ಪ್ರತಿನಿಧಿ $n
+SMS is off. Please phone them.	SMS ಆಫ್ ಆಗಿದೆ. ದಯವಿಟ್ಟು ಅವರಿಗೆ ಫೋನ್ ಮಾಡಿ.
+Saved.	ಉಳಿಸಲಾಗಿದೆ.
+Scan missing or changed. Ask for the signed paper.	ಸ್ಕ್ಯಾನ್ ಇಲ್ಲ ಅಥವಾ ಬದಲಾಗಿದೆ. ಸಹಿ ಮಾಡಿದ ಕಾಗದವನ್ನು ಕೇಳಿ.
+Send reminder	ಜ್ಞಾಪನೆ ಕಳುಹಿಸಿ
+Sign in front of two adult witnesses.	ಇಬ್ಬರು ವಯಸ್ಕ ಸಾಕ್ಷಿಗಳ ಎದುರು ಸಹಿ ಮಾಡಿ.
+Start	ಪ್ರಾರಂಭಿಸಿ
+To $name	$name ಅವರಿಗೆ
+Too many reminders. Try later.	ತುಂಬಾ ಜ್ಞಾಪನೆಗಳು. ನಂತರ ಪ್ರಯತ್ನಿಸಿ.
+Use access log	ಪ್ರವೇಶ ಲಾಗ್‌ನಿಂದ ತುಂಬಿಸಿ
+Values filled	ಮೌಲ್ಯಗಳನ್ನು ತುಂಬಲಾಗಿದೆ
+View scan	ಸ್ಕ್ಯಾನ್ ನೋಡಿ
+Your data	ನಿಮ್ಮ ಡೇಟಾ
+v$v: differs from the plan	v$v: ಯೋಜನೆಗಿಂತ ಭಿನ್ನ
+v$v: matches the plan	v$v: ಯೋಜನೆಯಂತೆ
+v$v: nothing to compare	v$v: ಹೋಲಿಸಲು ಏನೂ ಇಲ್ಲ
+${it.name} added	${it.name} ಸೇರಿಸಲಾಗಿದೆ
+Add dose	ಡೋಸ್ ಸೇರಿಸಿ
+Add file	ಫೈಲ್ ಸೇರಿಸಿ
+Add profile	ಪ್ರೊಫೈಲ್ ಸೇರಿಸಿ
+Calendars	ಕ್ಯಾಲೆಂಡರ್‌ಗಳು
+Care profiles	ಆರೈಕೆ ಪ್ರೊಫೈಲ್‌ಗಳು
+Change file	ಫೈಲ್ ಬದಲಿಸಿ
+Couldn't load visits	ಭೇಟಿಗಳನ್ನು ತೆರೆಯಲಾಗಲಿಲ್ಲ
+Couldn't save	ಉಳಿಸಲಾಗಲಿಲ್ಲ
+Details	ವಿವರಗಳು
+Drafts	ಡ್ರಾಫ್ಟ್‌ಗಳು
+Everyone agreed to upload	ಅಪ್‌ಲೋಡ್‌ಗೆ ಎಲ್ಲರೂ ಒಪ್ಪಿದ್ದಾರೆ
+File selected	ಫೈಲ್ ಆಯ್ಕೆಯಾಗಿದೆ
+I checked this text	ಈ ಪಠ್ಯವನ್ನು ನಾನು ಪರಿಶೀಲಿಸಿದ್ದೇನೆ
+I have permission to upload	ಅಪ್‌ಲೋಡ್ ಮಾಡಲು ನನಗೆ ಅನುಮತಿ ಇದೆ
+Manage account	ಖಾತೆ ನಿರ್ವಹಿಸಿ
+No check-ins	ಯಾವುದೇ ಚೆಕ್-ಇನ್ ಇಲ್ಲ
+No requests	ಯಾವುದೇ ವಿನಂತಿಗಳಿಲ್ಲ
+No visits	ಯಾವುದೇ ಭೇಟಿಗಳಿಲ್ಲ
+Not approved	ಅನುಮೋದನೆ ಆಗಿಲ್ಲ
+Not available	ಲಭ್ಯವಿಲ್ಲ
+Open file	ಫೈಲ್ ತೆರೆಯಿರಿ
+Opening…	ತೆರೆಯುತ್ತಿದೆ…
+Practice patients	ಅಭ್ಯಾಸ ರೋಗಿಗಳು
+Practice records	ಅಭ್ಯಾಸ ದಾಖಲೆಗಳು
+Published	ಪ್ರಕಟಿಸಲಾಗಿದೆ
+Reported by others	ಇತರರು ತಿಳಿಸಿದ್ದಾರೆ
+Save as copy	ಪ್ರತಿಯಾಗಿ ಉಳಿಸಿ
+Save draft	ಡ್ರಾಫ್ಟ್ ಉಳಿಸಿ
+Sharing & access	ಹಂಚಿಕೆ ಮತ್ತು ಪ್ರವೇಶ
+Something went wrong	ಏನೋ ತಪ್ಪಾಗಿದೆ
+Upload failed	ಅಪ್‌ಲೋಡ್ ವಿಫಲವಾಗಿದೆ
+Upload incomplete	ಅಪ್‌ಲೋಡ್ ಅಪೂರ್ಣ
+Upload recording	ರೆಕಾರ್ಡಿಂಗ್ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ
+Uploaded	ಅಪ್‌ಲೋಡ್ ಆಗಿದೆ
+Verified	ಪರಿಶೀಲಿಸಲಾಗಿದೆ
+Verify	ಪರಿಶೀಲಿಸಿ
+Visits this week	ಈ ವಾರದ ಭೇಟಿಗಳು
+Wrong email or password	ಇಮೇಲ್ ಅಥವಾ ಪಾಸ್‌ವರ್ಡ್ ತಪ್ಪಾಗಿದೆ
+Pain map	ನೋವಿನ ನಕ್ಷೆ
+How much distress have you felt in the past week, including today?	ಇಂದು ಸೇರಿದಂತೆ ಕಳೆದ ವಾರದಲ್ಲಿ ನೀವು ಎಷ್ಟು ಸಂಕಟ ಅನುಭವಿಸಿದ್ದೀರಿ?
+Couldn't read this note.	ಈ ಟಿಪ್ಪಣಿಯನ್ನು ಓದಲಾಗಲಿಲ್ಲ.
+No entries yet	ಇನ್ನೂ ನಮೂದುಗಳಿಲ್ಲ
+Can't show this picture	ಈ ಚಿತ್ರವನ್ನು ತೋರಿಸಲಾಗದು
+No place marked	ಯಾವ ಜಾಗವೂ ಗುರುತಿಸಿಲ್ಲ
+Side effects to raise	ತಿಳಿಸಬೇಕಾದ ಅಡ್ಡಪರಿಣಾಮಗಳು
+Side effects	ಅಡ್ಡಪರಿಣಾಮಗಳು
+Nothing since last visit	ಕಳೆದ ಭೇಟಿಯ ನಂತರ ಏನೂ ಇಲ್ಲ
+Notifications are off.	ಅಧಿಸೂಚನೆಗಳು ಆಫ್ ಆಗಿವೆ.
+On	ಆನ್
+Allow notifications in Settings.	ಸೆಟ್ಟಿಂಗ್ಸ್‌ನಲ್ಲಿ ಅಧಿಸೂಚನೆಗಳನ್ನು ಅನುಮತಿಸಿ.
+No reminders yet	ಇನ್ನೂ ಜ್ಞಾಪನೆಗಳಿಲ್ಲ
+Add other	ಇನ್ನೊಂದು ಸೇರಿಸಿ
+Plan withdrawn	ಯೋಜನೆ ಹಿಂಪಡೆಯಲಾಗಿದೆ
+Couldn't read the saved plan.	ಉಳಿಸಿದ ಯೋಜನೆಯನ್ನು ಓದಲಾಗಲಿಲ್ಲ.
+Draft v${draft.version}, not signed	ಕರಡು v${draft.version}, ಸಹಿ ಇಲ್ಲ
+Discard draft	ಕರಡು ತೆಗೆದುಹಾಕಿ
+Step ${step + 1} of ${steps.size}	${steps.size} ರಲ್ಲಿ ಹಂತ ${step + 1}
+Ready to sign	ಸಹಿಗೆ ಸಿದ್ಧ
+Still needed:	ಇನ್ನೂ ಬೇಕು:
+Sign plan	ಯೋಜನೆಗೆ ಸಹಿ ಮಾಡಿ
+Can't save yet	ಇನ್ನೂ ಉಳಿಸಲಾಗುವುದಿಲ್ಲ
+Discard changes	ಬದಲಾವಣೆಗಳನ್ನು ಬಿಡಿ
+Main treating doctor	ಮುಖ್ಯ ಚಿಕಿತ್ಸಾ ವೈದ್ಯರು
+Only if withdrawal or withholding has been decided (Common Cause v Union of India, 2018 and 2023).	ಚಿಕಿತ್ಸೆ ನಿಲ್ಲಿಸುವ ಅಥವಾ ಆರಂಭಿಸದಿರುವ ನಿರ್ಧಾರವಾಗಿದ್ದರೆ ಮಾತ್ರ (Common Cause v Union of India, 2018 ಮತ್ತು 2023).
+Locked: confirm Understanding first (V4)	ಲಾಕ್ ಆಗಿದೆ: ಮೊದಲು 'ತಿಳುವಳಿಕೆ' ದೃಢೀಕರಿಸಿ (V4)
+Locked: decision-maker must confirm first (V5)	ಲಾಕ್ ಆಗಿದೆ: ಮೊದಲು ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವವರು ದೃಢೀಕರಿಸಬೇಕು (V5)
+No preference = standard care	ಆದ್ಯತೆ ಇಲ್ಲ = ಸಾಮಾನ್ಯ ಚಿಕಿತ್ಸೆ
+Wish to remove feeding tube: needs the medical board process	ಆಹಾರ ಕೊಳವೆ ತೆಗೆಯುವ ಆಸೆ: ವೈದ್ಯಕೀಯ ಮಂಡಳಿ ಪ್ರಕ್ರಿಯೆ ಬೇಕು
+Give full standard emergency care.	ಪೂರ್ಣ ಸಾಮಾನ್ಯ ತುರ್ತು ಚಿಕಿತ್ಸೆ ನೀಡಿ.
+Card ready	ಕಾರ್ಡ್ ಸಿದ್ಧ
+Not uploaded yet	ಇನ್ನೂ ಅಪ್‌ಲೋಡ್ ಆಗಿಲ್ಲ
+Old QR may still open until the phone is online.	ಫೋನ್ ಆನ್‌ಲೈನ್ ಆಗುವವರೆಗೆ ಹಳೆಯ QR ಇನ್ನೂ ತೆರೆಯಬಹುದು.
+Online QR	ಆನ್‌ಲೈನ್ QR
+Offline QR	ಆಫ್‌ಲೈನ್ QR
+Living will changed. Issue a new card.	ಲಿವಿಂಗ್ ವಿಲ್ ಬದಲಾಗಿದೆ. ಹೊಸ ಕಾರ್ಡ್ ನೀಡಿ.
+New card	ಹೊಸ ಕಾರ್ಡ್
+Print or share	ಮುದ್ರಿಸಿ ಅಥವಾ ಹಂಚಿಕೊಳ್ಳಿ
+All doctors	ಎಲ್ಲಾ ವೈದ್ಯರು
+No matches	ಏನೂ ಸಿಗಲಿಲ್ಲ
+Update the app to open this.	ಇದನ್ನು ತೆರೆಯಲು ಆ್ಯಪ್ ಅಪ್‌ಡೇಟ್ ಮಾಡಿ.
+Family access	ಕುಟುಂಬದ ಪ್ರವೇಶ
+Only the owner can share	ಮಾಲೀಕರು ಮಾತ್ರ ಹಂಚಿಕೊಳ್ಳಬಹುದು
+Couldn't load. Try again.	ತೆರೆಯಲಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Choose family	ಕುಟುಂಬವನ್ನು ಆರಿಸಿ
+No family accounts	ಕುಟುಂಬದ ಖಾತೆಗಳಿಲ್ಲ
+From version ${CarriedForward.version(goal.origin)}	ಆವೃತ್ತಿ ${CarriedForward.version(goal.origin)} ರಿಂದ
+Dictating…	ಮಾತಾಡಿ ಬರೆಸುತ್ತಿದೆ…
+Ready	ಸಿದ್ಧ
+From transcript	ಬರಹದಿಂದ
+Typed	ಟೈಪ್ ಮಾಡಿದ್ದು
+New conversation	ಹೊಸ ಸಂಭಾಷಣೆ
+Earlier	ಹಿಂದಿನವು
+Previous	ಹಿಂದಿನದು
+No conversations yet	ಇನ್ನೂ ಸಂಭಾಷಣೆಗಳಿಲ್ಲ
+More options	ಇನ್ನಷ್ಟು ಆಯ್ಕೆಗಳು
+Start new	ಹೊಸದು ಆರಂಭಿಸಿ
+Transcribing…	ಬರಹ ಸಿದ್ಧವಾಗುತ್ತಿದೆ…
+Transcribe	ಬರಹ ಮಾಡಿ
+Sample transcript	ಮಾದರಿ ಬರಹ
+Online transcript	ಆನ್‌ಲೈನ್ ಬರಹ
+Type or paste here	ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ ಅಥವಾ ಅಂಟಿಸಿ
+Not found	ಸಿಗಲಿಲ್ಲ
+No audio yet	ಇನ್ನೂ ಆಡಿಯೋ ಇಲ್ಲ
+Not answered	ಉತ್ತರ ಸಿಕ್ಕಿಲ್ಲ
+No transcript	ಬರಹ ಇಲ್ಲ
+Can't play this audio	ಈ ಆಡಿಯೋ ಪ್ಲೇ ಆಗಲಿಲ್ಲ
+Agreed	ಒಪ್ಪಿದ್ದಾರೆ
+Not agreed	ಒಪ್ಪಿಲ್ಲ
+Role	ಪಾತ್ರ
+Daughter, nurse…	ಮಗಳು, ನರ್ಸ್…
+Everyone agreed	ಎಲ್ಲರೂ ಒಪ್ಪಿದ್ದಾರೆ
+Everyone must agree	ಎಲ್ಲರೂ ಒಪ್ಪಬೇಕು
+${list.covered} of ${list.rows.size} covered	${list.rows.size} ರಲ್ಲಿ ${list.covered} ಚರ್ಚೆಯಾಗಿದೆ
+No questions yet	ಇನ್ನೂ ಪ್ರಶ್ನೆಗಳಿಲ್ಲ
+Line ${answerLine.number}	ಸಾಲು ${answerLine.number}
+Suggested · line ${suggestion.line.number}	ಸಲಹೆ · ಸಾಲು ${suggestion.line.number}
+Suggested	ಸಲಹೆ
+All answered	ಎಲ್ಲಕ್ಕೂ ಉತ್ತರವಿದೆ
+$unanswered unanswered	$unanswered ಕ್ಕೆ ಉತ್ತರವಿಲ್ಲ
+Practice transcript	ಅಭ್ಯಾಸದ ಬರಹ
+Transcript · $model	ಬರಹ · $model
+Get started	ಪ್ರಾರಂಭಿಸಿ
+Try a demo	ಡೆಮೊ ನೋಡಿ
+Choose a person first.	ಮೊದಲು ಒಬ್ಬ ವ್ಯಕ್ತಿಯನ್ನು ಆಯ್ಕೆಮಾಡಿ.
+Verification	ಪರಿಶೀಲನೆ
+Pending review	ಪರಿಶೀಲನೆ ಬಾಕಿ ಇದೆ
+Submit	ಸಲ್ಲಿಸಿ
+Open on website	ವೆಬ್‌ಸೈಟ್‌ನಲ್ಲಿ ತೆರೆಯಿರಿ
+Clinical review	ಕ್ಲಿನಿಕಲ್ ಪರಿಶೀಲನೆ
+Couldn't load the demo.	ಡೆಮೊ ತೆರೆಯಲಾಗಲಿಲ್ಲ.
+Web link not available yet.	ವೆಬ್ ಲಿಂಕ್ ಇನ್ನೂ ಲಭ್ಯವಿಲ್ಲ.
+Sign in to add a web link.	ವೆಬ್ ಲಿಂಕ್ ಸೇರಿಸಲು ಸೈನ್ ಇನ್ ಮಾಡಿ.
+Only the profile owner can make a web link.	ಪ್ರೊಫೈಲ್ ಮಾಲೀಕರು ಮಾತ್ರ ವೆಬ್ ಲಿಂಕ್ ಮಾಡಬಹುದು.
+Web links are off in the walkthrough.	ವಾಕ್‌ಥ್ರೂನಲ್ಲಿ ವೆಬ್ ಲಿಂಕ್‌ಗಳು ಆಫ್ ಆಗಿವೆ.
+This link is off or expired.	ಈ ಲಿಂಕ್ ಆಫ್ ಆಗಿದೆ ಅಥವಾ ಅವಧಿ ಮುಗಿದಿದೆ.
+Couldn't connect. Try again.	ಸಂಪರ್ಕವಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Locked PDF saved	ಲಾಕ್ ಮಾಡಿದ PDF ಉಳಿಸಲಾಗಿದೆ
+Card updated	ಕಾರ್ಡ್ ಅಪ್‌ಡೇಟ್ ಆಗಿದೆ
+Card out of date	ಕಾರ್ಡ್ ಹಳೆಯದಾಗಿದೆ
+Edit card	ಕಾರ್ಡ್ ಬದಲಿಸಿ
+The old link will stop working.	ಹಳೆಯ ಲಿಂಕ್ ಕೆಲಸ ಮಾಡುವುದನ್ನು ನಿಲ್ಲಿಸುತ್ತದೆ.
+Link replaced	ಲಿಂಕ್ ಬದಲಾಯಿಸಲಾಗಿದೆ
+Web link code	ವೆಬ್ ಲಿಂಕ್ ಕೋಡ್
+Offline code	ಆಫ್‌ಲೈನ್ ಕೋಡ್
+Anyone who scans can see this.	ಸ್ಕ್ಯಾನ್ ಮಾಡುವ ಯಾರಾದರೂ ಇದನ್ನು ನೋಡಬಹುದು.
+No confirmed note	ಖಚಿತಪಡಿಸಿದ ನೋಟ್ ಇಲ್ಲ
+No contacts saved	ಯಾವುದೇ ಸಂಪರ್ಕ ಉಳಿಸಿಲ್ಲ
+Preview	ಮುನ್ನೋಟ
+No centres found	ಯಾವುದೇ ಕೇಂದ್ರ ಸಿಗಲಿಲ್ಲ
+Suggest a centre	ಕೇಂದ್ರವನ್ನು ಸೂಚಿಸಿ
+Waiting to send	ಕಳುಹಿಸಲು ಕಾಯುತ್ತಿದೆ
+Not sent yet	ಇನ್ನೂ ಕಳುಹಿಸಿಲ್ಲ
+Approved	ಅನುಮೋದಿಸಲಾಗಿದೆ
+Not added	ಸೇರಿಸಲಾಗಿಲ್ಲ
+Sent for review	ಪರಿಶೀಲನೆಗೆ ಕಳುಹಿಸಲಾಗಿದೆ
+Sign in to suggest a centre	ಕೇಂದ್ರವನ್ನು ಸೂಚಿಸಲು ಸೈನ್ ಇನ್ ಮಾಡಿ
+Services (optional)	ಸೇವೆಗಳು (ಐಚ್ಛಿಕ)
+Sample	ಮಾದರಿ
+Saved on this phone, not sent yet$detail	ಈ ಫೋನ್‌ನಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ, ಇನ್ನೂ ಕಳುಹಿಸಿಲ್ಲ$detail
+No camera app found.	ಕ್ಯಾಮೆರಾ ಆಪ್ ಸಿಗಲಿಲ್ಲ.
+Something went wrong. Try again.	ಏನೋ ತಪ್ಪಾಯಿತು. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+No documents yet	ಇನ್ನೂ ದಾಖಲೆಗಳಿಲ್ಲ
+Searching…	ಹುಡುಕುತ್ತಿದ್ದೇವೆ…
+Online answer failed$detail.	ಆನ್‌ಲೈನ್ ಉತ್ತರ ಸಿಗಲಿಲ್ಲ$detail.
+Offline	ಆಫ್‌ಲೈನ್
+Send my question and $sendWhat to $sendTo	ನನ್ನ ಪ್ರಶ್ನೆ ಮತ್ತು $sendWhat ಅನ್ನು $sendTo ಗೆ ಕಳುಹಿಸಿ
+Nothing found	ಏನೂ ಸಿಗಲಿಲ್ಲ
+Value found	ಸಿಕ್ಕ ಮೌಲ್ಯ
+Not checked yet	ಇನ್ನೂ ಪರಿಶೀಲಿಸಿಲ್ಲ
+No readable text found.	ಓದಬಹುದಾದ ಬರಹ ಸಿಗಲಿಲ್ಲ.
+Couldn't read this document.	ಈ ದಾಖಲೆಯನ್ನು ಓದಲಾಗಲಿಲ್ಲ.
+Couldn't open this file.	ಈ ಫೈಲ್ ತೆರೆಯಲಾಗಲಿಲ್ಲ.
+${document.pages.size} of ${document.pageCount} pages read	${document.pageCount} ರಲ್ಲಿ ${document.pages.size} ಪುಟಗಳನ್ನು ಓದಲಾಗಿದೆ
+I checked this against the original.	ಇದನ್ನು ಮೂಲ ಫೈಲ್‌ನೊಂದಿಗೆ ಹೋಲಿಸಿ ನೋಡಿದ್ದೇನೆ.
+Added to Calendar	ಕ್ಯಾಲೆಂಡರ್‌ಗೆ ಸೇರಿಸಲಾಗಿದೆ
+Choose a shorter line.	ಚಿಕ್ಕ ಸಾಲನ್ನು ಆರಿಸಿ.
+No results yet	ಇನ್ನೂ ಫಲಿತಾಂಶಗಳಿಲ್ಲ
+Printed range	ಮುದ್ರಿತ ವ್ಯಾಪ್ತಿ
+1 edited line	1 ಬದಲಿಸಿದ ಸಾಲು
+$n edited lines	$n ಬದಲಿಸಿದ ಸಾಲುಗಳು
+Approve doctors	ವೈದ್ಯರನ್ನು ಅನುಮೋದಿಸಿ
+${request.name} approved	${request.name} ಅನುಮೋದಿತರಾದರು
+${request.name} not approved	${request.name} ಅನುಮೋದಿತರಾಗಲಿಲ್ಲ
+Register name or link	ರಿಜಿಸ್ಟರ್ ಹೆಸರು ಅಥವಾ ಲಿಂಕ್
+No prescription	ಪ್ರಿಸ್ಕ್ರಿಪ್ಷನ್ ಇಲ್ಲ
+1 change not sent	1 ಬದಲಾವಣೆ ಕಳುಹಿಸಿಲ್ಲ
+$n changes not sent	$n ಬದಲಾವಣೆಗಳನ್ನು ಕಳುಹಿಸಿಲ್ಲ
+1 change not sent. Someone else edited it first.	1 ಬದಲಾವಣೆ ಕಳುಹಿಸಿಲ್ಲ. ಬೇರೆಯವರು ಮೊದಲೇ ಬದಲಿಸಿದ್ದಾರೆ.
+$n changes not sent. Someone else edited them first.	$n ಬದಲಾವಣೆಗಳನ್ನು ಕಳುಹಿಸಿಲ್ಲ. ಬೇರೆಯವರು ಮೊದಲೇ ಬದಲಿಸಿದ್ದಾರೆ.
+“${document.name}” has no readable text yet.	“${document.name}” ನಲ್ಲಿ ಇನ್ನೂ ಓದಬಹುದಾದ ಬರಹ ಇಲ್ಲ.
+Your documents have no readable text yet.	ನಿಮ್ಮ ದಾಖಲೆಗಳಲ್ಲಿ ಇನ್ನೂ ಓದಬಹುದಾದ ಬರಹ ಇಲ್ಲ.
+Too much text. Choose fewer documents.	ಬರಹ ತುಂಬಾ ಹೆಚ್ಚಿದೆ. ಕಡಿಮೆ ದಾಖಲೆಗಳನ್ನು ಆರಿಸಿ.
+Care note v${previous.number}	ಕೇರ್ ನೋಟ್ v${previous.number}
+Consent	ಸಮ್ಮತಿ
+Transcript added	ಲಿಪಿ ಸೇರಿಸಲಾಗಿದೆ
+Couldn't add transcript	ಲಿಪಿ ಸೇರಿಸಲಾಗಲಿಲ್ಲ
+Sample draft loaded	ಮಾದರಿ ಕರಡು ಲೋಡ್ ಆಯಿತು
+Load sample draft	ಮಾದರಿ ಕರಡು ಲೋಡ್ ಮಾಡಿ
+Sample draft · not AI	ಮಾದರಿ ಕರಡು · AI ಅಲ್ಲ
+Reviewer name	ಪರಿಶೀಲಕರ ಹೆಸರು
+Save version	ಆವೃತ್ತಿ ಉಳಿಸಿ
+Records	ದಾಖಲೆಗಳು
+Activity	ಚಟುವಟಿಕೆ
+Reviewer: ${version.reviewerName}	ಪರಿಶೀಲಕರು: ${version.reviewerName}
+PDF created	PDF ಸಿದ್ಧವಾಯಿತು
+Locked PDF created	ಲಾಕ್ ಮಾಡಿದ PDF ಸಿದ್ಧವಾಯಿತು
+Couldn't create PDF	PDF ಸಿದ್ಧವಾಗಲಿಲ್ಲ
+Create PDF	PDF ರಚಿಸಿ
+taken	ತೆಗೆದುಕೊಂಡಿದೆ
+Confirm	ದೃಢೀಕರಿಸಿ
+Date (YYYY-MM-DD)	ದಿನಾಂಕ (YYYY-MM-DD)
+Replace current prescription	ಈಗಿನ ಪ್ರಿಸ್ಕ್ರಿಪ್ಷನ್ ಬದಲಿಸಿ
+Checked against the prescription	ಪ್ರಿಸ್ಕ್ರಿಪ್ಷನ್‌ನೊಂದಿಗೆ ಹೋಲಿಸಿದ್ದೇನೆ
+Add a name for each medicine	ಪ್ರತಿ ಔಷಧಿಗೆ ಹೆಸರು ಬರೆಯಿರಿ
+Linked records	ಜೋಡಿಸಿದ ದಾಖಲೆಗಳು
+Reviewer: 	ಪರಿಶೀಲಕರು: 
+Contacts not shared	ಸಂಪರ್ಕಗಳನ್ನು ಹಂಚಿಕೊಂಡಿಲ್ಲ
+No contacts yet	ಇನ್ನೂ ಸಂಪರ್ಕಗಳಿಲ್ಲ

@@ -209,13 +209,7 @@ internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: C
         val mine = events.filter { it.medicineId == item.id }.let { all -> all.filterNot { MedicineDoses.redundantCheckoff(it, all, zone) } }
         val now = System.currentTimeMillis()
         LazyColumn(Modifier.fillMaxWidth().testTag("care-medicine-history-sheet"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            item { Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.weight(1f)) { Heading("${item.title} · ${t("History", "इतिहास")}", 24) }
-                MedicineInfoButton(t("About these reports", "इन सूचनाओं के बारे में"),
-                    t("Each tick or missed dose is what someone recorded, not proof a dose was swallowed. Ask the doctor or nurse what to do about a missed dose.", "हर टिक या छूटी खुराक वही है जो किसी ने दर्ज किया, खुराक निगलने का सबूत नहीं। छूटी खुराक के बारे में डॉक्टर या नर्स से पूछें।") + "\n\n" +
-                        (if (vm.cloud != null) t("Saved in your account. Family and doctors you share with can see it.", "आपके खाते में सेव। जिनके साथ आपने साझा किया, वे देख सकते हैं।") else t("Saved only on this phone. Sign in to share it with family and the doctor.", "सिर्फ़ इस फ़ोन पर सेव। परिवार और डॉक्टर से साझा करने के लिए साइन इन करें।")),
-                    "care-medicine-history-info")
-            } }
+            item { Heading("${item.title} · ${t("History", "इतिहास")}", 24) }
             // Friendly empty state: icon and one line; the Side effect? action sits below.
             if (mine.isEmpty()) item { Column(Modifier.fillMaxWidth().padding(vertical = 24.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Icon(Icons.Default.History, null, Modifier.size(32.dp), tint = DoctorCardSub)

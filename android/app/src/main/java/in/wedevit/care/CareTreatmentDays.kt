@@ -62,7 +62,6 @@ object TreatmentDayRules {
             // One title; what a treatment day does sits behind the "i" button.
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.weight(1f)) { Heading(if (initial == null) careBilingual("Add a treatment day", "इलाज का दिन") else careBilingual("Edit treatment day", "दिन बदलें"), 26) }
-                CareChartInfoButton(t("About this", "इसके बारे में"), t("Marks the day on the Lab history charts and in Calendar. It does not record a dose.", "लैब चार्ट और कैलेंडर में यह दिन दिखता है। इससे दवा की खुराक दर्ज नहीं होती।"), "treatment-day")
             }
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { TreatmentDayRules.categories.forEach { choice ->
                 FilterChip(category == choice, { category = choice }, label = { Text(TreatmentDayRules.label(choice), fontSize = 15.sp) }, shape = CircleShape,

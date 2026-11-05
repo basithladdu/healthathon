@@ -184,7 +184,6 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
             listOf("Patient", "Family / carer", "Doctor").forEach { role -> FilterChip(selected = speaker == role, onClick = { speaker = role }, enabled = !active, label = { Text(careSpeakerLabel(role)) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp)) }
         }
         CareLanguageMenu(languageTag, enabled = !active, includeMixed = true) { languageTag = it }
-        if (languageTag == "hi-en") Text(if (Build.VERSION.SDK_INT >= 34) t("Both phone language packs must be installed. If the language does not switch, turn a saved recording into text below.", "फ़ोन में दोनों भाषा पैक होने चाहिए। अगर भाषा नहीं बदलती, तो नीचे सहेजी रिकॉर्डिंग से लिखाई बनाएँ।") else t("This phone listens to one language at a time. For Hindi and English together, use a saved recording below.", "यह फ़ोन हर बार एक ही भाषा सुनता है। हिन्दी और अंग्रेज़ी साथ में नीचे सहेजी रिकॉर्डिंग के लिए उपलब्ध है।"), style = MaterialTheme.typography.bodySmall)
         if (dictation.available) {
             if (dictation.processing) LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), color = Rust)
             else if (dictation.listening) LinearProgressIndicator(progress = { dictation.level }, modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), color = Rust)
@@ -201,7 +200,7 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
                 if (active) TextButton(onClick = { dictation.cancel(keepWords = false); heldWords = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel turn", "यह बारी रद्द करें"), color = RustText) }
             }
             if (dictation.status.isNotBlank()) Text(dictation.status, fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.padding(top = 8.dp).announce())
-        } else Text(if (Build.VERSION.SDK_INT < 31) t("Speaking to type needs Android 12 or newer. Type the words or keep an audio recording.", "फ़ोन पर बोलकर लिखने के लिए Android 12 या नया चाहिए। शब्द लिखें या ऑडियो रिकॉर्डिंग रखें।") else t("Speaking to type does not work on this phone. Type the words or keep an audio recording.", "इस फ़ोन पर बोलकर लिखना उपलब्ध नहीं है। शब्द लिखें या ऑडियो रिकॉर्डिंग रखें।"), style = MaterialTheme.typography.bodySmall)
+        } else Text(t("Not available on this phone. Type instead.", "इस फ़ोन पर उपलब्ध नहीं। टाइप करें।"), style = MaterialTheme.typography.bodySmall)
         if (permissionError.isNotBlank()) Text(permissionError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall, modifier = Modifier.announce())
         if (heldWords.isNotBlank() && !active) {
             Text(t("Unfinished words · $pendingSpeaker · ${pendingLanguage.label}", "अधूरे शब्द · $pendingSpeaker · ${pendingLanguage.label}"), style = MaterialTheme.typography.labelMedium)
@@ -211,7 +210,7 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
         if (recording) Text(t("Stop the audio recording before dictating.", "बोलकर लिखने से पहले ऑडियो रिकॉर्डिंग रोकें।"), style = MaterialTheme.typography.bodySmall)
     }
     if (showConsent) AlertDialog(onDismissRequest = { showConsent = false }, title = { Text(t("Before we listen", "सुनने से पहले")) },
-        text = { Column { Text(t("Speak one person's turn, then check the words before using them in the care note.", "एक व्यक्ति की बात बोलें, फिर केयर नोट में डालने से पहले शब्द जाँचें।")); Spacer(Modifier.height(12.dp)); CheckLine(consent, { consent = it }, t("Everyone here agrees to the microphone being used for this turn.", "यहाँ मौजूद सभी इस बार माइक इस्तेमाल करने के लिए राज़ी हैं।")) } },
+        text = { Column { CheckLine(consent, { consent = it }, t("Everyone here agrees to the microphone being used for this turn.", "यहाँ मौजूद सभी इस बार माइक इस्तेमाल करने के लिए राज़ी हैं।")) } },
         confirmButton = { TextButton(onClick = {
             showConsent = false
             if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) { latestConsent(); dictation.start(pendingLanguage.tag) }
@@ -305,7 +304,7 @@ internal class CareReadAloud(context: Context, val changed: () -> Unit) {
                 val needed = (lines.mapNotNull { CareOfflineTranslation.scriptLanguage(it)?.let(CareOfflineTranslation::mlKitCode) } + target).toSet()
                 // No Wi-Fi-only preference exists for read aloud, so say plainly that mobile data may be used.
                 for (pack in needed - translation.installedLanguages()) {
-                    status = packDownloadStatus(pack) + " " + speechTr("Uses any network, including mobile data.", "किसी भी नेटवर्क, यहाँ तक कि मोबाइल डेटा, का उपयोग होता है।"); changed()
+                    status = packDownloadStatus(pack); changed()
                     translation.downloadPack(pack, wifiOnly = false)
                 }
                 status = speechTr("Translating…", "अनुवाद हो रहा है…"); changed()
@@ -361,7 +360,6 @@ internal class CareReadAloud(context: Context, val changed: () -> Unit) {
                 Icon(if (reader.busy) Icons.Default.Stop else Icons.Default.VolumeUp, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(if (reader.busy) t("Stop reading", "पढ़ना रोकें") else t("Read aloud", "पढ़कर सुनाएँ"), fontWeight = FontWeight.SemiBold)
             }
             Spacer(Modifier.weight(1f))
-            CareHelpIcon(t("Read aloud", "पढ़कर सुनाएँ"), t("The words are translated on this phone for listening only. The saved note is not changed. Check anything important with the care team.", "शब्द सिर्फ़ सुनने के लिए इसी फ़ोन पर अनुवाद होते हैं। सहेजा हुआ नोट नहीं बदलता। कोई भी ज़रूरी बात केयर टीम से जाँच लें।"))
         }
         Spacer(Modifier.height(8.dp))
         CareLanguageMenu(language) { language = it }

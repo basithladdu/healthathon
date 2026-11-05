@@ -62,12 +62,12 @@ class CarePendingJoinStore(private val kv: CareKeyValue, private val ttlMs: Long
 fun careJoinFailureMessage(raw: String?, hindi: Boolean = false): String {
     val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     return when {
-        raw.isNullOrBlank() -> t("This invitation couldn't be used. Ask for a new one.", "यह निमंत्रण काम नहीं आया। नया निमंत्रण माँगें।")
+        raw.isNullOrBlank() -> t("Invite didn't work. Ask for a new one.", "निमंत्रण काम नहीं आया। नया माँगें।")
         raw.startsWith("Clinician verification") -> raw
-        raw.startsWith("Couldn't reach") -> t("No connection right now. Check your internet and open the link again.", "अभी इंटरनेट नहीं मिल रहा। इंटरनेट देखें और लिंक फिर से खोलें।")
-        raw.startsWith("Sign in again") -> t("Please sign in again, then open the invitation link again.", "फिर से साइन इन करें, फिर निमंत्रण का लिंक दोबारा खोलें।")
-        raw.startsWith("Use a separate account") -> t("This invitation was made from this account. The family member must join from their own account.", "यह निमंत्रण इसी खाते से बना है। परिवार के सदस्य को अपने खाते से जुड़ना होगा।")
-        else -> t("This invitation has expired or was already used. Ask for a new one.", "यह निमंत्रण बंद हो चुका है या पहले ही इस्तेमाल हो चुका है। नया निमंत्रण माँगें।")
+        raw.startsWith("Couldn't reach") -> t("No connection. Open the link again.", "इंटरनेट नहीं है। लिंक फिर से खोलें।")
+        raw.startsWith("Sign in again") -> t("Sign in again, then reopen the link.", "फिर से साइन इन करें, फिर लिंक खोलें।")
+        raw.startsWith("Use a separate account") -> t("Join from their own account, not this one.", "इस खाते से नहीं, उनके अपने खाते से जुड़ें।")
+        else -> t("Invite expired or was already used.", "निमंत्रण बंद है या इस्तेमाल हो चुका है।")
     }
 }
 
@@ -121,10 +121,10 @@ object CareInviteLog {
         val day = if (status.at > 0) java.time.Instant.ofEpochMilli(status.at).atZone(java.time.ZoneId.systemDefault()).format(careDateFormat("d MMM", hindi)) else ""
         val text = when (status.state) {
             CareInviteState.JOINED -> listOf(t("Joined", "जुड़ गए"), memberEmail, day).filter { it.isNotBlank() }.joinToString(" · ")
-            CareInviteState.OPEN -> t("Invited · not joined yet · ", "निमंत्रण भेजा · अभी जुड़े नहीं · ") + expiry
-            CareInviteState.CLOSED -> t("Link used or cancelled · see who has access below", "लिंक इस्तेमाल हो गया या रद्द हुआ · नीचे देखें किसे पहुँच है")
-            CareInviteState.EXPIRED -> t("Expired · create a new invite", "बंद हो गया · नया निमंत्रण बनाएँ")
-            CareInviteState.UNKNOWN -> t("Sent · could not check if it arrived", "भेजा गया · अभी पता नहीं चल सका कि पहुँचा या नहीं")
+            CareInviteState.OPEN -> t("Invited · ", "निमंत्रण भेजा · ") + expiry
+            CareInviteState.CLOSED -> t("Used or cancelled", "इस्तेमाल हुआ या रद्द")
+            CareInviteState.EXPIRED -> t("Expired", "बंद हो गया")
+            CareInviteState.UNKNOWN -> t("Sent", "भेजा गया")
             CareInviteState.UNTRACKED -> t("Sent · ", "भेजा गया · ") + expiry
         }
         return "$who · $text"

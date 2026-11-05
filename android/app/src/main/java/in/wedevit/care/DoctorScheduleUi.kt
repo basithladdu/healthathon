@@ -159,7 +159,7 @@ private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone
             }
             if (expanded) {
                 Text(t("Doctor: $doctor", "डॉक्टर: $doctor"), fontSize = 14.sp, color = DoctorCardInk)
-                if (note.isNotBlank()) Text(t("Appointment logistics: $note", "अपॉइंटमेंट का इंतज़ाम: $note"), fontSize = 14.sp, color = DoctorCardSub)
+                if (note.isNotBlank()) Text(note, fontSize = 14.sp, color = DoctorCardSub)
                 OutlinedButton(onClick = onOpen, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-schedule-open-${item.id}")) { Text(t("Open", "खोलें"), color = RustText); Spacer(Modifier.width(4.dp)); Icon(Icons.Default.ChevronRight, null, Modifier.size(18.dp), tint = RustText) }
             }
         }

@@ -15,7 +15,7 @@ import java.util.Locale
  */
 enum class EmergencySection(val en: String, val hi: String) {
     NAME("Name", "नाम"),
-    GOALS("Goals of care (latest confirmed note)", "देखभाल के लक्ष्य (पुष्टि किया गया नोट)"),
+    GOALS("Goals of care", "देखभाल के लक्ष्य"),
     CONTACTS("Emergency contacts", "आपातकालीन संपर्क"),
     MEDICINES("Current medicines", "अभी की दवाएँ"),
 }

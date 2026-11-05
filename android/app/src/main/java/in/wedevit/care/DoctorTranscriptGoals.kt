@@ -66,14 +66,14 @@ internal fun doctorTranscriptIsSample(walkthrough: Boolean, source: String, samp
     walkthrough && sample != null && source.isNotBlank() && source.lineSequence().first().trim() == sample.lineSequence().first().trim()
 
 /** Compact covered / open list. [onDark] for the terracotta record stage. */
-@Composable internal fun DoctorGoalsChecklist(rows: List<DoctorPreparationQuestion>, matches: QuestionMatchResult?, onDark: Boolean = false, hint: String? = null) {
+@Composable internal fun DoctorGoalsChecklist(rows: List<DoctorPreparationQuestion>, matches: QuestionMatchResult?, onDark: Boolean = false, hint: String? = null) { val t = careText()
     if (rows.isEmpty()) return
     val list = transcriptChecklist(rows, matches)
     val ink = if (onDark) Color.White else DoctorCardInk
     val sub = if (onDark) Color.White.copy(alpha = .85f) else DoctorCardSub
     Column(Modifier.fillMaxWidth().testTag("goals-checklist"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(careBilingual("Goals-of-care checklist", "लक्ष्य-सूची"), fontWeight = FontWeight.Medium, fontSize = 15.sp, color = ink)
-        Text(list.summary, fontSize = 14.sp, lineHeight = 20.sp, color = sub, modifier = Modifier.testTag("goals-checklist-summary"))
+        Text(t("Goals of care", "देखभाल के लक्ष्य"), fontWeight = FontWeight.Medium, fontSize = 15.sp, color = ink)
+        Text(t("${list.covered} of ${list.rows.size} covered", "${list.rows.size} में से ${list.covered} पर बात हुई"), fontSize = 14.sp, lineHeight = 20.sp, color = sub, modifier = Modifier.testTag("goals-checklist-summary"))
         list.rows.forEach { (row, status) ->
             Row(verticalAlignment = Alignment.Top, modifier = Modifier.fillMaxWidth().testTag("goals-checklist-${row.id}")) {
                 val done = status != TranscriptGoalStatus.Open
@@ -81,11 +81,10 @@ internal fun doctorTranscriptIsSample(walkthrough: Boolean, source: String, samp
                 Spacer(Modifier.width(8.dp))
                 Column(Modifier.weight(1f)) {
                     Text(row.text, fontSize = 15.sp, lineHeight = 21.sp, color = ink)
-                    Text(transcriptChecklistLabel(status), fontSize = 14.sp, lineHeight = 20.sp, color = sub)
+                    Text(transcriptGoalShortLabel(status), fontSize = 14.sp, lineHeight = 20.sp, color = sub)
                 }
             }
         }
-        if (hint != null) Text(hint, fontSize = 14.sp, lineHeight = 20.sp, color = sub)
     }
 }
 
@@ -105,13 +104,10 @@ internal fun doctorTranscriptIsSample(walkthrough: Boolean, source: String, samp
 /** Collapsible goals-of-care cards for the transcript page. [onSave] receives (question id, answer); [onShowLine] jumps to a transcript line. */
 @Composable internal fun DoctorTranscriptGoals(rows: List<DoctorPreparationQuestion>, matches: QuestionMatchResult?, editable: Boolean, onSave: (String, String) -> Unit, onBackToWho: () -> Unit = {}, source: String = "", onShowLine: (CareSourceLine) -> Unit = {}) { val t = careText();
     Column(Modifier.fillMaxWidth().testTag("transcript-goals"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(t("Goals of care", "देखभाल के लक्ष्य"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
-            if (rows.isNotEmpty()) DoctorInfoIcon(t("Goals of care", "देखभाल के लक्ष्य"), careBilingual("Suggestions come from matching words in the transcript. Accept or edit each answer before the note is saved.", "सुझाव बातचीत के शब्दों से हैं; हर जवाब जाँचें।"), "transcript-goals-info")
-        }
+        Text(t("Goals of care", "देखभाल के लक्ष्य"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
         if (rows.isEmpty()) {
-            Text(t("No questions were prepared.", "कोई सवाल तैयार नहीं किया गया।"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardSub)
-            TextButton(onClick = onBackToWho, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-goals-back")) { Text(t("Back to who is here", "कौन मौजूद है पर वापस"), color = DoctorAccent) }
+            Text(t("No questions yet", "अभी कोई सवाल नहीं"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardSub)
+            TextButton(onClick = onBackToWho, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-goals-back")) { Text(t("Who's here", "कौन मौजूद है"), color = DoctorAccent) }
         } else {
             rows.forEach { row -> key(row.id) { GoalCard(row, matches, editable, onSave, source, onShowLine) } }
         }
@@ -136,33 +132,31 @@ internal fun doctorTranscriptIsSample(walkthrough: Boolean, source: String, samp
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(row.text, fontSize = 16.sp, lineHeight = 23.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
                     val (fg, bg) = when (status) { TranscriptGoalStatus.Answered -> DoctorStatusGood to DoctorStatusGoodBg; TranscriptGoalStatus.Suggested -> DoctorStatusWarn to DoctorStatusWarnBg; TranscriptGoalStatus.Open -> DoctorStatusRest to DoctorStatusRestBg }
-                    Surface(shape = RoundedCornerShape(50), color = bg) { Text(transcriptChecklistLabel(status), fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium, color = fg, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp).testTag("transcript-goal-status-${row.id}")) }
+                    Surface(shape = RoundedCornerShape(50), color = bg) { Text(transcriptGoalShortLabel(status), fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium, color = fg, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp).testTag("transcript-goal-status-${row.id}")) }
                 }
                 Icon(if (open) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, null, tint = DoctorCardSub, modifier = Modifier.size(48.dp).padding(12.dp))
             }
             if (open) {
                 if (row.answer.isNotBlank() && draft == null) {
-                    if (answerLine != null) TextButton(onClick = { onShowLine(answerLine) }, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-goal-line-${row.id}")) { Text(careBilingual("From line ${answerLine.number} · show in transcript", "पंक्ति देखें"), color = DoctorAccent) }
+                    if (answerLine != null) TextButton(onClick = { onShowLine(answerLine) }, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-goal-line-${row.id}")) { Text(t("Line ${answerLine.number}", "पंक्ति ${answerLine.number}"), color = DoctorAccent) }
                 }
                 if (row.answer.isBlank() && draft == null && suggestion != null) Surface(shape = RoundedCornerShape(14.dp), color = DoctorStatusWarnBg, modifier = Modifier.fillMaxWidth().testTag("transcript-goal-suggestion-${row.id}")) {
                     Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(careBilingual("Suggested from the transcript · found by matching words · line ${suggestion.line.number}", "पंक्ति ${suggestion.line.number}"), fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, color = DoctorStatusWarn)
+                        Text(t("Suggested · line ${suggestion.line.number}", "सुझाव · पंक्ति ${suggestion.line.number}"), fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, color = DoctorStatusWarn)
                         Text("“$span”", fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk, modifier = Modifier.clickable(role = Role.Button, onClickLabel = t("Show this line in the transcript", "यह पंक्ति लिखाई में दिखाएँ")) { onShowLine(suggestion.line) })
-                        Text(transcriptSuggestionNote(suggestion), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.testTag("transcript-goal-note-${row.id}"))
                         Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
-                            TextButton(onClick = { onShowLine(suggestion.line) }, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-goal-show-${row.id}")) { Text(t("Show line", "पंक्ति दिखाएँ"), color = DoctorAccent) }
                             if (editable) {
-                                TextButton(onClick = { draft = span.take(DOCTOR_PREPARATION_MAX_ANSWER_CHARS) }, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-goal-edit-${row.id}")) { Text(careBilingual("Edit", "बदलें"), color = DoctorAccent) }
-                                Button(onClick = { onSave(row.id, span.take(DOCTOR_PREPARATION_MAX_ANSWER_CHARS)) }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = Color.White), modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-goal-accept-${row.id}")) { Text(careBilingual("Accept", "ठीक है")) }
+                                TextButton(onClick = { draft = span.take(DOCTOR_PREPARATION_MAX_ANSWER_CHARS) }, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-goal-edit-${row.id}")) { Text(t("Edit", "बदलें"), color = DoctorAccent) }
+                                Button(onClick = { onSave(row.id, span.take(DOCTOR_PREPARATION_MAX_ANSWER_CHARS)) }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = Color.White), modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-goal-accept-${row.id}")) { Text(t("Accept", "ठीक है")) }
                             }
                         }
                     }
                 }
                 if (editable) {
-                    OutlinedTextField(shown, { draft = it.take(DOCTOR_PREPARATION_MAX_ANSWER_CHARS) }, placeholder = { Text(careBilingual("Write the answer", "जवाब लिखें")) }, minLines = 3, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("transcript-goal-answer-${row.id}"))
+                    OutlinedTextField(shown, { draft = it.take(DOCTOR_PREPARATION_MAX_ANSWER_CHARS) }, placeholder = { Text(t("Answer", "जवाब")) }, minLines = 3, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("transcript-goal-answer-${row.id}"))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text("${shown.length}/$DOCTOR_PREPARATION_MAX_ANSWER_CHARS", fontSize = 13.sp, color = DoctorCardSub, modifier = Modifier.weight(1f))
-                        TextButton(onClick = { onSave(row.id, shown.trim()); draft = null }, enabled = draft != null && shown.trim() != row.answer, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-goal-save-${row.id}")) { Text(t("Save answer", "जवाब सहेजें"), color = DoctorAccent) }
+                        TextButton(onClick = { onSave(row.id, shown.trim()); draft = null }, enabled = draft != null && shown.trim() != row.answer, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-goal-save-${row.id}")) { Text(t("Save", "सहेजें"), color = DoctorAccent) }
                     }
                 } else Text(shown.ifBlank { t("No answer yet.", "अभी कोई जवाब नहीं।") }, fontSize = 16.sp, lineHeight = 24.sp, color = if (shown.isBlank()) DoctorCardSub else DoctorCardInk, modifier = Modifier.testTag("transcript-goal-answer-${row.id}"))
             }
@@ -172,9 +166,14 @@ internal fun doctorTranscriptIsSample(walkthrough: Boolean, source: String, samp
 
 /** Where the transcript words came from, shown under the transcript. */
 internal fun doctorTranscriptOrigin(isSample: Boolean, transcribedAt: Long, model: String): String = when {
-    isSample -> careBilingual("Practice · written in advance for the walkthrough, not taken from your recording", "अभ्यास, पहले से लिखा, आपकी रिकॉर्डिंग से नहीं")
-    transcribedAt > 0 -> careBilingual("Transcript · $model. Check names, numbers and meaning against the audio.", "ऑडियो से नाम, अंक और मतलब जाँचें")
-    else -> careBilingual("Typed or dictated here · check every word", "यहाँ लिखा गया")
+    isSample -> careTr(CareLanguageState.shown, "Practice transcript", "अभ्यास की लिखाई")
+    transcribedAt > 0 -> careTr(CareLanguageState.shown, "Transcript · $model", "लिखाई · $model")
+    else -> careTr(CareLanguageState.shown, "Typed", "लिखा गया")
+}
+
+/** Short status for chips and checklist rows. */
+@Composable internal fun transcriptGoalShortLabel(status: TranscriptGoalStatus): String { val t = careText()
+    return when (status) { TranscriptGoalStatus.Answered -> t("Answered", "जवाब मिला"); TranscriptGoalStatus.Suggested -> t("Suggested", "सुझाव"); TranscriptGoalStatus.Open -> t("Open", "बाकी") }
 }
 
 internal val GOALS_CHECKLIST_HINT: String get() = careBilingual("Ticks update as the words are typed, dictated or transcribed", "शब्द लिखे जाने पर टिक बदलते हैं")

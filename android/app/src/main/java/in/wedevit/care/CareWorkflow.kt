@@ -197,7 +197,7 @@ object CareLabRules {
         if (visible.isEmpty()) item { SurfaceCard { Column(Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Icon(Icons.Default.Inbox, null, Modifier.size(32.dp), tint = DoctorCardSub)
             Text(if (showFinished) t("No matching requests or tasks", "कोई अनुरोध या काम नहीं मिला") else t("Nothing waiting here", "यहाँ कुछ बाक़ी नहीं"), fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
-            if (canEdit) OutlinedButton(onClick = { adding = if (filter == "Tasks") "task" else "conversation" }, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Text(if (filter == "Tasks") t("Add a task", "काम जोड़ें") else t("Ask for a conversation", "बातचीत के लिए कहें"), color = RustText) }
+            if (canEdit) OutlinedButton(onClick = { adding = if (filter == "Tasks") "task" else "conversation" }, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Text(if (filter == "Tasks") t("Add a task", "काम जोड़ें") else t("Ask to talk", "बात करने को कहें"), color = RustText) }
         } } }
         items(visible, key = { it.first.id }) { (item, data) -> WorkflowCard(vm, item, data, onTalk) }
     }
@@ -253,7 +253,6 @@ object CareLabRules {
         AlertDialog(onDismissRequest = { if (!busy) action = "" }, title = { Text(when (action) { "accepted" -> if (data.type == "conversation") t("Pick up this conversation?", "यह बातचीत आप लेंगे?") else t("Pick up this task?", "यह काम आप लेंगे?"); "completed" -> t("Mark completed?", "पूरा हुआ मानें?"); "cancelled" -> t("Cancel this entry?", "इसे रद्द करें?"); "remove" -> t("Remove this entry?", "इसे हटाएँ?"); else -> t("Reopen this entry?", "इसे फिर खोलें?") }) }, text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(item.title)
             if (action !in setOf("remove", "cancelled", "open")) OutlinedTextField(actor, { actor = it; error = "" }, label = { Text(t("Your name", "आपका नाम")) }, singleLine = true)
-            if (action == "accepted") Text(t("Names are self-entered and visible to this care circle.", "नाम लोग ख़ुद लिखते हैं और इस देखभाल समूह को दिखते हैं।"), style = MaterialTheme.typography.bodySmall)
             (error.ifBlank { savingError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
         } }, confirmButton = { TextButton(enabled = !busy, onClick = {
             if (!canEditCareContext(vm, item.personId, capturedAccount)) { error = t("Care access changed. Reopen this person's records.", "देखभाल की अनुमति बदल गई है। इस व्यक्ति के रिकॉर्ड फिर खोलें।") }

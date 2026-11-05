@@ -55,7 +55,7 @@ class DailyCareFlowsTest {
         ui.onNodeWithTag("nav-Today").performClick()
         ui.onNodeWithTag("today-list").performScrollToNode(hasTestTag("today-goals-of-care"))
         ui.onNodeWithTag("today-goals-of-care").performClick()
-        ui.onNodeWithText("Ask for a conversation").performScrollTo().performClick()
+        ui.onAllNodesWithText("Ask to talk").onFirst().performScrollTo().performClick()
         ui.onNodeWithTag("workflow-list").assertIsDisplayed()
     }
     private fun enter(label: String, text: String) {
@@ -165,7 +165,7 @@ class DailyCareFlowsTest {
         ui.waitUntil(15000) { !vm.busy.value && vm.selected.value != person && vm.items.value.isEmpty() }
         val other = vm.selected.value; createdPeople += other
         openShortcut("shortcut-labs")
-        ui.onNodeWithText("Keep results together").assertIsDisplayed()
+        ui.onNodeWithText("No results yet").assertIsDisplayed()
         ui.onNodeWithText("Haemoglobin").assertDoesNotExist()
         assertEquals(2, runBlocking { CareDatabase.get(ui.activity).care().items(person).first() }.size)
     }

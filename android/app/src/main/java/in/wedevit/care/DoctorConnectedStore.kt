@@ -19,7 +19,7 @@ private suspend fun CareCloud.doctorRows(table: String, filter: String): List<JS
     do {
         val rows = JSONArray(request("GET", "/rest/v1/sahara_doctor_$table?$filter&limit=500&offset=$offset")).rows()
         all += rows; offset += rows.size
-        require(offset <= 10000) { "This workspace is too large to load safely. No records were changed." }
+        require(offset <= 10000) { "Too many records to load." }
     } while (rows.size == 500)
     return all
 }
@@ -98,7 +98,7 @@ suspend fun CareCloud.seedDoctorDataset(): ConnectedDoctorDataset {
             .put("doses", doses))
     }
     request("POST", "/rest/v1/rpc/sahara_doctor_seed", JSONObject().put("p_patients", patients))
-    return loadDoctorDataset() ?: error("The synthetic workspace could not be loaded. Refresh before trying again.")
+    return loadDoctorDataset() ?: error("Couldn't load. Refresh and try again.")
 }
 
 suspend fun CareCloud.saveDoctorDraft(patientId: String, draft: WorkflowDraft, expectedRevision: Long, noteId: String? = null): ConnectedDoctorNote {
@@ -107,15 +107,15 @@ suspend fun CareCloud.saveDoctorDraft(patientId: String, draft: WorkflowDraft, e
     val id = noteId?.let(::requireConnectedDoctorId) ?: if (expectedRevision == 0L) UUID.randomUUID().toString() else {
         val author = requireConnectedDoctorId(session.value?.userId ?: error("Sign in first."))
         doctorRows("notes", "patient_id=eq.$patientId&author_id=eq.$author&status=eq.draft&revision=eq.$expectedRevision&order=updated_at.desc,id.asc").singleOrNull()?.getString("id")
-            ?: error("Choose the exact saved draft before editing. Your work was not changed.")
+            ?: error("Draft not found. Refresh and try again.")
     }
     val caller = requireConnectedDoctorId(session.value?.userId ?: error("Sign in first."))
     doctorRows("notes", "id=eq.$id").singleOrNull()?.let { row ->
         val existing = decodeDoctorNote(row)
-        require(existing.patientId == patientId && row.getString("author_id") == caller) { "This saved draft belongs to a different patient or author. Nothing was changed." }
-        require(existing.status == "draft") { "This note was already published. Refresh and create a new draft copy; the published version was not changed." }
+        require(existing.patientId == patientId && row.getString("author_id") == caller) { "This draft belongs to someone else." }
+        require(existing.status == "draft") { "Already published. Save as copy." }
         if (connectedDoctorDraftRetryMatches(existing, row.getString("author_id"), caller, patientId, expectedRevision, draft)) return existing
-        require(expectedRevision != 0L) { "A different draft already uses this submission identity. Refresh before creating a new copy; the saved draft was not changed." }
+        require(expectedRevision != 0L) { "Draft conflict. Refresh and try again." }
     }
     val saved = decodeDoctorNote(JSONObject(request("POST", "/rest/v1/rpc/sahara_doctor_save_note", JSONObject().put("p_patient", patientId).put("p_id", id)
         .put("p_revision", expectedRevision).put("p_payload", payload).put("p_publish", false))))
@@ -125,7 +125,7 @@ suspend fun CareCloud.saveDoctorDraft(patientId: String, draft: WorkflowDraft, e
 suspend fun CareCloud.publishDoctorNote(noteId: String, expectedRevision: Long): ConnectedDoctorNote {
     requireConnectedDoctorId(noteId); require(expectedRevision > 0)
     val current = doctorRows("notes", "id=eq.$noteId").singleOrNull()?.let(::decodeDoctorNote) ?: error("This note is not available to your account.")
-    require(current.status == "draft" && current.revision == expectedRevision) { "This draft changed. Refresh before publishing." }
+    require(current.status == "draft" && current.revision == expectedRevision) { "Draft changed. Refresh first." }
     val saved = decodeDoctorNote(JSONObject(request("POST", "/rest/v1/rpc/sahara_doctor_save_note", JSONObject().put("p_patient", current.patientId).put("p_id", noteId)
         .put("p_revision", expectedRevision).put("p_payload", validateConnectedDoctorDraft(current.draft)).put("p_publish", true))))
     require(saved.id == noteId && saved.patientId == current.patientId && saved.revision == expectedRevision + 1 && saved.status == "test_published")
@@ -143,7 +143,7 @@ suspend fun CareCloud.addDoctorDose(patientId: String, medicineLabel: String, pl
     val dataset = doctorPatientDataset(patientId)
     doctorRows("doses", "id=eq.$eventId").singleOrNull()?.let { existing ->
         val dose = decodeDoctorDose(existing)
-        require(dose.patientId == patientId && dose.medicineLabel == medicineLabel.trim() && dose.plannedAt == plannedAt && dose.reportedTakenAt == reportedTakenAt && dose.outcome == outcome && dose.reporterId == session.value?.userId) { "This dose submission already exists with different details. Refresh before trying again." }
+        require(dose.patientId == patientId && dose.medicineLabel == medicineLabel.trim() && dose.plannedAt == plannedAt && dose.reportedTakenAt == reportedTakenAt && dose.outcome == outcome && dose.reporterId == session.value?.userId) { "Dose already saved. Refresh first." }
         return dose
     }
     val row = JSONObject().put("id", eventId).put("dataset_id", dataset).put("patient_id", patientId).put("medicine_label", medicineLabel.trim())
@@ -152,15 +152,15 @@ suspend fun CareCloud.addDoctorDose(patientId: String, medicineLabel: String, pl
 }
 
 suspend fun CareCloud.uploadDoctorFile(context: Context, uri: Uri, patientId: String, title: String, kind: String, consent: Boolean): ConnectedDoctorFile {
-    require(consent) { "Agree to upload this specific file first." }; require(title.trim().length in 1..160 && kind in setOf("audio", "report"))
+    require(consent) { "Tick the permission box first." }; require(title.trim().length in 1..160 && kind in setOf("audio", "report"))
     val dataset = doctorPatientDataset(patientId)
     val (mime, bytes) = withContext(Dispatchers.IO) {
         val mime = context.contentResolver.getType(uri)?.lowercase() ?: if (uri.path?.endsWith(".m4a", true) == true) "audio/mp4" else "application/octet-stream"
         val allowed = if (kind == "audio") setOf("audio/mp4", "audio/mpeg", "audio/wav", "audio/x-wav", "audio/ogg") else setOf("application/pdf", "image/jpeg", "image/png", "image/webp")
-        require(mime in allowed) { "Choose a supported audio recording, PDF or report image." }
+        require(mime in allowed) { "Choose audio, PDF or an image." }
         val bytes = context.contentResolver.openInputStream(uri)?.use { input ->
             val output = java.io.ByteArrayOutputStream(); val buffer = ByteArray(8192)
-            while (true) { val size = input.read(buffer); if (size < 0) break; require(output.size() + size <= 4_194_304) { "Choose a file no larger than 4 MB. Nothing was uploaded." }; output.write(buffer, 0, size) }
+            while (true) { val size = input.read(buffer); if (size < 0) break; require(output.size() + size <= 4_194_304) { "File must be under 4 MB." }; output.write(buffer, 0, size) }
             output.toByteArray()
         } ?: error("This file could not be opened.")
         require(bytes.isNotEmpty()); mime to bytes
@@ -175,12 +175,12 @@ suspend fun CareCloud.uploadDoctorFile(context: Context, uri: Uri, patientId: St
 }
 suspend fun CareCloud.downloadDoctorFile(context: Context, file: ConnectedDoctorFile): File {
     requireConnectedDoctorId(file.id); requireConnectedDoctorId(file.patientId)
-    val fresh = doctorRows("files", "id=eq.${file.id}").singleOrNull()?.let(::decodeDoctorFile) ?: error("This file is no longer available to your account.")
-    require(fresh == file) { "This file's details changed. Refresh before opening it." }
-    require(fresh.ready) { "This upload is incomplete. No original file is available yet." }
+    val fresh = doctorRows("files", "id=eq.${file.id}").singleOrNull()?.let(::decodeDoctorFile) ?: error("File not available.")
+    require(fresh == file) { "File changed. Refresh first." }
+    require(fresh.ready) { "Upload incomplete." }
     val bytes = doctorFileRequest("GET", fresh.objectPath)
     val hash = MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
-    require(bytes.size.toLong() == fresh.bytes && hash == fresh.sha256) { "The downloaded file did not match its saved fingerprint. It was not opened." }
+    require(bytes.size.toLong() == fresh.bytes && hash == fresh.sha256) { "File check failed. Not opened." }
     return withContext(Dispatchers.IO) {
         val extension = when (file.mime) { "application/pdf" -> "pdf"; "image/jpeg" -> "jpg"; "image/png" -> "png"; "image/webp" -> "webp"; "audio/mp4" -> "m4a"; "audio/mpeg" -> "mp3"; "audio/ogg" -> "ogg"; else -> "wav" }
         val folder = File(context.cacheDir, "doctor-preview-exports").also { check(it.exists() || it.mkdir()) }

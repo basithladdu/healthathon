@@ -123,7 +123,6 @@ import java.time.LocalDate
 @Composable fun TodayQuickActions(onCalendar: () -> Unit, onSymptoms: () -> Unit, onLabs: () -> Unit, onCommunity: () -> Unit) {
     val t = careText()
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text(t("Go to", "यहाँ जाएँ"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf(
                 QuickAction(t("Calendar", "कैलेंडर"), R.drawable.quick_calendar_art, SaharaApricot, "shortcut-calendar", onCalendar),

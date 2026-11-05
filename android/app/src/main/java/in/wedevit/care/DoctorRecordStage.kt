@@ -80,14 +80,14 @@ internal fun doctorCaptureModeLabel(mode: String, hindi: Boolean): String = care
         BackHandler(expanded) { scope.launch { frac.animateTo(0f) } }
         Column(Modifier.fillMaxSize().padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = peek), horizontalAlignment = Alignment.CenterHorizontally) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                if (onBack != null) TextButton(onClick = onBack, enabled = backEnabled, colors = ButtonDefaults.textButtonColors(contentColor = white, disabledContentColor = white.copy(alpha = .5f)), contentPadding = PaddingValues(0.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-capture-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.size(20.dp)); Spacer(Modifier.width(6.dp)); Text(t("Back to conversations", "बातचीत की सूची पर वापस"), fontSize = 16.sp) }
+                if (onBack != null) TextButton(onClick = onBack, enabled = backEnabled, colors = ButtonDefaults.textButtonColors(contentColor = white, disabledContentColor = white.copy(alpha = .5f)), contentPadding = PaddingValues(0.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-capture-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.size(20.dp)); Spacer(Modifier.width(6.dp)); Text(t("Back", "वापस"), fontSize = 16.sp) }
                 Spacer(Modifier.weight(1f))
-                Box { IconButton(onClick = { menu = true }, enabled = menuEnabled, modifier = Modifier.size(48.dp).testTag("doctor-capture-mode")) { Icon(Icons.Default.MoreVert, t("Choose Record, Dictate or Type, start new, or go back to who is here", "रिकॉर्ड, बोलकर लिखें या टाइप चुनें, नया शुरू करें, या कौन मौजूद है पर लौटें"), tint = white.copy(alpha = if (menuEnabled) 1f else .5f)) }
+                Box { IconButton(onClick = { menu = true }, enabled = menuEnabled, modifier = Modifier.size(48.dp).testTag("doctor-capture-mode")) { Icon(Icons.Default.MoreVert, t("More options", "और विकल्प"), tint = white.copy(alpha = if (menuEnabled) 1f else .5f)) }
                     DropdownMenu(menu, { menu = false }) {
                         listOf("Record", "Dictate", "Type").forEach { value -> val available = when (value) { "Record" -> localRecordingAllowed; "Dictate" -> !demo; else -> true }; DropdownMenuItem(text = { Text(doctorCaptureModeLabel(value, careHindi()) + if (!available) t(" · unavailable", " · उपलब्ध नहीं") else if (value == mode) t(" · current", " · अभी यही") else "") }, enabled = available, onClick = { onMode(value); menu = false }) }
                         HorizontalDivider()
-                        if (onStartNew != null) DropdownMenuItem(text = { Text(t("Start new · archive this draft", "नया शुरू करें · यह ड्राफ़्ट संग्रह में रखें")) }, enabled = menuEnabled, onClick = { menu = false; onStartNew() }, modifier = Modifier.testTag("record-stage-start-new"))
-                        DropdownMenuItem(text = { Text(t("Back to who is here", "कौन मौजूद है पर वापस")) }, enabled = backToWhoEnabled, onClick = { menu = false; onBackToWho() }, modifier = Modifier.testTag("record-stage-who"))
+                        if (onStartNew != null) DropdownMenuItem(text = { Text(t("Start new", "नया शुरू करें")) }, enabled = menuEnabled, onClick = { menu = false; onStartNew() }, modifier = Modifier.testTag("record-stage-start-new"))
+                        DropdownMenuItem(text = { Text(t("Who's here", "कौन मौजूद है")) }, enabled = backToWhoEnabled, onClick = { menu = false; onBackToWho() }, modifier = Modifier.testTag("record-stage-who"))
                     } }
             }
             Column(Modifier.fillMaxWidth().padding(end = 12.dp)) {
@@ -99,9 +99,9 @@ internal fun doctorCaptureModeLabel(mode: String, hindi: Boolean): String = care
             DoctorWaveform(level, recording, Modifier.padding(end = 12.dp))
             Spacer(Modifier.height(28.dp))
             Surface(onClick = { if (recording) onStop() else onRecord() }, enabled = recordEnabled, shape = CircleShape, color = DoctorStageCream, contentColor = DoctorStageDeep, modifier = Modifier.size(88.dp).testTag("record-stage-button")) { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Icon(if (recording) Icons.Default.Stop else Icons.Default.Mic, if (recording) t("Stop and save", "रोकें और सहेजें") else t("Record conversation", "बातचीत रिकॉर्ड करें"), Modifier.size(40.dp), tint = DoctorStageDeep.copy(alpha = if (recordEnabled) 1f else .4f)) } }
-            if (saving || saveError) Column(Modifier.padding(top = 12.dp, end = 12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(if (saving) t("Saving local audio and its consent record…", "फ़ोन पर ऑडियो और उसकी सहमति सहेज रहे हैं…") else t("The audio file was retained, but its recording details could not be saved. Retry before continuing.", "ऑडियो फ़ाइल रखी गई, पर रिकॉर्डिंग की जानकारी सहेजी नहीं जा सकी। आगे बढ़ने से पहले फिर कोशिश करें।"), fontSize = 15.sp, lineHeight = 21.sp, color = white, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-                if (saveError) OutlinedButton(onClick = onRetry, enabled = !saving, shape = RoundedCornerShape(14.dp), border = androidx.compose.foundation.BorderStroke(1.dp, white), colors = ButtonDefaults.outlinedButtonColors(contentColor = white), modifier = Modifier.heightIn(min = 48.dp).testTag("retry-saving-audio")) { Text(t("Retry saving audio", "ऑडियो फिर से सहेजें")) }
+            if (saveError && !saving) Column(Modifier.padding(top = 12.dp, end = 12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(if (saving) t("Saving…", "सहेज रहे हैं…") else t("Couldn't save. Try again.", "सहेजा नहीं गया। फिर कोशिश करें।"), fontSize = 15.sp, lineHeight = 21.sp, color = white, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                if (saveError) OutlinedButton(onClick = onRetry, enabled = !saving, shape = RoundedCornerShape(14.dp), border = androidx.compose.foundation.BorderStroke(1.dp, white), colors = ButtonDefaults.outlinedButtonColors(contentColor = white), modifier = Modifier.heightIn(min = 48.dp).testTag("retry-saving-audio")) { Text(t("Retry", "फिर कोशिश करें")) }
             }
             Spacer(Modifier.weight(1f))
         }

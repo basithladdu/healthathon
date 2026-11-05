@@ -53,8 +53,8 @@ class CareInviteLinkTest {
         val e = CareInviteEntry("p1", "Arjun", "Brother", t0, id)
         val open = listOf(CareOpenInvite(id, "family", false, t0 + CareInviteLog.TTL_MS))
         assertEquals(CareInviteState.OPEN, CareInviteLog.status(e, open, emptyList(), t0 + 10).state)
-        assertEquals("Arjun · brother · Invited · not joined yet · expires in 3 days", CareInviteLog.label(e, CareInviteLog.status(e, open, emptyList(), t0 + 1000), t0 + 1000))
-        assertEquals("Arjun · brother · Invited · not joined yet · expires today", CareInviteLog.label(e, CareInviteLog.status(e, open, null, t0 + 2 * CareInviteLog.DAY_MS + 1000).copy(state = CareInviteState.OPEN), t0 + 2 * CareInviteLog.DAY_MS + 1000))
+        assertEquals("Arjun · brother · Invited · expires in 3 days", CareInviteLog.label(e, CareInviteLog.status(e, open, emptyList(), t0 + 1000), t0 + 1000))
+        assertEquals("Arjun · brother · Invited · expires today", CareInviteLog.label(e, CareInviteLog.status(e, open, null, t0 + 2 * CareInviteLog.DAY_MS + 1000).copy(state = CareInviteState.OPEN), t0 + 2 * CareInviteLog.DAY_MS + 1000))
         // More members than before is no longer read as "joined": only a membership created by this invitation is.
         val member = CareMemberDetail("u1", id, t0 + 50, 0)
         val joined = CareInviteLog.status(e, emptyList(), listOf(member, CareMemberDetail("u2", "", t0, 0)), t0 + 100)
@@ -69,7 +69,7 @@ class CareInviteLinkTest {
     }
     @Test fun labelsInHindiAndForUnnamedDoctorInvites() {
         val e = CareInviteEntry("p1", "", "", 0L, "x", role = "clinician")
-        assertEquals("Doctor invitation · Expired · create a new invite", CareInviteLog.label(e, CareInviteStatus(CareInviteState.EXPIRED), 0L))
+        assertEquals("Doctor invitation · Expired", CareInviteLog.label(e, CareInviteStatus(CareInviteState.EXPIRED), 0L))
         val hindi = CareInviteLog.label(CareInviteEntry("p1", "Arjun", "Brother", 0L, "x"), CareInviteStatus(CareInviteState.CLOSED), 0L, hindi = true)
         assertTrue(hindi, hindi.startsWith("Arjun · भाई · ") && HindiScan.hasHindi(hindi))
     }

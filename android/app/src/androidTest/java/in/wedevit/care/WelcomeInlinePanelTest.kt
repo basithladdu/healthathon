@@ -41,13 +41,13 @@ class WelcomeInlinePanelTest {
         ui.onNodeWithTag("welcome-add-person").assertDoesNotExist()
         ui.onNodeWithTag("welcome-account").assertDoesNotExist()
         ui.onNodeWithTag("doctor-demo-entry").assertDoesNotExist()
-        listOf("Welcome to Sahara", "Choose where you would like to begin.").forEach { label ->
+        listOf("Welcome to Sahara").forEach { label ->
             val layouts = mutableListOf<TextLayoutResult>()
             ui.onNodeWithText(label).performSemanticsAction(SemanticsActions.GetTextLayoutResult) { action -> action(layouts) }
             org.junit.Assert.assertTrue("Collapsed welcome copy is centred", layouts.any { it.layoutInput.style.textAlign == TextAlign.Center })
         }
         val doctorLayouts = mutableListOf<TextLayoutResult>()
-        ui.onNodeWithText("Doctor workspace", useUnmergedTree = true).performSemanticsAction(SemanticsActions.GetTextLayoutResult) { action -> action(doctorLayouts) }
+        ui.onNodeWithText("I'm a doctor", useUnmergedTree = true).performSemanticsAction(SemanticsActions.GetTextLayoutResult) { action -> action(doctorLayouts) }
         org.junit.Assert.assertTrue("Doctor entry remains a clearly underlined text link", doctorLayouts.any { it.layoutInput.style.textDecoration?.contains(TextDecoration.Underline) == true })
         val screen = ui.onNodeWithTag("welcome-panel-screen").fetchSemanticsNode().boundsInRoot
         val illustration = ui.onNodeWithTag("welcome-hero-illustration").fetchSemanticsNode().boundsInRoot

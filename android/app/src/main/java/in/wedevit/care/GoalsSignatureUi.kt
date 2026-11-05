@@ -93,7 +93,7 @@ internal suspend fun saveNoteSignature(context: android.content.Context, namespa
         val file = File(photoPath); photoPath = ""
         if (saved && file.isFile && file.length() > 0) {
             val bytes = runCatching { compressSignaturePhoto(file) }.getOrNull()
-            if (bytes != null) { draft.photo = bytes; draft.strokes = emptyList() } else onError(t("The photo could not be read. Try again or draw instead.", "फ़ोटो पढ़ी नहीं जा सकी। फिर कोशिश करें या स्क्रीन पर हस्ताक्षर करें।"))
+            if (bytes != null) { draft.photo = bytes; draft.strokes = emptyList() } else onError(t("Couldn't read photo. Try again.", "फ़ोटो नहीं पढ़ी गई। फिर कोशिश करें।"))
         }
         file.delete()
     }
@@ -103,7 +103,7 @@ internal suspend fun saveNoteSignature(context: android.content.Context, namespa
         if (photo != null) {
             val bitmap = remember(photo) { BitmapFactory.decodeByteArray(photo, 0, photo.size)?.asImageBitmap() }
             if (bitmap != null) Image(bitmap, t("Photo of the signature", "हस्ताक्षर की फ़ोटो"), Modifier.fillMaxWidth().heightIn(max = 220.dp).clip(RoundedCornerShape(14.dp)).border(1.dp, DoctorHairline, RoundedCornerShape(14.dp)), contentScale = ContentScale.Fit)
-            TextButton(onClick = { draft.photo = null }, enabled = enabled, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Remove photo and draw instead", "फ़ोटो हटाएँ और स्क्रीन पर हस्ताक्षर करें"), color = RustText, fontSize = 15.sp) }
+            TextButton(onClick = { draft.photo = null }, enabled = enabled, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Remove photo", "फ़ोटो हटाएँ"), color = RustText, fontSize = 15.sp) }
         } else {
             val ink = DoctorCardInk
             val guide = DoctorCardSub.copy(alpha = .35f)
@@ -131,13 +131,12 @@ internal suspend fun saveNoteSignature(context: android.content.Context, namespa
                     val directory = File(context.cacheDir, "signature-photo").apply { deleteRecursively(); mkdirs() }
                     val file = File(directory, "${newId()}.jpg")
                     runCatching { check(file.createNewFile()); photoPath = file.absolutePath; camera.launch(FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)) }
-                        .onFailure { file.delete(); photoPath = ""; onError(t("No camera app is available. Draw the signature instead.", "कैमरा ऐप नहीं मिला। स्क्रीन पर हस्ताक्षर करें।")) }
+                        .onFailure { file.delete(); photoPath = ""; onError(t("No camera app", "कैमरा ऐप नहीं मिला")) }
                 }, enabled = enabled, modifier = Modifier.heightIn(min = 48.dp).testTag("note-signature-photo")) {
-                    Icon(Icons.Default.PhotoCamera, null, Modifier.size(20.dp), tint = RustText); Spacer(Modifier.width(6.dp)); Text(t("Photo of a paper signature", "काग़ज़ पर किए हस्ताक्षर की फ़ोटो"), color = RustText, fontSize = 15.sp)
+                    Icon(Icons.Default.PhotoCamera, null, Modifier.size(20.dp), tint = RustText); Spacer(Modifier.width(6.dp)); Text(t("Photo", "फ़ोटो"), color = RustText, fontSize = 15.sp)
                 }
             }
         }
-        Text(t("The signature stays on this phone with a SHA-256 fingerprint tied to this exact version.", "हस्ताक्षर इसी फ़ोन पर रहता है, इस संस्करण से जुड़े SHA-256 फ़िंगरप्रिंट के साथ।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
     }
 }
 
@@ -153,8 +152,6 @@ internal fun signedAtLabel(at: Long): String = Instant.ofEpochMilli(at).atZone(Z
         val bitmap = remember(image) { image?.let { BitmapFactory.decodeByteArray(it, 0, it.size)?.asImageBitmap() } }
         if (bitmap != null) Surface(shape = RoundedCornerShape(14.dp), color = Color.White, border = BorderStroke(1.dp, DoctorHairline)) {
             Image(bitmap, t("Signature of ", "हस्ताक्षर: ") + signature.signerName, Modifier.fillMaxWidth().heightIn(max = 120.dp).padding(6.dp), contentScale = ContentScale.Fit)
-        } else Text(t("The signature image is not on this phone or has changed.", "हस्ताक्षर की तस्वीर इस फ़ोन पर नहीं है या बदल गई है।"), fontSize = 14.sp, color = RustText)
-        Text((if (signature.kind == NoteSignatureRules.PHOTO) t("Photo of a paper signature", "काग़ज़ पर किए हस्ताक्षर की फ़ोटो") else t("Drawn on this phone", "इसी फ़ोन पर किए गए")) +
-            " · SHA-256 ${NoteSignatureRules.shortHash(signature.imageSha256)} · " + t("tied to version fingerprint", "संस्करण फ़िंगरप्रिंट से जुड़ा") + " ${NoteSignatureRules.shortHash(signature.contentHash)}", fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
+        } else Text(t("Signature missing", "हस्ताक्षर नहीं मिला"), fontSize = 14.sp, color = RustText)
     }
 }

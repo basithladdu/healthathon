@@ -51,7 +51,7 @@ fun savedAudioFormatTime(at: Long, zone: ZoneId = ZoneId.systemDefault()): Strin
         if (rows.isEmpty()) Surface(Modifier.fillMaxWidth().testTag("saved_audio_empty"), color = Color.White, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline)) {
             Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Box(Modifier.size(40.dp).clip(RoundedCornerShape(50)).background(DoctorStageCream), contentAlignment = Alignment.Center) { Icon(Icons.Default.MicNone, null, tint = DoctorStageDeep, modifier = Modifier.size(22.dp)) }
-                Text(t("No audio recorded yet. Drag this down and record to add one.", "अभी कोई ऑडियो रिकॉर्ड नहीं हुआ। इसे नीचे खींचें और रिकॉर्ड करके जोड़ें।"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk, modifier = Modifier.weight(1f))
+                Text(t("No audio yet", "अभी कोई ऑडियो नहीं"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk, modifier = Modifier.weight(1f))
             }
         }
         LazyColumn(Modifier.weight(1f).testTag("saved_audio_list"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -82,6 +82,6 @@ fun savedAudioFormatTime(at: Long, zone: ZoneId = ZoneId.systemDefault()): Strin
             }
         }
         Spacer(Modifier.height(12.dp))
-        Button(onClick = onContinue, enabled = savedAudioContinueEnabled(selected.intersect(rows.map { it.id }.toSet())), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("saved_audio_continue"), colors = ButtonDefaults.buttonColors(containerColor = DoctorStageTerracotta, contentColor = Color.White)) { Text(t("Continue to transcript →", "लिखाई पर आगे बढ़ें →"), fontSize = 16.sp) }
+        Button(onClick = onContinue, enabled = savedAudioContinueEnabled(selected.intersect(rows.map { it.id }.toSet())), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("saved_audio_continue"), colors = ButtonDefaults.buttonColors(containerColor = DoctorStageTerracotta, contentColor = Color.White)) { Text(t("Continue", "आगे बढ़ें"), fontSize = 16.sp) }
     }
 }

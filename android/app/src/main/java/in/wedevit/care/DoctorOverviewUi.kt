@@ -61,7 +61,7 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
                     }
                     OverviewSource(discussion)
                 }
-                OutlinedButton(onClick=onConversation,modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("overview-conversations")) {Text(t("Open conversations & Care Notes", "बातचीत और केयर नोट खोलें"))}
+                OutlinedButton(onClick=onConversation,modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("overview-conversations")) {Text(t("Goals of care", "देखभाल के लक्ष्य"))}
             }
             OverviewTimeline(t("Next visit & actions", "अगली विज़िट और काम"),overviewDate(overview.nextVisit?.startMillis),SaharaSoftGold,"overview-next-visit") {
                 val visit=overview.nextVisit
@@ -93,8 +93,8 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
     }
 }
 @Composable private fun OverviewDiscussionMeta(discussion:DoctorOverviewDiscussion) { val t = careText();
-    Text(if(discussion.isPublishedPreview) t("Version ${discussion.versionNumber} · not a verified clinical note", "संस्करण ${discussion.versionNumber} · पुष्ट क्लिनिकल नोट नहीं") else t("Earlier discussion · not a verified clinical note", "पुरानी चर्चा · पुष्ट क्लिनिकल नोट नहीं"),style=MaterialTheme.typography.labelMedium,color=DoctorAccent)
-    Text(if(discussion.isPublishedPreview) t("Self-entered reviewer: ", "ख़ुद लिखे समीक्षक: ") + (discussion.reviewerName ?: t("Not recorded", "दर्ज नहीं")) + t(" · identity not verified", " · पहचान पुष्ट नहीं") else t("Discussion author: ", "चर्चा के लेखक: ") + (discussion.reviewerName ?: t("Not recorded", "दर्ज नहीं")),fontSize=14.sp,color=DoctorCardSub)
+    Text(if(discussion.isPublishedPreview) t("Version ${discussion.versionNumber}", "संस्करण ${discussion.versionNumber}") else t("Earlier discussion", "पुरानी चर्चा"),style=MaterialTheme.typography.labelMedium,color=DoctorAccent)
+    Text(if(discussion.isPublishedPreview) t("Reviewer: ", "समीक्षक: ") + (discussion.reviewerName ?: t("Not recorded", "दर्ज नहीं")) else t("Discussion author: ", "चर्चा के लेखक: ") + (discussion.reviewerName ?: t("Not recorded", "दर्ज नहीं")),fontSize=14.sp,color=DoctorCardSub)
     Text(t("Source: ${discussion.sourceLabel}", "स्रोत: ${discussion.sourceLabel}"),fontSize=14.sp,color=DoctorCardSub)
 }
 @Composable private fun OverviewSource(discussion:DoctorOverviewDiscussion) { val t = careText();

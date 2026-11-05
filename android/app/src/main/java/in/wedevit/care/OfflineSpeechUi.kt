@@ -93,10 +93,6 @@ import java.io.File
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.GraphicEq, null, Modifier.size(20.dp), tint = RustText); Spacer(Modifier.width(8.dp))
             Text(t("Recording → words", "रिकॉर्डिंग → शब्द"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, fontSize = 17.sp, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
-            // The pack needs and the offline promise sit behind "?" so the panel is one line and one button.
-            if (!ready) CareHelpIcon(t("Hindi / English language pack · 987 MB", "हिन्दी / अंग्रेज़ी भाषा पैक · 987 MB"),
-                t("Download once. Then turn speech into text without internet.", "एक बार डाउनलोड करें। फिर बिना इंटरनेट बात को लिखाई में बदलें।") + "\n\n" +
-                    t("Needs a 64-bit phone and at least 2.5 GB free memory. Check the words against the recording.", "64-bit फ़ोन और कम से कम 2.5 GB ख़ाली मेमोरी चाहिए। शब्दों को रिकॉर्डिंग से मिलाएँ।"))
         }
         Spacer(Modifier.height(8.dp))
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -122,9 +118,8 @@ import java.io.File
             HorizontalDivider(Modifier.padding(vertical = 8.dp), color = DoctorHairline)
             Text(t("Words the phone heard", "फ़ोन ने जो शब्द सुने"), fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
             SelectionContainer { Text(original.originalText, fontSize = 16.sp, color = DoctorCardInk) }
-            Text(t("Check names, medicine names, numbers and speakers against the audio. Mixed-language words may be missed.", "नाम, दवाओं के नाम, अंक और बोलने वालों को ऑडियो से मिलाएँ। मिली-जुली भाषा के शब्द छूट सकते हैं।"), fontSize = 14.sp, color = DoctorCardSub)
             CareField(value = words, onValueChange = { if (it.length <= OfflineSpeechModel.maxOriginalChars) { words = it; checked = false } }, label = t("Corrected text", "सुधारी गई लिखाई"), minLines = 4)
-            if (words.length > NoteRules.MAX_SOURCE_CHARS) Text(t("The full text is kept. Choose up to ${NoteRules.MAX_SOURCE_CHARS} letters for this care note. ${words.length} are chosen now.", "पूरी लिखाई रखी जाती है। इस देखभाल नोट के लिए ज़्यादा से ज़्यादा ${NoteRules.MAX_SOURCE_CHARS} अक्षर चुनें। अभी ${words.length} चुने हैं।"), fontSize = 14.sp, color = MaterialTheme.colorScheme.error)
+            if (words.length > NoteRules.MAX_SOURCE_CHARS) Text(t("Too long: ${words.length} / ${NoteRules.MAX_SOURCE_CHARS}", "बहुत लंबा: ${words.length} / ${NoteRules.MAX_SOURCE_CHARS}"), fontSize = 14.sp, color = MaterialTheme.colorScheme.error)
             CheckLine(checked, { checked = it }, t("I checked these words against the recording.", "मैंने ये शब्द रिकॉर्डिंग से मिला लिए हैं।"))
             Button(onClick = { runOperation(t("Saving checked words", "जाँचे गए शब्द सेव कर रहे हैं")) {
                 val reviewed = original.reviewed(words, checked)

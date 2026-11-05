@@ -50,8 +50,8 @@ class CentreSuggestionTest {
         listOf("waiting", "kept", "pending", "approved", "rejected").forEach { assertTrue(it, devanagari.containsMatchIn(CentreSuggestionRules.statusText(it).second)) }
     }
     @Test fun aSentSuggestionSaysSentForReviewNotCheckedYet() {
-        assertEquals("Sent for review, not checked yet.", CentreSuggestionRules.statusText("pending").first)
-        assertTrue(CentreSuggestionRules.statusText("waiting").first.contains("Not checked yet"))
+        assertEquals("Sent for review", CentreSuggestionRules.statusText("pending").first)
+        assertEquals("Waiting to send", CentreSuggestionRules.statusText("waiting").first)
     }
 
     @Test fun theQueuedWriteIsAnAppendWithTrimmedFieldsAndNoMorphineClaim() {

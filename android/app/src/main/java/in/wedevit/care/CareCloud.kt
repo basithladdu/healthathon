@@ -41,7 +41,7 @@ class CareCloud(context: Context) {
     private val preferences = context.getSharedPreferences("care-account", Context.MODE_PRIVATE)
     private val refreshLock = Mutex()
     val session = MutableStateFlow(runCatching { preferences.getString("session", null)?.let { decodeSession(JSONObject(unseal(it))) } }.getOrNull())
-    // Saanthvana project (26 Oct 2026): accounts, sharing and invites run here.
+    // Sahara project (26 Oct 2026): accounts, sharing and invites run here.
     private val base = "https://kjnhtakqzboayqorrlue.supabase.co"
     private val apiKey = PUBLIC_API_KEY
     private val accountRedirect = URLEncoder.encode("https://sahara.wedevit.in/android-account", "UTF-8")

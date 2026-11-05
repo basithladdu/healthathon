@@ -236,7 +236,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                 ProfileField(address, { address = it.take(160) }, t("City / address", "शहर / पता"), Icons.Default.Place)
             }
             error?.let { Text(t(it.en, it.hi), color = RustText, fontSize = 14.sp, fontWeight = FontWeight.Medium) }
-            Text(if (shared) t("Shared with the family and doctors you share this care with.", "उन परिवारजनों और डॉक्टरों के साथ साझा, जिनके साथ आप यह देखभाल साझा करते हैं।") else t("Saved on this phone only.", "सिर्फ़ इसी फ़ोन पर सहेजा जाता है।"), fontSize = 14.sp, color = DoctorCardSub)
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
                 OutlinedButton(onClick = onDismiss, modifier = Modifier.weight(1f).heightIn(min = 52.dp), shape = RoundedCornerShape(14.dp)) { Text(t("Cancel", "रद्द करें")) }
                 Button(onClick = {

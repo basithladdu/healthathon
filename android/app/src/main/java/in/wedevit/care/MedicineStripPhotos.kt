@@ -174,8 +174,7 @@ class MedicineStripPhotos(context: Context, storage: String) {
             latestOnRead?.let { read ->
                 val reading = runCatching { MedicineStripPhotos.read(saved) }.getOrNull()
                 if (reading != null) read(reading)
-                note = if (reading?.name.isNullOrBlank()) t("No name read from this photo (a cut strip often has none). Type the name, or pick it from the list as you type.", "इस फ़ोटो से नाम नहीं पढ़ा गया (कटे पत्ते पर अक्सर नाम नहीं होता)। नाम लिखें, या लिखते समय सूची से चुनें।")
-                    else t("Name, strength and form were read from the photo where empty. Check them.", "ख़ाली जगहों में नाम, ताक़त और रूप फ़ोटो से भरे गए। इन्हें जाँचें।")
+                note = if (reading?.name.isNullOrBlank()) t("No name found. Type it.", "नाम नहीं मिला। ख़ुद लिखें।") else ""
             }
         } catch (failure: Exception) { if (failure is CancellationException) throw failure; note = t("This photo couldn't be kept. Try another photo.", "यह फ़ोटो नहीं रखी जा सकी। दूसरी फ़ोटो लें।") }
         finally { temporary?.delete() }
@@ -186,10 +185,7 @@ class MedicineStripPhotos(context: Context, storage: String) {
     }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) keep(uri, null) }
     Column(Modifier.fillMaxWidth().testTag("strip-photos-$itemId"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(t("Strip photos (optional)", "पत्ते की फ़ोटो (चाहें तो)"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.weight(1f))
-            MedicineInfoButton(t("Strip photos (optional)", "पत्ते की फ़ोटो (चाहें तो)"), t("Shown with the dose reminder so anyone giving the medicine can match the strip. Kept only on this phone.", "दवा के रिमाइंडर के साथ दिखती है, ताकि दवा देने वाला पत्ता मिला सके। सिर्फ़ इसी फ़ोन पर रहती है।"), "strip-photos-info")
-        }
+        Text(t("Strip photos", "पत्ते की फ़ोटो"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
         if (photos.isNotEmpty()) Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             photos.forEachIndexed { index, file -> Box {
                 StripThumb(file, 80)
@@ -217,7 +213,7 @@ class MedicineStripPhotos(context: Context, storage: String) {
     val t = careText(); val hindi = careHindi()
     var other by remember { mutableStateOf(times.filter { it !in MedicineDoseRules.commonTimes }.joinToString(", ")) }
     var error by remember { mutableStateOf(false) }
-    Text(t("Dose times (optional)", "दवा का समय (चाहें तो)"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
+    Text(t("Dose times", "दवा का समय"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         MedicineDoseRules.commonTimes.forEach { time ->
             val slot = MedicineDoseRules.slot(time); val on = time in times
@@ -266,10 +262,6 @@ class MedicineStripPhotos(context: Context, storage: String) {
     CareField(entry.days?.toString().orEmpty(), { value -> if (value.isBlank()) change(entry.copy(days = null)) else value.toIntOrNull()?.takeIf { it in 1..365 }?.let { change(entry.copy(days = it)) } },
         t("For how many days", "कितने दिन"), singleLine = true, placeholder = t("e.g. 5 · leave empty if ongoing", "जैसे 5 · चलती रहे तो ख़ाली छोड़ें"))
     CareField(entry.directions, { change(entry.copy(directions = it.take(500))) }, t("Directions", "तरीक़ा"), placeholder = t("e.g. as written: dissolve in water", "जैसे पर्चे में लिखा: पानी में घोलकर"))
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(t("Type these from the prescription.", "ये पर्चे से देखकर लिखें।"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.weight(1f))
-        MedicineInfoButton(t("Type these from the prescription.", "ये पर्चे से देखकर लिखें।"), t("Sahara never reads how much, how often, times or directions from a photo. Each dose time is its own tick on the medicine card. Strip cut or name missing? Type the name, or pick it from the list as you type.", "सहारा कितनी, कितनी बार, समय या तरीक़ा फ़ोटो से कभी नहीं पढ़ता। हर दवा के समय का अपना टिक होता है। पत्ता कटा है या नाम नहीं दिखता? नाम लिखें, या लिखते समय सूची से चुनें।"), "medicine-entry-info")
-    }
     if (detail.isBlank()) Text(t("Add at least the strength, form or how much each time.", "कम से कम ताक़त, रूप या हर बार कितनी लिखें।"), fontSize = 14.sp, color = RustText)
     StripPhotoRow(storage, personId, itemId, enabled = !busy) { reading ->
         if (name.isBlank() && reading.name.isNotBlank()) onName(reading.name.take(200))

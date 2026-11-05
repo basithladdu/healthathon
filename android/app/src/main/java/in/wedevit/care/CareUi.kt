@@ -237,10 +237,6 @@ private val CareSurfaceHigh = Color(0xFFF1E9DE)
                 onSelect = { vm.select(it); reading = null }, onAdd = { dialog = "person" }, canAdd = true,
                 onInvite = { inviteFamilyOpen = true }, canInvite = !clinician && isOwnerTop,
                 inviteLabel = if (vm.cloud == null) t("Add family", "परिवार जोड़ें") else t("Invite family", "परिवार को बुलाएँ"))
-            if (person == null && onDoctorWorkspace == null) OutlinedButton(onClick = { sharedWorkspaceOpen = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-workspace-entry").semantics { contentDescription = t("Doctor workspace", "डॉक्टर के लिए") }, contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)) {
-                if (compactWelcomeHeader) { Icon(Icons.Default.MedicalServices, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)) }
-                Text(if (compactWelcomeHeader) t("Doctor", "डॉक्टर") else t("Doctor workspace", "डॉक्टर के लिए"), fontSize = 14.sp, maxLines = 1)
-            }
         }
         if (person != null) HorizontalDivider(color = DoctorHairline)
         }
@@ -291,7 +287,7 @@ private val CareSurfaceHigh = Color(0xFFF1E9DE)
     if (dialog == "person") AddPerson(onDismiss = { dialog = "" }, busy = busy || refreshing, error = actionError, onSave = { vm.addPerson(it) { dialog = "" } })
     if (dialog in listOf("medicine", "visit", "task", "journal")) AddCareItem(dialog, vm, onDismiss = { dialog = "" })
     if (dialog == "delete") AlertDialog(onDismissRequest = { dialog = "" }, title = { Text(t("Remove ${person?.name}'s records?", "${person?.name} के रिकॉर्ड हटाएँ?")) },
-        text = { Text(t("This removes their notes, reports, recordings and care entries. Export anything you want to keep first.", "इससे उनके नोट, रिपोर्ट, रिकॉर्डिंग और देखभाल की सारी जानकारी हट जाएगी। जो रखना है, उसे पहले भेजकर सँभाल लें।")) },
+        text = { Text(t("This can't be undone.", "इसे वापस नहीं किया जा सकता।")) },
         confirmButton = { TextButton(onClick = { val removedId = person?.id; vm.removePerson { (0..12).forEach { screens.removeState("$removedId:$it") }; dialog = "" } }, enabled = !busy, colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Text(t("Remove records", "रिकॉर्ड हटाएँ"), fontWeight = FontWeight.Bold) } },
         dismissButton = { TextButton(onClick = { dialog = "" }) { Text(t("Keep records", "रिकॉर्ड रखें")) } })
     reading?.let { note -> NoteReader(vm, note, onDismiss = { reading = null }) }
@@ -337,7 +333,6 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                 Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 24.dp, end = 24.dp, top = heroTopPadding.dp, bottom = 24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                     WelcomeHero()
                     Text(t("Palliative care,\ntogether.", "पैलिएटिव देखभाल,\nसाथ मिलकर।"), Modifier.fillMaxWidth(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 30.sp, lineHeight = 36.sp, textAlign = TextAlign.Center)
-                    Spacer(Modifier.height(10.dp)); Text(t("Care notes, medicines and visits.", "देखभाल नोट, दवाएँ और मुलाक़ातें।"), Modifier.fillMaxWidth(), fontSize = 16.sp, textAlign = TextAlign.Center)
                 }
                 }
         }
@@ -350,22 +345,19 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                 Column(if (shown.isEmpty()) Modifier.fillMaxWidth() else Modifier.fillMaxSize()) {
                     if (shown.isEmpty()) Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 22.dp, end = 22.dp, top = 22.dp, bottom = 14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         Text(t("Welcome to Sahara", "सहारा में आपका स्वागत है"), modifier = Modifier.fillMaxWidth().testTag("welcome-panel-heading"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 26.sp, textAlign = TextAlign.Center)
-                        Text(t("Choose where you would like to begin.", "चुनें कि कहाँ से शुरू करना है।"), modifier = Modifier.fillMaxWidth().testTag("welcome-panel-description"), style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
-                        Button(onClick = { select("family") }, enabled = !entryBusy, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Paper, contentColor = RustText), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("welcome-patient-family")) { Icon(Icons.Default.People, null); Spacer(Modifier.width(10.dp)); Text(t("Patient & family", "मरीज़ और परिवार")) }
-                        TextButton(onClick = { select("doctor") }, enabled = !entryBusy, colors = ButtonDefaults.textButtonColors(contentColor = WelcomePanelInk), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-workspace-entry")) { Text(t("Doctor workspace", "डॉक्टर के लिए"), textDecoration = TextDecoration.Underline) }
+                        Button(onClick = { select("family") }, enabled = !entryBusy, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Paper, contentColor = RustText), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("welcome-patient-family")) { Text(t("Get started", "शुरू करें")) }
+                        TextButton(onClick = { select("doctor") }, enabled = !entryBusy, colors = ButtonDefaults.textButtonColors(contentColor = WelcomePanelInk), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-workspace-entry")) { Text(t("I'm a doctor", "मैं डॉक्टर हूँ"), textDecoration = TextDecoration.Underline) }
                     } else {
                         Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                            IconButton(onClick = close, enabled = !formBusy && !entryBusy, modifier = Modifier.testTag("welcome-panel-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, if (shown == "person" || shown == "account") t("Back to patient and family", "मरीज़ और परिवार पर वापस") else t("Back to welcome", "शुरुआत पर वापस"), tint = WelcomePanelInk) }
-                            Text(when(shown) { "family" -> t("Patient & family", "मरीज़ और परिवार"); "person" -> t("Add a person", "व्यक्ति जोड़ें"); "doctor" -> t("Doctor workspace", "डॉक्टर के लिए"); else -> t("Your account", "आपका खाता") }, fontFamily = SaharaTitleFont, fontSize = 22.sp, fontWeight = FontWeight.Medium)
+                            IconButton(onClick = close, enabled = !formBusy && !entryBusy, modifier = Modifier.testTag("welcome-panel-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस"), tint = WelcomePanelInk) }
+                            Text(when(shown) { "family" -> t("Get started", "शुरू करें"); "person" -> t("Add a person", "व्यक्ति जोड़ें"); "doctor" -> t("Doctor", "डॉक्टर"); else -> t("Sign in", "साइन इन") }, fontFamily = SaharaTitleFont, fontSize = 22.sp, fontWeight = FontWeight.Medium)
                         }
                         Surface(color = Paper, contentColor = Ink, shape = RoundedCornerShape(topStart = 26.dp, topEnd = 26.dp), modifier = Modifier.fillMaxWidth().weight(1f)) {
                             Box(Modifier.fillMaxSize().padding(top = 20.dp)) { when(shown) {
                                 "family" -> Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                                    Heading(t("Care, together", "साथ मिलकर देखभाल"), 27)
-                                    Text(t("Start a care profile, or sign in to the records you already use.", "नई देखभाल प्रोफ़ाइल बनाएँ, या अपने पुराने रिकॉर्ड के लिए साइन इन करें।"), style = MaterialTheme.typography.bodyLarge, color = DoctorCardSub)
                                     Button(onClick = { if (addPersonContent == null) onStart() else select("person") }, enabled = !entryBusy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-add-person")) { Icon(Icons.Default.PersonAdd, null); Spacer(Modifier.width(10.dp)); Text(t("Add a person", "व्यक्ति जोड़ें")) }
-                                    OutlinedButton(onClick = { if (accountContent == null) onAccount() else select("account") }, enabled = !entryBusy, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, Rust.copy(alpha = .6f)), colors = ButtonDefaults.outlinedButtonColors(contentColor = RustText), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-account")) { Icon(Icons.Default.AccountCircle, null); Spacer(Modifier.width(10.dp)); Text(t("Sign in to your account", "अपने खाते में साइन इन करें")) }
-                                    TextButton(onClick = { walkthroughChooser = true }, enabled = !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("patient-walkthrough-entry")) { Text(t("Try the walkthrough", "डेमो देखें")) }
+                                    OutlinedButton(onClick = { if (accountContent == null) onAccount() else select("account") }, enabled = !entryBusy, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, Rust.copy(alpha = .6f)), colors = ButtonDefaults.outlinedButtonColors(contentColor = RustText), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-account")) { Icon(Icons.Default.AccountCircle, null); Spacer(Modifier.width(10.dp)); Text(t("Sign in", "साइन इन")) }
+                                    TextButton(onClick = { walkthroughChooser = true }, enabled = !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("patient-walkthrough-entry")) { Text(t("Try a demo", "डेमो देखें")) }
                                 }
                                 "person" -> addPersonContent?.invoke(close)
                                 "doctor" -> Column(Modifier.fillMaxSize()) {
@@ -373,11 +365,10 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                                         if (doctorContent != null) doctorContent.invoke(close) { formBusy = it }
                                         else Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(22.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                                             Heading(t("Doctor sign in", "डॉक्टर साइन इन"), 27)
-                                            Text(t("Open the records linked to your account.", "अपने खाते से जुड़े रिकॉर्ड खोलें।"))
-                                            Button(onClick = onSharedWorkspace, enabled = !formBusy && !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-open-doctor-workspace")) { Text(t("Open doctor workspace", "डॉक्टर कार्यक्षेत्र खोलें")) }
+                                            Button(onClick = onSharedWorkspace, enabled = !formBusy && !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-open-doctor-workspace")) { Text(t("Sign in", "साइन इन")) }
                                         }
                                     }
-                                    TextButton(onClick = onDoctorDemo, enabled = !formBusy && !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-demo-entry")) { Text(t("Try the walkthrough", "डेमो देखें")) }
+                                    TextButton(onClick = onDoctorDemo, enabled = !formBusy && !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-demo-entry")) { Text(t("Try a demo", "डेमो देखें")) }
                                 }
                                 else -> accountContent?.invoke(close) { formBusy = it }
                             } }
@@ -632,7 +623,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         menuEnabled = !recording && !dictating && !permissionDialog && !audienceBusy,
         onStartNew = if (draft.source.isNotBlank() && onDoctorStartNew != null) ({ if (!recordingSaving && recordingSaveError == null && !busy && !recording && !dictating && !permissionDialog && !audienceBusy) onDoctorStartNew() }) else null,
         onBackToWho = { nextStep(0) }, backToWhoEnabled = !recordingSaving && recordingSaveError == null && !recording && !dictating, audioCount = if (recordingSaving || recordingSaveError != null) 0 else recordings.size,
-        checklist = { DoctorGoalsChecklist(prepRows, questionMatches, onDark = true, hint = GOALS_CHECKLIST_HINT) }) {
+        checklist = { DoctorGoalsChecklist(prepRows, questionMatches, onDark = true) }) {
         DoctorSavedAudioPage(rows = audioRows, selected = savedAudioPicked, onSelectedChange = { savedAudioPicked = it }, nowPlaying = playingPath, isPlaying = playingNow, onPlay = playAudio,
             onPause = { runCatching { audioPlayer.pause() }; playingNow = false },
             onSeek = { delta -> runCatching { audioPlayer.seekTo((audioPlayer.currentPosition + delta).coerceAtLeast(0L).toInt()) } },
@@ -650,8 +641,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             when (step) {
                 0 -> {
                     item { GoalsScreeningHelper(draft.personId) }
-                    item { Text(t("Write down everyone in the room, then the questions this conversation should cover. Each person must agree before anything is recorded.", "कमरे में मौजूद सभी के नाम लिखें, फिर वे सवाल जिन पर बात होनी है। कुछ भी रिकॉर्ड करने से पहले हर व्यक्ति की सहमति ज़रूरी है।"), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk) }
-                    if (attendeeScope.isBlank()) item { Text(t("Choose a person first to list who is here.", "कौन मौजूद है, यह लिखने के लिए पहले व्यक्ति चुनें।"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub) }
+                    if (attendeeScope.isBlank()) item { Text(t("Choose a person first.", "पहले व्यक्ति चुनें।"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub) }
                     else item {
                         val doctorLabel = listOf(session?.email?.substringBefore('@')?.trim().orEmpty(), if (doctorPresentation) DoctorDemoData.doctorName else "", doctor.trim()).firstOrNull { it.isNotBlank() && !it.equals("Doctor", true) } ?: "Clinician"
                         val patientLabel = peopleList.firstOrNull { it.id == draft.personId }?.name?.trim().orEmpty().ifBlank { "Patient" }
@@ -662,13 +652,11 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                         }
                     }
                     if (preparationScope.isNotBlank()) item { DoctorPreparationQuestions(preparationStore, preparationScope, !busy && !recording && !dictating && !recordingSaving && recordingSaveError == null, canSave = { !vm.recordingSaving.value && vm.recordingSaveError.value == null && canEditCareContext(vm, draft.personId, preparationAccount) && vm.draft.value.conversationId == draft.conversationId }, onInteraction = { preparationBusy = it }, initial = remember(preparationScope, previousVersion?.id) { doctorSuggestQuestions(previousVersion?.let { DoctorPreviousNote(it.priorities, it.participants, it.topics, it.questions, it.nextSteps) }, "") }, onChange = { prepRows = it }, reload = prepReload) }
-                    else item { Text(t("Choose a person first to prepare questions.", "सवाल तैयार करने के लिए पहले व्यक्ति चुनें।"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub) }
                     item { Button(onClick = { nextStep(1) }, enabled = attendeesConsented && !recordingSaving && recordingSaveError == null && !preparationBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Continue to recording", "रिकॉर्डिंग पर आगे बढ़ें")); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null) } }
                     if (!attendeesConsented) item { Text(if (attendees.isEmpty()) t("Add at least one person before continuing.", "आगे बढ़ने से पहले कम से कम एक व्यक्ति जोड़ें।") else t("Continue unlocks once everyone listed has agreed to being recorded.", "सूची के सभी लोग रिकॉर्डिंग के लिए राज़ी हों, तभी आगे बढ़ सकते हैं।"), fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint, modifier = Modifier.testTag("attendees-continue-reason")) }
                 }
                 1 -> {
                     if (doctorPresentation) item { DoctorCaptureHeader(captureMode, { captureMode = it }, recording, dictating, level, seconds.toLong(), vm.demoMode, onDoctorBack, !recording && !dictating && !permissionDialog && !audienceBusy && !recordingSaving && recordingSaveError == null, localRecordingAllowed = vm.localAudioRecordingAllowed && recordingCanEdit && !recordingSaving && recordingSaveError == null, testRecord = vm.demoMode && DoctorTestProfiles.contains(draft.personId)) }
-                    if (vm.demoMode && !doctorPresentation) captureItem { DoctorFootnote(if (vm.localAudioRecordingAllowed) t("Audio stays on this phone. It is not sent when you share a written note. It is not turned into text by itself. Speaking to type, online speech-to-text and downloads are not available here.", "ऑडियो इसी फ़ोन पर रहता है। लिखा नोट भेजने पर यह साथ नहीं जाता। इसकी लिखाई अपने-आप नहीं बनती। बोलकर लिखना, ऑनलाइन लिखाई और डाउनलोड यहाँ उपलब्ध नहीं हैं।") else t("Type and edit below. Speaking to type, recording, speech-to-text and downloads are not available here.", "नीचे लिखें और बदलें। बोलकर लिखना, रिकॉर्डिंग, लिखाई और डाउनलोड यहाँ उपलब्ध नहीं हैं।")) }
                     if (recordingSaving || recordingSaveError != null) captureItem { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(if(recordingSaving) t("Saving the audio and everyone's agreement on this phone…", "ऑडियो और सबकी सहमति इस फ़ोन पर सेव कर रहे हैं…") else t("The audio was kept, but its details could not be saved. Try again before you continue.", "ऑडियो फ़ाइल रखी गई, पर उसकी जानकारी सहेजी नहीं जा सकी। आगे बढ़ने से पहले फिर कोशिश करें।"))
                         if (recordingSaveError != null) OutlinedButton(onClick = vm::retrySavingRecording, enabled = !recordingSaving, modifier = Modifier.heightIn(min = 48.dp).testTag("retry-saving-audio")) { Text(t("Retry saving audio", "ऑडियो फिर से सहेजें")) }
@@ -684,7 +672,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                         },
                         onConsent = { val current = vm.draft.value; if (current.personId == draft.personId) vm.edit(current.copy(consentAt = System.currentTimeMillis())) },
                         onActiveChanged = { dictating = it }) }
-                    if (doctorPresentation && prepRows.isNotEmpty()) captureItem { DoctorGoalsChecklist(prepRows, questionMatches, hint = GOALS_CHECKLIST_HINT) }
+                    if (doctorPresentation && prepRows.isNotEmpty()) captureItem { DoctorGoalsChecklist(prepRows, questionMatches) }
                     if (!doctorPresentation || captureMode == "Record" || recording) captureItem { Surface(shape = RoundedCornerShape(20.dp), color = DoctorCardReport, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         Text(t("Conversation audio", "बातचीत का ऑडियो"), fontFamily = SaharaTitleFont, fontSize = 19.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
                         if (recording) {
@@ -740,7 +728,6 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                         } }
                         if (isSample) Surface(shape = RoundedCornerShape(16.dp), color = DoctorStatusWarnBg, modifier = Modifier.fillMaxWidth().testTag("transcript-sample")) { Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(t("Practice", "अभ्यास"), fontWeight = FontWeight.Medium, color = DoctorStatusWarn)
-                            Text(t("This demo text was written in advance. It is not from your recording.", "यह डेमो की लिखाई पहले से लिखी गई है। यह आपकी रिकॉर्डिंग से नहीं है।"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardInk)
                             TextButton(onClick = { val current = vm.draft.value; if (current.personId == draft.personId) { vm.edit(current.copy(source = "")); editingTranscript = true; highlightLine = null } }, enabled = !busy && !recording && !dictating, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-sample-clear")) { Text(t("Clear the practice text and type your own", "अभ्यास वाला लिखा हटाकर ख़ुद लिखें"), color = DoctorAccent) }
                         } }
                         DoctorGoalsChecklist(prepRows, questionMatches)
@@ -764,11 +751,9 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                 }
                 3 -> {
                     if (!buildOpen) {
-                    item { Text(t("Sahara matched your questions to lines that use the same words. A matched line is only a suggestion. Read it and decide. Anything you type is your own note.", "Sahara ने एक जैसे शब्द देखकर आपके सवालों को पंक्तियों से मिलाया है। मिली पंक्ति सिर्फ़ सुझाव है। पढ़कर ख़ुद तय करें। जो आप लिखें, वह आपका अपना नोट है।"), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk) }
                     if (questionMatches != null) item { Text(if (questionMatches.unanswered.isEmpty()) t("Every question has at least one suggested line.", "हर सवाल के लिए कम से कम एक सुझाई पंक्ति है।") else t("${questionMatches.unanswered.size} of ${prepRows.size} questions have no suggested line.", "${prepRows.size} में से ${questionMatches.unanswered.size} सवालों के लिए कोई सुझाई पंक्ति नहीं है।"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub, modifier = Modifier.testTag("answers-match-status")) }
                     questionMatches?.let { result -> items(result.answered, key = { "match-${it.question.id}" }) { qa -> Surface(shape = RoundedCornerShape(20.dp), color = DoctorCardReport, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text(qa.question.text, fontFamily = SaharaTitleFont, fontSize = 19.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-                        Text(t("Suggested from the talk · check each line", "बातचीत से सुझाव · हर पंक्ति जाँचें"), fontSize = 12.sp, color = DoctorCardFaint)
                         qa.matches.forEach { m -> Text(m.quote, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk); TextButton(onClick = { useLine(qa.question.section, m.line) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Use this line in ${NoteRules.labels[qa.question.section]}", "यह पंक्ति ${NoteRules.labels[qa.question.section]} में डालें")) } }
                     } } } }
                     if (preparationScope.isNotBlank()) item { DoctorPreparationAnswers(preparationStore, preparationScope, !busy && !recording && !dictating && !recordingSaving && recordingSaveError == null, canSave = { !vm.recordingSaving.value && vm.recordingSaveError.value == null && canEditCareContext(vm, draft.personId, preparationAccount) && vm.draft.value.conversationId == draft.conversationId }, onChange = { prepRows = it }, reload = prepReload) }
@@ -779,9 +764,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                     } else {
                     item { SurfaceCard(Peach) {
                         Text(if (draft.transcribedAt > 0 && draft.transcriptProvider == OfflineSpeechModel.provider) t("Text made on this phone · not checked by a doctor", "फ़ोन पर बनी लिखाई · डॉक्टर ने नहीं जाँची") else if (draft.transcribedAt > 0) t("Text made online · not checked by a doctor", "ऑनलाइन बनी लिखाई · डॉक्टर ने नहीं जाँची") else t("Draft · not checked by a doctor", "ड्राफ़्ट · डॉक्टर ने नहीं जाँचा"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium)
-                        Spacer(Modifier.height(6.dp)); Text(if (draft.transcribedAt > 0) t("${draft.transcriptModel} turned this recording into text. Who spoke and the words can be wrong. Check them with the audio before you publish.", "${draft.transcriptModel} ने यह रिकॉर्डिंग लिखाई में बदली। बोलने वाले के नाम और शब्द ग़लत हो सकते हैं। प्रकाशित करने से पहले ऑडियो से मिलाएँ।") else t("Pick the exact words for each section, or add clear headings. Nothing here was made from the audio by itself.", "हर हिस्से के लिए असली शब्द चुनें, या साफ़ शीर्षक लगाएँ। यहाँ कुछ भी ऑडियो से अपने-आप नहीं बना।"), style = MaterialTheme.typography.bodySmall)
                     } }
-                    item { Text(t("Check every word against the conversation. Leave anything not discussed blank.", "हर शब्द बातचीत से मिलाएँ। जिस पर बात नहीं हुई, उसे ख़ाली छोड़ें।"), color = MaterialTheme.colorScheme.onSurfaceVariant) }
                     item { CareSourcePicker(draft, buildSection) { section, line ->
                         try { val current = vm.draft.value; require(current.personId == draft.personId && vm.selected.value == draft.personId) { t("Choose this person's conversation again.", "इस व्यक्ति की बातचीत फिर चुनें।") }; if (doctorPresentation) assignDoctorSource(vm, draft, section, line) else vm.edit(CareDraftAssist.assign(current, section, line)) }
                         catch (e: IllegalArgumentException) { vm.message.value = e.message }
@@ -802,7 +785,6 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                     }
                 }
                 4 -> {
-                    item { Text(t("Read the whole note before you publish. Nothing here can be changed on this screen.", "प्रकाशित करने से पहले पूरा नोट पढ़ें। इस स्क्रीन पर कुछ बदला नहीं जा सकता।"), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk) }
                     items(NoteRules.labels.withIndex().toList(), key = { "preview-${it.index}" }) { (index, label) -> Surface(shape = RoundedCornerShape(20.dp), color = DoctorCardReport, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text(label, fontFamily = SaharaTitleFont, fontSize = 19.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
                         Text(NoteRules.values(draft)[index].ifBlank { t("Not recorded", "दर्ज नहीं") }, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk)
@@ -814,26 +796,21 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                 }
                 else -> {
                     if (doctorPresentation) {
-                                                item { InfoDisclosure(t("Check the exact conversation", "मूल बातचीत जाँचें"), Peach) { Text(t("Audio stays on this phone. Only the recording linked above can be played with this version, and only on the phone that recorded it.", "ऑडियो इसी फ़ोन पर रहता है। ऊपर जोड़ी गई रिकॉर्डिंग ही इस संस्करण के साथ, इसी फ़ोन पर चल सकती है।"), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk); Text(t("To let family see only this conversation, Sahara needs an update and the owner's approval. It is never shared more widely instead.", "सिर्फ़ यह बातचीत परिवार को दिखाने के लिए Sahara का अपडेट और मालिक की मंज़ूरी चाहिए। इसकी जगह इसे कभी सबके साथ साझा नहीं किया जाता।"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub) } }
                         item { DoctorRecorderLabel(vm,draft) }
                         item { DoctorConversationAudience(vm,draft) {audienceBusy=it} }
                     }
-                    item { InfoDisclosure(t("Doctor's check", "डॉक्टर की जाँच"), Gold) { Text(t("Publishing saves this as a fixed version. Earlier versions are kept.", "प्रकाशित करने पर यह एक पक्का संस्करण बनता है। पुराने संस्करण रखे रहते हैं।"), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk) } }
                     if (vm.cloud == null) item { CareField(value = doctor, onValueChange = { doctor = it.take(100) }, label = t("Doctor's name", "डॉक्टर का नाम"), singleLine = true) }
                     item { CheckLine(reviewed, { reviewed = it }, t("I checked every section against the conversation. This records what was discussed, without adding treatment advice.", "मैंने हर हिस्सा बातचीत से मिलाया है। इसमें वही दर्ज है जिस पर बात हुई, इलाज की कोई सलाह नहीं जोड़ी गई।")) }
-                                        item { InfoDisclosure(if (vm.cloud == null) t("Identity not checked", "पहचान की जाँच नहीं हुई") else t("Separate doctor's check", "डॉक्टर की अलग जाँच"), Peach) { Text(if (vm.cloud == null) t("This saves the name the reviewer typed. It does not mean a checked doctor reviewed it.", "इसमें जाँचने वाले का ख़ुद लिखा नाम सेव होता है। इसका मतलब यह नहीं कि किसी पक्के डॉक्टर ने जाँचा।") else t("Your draft is sent to the shared care space. Only a doctor this patient invited, whose identity is checked, can publish the checked care note.", "आपका ड्राफ़्ट साझा देखभाल जगह में भेजा जाता है। सिर्फ़ इस मरीज़ के बुलाए, पहचान-जाँचे डॉक्टर ही जाँचा हुआ देखभाल नोट प्रकाशित कर सकते हैं।"), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk) } }
                     item { TextButton(onClick = { nextStep(4) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Back to read the note", "नोट पढ़ने पर वापस")) } }
-                    if (vm.cloud != null) item { Text(t(CarePrivacy.CONVERSATION_NOTICE_EN, CarePrivacy.CONVERSATION_NOTICE_HI), style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("conversation-privacy-notice")) }
                     item { Button(onClick = { vm.publish(doctor, reviewed) { buildOpen = false; nextStep(0); reviewed = false } }, enabled = !recordingSaving && recordingSaveError == null && reviewed && (vm.cloud != null || doctor.isNotBlank()) && !busy && draft.source.isNotBlank(), modifier = Modifier.fillMaxWidth().testTag("conversation-publish")) { Text(if (vm.cloud == null) t("Publish reviewed version", "जाँचा संस्करण प्रकाशित करें") else t("Send to a doctor to check", "डॉक्टर को जाँचने के लिए भेजें")) } }
                 }
             }
         } else {
-            item { SurfaceCard(Gold) { Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Forum, null, Modifier.size(28.dp)); Spacer(Modifier.width(14.dp)); Text(t("Read together. Ask your doctor if anything needs changing.", "साथ बैठकर पढ़ें। कुछ बदलना हो तो डॉक्टर से कहें।"), modifier = Modifier.weight(1f)) } } }
             item { OutlinedButton(onClick = { onRequestConversation?.invoke() ?: vm.saveItem("task", t("Ask for a goals-of-care conversation", "देखभाल के लक्ष्यों पर बातचीत माँगें"), t("Discuss what matters and questions for the care team.", "जो ज़रूरी है और देखभाल टीम से सवाल, उन पर बात करें।")) }, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.Add, null); Spacer(Modifier.width(6.dp)); Text(if (onRequestConversation == null) t("Add a reminder to talk", "बात करने का रिमाइंडर जोड़ें") else t("Ask for a conversation", "बातचीत के लिए कहें")) } }
         }
         if (!doctorCapture && !clinician) {
         if (clinician) item { SectionTitle(t("Saved notes", "सहेजे नोट")) }
-        if (versions.isEmpty()) item { Text(t("Your first care note will appear here after a doctor reviews and saves it.", "डॉक्टर के जाँचकर सहेजने के बाद आपका पहला देखभाल नोट यहाँ दिखेगा।"), color = MaterialTheme.colorScheme.onSurfaceVariant) }
+        if (versions.isEmpty()) item { Text(t("No care notes yet", "अभी कोई देखभाल नोट नहीं"), color = MaterialTheme.colorScheme.onSurfaceVariant) }
         items(versions, key = { it.id }) { note -> Card(onClick = { onRead(note) }, colors = CardDefaults.cardColors(containerColor = Paper), shape = RoundedCornerShape(18.dp)) {
             Row(Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Description, null, tint = Rust); Spacer(Modifier.width(12.dp)); Column(Modifier.weight(1f)) { Text(t("Version ${note.version}", "संस्करण ${note.version}") + if (note.id == versions.first().id) t(" · Latest", " · नया") else t(" · Earlier", " · पुराना"), fontWeight = FontWeight.Bold); Text("${date(note.published)} · ${note.doctor}", style = MaterialTheme.typography.bodySmall); Text(ReviewWorkflow.label(note), style = MaterialTheme.typography.labelSmall, color = Rust) }; Icon(Icons.AutoMirrored.Filled.ArrowForward, t("Read note", "नोट पढ़ें")) }
         } }
@@ -933,7 +910,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         LazyColumn(Modifier.fillMaxWidth().imePadding(), contentPadding = PaddingValues(start = 22.dp, end = 22.dp, bottom = 40.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             item { Heading(if (note.hashScheme == DoctorConversationContext.HASH_SCHEME) t("Conversation notes", "बातचीत के नोट") else t("Goals of care", "देखभाल के लक्ष्य")); Text("${note.personName} · " + t("Version ${note.version}", "संस्करण ${note.version}")); Text(t("Reviewer: ${note.doctor} · ${date(note.published)}", "जाँचने वाले: ${note.doctor} · ${date(note.published)}"), style = MaterialTheme.typography.bodySmall); Text(ReviewWorkflow.label(note, note.id in verifiedReviews), style = MaterialTheme.typography.labelMedium, color = Rust) }
             if(note.hashScheme==DoctorConversationContext.HASH_SCHEME) item { DoctorNoteReaderBody(vm, note) }
-            if (vm.cloud != null) item { OutlinedButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, sharedCareNoteUrl(note)), t("Share exact care-note link", "इसी देखभाल नोट का लिंक भेजें"))) }, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.QrCode, null); Spacer(Modifier.width(8.dp)); Text(t("Share exact-version link", "इसी संस्करण का लिंक भेजें")) }; Text(t("The person you send this to must sign in with an allowed account. The link does not open for anyone else.", "जिसे भेजें, उसे अनुमति वाले खाते से साइन इन करना होगा। यह लिंक किसी और के लिए नहीं खुलता।"), style = MaterialTheme.typography.bodySmall) }
+            if (vm.cloud != null) item { OutlinedButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, sharedCareNoteUrl(note)), t("Share exact care-note link", "इसी देखभाल नोट का लिंक भेजें"))) }, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.QrCode, null); Spacer(Modifier.width(8.dp)); Text(t("Share exact-version link", "इसी संस्करण का लिंक भेजें")) } }
             item { Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 OutlinedButton(onClick = { exporting = NoteRules.text(note, confirmations); saveNote.launch("Goals-of-care-v${note.version}.txt") }, modifier = Modifier.weight(1f)) { Icon(Icons.Default.FileDownload, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Save copy", "कॉपी सहेजें")) }
                 FilledTonalButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, NoteRules.text(note, confirmations)), t("Share care note", "देखभाल नोट भेजें"))) }, modifier = Modifier.weight(1f), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Gold, contentColor = Ink)) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Share", "भेजें")) }
@@ -948,8 +925,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                 signatures.filter { it.ackId == confirmation.id }.forEach { NoteSignedBy(it, signatureStore) }
             } }
             if (versions.firstOrNull()?.id == note.id) {
-                item { HorizontalDivider(); Spacer(Modifier.height(12.dp)); Heading(if (patientConfirmation == null) t("Patient's review", "मरीज़ की जाँच") else t("Family's review", "परिवार की जाँच"), 26)
-                    Text(if (patientConfirmation == null) t("The patient confirms first. Family can then add their own confirmation to this same version.", "पहले मरीज़ पुष्टि करें। फिर परिवार इसी संस्करण पर अपनी पुष्टि जोड़ सकता है।") else t("The patient's confirmation stays saved. Add your own after reading this version.", "मरीज़ की पुष्टि सहेजी रहेगी। यह संस्करण पढ़कर अपनी पुष्टि जोड़ें।"), style = MaterialTheme.typography.bodySmall) }
+                item { HorizontalDivider(); Spacer(Modifier.height(12.dp)); Heading(if (patientConfirmation == null) t("Patient's review", "मरीज़ की जाँच") else t("Family's review", "परिवार की जाँच"), 26) }
                 item { CareField(value = name, onValueChange = { name = it.take(100) }, label = t("Your name", "आपका नाम"), singleLine = true) }
                 item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("Patient", "Family / carer").forEach { role -> FilterChip(selected = relationship == role, onClick = { relationship = role }, enabled = (vm.cloud == null || (role == "Patient") == owner) && !(familyOnly && role == "Patient") && if (role == "Patient") patientConfirmation == null else patientConfirmation != null, label = { Text(if (role == "Patient") t("Patient", "मरीज़") else t("Family / carer", "परिवार / देखभाल करने वाले")) }) } } }
                 item { CheckLine(reviewed, { reviewed = it }, t("I have read this version. This is not a legal signature, consent for treatment or a treatment decision. I can ask my doctor to change it later.", "मैंने यही संस्करण पढ़ा है। यह क़ानूनी हस्ताक्षर, इलाज की सहमति या इलाज का फ़ैसला नहीं है। मैं बाद में डॉक्टर से इसे बदलवा सकता/सकती हूँ।")) }
@@ -963,7 +939,6 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                     }
                 }, enabled = reviewed && name.isNotBlank() && signatureDraft.ready && !busy && !alreadyConfirmed && (relationship == "Patient" || patientConfirmation != null), modifier = Modifier.fillMaxWidth()) { Text(if (alreadyConfirmed) t("Confirmation already saved", "पुष्टि पहले से सहेजी है") else t("Sign and confirm this version", "हस्ताक्षर करके इस संस्करण की पुष्टि करें")) } }
             }
-            item { Text(t("This is a record of a conversation. It is not a treatment order or a legal instruction. People typed their own names, unless this version shows a checked doctor review.", "यह एक बातचीत का रिकॉर्ड है। यह इलाज का आदेश या क़ानूनी निर्देश नहीं है। जब तक डॉक्टर की पक्की जाँच न दिखे, नाम लोगों ने ख़ुद लिखे हैं।"), style = MaterialTheme.typography.bodySmall) }
         }
     }
 }
@@ -985,10 +960,10 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     val hindi = careHindi(); val t = careText()
     // [name] stays English: it is the module's key and test tag; only [title] is shown.
     val tiles = listOf(
-        CareModuleTile("Conversations", t("Conversations", "बातचीत"), t("Saved talks and care notes", "सहेजी बातचीत और देखभाल नोट"), SaharaLavender, R.drawable.conversation_recent_art, versions.size) {
+        CareModuleTile("Conversations", t("Conversations", "बातचीत"), "", SaharaLavender, R.drawable.conversation_recent_art, versions.size) {
             CareModuleList("conversations", versions, t("No saved conversations yet.", "अभी कोई सहेजी हुई बातचीत नहीं।"), keyOf = { it.id }) { CareConversationRow(it, onReadNote) }
         },
-        CareModuleTile("Medicines", t("Medicines", "दवाइयाँ"), t("Current and past", "अभी की और पहले की"), SaharaSoftBlue, R.drawable.care_medicines_art, currentMeds.size + pastMeds.size) {
+        CareModuleTile("Medicines", t("Medicines", "दवाइयाँ"), "", SaharaSoftBlue, R.drawable.care_medicines_art, currentMeds.size + pastMeds.size) {
                 SideEffectsToRaiseCard(vm)
                 MedicineScanAction(onScanPrescription) { onAdd("medicine") }
                 if (currentMeds.isEmpty() && pastMeds.isEmpty()) QuietLine(t("No medicines yet.", "अभी कोई दवा नहीं।")) else {
@@ -996,16 +971,16 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                     CareModuleList("medicines-past", pastMeds, t("No past medicines yet.", "पहले की कोई दवा नहीं।"), t("Past", "पहले की"), { it.id }) { CareRow(it, vm) }
                 }
         },
-        CareModuleTile("Visits", t("Visits", "मुलाक़ातें"), t("Upcoming and past", "आगे की और पहले की"), SaharaApricot, R.drawable.conversation_history_art, upcoming.size + pastVisits.size) {
+        CareModuleTile("Visits", t("Visits", "मुलाक़ातें"), "", SaharaApricot, R.drawable.conversation_history_art, upcoming.size + pastVisits.size) {
                 CareVisitsModule(vm, upcoming, pastVisits, onCalendarAt)
         },
-        CareModuleTile("To do", t("To do", "करने के काम"), t("Things to get done", "जो काम करने हैं"), SaharaSoftGold, R.drawable.care_notes_illustration, tasks.size) {
+        CareModuleTile("To do", t("To do", "करने के काम"), "", SaharaSoftGold, R.drawable.care_notes_illustration, tasks.size) {
             CareTodoModule(vm, tasks)
         },
-        CareModuleTile("Check-ins", t("Check-ins", "रोज़ का हाल"), t("How each day went", "हर दिन कैसा रहा"), Mint, R.drawable.wellbeing_checkin_illustration, checkins.size) {
+        CareModuleTile("Check-ins", t("Check-ins", "रोज़ का हाल"), "", Mint, R.drawable.wellbeing_checkin_illustration, checkins.size) {
             DistressHistoryCard(checkins, selectedPerson); CareModuleList("check-ins", checkins, t("No check-ins yet.", "अभी कोई हाल नहीं लिखा।"), keyOf = { it.id }) { CareRow(it, vm) }
         },
-        CareModuleTile("Journal", t("Journal", "डायरी"), t("Your own notes", "आपके अपने नोट"), Peach, R.drawable.conversation_record_art, journal.size) {
+        CareModuleTile("Journal", t("Journal", "डायरी"), "", Peach, R.drawable.conversation_record_art, journal.size) {
             CareModuleList("journal", journal, t("No journal notes yet.", "डायरी में अभी कोई नोट नहीं।"), keyOf = { it.id }) { CareRow(it, vm) }
         },
     )
@@ -1023,7 +998,6 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                 Surface(shape = CircleShape, color = SaharaApricot) { Icon(careIcon("task"), null, Modifier.padding(14.dp).size(30.dp), tint = DoctorAccent) }
                 Spacer(Modifier.height(12.dp)); Text(t("Nothing added yet", "अभी कुछ नहीं जोड़ा गया"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-                Spacer(Modifier.height(4.dp)); Text(t("Use Add to record a medicine, visit, task, check-in or note.", "दवा, मुलाक़ात, काम, आज का हाल या नोट लिखने के लिए “जोड़ें” दबाएँ।"), fontSize = 15.sp, color = DoctorCardSub, textAlign = TextAlign.Center)
                 Spacer(Modifier.height(12.dp)); CareAddMenuButton(onAdd, onScanPrescription)
             }
         } } else {
@@ -1111,26 +1085,28 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                     Spacer(Modifier.width(14.dp))
                     Column(Modifier.weight(1f)) {
                         Text(person.name, fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 1)
-                        Text(if (vm.cloud == null) t("Sign in to share care", "देखभाल साझा करने के लिए साइन इन करें") else t("Your account and sharing", "आपका खाता और साझा करना"), fontSize = 14.sp, color = RustText)
+                        Text(if (vm.cloud == null) t("Sign in", "साइन इन") else t("Account", "खाता"), fontSize = 14.sp, color = RustText)
                     }
                     Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(20.dp), tint = Rust)
                 }
             } else Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
-                MoreRow(Icons.Default.AccountCircle, SaharaSoftBlue, if (vm.cloud == null) t("Sign in to share care", "देखभाल साझा करने के लिए साइन इन करें") else t("Your account and sharing", "आपका खाता और साझा करना"), "", Modifier.testTag("more-account"), onAccount)
+                MoreRow(Icons.Default.AccountCircle, SaharaSoftBlue, if (vm.cloud == null) t("Sign in", "साइन इन") else t("Account", "खाता"), "", Modifier.testTag("more-account"), onAccount)
             }
         }
+        // Patients and family already have Docs in the bottom bar and Calendar and Lab history on the Care tab, so those rows are only here for doctors.
+        val shortcutsElsewhere = !doctorEmbedded && !clinicianView
         item { MoreGroup(t("Your care", "आपकी देखभाल")) {
-            MoreRow(Icons.Default.FolderOpen, SaharaSoftBlue, t("Documents", "दस्तावेज़"), "", Modifier.testTag("more-documents-entry"), onDocuments)
+            if (!shortcutsElsewhere) MoreRow(Icons.Default.FolderOpen, SaharaSoftBlue, t("Documents", "दस्तावेज़"), "", Modifier.testTag("more-documents-entry"), onDocuments)
             if (onCarePlan != null) MoreRow(Icons.Default.LocalHospital, Peach, t("Emergency plan & living will", "आपातकालीन योजना और लिविंग विल"), "", Modifier.testTag("more-care-plan-entry"), onCarePlan)
-            MoreRow(Icons.Default.CalendarMonth, Mint, t("Calendar", "कैलेंडर"), "", Modifier.testTag("more-calendar"), onCalendar)
-            MoreRow(Icons.Default.Science, SaharaApricot, t("Lab history", "जाँच का इतिहास"), "", Modifier.testTag("more-labs"), onLabs)
+            if (!shortcutsElsewhere) MoreRow(Icons.Default.CalendarMonth, Mint, t("Calendar", "कैलेंडर"), "", Modifier.testTag("more-calendar"), onCalendar)
+            if (!shortcutsElsewhere) MoreRow(Icons.Default.Science, SaharaApricot, t("Lab history", "जाँच का इतिहास"), "", Modifier.testTag("more-labs"), onLabs)
             if (!walkthrough) MoreRow(Icons.Default.NotificationsNone, SaharaSoftGold, t("Reminders", "रिमाइंडर"), "", Modifier.testTag("more-reminders"), onReminders)
         } }
         if (!walkthrough || doctorEmbedded) item { MoreGroup(t("Help and settings", "मदद और सेटिंग")) {
-            if (!walkthrough) MoreRow(Icons.Default.SentimentSatisfiedAlt, Mint, t("App feedback", "ऐप के बारे में अपनी राय"), "", Modifier.testTag("patient-feedback-entry"), onFeedback)
+            if (!walkthrough) MoreRow(Icons.Default.SentimentSatisfiedAlt, Mint, t("Feedback", "राय दें"), "", Modifier.testTag("patient-feedback-entry"), onFeedback)
             if (doctorEmbedded) MoreRow(Icons.Default.Groups, SaharaSoftBlue, t("Shared care and doctor's check", "साझा देखभाल और डॉक्टर की जाँच"), "", Modifier, onSharedWorkspace)
-            // Today's "Your care team" opens the family's Care team, so the doctor workspace keeps its own entry here.
-            else if (!walkthrough) MoreRow(Icons.Default.MedicalServices, SaharaSoftBlue, t("Doctor workspace", "डॉक्टर वर्कस्पेस"), "", Modifier.testTag("more-doctor-workspace-entry"), onSharedWorkspace)
+            else if (!walkthrough) MoreRow(Icons.Default.MedicalServices, SaharaSoftBlue, t("Doctor sign in", "डॉक्टर साइन इन"), "", Modifier.testTag("more-doctor-workspace-entry"), onSharedWorkspace)
+            MoreRow(Icons.Default.Lock, Peach, t("Privacy", "निजता"), "", Modifier.testTag("more-privacy"), { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url)))) })
         } }
         item { SurfaceCard(Gold) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -1142,17 +1118,8 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             Spacer(Modifier.height(12.dp))
             Button(onClick = { val text = versions.joinToString("\n\n──────────\n\n") { v -> NoteRules.text(v, acks.filter { it.versionId == v.id && it.contentHash == v.contentHash }) }; open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), t("Export care notes", "देखभाल नोट भेजें"))) }, enabled = versions.isNotEmpty(), shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Export notes", "नोट भेजें")) }
         } }
-        item { InfoDisclosure(t("Privacy", "निजता")) {
-            Text(t("You choose which notes to share and with whom.", "कौन-से नोट किसके साथ साझा हों, यह आप तय करते हैं।"))
-            Spacer(Modifier.height(10.dp)); Text(t("You can delete a recording or remove a person's records here.", "आप यहाँ कोई रिकॉर्डिंग मिटा सकते हैं या किसी व्यक्ति के रिकॉर्ड हटा सकते हैं।"))
-            Spacer(Modifier.height(10.dp)); Text(t("Reports in Documents stay on this phone. Your care team does not get them by itself. Tap Share to send a copy. Keep your own copies before you remove the app.", "दस्तावेज़ में जोड़ी गई रिपोर्टें इसी फ़ोन पर रहती हैं। देखभाल टीम तक ये अपने-आप नहीं पहुँचतीं। कॉपी भेजने के लिए “शेयर” दबाएँ। ऐप हटाने से पहले अपनी रिपोर्टें सँभाल कर रखें।"))
-            Spacer(Modifier.height(10.dp)); Text(t("Read prescription photos on this phone, then check the original and every medicine before saving it.", "पर्चे की फ़ोटो इसी फ़ोन पर पढ़ी जाती है। सहेजने से पहले असली पर्चे से हर दवा मिला लें।"))
-            TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url)))) }) { Text(t("Privacy policy", "निजता नीति")) }
-        } }
         item { InfoDisclosure(t("About", "ऐप के बारे में")) {
             Text(androidx.compose.ui.res.stringResource(R.string.app_full_name))
-            Spacer(Modifier.height(10.dp)); Text(t("Your doctor decides on treatment. Choosing a role does not prove who you are. Only invited accounts that are checked separately can publish a checked review online.", "इलाज आपके डॉक्टर तय करते हैं। भूमिका चुनने से पहचान पक्की नहीं होती। सिर्फ़ अलग से मंज़ूर और बुलाए गए खाते ही ऑनलाइन जाँची हुई समीक्षा डाल सकते हैं।"))
-            Spacer(Modifier.height(10.dp)); Text(t("Speak to type, or turn a recording into text, with the downloaded Hindi/English pack. Then check the words. Hindi/English reading uses Google Translate on this phone. Read aloud uses a downloaded voice.", "डाउनलोड किए गए हिन्दी/अंग्रेज़ी पैक से बोलकर लिखवाएँ या रिकॉर्डिंग को लिखाई में बदलें। फिर शब्द जाँच लें। हिन्दी/अंग्रेज़ी पढ़ने के लिए इसी फ़ोन पर Google Translate चलता है। पढ़कर सुनाने के लिए डाउनलोड की गई आवाज़ इस्तेमाल होती है।"))
             Spacer(Modifier.height(10.dp)); Text(t(MedicineNames.ATTRIBUTION, "दवा के नाम: CDCI (NRCeS / C-DAC), CC BY 4.0"), style = MaterialTheme.typography.bodySmall)
             TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse("https://creativecommons.org/licenses/by/4.0/"))) }) { Text(t("CC BY 4.0 licence", "CC BY 4.0 लाइसेंस")) }
             Spacer(Modifier.height(12.dp)); Text(t("Version ${BuildConfig.VERSION_NAME}", "संस्करण ${BuildConfig.VERSION_NAME}"), style = MaterialTheme.typography.bodySmall)
@@ -1193,7 +1160,6 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     var name by rememberSaveable { mutableStateOf("") }; val t = careText()
     Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Heading(t("Who is this care for?", "यह देखभाल किसके लिए है?"), 27)
-        Text(t("Create a care profile for yourself or someone you support.", "अपने लिए, या जिनकी आप देखभाल करते हैं उनके लिए, देखभाल प्रोफ़ाइल बनाएँ।"), color = DoctorCardSub)
         CareField(name, { name = it.take(100) }, t("Name", "नाम"), singleLine = true)
         error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
         Button(onClick = { onSave(name.trim()) }, enabled = name.isNotBlank() && !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-save-person")) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Continue", "आगे बढ़ें")) }
@@ -1240,7 +1206,6 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                 listOf(t("Today", "आज") to 0L, t("Tomorrow", "कल") to 1L).forEach { (label, days) -> val day = LocalDate.now().plusDays(days).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli(); FilterChip(selected = due == day, onClick = { due = day }, label = { Text(label) }, modifier = Modifier.heightIn(min = 48.dp)) }
             }
             if (kind == "visit") OutlinedButton(onClick = { val chosen = if (due > 0) Instant.ofEpochMilli(due).atZone(ZoneId.systemDefault()).toLocalDate() else LocalDate.now(); DatePickerDialog(context, { _, y, m, d -> due = LocalDate.of(y, m + 1, d).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() }, chosen.year, chosen.monthValue - 1, chosen.dayOfMonth).show() }, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.CalendarMonth, null); Spacer(Modifier.width(8.dp)); Text(if (due == 0L) t("Choose date", "तारीख़ चुनें") else date(due)) }
-            if (kind == "medicine") Text(t("Use your prescription. Choose reminder times in Reminders. Android may delay alerts.", "पर्चे में जैसा लिखा है वैसा ही लिखें। याद दिलाने का समय “रिमाइंडर” में चुनें। फ़ोन कभी-कभी सूचना देर से दिखा सकता है।"), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub)
             error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
             Button(onClick = { if (!canEditCareContext(vm, capturedPerson, capturedAccount)) { vm.message.value = t("Care access changed. Reopen this person's records before saving.", "देखभाल की अनुमति बदल गई है। सहेजने से पहले इस व्यक्ति के रिकॉर्ड फिर से खोलें।"); onDismiss() } else if (initial == null) vm.saveItem(kind, title, detail, due, savedAndClose, entryId) else vm.updateItem(initial.copy(title = title, detail = detail, due = due), onDismiss) }, enabled = selected == capturedPerson && title.isNotBlank() && !busy && (kind != "visit" || due > 0) && (kind != "medicine" || detail.isNotBlank()), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp)) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Save", "सहेजें"), fontSize = 16.sp) }
         }
@@ -1330,7 +1295,6 @@ object ConversationPages {
             Icon(if (open) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, tint = DoctorCardSub)
         }
         AnimatedVisibility(open, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) { Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(t("Read only. To change it, go back to the written text step.", "सिर्फ़ पढ़ने के लिए। बदलने के लिए लिखाई वाले चरण पर लौटें।"), fontSize = 12.sp, color = DoctorCardFaint)
             Box(Modifier.fillMaxWidth().heightIn(max = 280.dp).verticalScroll(rememberScrollState())) { androidx.compose.foundation.text.selection.SelectionContainer { Text(source.ifBlank { t("No written text yet.", "अभी कोई लिखाई नहीं बनी।") }, fontSize = 15.sp, lineHeight = 24.sp, color = DoctorCardInk) } }
         } }
     } }

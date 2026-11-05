@@ -107,7 +107,7 @@ object TrendChartRules {
     Column(Modifier.fillMaxWidth().background(Paper, RoundedCornerShape(20.dp)).border(1.dp, DoctorHairline, RoundedCornerShape(20.dp)).padding(horizontal = 16.dp, vertical = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Icon(Icons.Default.Timeline, null, Modifier.size(32.dp), tint = DoctorCardSub)
-        Text(careTr(hindi, "No entries yet. Add one from Today.", "अभी कोई नोट नहीं। ‘आज’ पेज से एक जोड़ें।"), color = DoctorCardSub, fontSize = 15.sp, textAlign = TextAlign.Center, modifier = Modifier.testTag("$tag-empty"))
+        Text(careTr(hindi, "No entries yet", "अभी कोई नोट नहीं"), color = DoctorCardSub, fontSize = 15.sp, textAlign = TextAlign.Center, modifier = Modifier.testTag("$tag-empty"))
     }
 }
 
@@ -141,7 +141,6 @@ object TrendChartRules {
                 lineColor = DoctorCardSub.copy(alpha = 0.7f), xMin = 0.0, xMax = (window.days.size - 1).coerceAtLeast(1).toDouble(), xLabelLines = 2,
                 bands = listOf(ChartBand(0.0, 3.5, ChartBands.Mild), ChartBand(3.5, 6.5, ChartBands.Moderate), ChartBand(6.5, 10.0, ChartBands.Severe)),
             )
-            Text(t("Each point is the highest number noted that day. 0 = none, 10 = worst.", "हर बिंदु उस दिन का सबसे ऊँचा अंक है। 0 = बिलकुल नहीं, 10 = सबसे ज़्यादा।"), fontSize = 14.sp, color = DoctorCardSub)
             TextButton(onClick = { showAll = !showAll }, modifier = Modifier.heightIn(min = 48.dp).testTag("$tag-toggle")) {
                 Text(if (showAll) t("Hide entries", "नोट छिपाएँ") else t("See all ${points.size} entries", "सभी ${points.size} नोट देखें"))
             }

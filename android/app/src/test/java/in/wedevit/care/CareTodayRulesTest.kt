@@ -33,18 +33,15 @@ class CareTodayRulesTest {
         assertEquals("today", CareTodayRules.todayCheckIn(listOf(symptom, today, yesterday), dayStart)?.id)
     }
 
-    @Test fun emptySectionsSayWhatToDoNextOnlyWhenTheViewerCanAdd() {
+    @Test fun emptySectionsAreAFewWordsWithoutInstructions() {
         for (section in listOf("visits", "tasks", "journal")) {
             val editable = CareTodayRules.emptyText(section, canEdit = true)
             val readOnly = CareTodayRules.emptyText(section, canEdit = false)
-            assertTrue(section, editable.contains("Tap "))
+            assertFalse(section, editable.contains("Tap "))
             assertFalse(section, readOnly.contains("Tap "))
             // Every string carries its Hindi half after the separator.
             for (text in listOf(editable, readOnly)) assertTrue(text, text.substringAfter(" · ", "").any { it in 'ऀ'..'ॿ' })
         }
-        assertTrue(CareTodayRules.emptyText("visits", true).contains("Add visit"))
-        assertTrue(CareTodayRules.emptyText("tasks", true).contains("Add task"))
-        assertTrue(CareTodayRules.emptyText("journal", true).contains("Write a note"))
     }
 
     @Test fun aReminderOpensThePersonWhoseSavedItemIsDue() {

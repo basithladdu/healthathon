@@ -59,8 +59,8 @@ object DocumentQuestionRules {
             // Line numbers match the review screen and the report search, so a citation points at the same line there.
             page.reviewedText.split('\n').mapIndexedNotNull { index, text -> text.trim().takeIf { it.isNotEmpty() }?.let { DocumentQuestionLine(ref, page.page, index + 1, it.take(2000)) } }
         } }
-        sources.forEach { (ref, document) -> require(lines.any { it.document == ref }) { careBilingual("“${document.name}” has no readable text yet. Open it with “Read and copy facts” first.", "“${document.name}” में अभी पढ़ने लायक लिखाई नहीं है। पहले “पढ़ें और बातें कॉपी करें” से खोलें।") } }
-        require(lines.sumOf { it.text.length } <= MAX_CHARACTERS) { careBilingual("These documents have too much text. Choose fewer documents.", "इन कागज़ों में बहुत ज़्यादा लिखाई है। कम कागज़ चुनें।") }
+        sources.forEach { (ref, document) -> require(lines.any { it.document == ref }) { careBilingual("“${document.name}” has no readable text yet.", "“${document.name}” में अभी पढ़ने लायक लिखाई नहीं है।") } }
+        require(lines.sumOf { it.text.length } <= MAX_CHARACTERS) { careBilingual("Too much text. Choose fewer documents.", "इन कागज़ों में बहुत ज़्यादा लिखाई है। कम कागज़ चुनें।") }
         val canonical = buildString { append(asked).append('\n'); lines.forEach { append(it.document).append('|').append(it.page).append('|').append(it.line).append('|').append(it.text).append('\n') } }
         return DocumentQuestionRequest(asked, careAssistSourceHash(canonical), sources, lines)
     }
@@ -72,7 +72,7 @@ object DocumentQuestionRules {
     private fun readable(asked: String, documents: List<DocumentQuestionSource>): List<DocumentQuestionSource> {
         require(asked.isNotEmpty() && asked.length <= MAX_QUESTION) { careBilingual("Type a question of up to 300 characters.", "300 अक्षरों तक का सवाल लिखें।") }
         return documents.distinctBy { it.reportId }.filter { document -> document.pages.any { it.reviewedText.isNotBlank() } }
-            .also { require(it.isNotEmpty()) { careBilingual("Your documents have no readable text yet. Open one with “Read and copy facts” first.", "आपके कागज़ों में अभी पढ़ने लायक लिखाई नहीं है। पहले किसी को “पढ़ें और बातें कॉपी करें” से खोलें।") } }
+            .also { require(it.isNotEmpty()) { careBilingual("Your documents have no readable text yet.", "आपके कागज़ों में अभी पढ़ने लायक लिखाई नहीं है।") } }
     }
 
     /**

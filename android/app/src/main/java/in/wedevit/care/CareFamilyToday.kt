@@ -103,12 +103,10 @@ internal class CaregiverCheckStore(context: Context) {
                     Text(t("How are you holding up?", "आप ख़ुद कैसे हैं?"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
                     val current = saved
                     val band = current?.let { CareFamilyRules.band(it, hindi) }.orEmpty()
-                    if (current == null) Text(t("Your own check, not $personName's", "आपकी अपनी जाँच, $personName की नहीं"), fontSize = 14.sp, color = DoctorCardSub)
-                    else Surface(shape = RoundedCornerShape(50), color = Paper, modifier = Modifier.padding(top = 4.dp)) {
+                    if (current != null) Surface(shape = RoundedCornerShape(50), color = Paper, modifier = Modifier.padding(top = 4.dp)) {
                         Text(t("Today: $current/10 · $band", "आज: $current/10 · $band"), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
                     }
                 }
-                CareHelpIcon(t("Your own check", "आपकी अपनी जाँच"), t("This is the Distress Thermometer question, for you as a carer: how much distress have you felt this past week, including today? 0 is none, 10 is extreme. Only you see it. It stays on this phone and is not added to $personName's record. A score of 4 or more is worth telling the care team about.", "यह आपके लिए, देखभाल करने वाले के रूप में, डिस्ट्रेस थर्मामीटर का सवाल है: पिछले हफ़्ते, आज समेत, आपको कितनी परेशानी रही? 0 मतलब कोई नहीं, 10 मतलब बहुत ज़्यादा। इसे सिर्फ़ आप देखते हैं। यह इसी फ़ोन पर रहता है और $personName के रिकॉर्ड में नहीं जुड़ता। 4 या ज़्यादा हो तो देखभाल टीम को ज़रूर बताएँ।"))
             }
             if (saved == null || picking) {
                 Text(t("Distress this past week, including today", "पिछले हफ़्ते, आज समेत, परेशानी"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
@@ -130,7 +128,7 @@ internal class CaregiverCheckStore(context: Context) {
             } else {
                 val current = saved ?: 0
                 LinearProgressIndicator(progress = { current / 10f }, color = CareFamilyRules.colour(current), trackColor = Paper, modifier = Modifier.fillMaxWidth().height(10.dp).clip(RoundedCornerShape(50)))
-                if (current >= CareFamilyRules.TALK_FROM) Text(t("That is a lot to carry. Tell the care team how you are at the next visit or call.", "यह बहुत भारी है। अगली मुलाक़ात या फ़ोन पर देखभाल टीम को अपना हाल बताएँ।"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk)
+                if (current >= CareFamilyRules.TALK_FROM) Text(t("Tell your care team how you are.", "देखभाल टीम को अपना हाल बताएँ।"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk)
                 TextButton(onClick = { picking = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("family-check-change")) { Text(t("Change", "बदलें"), color = RustText) }
             }
         }
@@ -148,8 +146,7 @@ internal class CaregiverCheckStore(context: Context) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Surface(shape = CircleShape, color = Paper) { Icon(Icons.Default.Lightbulb, null, Modifier.padding(10.dp).size(22.dp), tint = RustText) }
                 Spacer(Modifier.width(12.dp))
-                Text(t("A tip for carers", "देखभाल करने वालों के लिए एक सुझाव"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
-                CareHelpIcon(t("About these tips", "इन सुझावों के बारे में"), t("General tips for family carers. They are not medical advice. Ask the palliative care team about anything to do with treatment.", "परिवार में देखभाल करने वालों के लिए सामान्य सुझाव। यह इलाज की सलाह नहीं है। इलाज से जुड़ी हर बात पैलिएटिव देखभाल टीम से पूछें।"))
+                Text(t("Tip of the day", "आज का सुझाव"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
             }
             Text(t(tip.first, tip.second), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk)
             TextButton(onClick = { offset += 1 }, modifier = Modifier.heightIn(min = 48.dp).testTag("family-tip-next")) { Text(t("Next tip", "अगला सुझाव"), color = RustText) }

@@ -191,14 +191,14 @@ internal object CareSyncOps {
 
 object CareSyncText {
     fun waiting(n: Int) = if (n == 1) careBilingual("1 change waiting to send", "1 बदलाव भेजना बाकी है") else careBilingual("$n changes waiting to send", "$n बदलाव भेजने बाकी हैं")
-    fun kept(n: Int) = if (n == 1) careBilingual("1 change couldn't be sent. It is kept on this phone.", "1 बदलाव नहीं भेजा जा सका। यह फ़ोन पर रखा है।")
-        else careBilingual("$n changes couldn't be sent. They are kept on this phone.", "$n बदलाव नहीं भेजे जा सके। ये फ़ोन पर रखे हैं।")
-    fun serverKept(n: Int) = if (n == 1) careBilingual("1 change wasn't sent: the record was changed by someone else, so their version was kept.", "1 बदलाव नहीं भेजा गया: रिकॉर्ड किसी और ने बदला था, इसलिए उनका संस्करण रखा गया।")
-        else careBilingual("$n changes weren't sent: the records were changed by someone else, so their versions were kept.", "$n बदलाव नहीं भेजे गए: रिकॉर्ड किसी और ने बदले थे, इसलिए उनके संस्करण रखे गए।")
-    val REMOVED_WAITING: String get() = careBilingual("Removed on this phone. The server will be updated when you're online.", "फ़ोन से हटाया गया। इंटरनेट मिलने पर सर्वर पर भी हटेगा।")
-    val CONFIRMED_WAITING: String get() = careBilingual("Your confirmation is saved on this phone. It will be sent when you're online.", "आपकी पुष्टि फ़ोन पर सहेजी गई। इंटरनेट मिलने पर भेजी जाएगी।")
-    val SAVED_WAITING: String get() = careBilingual("Saved on this phone. It will be sent when you're online.", "फ़ोन पर सहेजा गया। इंटरनेट मिलने पर भेजा जाएगा।")
-    val SEND_NOW: String get() = careBilingual("Send now", "अभी भेजें")
+    fun kept(n: Int) = if (n == 1) careBilingual("1 change not sent", "1 बदलाव नहीं भेजा गया")
+        else careBilingual("$n changes not sent", "$n बदलाव नहीं भेजे गए")
+    fun serverKept(n: Int) = if (n == 1) careBilingual("1 change not sent. Someone else edited it first.", "1 बदलाव नहीं भेजा गया। किसी और ने पहले बदल दिया।")
+        else careBilingual("$n changes not sent. Someone else edited them first.", "$n बदलाव नहीं भेजे गए। किसी और ने पहले बदल दिए।")
+    val REMOVED_WAITING: String get() = careBilingual("Removed", "हटाया गया")
+    val CONFIRMED_WAITING: String get() = careBilingual("Saved", "सहेजा गया")
+    val SAVED_WAITING: String get() = careBilingual("Saved", "सहेजा गया")
+    val SEND_NOW: String get() = careBilingual("Retry", "फिर भेजें")
 }
 
 /** One queue per signed-in account. Only that account's session ever sends its writes. */
@@ -313,7 +313,8 @@ internal suspend fun CareCloud.removeCareContactOnce(contact: CareContact) {
 
 /** Small, calm line above the tab bar while signed-in changes are still on the phone. */
 @Composable fun CareSyncStatusLine(waiting: Int, kept: Int, busy: Boolean, onSend: () -> Unit, modifier: Modifier = Modifier) {
-    if (waiting + kept == 0) return
+    // Waiting changes send on their own; the line shows only when something could not be sent.
+    if (kept == 0) return
     Surface(modifier.fillMaxWidth().testTag("care-sync-status").semantics { liveRegion = LiveRegionMode.Polite }, color = SaharaSoftBlue) {
         Row(Modifier.padding(start = 16.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             // Icon carries the state: a spinner while sending, a warning when some were kept back, a cloud while waiting.
@@ -321,7 +322,6 @@ internal suspend fun CareCloud.removeCareContactOnce(contact: CareContact) {
             else Icon(if (kept > 0) Icons.Default.ErrorOutline else Icons.Default.CloudUpload, null, Modifier.size(20.dp), tint = if (kept > 0) RustText else DoctorCardSub)
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
-                if (waiting > 0) Text(CareSyncText.waiting(waiting), fontSize = 14.sp, color = DoctorCardInk)
                 if (kept > 0) Text(CareSyncText.kept(kept), fontSize = 14.sp, color = RustText, fontWeight = FontWeight.Medium)
             }
             TextButton(onClick = onSend, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(CareSyncText.SEND_NOW, color = if (busy) DoctorCardFaint else RustText, fontWeight = FontWeight.SemiBold) }

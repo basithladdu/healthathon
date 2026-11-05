@@ -27,9 +27,13 @@ import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
 /*
- * Online transcription of a goals-of-care recording with Google Gemini, through the Saanthvana function sahara-care-assist
- * (CARE_ASSIST_ENDPOINT, actions goc-transcribe-start / -window / -delete / -chunk; see android/supabase/functions/sahara-care-assist/goc-gemini.ts).
- * Gemini returns verbatim lines with DOCTOR / PATIENT_PARTY / UNKNOWN speakers. The key stays in the function's secrets (SAHARA_AI_API_KEY).
+ * Online transcription of a goals-of-care recording with Google Gemini, through the Sahara website route /api/goc-transcribe on Vercel
+ * (GOC_ONLINE_ENDPOINT; prototype/app/goc-transcribe-server.ts). The pipeline still speaks the old action names (goc-transcribe-start /
+ * -window / -delete / -chunk, as android/supabase/functions/sahara-care-assist/goc-gemini.ts); GocGeminiHttpTransport maps them onto the
+ * route's {action: start | transcribe | delete} and ?action=chunk. The Gemini keys stay in Vercel (GEMINI_API_KEY_1 … _5, tried in order).
+ * Gemini returns verbatim lines with DOCTOR / PATIENT_PARTY / UNKNOWN speakers. After the last window the transcript is posted once more
+ * (action analyze): Gemini maps what was said onto the goals-of-care form, with a word-for-word quote per item, and the route saves the
+ * checked result to Supabase (sahara_goc_analyses) as this account. That reading is optional: if it fails, the transcript is returned as before.
  * When Gemini cannot finish, the caller falls back to on-device Whisper (CareGocTranscribe.kt) with the lines already done, then typing.
  *
  * Audio: the recorder writes AAC in an M4A box, which Gemini does not list. Each 5-minute window (Supabase stops a request after 150 s) is
@@ -37,9 +41,19 @@ import kotlin.math.roundToLong
  * The rules here mirror prototype/app/goc-online-lines.ts; keep both in step.
  */
 
+/** The Sahara website route that holds the Gemini keys (Vercel). */
+internal const val GOC_ONLINE_ENDPOINT = "https://sahara.wedevit.in/api/goc-transcribe"
+
 data class GocGeminiLine(val startSec: Double, val speaker: String, val lang: String, val text: String)
-/** engine is "gemini"; model names who transcribed it, for "Transcribed by …". */
-data class GocGeminiResult(val lines: List<GocGeminiLine>, val model: String, val engine: String)
+/**
+ * Gemini's reading of the finished transcript onto the goals-of-care form. Every hit's quote is word for word in one transcript line;
+ * a topic with no hit was not discussed. [GocHit.start] / [GocHit.at] are offsets into the lines' texts joined with "\n".
+ * patientKnows / familyAskedNotToTell have no GocDecision yet and stay in [otherFields] as field to option ids.
+ * [saved]: the reading was stored in Supabase (sahara_goc_analyses) under [id]. Every item still needs the doctor's confirmation.
+ */
+data class GocGeminiAnalysis(val extraction: GocExtraction, val notDiscussed: List<String>, val otherFields: Map<String, List<String>>, val model: String, val saved: Boolean, val id: String)
+/** engine is "gemini"; model names who transcribed it, for "Transcribed by …". analysis is null when the reading could not be done. */
+data class GocGeminiResult(val lines: List<GocGeminiLine>, val model: String, val engine: String, val analysis: GocGeminiAnalysis? = null)
 data class GocOnlineEngines(val gemini: Boolean, val consentLine: String)
 /** code: not_enabled, sign_in_required, offline, provider_busy, invalid_output, rejected, unavailable, decode, too_long. partial keeps the lines already finished. */
 class GocGeminiException(val code: String, message: String, val partial: List<GocGeminiLine> = emptyList()) : IOException(message)
@@ -176,7 +190,7 @@ object GocGeminiRules {
 interface GocGeminiTransport {
     /** GET the function: whether a Gemini key is set (gocReady). */
     suspend fun info(): Pair<Int, String>
-    /** POST JSON to one action: goc-transcribe-start, goc-transcribe-window or goc-transcribe-delete. */
+    /** POST JSON to one action: goc-transcribe-start, goc-transcribe-window, goc-transcribe-delete or goc-analyze. */
     suspend fun post(action: String, body: String): Pair<Int, String>
     /** Relay mode only: POST one raw chunk of under 4 MB to goc-transcribe-chunk. */
     suspend fun chunk(bytes: ByteArray, headers: Map<String, String>): Pair<Int, String>
@@ -184,7 +198,7 @@ interface GocGeminiTransport {
     suspend fun upload(url: String, bytes: ByteArray, headers: Map<String, String>): Triple<Int, String, String>
 }
 
-/** The Saanthvana function sahara-care-assist, with the same headers as CareAssistHttpTransport. The key stays in the function's secrets. */
+/** The Sahara website route /api/goc-transcribe (Vercel), with the same headers as CareAssistHttpTransport. The Gemini keys stay on the server. */
 class GocGeminiHttpTransport(private val token: suspend () -> String) : GocGeminiTransport {
     private suspend fun call(url: String, method: String, bytes: ByteArray?, headers: Map<String, String>, readMs: Int): Triple<Int, String, String> = withContext(Dispatchers.IO) {
         var attempt = 0
@@ -212,13 +226,20 @@ class GocGeminiHttpTransport(private val token: suspend () -> String) : GocGemin
         if (!access.matches(Regex("[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+")) || access.length > 16384) throw GocGeminiException("sign_in_required", "Sign in to Sahara first.")
         return mapOf("X-Sahara-Client" to "android", "Authorization" to "Bearer $access", "apikey" to CareCloud.PUBLIC_API_KEY)
     }
-    override suspend fun info(): Pair<Int, String> = call(CARE_ASSIST_ENDPOINT, "GET", null, app(), 15_000).let { it.first to it.third }
+    /** The route answers {gemini: true, …}; the pipeline reads gocReady, as from the old function. */
+    override suspend fun info(): Pair<Int, String> = call(GOC_ONLINE_ENDPOINT, "GET", null, app(), 15_000).let { (status, _, body) ->
+        status to (runCatching { JSONObject(body).let { it.put("gocReady", status == 200 && it.optBoolean("gemini")) }.toString() }.getOrNull() ?: body)
+    }
     override suspend fun post(action: String, body: String): Pair<Int, String> {
-        require(action in setOf("goc-transcribe-start", "goc-transcribe-window", "goc-transcribe-delete"))
-        return call("$CARE_ASSIST_ENDPOINT/$action", "POST", body.toByteArray(Charsets.UTF_8), app() + ("Content-Type" to "application/json"), 160_000).let { it.first to it.third }
+        val route = routeActions[action] ?: throw IllegalArgumentException("Unknown action")
+        val json = JSONObject(body).put("action", route)
+        // One window or the whole reading can take a few minutes: the route's own limit is 300 s.
+        val readMs = if (route == "transcribe" || route == "analyze") 300_000 else 60_000
+        return call(GOC_ONLINE_ENDPOINT, "POST", json.toString().toByteArray(Charsets.UTF_8), app() + ("Content-Type" to "application/json"), readMs).let { it.first to it.third }
     }
     override suspend fun chunk(bytes: ByteArray, headers: Map<String, String>): Pair<Int, String> =
-        call("$CARE_ASSIST_ENDPOINT/goc-transcribe-chunk", "POST", bytes, app() + headers + mapOf("Content-Type" to "application/octet-stream", "X-Sahara-Consent" to "online-transcription"), 90_000).let { it.first to it.third }
+        call("$GOC_ONLINE_ENDPOINT?action=chunk", "POST", bytes, app() + headers + mapOf("Content-Type" to "application/octet-stream", "X-Sahara-Consent" to "online-transcription"), 90_000).let { it.first to it.third }
+    private val routeActions = mapOf("goc-transcribe-start" to "start", "goc-transcribe-window" to "transcribe", "goc-transcribe-delete" to "delete", "goc-analyze" to "analyze")
     override suspend fun upload(url: String, bytes: ByteArray, headers: Map<String, String>): Triple<Int, String, String> {
         require(url.startsWith("https://generativelanguage.googleapis.com/upload/"))
         return call(url, "POST", bytes, headers, 120_000)
@@ -306,11 +327,13 @@ internal class GocGeminiM4aAudio(private val file: File) : GocGeminiAudio {
     override fun close() { pcm.delete() }
 }
 
-private class GocEngineFailure(val code: String, message: String, val retryAfterSec: Double? = null) : Exception(message)
+/** restart: the key that holds this upload is out of quota and another key is free, so the window is uploaded again (it lands on that key). */
+private class GocEngineFailure(val code: String, message: String, val retryAfterSec: Double? = null, val restart: Boolean = false) : Exception(message)
 private fun engineFailure(status: Int, body: String): GocEngineFailure {
     val value = runCatching { JSONObject(body) }.getOrNull()
     return GocEngineFailure(value?.optString("code")?.takeIf { it.isNotEmpty() } ?: if (status == 429 || status == 503) "provider_busy" else "unavailable",
-        value?.optString("error")?.takeIf { it.isNotEmpty() } ?: "The online service could not finish.", value?.optDouble("retryAfterSec")?.takeIf { it.isFinite() })
+        value?.optString("error")?.takeIf { it.isNotEmpty() } ?: "The online service could not finish.", value?.optDouble("retryAfterSec")?.takeIf { it.isFinite() },
+        value?.optBoolean("restart") == true)
 }
 
 /** The whole pipeline over any audio and transport; [transcribeGocWithGemini] wires the real ones. Mirrors runGocOnline in goc-gemini-client.ts. */
@@ -367,6 +390,8 @@ internal class GocGeminiPipeline(private val transport: GocGeminiTransport, priv
                 val (status, body) = transport.post("goc-transcribe-window", request.toString())
                 val busy = (status == 503 || status == 429) && engineFailure(status, body).code == "provider_busy"
                 when {
+                    // Upload this window again at once: the new upload starts on a Gemini key that still has quota. The finally block deletes this one.
+                    busy && engineFailure(status, body).restart -> throw engineFailure(status, body)
                     status == 202 -> { JSONObject(body).optString("file").takeIf { it.startsWith("files/") }?.let { file = it }; pause(JSONObject(body).optLong("retryMs", 2000)) }
                     busy && busyWaits++ < 1 -> pause((min(30.0, engineFailure(status, body).retryAfterSec ?: 10.0) * 1000).toLong())
                     status != 200 -> { if (!busy) done = true; throw engineFailure(status, body) }
@@ -386,7 +411,7 @@ internal class GocGeminiPipeline(private val transport: GocGeminiTransport, priv
         val queue = GocGeminiRules.planWindows(duration, GocGeminiRules.windowSec).toMutableList()
         val parts = ArrayList<List<GocGeminiLine>>(); val models = LinkedHashSet<String>(); var doneSec = 0.0
         onProgress(0f)
-        var i = 0
+        var i = 0; var restarts = 0
         while (i < queue.size) {
             val (start, end) = queue[i]
             val report: (Float) -> Unit = { fraction -> onProgress(min(1.0, (doneSec + fraction * (end - start)) / max(1.0, duration)).toFloat()) }
@@ -394,6 +419,8 @@ internal class GocGeminiPipeline(private val transport: GocGeminiTransport, priv
                 val (lines, model) = window(audio, start, end, lang, report)
                 parts += lines; models += model; doneSec += end - start; i++
             } catch (error: GocEngineFailure) {
+                // At most one restart per Gemini key (5) in a whole recording, so a run of busy keys still ends.
+                if (error.restart && restarts < 5) { restarts++; continue }
                 if (error.code == "output_truncated" && end - start > GocGeminiRules.minWindowSec * 2) {
                     val middle = start + (end - start) / 2
                     queue[i] = start to middle; queue.add(i + 1, middle to end); continue
@@ -427,18 +454,65 @@ suspend fun gocOnlineEngines(transport: GocGeminiTransport? = GocGeminiAuth.toke
 suspend fun geminiGocAvailable(): Boolean = gocOnlineEngines().gemini
 
 /**
- * Transcribes a goals-of-care recording online with Gemini, through sahara-care-assist. Throws [GocGeminiException] (with `partial` lines) when
+ * Transcribes a goals-of-care recording online with Gemini, through the website route /api/goc-transcribe, then reads it onto the form (analysis). Throws [GocGeminiException] (with `partial` lines) when
  * Gemini cannot finish ("offline" with no network); the caller then offers on-device Whisper, then typing. `lang` is en, hi, te, ur, kn, or null for auto.
  * Show [GocOnlineEngines.consentLine] ("Audio is sent to Google Gemini to transcribe.") and get consent before calling this.
  */
-suspend fun transcribeGocWithGemini(audio: File, lang: String?, onProgress: (Float) -> Unit): GocGeminiResult {
+suspend fun transcribeGocWithGemini(audio: File, lang: String?, patientId: String? = null, conversationId: String? = null, onProgress: (Float) -> Unit): GocGeminiResult {
     val token = GocGeminiAuth.token ?: throw GocGeminiException("sign_in_required", "Sign in to Sahara first.")
-    return transcribeGocWithGemini(audio, lang, GocGeminiHttpTransport(token), onProgress)
+    return transcribeGocWithGemini(audio, lang, GocGeminiHttpTransport(token), onProgress, patientId, conversationId)
 }
 
-internal suspend fun transcribeGocWithGemini(audio: File, lang: String?, transport: GocGeminiTransport, onProgress: (Float) -> Unit): GocGeminiResult {
+internal suspend fun transcribeGocWithGemini(audio: File, lang: String?, transport: GocGeminiTransport, onProgress: (Float) -> Unit,
+    patientId: String? = null, conversationId: String? = null): GocGeminiResult {
     val hint = lang?.takeIf { it in setOf("en", "hi", "te", "ur", "kn") } ?: "auto"
     if (!gocOnlineEngines(transport).gemini) throw GocGeminiException("not_enabled", "Online transcription is not set up, or you are offline. Use on-device transcription or type the words.")
     val source = withContext(Dispatchers.IO) { GocGeminiM4aAudio(audio) }
-    try { return GocGeminiPipeline(transport).run(source, hint, onProgress) } finally { source.close() }
+    val result = try { GocGeminiPipeline(transport).run(source, hint, onProgress) } finally { source.close() }
+    if (result.lines.isEmpty()) return result
+    return result.copy(analysis = analyzeGocWithGemini(transport, result, lang, patientId, conversationId))
 }
+
+/** Option ids on the server (prototype/app/goc-extract.ts GOC_FIELD_VALUES) are the same enum names the plan uses here. */
+private val gocServerFields = mapOf("goalOfCare" to GocDecision.GOAL, "cpr" to GocDecision.CPR, "hospitalTransfer" to GocDecision.TRANSFER,
+    "ambulance" to GocDecision.AMBULANCE, "respCeiling" to GocDecision.BREATHING, "icu" to GocDecision.ICU, "vasopressors" to GocDecision.VASOPRESSORS,
+    "dialysis" to GocDecision.DIALYSIS, "ng" to GocDecision.FEEDING_NG, "peg" to GocDecision.FEEDING_PEG, "hydration" to GocDecision.HYDRATION)
+
+/** The route's analyze answer → the app's own GocExtraction. Options not offered for that decision are dropped. Exposed for tests. */
+internal fun gocAnalysisFrom(body: JSONObject): GocGeminiAnalysis {
+    val hits = ArrayList<GocHit>(); val other = LinkedHashMap<String, MutableList<String>>()
+    val suggestions = body.optJSONArray("suggestions") ?: JSONArray()
+    for (index in 0 until suggestions.length()) {
+        val item = suggestions.optJSONObject(index) ?: continue
+        val quote = item.optString("quote").trim(); val at = item.optInt("at", 0)
+        val values = item.optJSONArray("values")?.let { list -> (0 until list.length()).map { list.optString(it) }.filter { it.isNotEmpty() } }.orEmpty()
+        if (quote.length < 3 || values.isEmpty()) continue
+        val field = item.optString("field")
+        val decision = gocServerFields[field]
+        if (decision == null) { if (field.isNotEmpty()) other.getOrPut(field) { mutableListOf() } += values; continue }
+        val allowed = GocPlan.options(decision).map { it.id }.toSet()
+        val options = values.filter { it in allowed }
+        if (options.isNotEmpty()) hits += GocHit(decision, options, quote, at, at = at)
+    }
+    fun quotes(name: String, option: String) = (body.optJSONArray(name) ?: JSONArray()).let { list ->
+        (0 until list.length()).mapNotNull { list.optJSONObject(it)?.optString("quote")?.trim()?.takeIf { q -> q.length >= 3 } }.map { GocHit(GocDecision.VALUES, listOf(option), it, 0) }
+    }
+    hits += quotes("ownWords", GOC_VALUES_OWN_WORDS); hits += quotes("unacceptableOutcomes", GOC_VALUES_NOT_ACCEPTED)
+    val notDiscussed = body.optJSONArray("notDiscussed")?.let { list -> (0 until list.length()).map { list.optString(it) } }.orEmpty()
+    return GocGeminiAnalysis(GocExtraction(hits = hits), notDiscussed, other, body.optString("model", "gemini"), body.optBoolean("saved"), body.optString("id"))
+}
+
+/**
+ * One reading of the whole transcript by Gemini (route action analyze), saved to Supabase by the route. Never throws except on cancel:
+ * any failure gives null and the transcript is used as before.
+ */
+private suspend fun analyzeGocWithGemini(transport: GocGeminiTransport, result: GocGeminiResult, lang: String?, patientId: String?, conversationId: String?): GocGeminiAnalysis? = try {
+    val lines = JSONArray()
+    result.lines.forEach { lines.put(JSONObject().put("startSec", it.startSec).put("speaker", it.speaker).put("lang", it.lang).put("text", it.text)) }
+    val request = JSONObject().put("consent", true).put("requestId", UUID.randomUUID().toString()).put("lines", lines)
+        .put("transcribedBy", "Google Gemini (${result.model})".take(120)).put("language", lang ?: "auto")
+    patientId?.takeIf { Regex("[A-Za-z0-9._:-]{1,120}").matches(it) }?.let { request.put("patientId", it) }
+    conversationId?.takeIf { Regex("[A-Za-z0-9._:-]{1,120}").matches(it) }?.let { request.put("conversationId", it) }
+    val (status, body) = transport.post("goc-analyze", request.toString())
+    if (status == 200) gocAnalysisFrom(JSONObject(body)) else null
+} catch (error: CancellationException) { throw error } catch (_: Exception) { null }

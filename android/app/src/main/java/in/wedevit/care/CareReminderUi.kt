@@ -46,7 +46,7 @@ import java.time.ZoneId
     var error by remember { mutableStateOf("") }
     val request = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (granted) scheduler.enable(true)
-        else { scheduler.enable(false); error = t("Notifications are off. Your care records are still saved. You can allow them in Android Settings.", "सूचनाएँ बंद हैं। आपके देखभाल रिकॉर्ड सहेजे हुए हैं। आप इन्हें Android Settings में चालू कर सकते हैं।") }
+        else { scheduler.enable(false); error = t("Notifications are off.", "सूचनाएँ बंद हैं।") }
         revision++
     }
     DisposableEffect(lifecycle, scheduler) {
@@ -66,22 +66,18 @@ import java.time.ZoneId
                 Icon(if (enabled && allowed) Icons.Default.NotificationsActive else Icons.Default.NotificationsOff, null, Modifier.size(24.dp), tint = DoctorCardInk); Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) { Text(t("Care reminders", "देखभाल रिमाइंडर"), fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = DoctorCardInk)
                     // Status as a chip, not a sentence.
-                    Surface(shape = RoundedCornerShape(50), color = if (enabled && allowed) Paper else Cream) { Text(if (enabled && allowed) t("$count next alerts scheduled", "अगले $count अलर्ट तय हैं") else t("Off", "बंद"), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = if (enabled && allowed) DoctorStatusGood else DoctorCardSub) } }
-                MedicineInfoButton(t("Care reminders", "देखभाल रिमाइंडर"), t("Alerts can be delayed by Android, battery settings or a switched-off phone. They are a reminder to check the record, not an urgent-care service.", "Android, बैटरी सेटिंग या बंद फ़ोन की वजह से अलर्ट देर से आ सकते हैं। ये रिकॉर्ड देखने की याद दिलाते हैं, आपातकालीन सेवा नहीं हैं।") + "\n\n" +
-                    t("Only the active account sends alerts. Medicine times follow the phone’s current time zone; dated visits keep their saved time.", "सिर्फ़ चालू खाता अलर्ट भेजता है। दवा का समय फ़ोन के अभी के समय क्षेत्र से चलता है; तय मुलाक़ातें अपने सहेजे समय पर रहती हैं।") + "\n\n" +
-                    t("Reminders are optional. Turn the bell on for each dose you want a reminder for. Strip photos stay on the phone they were taken on.", "रिमाइंडर चाहें तो ही लगाएँ। जिस खुराक का रिमाइंडर चाहिए, उसकी घंटी चालू करें। पत्ते की फ़ोटो उसी फ़ोन पर रहती है जिस पर ली गई।"), "reminder-info")
+                    Surface(shape = RoundedCornerShape(50), color = if (enabled && allowed) Paper else Cream) { Text(if (enabled && allowed) t("On", "चालू") else t("Off", "बंद"), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = if (enabled && allowed) DoctorStatusGood else DoctorCardSub) } }
                 Switch(checked = enabled && allowed, onCheckedChange = { turnOn ->
                 error = ""
                 if (!turnOn) scheduler.enable(false)
                 else if (Build.VERSION.SDK_INT >= 33 && !allowed) request.launch(Manifest.permission.POST_NOTIFICATIONS)
-                else if (!allowed) error = t("Allow Sahara notifications in Android Settings, then return here.", "Android Settings में सहारा की सूचनाएँ चालू करें, फिर यहाँ लौटें।")
+                else if (!allowed) error = t("Allow notifications in Settings.", "Settings में सूचनाएँ चालू करें।")
                 else scheduler.enable(true)
                 revision++
             }) }
             if (!allowed) OutlinedButton(onClick = { runCatching { context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)) }.onFailure { error = t("Open Android Settings → Apps → Sahara → Notifications.", "Android Settings → Apps → Sahara → Notifications खोलें।") } }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().padding(top = 12.dp).heightIn(min = 48.dp)) { Text(t("Open notification settings", "सूचना सेटिंग खोलें"), fontSize = 15.sp) }
             if (enabled && allowed && !exact && Build.VERSION.SDK_INT >= 31) {
-                Text(t("Android may send these alerts late. Allow on-time alerts so they arrive at the set time.", "Android ये सूचनाएँ देर से भेज सकता है। समय पर सूचना की अनुमति दें, ताकि वे तय समय पर आएँ।"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.padding(top = 12.dp).testTag("reminder-exact-off"))
-                OutlinedButton(onClick = { runCatching { context.startActivity(Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, android.net.Uri.parse("package:${context.packageName}"))) }.onFailure { error = t("Open Android Settings → Apps → Sahara → Alarms & reminders.", "Android सेटिंग्स → ऐप्स → Sahara → अलार्म और रिमाइंडर खोलें।") } }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().padding(top = 8.dp).heightIn(min = 48.dp)) { Text(t("Allow on-time alerts", "समय पर सूचना की अनुमति दें"), fontSize = 15.sp) }
+                OutlinedButton(onClick = { runCatching { context.startActivity(Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, android.net.Uri.parse("package:${context.packageName}"))) }.onFailure { error = t("Open Android Settings → Apps → Sahara → Alarms & reminders.", "Android सेटिंग्स → ऐप्स → Sahara → अलार्म और रिमाइंडर खोलें।") } }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().padding(top = 12.dp).heightIn(min = 48.dp).testTag("reminder-exact-off")) { Text(t("Allow on-time alerts", "समय पर सूचना की अनुमति दें"), fontSize = 15.sp) }
             }
         } }
         if (error.isNotBlank()) item { Text(error, color = RustText, fontSize = 15.sp, modifier = Modifier.announce()) }
@@ -90,11 +86,9 @@ import java.time.ZoneId
         // Friendly empty state: icon, one line, and the hint as the next step.
         if (eligible.isEmpty()) item { SurfaceCard { Column(Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Icon(Icons.Default.NotificationsOff, null, Modifier.size(32.dp), tint = DoctorCardSub)
-            Text(t("No dated care activities or medicines yet.", "अभी कोई तारीख़ वाली देखभाल या दवा नहीं है।"), fontSize = 16.sp, color = DoctorCardInk, textAlign = TextAlign.Center)
-            Text(t("Add a medicine or choose a time in Calendar first.", "पहले दवा जोड़ें या कैलेंडर में समय चुनें।"), fontSize = 14.sp, color = DoctorCardSub, textAlign = TextAlign.Center)
+            Text(t("No reminders yet", "अभी कोई रिमाइंडर नहीं"), fontSize = 16.sp, color = DoctorCardInk, textAlign = TextAlign.Center)
             TextButton(onClick = onClose, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Back", "वापस"), fontSize = 15.sp) }
         } } }
-        if (!canEdit && eligible.any { it.kind == "medicine" }) item { Text(t("Times you change here apply only to this phone.", "यहाँ बदले समय सिर्फ़ इसी फ़ोन पर लागू होते हैं।"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.testTag("reminder-shared-times")) }
         items(eligible, key = { it.id }) { item -> ReminderItemSettings(item, scheduler, revision, share = if (canEdit && item.kind == "medicine") { times ->
             val detail = runCatching { MedicineEntryText.withTimes(item.detail, times) }.getOrDefault(item.detail)
             if (detail != item.detail && detail.length <= 4000) vm.updateItem(item.copy(detail = detail)) {}
@@ -143,7 +137,7 @@ import java.time.ZoneId
                 if (doseTimes.isEmpty() || dates) Button(onClick = { runCatching {
                     val chosen = if (doseTimes.isNotEmpty()) option?.times ?: doseTimes else if (times.isBlank()) emptyList() else times.split(',').map(String::trim)
                     scheduler.configure(item.id, ReminderOption(chosen, starts.trim(), ends.trim(), option?.muted == true)); if (doseTimes.isEmpty()) share?.invoke(chosen); changed()
-                }.onFailure { error = it.message?.let { m -> t(m, ReminderTextHindi[m] ?: m) } ?: t("Check the times and dates.", "समय और तारीख़ें जाँचें।") } }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Save reminder times", "रिमाइंडर का समय सहेजें"), fontSize = 16.sp) }
+                }.onFailure { error = it.message?.let { m -> t(m, ReminderTextHindi[m] ?: m) } ?: t("Check the times and dates.", "समय और तारीख़ें जाँचें।") } }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Save", "सहेजें"), fontSize = 16.sp) }
             }
         } else if (dateOnly) {
             // Saved with a date only: no alert until a time on that day is chosen here (never a midnight alert).
@@ -152,7 +146,7 @@ import java.time.ZoneId
                 if (error.isNotBlank()) Text(error, color = RustText, fontSize = 15.sp, modifier = Modifier.announce())
                 Button(onClick = { runCatching {
                     scheduler.configure(item.id, ReminderOption(if (times.isBlank()) emptyList() else times.split(',').map(String::trim), muted = option?.muted == true)); changed()
-                }.onFailure { error = it.message?.let { m -> t(m, ReminderTextHindi[m] ?: m) } ?: t("Use HH:mm, such as 08:30.", "HH:mm लिखें, जैसे 08:30।") } }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("reminder-save-${item.id}")) { Text(t("Save alert time", "समय सहेजें"), fontSize = 16.sp) }
+                }.onFailure { error = it.message?.let { m -> t(m, ReminderTextHindi[m] ?: m) } ?: t("Use HH:mm, such as 08:30.", "HH:mm लिखें, जैसे 08:30।") } }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("reminder-save-${item.id}")) { Text(t("Save", "सहेजें"), fontSize = 16.sp) }
             }
         }
     }

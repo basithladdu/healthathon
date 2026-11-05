@@ -471,7 +471,7 @@ object GocLines {
     fun partyAt(lines: List<GocLine>, offset: Int): GocParty = lineAt(lines, offset)?.party ?: GocParty.UNSET
 
     fun nextParty(p: GocParty): GocParty = when (p) { GocParty.UNSET -> GocParty.DOCTOR_SIDE; GocParty.DOCTOR_SIDE -> GocParty.PATIENT_PARTY; GocParty.PATIENT_PARTY -> GocParty.UNSET }
-    fun label(p: GocParty): Bi = when (p) { GocParty.DOCTOR_SIDE -> Bi("Doctor side", "डॉक्टर की ओर"); GocParty.PATIENT_PARTY -> Bi("Patient party", "मरीज़ की ओर"); GocParty.UNSET -> Bi("Not marked", "तय नहीं") }
+    fun label(p: GocParty): Bi = when (p) { GocParty.DOCTOR_SIDE -> Bi("Doctor side", "डॉक्टर की ओर"); GocParty.PATIENT_PARTY -> Bi("Patient side", "मरीज़ की ओर"); GocParty.UNSET -> Bi("Not marked", "तय नहीं") }
 }
 
 // ── The saved record. Optional, and never on the emergency card. ──
@@ -684,7 +684,6 @@ object GocNote {
      */
     fun draft(r: EctprRecord, topics: Map<GocDecision, GocTopicRecord>, participants: String, hindi: Boolean, notDiscussed: List<Bi> = emptyList()): String = buildList {
         add(Bi("Goals-of-care conversation note", "देखभाल के लक्ष्यों की बातचीत का नोट").pick(hindi))
-        add(Bi("For the doctor, and the patient or family, to read together and sign.", "डॉक्टर और मरीज़ या परिवार साथ पढ़ें और साइन करें।").pick(hindi))
         add(kindLabel(kind(topics.values)).pick(hindi))
         if (participants.isNotBlank()) add(Bi("Present", "मौजूद").pick(hindi) + ": " + participants.lines().filter(String::isNotBlank).joinToString(", "))
         if (notDiscussed.isNotEmpty()) add(Bi("Not discussed", "बात नहीं हुई").pick(hindi) + ": " + notDiscussed.joinToString("; ") { it.pick(hindi) })

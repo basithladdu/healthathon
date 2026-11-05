@@ -38,7 +38,7 @@ class DoctorVisitAndTeamContentTest {
     @Test fun visitLargeTextReadOnlyCannotSave() = visit(1.5f, false)
     @Test fun teamEmptyStateIsHonest() {
         ui.setContent { CareTheme { Box(Modifier.fillMaxSize().safeDrawingPadding()) { DoctorCareTeamContent(emptyList(), true, false, null, {}) } } }
-        ui.onNodeWithText("No contacts have been added yet.").assertIsDisplayed()
+        ui.onNodeWithText("No contacts yet").assertIsDisplayed()
         screenshot("doctor-care-team-empty")
     }
     @Test fun sharedTeamLongListRemainsReadableAtLargeText() {
@@ -55,7 +55,7 @@ class DoctorVisitAndTeamContentTest {
     @Test fun notSharedStateDoesNotRenderPrivateContacts() {
         ui.setContent { CareTheme { DoctorCareTeamContent(listOf(CareContact("qa", "qa-person", "Hidden synthetic contact", "Sibling", "family")),false,false,null,{}) } }
         ui.onNodeWithText("Hidden synthetic contact").assertDoesNotExist()
-        ui.onNodeWithText("The owner has not shared care-team contacts with this account.").assertExists()
+        ui.onNodeWithText("Contacts not shared").assertExists()
     }
     private fun screenshot(name:String) {
         ui.waitForIdle()

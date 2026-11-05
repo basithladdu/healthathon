@@ -78,16 +78,13 @@ internal fun doctorAttendeesAllConsented(rows: List<DoctorAttendee>): Boolean = 
     var name by rememberSaveable(scope) { mutableStateOf("") }
     var role by rememberSaveable(scope) { mutableStateOf("") }
     val callback by rememberUpdatedState(onChange)
-    fun persist(next: List<DoctorAttendee>): Boolean = try { check(editable) { t("This list can no longer be changed.", "यह सूची अब बदली नहीं जा सकती।") }; store.save(scope, next); rows = next; error = null; callback(next); true } catch (e: Exception) { error = e.message?.let { m -> t(m, DoctorAttendeeErrorsHindi[m] ?: m) } ?: t("People present were not saved. Try again.", "मौजूद लोगों की सूची सहेजी नहीं गई। फिर कोशिश करें।"); false }
-    fun load() { try { val saved = store.load(scope); rows = if (saved.isEmpty()) initial else saved; loaded = true; error = null; callback(rows) } catch (_: Exception) { error = t("People present could not be loaded. Retry before editing.", "मौजूद लोगों की सूची नहीं खुली। बदलने से पहले फिर कोशिश करें।"); loaded = false } }
+    fun persist(next: List<DoctorAttendee>): Boolean = try { check(editable) { t("This list can no longer be changed.", "यह सूची अब बदली नहीं जा सकती।") }; store.save(scope, next); rows = next; error = null; callback(next); true } catch (e: Exception) { error = e.message?.let { m -> t(m, DoctorAttendeeErrorsHindi[m] ?: m) } ?: t("Couldn't save. Try again.", "सहेजा नहीं गया। फिर कोशिश करें।"); false }
+    fun load() { try { val saved = store.load(scope); rows = if (saved.isEmpty()) initial else saved; loaded = true; error = null; callback(rows) } catch (_: Exception) { error = t("Couldn't load. Try again.", "नहीं खुला। फिर कोशिश करें।"); loaded = false } }
     LaunchedEffect(store, scope) { load() }
     val all = doctorAttendeesAllConsented(rows)
     Card(Modifier.fillMaxWidth().testTag("doctor-attendees"), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = DoctorCardReport), border = BorderStroke(1.dp, DoctorHairline)) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(t("Who is in the room", "कमरे में कौन है"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
-                DoctorInfoIcon(t("Who is in the room", "कमरे में कौन है"), t("Write down everyone physically present. Each person ticks to agree to being recorded. Nobody listed here is contacted or notified, and names are not checked.", "जो भी यहाँ मौजूद है, सबका नाम लिखें। रिकॉर्डिंग के लिए हर व्यक्ति ख़ुद टिक करके सहमति दे। यहाँ लिखे किसी व्यक्ति से संपर्क नहीं होता, उसे सूचना नहीं जाती, और नाम जाँचे नहीं जाते।"), "doctor-attendees-info")
-            }
+            Text(t("Who's here", "कौन मौजूद है"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
             error?.let { Text(it, fontSize = 15.sp, lineHeight = 21.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag("doctor-attendees-error").announce()) }
             if (!loaded) TextButton(onClick = { load() }, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-attendees-retry")) { Text(t("Retry", "फिर कोशिश करें"), color = RustText, fontSize = 16.sp) }
             rows.forEachIndexed { i, row -> if (i > 0) HorizontalDivider(color = DoctorHairline); Column(Modifier.fillMaxWidth().testTag("doctor-attendee-${row.id}")) {
@@ -96,7 +93,7 @@ internal fun doctorAttendeesAllConsented(rows: List<DoctorAttendee>): Boolean = 
                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         Text(row.name, fontSize = 16.sp, lineHeight = 22.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
                         Text(row.role, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
-                        Text(if (row.consented) t("Agrees to being recorded", "रिकॉर्डिंग के लिए सहमत") else t("Has not agreed yet", "अभी सहमति नहीं दी"), fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, color = if (row.consented) DoctorStatusGood else DoctorStatusWarn)
+                        Text(if (row.consented) t("Agreed", "सहमत") else t("Not agreed", "सहमति नहीं"), fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, color = if (row.consented) DoctorStatusGood else DoctorStatusWarn)
                     }
                     if (editable) TextButton(onClick = { persist(rows.filterNot { it.id == row.id }) }, enabled = loaded, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-attendee-remove-${row.id}")) { Text(t("Remove", "हटाएँ"), color = RustText) }
                 }
@@ -106,10 +103,10 @@ internal fun doctorAttendeesAllConsented(rows: List<DoctorAttendee>): Boolean = 
                 val canAdd = loaded && rows.size < 12 && name.isNotBlank() && role.isNotBlank()
                 val add = { if (persist(rows + DoctorAttendee(newId(), name.trim(), role.trim(), false))) { name = ""; role = "" } }
                 OutlinedTextField(name, { name = it.take(100) }, label = { Text(t("Name", "नाम")) }, singleLine = true, enabled = loaded, shape = RoundedCornerShape(14.dp), keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-attendee-name-input"))
-                OutlinedTextField(role, { role = it.take(40) }, label = { Text(t("Role, such as Daughter or Nurse", "रिश्ता या भूमिका, जैसे बेटी या नर्स")) }, singleLine = true, enabled = loaded, shape = RoundedCornerShape(14.dp), keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done), keyboardActions = KeyboardActions(onDone = { if (canAdd) add() }), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-attendee-role-input"))
+                OutlinedTextField(role, { role = it.take(40) }, label = { Text(t("Role", "भूमिका")) }, placeholder = { Text(t("Daughter, nurse…", "बेटी, नर्स…")) }, singleLine = true, enabled = loaded, shape = RoundedCornerShape(14.dp), keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done), keyboardActions = KeyboardActions(onDone = { if (canAdd) add() }), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-attendee-role-input"))
                 OutlinedButton(onClick = add, enabled = canAdd, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.outlinedButtonColors(contentColor = RustText), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-add-attendee")) { Icon(Icons.Default.PersonAdd, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(t("Add person", "व्यक्ति जोड़ें"), fontSize = 16.sp) }
             }
-            Text(if (all) t("Everyone listed has agreed to being recorded.", "सूची में सभी रिकॉर्डिंग के लिए सहमत हैं।") else t("Recording can start once everyone listed has agreed.", "सूची में सबकी सहमति के बाद ही रिकॉर्डिंग शुरू हो सकती है।"), fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, color = if (all) DoctorStatusGood else DoctorStatusWarn, modifier = Modifier.testTag("doctor-attendees-status").announce())
+            Text(if (all) t("Everyone agreed", "सभी सहमत") else t("Everyone must agree", "सबकी सहमति ज़रूरी"), fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, color = if (all) DoctorStatusGood else DoctorStatusWarn, modifier = Modifier.testTag("doctor-attendees-status").announce())
         }
     }
 }

@@ -69,7 +69,7 @@ private fun readerFallbackGoals(note: CareVersion): List<ReaderGoal> = listOf(no
     var problem by remember(note.id) { mutableStateOf<String?>(null) }
     val goals = remember(vm, note.id, note.personId, note.conversationId, note.priorities, note.participants, note.topics, note.questions, note.nextSteps) {
         val stored = runCatching { DoctorPreparationStore(context, vm.storageNamespace).load(DoctorPreparationStore.scope(vm.accountNamespace, note.personId, note.conversationId)) }.getOrDefault(emptyList())
-        if (stored.isNotEmpty()) stored.map { ReaderGoal(it.id, it.text.trim(), it.answer.trim().ifBlank { t("Not answered in this conversation", "इस बातचीत में जवाब नहीं मिला") }, it.answer.trim()) } else readerFallbackGoals(note)
+        if (stored.isNotEmpty()) stored.map { ReaderGoal(it.id, it.text.trim(), it.answer.trim().ifBlank { t("Not answered", "जवाब नहीं मिला") }, it.answer.trim()) } else readerFallbackGoals(note)
     }
     // The audio card is looked up after the first frame; the body grows smoothly instead of pushing the transcript down in one jump.
     Column(Modifier.animateContentSize(), verticalArrangement = Arrangement.spacedBy(24.dp)) {
@@ -105,7 +105,7 @@ private fun readerFallbackGoals(note: CareVersion): List<ReaderGoal> = listOf(no
     var overflow by remember(source) { mutableStateOf(false) }
     Surface(color = DoctorCardReport, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("note-reader-transcript")) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            if (source.isBlank()) Text(t("No transcript was saved with this note.", "इस नोट के साथ कोई लिखाई सहेजी नहीं गई।"), fontSize = 16.sp, lineHeight = 24.sp, color = DoctorCardSub)
+            if (source.isBlank()) Text(t("No transcript", "कोई लिखाई नहीं"), fontSize = 16.sp, lineHeight = 24.sp, color = DoctorCardSub)
             else {
                 SelectionContainer { Text(source, fontSize = 16.sp, lineHeight = 25.sp, color = DoctorCardInk, maxLines = if (all) Int.MAX_VALUE else 12, overflow = TextOverflow.Ellipsis, onTextLayout = { if (!all) overflow = it.hasVisualOverflow }) }
                 if (overflow || all) TextButton(onClick = { all = !all }, modifier = Modifier.heightIn(min = 48.dp).testTag("note-reader-transcript-toggle")) { Text(if (all) t("Show less", "कम दिखाएँ") else t("Show all", "सभी दिखाएँ"), color = RustText, fontSize = 16.sp) }
@@ -153,13 +153,13 @@ private fun readerFallbackGoals(note: CareVersion): List<ReaderGoal> = listOf(no
     Surface(color = DoctorAccent, contentColor = Color.White, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().testTag("note-reader-audio-1")) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(t("Audio 1", "ऑडियो 1"), fontFamily = SaharaTitleFont, fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.Medium, color = Color.White)
-            Text(t("Recorded $recorded", "रिकॉर्ड हुआ $recorded"), fontSize = 14.sp, lineHeight = 20.sp, color = Color.White)
+            Text(recorded, fontSize = 14.sp, lineHeight = 20.sp, color = Color.White)
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = { seek(-10_000) }, enabled = player != null, modifier = Modifier.size(48.dp).testTag("note-reader-audio-1-back")) { Icon(Icons.Default.Replay10, t("Back 10 seconds", "10 सेकंड पीछे"), tint = Color.White) }
                 IconButton(onClick = { if (playing) { runCatching { player?.pause() }; playing = false } else { runCatching { player?.start() }; playing = runCatching { player?.isPlaying == true }.getOrDefault(false) } }, enabled = player != null, modifier = Modifier.size(56.dp).testTag("note-reader-audio-1-play")) { Icon(if (playing) Icons.Default.Pause else Icons.Default.PlayArrow, if (playing) t("Pause audio", "ऑडियो रोकें") else t("Play audio", "ऑडियो चलाएँ"), tint = Color.White, modifier = Modifier.size(36.dp)) }
                 IconButton(onClick = { seek(10_000) }, enabled = player != null, modifier = Modifier.size(48.dp).testTag("note-reader-audio-1-forward")) { Icon(Icons.Default.Forward10, t("Forward 10 seconds", "10 सेकंड आगे"), tint = Color.White) }
             }
-            if (player == null) Text(t("This recording could not be opened.", "यह रिकॉर्डिंग नहीं खुल सकी।"), fontSize = 14.sp, lineHeight = 20.sp, color = Color.White)
+            if (player == null) Text(t("Can't play this audio", "यह ऑडियो नहीं चल सका"), fontSize = 14.sp, lineHeight = 20.sp, color = Color.White)
         }
     }
 }

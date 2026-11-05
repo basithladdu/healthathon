@@ -12,12 +12,12 @@ data class EmergencyLinkStatus(val live: Boolean, val expiresAt: Long?, val view
 
 /** Why there is no live link yet. Each one is said plainly on Today. */
 enum class EmergencyLinkProblem(val en: String, val hi: String) {
-    NOT_SET_UP("The web link becomes live after setup: the Sahara server needs a one-time update by the owner. Until then, the offline code and the PDF work.", "वेब लिंक सेटअप के बाद चालू होगा। तब तक ऑफ़लाइन कोड और PDF काम करते हैं।"),
-    SIGNED_OUT("Sign in to add a web link. The offline code and the PDF work now.", "वेब लिंक के लिए साइन इन करें। ऑफ़लाइन कोड और PDF अभी काम करते हैं।"),
-    NOT_OWNER("Only the person who added this profile can make its web link. The offline code and the PDF work.", "वेब लिंक केवल प्रोफ़ाइल जोड़ने वाला बना सकता है। ऑफ़लाइन कोड और PDF काम करते हैं।"),
-    WALKTHROUGH("Web links are off in the walkthrough. The offline code and the PDF work.", "वॉकथ्रू में वेब लिंक बंद है। ऑफ़लाइन कोड और PDF काम करते हैं।"),
-    LINK_OFF("This web link was turned off or has expired. Make a new link.", "यह वेब लिंक बंद है या समाप्त हो गया है। नया लिंक बनाएँ।"),
-    OFFLINE("Couldn't reach the Sahara server. The offline code and the PDF still work. Try again when online.", "सर्वर से संपर्क नहीं हुआ। ऑफ़लाइन कोड और PDF काम करते हैं। ऑनलाइन होने पर फिर कोशिश करें।"),
+    NOT_SET_UP("Web link not available yet.", "वेब लिंक अभी उपलब्ध नहीं है।"),
+    SIGNED_OUT("Sign in to add a web link.", "वेब लिंक के लिए साइन इन करें।"),
+    NOT_OWNER("Only the profile owner can make a web link.", "वेब लिंक केवल प्रोफ़ाइल का मालिक बना सकता है।"),
+    WALKTHROUGH("Web links are off in the walkthrough.", "वॉकथ्रू में वेब लिंक बंद है।"),
+    LINK_OFF("This link is off or expired.", "यह लिंक बंद है या समाप्त हो गया है।"),
+    OFFLINE("Couldn't connect. Try again.", "कनेक्ट नहीं हो सका। फिर कोशिश करें।"),
 }
 
 class EmergencyLinkException(val problem: EmergencyLinkProblem) : IllegalStateException(problem.en)

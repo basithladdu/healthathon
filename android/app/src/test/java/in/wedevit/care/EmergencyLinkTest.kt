@@ -26,8 +26,7 @@ class EmergencyLinkTest {
         assertEquals(EmergencyLinkProblem.NOT_SET_UP, EmergencyLinkRules.problemFor(404))
         assertEquals(EmergencyLinkProblem.NOT_OWNER, EmergencyLinkRules.problemFor(403))
         assertEquals(EmergencyLinkProblem.OFFLINE, EmergencyLinkRules.problemFor(500))
-        assertTrue(EmergencyLinkProblem.NOT_SET_UP.en.contains("becomes live after setup"))
-        assertTrue(EmergencyLinkProblem.NOT_SET_UP.en.contains("offline code and the PDF work"))
+        assertTrue(EmergencyLinkProblem.NOT_SET_UP.en.contains("not available yet"))
         EmergencyLinkProblem.entries.forEach { assertTrue(it.name, it.hi.isNotBlank()) }
     }
 

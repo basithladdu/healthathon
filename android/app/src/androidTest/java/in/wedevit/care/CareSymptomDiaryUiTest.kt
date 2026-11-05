@@ -231,7 +231,7 @@ class CareSymptomDiaryUiTest {
         markWholePart("head"); setStrength(9f)
         markWholePart("neck")
         ui.onNodeWithTag("pain-strength-target").performScrollTo().assertTextContains("Neck")
-        ui.onNodeWithTag("pain-strength-value").assertTextContains("Slide to set. Not rated yet.") // a new spot starts unrated; the head keeps its 9
+        ui.onNodeWithTag("pain-strength-value").assertTextContains("Not rated") // a new spot starts unrated; the head keeps its 9
         setStrength(3f)
         ui.onNodeWithTag("pain-body-site-head").performScrollTo().performClick() // a marked part tile makes that spot active again
         ui.onNodeWithTag("pain-strength-target").assertTextContains("Head")

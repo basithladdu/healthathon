@@ -4415,3 +4415,388 @@ Add a report, then choose “Cancer document?” in its menu.	ఒక రిప�
 ${values.size} results	${values.size} ఫలితాలు
 How this works	ఇది ఎలా పనిచేస్తుంది
 Not sure who	ఎవరో ఖచ్చితంగా తెలియదు
+Not signed	సంతకం కాలేదు
+Stopped	ఆపబడింది
+Didn't work. Try again.	కాలేదు. మళ్లీ ప్రయత్నించండి.
+Transcribing	రాస్తోంది
+Downloading	డౌన్‌లోడ్ అవుతోంది
+Finding speakers	మాట్లాడేవారిని గుర్తిస్తోంది
+No words heard. Pick a language.	మాటలు వినిపించలేదు. భాష ఎంచుకోండి.
+Sign	సంతకం
+Who's present	ఎవరు ఉన్నారు
+Upload	అప్‌లోడ్
+Use	ఉపయోగించండి
+Tap their line	వారి మాటను నొక్కండి
+Suggestions	సూచనలు
+Confirm all	అన్నీ ఖరారు చేయండి
+All confirmed	అన్నీ ఖరారయ్యాయి
+Note changed. Sign again.	నోట్ మారింది. మళ్లీ సంతకం చేయండి.
+Couldn't save. Try again.	సేవ్ కాలేదు. మళ్లీ ప్రయత్నించండి.
+Note read to them	నోట్ వారికి చదివి వినిపించారు
+Lock	లాక్ చేయండి
+Start over	మళ్లీ మొదలుపెట్టండి
+Locked	లాక్ అయింది
+Couldn't read photo. Try again.	ఫోటో చదవలేకపోయింది. మళ్లీ ప్రయత్నించండి.
+Remove photo	ఫోటో తీసివేయండి
+No camera app	కెమెరా యాప్ లేదు
+Photo	ఫోటో
+Signature missing	సంతకం కనిపించలేదు
+Screening	స్క్రీనింగ్
+Low memory. Close other apps and retry.	మెమరీ తక్కువగా ఉంది. ఇతర యాప్‌లు మూసి మళ్లీ ప్రయత్నించండి.
+Low storage. Free some space and retry.	స్థలం తక్కువగా ఉంది. కొంత ఖాళీ చేసి మళ్లీ ప్రయత్నించండి.
+Not available on this phone. Type instead.	ఈ ఫోన్‌లో అందుబాటులో లేదు. టైప్ చేయండి.
+Patient side	రోగి వైపు
+Invite link not valid.	ఆహ్వాన లింక్ సరైనది కాదు.
+Sign in to join ${it.possessive} care	${it.possessive} సంరక్షణలో చేరడానికి సైన్ ఇన్ చేయండి
+Stop recording first.	ముందు రికార్డింగ్ ఆపండి.
+I'm a doctor	నేను డాక్టర్‌ని
+Signed in	సైన్ ఇన్ అయింది
+Wrong email or password.	ఈమెయిల్ లేదా పాస్‌వర్డ్ తప్పు.
+At least 10 characters	కనీసం 10 అక్షరాలు
+Check your email to confirm, then sign in.	నిర్ధారించడానికి మీ ఈమెయిల్ చూడండి, తర్వాత సైన్ ఇన్ చేయండి.
+Email sent again.	ఈమెయిల్ మళ్ళీ పంపబడింది.
+Resend email	ఈమెయిల్ మళ్ళీ పంపండి
+Check your email for a reset link.	పాస్‌వర్డ్ మార్చే లింక్ కోసం మీ ఈమెయిల్ చూడండి.
+Invite saved. Sign in to join.	ఆహ్వానం సేవ్ అయింది. చేరడానికి సైన్ ఇన్ చేయండి.
+No invite copied.	ఏ ఆహ్వానమూ కాపీ కాలేదు.
+Refresh	రిఫ్రెష్ చేయండి
+Sharing	పంచుకోవడం
+Invite doctor	డాక్టర్‌ను ఆహ్వానించండి
+Access	అనుమతి
+Medicines & calendar	మందులు & క్యాలెండర్
+Can edit	మార్చగలరు
+Days	రోజులు
+Create invite	ఆహ్వానం సృష్టించండి
+Expires in 3 days	3 రోజుల్లో ముగుస్తుంది
+Invitation cancelled.	ఆహ్వానం రద్దయింది.
+People	వ్యక్తులు
+access ended ${day(it)}	${day(it)}న అనుమతి ముగిసింది
+Not available yet.	ఇంకా అందుబాటులో లేదు.
+Make view only	చూడటానికి మాత్రమే చేయండి
+Allow editing	మార్చడానికి అనుమతించండి
+Invite code	ఆహ్వాన కోడ్
+Delete account	ఖాతా తొలగించండి
+Delete account?	ఖాతా తొలగించాలా?
+Your account and the care records you set up will be deleted for everyone.	మీ ఖాతా, మీరు సృష్టించిన సంరక్షణ రికార్డులు అందరికీ తొలగించబడతాయి.
+Couldn't delete. Request deletion by email below.	తొలగించలేకపోయాం. కింద ఈమెయిల్ ద్వారా అభ్యర్థించండి.
+Your data was deleted and the account closed.	మీ సమాచారం తొలగించబడింది, ఖాతా మూసివేయబడింది.
+Confirm your email first.	ముందు మీ ఈమెయిల్ నిర్ధారించండి.
+This email already has an account. Sign in.	ఈ ఈమెయిల్‌కు ఇప్పటికే ఖాతా ఉంది. సైన్ ఇన్ చేయండి.
+Email couldn't be sent. Write to workwithdevit@gmail.com.	ఈమెయిల్ పంపలేకపోయాం. workwithdevit@gmail.com కు రాయండి.
+Too many emails. Try again in an hour.	చాలా ఈమెయిల్స్ పంపబడ్డాయి. గంట తర్వాత మళ్ళీ ప్రయత్నించండి.
+No internet. Try again.	ఇంటర్నెట్ లేదు. మళ్ళీ ప్రయత్నించండి.
+Only the owner can invite.	యజమాని మాత్రమే ఆహ్వానించగలరు.
+Relationship	సంబంధం
+Send on WhatsApp	WhatsApp లో పంపండి
+Other apps	ఇతర యాప్‌లు
+Invite didn't work. Ask for a new one.	ఆహ్వానం పని చేయలేదు. కొత్తది అడగండి.
+No connection. Open the link again.	కనెక్షన్ లేదు. లింక్ మళ్ళీ తెరవండి.
+Sign in again, then reopen the link.	మళ్ళీ సైన్ ఇన్ చేసి, లింక్ మళ్ళీ తెరవండి.
+Join from their own account, not this one.	ఈ ఖాతా నుండి కాదు, వారి సొంత ఖాతా నుండి చేరాలి.
+Invite expired or was already used.	ఆహ్వానం ముగిసింది లేదా ఇప్పటికే వాడబడింది.
+Invited · 	ఆహ్వానించారు · 
+Used or cancelled	వాడబడింది లేదా రద్దయింది
+Expired	ముగిసింది
+Sent	పంపబడింది
+Not available in the demo.	డెమోలో అందుబాటులో లేదు.
+View only	చూడటానికి మాత్రమే
+Profile unavailable	ప్రొఫైల్ అందుబాటులో లేదు
+Loading…	లోడ్ అవుతోంది…
+This can't be undone.	దీన్ని వెనక్కి తీసుకోలేరు.
+Care plan	సంరక్షణ ప్రణాళిక
+Feedback	అభిప్రాయం
+Tools	సాధనాలు
+Tell your care team how you are.	మీరు ఎలా ఉన్నారో మీ సంరక్షణ బృందానికి చెప్పండి.
+Tip of the day	ఈరోజు సూచన
+No medicines found	మందులు ఏవీ కనబడలేదు
+I checked this with the prescription	దీన్ని ప్రిస్క్రిప్షన్‌తో సరిచూశాను
+Matched	సరిపోయింది
+Possible match	సరిపోయి ఉండవచ్చు
+Prescription only	ప్రిస్క్రిప్షన్‌లో మాత్రమే
+No name found. Type it.	పేరు కనబడలేదు. టైప్ చేయండి.
+Strip photos	స్ట్రిప్ ఫోటోలు
+Dose times	మోతాదు సమయాలు
+Speech to text	మాట నుండి రాత
+Not checked	తనిఖీ చేయలేదు
+Everyone here agrees to send this recording to ${ready.provider}.	ఈ రికార్డింగ్‌ను ${ready.provider}కి పంపడానికి ఇక్కడ అందరూ అంగీకరిస్తున్నారు.
+I checked the words and who spoke.	మాటలను, ఎవరు మాట్లాడారో తనిఖీ చేశాను.
+Draft note	నోట్ డ్రాఫ్ట్
+Everyone here agrees to send these words to ${service.provider}.	ఈ మాటలను ${service.provider}కి పంపడానికి ఇక్కడ అందరూ అంగీకరిస్తున్నారు.
+I agree to send this note to ${service.provider}.	ఈ నోట్‌ను ${service.provider}కి పంపడానికి అంగీకరిస్తున్నాను.
+A bilingual person checked this.	రెండు భాషలు తెలిసిన వ్యక్తి దీన్ని తనిఖీ చేశారు.
+Too long: ${words.length} / ${NoteRules.MAX_SOURCE_CHARS}	చాలా పొడవు: ${words.length} / ${NoteRules.MAX_SOURCE_CHARS}
+$filled of $total treatments	$total లో $filled చికిత్సలు
+$ok of $compared	$compared లో $ok
+Add representative	ప్రతినిధిని జోడించండి
+Add signed scan	సంతకం చేసిన స్కాన్ జోడించండి
+Audit log	ఆడిట్ లాగ్
+Board process	బోర్డు ప్రక్రియ
+Cancelled on $on	$on న రద్దు చేయబడింది
+Copy acknowledged	ప్రతి అందినట్లు రసీదు వచ్చింది
+Could not read file. Try another.	ఫైల్ చదవలేకపోయాం. వేరొకటి ప్రయత్నించండి.
+Days to sign	సంతకం వరకు రోజులు
+Delete draft	డ్రాఫ్ట్ తొలగించండి
+Delete the unsigned draft? This cannot be undone.	సంతకం లేని డ్రాఫ్ట్ తొలగించాలా? దీన్ని తిరిగి పొందలేరు.
+Download failed. Try again.	డౌన్‌లోడ్ కాలేదు. మళ్లీ ప్రయత్నించండి.
+Draft deleted.	డ్రాఫ్ట్ తొలగించబడింది.
+ED arrival	ED కి చేరిక
+ED visit	ED సందర్శన
+Found within $target min	$target నిమిషాల్లో దొరికింది
+Incident	సంఘటన
+Link ABHA	ABHA లింక్ చేయండి
+Make PDF	PDF తయారు చేయండి
+Mark as signed	సంతకం చేసినట్లు నమోదు చేయండి
+New living will	కొత్త లివింగ్ విల్
+New version	కొత్త వెర్షన్
+No ED access after this time.	ఈ సమయం తర్వాత ED యాక్సెస్ లేదు.
+No connection. Please phone them.	కనెక్షన్ లేదు. దయచేసి వారికి ఫోన్ చేయండి.
+No draft to delete.	తొలగించడానికి డ్రాఫ్ట్ లేదు.
+No living will	లివింగ్ విల్ లేదు
+No mobile number.	మొబైల్ నంబర్ లేదు.
+No signed plan at this time.	ఆ సమయంలో సంతకం చేసిన ప్రణాళిక లేదు.
+None yet.	ఇంకా ఏమీ లేదు.
+Not sent. Please phone them.	పంపలేదు. దయచేసి వారికి ఫోన్ చేయండి.
+Not signed. Not valid.	సంతకం లేదు. చెల్లదు.
+Opened after $minutes min	$minutes నిమిషాల తర్వాత తెరిచారు
+Outcome	ఫలితం
+Over target	లక్ష్యం కంటే ఎక్కువ
+Printed. Not valid until signed.	ముద్రించబడింది. సంతకం వరకు చెల్లదు.
+Ready. Keep the file safe.	సిద్ధం. ఫైల్‌ను జాగ్రత్తగా ఉంచండి.
+Record not opened	రికార్డు తెరవలేదు
+Record opened	రికార్డు తెరిచిన సమయం
+Relation	సంబంధం
+Representative $n	ప్రతినిధి $n
+SMS is off. Please phone them.	SMS ఆఫ్‌లో ఉంది. దయచేసి వారికి ఫోన్ చేయండి.
+Saved.	సేవ్ అయింది.
+Scan missing or changed. Ask for the signed paper.	స్కాన్ లేదు లేదా మారింది. సంతకం చేసిన కాగితం అడగండి.
+Send reminder	రిమైండర్ పంపండి
+Sign in front of two adult witnesses.	ఇద్దరు పెద్దల సాక్షుల ముందు సంతకం చేయండి.
+Start	ప్రారంభించండి
+To $name	$name కు
+Too many reminders. Try later.	చాలా ఎక్కువ రిమైండర్లు. తర్వాత ప్రయత్నించండి.
+Use access log	యాక్సెస్ లాగ్ నుండి నింపండి
+Values filled	విలువలు నింపారు
+View scan	స్కాన్ చూడండి
+Your data	మీ డేటా
+v$v: differs from the plan	v$v: ప్రణాళికకు భిన్నంగా
+v$v: matches the plan	v$v: ప్రణాళిక ప్రకారం
+v$v: nothing to compare	v$v: పోల్చడానికి ఏమీ లేదు
+${it.name} added	${it.name} చేర్చబడ్డారు
+Add dose	డోస్ జోడించండి
+Add file	ఫైల్ జోడించండి
+Add profile	ప్రొఫైల్ జోడించండి
+Calendars	క్యాలెండర్లు
+Care profiles	సంరక్షణ ప్రొఫైల్‌లు
+Change file	ఫైల్ మార్చండి
+Couldn't load visits	సందర్శనలు తెరవలేకపోయాం
+Couldn't save	సేవ్ చేయలేకపోయాం
+Details	వివరాలు
+Drafts	డ్రాఫ్ట్‌లు
+Everyone agreed to upload	అప్‌లోడ్‌కు అందరూ అంగీకరించారు
+File selected	ఫైల్ ఎంచుకోబడింది
+I checked this text	ఈ వచనాన్ని నేను సరిచూశాను
+I have permission to upload	అప్‌లోడ్ చేయడానికి నాకు అనుమతి ఉంది
+Manage account	ఖాతాను నిర్వహించండి
+No check-ins	చెక్-ఇన్‌లు లేవు
+No requests	అభ్యర్థనలు లేవు
+No visits	సందర్శనలు లేవు
+Not approved	ఆమోదించబడలేదు
+Not available	అందుబాటులో లేదు
+Open file	ఫైల్ తెరవండి
+Opening…	తెరుస్తోంది…
+Practice patients	అభ్యాస రోగులు
+Practice records	అభ్యాస రికార్డులు
+Published	ప్రచురించబడింది
+Reported by others	ఇతరులు తెలిపారు
+Save as copy	కాపీగా సేవ్ చేయండి
+Save draft	డ్రాఫ్ట్ సేవ్ చేయండి
+Sharing & access	షేరింగ్ & యాక్సెస్
+Something went wrong	ఏదో పొరపాటు జరిగింది
+Upload failed	అప్‌లోడ్ కాలేదు
+Upload incomplete	అప్‌లోడ్ పూర్తి కాలేదు
+Upload recording	రికార్డింగ్ అప్‌లోడ్ చేయండి
+Uploaded	అప్‌లోడ్ అయింది
+Verified	ధృవీకరించబడింది
+Verify	ధృవీకరించండి
+Visits this week	ఈ వారం సందర్శనలు
+Wrong email or password	ఈమెయిల్ లేదా పాస్‌వర్డ్ తప్పు
+Pain map	నొప్పి పటం
+How much distress have you felt in the past week, including today?	ఈ రోజుతో సహా గత వారంలో మీకు ఎంత బాధ (డిస్ట్రెస్) కలిగింది?
+Couldn't read this note.	ఈ నోట్ చదవలేకపోయాం.
+No entries yet	ఇంకా నమోదులు లేవు
+Can't show this picture	ఈ చిత్రాన్ని చూపలేము
+No place marked	ఏ చోటూ గుర్తించలేదు
+Side effects to raise	చెప్పాల్సిన దుష్ప్రభావాలు
+Side effects	దుష్ప్రభావాలు
+Nothing since last visit	గత సందర్శన తర్వాత ఏమీ లేదు
+Notifications are off.	నోటిఫికేషన్లు ఆఫ్‌లో ఉన్నాయి.
+On	ఆన్
+Allow notifications in Settings.	సెట్టింగ్స్‌లో నోటిఫికేషన్లను అనుమతించండి.
+No reminders yet	ఇంకా రిమైండర్లు లేవు
+Add other	ఇంకొకటి జోడించండి
+Plan withdrawn	ప్రణాళిక ఉపసంహరించబడింది
+Couldn't read the saved plan.	సేవ్ చేసిన ప్రణాళికను చదవలేకపోయాం.
+Draft v${draft.version}, not signed	డ్రాఫ్ట్ v${draft.version}, సంతకం లేదు
+Discard draft	డ్రాఫ్ట్ తీసివేయండి
+Step ${step + 1} of ${steps.size}	${steps.size}లో దశ ${step + 1}
+Ready to sign	సంతకానికి సిద్ధం
+Still needed:	ఇంకా కావాలి:
+Sign plan	ప్రణాళికపై సంతకం చేయండి
+Can't save yet	ఇంకా సేవ్ చేయలేం
+Discard changes	మార్పులు వదిలేయండి
+Main treating doctor	ప్రధాన చికిత్స వైద్యుడు
+Only if withdrawal or withholding has been decided (Common Cause v Union of India, 2018 and 2023).	చికిత్స ఆపడం లేదా ప్రారంభించకపోవడం నిర్ణయించినప్పుడు మాత్రమే (Common Cause v Union of India, 2018 మరియు 2023).
+Locked: confirm Understanding first (V4)	లాక్ అయింది: ముందు 'అవగాహన' నిర్ధారించండి (V4)
+Locked: decision-maker must confirm first (V5)	లాక్ అయింది: ముందు నిర్ణయం తీసుకునేవారు నిర్ధారించాలి (V5)
+No preference = standard care	ప్రాధాన్యత లేదు = సాధారణ చికిత్స
+Wish to remove feeding tube: needs the medical board process	ఆహార గొట్టం తీసివేయాలనే కోరిక: మెడికల్ బోర్డు ప్రక్రియ అవసరం
+Give full standard emergency care.	పూర్తి సాధారణ అత్యవసర చికిత్స ఇవ్వండి.
+Card ready	కార్డ్ సిద్ధం
+Not uploaded yet	ఇంకా అప్‌లోడ్ కాలేదు
+Old QR may still open until the phone is online.	ఫోన్ ఆన్‌లైన్ అయ్యే వరకు పాత QR ఇంకా తెరుచుకోవచ్చు.
+Online QR	ఆన్‌లైన్ QR
+Offline QR	ఆఫ్‌లైన్ QR
+Living will changed. Issue a new card.	లివింగ్ విల్ మారింది. కొత్త కార్డ్ జారీ చేయండి.
+New card	కొత్త కార్డ్
+Print or share	ప్రింట్ లేదా షేర్ చేయండి
+All doctors	అందరు డాక్టర్లు
+No matches	ఏమీ దొరకలేదు
+Update the app to open this.	దీన్ని తెరవడానికి యాప్‌ను అప్‌డేట్ చేయండి.
+Family access	కుటుంబ యాక్సెస్
+Only the owner can share	యజమాని మాత్రమే పంపగలరు
+Couldn't load. Try again.	తెరవలేకపోయాం. మళ్ళీ ప్రయత్నించండి.
+Choose family	కుటుంబాన్ని ఎంచుకోండి
+No family accounts	కుటుంబ ఖాతాలు లేవు
+From version ${CarriedForward.version(goal.origin)}	వెర్షన్ ${CarriedForward.version(goal.origin)} నుండి
+Dictating…	చెబుతూ రాస్తున్నాం…
+Ready	సిద్ధం
+From transcript	రాతప్రతి నుండి
+Typed	టైప్ చేసింది
+New conversation	కొత్త సంభాషణ
+Earlier	ముందటివి
+Previous	గతది
+No conversations yet	ఇంకా సంభాషణలు లేవు
+More options	మరిన్ని ఎంపికలు
+Start new	కొత్తది మొదలుపెట్టండి
+Transcribing…	రాతప్రతి తయారవుతోంది…
+Transcribe	రాతప్రతి చేయండి
+Sample transcript	నమూనా రాతప్రతి
+Online transcript	ఆన్‌లైన్ రాతప్రతి
+Type or paste here	ఇక్కడ టైప్ చేయండి లేదా అతికించండి
+Not found	దొరకలేదు
+No audio yet	ఇంకా ఆడియో లేదు
+Not answered	జవాబు లేదు
+No transcript	రాతప్రతి లేదు
+Can't play this audio	ఈ ఆడియో ప్లే కాలేదు
+Agreed	అంగీకరించారు
+Not agreed	అంగీకరించలేదు
+Role	పాత్ర
+Daughter, nurse…	కూతురు, నర్సు…
+Everyone agreed	అందరూ అంగీకరించారు
+Everyone must agree	అందరూ అంగీకరించాలి
+${list.covered} of ${list.rows.size} covered	${list.rows.size} లో ${list.covered} చర్చించాం
+No questions yet	ఇంకా ప్రశ్నలు లేవు
+Line ${answerLine.number}	లైన్ ${answerLine.number}
+Suggested · line ${suggestion.line.number}	సూచన · లైన్ ${suggestion.line.number}
+Suggested	సూచన
+All answered	అన్నిటికీ జవాబు ఉంది
+$unanswered unanswered	$unanswered కి జవాబు లేదు
+Practice transcript	ప్రాక్టీస్ రాతప్రతి
+Transcript · $model	రాతప్రతి · $model
+Get started	ప్రారంభించండి
+Try a demo	డెమో చూడండి
+Choose a person first.	ముందు ఒక వ్యక్తిని ఎంచుకోండి.
+Verification	ధృవీకరణ
+Pending review	సమీక్ష పెండింగ్‌లో ఉంది
+Submit	పంపండి
+Open on website	వెబ్‌సైట్‌లో తెరవండి
+Clinical review	క్లినికల్ సమీక్ష
+Couldn't load the demo.	డెమో తెరవలేకపోయాం.
+Web link not available yet.	వెబ్ లింక్ ఇంకా అందుబాటులో లేదు.
+Sign in to add a web link.	వెబ్ లింక్ జోడించడానికి సైన్ ఇన్ చేయండి.
+Only the profile owner can make a web link.	ప్రొఫైల్ యజమాని మాత్రమే వెబ్ లింక్ చేయగలరు.
+Web links are off in the walkthrough.	వాక్‌థ్రూలో వెబ్ లింక్‌లు ఆఫ్‌లో ఉన్నాయి.
+This link is off or expired.	ఈ లింక్ ఆఫ్ అయింది లేదా గడువు ముగిసింది.
+Couldn't connect. Try again.	కనెక్ట్ కాలేదు. మళ్లీ ప్రయత్నించండి.
+Locked PDF saved	లాక్ చేసిన PDF సేవ్ అయింది
+Card updated	కార్డ్ అప్‌డేట్ అయింది
+Card out of date	కార్డ్ పాతది అయింది
+Edit card	కార్డ్ మార్చండి
+The old link will stop working.	పాత లింక్ పని చేయడం ఆగిపోతుంది.
+Link replaced	లింక్ మార్చబడింది
+Web link code	వెబ్ లింక్ కోడ్
+Offline code	ఆఫ్‌లైన్ కోడ్
+Anyone who scans can see this.	స్కాన్ చేసే ఎవరైనా దీన్ని చూడగలరు.
+No confirmed note	నిర్ధారించిన నోట్ లేదు
+No contacts saved	సంప్రదింపులు ఏవీ సేవ్ కాలేదు
+Preview	ముందుగా చూడండి
+No centres found	కేంద్రాలు ఏవీ దొరకలేదు
+Suggest a centre	కేంద్రాన్ని సూచించండి
+Waiting to send	పంపడానికి వేచి ఉంది
+Not sent yet	ఇంకా పంపలేదు
+Approved	ఆమోదించబడింది
+Not added	జోడించలేదు
+Sent for review	సమీక్షకు పంపబడింది
+Sign in to suggest a centre	కేంద్రాన్ని సూచించడానికి సైన్ ఇన్ చేయండి
+Services (optional)	సేవలు (ఐచ్ఛికం)
+Sample	నమూనా
+Saved on this phone, not sent yet$detail	ఈ ఫోన్‌లో సేవ్ చేశాం, ఇంకా పంపలేదు$detail
+No camera app found.	కెమెరా యాప్ కనబడలేదు.
+Something went wrong. Try again.	ఏదో తప్పు జరిగింది. మళ్ళీ ప్రయత్నించండి.
+No documents yet	ఇంకా పత్రాలు లేవు
+Searching…	వెతుకుతున్నాం…
+Online answer failed$detail.	ఆన్‌లైన్ జవాబు రాలేదు$detail.
+Offline	ఆఫ్‌లైన్
+Send my question and $sendWhat to $sendTo	నా ప్రశ్న, $sendWhat ను $sendTo కి పంపండి
+Nothing found	ఏమీ కనబడలేదు
+Value found	దొరికిన విలువ
+Not checked yet	ఇంకా సరిచూడలేదు
+No readable text found.	చదవగలిగే రాత కనబడలేదు.
+Couldn't read this document.	ఈ పత్రాన్ని చదవలేకపోయాం.
+Couldn't open this file.	ఈ ఫైల్ తెరవలేకపోయాం.
+${document.pages.size} of ${document.pageCount} pages read	${document.pageCount} లో ${document.pages.size} పేజీలు చదివాం
+I checked this against the original.	దీన్ని అసలు ఫైల్‌తో సరిచూశాను.
+Added to Calendar	క్యాలెండర్‌లో చేర్చాం
+Choose a shorter line.	చిన్న పంక్తిని ఎంచుకోండి.
+No results yet	ఇంకా ఫలితాలు లేవు
+Printed range	ముద్రించిన పరిధి
+1 edited line	1 మార్చిన పంక్తి
+$n edited lines	$n మార్చిన పంక్తులు
+Approve doctors	డాక్టర్లను ఆమోదించండి
+${request.name} approved	${request.name} ఆమోదించబడ్డారు
+${request.name} not approved	${request.name} ఆమోదించబడలేదు
+Register name or link	రిజిస్టర్ పేరు లేదా లింక్
+No prescription	ప్రిస్క్రిప్షన్ లేదు
+1 change not sent	1 మార్పు పంపలేదు
+$n changes not sent	$n మార్పులు పంపలేదు
+1 change not sent. Someone else edited it first.	1 మార్పు పంపలేదు. వేరొకరు ముందే మార్చారు.
+$n changes not sent. Someone else edited them first.	$n మార్పులు పంపలేదు. వేరొకరు ముందే మార్చారు.
+“${document.name}” has no readable text yet.	“${document.name}” లో ఇంకా చదవగలిగే రాత లేదు.
+Your documents have no readable text yet.	మీ పత్రాల్లో ఇంకా చదవగలిగే రాత లేదు.
+Too much text. Choose fewer documents.	రాత చాలా ఎక్కువగా ఉంది. తక్కువ పత్రాలు ఎంచుకోండి.
+Care note v${previous.number}	కేర్ నోట్ v${previous.number}
+Consent	సమ్మతి
+Transcript added	లిపి జోడించబడింది
+Couldn't add transcript	లిపి జోడించలేకపోయాం
+Sample draft loaded	నమూనా డ్రాఫ్ట్ లోడ్ అయింది
+Load sample draft	నమూనా డ్రాఫ్ట్ లోడ్ చేయండి
+Sample draft · not AI	నమూనా డ్రాఫ్ట్ · AI కాదు
+Reviewer name	సమీక్షకుడి పేరు
+Save version	వెర్షన్ సేవ్ చేయండి
+Records	రికార్డులు
+Activity	కార్యకలాపం
+Reviewer: ${version.reviewerName}	సమీక్షకుడు: ${version.reviewerName}
+PDF created	PDF తయారైంది
+Locked PDF created	లాక్ చేసిన PDF తయారైంది
+Couldn't create PDF	PDF తయారు కాలేదు
+Create PDF	PDF తయారు చేయండి
+taken	తీసుకున్నారు
+Confirm	నిర్ధారించండి
+Date (YYYY-MM-DD)	తేదీ (YYYY-MM-DD)
+Replace current prescription	ప్రస్తుత ప్రిస్క్రిప్షన్ మార్చండి
+Checked against the prescription	ప్రిస్క్రిప్షన్‌తో సరిచూశాను
+Add a name for each medicine	ప్రతి మందుకు పేరు రాయండి
+Linked records	జత చేసిన రికార్డులు
+Reviewer: 	సమీక్షకుడు: 
+Contacts not shared	పరిచయాలు పంచుకోలేదు
+No contacts yet	ఇంకా పరిచయాలు లేవు

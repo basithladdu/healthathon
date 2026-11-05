@@ -54,8 +54,8 @@ class DoctorEmbeddedNavigationTest {
         }
         ui.onNodeWithTag("doctor-shared-patient-hub").performScrollToNode(hasTestTag("doctor-shared-tools"))
         ui.onNodeWithTag("doctor-shared-tools").assertIsDisplayed().performSemanticsAction(SemanticsActions.OnClick) { it() }
-        ui.onNodeWithTag("doctor-shared-patient-hub").performScrollToNode(hasText("Sharing, access & clinical review"))
-        ui.onNodeWithText("Sharing, access & clinical review").performClick()
+        ui.onNodeWithTag("doctor-shared-patient-hub").performScrollToNode(hasText("Sharing & access"))
+        ui.onNodeWithText("Sharing & access").performClick()
         assertEquals(listOf("Progress", "Labs", "Conversations", "Visits", "Medicines", "Reports", "Tools", "Shared"), opened)
         listOf("Today", "Talk", "Care", "Nearby", "More").forEach { ui.onNodeWithText(it).assertDoesNotExist() }
     }
