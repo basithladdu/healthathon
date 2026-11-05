@@ -2,6 +2,20 @@
 
 > **30 Oct 2026:** SVK spec build (emergency care plan, living will, QR card, languages): see [docs/SAHARA_SVK_BUILD_HANDOFF.md](docs/SAHARA_SVK_BUILD_HANDOFF.md).
 
+## 5 Nov: Awaiz's tasks from the 4 Nov handoff (Awaiz, with Claude Code)
+
+Done:
+- [x] Task 1: `sahara-care-assist` deployed to Saanthvana (`kjnhtakqzboayqorrlue`) as **version 8** (`index.ts` + `goc-gemini.ts`, verify_jwt on). Android goals-of-care recordings can now use Gemini. `deno check` passed.
+- [x] Task 2: Vercel env `SAHARA_AI_API_KEY` and `SAHARA_AI_MODEL` = `gemini-3.1-flash-lite` added and redeployed (Awaiz). The website's goals of care can now use Gemini.
+- [x] Pulled main `27eb3fa` (fast-forward, no conflicts) and built a debug APK on Awaiz's machine: `E:\Healthathon\Sahara-dev-2026-11-05.apk` (all ABIs, ~317 MB).
+- [x] Model check: `gemini-3.1-flash-lite` is Google's current model (released 7 May 2026, shutdown 7 May 2027, replacement `gemini-3.5-flash-lite`).
+
+Still to do:
+- [ ] Task 3: real-phone test of the checklist above.
+- [ ] Task 4: `connectedDebugAndroidTest`. **Blocked on Awaiz's PC:** the emulator says "Android Emulator hypervisor driver is not installed". Fix: Windows features → Windows Hypervisor Platform (or Android Studio → SDK Manager → SDK Tools → Android Emulator hypervisor driver), restart. Or plug in a phone with USB debugging on.
+- [ ] Task 5: goals-of-care recording with Dr. Sharada.
+- [ ] Optional: Supabase secret `SAHARA_AI_FALLBACK_MODEL` = `gemini-3.5-flash-lite` (backup for drafting, translation and Ask documents).
+
 ## 4 Nov: 3 Nov meeting changes, goals-of-care finished (Basith, with Claude Code)
 
 Sources: `source-materials/meetings/2026-11-03-team-meeting-transcript.txt` (the 3 Nov app walkthrough with Sujay), the team WhatsApp to 4 Nov (tubes and lines, "If" wording, faded text, side-effect list, ambulances), and Rituparna's legal form (`source-materials/team-context/legal-review-2026-10-31/`).

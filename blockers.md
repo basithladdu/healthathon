@@ -54,10 +54,11 @@ Done (5 Nov):
 - [x] Goals of care follows Rituparna's legal form word for word, in 8 taps; doctor side shows the same layout.
 
 **Awaiz**
-- [ ] `supabase functions deploy sahara-care-assist --project-ref kjnhtakqzboayqorrlue` from `android/` (goals-of-care Gemini on Android).
-- [ ] Vercel env: `SAHARA_AI_API_KEY` and `SAHARA_AI_MODEL`, then redeploy (goals-of-care Gemini on the website).
-- [ ] Real-phone test of the APK: goals-of-care recording, signing and PDF; Today; Nearby location; per-dose ticks; family view; faded text on the Xiaomi.
-- [ ] `./gradlew :app:connectedDebugAndroidTest` on a device or emulator.
+- [x] `sahara-care-assist` deployed (5 Nov, version 8, with `goc-gemini.ts`): goals-of-care Gemini on Android.
+- [x] Vercel env: `SAHARA_AI_API_KEY` and `SAHARA_AI_MODEL` added and redeployed (5 Nov): goals-of-care Gemini on the website.
+- [ ] Real-phone test of the APK (`E:\Healthathon\Sahara-dev-2026-11-05.apk`): goals-of-care recording, signing and PDF; Today; Nearby location; per-dose ticks; family view; faded text on the Xiaomi.
+- [ ] `./gradlew :app:connectedDebugAndroidTest` on a device or emulator. Blocked on Awaiz's PC until the Android Emulator hypervisor driver (or Windows Hypervisor Platform) is turned on; a USB phone works too.
+- [ ] Optional: Supabase secret `SAHARA_AI_FALLBACK_MODEL` = `gemini-3.5-flash-lite`.
 
 **Team and doctors**
 - [ ] Tagline (meeting: "we'll put that on the group").
