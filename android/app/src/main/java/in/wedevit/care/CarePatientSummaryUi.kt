@@ -130,10 +130,10 @@ import java.time.LocalDate
                 QuickAction(t("Labs", "जाँच"), R.drawable.quick_labs_art, SaharaLavender, "shortcut-labs", onLabs),
                 QuickAction(t("Community", "समुदाय"), R.drawable.quick_family_art, Mint, "shortcut-community", onCommunity),
             ).forEach { action ->
-                ActionCard(Paper, Modifier.weight(1f).height(124.dp).testTag(action.tag), action.onClick) {
-                    Column(Modifier.fillMaxSize().padding(vertical = 12.dp, horizontal = 4.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceBetween) {
+                ActionCard(Paper, Modifier.weight(1f).heightIn(min = 124.dp).testTag(action.tag), action.onClick) {
+                    Column(Modifier.fillMaxSize().padding(vertical = 12.dp, horizontal = 2.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceBetween) {
                         Surface(shape = CircleShape, color = action.tint, modifier = Modifier.size(60.dp)) { Box(contentAlignment = Alignment.Center) { Image(saharaImage(action.art, 46.dp), null, Modifier.size(46.dp), contentScale = ContentScale.Fit) } }
-                        Text(action.label, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                        Text(action.label, fontSize = cappedLabelSize(12f), fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, softWrap = false, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                     }
                 }
             }

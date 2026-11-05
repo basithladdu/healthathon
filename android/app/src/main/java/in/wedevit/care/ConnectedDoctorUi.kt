@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -63,6 +64,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
     val initialPlanner = remember(userId) { runCatching { planner.visits() to planner.requests() } }
     val scope = rememberCoroutineScope()
     val realPeople by vm.people.collectAsStateWithLifecycle()
+    var signingOut by remember { mutableStateOf(false) }
     var dataset by remember { mutableStateOf<ConnectedDoctorDataset?>(null) }
     var loaded by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf(false) }
@@ -245,11 +247,13 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                     item { ConnectedCard(t("Your account", "आपका खाता")) { Text(email, style = MaterialTheme.typography.titleLarge); Button(onClick = onAccount) { Text(t("Manage account", "खाता संभालें")) } } }
                     item { OutlinedButton(onClick = ::openShared, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Shared care", "साझा देखभाल")) } }
                     item { TextButton(onClick = onExit) { Text(t("Back to Sahara", "सहारा पर वापस")) } }
+                    item { OutlinedButton(onClick = { signingOut = true }, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, MaterialTheme.colorScheme.error), colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("account-sign-out")) { Icon(Icons.AutoMirrored.Filled.Logout, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(t("Sign out", "साइन आउट करें"), fontWeight = FontWeight.SemiBold) } }
                 }
             }
         }
     }
     schedulePatient?.let { selected -> val patients = dataset?.patients.orEmpty(); if (patients.isNotEmpty()) DemoAppointmentEditor(patients.map { it.card() }, selected, editingVisit, LocalDate.now(), onDismiss = { schedulePatient = null; editingVisit = null }, onSave = { visit -> localVisits = localVisits.filterNot { it.id == visit.id } + visit; schedulePatient = null; editingVisit = null; null }) }
+    if (signingOut) AlertDialog(onDismissRequest = { signingOut = false }, title = { Text(t("Sign out?", "साइन आउट करें?")) }, confirmButton = { TextButton(onClick = { signingOut = false; vm.stopRecording(); scope.launch { cloud.signOut() } }, modifier = Modifier.testTag("account-sign-out-confirm")) { Text(t("Sign out", "साइन आउट करें")) } }, dismissButton = { TextButton(onClick = { signingOut = false }) { Text(t("Cancel", "रद्द करें")) } })
     if(requestsOpen) ModalBottomSheet(onDismissRequest = {requestsOpen=false},containerColor=Cream) {
         LazyColumn(Modifier.fillMaxWidth(),contentPadding=PaddingValues(20.dp),verticalArrangement=Arrangement.spacedBy(14.dp)) {
             item {Text(t("Requests", "अनुरोध"),style=MaterialTheme.typography.headlineSmall)}

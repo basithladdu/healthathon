@@ -4,7 +4,6 @@ package `in`.wedevit.care
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,13 +12,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Groups
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -62,46 +59,29 @@ internal object CareCommunitySample {
             IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) }
             Spacer(Modifier.width(4.dp))
             Heading(t("Community", "समुदाय"), 26)
-        } }
-        // The sample label stays at the top so nobody takes these for real people.
-        item { Surface(shape = RoundedCornerShape(50), color = SaharaSoftGold, contentColor = DoctorCardInk, modifier = Modifier.testTag("community-sample-label")) {
-            Row(Modifier.padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Outlined.Info, null, Modifier.size(16.dp), tint = RustText); Spacer(Modifier.width(6.dp))
-                Text(t("Sample", "नमूना"), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
+            Spacer(Modifier.weight(1f))
+            // Small tag so nobody takes the sample groups for real ones.
+            Surface(shape = RoundedCornerShape(50), color = SaharaSoftGold, contentColor = DoctorCardInk, modifier = Modifier.testTag("community-sample-label")) {
+                Text(t("Sample", "नमूना"), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         } }
-        item { Column { Spacer(Modifier.height(8.dp)); SectionTitle(t("Support groups", "सहायता समूह")) } }
-        // One surface with dividers: a coloured badge per group, the name, who it is for, and Join on the right.
-        item { Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Column {
-            CareCommunitySample.groups.forEachIndexed { index, group ->
-                val asked = group.id in tapped
-                if (index > 0) HorizontalDivider(Modifier.padding(horizontal = 16.dp), color = DoctorHairline)
+        // One card per group: icon, name, one line of who it is for, and one action.
+        items(CareCommunitySample.groups, key = { it.id }) { group ->
+            val asked = group.id in tapped
+            Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
                 Row(Modifier.fillMaxWidth().padding(16.dp).a11yCard(), verticalAlignment = Alignment.CenterVertically) {
                     Surface(shape = CircleShape, color = group.color, contentColor = DoctorCardInk, modifier = Modifier.size(40.dp)) {
                         Box(contentAlignment = Alignment.Center) { Icon(Icons.Default.Groups, null, Modifier.size(22.dp)) }
                     }
                     Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f)) {
-                        Text(t(group.name, group.nameHindi), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 17.sp, color = DoctorCardInk)
-                        Text(t(group.forWhom, group.forWhomHindi), fontSize = 14.sp, color = DoctorCardSub)
+                        Text(t(group.name, group.nameHindi), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 17.sp, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(t(group.forWhom, group.forWhomHindi), fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                     Spacer(Modifier.width(8.dp))
-                    if (asked) OutlinedButton(onClick = {}, enabled = false, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("community-join-${group.id}")) { Text(t("Coming soon", "जल्द आ रहा है")) }
-                    else OutlinedButton(onClick = { tapped = tapped + group.id }, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("community-join-${group.id}")) { Text(t("Join", "जुड़ें"), color = RustText, fontWeight = FontWeight.SemiBold) }
+                    if (asked) OutlinedButton(onClick = {}, enabled = false, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("community-join-${group.id}")) { Text(t("Coming soon", "जल्द आ रहा है"), maxLines = 1, overflow = TextOverflow.Ellipsis) }
+                    else OutlinedButton(onClick = { tapped = tapped + group.id }, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("community-join-${group.id}")) { Text(t("Join", "जुड़ें"), color = RustText, fontWeight = FontWeight.SemiBold, maxLines = 1) }
                 }
-            }
-        } } }
-        item { Column { Spacer(Modifier.height(8.dp)); SectionTitle(t("Discussions", "बातचीत")) } }
-        items(CareCommunitySample.posts, key = { "${it.groupId}:${it.author}" }) { post ->
-            val group = CareCommunitySample.groups.first { it.id == post.groupId }
-            SurfaceCard {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(Modifier.size(10.dp).clip(CircleShape).background(group.color)); Spacer(Modifier.width(8.dp))
-                    Text(t(post.author, post.authorHindi), Modifier.weight(1f), fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
-                    Surface(shape = RoundedCornerShape(50), color = group.color, contentColor = DoctorCardInk) { Text(t(group.name, group.nameHindi), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), style = MaterialTheme.typography.labelMedium, maxLines = 1, overflow = TextOverflow.Ellipsis) }
-                }
-                Spacer(Modifier.height(8.dp))
-                Text(t(post.text, post.textHindi), fontSize = 16.sp, lineHeight = 23.sp, color = DoctorCardInk)
             }
         }
     }

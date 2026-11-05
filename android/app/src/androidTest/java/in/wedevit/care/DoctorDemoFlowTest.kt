@@ -165,7 +165,7 @@ class DoctorDemoFlowTest {
             screenshot("doctor-demo-schedule")
             ui.onNodeWithTag("demo-nav-Account").performClick()
             screenshot("doctor-account")
-            ui.onNodeWithTag("demo-exit").performScrollTo().performClick()
+            ui.onNodeWithTag("demo-exit").performScrollTo().performClick(); ui.onNodeWithTag("account-sign-out-confirm").performClick()
             ui.runOnIdle { assertTrue(exited.value) }
             assertEquals(before, account.all)
         } finally {

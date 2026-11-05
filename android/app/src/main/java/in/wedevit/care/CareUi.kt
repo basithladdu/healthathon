@@ -226,7 +226,7 @@ private val CareSurfaceHigh = Color(0xFFF1E9DE)
             Image(saharaImage(R.drawable.sahara_professional_logo, 44.dp), null, Modifier.size(44.dp), contentScale = ContentScale.Fit)
             Spacer(Modifier.width(4.dp))
             Column(Modifier.weight(1f).padding(vertical = 8.dp, horizontal = 2.dp)) {
-                    Text(androidx.compose.ui.res.stringResource(R.string.app_name), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 22.sp, color = Ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(androidx.compose.ui.res.stringResource(R.string.app_name), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 22.sp, lineHeight = 28.sp, color = Ink, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis)
             }
             // The one language choice, on the header of every family-side screen (welcome and sign-in included).
             CareLanguageMenu(compact = compactWelcomeHeader || person != null)
@@ -640,7 +640,6 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             if (!doctorCapture) item { Column { ConversationStepper(topStep); val subLabel = ConversationPages.subLabel(topStep, subPage, careHindi()); if (subLabel.isNotBlank()) Text(subLabel, fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(top = 4.dp).testTag("conversation-substep")) } }
             when (step) {
                 0 -> {
-                    item { GoalsScreeningHelper(draft.personId) }
                     if (attendeeScope.isBlank()) item { Text(t("Choose a person first.", "पहले व्यक्ति चुनें।"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub) }
                     else item {
                         val doctorLabel = listOf(session?.email?.substringBefore('@')?.trim().orEmpty(), if (doctorPresentation) DoctorDemoData.doctorName else "", doctor.trim()).firstOrNull { it.isNotBlank() && !it.equals("Doctor", true) } ?: "Clinician"

@@ -56,7 +56,7 @@ import androidx.compose.ui.unit.sp
                     Box(Modifier.size(width = 56.dp, height = 30.dp).clip(RoundedCornerShape(50)).background(pill), contentAlignment = Alignment.Center) {
                         Icon(icons[index], null, Modifier.size(22.dp), tint = if (active) RustText else MaterialTheme.colorScheme.onSurfaceVariant)
                     }
-                    Spacer(Modifier.height(4.dp)); Text(label, fontSize = cappedLabelSize(12f), fontWeight = if (active) FontWeight.Bold else FontWeight.Medium, color = if (active) Ink else DoctorCardSub, maxLines = 1)
+                    Spacer(Modifier.height(4.dp)); Text(label, fontSize = cappedLabelSize(12f), fontWeight = if (active) FontWeight.Bold else FontWeight.Medium, color = if (active) Ink else DoctorCardSub, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis)
                 }
             }
         }
@@ -142,7 +142,7 @@ import androidx.compose.ui.unit.sp
     var expanded by remember { mutableStateOf(false) }; val t = careText()
     LaunchedEffect(enabled) { if (!enabled) expanded = false }
     Box {
-        TextButton(onClick = { expanded = true }, enabled = enabled, modifier = Modifier.heightIn(min = 48.dp).widthIn(max = 180.dp).testTag("selected-care-profile").semantics { contentDescription = t("Switch care profile, $name", "देखभाल प्रोफ़ाइल बदलें, $name") },
+        TextButton(onClick = { expanded = true }, enabled = enabled, modifier = Modifier.heightIn(min = 48.dp).widthIn(max = 130.dp).testTag("selected-care-profile").semantics { contentDescription = t("Switch care profile, $name", "देखभाल प्रोफ़ाइल बदलें, $name") },
             shape = RoundedCornerShape(50), contentPadding = PaddingValues(start = 6.dp, end = 10.dp, top = 6.dp, bottom = 6.dp),
             colors = ButtonDefaults.textButtonColors(containerColor = SaharaApricot, contentColor = RustText, disabledContainerColor = SaharaApricot.copy(alpha = .5f))) {
             Box(Modifier.size(28.dp).clip(CircleShape).background(Paper), contentAlignment = Alignment.Center) {

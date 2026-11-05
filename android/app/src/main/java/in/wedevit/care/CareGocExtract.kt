@@ -794,16 +794,17 @@ object GocForm {
             tk(amd != null, Bi("There is a valid written Advance Medical Directive / living will. Executed on ____. Location of original: ____", "वैध लिखित एडवांस मेडिकल डायरेक्टिव / लिविंग विल है। कब बनी: ____। मूल कहाँ है: ____"), amd?.let { listOf(it.date, it.location).filter(String::isNotBlank).joinToString(" · ") }),
             tk(amd?.attestor?.contains("notary", true) == true, indent(Bi("Attested by Notary", "नोटरी ने सत्यापित किया"))),
             tk(amd?.attestor?.contains("gazett", true) == true, indent(Bi("Attested by Gazetted Officer", "राजपत्रित अधिकारी ने सत्यापित किया")), amd?.attestor?.takeIf { !it.contains("notary", true) && !it.contains("gazett", true) }),
-            tk(false, indent(Bi("With two witnesses? Yes / No. If yes, this ECTPR must be read as subordinate to it — the directive governs; this record operationalises it.", "दो गवाहों के साथ? हाँ / नहीं। अगर हाँ, तो यह ECTPR उसके अधीन है — डायरेक्टिव ही मान्य है; यह रिकॉर्ड उसे लागू करता है।"))),
+            tk(amd?.twoWitnesses == true, indent(Bi("With two witnesses? Yes. If yes, this ECTPR must be read as subordinate to it — the directive governs; this record operationalises it.", "दो गवाहों के साथ? हाँ। अगर हाँ, तो यह ECTPR उसके अधीन है — डायरेक्टिव ही मान्य है; यह रिकॉर्ड उसे लागू करता है।"))),
+            tk(amd?.twoWitnesses == false, indent(Bi("With two witnesses? No.", "दो गवाहों के साथ? नहीं।"))),
             tk(dir?.kind == DirectiveKind.PRIOR_WISHES, Bi("There is no directive, but the patient previously expressed clear wishes. Recorded here, with who heard them and when:", "कोई डायरेक्टिव नहीं, पर मरीज़ ने पहले साफ़ इच्छाएँ बताई थीं। यहाँ दर्ज, किसने और कब सुनीं:"), dir?.note?.takeIf { dir?.kind == DirectiveKind.PRIOR_WISHES }),
             tk(dir?.kind == DirectiveKind.NONE, Bi("No directive and no recorded prior wishes. Decisions will be made in the patient’s best interests through family consensus with the team.", "न डायरेक्टिव, न पहले की दर्ज इच्छाएँ। फ़ैसले मरीज़ के हित में, परिवार और टीम की सहमति से होंगे।")),
         )
-        // The plan stores only "knows the diagnosis": the prognosis box and "does not wish to know" stay empty, never guessed.
+        // Each box ticks only from its own recorded field; nothing is guessed.
         val knowsTicks = listOf(
-            tk(false, Bi("The patient knows the diagnosis and the prognosis.", "मरीज़ बीमारी और आगे क्या होगा, दोनों जानते हैं।")),
+            tk(v.knowsPrognosis, Bi("The patient knows the diagnosis and the prognosis.", "मरीज़ बीमारी और आगे क्या होगा, दोनों जानते हैं।")),
             tk(v.patientKnows == true, Bi("The patient knows the diagnosis but not the prognosis.", "मरीज़ बीमारी जानते हैं, पर आगे क्या होगा यह नहीं।")),
             tk(v.familyAskedNotToTell, Bi("The family has asked that the patient not be told. Discussed with the family that the patient may ask directly and will not be lied to. Family understands: Yes / Not yet resolved", "परिवार ने कहा कि मरीज़ को न बताया जाए। परिवार से बात हुई कि मरीज़ सीधे पूछ सकते हैं और उनसे झूठ नहीं बोला जाएगा। परिवार समझता है: हाँ / अभी तय नहीं"), v.directQuestionPlan.takeIf { v.familyAskedNotToTell }),
-            tk(false, Bi("The patient has said they do not wish to know details and has delegated:", "मरीज़ ने कहा कि वे विस्तार नहीं जानना चाहते और यह सौंपा:")),
+            tk(v.doesNotWishToKnow, Bi("The patient has said they do not wish to know details and has delegated:", "मरीज़ ने कहा कि वे विस्तार नहीं जानना चाहते और यह सौंपा:")),
         )
         val outcomes = v.unacceptableOutcomes.map(GocExtract::withoutSoundCaptions).map(String::trim).filter(String::isNotBlank)
         val other = outcomes.filter { o -> UNACCEPTABLE.none { same(o, it.en) || same(o, it.hi) } }
@@ -821,12 +822,11 @@ object GocForm {
             val filled = if (level == 1 && c.maxOxygenLpm != null) Bi(meaning.en.replace("____", "%.0f".format(c.maxOxygenLpm)), meaning.hi.replace("____", "%.0f".format(c.maxOxygenLpm)), meaning.pick(false).replace("____", "%.0f".format(c.maxOxygenLpm))) else meaning
             listOf(Bi.plain(level.toString()), Bi.join("\n", listOf(name, filled)), Bi.plain(box(ceiling == level)))
         })
-        val vp = c.vasopressors; val dy = c.dialysis; val ng = c.feeding.ng; val icu = c.icu
+        val vp = c.vasopressors; val dy = c.dialysis; val ng = c.feeding.ng
         val vasoTicks = listOf(tk(vp?.kind == VasopressorKind.NO, Bi("No", "नहीं")), tk(vp?.kind == VasopressorKind.TRIAL, Bi("Short trial only, up to ______ hours", "केवल छोटा ट्रायल, ______ घंटे तक"), trial(vp?.trial).takeIf { vp?.kind == VasopressorKind.TRIAL }),
             tk(vp?.kind == VasopressorKind.YES_NO_LIMIT, Bi("Yes, without a pre-set limit", "हाँ, बिना पहले से तय सीमा")), tk(vp?.kind == VasopressorKind.YES_MAX_AGENTS, Bi("Yes, but no escalation beyond ____ agents", "हाँ, पर ____ दवाओं से आगे नहीं"), vp?.maxAgents?.toString()?.takeIf { vp?.kind == VasopressorKind.YES_MAX_AGENTS }))
         val dialysisTicks = listOf(tk(dy?.kind == DialysisKind.NO, Bi("No", "नहीं")), tk(dy?.kind == DialysisKind.TRIAL, Bi("Trial of ______ sessions / days, then review", "______ सत्र / दिन का ट्रायल, फिर समीक्षा"), trial(dy?.trial).takeIf { dy?.kind == DialysisKind.TRIAL }),
             tk(dy?.kind == DialysisKind.YES, Bi("Yes", "हाँ")), tk(dy?.kind == DialysisKind.ONLY_IF_REVERSIBLE, Bi("Only if the renal failure is judged reversible", "केवल तब जब किडनी फ़ेल्योर ठीक होने वाला माना जाए")))
-        val icuTicks = listOf(tk(icu?.kind == IcuKind.YES, Bi("Yes", "हाँ")), tk(icu?.kind == IcuKind.TRIAL, Bi("Time-limited trial", "समय-सीमित ट्रायल"), trial(icu?.trial).takeIf { icu?.kind == IcuKind.TRIAL }), tk(icu?.kind == IcuKind.NO, Bi("No", "नहीं")))
         val ngTicks = listOf(tk(ng?.kind == NgKind.NO, Bi("No", "नहीं")), tk(ng?.kind == NgKind.UP_TO_DAYS, Bi("Yes, short-term only, up to ______ days, then review", "हाँ, थोड़े समय, ______ दिन तक, फिर समीक्षा"), ng?.days?.let { "$it days" }?.takeIf { ng?.kind == NgKind.UP_TO_DAYS }), tk(ng?.kind == NgKind.YES, Bi("Yes", "हाँ")))
         val pegTicks = listOf(tk(c.feeding.peg == PegFeeding.NO, Bi("No", "नहीं")), tk(c.feeding.peg == PegFeeding.ONLY_AFTER_PALLIATIVE_DISCUSSION, Bi("Only after discussion with the palliative care team", "केवल पैलिएटिव केयर टीम से बात के बाद")), tk(c.feeding.peg == PegFeeding.YES, Bi("Yes", "हाँ")))
         val goalTicks = listOf(
@@ -907,7 +907,7 @@ object GocForm {
                 GocFormGroup(Bi("Other parameters", "दूसरी बातें"), listOf(
                     decision(Bi("Dialysis or CRRT", "डायलिसिस या CRRT"), GocDecision.DIALYSIS, dialysisTicks),
                     field(Bi("Others", "अन्य"), null),
-                    decision(Bi("Requirement of ICU?", "ICU की ज़रूरत?"), GocDecision.ICU, icuTicks))),
+                    GocFormRow(Bi("Requirement of ICU?", "ICU की ज़रूरत?"), blank))),
                 GocFormGroup(Bi("If withdrawal and withholding of treatment has been decided (as per Common Cause v Union of India, 2018 and 2023)", "अगर इलाज रोकने और शुरू न करने का फ़ैसला हुआ है (कॉमन कॉज़ बनाम भारत संघ, 2018 और 2023 के अनुसार)"), listOf(
                     wField(Bi("Dates of constitution of the Primary and Secondary Boards", "प्राथमिक और द्वितीय बोर्ड बनने की तारीख़ें"), listOfNotNull(w?.primaryBoardDate, w?.secondaryBoardDate).filter(String::isNotBlank).joinToString(" · ")),
                     wField(Bi("Composition of the Boards", "बोर्ड के सदस्य"), listOfNotNull(w?.primaryBoardMembers, w?.secondaryBoardMembers).filter(String::isNotBlank).joinToString(" · ")),

@@ -63,7 +63,7 @@ class NativeMergeComponentsTest {
             ui.onNodeWithTag("demo-nav-Account").performClick()
             ui.onNodeWithTag("doctor-feedback-entry").performScrollTo().assertIsDisplayed()
             // Do not open the workspace's real guest-feedback preference scope.
-            ui.onNodeWithTag("demo-exit").performScrollTo().performClick()
+            ui.onNodeWithTag("demo-exit").performScrollTo().performClick(); ui.onNodeWithTag("account-sign-out-confirm").performClick()
             ui.runOnIdle { assertTrue(exited) }
         } finally {
             context.getSharedPreferences(scheduleNamespace, Context.MODE_PRIVATE).edit().clear().commit()

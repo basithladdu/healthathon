@@ -55,7 +55,9 @@ enum class Capacity { HAS, HAS_DELEGATED, FLUCTUATES, LACKS }
 enum class AuthorityBasis { NAMED_IN_AMD, NAMED_BY_PATIENT, NEXT_OF_KIN, COURT_APPOINTED }
 enum class IdType { AADHAAR, VOTER_ID, PAN, PASSPORT, DRIVING_LICENCE, RATION_CARD, OTHER }
 enum class DirectiveKind { VALID_AMD, PRIOR_WISHES, NONE }
-data class ExistingDirective(val kind: DirectiveKind, val date: String = "", val location: String = "", val attestor: String = "", val note: String = "")
+data class ExistingDirective(val kind: DirectiveKind, val date: String = "", val location: String = "", val attestor: String = "", val note: String = "",
+    /** The directive was signed before two witnesses (true), or not (false). Null when not recorded. */
+    val twoWitnesses: Boolean? = null)
 enum class ImplantedDevice { NONE, PACEMAKER, ICD, CRT_D, OTHER }
 enum class IcdDecision { DEACTIVATE, KEEP }
 
@@ -84,7 +86,11 @@ data class PrognosticUnderstanding(val confirmed: Boolean = false, val confirmed
 data class SurrogateDeclaration(val answeringAsSurrogate: Boolean = false, val confirmed: Boolean = false, val confirmedOn: String = "")
 enum class KnowsRecordedWhen { BEFORE_COUNSELLING, AFTER_COUNSELLING }
 data class PlanValues(val patientKnows: Boolean? = null, val ownWords: String = "", val unacceptableOutcomes: List<String> = emptyList(), val familyAskedNotToTell: Boolean = false,
-    val directQuestionPlan: String = "", val financialConcernDiscussed: Boolean? = null, val socialWorkReferral: Boolean? = null, val knowsRecordedWhen: KnowsRecordedWhen? = null)
+    val directQuestionPlan: String = "", val financialConcernDiscussed: Boolean? = null, val socialWorkReferral: Boolean? = null, val knowsRecordedWhen: KnowsRecordedWhen? = null,
+    /** The patient knows the diagnosis and the prognosis (legal form 5.3). */
+    val knowsPrognosis: Boolean = false,
+    /** The patient does not wish to know details and has delegated (legal form 5.3). */
+    val doesNotWishToKnow: Boolean = false)
 data class DnacprDecidedBy(val name: String = "", val registrationNo: String = "", val decidedAt: String = "")
 data class CeilingConditions(val reversibleCauseException: Boolean? = null, val nivMaxHours: Int? = null, val spo2Floor: Int? = null, val homeNivReason: String = "")
 /** Comfort feeding by mouth is always on (L9); it is stored so the record says so explicitly. */
@@ -774,14 +780,15 @@ object PlanJson {
                 .put("icdDeactivation", JSONObject().n("decision", r.clinical.icdDeactivation.decision?.name).put("date", r.clinical.icdDeactivation.date)).put("keyMedicines", r.clinical.keyMedicines).put("eligibilityDate", r.clinical.eligibilityDate))
             .put("capacity", JSONObject().n("status", r.capacity.status?.name).put("assessor", r.capacity.assessor).put("assessedOn", r.capacity.assessedOn).put("basis", r.capacity.basis).put("reassessOn", r.capacity.reassessOn))
             .n("existingDirective", r.existingDirective?.let { d -> when (d.kind) {
-                DirectiveKind.VALID_AMD -> kind("VALID_AMD").put("date", d.date).put("location", d.location).put("attestor", d.attestor)
+                DirectiveKind.VALID_AMD -> kind("VALID_AMD").put("date", d.date).put("location", d.location).put("attestor", d.attestor).n("twoWitnesses", d.twoWitnesses)
                 DirectiveKind.PRIOR_WISHES -> kind("PRIOR_WISHES").put("note", d.note)
                 DirectiveKind.NONE -> kind("NONE")
             } })
             .put("prognosticUnderstanding", JSONObject().put("confirmed", r.prognosticUnderstanding.confirmed).put("confirmedBy", r.prognosticUnderstanding.confirmedBy).put("confirmedOn", r.prognosticUnderstanding.confirmedOn))
             .put("surrogateDeclaration", JSONObject().put("answeringAsSurrogate", r.surrogateDeclaration.answeringAsSurrogate).put("confirmed", r.surrogateDeclaration.confirmed).put("confirmedOn", r.surrogateDeclaration.confirmedOn))
             .put("values", JSONObject().n("patientKnows", r.values.patientKnows).put("ownWords", r.values.ownWords).put("unacceptableOutcomes", arr(r.values.unacceptableOutcomes)).put("familyAskedNotToTell", r.values.familyAskedNotToTell)
-                .put("directQuestionPlan", r.values.directQuestionPlan).n("financialConcernDiscussed", r.values.financialConcernDiscussed).n("socialWorkReferral", r.values.socialWorkReferral).n("knowsRecordedWhen", r.values.knowsRecordedWhen?.name))
+                .put("directQuestionPlan", r.values.directQuestionPlan).n("financialConcernDiscussed", r.values.financialConcernDiscussed).n("socialWorkReferral", r.values.socialWorkReferral).n("knowsRecordedWhen", r.values.knowsRecordedWhen?.name)
+                .put("knowsPrognosis", r.values.knowsPrognosis).put("doesNotWishToKnow", r.values.doesNotWishToKnow))
             .put("choices", JSONObject().n("goalOfCare", c.goalOfCare?.name).n("cpr", c.cpr?.name).n("dnacprReason", c.dnacprReason?.name).put("dnacprDiscussedWith", c.dnacprDiscussedWith)
                 .n("dnacprDecidedBy", c.dnacprDecidedBy?.let { JSONObject().put("name", it.name).put("registrationNo", it.registrationNo).put("decidedAt", it.decidedAt) })
                 .put("cprConflictReason", c.cprConflictReason)
@@ -814,10 +821,11 @@ object PlanJson {
             decisionMakers = DecisionMakers(dm(dms.o("primary")), dm(dms.o("alternate")), dms.strings("familyToInform"), dms.s("familyConsensusNote"), dms.strings("presentAtDiscussion"), dms.strings("attemptedContact")),
             clinical = ClinicalDetails(cl.s("diagnosis"), cl.s("stage"), cl.ni("ecog"), cl.s("allergies"), cl.e<ImplantedDevice>("implantedDevice"), IcdDeactivation(icd.e<IcdDecision>("decision"), icd.s("date")), cl.s("keyMedicines"), cl.s("eligibilityDate")),
             capacity = CapacityAssessment(cap.e<Capacity>("status"), cap.s("assessor"), cap.s("assessedOn"), cap.s("basis"), cap.s("reassessOn")),
-            existingDirective = j.o("existingDirective")?.let { d -> d.e<DirectiveKind>("kind")?.let { ExistingDirective(it, d.s("date"), d.s("location"), d.s("attestor"), d.s("note")) } },
+            existingDirective = j.o("existingDirective")?.let { d -> d.e<DirectiveKind>("kind")?.let { ExistingDirective(it, d.s("date"), d.s("location"), d.s("attestor"), d.s("note"), d.nb("twoWitnesses")) } },
             prognosticUnderstanding = PrognosticUnderstanding(pu.optBoolean("confirmed"), pu.s("confirmedBy"), pu.s("confirmedOn")),
             surrogateDeclaration = SurrogateDeclaration(sd.optBoolean("answeringAsSurrogate"), sd.optBoolean("confirmed"), sd.s("confirmedOn")),
-            values = PlanValues(v.nb("patientKnows"), v.s("ownWords"), v.strings("unacceptableOutcomes"), v.optBoolean("familyAskedNotToTell"), v.s("directQuestionPlan"), v.nb("financialConcernDiscussed"), v.nb("socialWorkReferral"), v.e<KnowsRecordedWhen>("knowsRecordedWhen")),
+            values = PlanValues(v.nb("patientKnows"), v.s("ownWords"), v.strings("unacceptableOutcomes"), v.optBoolean("familyAskedNotToTell"), v.s("directQuestionPlan"), v.nb("financialConcernDiscussed"), v.nb("socialWorkReferral"), v.e<KnowsRecordedWhen>("knowsRecordedWhen"),
+                knowsPrognosis = v.optBoolean("knowsPrognosis"), doesNotWishToKnow = v.optBoolean("doesNotWishToKnow")),
             choices = PlanChoices(
                 goalOfCare = c.e<GoalOfCare>("goalOfCare"), cpr = c.e<Cpr>("cpr"), dnacprReason = c.e<DnacprReason>("dnacprReason"), dnacprDiscussedWith = c.s("dnacprDiscussedWith"),
                 dnacprDecidedBy = c.o("dnacprDecidedBy")?.let { DnacprDecidedBy(it.s("name"), it.s("registrationNo"), it.s("decidedAt")) }, cprConflictReason = c.s("cprConflictReason"),

@@ -31,7 +31,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Lock
@@ -222,6 +221,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
     val card = record
     val qr = remember(card?.text) { card?.text?.let { runCatching { EmergencyCardRules.qr(it) }.getOrNull() } }
     val linkQr = remember(card?.link?.token) { card?.link?.let { runCatching { EmergencyLinkQr.encode(it.url) }.getOrNull() } }
+    val readNote = source.goals?.let { g -> versions.firstOrNull { it.version == g.version && it.personId == selected } }
 
     fun keep(next: EmergencyCardRecord) { store.save(next); EmergencyCardPdf.create(store.pdf(next), next, EmergencyCardRules.qr(next.text)) }
     fun ensurePdf(c: EmergencyCardRecord): File = store.pdf(c).takeIf(File::isFile) ?: run { EmergencyCardPdf.create(store.pdf(c), c, EmergencyCardRules.qr(c.text)); store.pdf(c) }
@@ -298,15 +298,18 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
         finally { busy = false }
     }
 
+    // No card yet: make one now from the saved records (every part), so the QR shows at once. A tap retries if that failed.
+    LaunchedEffect(selected, ready, card == null) {
+        if (card == null && ready && selected.isNotBlank() && !busy) remake(EmergencySection.entries.toSet(), null)
+    }
     if (selected.isBlank()) return
     if (card == null || qr == null) {
-        ActionCard(Peach, modifier = Modifier.fillMaxWidth().testTag("emergency-card-entry"), onClick = { setup = true }) {
+        ActionCard(Peach, modifier = Modifier.fillMaxWidth().testTag("emergency-card-entry"), onClick = { if (ready && !busy) remake(EmergencySection.entries.toSet(), null) }) {
             Row(Modifier.fillMaxWidth().heightIn(min = 64.dp).padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.QrCode, null, Modifier.size(36.dp), tint = Rust); Spacer(Modifier.width(12.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(t("Emergency card", "आपातकालीन कार्ड"), fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Ink)
-                }
-                Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(19.dp))
+                Text(t("Emergency card", "आपातकालीन कार्ड"), fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Ink, modifier = Modifier.weight(1f))
+                if (!ready || busy) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp, color = Rust)
+                else Icon(Icons.Default.Refresh, null, Modifier.size(19.dp))
             }
         }
     } else {
@@ -315,12 +318,9 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
         val link = card.link
         Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = androidx.compose.foundation.BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("emergency-card")) {
             Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(t("Emergency card", "आपातकालीन कार्ड"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, modifier = Modifier.fillMaxWidth().a11yHeading())
-                QrImage(shownQr, if (link != null) t("Emergency web link QR code", "आपातकालीन वेब लिंक QR कोड") else t("Emergency card offline QR code", "आपातकालीन कार्ड ऑफ़लाइन QR कोड"), Modifier.fillMaxWidth(.86f).widthIn(max = 320.dp).border(2.dp, Ink).clickable(onClickLabel = t("Show full screen", "पूरी स्क्रीन पर दिखाएँ")) { fullScreen = true }.testTag("emergency-card-qr"))
-                Text(t("Card ${card.number} · ID ${card.id} · made ${cardDay(card.madeAt)}", "कार्ड ${card.number} · ID ${card.id} · बना ${cardDay(card.madeAt)}"), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Ink, textAlign = TextAlign.Center)
-                if (link != null) {
-                    linkStatus?.takeIf { it.live }?.let { s -> Text(if (s.views == 0) t("Not opened yet", "अभी तक नहीं खोला गया") else { val views = s.views; val last = s.lastViewedAt?.let { val day = cardDay(it); t(", last on $day", ", आख़िरी बार $day") }.orEmpty(); if (views == 1) t("Opened once$last", "एक बार खोला गया$last") else t("Opened $views times$last", "$views बार खोला गया$last") }, fontSize = 14.sp, color = DoctorCardSub) }
-                }
+                QrImage(shownQr, if (link != null) t("Emergency web link QR code", "आपातकालीन वेब लिंक QR कोड") else t("Emergency card offline QR code", "आपातकालीन कार्ड ऑफ़लाइन QR कोड"), Modifier.fillMaxWidth().widthIn(max = 340.dp).clickable(onClickLabel = t("Show full screen", "पूरी स्क्रीन पर दिखाएँ")) { fullScreen = true }.testTag("emergency-card-qr"))
+                if (name.isNotBlank()) Text(name, fontWeight = FontWeight.Bold, fontSize = 22.sp, color = Ink, textAlign = TextAlign.Center, modifier = Modifier.testTag("emergency-card-name"))
+                Text(t("Scan in an emergency", "आपातकाल में स्कैन करें"), fontSize = 16.sp, color = DoctorCardSub, textAlign = TextAlign.Center)
                 val problem = linkProblem
                 if (linkBusy) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = Rust)
                 else if (problem != null) Column(Modifier.fillMaxWidth().background(DoctorStatusWarnBg, RoundedCornerShape(14.dp)).padding(12.dp).testTag("emergency-link-problem")) {
@@ -336,22 +336,13 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
                     }, enabled = !linkBusy, modifier = Modifier.heightIn(min = 48.dp)) { Text(if (problem == EmergencyLinkProblem.LINK_OFF) t("Make a new link", "नया लिंक बनाएँ") else t("Try again", "फिर कोशिश करें")) }
                 }
                 if (stale) Column(Modifier.fillMaxWidth().background(DoctorStatusWarnBg, RoundedCornerShape(14.dp)).padding(12.dp).testTag("emergency-card-stale")) {
-                    Text(t("Card out of date", "कार्ड पुराना है"), fontSize = 14.sp, color = DoctorStatusWarn)
                     TextButton(onClick = { remake(card.sections, card) }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp).testTag("emergency-card-update")) { Text(t("Update card", "कार्ड अपडेट करें")) }
-                }
-                source.goals?.let { g -> versions.firstOrNull { it.version == g.version && it.personId == selected } }?.takeIf { EmergencySection.GOALS in card.sections }?.let { note ->
-                    OutlinedButton(onClick = { onRead(note) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("emergency-card-note")) { Icon(Icons.Default.Description, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Read note", "नोट पढ़ें")) }
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(onClick = { share(card) }, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("emergency-card-share")) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Share", "साझा करें")) }
-                    OutlinedButton(onClick = { print(card) }, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("emergency-card-print")) { Icon(Icons.Default.Print, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Print", "प्रिंट")) }
+                    OutlinedButton(onClick = { print(card) }, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("emergency-card-print")) { Icon(Icons.Default.Print, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Print / Save", "प्रिंट / सहेजें")) }
                 }
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(onClick = { savePdf.launch("Sahara-emergency-card-${card.number}.pdf") }, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("emergency-card-save")) { Icon(Icons.Default.FileDownload, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Save PDF", "PDF सहेजें")) }
-                    OutlinedButton(onClick = { lockFor = "" }, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("emergency-card-lock")) { Icon(Icons.Default.Lock, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Locked PDF", "लॉक PDF")) }
-                }
-                OutlinedButton(onClick = { setup = true }, enabled = !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("emergency-card-replace")) { Icon(Icons.Default.Refresh, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Edit card", "कार्ड बदलें")) }
-                if (link != null && blocked == null) TextButton(onClick = { confirmNewLink = true }, enabled = !linkBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("emergency-link-replace")) { Text(t("Replace link", "लिंक बदलें"), color = RustText) }
+                TextButton(onClick = { setup = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp).testTag("emergency-card-replace")) { Text(t("Edit", "बदलें")) }
             }
         }
         if (fullScreen) EmergencyQrFullScreen(linkQr, qr, card) { fullScreen = false }
@@ -371,7 +362,18 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
             dismissButton = { TextButton(onClick = { confirmNewLink = false }) { Text(t("Cancel", "रद्द करें")) } })
         lockFor?.let { _ -> PdfPasswordDialog(onDismiss = { lockFor = null }, onSave = { password -> lockFor = password; saveLocked.launch("Sahara-emergency-card-${card.number}-locked.pdf") }, onShare = { password -> lockFor = null; share(card, password) }) }
     }
-    if (setup) EmergencyCardSetup(source, name, ready && !busy, card, blocked, onDismiss = { setup = false }) { sections -> remake(sections, card) }
+    if (setup) EmergencyCardSetup(source, name, ready && !busy, card, blocked, onDismiss = { setup = false }, onMake = { sections -> remake(sections, card) }) {
+        val c = card
+        if (c != null) Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (c.link != null) linkStatus?.takeIf { it.live }?.let { s -> Text(if (s.views == 0) t("Not opened yet", "अभी तक नहीं खोला गया") else { val views = s.views; val last = s.lastViewedAt?.let { val day = cardDay(it); t(", last on $day", ", आख़िरी बार $day") }.orEmpty(); if (views == 1) t("Opened once$last", "एक बार खोला गया$last") else t("Opened $views times$last", "$views बार खोला गया$last") }, fontSize = 14.sp, color = DoctorCardSub) }
+            readNote?.takeIf { EmergencySection.GOALS in c.sections }?.let { note ->
+                OutlinedButton(onClick = { setup = false; onRead(note) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("emergency-card-note")) { Icon(Icons.Default.Description, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Read note", "नोट पढ़ें")) }
+            }
+            OutlinedButton(onClick = { setup = false; savePdf.launch("Sahara-emergency-card-${c.number}.pdf") }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("emergency-card-save")) { Icon(Icons.Default.FileDownload, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Save PDF", "PDF सहेजें")) }
+            OutlinedButton(onClick = { setup = false; lockFor = "" }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("emergency-card-lock")) { Icon(Icons.Default.Lock, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Locked PDF", "लॉक PDF")) }
+            if (c.link != null && blocked == null) TextButton(onClick = { setup = false; confirmNewLink = true }, enabled = !linkBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("emergency-link-replace")) { Text(t("Replace link", "लिंक बदलें"), color = RustText) }
+        }
+    }
 }
 
 @Composable private fun PdfPasswordDialog(onDismiss: () -> Unit, onSave: (String) -> Unit, onShare: (String) -> Unit) {
@@ -411,14 +413,13 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Composable private fun EmergencyCardSetup(source: EmergencySource, name: String, ready: Boolean, previous: EmergencyCardRecord?, blocked: EmergencyLinkProblem?, onDismiss: () -> Unit, onMake: (Set<EmergencySection>) -> Unit) {
+@Composable private fun EmergencyCardSetup(source: EmergencySource, name: String, ready: Boolean, previous: EmergencyCardRecord?, blocked: EmergencyLinkProblem?, onDismiss: () -> Unit, onMake: (Set<EmergencySection>) -> Unit, extras: @Composable () -> Unit = {}) {
     var chosen by rememberSaveable { mutableStateOf(previous?.sections?.map { it.name }.orEmpty()) }; val t = careText()
     val sections = chosen.mapNotNull { s -> EmergencySection.entries.firstOrNull { it.name == s } }.toSet()
     val preview = remember(source, sections, previous) { if (sections.isEmpty()) null else runCatching { EmergencyCardRules.build(source, sections, (previous?.number ?: 0) + 1, "NEW", System.currentTimeMillis()) }.getOrNull() }
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         LazyColumn(Modifier.fillMaxWidth().testTag("emergency-card-setup"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item { Heading(if (previous == null) t("Emergency card", "आपातकालीन कार्ड") else t("Edit card", "कार्ड बदलें"), 26) }
-            item { Text(t("Anyone who scans can see this.", "स्कैन करने वाला इसे देख सकता है।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub) }
             item {
                 val goals = source.goals
                 EmergencySection.entries.forEach { section ->
@@ -437,6 +438,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
                 if (preview.leftOut.isNotEmpty()) Text(t("Left out: ", "छोड़ा गया: ") + preview.leftOut.joinToString("; "), style = MaterialTheme.typography.bodySmall, color = RustText)
             } }
             item { Button(onClick = { onMake(sections) }, enabled = ready && preview != null, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("emergency-card-make")) { Text(if (!ready) t("Loading…", "लोड हो रहा है…") else if (sections.isEmpty()) t("Choose what to include", "क्या शामिल करें चुनें") else if (previous == null) t("Make card", "कार्ड बनाएँ") else t("Save", "सहेजें")) } }
+            item { extras() }
         }
     }
 }

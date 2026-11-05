@@ -6,6 +6,27 @@ Agents cannot do these: server migrations, deployments, provider accounts and ke
 
 Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. The web survey and Android feature work have separate handoffs; these are the remaining owner/team actions. Tick an item only after the external step is verified.
 
+### Sahara: 5 Nov 2026 (evening): removed or changed, ask the team whether to bring any back
+Goals of care must follow Rituparna's legal form (`source-materials/team-context/legal-review-2026-10-31/`). Anything not in it was hidden, not deleted:
+- [ ] **Screening helper (surprise question + ECOG 0-5)** at the start of the doctor's goals-of-care flow: hidden (`CareUi.kt`, the `GoalsScreeningHelper` item). It came from the 28 Oct meeting, not the legal form. The code is still in `GoalsScreening.kt`. Bring back?
+- [ ] **ICU "Yes / Time-limited trial / No" ticks** on the form: removed, because the legal form has only the label "Requirement of ICU?". The app still records the ICU choice; it is just not printed on the form. Print it as text?
+- [ ] **Community "Discussions" posts** (sample posts): removed from the screen; only support groups show. Data still in `CareCommunitySample.posts`.
+- [ ] **Emergency card** now makes itself automatically with all four parts (name, goals of care, contacts, medicines), with no ticking first. Should goals of care be left off by default?
+- [ ] Earlier today: the pilot audit-log button, "Older practice records" and the doctor practice cards were removed from the screens (routes still exist).
+
+Legal form: still open for Rituparna / Dr. Sharada (the app can't decide these):
+- [ ] C1: the form says "Primary Oncologist". Is it for cancer only, or for other illnesses too?
+- [ ] C3: "Members present … relationship": does it cover live-in and queer partners? What wording?
+- [ ] C7: capacity-assessment guidance (an annexure?). Wording needed.
+- [ ] C8: is capacity checked before or after counselling?
+- [ ] C24: care-schedule and measures tracking is one free-text box. Is a structured schedule needed?
+- [ ] C31: should treatment withdrawal (Common Cause 2018/2023) be its own section?
+- [ ] New tick boxes ("two witnesses Yes/No", "knows diagnosis and prognosis", "has delegated") are on the form now, but there is no control in the app to tick them yet.
+
+Goals-of-care Gemini:
+- [ ] Gemini answered 503 "high demand" on 5 Nov. Fixed so a busy model falls through to the next one (flash-lite first, then flash) and to keys 2-5. Add `GEMINI_API_KEY_2`..`_5` in Vercel to make busy times rarer.
+- [ ] Vercel → Settings → Build and Deployment → Root Directory must be `prototype`, or a GitHub push deploys the repo root and the site shows 404.
+
 ### Sahara: status on 2 Nov 2026 (Awaiz)
 New since 1 Nov, all on GitHub main (`b3435d7`): patient profile in the shared record, doctor Schedule redesign, compact cards, point graphs, read aloud in the chosen language, about 100 more translations, force-dark off. Details in HANDOFF.md "2 Nov 2026". A development APK was shared for a real-phone test.
 

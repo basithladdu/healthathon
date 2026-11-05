@@ -28,6 +28,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -591,13 +592,16 @@ private val DoctorMist = Peach
     }
 }
 
-@Composable private fun DemoAccount(onExit: () -> Unit, onFeedback:()->Unit) { val t = careText();
+@Composable private fun DemoAccount(onExit: () -> Unit, onFeedback:()->Unit) { val t = careText(); var signingOut by remember { mutableStateOf(false) };
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         DoctorTitle(t("Account", "खाता"))
         DemoDoctorProfileCard()
         OutlinedButton(onClick = onFeedback, shape=RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-feedback-entry")) { Icon(Icons.Default.SentimentSatisfiedAlt,null); Spacer(Modifier.width(8.dp)); Text(t("Feedback", "राय")) }
-        OutlinedButton(onClick = onExit, shape=RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("demo-exit")) { Text(t("Sign out", "साइन आउट करें")) }
+        Column(Modifier.fillMaxWidth().testTag("account-sign-out")) {
+            OutlinedButton(onClick = { signingOut = true }, shape=RoundedCornerShape(14.dp), border = BorderStroke(1.dp, MaterialTheme.colorScheme.error), colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("demo-exit")) { Icon(Icons.AutoMirrored.Filled.Logout, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(t("Sign out", "साइन आउट करें"), fontWeight = FontWeight.SemiBold) }
+        }
     }
+    if (signingOut) AlertDialog(onDismissRequest = { signingOut = false }, title = { Text(t("Sign out?", "साइन आउट करें?")) }, confirmButton = { TextButton(onClick = { signingOut = false; onExit() }, modifier = Modifier.testTag("account-sign-out-confirm")) { Text(t("Sign out", "साइन आउट करें")) } }, dismissButton = { TextButton(onClick = { signingOut = false }) { Text(t("Cancel", "रद्द करें")) } })
 }
 
 

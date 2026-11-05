@@ -44,6 +44,9 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
+/** How many centres the Nearby list and its map show at first, and how many each "Show more" tap adds. */
+internal const val NEARBY_PAGE = 10
+
 /**
  * Nearby (3 Nov 2026 review): the map first, framed on the person's location when the phone shares it; one "Call 112" bar;
  * searchable state, district and service pickers; coloured service tags on each card; the source and fine print behind info icons.
@@ -71,6 +74,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
     val here = location.value
     // Closest first when the phone shares where it is, unless a district was chosen (its own order puts listed matches first).
     val visible = remember(filtered, here, district) { if (here != null && district.isBlank()) NearbyHelp.byDistance(filtered, here.first, here.second) else filtered }
+    // Only the first page is composed and drawn on the map; "Show more" adds a page. The page size resets when a filter changes.
+    var shown by rememberSaveable(search, service, state, district, layerKey) { mutableStateOf(NEARBY_PAGE) }
+    val listed = remember(visible, shown) { visible.take(shown) }
     val clear = { search = ""; service = NearbyHelp.ALL_SERVICES; state = NearbyHelp.ALL_INDIA; district = ""; layerKey = allLayers }
     val filtersOn = search.isNotBlank() || service != NearbyHelp.ALL_SERVICES || state != NearbyHelp.ALL_INDIA || district.isNotBlank() || layerKey != allLayers
     LazyColumn(Modifier.fillMaxSize().testTag("nearby-list"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -86,7 +92,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                     }
                     NearbyInfoButton(t("About this list", "इस सूची के बारे में"), Modifier.testTag("nearby-about")) {
                         Text(t("Directory listings. Call to confirm services, availability and cost.", "यह सूची से ली गई जानकारी है। सेवा, उपलब्धता और ख़र्च फ़ोन करके पक्का करें।"))
-                        val coverage = CentreLocation.coverage(visible)
+                        val coverage = CentreLocation.coverage(listed)
                         if (coverage.approximate > 0) Text(t("Approximate locations © GeoNames (CC BY 4.0)", "अनुमानित जगहें © GeoNames (CC BY 4.0)"), style = MaterialTheme.typography.labelSmall)
                     }
                 }
@@ -96,8 +102,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
             }
         } }
         // The map comes first. When nothing in the results has a map spot, the list below still has Directions.
-        if (visible.any { it.latitude != null && it.longitude != null }) item(key = "nearby-map") {
-            Column(Modifier.clip(RoundedCornerShape(20.dp))) { CentreMap(visible, userLocation = here, height = 300.dp, onLocate = location.ask) { chosen = it } }
+        if (listed.any { it.latitude != null && it.longitude != null }) item(key = "nearby-map") {
+            Column(Modifier.clip(RoundedCornerShape(20.dp))) { CentreMap(listed, userLocation = here, height = 300.dp, onLocate = location.ask) { chosen = it } }
         }
         item(key = "nearby-call") { NearbyCallBar() }
         item { OutlinedTextField(value = search, onValueChange = { search = it }, placeholder = { Text(t("Name, place, state or PIN", "नाम, जगह, राज्य या पिन")) }, leadingIcon = { Icon(Icons.Default.Search, null) }, trailingIcon = { if (search.isNotEmpty()) IconButton(onClick = { search = "" }) { Icon(Icons.Default.Close, t("Clear search", "खोज मिटाएँ")) } }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp), singleLine = true,
@@ -124,7 +130,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                 if (filtersOn) OutlinedButton(onClick = clear, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Clear filters", "सभी चुनाव हटाएँ"), color = RustText) }
             }
         } }
-        items(visible, key = { it.id }) { c -> Box(Modifier.animateItem()) { NearbyCentreCard(c, here) } }
+        items(listed, key = { it.id }) { c -> Box(Modifier.animateItem()) { NearbyCentreCard(c, here) } }
+        if (visible.size > listed.size) item(key = "nearby-show-more") {
+            OutlinedButton(onClick = { shown += NEARBY_PAGE }, shape = RoundedCornerShape(14.dp), border = androidx.compose.foundation.BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("nearby-show-more")) {
+                Text(t("Show more", "और दिखाएँ"), color = RustText, fontWeight = FontWeight.SemiBold)
+            }
+        }
         if (vm != null) item(key = "nearby-suggest") {
             OutlinedButton(onClick = { suggesting = true }, shape = RoundedCornerShape(14.dp), border = androidx.compose.foundation.BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("nearby-suggest-centre")) {
                 Icon(Icons.Default.Add, null, Modifier.size(18.dp), tint = RustText); Spacer(Modifier.width(8.dp)); Text(t("Suggest a centre", "केंद्र सुझाएँ"), color = RustText)
