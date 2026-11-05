@@ -24,6 +24,9 @@ Legal form: still open for Rituparna / Dr. Sharada (the app can't decide these):
 - [ ] New tick boxes ("two witnesses Yes/No", "knows diagnosis and prognosis", "has delegated") are on the form now, but there is no control in the app to tick them yet.
 
 Goals-of-care Gemini:
+- [x] 5 Nov night, tested on Samsung A34: recorded mock talk → Gemini transcript with Doctor/Patient labels → Gemini filled the legal-form checklist (consent, family, CPR, ICU). Busy models (503) fall through to the next one.
+- [ ] Supabase save of the Gemini reading (`sahara_goc_analyses`, table exists) only happens when signed in; not yet seen working. First signed-in test: record a goals-of-care talk, then check the table in Supabase.
+- [ ] Testers: install fresh (uninstall older Sahara builds first; different signing key). APK: `C:\Users\basit\sahara-build\Sahara-2026-11-05-goc.apk`.
 - [ ] Gemini answered 503 "high demand" on 5 Nov. Fixed so a busy model falls through to the next one (flash-lite first, then flash) and to keys 2-5. Add `GEMINI_API_KEY_2`..`_5` in Vercel to make busy times rarer.
 - [ ] Vercel → Settings → Build and Deployment → Root Directory must be `prototype`, or a GitHub push deploys the repo root and the site shows 404.
 
