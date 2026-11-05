@@ -216,7 +216,7 @@ test('the key and model come from SAHARA_AI_API_KEY / SAHARA_AI_MODEL, with GEMI
 
 test('when Gemini stays busy the caller gets GocOnlineError with the finished lines, to go on-device', async () => {
   // Window 1 fine; window 2 busy on both models twice, plus the client's one wait.
-  const google = upstream({ gemini: ['ok', 429, 429, 429, 429, 429, 429, 429, 429] });
+  const google = upstream({ gemini: ['ok', 429, 429, 429, 429, 429, 429, 429, 429, 429, 429, 429, 429] });
   const handler = createGocTranscribeHandler(google.send, { SAHARA_AI_API_KEY: KEY }, noPause);
   await assert.rejects(runGocOnline(source(1300), {}, { http: httpFor(handler, google.send), pause: noPause }), (error) => {
     assert.ok(error instanceof GocOnlineError); assert.equal(error.code, 'provider_busy'); assert.equal(error.partial.length, 2);
@@ -226,7 +226,7 @@ test('when Gemini stays busy the caller gets GocOnlineError with the finished li
 });
 
 test('a Gemini failure or a missing key ends the online run without trying another service', async () => {
-  const google = upstream({ gemini: ['ok', 500, 500, 500, 500] });
+  const google = upstream({ gemini: ['ok', 500, 500, 500, 500, 500, 500] });
   const handler = createGocTranscribeHandler(google.send, { SAHARA_AI_API_KEY: KEY }, noPause);
   await assert.rejects(runGocOnline(source(1300), {}, { http: httpFor(handler, google.send), pause: noPause }), (error) => {
     assert.ok(error instanceof GocOnlineError); assert.equal(error.code, 'unavailable'); assert.equal(error.partial.length, 2); return true;

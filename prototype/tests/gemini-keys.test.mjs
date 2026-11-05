@@ -127,7 +127,7 @@ test('analyze reads the transcript with the first key that works, keeps only quo
   assert.ok(body.notDiscussed.includes('icu') && !body.notDiscussed.includes('cpr'));
   assert.equal(body.saved, true); assert.equal(body.requiresReview, true); assert.equal(body.id, '22222222-2222-4222-8222-222222222222');
   // A busy key-1 model falls through to the next model on key 1 before key 2 is tried.
-  assert.deepEqual(fake.calls.filter((c) => c.url.includes(':generateContent')).map((c) => c.key), ['an-k1', 'an-k1', 'an-k2', 'an-k4']);
+  assert.deepEqual(fake.calls.filter((c) => c.url.includes(':generateContent')).map((c) => c.key), ['an-k1', 'an-k1', 'an-k1', 'an-k2', 'an-k4']);
   const row = fake.saved[0];
   assert.equal(row.patient_ref, 'P1'); assert.equal(row.conversation_ref, 'c-1'); assert.equal(row.transcript.length, 3); assert.match(row.transcript_sha256, /^[a-f0-9]{64}$/u);
   assert.equal(row.suggestions[0].field, 'cpr'); assert.ok(row.model.startsWith('gemini-'));
