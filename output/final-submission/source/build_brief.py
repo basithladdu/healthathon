@@ -124,9 +124,9 @@ olds = list(l2.text_frame._txBody.findall(qn('a:p')))
 tB = olds[2]
 plan = [('keep', 0)]
 for head, rest in [
-    ('Weeks 1\u20132: ', 'Android app with check-ins, pain map, medicines and nearby palliative centres; hospital survey (live 27 Oct); \u201cAsk your documents\u201d with Gemini; emergency QR card.'),
-    ('Week 3: ', 'Dr Sharada\u2019s clinical specification became the emergency care plan and living will; Telugu, Urdu and Kannada; legal review of the goals-of-care form.'),
-    ('Week 4: ', 'doctor-led goals-of-care recording, Gemini transcription mapped word for word onto the legal form, drawn signatures and a locked PDF; doctor side (patients, schedule, symptom history); design polish.'),
+    ('Weeks 1\u20132 (9\u201322 Oct): ', 'native Android app on Google Play testing; nearby palliative centres map and national directory; medicines and prescription scan; symptom tracker and pain map.'),
+    ('Week 3 (23\u201329 Oct): ', 'hospital survey (live 27 Oct); \u201cAsk your documents\u201d with Gemini; Dr Sharada\u2019s clinical specification.'),
+    ('Week 4 (30 Oct\u20135 Nov): ', 'care plan, living will and emergency QR card; Telugu, Urdu and Kannada; legal review; doctor-led goals-of-care recording, Gemini transcription mapped word for word onto the legal form, drawn signatures and a locked PDF; doctor side.'),
     ('How it evolved: ', 'from Round 1\u2019s AI-drafted \u201cCare Note\u201d to a doctor-led discussion on a legally reviewed form, plus a daily companion for patients and families.'),
 ]:
     plan.append(('new', make_para(tB, [S(head, b=True), S(rest)], bullet=True, bullet_src=bullet_src, space_before=2)))
@@ -159,7 +159,7 @@ plan.append(('keep', 6))
 for head, rest in [
     ('Pilot: ', '60\u201390 days in a palliative-care clinic with our doctors, with a consent process under India\u2019s DPDP Act.'),
     ('Integration: ', 'works on its own; FHIR export ready for a later link to hospital records or CARE.'),
-    ('Cost (estimate): ', 'about \u20b94,000 a month hosting (Supabase and Vercel) plus a few rupees of Gemini per conversation; free for patients, paid by hospitals or NGOs per clinic.'),
+    ('Cost (estimate): ', 'hosting about \u20b93,900 a month (Supabase, Vercel); Gemini about \u20b92 per 30-minute conversation; about \u20b91,600 per clinic a month at 10 clinics. Free for patients; clinics or NGOs pay.'),
 ]:
     plan.append(('new', make_para(tS, [S(head, b=True), S(rest)], bullet=True, bullet_src=bullet_src, space_before=2)))
 plan.append(('new', make_para(tS, [S(' ')], size=4)))
