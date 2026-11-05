@@ -222,9 +222,11 @@ class GocGeminiHttpTransport(private val token: suspend () -> String) : GocGemin
         result!!
     }
     private suspend fun app(): Map<String, String> {
-        val access = try { token() } catch (error: CancellationException) { throw error } catch (_: Exception) { throw GocGeminiException("sign_in_required", "Sign in to Sahara first.") }
-        if (!access.matches(Regex("[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+")) || access.length > 16384) throw GocGeminiException("sign_in_required", "Sign in to Sahara first.")
-        return mapOf("X-Sahara-Client" to "android", "Authorization" to "Bearer $access", "apikey" to CareCloud.PUBLIC_API_KEY)
+        // Signed in: send the account token (results can be saved). Signed out or demo: the route allows the app by name, rate limited per phone.
+        val access = try { token() } catch (error: CancellationException) { throw error } catch (_: Exception) { "" }
+        val signedIn = access.matches(Regex("[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+")) && access.length <= 16384
+        return if (signedIn) mapOf("X-Sahara-Client" to "android", "Authorization" to "Bearer $access", "apikey" to CareCloud.PUBLIC_API_KEY)
+        else mapOf("X-Sahara-Client" to "android", "apikey" to CareCloud.PUBLIC_API_KEY)
     }
     /** The route answers {gemini: true, …}; the pipeline reads gocReady, as from the old function. */
     override suspend fun info(): Pair<Int, String> = call(GOC_ONLINE_ENDPOINT, "GET", null, app(), 15_000).let { (status, _, body) ->
@@ -444,7 +446,7 @@ internal class GocGeminiPipeline(private val transport: GocGeminiTransport, priv
 object GocGeminiAuth { @Volatile var token: (suspend () -> String)? = null }
 
 /** Whether the function has a Gemini key, and the consent line to show first. Not available when signed out or offline. */
-suspend fun gocOnlineEngines(transport: GocGeminiTransport? = GocGeminiAuth.token?.let { GocGeminiHttpTransport(it) }): GocOnlineEngines = try {
+suspend fun gocOnlineEngines(transport: GocGeminiTransport? = GocGeminiHttpTransport(GocGeminiAuth.token ?: { "" })): GocOnlineEngines = try {
     val (status, body) = transport?.info() ?: (0 to "{}")
     val ready = status == 200 && JSONObject(body).optBoolean("gocReady")
     GocOnlineEngines(ready, GocGeminiRules.consentLine(ready))
@@ -459,7 +461,7 @@ suspend fun geminiGocAvailable(): Boolean = gocOnlineEngines().gemini
  * Show [GocOnlineEngines.consentLine] ("Audio is sent to Google Gemini to transcribe.") and get consent before calling this.
  */
 suspend fun transcribeGocWithGemini(audio: File, lang: String?, patientId: String? = null, conversationId: String? = null, onProgress: (Float) -> Unit): GocGeminiResult {
-    val token = GocGeminiAuth.token ?: throw GocGeminiException("sign_in_required", "Sign in to Sahara first.")
+    val token = GocGeminiAuth.token ?: { "" }
     return transcribeGocWithGemini(audio, lang, GocGeminiHttpTransport(token), onProgress, patientId, conversationId)
 }
 

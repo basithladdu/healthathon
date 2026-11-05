@@ -65,7 +65,7 @@ android {
         debug {
             applicationIdSuffix = ".development"
             // Android uses on-device speech in development and store builds.
-            buildConfigField("boolean", "CLOUD_AUDIO_ENABLED", "false")
+            buildConfigField("boolean", "CLOUD_AUDIO_ENABLED", "true")
             buildConfigField(
                 "String",
                 "CONVERSATION_TRANSCRIPTION_ENDPOINT",
@@ -74,7 +74,7 @@ android {
         }
         release {
             isMinifyEnabled = true
-            buildConfigField("boolean", "CLOUD_AUDIO_ENABLED", "false")
+            buildConfigField("boolean", "CLOUD_AUDIO_ENABLED", "true")
             buildConfigField(
                 "String",
                 "CONVERSATION_TRANSCRIPTION_ENDPOINT",

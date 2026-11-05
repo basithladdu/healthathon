@@ -735,7 +735,6 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         if (!localAudioRecordingAllowed || selected.value != draft.value.personId || !canEdit.value || (cloud!=null && cloud.session.value?.userId!=account)) { message.value = "Choose an editable care profile before recording."; return }
         if ((demoMode && (expected==null || expected.conversationId.isBlank())) || (expected!=null && !sameDoctorConversation(expected))) {message.value="The conversation changed. Review consent again before recording.";return}
         if (getApplication<Application>().checkSelfPermission(android.Manifest.permission.RECORD_AUDIO)!=android.content.pm.PackageManager.PERMISSION_GRANTED) {message.value="Microphone permission is required. You can still type the conversation.";return}
-        if (demoMode && transcriptionAccepted) {message.value="Test recordings stay on this device. Online transcription is unavailable.";return}
         val consentAt = System.currentTimeMillis()
         val base = draft.value.copy(consentAt = consentAt)
         val file = File(audioRoot(), "${base.personId}/${newId()}.m4a")
@@ -862,23 +861,34 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         } catch (failure: Exception) { message.value = failure.message ?: "The transcript was not inserted."; false }
     }
     fun transcribeAudio(path: String, consent: RecordingConsent) {
-        if (demoMode) { message.value = "Online transcription is unavailable in Doctor examples."; return }
         val personId = selected.value
         action {
-            require(BuildConfig.CLOUD_AUDIO_ENABLED) { "Online audio processing is not available in this release. Use on-device dictation or enter the conversation text." }
             requireEdit(personId)
             require(path == consent.audioPath && consent.personId == personId) { "Choose a recording for this person." }
             require(draft.value.personId == personId && draft.value.source.isBlank()) { "Clear the conversation text before creating a new transcript." }
-            val service = cloud ?: throw IllegalArgumentException("Sign in to Sahara before sending audio for transcription.")
             transcribingPath.value = path
             try {
-                val result = try {
-                    conversationTranscriber.transcribe(File(path), consent, service.transcriptionToken())
-                } catch (error: ConversationTranscriptionException) {
-                    // Only an auth rejection is retried; provider/quota failures must not double-call Gemini.
-                    if (error.code != ConversationTranscriptionError.AUTH_REQUIRED) throw error
-                    conversationTranscriber.transcribe(File(path), consent, service.transcriptionToken(forceRefresh = true))
+                // Doctor recordings go through the same Gemini goals-of-care route as the patient side (sahara.wedevit.in/api/goc-transcribe, Vercel GEMINI_API_KEY_1..5).
+                // Gemini first (works signed in or in demo). If it fails, the audio stays on the phone and Whisper on this phone writes it instead.
+                var engineName = "google-gemini"; var engineModel = "gemini"; var langs = emptyList<String>()
+                val text = try {
+                    val gemini = transcribeGocWithGemini(File(path), null, patientId = personId, conversationId = File(path).nameWithoutExtension) { }
+                    engineModel = gemini.model; langs = gemini.lines.map { it.lang }.filter { it.isNotBlank() }.distinct()
+                    gemini.lines.joinToString("\n") { line ->
+                        val who = when (line.speaker) { "DOCTOR" -> "Doctor: "; "PATIENT_PARTY" -> "Patient: "; else -> "" }
+                        who + line.text.trim()
+                    }.trim()
+                } catch (failure: Exception) {
+                    if (failure is kotlinx.coroutines.CancellationException) throw failure
+                    message.value = "Gemini could not finish. Writing it on this phone…"
+                    val engine = GocSpeechEngine(getApplication())
+                    if (!engine.models.ready()) engine.models.download { _, _ -> }
+                    engineName = "whisper-on-phone"; engineModel = OfflineWhisperModel.id
+                    engine.transcribe(DoctorAudioClip(File(path).nameWithoutExtension, File(path), consent), personId, GocSpeechLanguage.AUTO, { _, _ -> }) { }
+                        .joinToString(" ") { it.text.trim() }.trim()
                 }
+                require(text.isNotBlank()) { "No speech was found in this recording." }
+                val result = ConversationTranscript(text = text, provider = engineName, model = engineModel, languages = langs)
                 require(result.text.length <= NoteRules.MAX_SOURCE_CHARS) { "This transcript is too long for a shared care note. Keep the recording and enter a shorter selection." }
                 require(selected.value == personId && draft.value.personId == personId && draft.value.source.isBlank()) { "The conversation changed while transcription was running. The transcript was not inserted." }
                 edit(DoctorConversationContext.acceptedTranscript(draft.value.copy(

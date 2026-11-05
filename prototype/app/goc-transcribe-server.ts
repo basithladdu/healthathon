@@ -254,13 +254,14 @@ export async function geminiTranscribeWindow(config: Config, request: GeminiWind
       try {
         response = await send(`${GEMINI_NATIVE}/models/${encodeURIComponent(model)}:generateContent`, { method: 'POST', redirect: 'error', cache: 'no-store', signal: AbortSignal.timeout(Math.min(240_000, left)),
           headers: { 'x-goog-api-key': request.key ?? config.gemini, 'Content-Type': 'application/json', Accept: 'application/json' }, body });
-      } catch {
+      } catch (error) {
+        console.warn('goc_gemini_fetch_failed', model, String(error).slice(0, 200));
         last = new GocFailure(502, 'gemini_unavailable', 'Google Gemini did not answer in time.');
         if (attempt === 0) { await pause(2000); continue; } break;
       }
       if (response.status === 404) { void response.body?.cancel().catch(() => {}); last = new GocFailure(502, 'gemini_unavailable', 'The Gemini model was not found.'); break; }
       if (response.status === 429 || response.status >= 500) {
-        void response.body?.cancel().catch(() => {});
+        console.warn('goc_gemini_error', model, response.status, (await response.text().catch(() => '')).slice(0, 300));
         if (response.status === 429) busy++;
         last = response.status === 429 ? new GocFailure(429, 'provider_busy', BUSY, retryAfter(response)) : new GocFailure(502, 'gemini_unavailable', 'Google Gemini had a problem. Try again later.');
         if (attempt === 0) { await pause(Math.min(8, retryAfter(response) ?? 2) * 1000); continue; } break;
@@ -268,6 +269,7 @@ export async function geminiTranscribeWindow(config: Config, request: GeminiWind
       const value = await response.json().catch(() => null) as Json | null;
       if (!response.ok) {
         const message = String((isObject(value?.error) ? (value.error as Json).message : '') ?? '');
+        console.warn('goc_gemini_rejected', model, response.status, message.slice(0, 300));
         // A retired or unknown model: try the next one. Anything else (format, size) will not improve with a retry.
         if (/model|not found|not supported/iu.test(message) && !/mime|audio|file/iu.test(message)) { last = new GocFailure(502, 'gemini_unavailable', 'The Gemini model is not available.'); break; }
         throw new GocFailure(502, 'gemini_rejected', 'Google Gemini could not read this audio.');

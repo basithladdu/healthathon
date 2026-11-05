@@ -138,9 +138,10 @@ export async function analyzeGoc(lines: GocAnalyzeLine[], options: GocAnalyzeOpt
         try {
           response = await options.send(`${GEMINI_NATIVE}/models/${encodeURIComponent(model)}:generateContent`, { method: 'POST', redirect: 'error', cache: 'no-store',
             signal: AbortSignal.timeout(Math.min(options.perAttemptMs ?? 120_000, left)), headers: { 'x-goog-api-key': slot.key, 'Content-Type': 'application/json', Accept: 'application/json' }, body });
-        } catch { throw new GeminiCallError(null); }
+        } catch (error) { console.warn('goc_analyze_fetch_failed', model, String(error).slice(0, 200)); throw new GeminiCallError(null); }
         if (!response.ok) {
           const detail = (await response.text().catch(() => '')).slice(0, 600);
+          console.warn('goc_analyze_gemini_error', model, response.status, detail.slice(0, 300));
           const retry = Number(response.headers.get('retry-after'));
           if (response.status === 404 || (response.status === 400 && /model/iu.test(detail) && /not found|not supported|unknown/iu.test(detail))) { missing++; continue; }
           throw new GeminiCallError(response.status, detail, Number.isFinite(retry) && retry > 0 ? retry : undefined);
@@ -150,6 +151,7 @@ export async function analyzeGoc(lines: GocAnalyzeLine[], options: GocAnalyzeOpt
       }
       if (unusable) throw new UnusableAnswer();
       if (missing) throw new ModelMissing();
+      console.warn('goc_analyze_no_model_tried', options.models.join(','));
       throw new GeminiCallError(null, 'out of time');
     });
     return { ...result.value, slot: result.slot.slot };

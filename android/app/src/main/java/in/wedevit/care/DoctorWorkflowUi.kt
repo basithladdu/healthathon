@@ -118,15 +118,18 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer);onlineJob?.cancel();audio.release() }
     }
     fun transcribeAndDraft(clip:DoctorAudioClip) {
-        val service=cloud ?: return
-        if(onlineBusy || service.session.value?.userId!=accountId || !audio.owns(clip)) return
+        if(onlineBusy || (cloud!=null && cloud.session.value?.userId!=accountId) || !audio.owns(clip)) return
         val expected=store.draft(patient.id).sourceText
         if(expected.isNotBlank()) { message=t("Your existing source was kept. Use an empty draft for a new transcript.", "आपका मौजूदा स्रोत रखा गया। नई लिखाई के लिए ख़ाली ड्राफ़्ट लें।");return }
         onlineBusy=true;message=null
         onlineJob=onlineScope.launch {
             try {
-                val result=DoctorAiClient().transcribeAndDraft(clip.file,clip.consent,service.transcriptionToken())
-                if(service.session.value?.userId!=accountId || !audio.owns(clip)) { message=t("The account or recording changed. No result was inserted.", "खाता या रिकॉर्डिंग बदल गई। कोई नतीजा नहीं डाला गया।");return@launch }
+                // Gemini through sahara.wedevit.in/api/goc-transcribe (Vercel GEMINI_API_KEY_1..5), same as the goals-of-care screen.
+                val gemini=transcribeGocWithGemini(clip.file,null,patientId=patient.id,conversationId=clip.id) { }
+                val words=gemini.lines.joinToString("\n") { l -> (when(l.speaker) { "DOCTOR" -> "Doctor: "; "PATIENT_PARTY" -> "Patient: "; else -> "" })+l.text.trim() }.trim()
+                if(words.isBlank()) { message=t("No speech was found in this recording.", "इस रिकॉर्डिंग में कोई बात नहीं मिली।");return@launch }
+                val result=DoctorAudioAiResult(ConversationTranscript(words,"google-gemini",gemini.model,gemini.lines.map { it.lang }.filter { it.isNotBlank() }.distinct()),null,null)
+                if((cloud!=null && cloud.session.value?.userId!=accountId) || !audio.owns(clip)) { message=t("The account or recording changed. No result was inserted.", "खाता या रिकॉर्डिंग बदल गई। कोई नतीजा नहीं डाला गया।");return@launch }
                 returnedTranscript=result.transcript.text
                 val error=store.importTranscript(patient.id,result.transcript.text,result.transcript.provider,result.transcript.model,clip.id,clip.consent.transcriptionConsentAt,expected)
                 if(error!=null) { message=error+t(" The returned transcript is preserved below for review.", " लौटी लिखाई जाँच के लिए नीचे रखी है।");return@launch }

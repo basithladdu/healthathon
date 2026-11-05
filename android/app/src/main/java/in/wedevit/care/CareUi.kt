@@ -693,7 +693,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                             path = file.absolutePath,
                             consent = consent,
                             transcribing = transcribingPath == file.absolutePath,
-                            canTranscribe = !vm.demoMode && BuildConfig.CLOUD_AUDIO_ENABLED && consent?.let { it.transcriptionConsentAt > 0 && it.noticeVersion >= 2 } == true && draft.source.isBlank() && !busy && !dictating && !recording,
+                            canTranscribe = BuildConfig.CLOUD_AUDIO_ENABLED && consent?.let { it.transcriptionConsentAt > 0 && it.noticeVersion >= 2 } == true && draft.source.isBlank() && !busy && !dictating && !recording,
                             onTranscribe = { consent?.let { vm.transcribeAudio(file.absolutePath, it) } },
                             onDelete = { vm.deleteAudio(file.absolutePath) },
                         )
@@ -825,11 +825,10 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             if (quickConsent) Text(t("By starting, everyone listed agrees: this recording is to write and check a note of this talk. It stays private on this phone. People who can open this phone or the shared records may read the written note.", "शुरू करने पर सूची के सभी लोग मानते हैं: यह रिकॉर्डिंग इस बातचीत का नोट लिखने और जाँचने के लिए है। यह इसी फ़ोन पर निजी रहती है। जो लोग यह फ़ोन या साझा रिकॉर्ड खोल सकते हैं, वे लिखा नोट पढ़ सकते हैं।"), style = MaterialTheme.typography.bodySmall) else CheckLine(purposeAccepted, { purposeAccepted = it }, t("We understand this recording is to write and check a note of this talk.", "हम समझते हैं कि यह रिकॉर्डिंग इस बातचीत का नोट लिखने और जाँचने के लिए है।"))
             if (!quickConsent) CheckLine(storageAccepted, { storageAccepted = it }, if (!vm.demoMode && BuildConfig.CLOUD_AUDIO_ENABLED) t("We understand the audio stays private on this phone, unless someone shares it or separately agrees below to send it online to turn speech into text.", "हम समझते हैं कि ऑडियो इसी फ़ोन पर निजी रहता है, जब तक कोई इसे साझा न करे या नीचे इसे लिखाई के लिए ऑनलाइन भेजने पर अलग से राज़ी न हो।") else t("We understand the recording stays private on this phone.", "हम समझते हैं कि रिकॉर्डिंग इसी फ़ोन पर निजी रहती है।"))
             if (!quickConsent) CheckLine(accessAccepted, { accessAccepted = it }, t("We understand people with access to this person's phone or shared records may be able to read the written note.", "हम समझते हैं कि इस व्यक्ति के फ़ोन या साझा रिकॉर्ड तक पहुँच वाले लोग लिखा नोट पढ़ सकते हैं।"))
-            if (!vm.demoMode && BuildConfig.CLOUD_AUDIO_ENABLED) {
+            if (BuildConfig.CLOUD_AUDIO_ENABLED) {
             HorizontalDivider()
-            Text(t("Optional: turn this demo recording into text online", "चाहें तो: इस डेमो रिकॉर्डिंग को ऑनलाइन लिखाई में बदलें"), fontWeight = FontWeight.Bold)
-            CheckLine(transcriptionAccepted, { transcriptionAccepted = it }, t("Everyone agrees to send this made-up demo recording to Supabase and Google Gemini. It has no real patient, personal or private information.", "सभी इस बनावटी डेमो रिकॉर्डिंग को Supabase और Google Gemini को भेजने पर राज़ी हैं। इसमें किसी असली मरीज़ की, निजी या गोपनीय जानकारी नहीं है।"))
-            Text(t("Use test conversations only. Google may use free audio and text to improve its products, and people there may read them. Deleting the file later does not undo this. Limit: 5 minutes or 3 MB, up to 5 tries per account each day. Check the words with the audio.", "सिर्फ़ टेस्ट बातचीत इस्तेमाल करें। Google मुफ़्त सेवा का ऑडियो और लिखाई अपने उत्पाद सुधारने में इस्तेमाल कर सकता है, और वहाँ के लोग इन्हें पढ़ सकते हैं। बाद में फ़ाइल मिटाने से यह वापस नहीं होता। सीमा: 5 मिनट या 3 MB, हर खाते के लिए दिन में 5 बार तक। लौटे शब्द ऑडियो से मिलाएँ।"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(t("Online transcription", "ऑनलाइन लिखाई"), fontWeight = FontWeight.Bold)
+            CheckLine(transcriptionAccepted, { transcriptionAccepted = it }, t("Everyone agrees to send this audio to Google Gemini.", "सभी इस ऑडियो को Google Gemini को भेजने पर राज़ी हैं।"))
             }
         }
     }, confirmButton = {
