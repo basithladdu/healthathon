@@ -26,7 +26,7 @@ class DoctorAppointmentEditorTest {
             }
         } }
         ui.onNodeWithTag("demo-change-patient").assertDoesNotExist()
-        ui.onNodeWithText("Patient linked to the conversation request").assertExists()
+        ui.onNodeWithTag("demo-visit-patient").assertExists()
         ui.onNodeWithTag("demo-save-appointment").performScrollTo().assertIsDisplayed().performClick()
         ui.runOnIdle { assertEquals(existing, saved) }
     }

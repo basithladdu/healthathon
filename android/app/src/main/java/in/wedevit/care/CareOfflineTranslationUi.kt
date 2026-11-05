@@ -57,21 +57,19 @@ import kotlinx.coroutines.launch
                     if (failure is CancellationException) throw failure
                     error = CareOfflineTranslationCopy.downloadFailed
                 } finally { downloadBusy = false } }
-            }, enabled = !downloadBusy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("offline-translation-download")) { Text(if (downloadBusy) t("Downloading language pack…", "भाषा पैक डाउनलोड हो रहा है…") else t("Download Hindi–English pack", "हिन्दी–अंग्रेज़ी पैक डाउनलोड करें")) }
-            if (downloadBusy && wifiOnly) Text(CareOfflineTranslationCopy.waitingForWifi, fontSize = 14.sp, color = DoctorCardSub)
-            if (downloadBusy) TextButton(onClick = { job?.cancel(); downloadBusy = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Stop waiting", "इंतज़ार बंद करें")) }
+            }, enabled = !downloadBusy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("offline-translation-download")) { Text(if (downloadBusy) t("Downloading…", "डाउनलोड हो रहा है…") else t("Download", "डाउनलोड करें")) }
+            if (downloadBusy) TextButton(onClick = { job?.cancel(); downloadBusy = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें")) }
         } else {
             Button(onClick = {
                 busy = true; error = ""; checked = false; result = emptyList(); progress = 0 to 0
                 job = scope.launch { try { result = service.translate(source, target) { done, total -> progress = done to total } }
-                catch (failure: Exception) { if (failure is CancellationException) throw failure; error = failure.message ?: t("Could not translate. The original is unchanged.", "अनुवाद नहीं हो सका। मूल वैसा ही है।") }
+                catch (failure: Exception) { if (failure is CancellationException) throw failure; error = failure.message ?: t("Couldn't translate.", "अनुवाद नहीं हो सका।") }
                 finally { busy = false } }
-            }, enabled = !busy && source.isNotBlank(), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("offline-translation-start")) { Text(if (busy) t("Reading line ${progress.first} / ${progress.second}", "पंक्ति ${progress.first} / ${progress.second} पढ़ रहे हैं") else if (target == "hi") careBilingual("Translate with Google", "हिन्दी") else "Translate with Google · English") }
+            }, enabled = !busy && source.isNotBlank(), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("offline-translation-start")) { Text(if (busy) t("Reading line ${progress.first} / ${progress.second}", "पंक्ति ${progress.first} / ${progress.second} पढ़ रहे हैं") else t("Translate", "अनुवाद करें")) }
             if (busy) TextButton(onClick = { job?.cancel(); busy = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें")) }
         }
         if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error, fontSize = 14.sp, modifier = Modifier.announce())
         if (result.isNotEmpty()) {
-            Text(careBilingual("Original and machine translation", "मूल और अनुवाद"), Modifier.padding(top = 8.dp), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk)
             result.forEachIndexed { index, line ->
                 if (index > 0) HorizontalDivider(color = DoctorHairline)
                 Column(Modifier.padding(vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -79,19 +77,18 @@ import kotlinx.coroutines.launch
                     SelectionContainerText(line.translated)
                 }
             }
-            CheckLine(checked, { checked = it }, careBilingual("A Hindi/English reader checked this translation", "अनुवाद जाँच लिया"))
+            CheckLine(checked, { checked = it }, careBilingual("Checked by a reader", "पाठक ने जाँचा"))
             if (checked) {
                 val translated = result.joinToString("\n") { it.translated }
                 CareReadAloudControl(translated, "$versionId-offline-$target", if (target == "hi") "hi-IN" else "en-IN")
                 OutlinedButton(shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp), onClick = { clipboard.setText(AnnotatedString("Machine translation · human checked\n${result.joinToString("\n\n") { "${it.original}\n${it.translated}" }}")) }) { Text(t("Copy both languages", "दोनों भाषाएँ कॉपी करें")) }
             }
             Image(painterResource(R.drawable.google_translate_attribution), contentDescription = "Powered by Google Translate", modifier = Modifier.width(150.dp))
-            TextButton(onClick = { notices = true }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Translation notices", "अनुवाद की सूचनाएँ")) }
+            TextButton(onClick = { notices = true }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Notices", "सूचनाएँ")) }
         }
     }
-    if (notices) AlertDialog(onDismissRequest = { notices = false }, title = { Text(t("Translation notices", "अनुवाद की सूचनाएँ")) }, text = {
+    if (notices) AlertDialog(onDismissRequest = { notices = false }, title = { Text(t("Notices", "सूचनाएँ")) }, text = {
         Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(t("This reading help uses Google Translate on this phone. Your text stays on the phone. Downloading the language pack needs internet. Ask someone who knows both languages to check before you rely on it.", "पढ़ने की यह मदद इसी फ़ोन पर Google Translate से चलती है। आपकी लिखाई फ़ोन पर ही रहती है। भाषा पैक डाउनलोड करने के लिए इंटरनेट चाहिए। भरोसा करने से पहले दोनों भाषाएँ जानने वाले किसी व्यक्ति से जँचवाएँ।"))
             Text("THIS SERVICE MAY CONTAIN TRANSLATIONS POWERED BY GOOGLE. GOOGLE DISCLAIMS ALL WARRANTIES RELATED TO THE TRANSLATIONS, EXPRESS OR IMPLIED, INCLUDING ANY WARRANTIES OF ACCURACY, RELIABILITY, AND ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.", style = MaterialTheme.typography.bodySmall)
             TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse("https://cloud.google.com/translate"))) }) { Text(t("Google Translate information", "Google Translate की जानकारी")) }
         }
@@ -101,6 +98,6 @@ import kotlinx.coroutines.launch
 /** Plain statements for when the on-device translator cannot run. English · Hindi. */
 internal object CareOfflineTranslationCopy {
     val unavailable: String get() = careBilingual("Translation is unavailable on this phone right now. Please read the original note.", "इस फ़ोन पर अभी अनुवाद नहीं हो सकता। मूल नोट पढ़ें।")
-    val downloadFailed: String get() = careBilingual("Translation is unavailable until the Hindi–English pack downloads. Check the internet connection and try again; the original note is unchanged.", "हिन्दी–English पैक डाउनलोड होने तक अनुवाद उपलब्ध नहीं है। इंटरनेट जाँचकर फिर कोशिश करें; मूल नोट नहीं बदला।")
+    val downloadFailed: String get() = careBilingual("Couldn't download. Check the internet.", "डाउनलोड नहीं हो सका। इंटरनेट जाँचें।")
     val waitingForWifi: String get() = careBilingual("Waiting for Wi-Fi. Untick “Download over Wi-Fi only” to use mobile data.", "वाई-फ़ाई का इंतज़ार है। मोबाइल डेटा से डाउनलोड के लिए “Wi-Fi only” हटाएँ।")
 }

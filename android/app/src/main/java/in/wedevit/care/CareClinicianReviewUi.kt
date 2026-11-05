@@ -67,7 +67,7 @@ import kotlinx.coroutines.launch
             Text(t("Council: ", "काउंसिल: ") + request.council, fontSize = 14.sp, color = DoctorCardSub)
             Text(t("Registration number: ", "रजिस्ट्रेशन नंबर: ") + request.registration, fontSize = 14.sp, color = DoctorCardSub)
             Spacer(Modifier.height(4.dp))
-            CareField(evidence, { evidence = it.take(1200) }, t("Register name or link", "रजिस्टर का नाम या लिंक"), singleLine = true)
+            CareField(evidence, { evidence = it.take(1200) }, t("Register link", "रजिस्टर लिंक"), singleLine = true)
             CareField(note, { note = it.take(2000) }, t("Reason", "कारण"), minLines = 2)
             val valid = runCatching { ClinicianReviewRules.check("approved", evidence, note) }.isSuccess
             Spacer(Modifier.height(4.dp))

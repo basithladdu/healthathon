@@ -192,13 +192,13 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                         else if (section == "Summary") {
                             item { ConnectedCard(t("Care overview", "देखभाल का सार")) { Text(patient.summary, lineHeight = 25.sp) } }
                             item { ConnectedCard(t("Previous doctor", "पिछले डॉक्टर")) { Text(patient.payload.optString("previousDoctor").ifBlank { t("Not recorded", "दर्ज नहीं") }) } }
-                            item { ConnectedCard(t("Last conversation", "पिछली बातचीत")) { val note = dataset!!.notes.filter { it.patientId == patient.id }.maxByOrNull { it.updatedAt }; Text(note?.draft?.topics?.ifBlank { t("No discussion recorded", "कोई चर्चा दर्ज नहीं") } ?: t("No discussion recorded", "कोई चर्चा दर्ज नहीं")); TextButton(onClick = { section = "Conversations" }) { Text(t("Open conversations", "बातचीत खोलें")) } } }
+                            item { ConnectedCard(t("Last conversation", "पिछली बातचीत")) { val note = dataset!!.notes.filter { it.patientId == patient.id }.maxByOrNull { it.updatedAt }; Text(note?.draft?.topics?.ifBlank { t("Not recorded", "दर्ज नहीं") } ?: t("Not recorded", "दर्ज नहीं")); TextButton(onClick = { section = "Conversations" }) { Text(t("Open", "खोलें")) } } }
                         } else {
                             item { Text(t("Progress", "प्रगति"), style = MaterialTheme.typography.headlineSmall) }
                             val checks = patient.payload.optJSONArray("checkIns")
-                            if (checks == null || checks.length() == 0) item { Text(t("No reported updates saved.", "कोई अपडेट सहेजा नहीं गया।")) }
+                            if (checks == null || checks.length() == 0) item { Text(t("No updates yet.", "अभी कोई अपडेट नहीं।")) }
                             else items(checks.length()) { index -> val row = checks.getJSONObject(index); ConnectedCard(row.optString("source", t("Reported update", "बताया गया अपडेट"))) { Text(row.optString("text"), lineHeight = 25.sp); row.optLong("at").takeIf { it > 0 }?.let { Text(connectedTime(it), style = MaterialTheme.typography.bodySmall) } } }
-                            item { TextButton(onClick = { section = "Medicines" }) { Text(t("Open medicine history", "दवाओं का इतिहास खोलें")) } }
+                            item { TextButton(onClick = { section = "Medicines" }) { Text(t("Medicines", "दवाइयाँ")) } }
                         }
                     }
                 }
@@ -229,8 +229,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                             Button(onClick = ::joinPatient, enabled = !joining && joinCode.isNotBlank(), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-join")) { if (joining) { CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = Color.White); Spacer(Modifier.width(8.dp)) } else { Icon(Icons.Default.PersonAdd, null); Spacer(Modifier.width(8.dp)) }; Text(t("Join", "जुड़ें")) }
                             joinMessage?.let { Text(it, color = RustText, modifier = Modifier.announce()) }
                         } }
-                        item { DoctorWalkthroughCard(hindi) { profile -> if (!navigationBlocked && !vm.recording.value) { testCarePerson = DoctorTestProfiles.personId(profile); testInitialSection = "Hub"; isolatedDemo = true; tab = 1; nestedBack = null } } }
-                    }
+                                    }
                 }
                 2 -> {
                     var day by rememberSaveable { mutableStateOf(LocalDate.now().toString()) }
@@ -523,7 +522,6 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
         if(expanded) {
             listOf(t("Original words", "मूल शब्द") to note.draft.sourceText,t("Participants", "भागीदार") to note.draft.participants,t("Questions", "सवाल") to note.draft.questions,t("Undecided", "तय नहीं") to note.draft.undecided,t("Next steps", "अगले क़दम") to note.draft.nextSteps).forEach {(label,value)->Text(label,fontWeight=FontWeight.SemiBold);Text(value.ifBlank {t("Not recorded", "दर्ज नहीं")},lineHeight=25.sp)}
             note.draft.checklist.forEach {Text("${it.title}: ${it.status.name.lowercase().replace('_',' ')}")}
-            Text(t("Revision ${note.revision}", "संशोधन ${note.revision}"),style=MaterialTheme.typography.bodySmall)
             if(note.draft.audioClipId.isNotBlank())Text(t("Associated local audio: ", "जुड़ा लोकल ऑडियो: ") + note.draft.audioClipId,style=MaterialTheme.typography.bodySmall)
             if(note.draft.transcriptModel.isNotBlank())Text(t("Transcript source: ", "लिखाई का स्रोत: ") + "${note.draft.transcriptProvider} / ${note.draft.transcriptModel}",style=MaterialTheme.typography.bodySmall)
             if(note.draft.mockGenerated)Text(t("Practice draft, written in advance, not from your recording", "अभ्यास ड्राफ़्ट, पहले से लिखा, आपकी रिकॉर्डिंग से नहीं"),color=Rust)
@@ -558,7 +556,6 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                 OutlinedButton(onClick={picker.launch(if(kind=="audio")arrayOf("audio/*") else arrayOf("application/pdf","image/*"))},enabled=!busy) {
                     Text(if(uri==null)t("Choose file", "फ़ाइल चुनें") else t("Change file", "फ़ाइल बदलें"))
                 }
-                if(uri!=null)Text(t("File selected", "फ़ाइल चुनी गई"),style=MaterialTheme.typography.bodySmall)
                 CheckLine(consent,{if(!busy)consent=it},t("I have permission to upload", "मुझे अपलोड की अनुमति है"))
                 Button(onClick={
                     val selected=uri ?: return@Button

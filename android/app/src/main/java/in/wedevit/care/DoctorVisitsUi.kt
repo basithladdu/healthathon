@@ -142,16 +142,15 @@ internal val DoctorVisitHighlightInk = Color(0xFF201711)
                 val state = doctorVisitState(item, System.currentTimeMillis())
                 val (fg, bg) = when { state == "Completed" -> DoctorStatusGood to DoctorStatusGoodBg; state == "Upcoming" -> DoctorStatusWarn to DoctorStatusWarnBg; else -> DoctorStatusRest to DoctorStatusRestBg }
                 Surface(color = bg, shape = RoundedCornerShape(50)) { Text(state, Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = fg) }
-                if (doctorVisitCompleted(item)) entry?.completedAt?.takeIf { it in 1..System.currentTimeMillis() }?.let { Surface(color = Paper, shape = RoundedCornerShape(50), border = androidx.compose.foundation.BorderStroke(1.dp, DoctorHairline)) { Text(t("Completion recorded: ${visitSourceDate(it)}", "पूरा होना दर्ज: ${visitSourceDate(it)}"), Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontSize = 14.sp, color = DoctorCardSub) } }
-            }
+                            }
         } }
         item { VisitSection(t("Place / visit type", "जगह / विज़िट का प्रकार"), entry?.location?.ifBlank { t("Not recorded", "दर्ज नहीं") } ?: t("Not recorded", "दर्ज नहीं")) }
         val sources = doctorVisitSources(item, conditionSources, discussionSources)
         val condition = sources.condition
         val discussion = sources.discussion
-        val conditionText = if (summary.conditionRef.isBlank()) t("Not recorded for this visit.", "इस विज़िट के लिए दर्ज नहीं।") else condition?.let { "${visitSourceDate(it.created)} · " + t("Patient / family report", "मरीज़ / परिवार की सूचना") + "\n${it.title}\n${CareEntryCodec.readable(it.detail)}" } ?: t("Linked update is not accessible or no longer available.", "जुड़ा अपडेट खुल नहीं सकता या अब उपलब्ध नहीं।")
-        val discussionText = if (summary.discussionRef.isBlank()) t("Not recorded for this visit.", "इस विज़िट के लिए दर्ज नहीं।") else discussion?.let { "${visitSourceDate(it.published)}\n${ReviewWorkflow.label(it)}\n${it.topics.ifBlank { t("Discussion not recorded in this note.", "इस नोट में चर्चा दर्ज नहीं।") }}\n${it.nextSteps}" } ?: t("Linked care note is not accessible or no longer available.", "जुड़ा केयर नोट खुल नहीं सकता या अब उपलब्ध नहीं।")
-        listOf(t("Linked condition report", "जुड़ी हालत की सूचना") to conditionText, t("Discussion linked to this visit", "इस विज़िट से जुड़ी चर्चा") to discussionText, t("Visit notes", "विज़िट के नोट") to summary.note).forEach { (label, value) -> item { VisitSection(label, value.ifBlank { t("Not recorded for this visit.", "इस विज़िट के लिए दर्ज नहीं।") }) } }
+        val conditionText = if (summary.conditionRef.isBlank()) t("Not recorded", "दर्ज नहीं") else condition?.let { "${visitSourceDate(it.created)} · " + t("Patient / family report", "मरीज़ / परिवार की सूचना") + "\n${it.title}\n${CareEntryCodec.readable(it.detail)}" } ?: t("Not available", "उपलब्ध नहीं")
+        val discussionText = if (summary.discussionRef.isBlank()) t("Not recorded", "दर्ज नहीं") else discussion?.let { "${visitSourceDate(it.published)}\n${ReviewWorkflow.label(it)}\n${it.topics.ifBlank { t("Not recorded", "दर्ज नहीं") }}\n${it.nextSteps}" } ?: t("Not available", "उपलब्ध नहीं")
+        listOf(t("Linked condition report", "जुड़ी हालत की सूचना") to conditionText, t("Discussion linked to this visit", "इस विज़िट से जुड़ी चर्चा") to discussionText, t("Visit notes", "विज़िट के नोट") to summary.note).forEach { (label, value) -> item { VisitSection(label, value.ifBlank { t("Not recorded", "दर्ज नहीं") }) } }
         if (canEdit) item { Column(Modifier.padding(top = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             if (doctorVisitCompleted(item) || entry?.status == "cancelled") Button(onClick = onPlanAnother, enabled = !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Plan another visit", "एक और विज़िट तय करें")) }
             else {

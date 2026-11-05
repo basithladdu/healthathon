@@ -100,8 +100,8 @@ class DoctorDayBentoTest {
         assertTrue(hero.bottom < condition.top)
         assertEquals(hero.left,condition.left,1f)
         assertEquals(condition.width,tools.width,1f)
-        ui.onNodeWithText("Reported by the patient or family.",useUnmergedTree=true).performScrollTo().assertIsDisplayed()
-        val source=ui.onNodeWithText("Reported by the patient or family.",useUnmergedTree=true).fetchSemanticsNode().boundsInRoot
+        ui.onNodeWithText("Patient / family report",useUnmergedTree=true).performScrollTo().assertIsDisplayed()
+        val source=ui.onNodeWithText("Patient / family report",useUnmergedTree=true).fetchSemanticsNode().boundsInRoot
         val visibleCondition=ui.onNodeWithTag("doctor-condition-today").fetchSemanticsNode().boundsInRoot
         assertTrue(source.bottom<=visibleCondition.bottom)
         assertConditionBodyStartsTogether()

@@ -554,7 +554,6 @@ private val DoctorMist = Peach
                     }
                 }
             }
-            if(patientLocked) Text(t("Patient linked to the conversation request", "बातचीत के अनुरोध से जुड़ा मरीज़"),style=MaterialTheme.typography.bodySmall,color=DoctorMuted)
             val date = LocalDate.parse(day); val clock = LocalTime.parse(time)
             Surface(color = Paper, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {

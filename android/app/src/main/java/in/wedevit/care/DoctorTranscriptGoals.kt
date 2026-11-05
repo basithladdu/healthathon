@@ -73,7 +73,6 @@ internal fun doctorTranscriptIsSample(walkthrough: Boolean, source: String, samp
     val sub = if (onDark) Color.White.copy(alpha = .85f) else DoctorCardSub
     Column(Modifier.fillMaxWidth().testTag("goals-checklist"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(t("Goals of care", "देखभाल के लक्ष्य"), fontWeight = FontWeight.Medium, fontSize = 15.sp, color = ink)
-        Text(t("${list.covered} of ${list.rows.size} covered", "${list.rows.size} में से ${list.covered} पर बात हुई"), fontSize = 14.sp, lineHeight = 20.sp, color = sub, modifier = Modifier.testTag("goals-checklist-summary"))
         list.rows.forEach { (row, status) ->
             Row(verticalAlignment = Alignment.Top, modifier = Modifier.fillMaxWidth().testTag("goals-checklist-${row.id}")) {
                 val done = status != TranscriptGoalStatus.Open

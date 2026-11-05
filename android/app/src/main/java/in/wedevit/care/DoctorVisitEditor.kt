@@ -86,7 +86,7 @@ fun DoctorVisitEditor(vm: CareModel, personId: String, onDismiss: () -> Unit, in
                 OutlinedButton(onClick = onDate, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1.4f).heightIn(min = 48.dp), enabled = !busy) { Icon(Icons.Default.CalendarMonth, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(dateLabel, maxLines = 2) }
                 OutlinedButton(onClick = onTime, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("doctor-visit-time"), enabled = !busy) { Icon(Icons.Default.Schedule, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(timeLabel, maxLines = 1) }
             }
-            CareField(location, onLocation, t("Place or visit type (optional)", "जगह या विज़िट का प्रकार (चाहें तो)"), singleLine = true)
+            CareField(location, onLocation, t("Place", "जगह"), singleLine = true)
             CareField(note, onNote, t("Notes", "नोट"), minLines = 2)
             sourceLinks()
             error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }

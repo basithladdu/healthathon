@@ -814,7 +814,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
                         edit(current.copy(audioPath=verified.localPath,consentAt=verified.consentAt))
                         refreshRecordings(verified.personId)
                     }
-                    message.value="Recording saved on this device. No transcript was generated."
+                    message.value="Recording saved."
                 }
             } catch (_: Exception) {
                 recordingSaveError.value="The audio file was kept, but its consent details could not be saved. Retry saving before leaving."

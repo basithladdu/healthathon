@@ -128,7 +128,7 @@ internal enum class FeedbackSendState { NONE, LOCAL, SENDING, SENT, QUEUED }
             CareLanguageMenu(compact = true)
         }
         Spacer(Modifier.height(16.dp))
-        Text(if (checkIn) t("How was your day?", "आज का दिन कैसा रहा?") else t("How was your Sahara experience?", "सहारा का अनुभव कैसा रहा?"), color = Ink, fontFamily = SaharaTitleFont, fontSize = 32.sp, lineHeight = 37.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+        Text(if (checkIn) t("How was your day?", "आज का दिन कैसा रहा?") else t("How was Sahara?", "सहारा कैसा रहा?"), color = Ink, fontFamily = SaharaTitleFont, fontSize = 32.sp, lineHeight = 37.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
         Spacer(Modifier.height(12.dp))
         CareMoodFace(expression, Modifier.sizeIn(maxWidth = 210.dp, maxHeight = 210.dp).fillMaxWidth().aspectRatio(1f).clearAndSetSemantics { })
         Spacer(Modifier.height(8.dp))
@@ -163,8 +163,7 @@ internal enum class FeedbackSendState { NONE, LOCAL, SENDING, SENT, QUEUED }
             Text(if (checkIn) (if (saved) t("Check-in saved", "आज का हाल सहेज लिया") else if (today != null) t("Update today's check-in", "आज का हाल बदलें") else t("Save check-in", "आज का हाल सहेजें")) else if (sendState == FeedbackSendState.SENDING) t("Sending…", "भेजा जा रहा है…") else if (saved && sendState == FeedbackSendState.SENT) t("Sent to Sahara", "Sahara को भेजा") else if (saved) t("Saved on this phone", "फ़ोन पर सहेजा") else if (account != null) t("Send", "भेजें") else t("Save", "सहेजें"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
         }
         Spacer(Modifier.height(12.dp))
-        if (!checkIn && sendState == FeedbackSendState.QUEUED) Text(FeedbackSendCopy.status(sendState, saved, account != null, sendError), color = DoctorCardSub, fontSize = 14.sp, lineHeight = 20.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }.testTag("feedback-send-status"))
-        if (account != null && sendState == FeedbackSendState.QUEUED) TextButton(onClick = { send(account) }, modifier = Modifier.heightIn(min = 48.dp).testTag("feedback-retry")) { Text(t("Try sending again", "फिर से भेजें"), color = RustText) }
+        if (account != null && sendState == FeedbackSendState.QUEUED) TextButton(onClick = { send(account) }, modifier = Modifier.heightIn(min = 48.dp).testTag("feedback-retry")) { Text(t("Try again", "फिर कोशिश करें"), color = RustText) }
     }
     if (discard) AlertDialog(onDismissRequest = { discard = false }, containerColor = Paper, title = { Text(t("Leave without saving?", "बिना सहेजे जाएँ?")) }, confirmButton = { TextButton(onClick = { discard = false; onClose() }) { Text(t("Leave", "जाएँ"), color = Rust) } }, dismissButton = { TextButton(onClick = { discard = false }) { Text(t("Keep editing", "लिखते रहें"), color = Rust) } })
 }

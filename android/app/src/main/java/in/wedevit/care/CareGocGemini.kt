@@ -465,6 +465,12 @@ suspend fun transcribeGocWithGemini(audio: File, lang: String?, patientId: Strin
     return transcribeGocWithGemini(audio, lang, GocGeminiHttpTransport(token), onProgress, patientId, conversationId)
 }
 
+/** Gemini reads an on-phone (Whisper) transcript onto the legal form: text only, no audio. Null when offline or Gemini cannot finish; never throws except on cancel. */
+suspend fun analyzeGocTextWithGemini(lines: List<GocGeminiLine>, model: String, lang: String?, patientId: String? = null, conversationId: String? = null): GocGeminiAnalysis? {
+    if (lines.isEmpty()) return null
+    return analyzeGocWithGemini(GocGeminiHttpTransport(GocGeminiAuth.token ?: { "" }), GocGeminiResult(lines, model, "whisper"), lang, patientId, conversationId)
+}
+
 internal suspend fun transcribeGocWithGemini(audio: File, lang: String?, transport: GocGeminiTransport, onProgress: (Float) -> Unit,
     patientId: String? = null, conversationId: String? = null): GocGeminiResult {
     val hint = lang?.takeIf { it in setOf("en", "hi", "te", "ur", "kn") } ?: "auto"

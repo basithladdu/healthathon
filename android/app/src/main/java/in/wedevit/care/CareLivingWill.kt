@@ -155,20 +155,20 @@ object AmdRules {
         else if (age == null) add(issue("L1_DOB", IssueSeverity.BLOCK, "executant.dob", "Enter a real date of birth.", "सही जन्म तिथि लिखें।"))
         else if (age < 18) add(issue("L1_ADULT", IssueSeverity.BLOCK, "executant.dob", "Only an adult (18 years or older) can make a living will.", "केवल वयस्क (18 साल या उससे ज़्यादा) ही लिविंग विल बना सकते हैं।"))
         if (!AmdIds.valid(ex.idLast4)) add(issue("ID_LAST4", IssueSeverity.BLOCK, "executant.idLast4", "Enter only the last 4 digits of the ID.", "पहचान पत्र के केवल आख़िरी 4 अंक लिखें।"))
-        if (ex.permanentAddress.isBlank()) add(issue("ADDRESS", IssueSeverity.WARN, "executant.permanentAddress", "Your address is empty. You will need to write it by hand on the paper.", "आपका पता खाली है। आपको इसे काग़ज़ पर हाथ से लिखना होगा।"))
+        if (ex.permanentAddress.isBlank()) add(issue("ADDRESS", IssueSeverity.WARN, "executant.permanentAddress", "Address is empty. Write it by hand on the paper.", "पता खाली है। काग़ज़ पर हाथ से लिखें।"))
         val d = content.declarations
         if (!d.capacity) add(issue("L1_CAPACITY", IssueSeverity.BLOCK, "declarations.capacity", "Confirm that you understand what this document means.", "पुष्टि करें कि आप समझते हैं कि इस दस्तावेज़ का क्या मतलब है।"))
         if (!d.voluntary) add(issue("L1_VOLUNTARY", IssueSeverity.BLOCK, "declarations.voluntary", "Confirm that nobody is forcing or pressuring you.", "पुष्टि करें कि कोई आप पर दबाव नहीं डाल रहा है।"))
         if (!d.consideredCarefully) add(issue("L1_CONSIDERED", IssueSeverity.BLOCK, "declarations.consideredCarefully", "Confirm that you have thought about this carefully.", "पुष्टि करें कि आपने इस पर ध्यान से सोचा है।"))
         if (!d.understandsNotAppliedIfUnclear) add(issue("L7_UNDERSTOOD", IssueSeverity.BLOCK, "declarations.understandsNotAppliedIfUnclear", "Confirm that you understand it will not be used if the situation is unclear or was not foreseen.", "पुष्टि करें कि आप समझते हैं कि स्थिति साफ़ न होने या पहले से न सोची गई होने पर इसका उपयोग नहीं होगा।"))
         if (content.conditions.isEmpty()) add(issue("CONDITIONS", IssueSeverity.BLOCK, "conditions", "Choose at least one situation when this living will applies.", "कम से कम एक स्थिति चुनें जब यह लिविंग विल लागू हो।"))
-        if (content.treatments.isEmpty()) add(issue("NO_TREATMENT_CHOICE", IssueSeverity.WARN, "treatments", "You have not chosen any specific treatment. The general direction in Section 2 will still apply.", "आपने कोई ख़ास इलाज नहीं चुना है। खंड 2 का सामान्य निर्देश फिर भी लागू होगा।"))
+        if (content.treatments.isEmpty()) add(issue("NO_TREATMENT_CHOICE", IssueSeverity.WARN, "treatments", "No treatment chosen. The general direction still applies.", "कोई इलाज नहीं चुना। सामान्य निर्देश फिर भी लागू होगा।"))
         listOf("values" to content.values, "anticipatedConditions" to content.anticipatedConditions, "wishes.focus" to content.wishes.focus, "afterDeath.lastRites" to content.afterDeath.lastRites).forEach { (field, text) ->
             if (ENDING_LIFE.containsMatchIn(text)) add(issue("NO_EUTHANASIA", IssueSeverity.BLOCK, field, "A living will cannot ask for anything meant to end life. That is against the law in India. Please change these words.", "लिविंग विल में जीवन ख़त्म करने के लिए कुछ भी नहीं माँगा जा सकता। यह भारत में क़ानून के ख़िलाफ़ है। कृपया ये शब्द बदलें।"))
         }
         val named = content.dhrs.filter { it.name.isNotBlank() }
         if (named.isEmpty()) add(issue("L2_DHR_REQUIRED", IssueSeverity.BLOCK, "dhrs", "Name at least one person who can speak for you (a representative).", "कम से कम एक व्यक्ति का नाम लिखें जो आपकी ओर से बोल सके (प्रतिनिधि)।"))
-        else if (named.size < 2) add(issue("L2_DHR_TWO", IssueSeverity.WARN, "dhrs", "It is better to name two representatives, in order of preference, in case the first cannot be reached.", "दो प्रतिनिधियों के नाम, पसंद के क्रम में, लिखना बेहतर है, ताकि पहले से संपर्क न हो पाने पर दूसरा हो।"))
+        else if (named.size < 2) add(issue("L2_DHR_TWO", IssueSeverity.WARN, "dhrs", "Name a second representative, in case the first cannot be reached.", "दूसरा प्रतिनिधि भी लिखें, ताकि पहले से संपर्क न हो तो दूसरे से हो सके।"))
         content.dhrs.forEachIndexed { index, dhr ->
             if (dhr.name.isBlank() && dhr.phone.isBlank() && dhr.relation.isBlank()) return@forEachIndexed
             val n = index + 1; val field = "dhrs.$index"
@@ -178,11 +178,11 @@ object AmdRules {
             if (!AmdIds.valid(dhr.idLast4)) add(issue("ID_LAST4", IssueSeverity.BLOCK, "$field.idLast4", "Representative $n: enter only the last 4 digits of the ID.", "प्रतिनिधि $n: पहचान पत्र के केवल आख़िरी 4 अंक लिखें।"))
             if (dhr.dob.isNotBlank() && (PlanDates.age(dhr.dob, today) ?: 0) < 18) add(issue("DHR_ADULT", IssueSeverity.BLOCK, "$field.dob", "Representative $n must be an adult (18 or older).", "प्रतिनिधि $n वयस्क (18 या उससे ज़्यादा) होना चाहिए।"))
             if (dhr.name.isNotBlank() && ex.name.isNotBlank() && normaliseName(dhr.name) == normaliseName(ex.name)) add(issue("DHR_SELF", IssueSeverity.BLOCK, "$field.name", "You cannot name yourself as your representative.", "आप ख़ुद को अपना प्रतिनिधि नहीं बना सकते।"))
-            if (!dhr.agreed) add(issue("DHR_AGREED", IssueSeverity.WARN, "$field.agreed", "Representative $n: talk to them and tick that they agreed before you sign.", "प्रतिनिधि $n: उनसे बात करें और हस्ताक्षर से पहले टिक करें कि वे सहमत हैं।"))
+            if (!dhr.agreed) add(issue("DHR_AGREED", IssueSeverity.WARN, "$field.agreed", "Representative $n: tick once they agree.", "प्रतिनिधि $n: सहमत होने पर टिक करें।"))
         }
         val names = named.map { normaliseName(it.name) }
         if (names.toSet().size != names.size) add(issue("DHR_DUPLICATE", IssueSeverity.BLOCK, "dhrs", "The same person is listed twice as a representative.", "एक ही व्यक्ति प्रतिनिधि के रूप में दो बार लिखा है।"))
-        if (content.custodianBody.isBlank()) add(issue("CUSTODIAN_BODY", IssueSeverity.WARN, "custodianBody", "Write your panchayat or municipality so a copy can go to its custodian.", "अपनी पंचायत या नगरपालिका लिखें ताकि एक प्रति उसके संरक्षक को जा सके।"))
+        if (content.custodianBody.isBlank()) add(issue("CUSTODIAN_BODY", IssueSeverity.WARN, "custodianBody", "Write your panchayat or municipality.", "अपनी पंचायत या नगरपालिका लिखें।"))
     }
 
     /** L3 and L5. BLOCK keeps the living will "printed, not signed". */
@@ -201,7 +201,7 @@ object AmdRules {
             if (w.name.isBlank()) { add(issue("L3_WITNESS", IssueSeverity.BLOCK, "$field.name", "Enter the name of witness $n.", "गवाह $n का नाम लिखें।")); return@forEachIndexed }
             val name = normaliseName(w.name)
             if (name == executant) add(issue("WITNESS_SELF", IssueSeverity.BLOCK, "$field.name", "The person making the living will cannot be their own witness.", "लिविंग विल बनाने वाला व्यक्ति ख़ुद अपना गवाह नहीं हो सकता।"))
-            if (name in dhrNames) add(issue("L3_WITNESS_IS_DHR", IssueSeverity.WARN, "$field.name", "Witness $n is also a named representative. Witnesses should preferably be independent.", "गवाह $n एक नामित प्रतिनिधि भी है। गवाह हो सके तो स्वतंत्र होने चाहिए।"))
+            if (name in dhrNames) add(issue("L3_WITNESS_IS_DHR", IssueSeverity.WARN, "$field.name", "Witness $n is also a representative.", "गवाह $n एक प्रतिनिधि भी है।"))
             if (!AmdIds.valid(w.idLast4)) add(issue("ID_LAST4", IssueSeverity.BLOCK, "$field.idLast4", "Witness $n: enter only the last 4 digits of the ID.", "गवाह $n: पहचान पत्र के केवल आख़िरी 4 अंक लिखें।"))
         }
         if (witnesses[0].name.isNotBlank() && normaliseName(witnesses[0].name) == normaliseName(witnesses[1].name)) add(issue("WITNESS_SAME", IssueSeverity.BLOCK, "execution.witnesses.1.name", "The two witnesses must be two different people.", "दोनों गवाह अलग-अलग व्यक्ति होने चाहिए।"))

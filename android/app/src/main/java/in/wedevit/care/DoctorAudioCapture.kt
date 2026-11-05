@@ -70,17 +70,16 @@ import java.time.format.DateTimeFormatter
             Text("Conversation · "+DateTimeFormatter.ofPattern("d MMM, h:mm a").withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(clip.consent.recordingConsentAt)),fontWeight=FontWeight.Medium)
             Row(verticalAlignment=Alignment.CenterVertically) {
                 IconButton(onClick={controller.play(clip)},enabled=!state.recording && !busy,modifier=Modifier.testTag("doctor-play-${clip.id}")) { Icon(if(state.playing==clip.id) Icons.Default.Stop else Icons.Default.PlayArrow,if(state.playing==clip.id) "Stop playback" else "Play recording") }
-                Text("${clip.file.length()/1024} KB",Modifier.weight(1f),style=MaterialTheme.typography.bodySmall)
+                Spacer(Modifier.weight(1f))
                 IconButton(onClick={deleting=clip},enabled=!busy && !state.recording) { Icon(Icons.Default.DeleteOutline,"Delete recording",tint=MaterialTheme.colorScheme.error) }
             }
             if(clip.consent.transcriptionConsentAt>0) Button(onClick={controller.stopPlayback();onTranscribe(clip)},enabled=signedIn && !busy && !state.recording && sourceIsBlank,modifier=Modifier.fillMaxWidth().heightIn(min=52.dp).testTag("doctor-transcribe-${clip.id}")) { Icon(Icons.Default.AutoAwesome,null,Modifier.size(18.dp));Spacer(Modifier.width(8.dp));Text("Transcribe") }
-            else Text("Upload not agreed",style=MaterialTheme.typography.bodySmall)
         }
     } }
     if(consentOpen) AlertDialog(containerColor=Paper,onDismissRequest={consentOpen=false},title={Text("Before recording")},text={
         Column(Modifier.heightIn(max=510.dp).verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(10.dp)) {
             Text("Everyone must agree.")
-            OutlinedTextField(participants,{participants=it.take(600)},label={Text("Names")},placeholder={Text("Separate with commas")},modifier=Modifier.testTag("doctor-record-participants"))
+            OutlinedTextField(participants,{participants=it.take(600)},label={Text("Names")},modifier=Modifier.testTag("doctor-record-participants"))
             names.forEachIndexed { i,name -> AudioConsentCheck(agreements[name]==true,{agreements[name]=it},"$name agrees to recording","doctor-participant-consent-$i") }
             AudioConsentCheck(purpose,{purpose=it},"We understand this is for preparing and checking a care-conversation note.","doctor-record-purpose")
             AudioConsentCheck(storage,{storage=it},"Audio stays on this device unless separately uploaded or shared.","doctor-record-storage")

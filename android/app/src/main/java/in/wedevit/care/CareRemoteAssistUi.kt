@@ -72,13 +72,13 @@ import kotlinx.coroutines.withContext
                                 try { reader.setDataSource(recording.absolutePath); reader.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L }
                                 finally { reader.release() }
                             }
-                            require(duration in 1..30000 && recording.length() in 16..2L * 1024 * 1024) { t("Choose a part up to 30 seconds and 2 MB. Longer recordings stay saved so you can check them yourself.", "30 सेकंड और 2 MB तक का हिस्सा चुनें। लंबी रिकॉर्डिंग सेव रहती हैं, ताकि आप ख़ुद जाँच सकें।") }
+                            require(duration in 1..30000 && recording.length() in 16..2L * 1024 * 1024) { t("Choose a part up to 30 seconds and 2 MB.", "30 सेकंड और 2 MB तक का हिस्सा चुनें।") }
                             val approved = previous.copy(transcriptionConsentAt = System.currentTimeMillis(), noticeVersion = maxOf(previous.noticeVersion, 3))
                             latestSaveConsent(approved)
                             val next = client.transcribe(recording, approved, duration, language, latestToken())
                             if (originalSource == latestSource) { result = next; words = next.original }
-                        } catch (cancel: CancellationException) { message = t("Stopped. Your recording is unchanged.", "रोक दिया। आपकी रिकॉर्डिंग वैसी ही है।"); throw cancel }
-                        catch (error: Exception) { message = error.message ?: t("Could not turn the speech into text. Your recording is safe.", "बात लिखाई में नहीं बदल सकी। आपकी रिकॉर्डिंग सुरक्षित है।") }
+                        } catch (cancel: CancellationException) { message = t("Stopped.", "रोक दिया।"); throw cancel }
+                        catch (error: Exception) { message = error.message ?: t("Could not turn speech into text.", "बात लिखाई में नहीं बदल सकी।") }
                         finally { busy = false }
                     }
                 }, enabled = consent && recordingConsent != null && !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("care-transcribe-turn")) { CareAssistBusy(busy); Text(if (busy) t("Turning speech into text…", "बात लिखाई में बदल रही है…") else t("Turn speech into text", "बात को लिखाई में बदलें")) }
@@ -145,8 +145,8 @@ import kotlinx.coroutines.withContext
                         try {
                             val next = client.draft(snapshot, latestToken(), consent)
                             if (snapshot == latestSource) result = next
-                        } catch (cancel: CancellationException) { message = t("Stopped. Your words are safe.", "रोक दिया। आपके शब्द सुरक्षित हैं।"); throw cancel }
-                        catch (error: Exception) { message = error.message ?: t("The draft could not be made. Your words are safe.", "ड्राफ़्ट नहीं बन सका। आपके शब्द सुरक्षित हैं।") }
+                        } catch (cancel: CancellationException) { message = t("Stopped.", "रोक दिया।"); throw cancel }
+                        catch (error: Exception) { message = error.message ?: t("The draft could not be made.", "ड्राफ़्ट नहीं बन सका।") }
                         finally { busy = false }
                     }
                 }, enabled = consent && source.isNotBlank() && source.length <= 12000 && !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("care-assist-draft")) { CareAssistBusy(busy); Text(if (busy) t("Preparing draft…", "ड्राफ़्ट बन रहा है…") else t("Make draft", "ड्राफ़्ट बनाएँ")) }
@@ -212,8 +212,8 @@ import kotlinx.coroutines.withContext
                         try {
                             val translated = client.translate(original, selectedVersion, from, to, latestToken(), consent)
                             if (original == latestSource && selectedVersion == latestVersion) result = translated
-                        } catch (cancel: CancellationException) { message = t("Stopped. The original note is unchanged.", "रोक दिया। मूल नोट वैसा ही है।"); throw cancel }
-                        catch (error: Exception) { message = error.message ?: t("Could not translate. Use the original note.", "अनुवाद नहीं हो सका। मूल नोट इस्तेमाल करें।") }
+                        } catch (cancel: CancellationException) { message = t("Stopped.", "रोक दिया।"); throw cancel }
+                        catch (error: Exception) { message = error.message ?: t("Could not translate.", "अनुवाद नहीं हो सका।") }
                         finally { busy = false }
                     }
                 }, enabled = consent && !busy && from != to && source.isNotBlank(), shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("care-translate")) { CareAssistBusy(busy); Text(if (busy) t("Translating…", "अनुवाद हो रहा है…") else t("Translate note", "नोट का अनुवाद करें")) }

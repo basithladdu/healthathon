@@ -19,7 +19,6 @@ class DoctorCareStoryTest {
         ui.onNodeWithText(person.name).assertExists()
         ui.onNode(hasText("Latest saved priority") and hasAnyAncestor(hasTestTag("doctor-handover-glance"))).assertExists()
         ui.onNodeWithText("Last recorded reviewer").assertExists()
-        ui.onNodeWithText("From latest saved care note").assertExists()
         ui.onNode(hasText(ReviewWorkflow.label(latest)) and hasAnyAncestor(hasTestTag("doctor-handover-glance"))).assertExists()
         ui.onNode(hasText("Clinical assessment") and hasAnyAncestor(hasTestTag("doctor-handover-glance"))).assertExists()
         ui.onNode(hasText("Not recorded") and hasAnyAncestor(hasTestTag("doctor-handover-glance"))).assertExists()
@@ -31,7 +30,6 @@ class DoctorCareStoryTest {
     @Test fun missingNoteNeverInventsReviewerOrClinicalAssessment() {
         ui.setContent {CareTheme {DoctorCareStory(Person("empty-story","Fictional empty record"),emptyList(),{})}}
         ui.onNodeWithText("Fictional empty record").assertExists()
-        ui.onNodeWithText("No saved care note").assertExists()
         ui.onAllNodesWithText("Not recorded").assertCountEquals(3)
         ui.onNodeWithText("Cancer",substring=true).assertDoesNotExist()
     }

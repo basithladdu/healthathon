@@ -84,7 +84,7 @@ import java.io.ByteArrayInputStream
         // Title row first, with the how-to behind the "i" button instead of a paragraph above the model.
         val help = if (readOnly) t("Pick a part to zoom in. Left and right mean the patient's sides. If the pain has gone, use ⋮ › Pain has gone (0) on the note.", "ज़ूम करने के लिए हिस्सा चुनें। बायाँ और दायाँ मरीज़ के हिसाब से है। दर्द चला गया हो तो नोट पर ⋮ › दर्द चला गया (0) चुनें।") else t("Pick a part to zoom in, then tap the model exactly where it hurts. Left and right mean the patient's sides.", "ज़ूम करने के लिए हिस्सा चुनें, फिर मॉडल पर ठीक वहाँ छुएँ जहाँ दर्द है। बायाँ और दायाँ मरीज़ की तरफ़ से हैं।")
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text(if (readOnly) t("Saved pain areas", "सहेजी गई दर्द की जगह") else t("Where is the pain? (optional)", "दर्द कहाँ है? (वैकल्पिक)"), color = DoctorCardInk, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f).a11yHeading())
+            Text(if (readOnly) t("Saved pain areas", "सहेजी गई दर्द की जगह") else t("Pain area", "दर्द की जगह"), color = DoctorCardInk, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f).a11yHeading())
             CareChartInfoButton(t("About this", "इसके बारे में"), help, "pain-body-help")
             if (!readOnly && selected.isNotEmpty()) TextButton(onClick = { active = null; onChange(emptyList(), emptyList()) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-clear")) { Text(t("Clear", "हटाएँ"), color = Rust, fontWeight = FontWeight.SemiBold) }
         }
@@ -116,7 +116,7 @@ import java.io.ByteArrayInputStream
             val part = PainBodyMapRules.focusLabel(zoomed, back, hindi)
             FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 if (zoomed in selected) {
-                    Text("$part · ${t("Marked as pain", "दर्द चिह्नित")}", color = DoctorCardInk, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.align(Alignment.CenterVertically))
+                    Text("$part · ${t("Marked", "चिह्नित")}", color = DoctorCardInk, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.align(Alignment.CenterVertically))
                     TextButton(onClick = { val next = PainBodyMapRules.unmarked(selected, zoomed); change(next, points.filter { it.site in next }) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-unmark-$zoomed")) { Icon(Icons.Default.Close, null, Modifier.size(18.dp), tint = Rust); Spacer(Modifier.width(4.dp)); Text(t("Remove", "हटाएँ"), color = Rust, fontWeight = FontWeight.SemiBold) }
                 } else {
                     TextButton(onClick = { val next = PainBodyMapRules.marked(selected, zoomed); change(next, points.filter { it.site in next }) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-mark-$zoomed")) { Text(t("Mark whole $part", "पूरा $part चिह्नित करें"), color = Rust, fontWeight = FontWeight.SemiBold) }
@@ -153,7 +153,7 @@ import java.io.ByteArrayInputStream
     val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     val stops = listOf(Color(PainBodyMapRules.NEUTRAL).copy(alpha = 0.55f)) + PainBodyMapRules.heatStops.map { Color(it) }; val blockWeights = listOf(0.5f, 1f, 2f, 2f, 2f, 2f, 0.5f) // 0 is a neutral cap (no colour); green starts at 1 // block edges sit between integers so the thumb always lies over its own block
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        FlowRow { Text(t("How strong is the pain?", "दर्द कितना तेज़ है?"), fontWeight = FontWeight.SemiBold); Text(" · $target", fontWeight = FontWeight.SemiBold, color = Rust, modifier = Modifier.testTag("pain-strength-target")) }
+        FlowRow { Text(t("Strength", "तीव्रता"), fontWeight = FontWeight.SemiBold); Text(" · $target", fontWeight = FontWeight.SemiBold, color = Rust, modifier = Modifier.testTag("pain-strength-target")) }
         Text(if (rating == null) t("Not rated", "अंक नहीं बताया") else "$rating/10 · ${PainBodyMapRules.strengthWord(rating, hindi)}", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = if (rating == null) DoctorCardSub else DoctorCardInk, modifier = Modifier.testTag("pain-strength-value"))
         Box(Modifier.fillMaxWidth()) { // the overlay takes touches so an up/down page scroll never changes the score; keyboard and TalkBack still adjust the Slider
             Slider(value = (rating ?: 0).toFloat(), onValueChange = { onRatingChange(it.roundToInt().coerceIn(0, 10)) }, valueRange = 0f..10f, steps = 9,

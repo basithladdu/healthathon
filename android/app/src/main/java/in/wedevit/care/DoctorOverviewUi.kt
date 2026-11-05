@@ -36,7 +36,7 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
                     Text(overview.previousProfessional?.name ?: t("Name not recorded", "नाम दर्ज नहीं"),fontWeight=FontWeight.Medium,fontSize=18.sp, fontFamily = SaharaTitleFont)
                 }
                 Text(t("Clinical assessment: ${overview.clinicalAssessment}", "क्लिनिकल आकलन: ${overview.clinicalAssessment}"),fontWeight=FontWeight.Medium,modifier=Modifier.testTag("overview-clinical-assessment"))
-                Column(Modifier.testTag("overview-handover-toggle"), verticalArrangement=Arrangement.spacedBy(4.dp)) {Text(overview.previousProfessional?.role ?: t("Professional role not recorded", "पेशेवर भूमिका दर्ज नहीं"));Text(overview.previousProfessional?.disclosure ?: t("No previous professional is documented.", "कोई पिछला पेशेवर दर्ज नहीं।"),fontSize=14.sp,color=DoctorCardSub)}
+                Column(Modifier.testTag("overview-handover-toggle"), verticalArrangement=Arrangement.spacedBy(4.dp)) {Text(overview.previousProfessional?.role ?: t("Professional role not recorded", "पेशेवर भूमिका दर्ज नहीं"));overview.previousProfessional?.disclosure?.takeIf{it.isNotBlank()}?.let{Text(it,fontSize=14.sp,color=DoctorCardSub)}}
                 Column(Modifier.testTag("overview-background-toggle"), verticalArrangement=Arrangement.spacedBy(4.dp)) {Text(t("Background summary", "पृष्ठभूमि का सार"),fontWeight=FontWeight.SemiBold);Text(overview.background,lineHeight=24.sp)}
             }
         }
@@ -45,7 +45,6 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
             val report=overview.latestReport
             OverviewTimeline(t("Last reported update", "पिछला बताया अपडेट"),overviewDate(report?.at),SaharaSoftBlue,"overview-latest-report") {
                 Text(report?.text ?: t("No patient or family update recorded.", "मरीज़ या परिवार का कोई अपडेट दर्ज नहीं।"),lineHeight=24.sp)
-                if(report!=null) Text("${report.source.name.lowercase().replaceFirstChar {it.uppercase()}} report",fontSize=14.sp,color=RustText)
                 TextButton(onClick={onSection("Progress")},modifier=Modifier.heightIn(min=48.dp).testTag("overview-progress")) {Text(t("View reported updates", "बताए अपडेट देखें"))}
             }
             OverviewTimeline(t("Last conversation", "पिछली बातचीत"),overviewDate(discussion?.publishedAt),SaharaLavender,"overview-last-discussion") {
@@ -79,7 +78,7 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
                         Text(overviewDate(earlier.publishedAt),style=MaterialTheme.typography.labelLarge,color=Rust)
                         OverviewDiscussionMeta(earlier)
                         Text(t("Original discussion source", "चर्चा का मूल स्रोत"),fontWeight=FontWeight.Medium,modifier=Modifier.testTag("overview-history-${earlier.id}"), fontFamily = SaharaTitleFont)
-                        Text(earlier.sourceText.ifBlank {t("Original source not recorded.", "मूल स्रोत दर्ज नहीं।")},lineHeight=24.sp,modifier=Modifier.testTag("overview-source-text-${earlier.id}"))
+                        Text(earlier.sourceText.ifBlank {t("Not recorded", "दर्ज नहीं")},lineHeight=24.sp,modifier=Modifier.testTag("overview-source-text-${earlier.id}"))
                     }
                 }
             }
@@ -95,13 +94,12 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
 @Composable private fun OverviewDiscussionMeta(discussion:DoctorOverviewDiscussion) { val t = careText();
     Text(if(discussion.isPublishedPreview) t("Version ${discussion.versionNumber}", "संस्करण ${discussion.versionNumber}") else t("Earlier discussion", "पुरानी चर्चा"),style=MaterialTheme.typography.labelMedium,color=DoctorAccent)
     Text(if(discussion.isPublishedPreview) t("Reviewer: ", "समीक्षक: ") + (discussion.reviewerName ?: t("Not recorded", "दर्ज नहीं")) else t("Discussion author: ", "चर्चा के लेखक: ") + (discussion.reviewerName ?: t("Not recorded", "दर्ज नहीं")),fontSize=14.sp,color=DoctorCardSub)
-    Text(t("Source: ${discussion.sourceLabel}", "स्रोत: ${discussion.sourceLabel}"),fontSize=14.sp,color=DoctorCardSub)
 }
 @Composable private fun OverviewSource(discussion:DoctorOverviewDiscussion) { val t = careText();
     if(discussion.sourceText.isNotBlank()) {
         Text(t("Original source", "मूल स्रोत"),fontWeight=FontWeight.Medium,modifier=Modifier.testTag("overview-source-${discussion.id}"), fontFamily = SaharaTitleFont)
         Text(discussion.sourceText,lineHeight=24.sp,modifier=Modifier.testTag("overview-source-text-${discussion.id}"))
-    } else Text(t("Original source not recorded.", "मूल स्रोत दर्ज नहीं।"),fontSize=14.sp,color=DoctorCardSub)
+    }
 }
 @Composable private fun OverviewTimeline(title:String,date:String,tint:Color,tag:String,content:@Composable ColumnScope.()->Unit) {
     Column(Modifier.fillMaxWidth().testTag(tag).drawBehind {

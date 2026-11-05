@@ -316,7 +316,6 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
         "how" -> !ratingMissing && respondent in SymptomDiaryRules.respondents && recall in SymptomDiaryRules.recalls && value.author.trim().length in 1..120 && !dateProblem
         else -> true
     }
-    val stepTitle = when (cur) { "what" -> t("What would you like to note?", "किस बारे में नोट लिखना है?"); "where" -> t("Where does it hurt?", "कहाँ दर्द है?"); else -> t("About this note", "इस नोट के बारे में") }
     val goBack: () -> Unit = { if (quick || pos <= 0) onClose() else stepKey = steps[pos - 1] }
     val scroll = rememberScrollState()
     LaunchedEffect(cur) { scroll.scrollTo(0) }
@@ -332,7 +331,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
                 Text(personName, color = DoctorCardSub, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 if (!quick) {
                     Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) { steps.forEachIndexed { i, _ -> Box(Modifier.weight(1f).height(6.dp).clip(RoundedCornerShape(3.dp)).background(if (i <= pos) DoctorAccent else DoctorHairline)) } }
-                    Text("${t("Step", "चरण")} ${pos + 1} ${t("of", "/")} ${steps.size} · $stepTitle", color = DoctorCardSub, fontSize = 14.sp, modifier = Modifier.testTag("symptom-step-indicator"))
+                    Text("${pos + 1} ${t("of", "/")} ${steps.size}", color = DoctorCardSub, fontSize = 14.sp, modifier = Modifier.testTag("symptom-step-indicator"))
                 }
             }
             Column(Modifier.weight(1f, fill = false).verticalScroll(scroll).padding(horizontal = 16.dp, vertical = 12.dp)) {

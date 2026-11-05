@@ -176,7 +176,7 @@ class MedicineStripPhotos(context: Context, storage: String) {
                 if (reading != null) read(reading)
                 note = if (reading?.name.isNullOrBlank()) t("No name found. Type it.", "नाम नहीं मिला। ख़ुद लिखें।") else ""
             }
-        } catch (failure: Exception) { if (failure is CancellationException) throw failure; note = t("This photo couldn't be kept. Try another photo.", "यह फ़ोटो नहीं रखी जा सकी। दूसरी फ़ोटो लें।") }
+        } catch (failure: Exception) { if (failure is CancellationException) throw failure; note = t("Couldn't save photo.", "फ़ोटो नहीं सहेजी गई।") }
         finally { temporary?.delete() }
     }
     val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { taken ->
@@ -200,7 +200,7 @@ class MedicineStripPhotos(context: Context, storage: String) {
                 val directory = File(context.cacheDir, "medicine-scan").apply { mkdirs() }
                 val file = File(directory, "strip-${newId()}.jpg")
                 runCatching { check(file.createNewFile()); pendingPath = file.absolutePath; camera.launch(FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)) }
-                    .onFailure { file.delete(); pendingPath = ""; note = t("No camera app is available. Choose a photo instead.", "कैमरा ऐप नहीं मिला। फ़ोटो चुनें।") }
+                    .onFailure { file.delete(); pendingPath = ""; note = t("No camera app", "कैमरा ऐप नहीं मिला") }
             }, shape = RoundedCornerShape(14.dp), contentPadding = PaddingValues(horizontal = 12.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Icon(Icons.Default.PhotoCamera, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Take photo", "फ़ोटो लें"), fontSize = 15.sp, maxLines = 2) }
             OutlinedButton(onClick = { picker.launch(arrayOf("image/*")) }, shape = RoundedCornerShape(14.dp), contentPadding = PaddingValues(horizontal = 12.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Icon(Icons.Default.PhotoLibrary, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Choose photo", "फ़ोटो चुनें"), fontSize = 15.sp, maxLines = 2) }
         }
@@ -262,7 +262,6 @@ class MedicineStripPhotos(context: Context, storage: String) {
     CareField(entry.days?.toString().orEmpty(), { value -> if (value.isBlank()) change(entry.copy(days = null)) else value.toIntOrNull()?.takeIf { it in 1..365 }?.let { change(entry.copy(days = it)) } },
         t("For how many days", "कितने दिन"), singleLine = true, placeholder = t("e.g. 5 · leave empty if ongoing", "जैसे 5 · चलती रहे तो ख़ाली छोड़ें"))
     CareField(entry.directions, { change(entry.copy(directions = it.take(500))) }, t("Directions", "तरीक़ा"), placeholder = t("e.g. as written: dissolve in water", "जैसे पर्चे में लिखा: पानी में घोलकर"))
-    if (detail.isBlank()) Text(t("Add at least the strength, form or how much each time.", "कम से कम ताक़त, रूप या हर बार कितनी लिखें।"), fontSize = 14.sp, color = RustText)
     StripPhotoRow(storage, personId, itemId, enabled = !busy) { reading ->
         if (name.isBlank() && reading.name.isNotBlank()) onName(reading.name.take(200))
         val filled = entry.copy(strength = entry.strength.ifBlank { reading.strength }, form = entry.form.ifBlank { reading.form })

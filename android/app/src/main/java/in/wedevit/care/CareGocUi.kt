@@ -376,6 +376,11 @@ private val GocTickSoft get() = DoctorStatusGoodBg
                 if (doctor != null) lines = lines.map { if (it.who.startsWith("Speaker ")) it.copy(party = if (it.who == doctor) GocParty.DOCTOR_SIDE else GocParty.PATIENT_PARTY, guessed = true) else it }
                 else askDoctor = byKey.map { it.second }.distinct().size > 1
             }.onFailure { if (it is CancellationException) throw it }
+            // Whisper wrote the words on this phone; Gemini may still read that text onto the legal form (text is small, so it often gets through when audio did not).
+            if (gemini && consentAt > 0 && lines.size > before) runCatching {
+                val heard = lines.mapIndexed { i, l -> GocGeminiLine(i.toDouble(), when (l.party) { GocParty.DOCTOR_SIDE -> "DOCTOR"; GocParty.PATIENT_PARTY -> "PATIENT_PARTY"; else -> "UNKNOWN" }, "", l.text) }
+                analyzeGocTextWithGemini(heard, OfflineWhisperModel.id, GocSpeechLanguage.valueOf(language).code.ifBlank { null }, d.patientId, clip.id)?.let { geminiReading = GocLines.text(lines) to it }
+            }.onFailure { if (it is CancellationException) throw it }
         }
         delay(50)
         if (lines.size > before) stage = GocStage.REVIEW else { askLanguage = true; typing = true; error = t("No words heard. Pick a language.", "कोई शब्द नहीं सुने। भाषा चुनें।") }
@@ -437,7 +442,7 @@ private val GocTickSoft get() = DoctorStatusGoodBg
                     }
                     if (recorderState.recording) OutlinedButton(onClick = { if (recorderState.paused) recorder.resume() else recorder.pause() }, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("goc-pause")) {
                         Icon(if (recorderState.paused) Icons.Default.PlayArrow else Icons.Default.Pause, null, tint = RustText); Spacer(Modifier.width(8.dp))
-                        Text(if (recorderState.paused) t("Resume", "फिर शुरू") else t("Pause", "रोकें (थोड़ी देर)"), color = RustText, fontSize = 16.sp)
+                        Text(if (recorderState.paused) t("Resume", "फिर शुरू") else t("Pause", "रोकें"), color = RustText, fontSize = 16.sp)
                     }
                     recorderState.error?.let { Text(it.pick(hindi), color = MaterialTheme.colorScheme.error, fontSize = 15.sp, textAlign = TextAlign.Center, modifier = Modifier.announce()) }
                 }
@@ -499,7 +504,6 @@ private val GocTickSoft get() = DoctorStatusGoodBg
                         Icon(Icons.Default.Info, null, tint = DoctorStatusWarn); Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(t("Who’s the doctor?", "डॉक्टर कौन हैं?"), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = DoctorCardInk)
-                            Text(t("Tap their line", "उनकी पंक्ति दबाएँ"), fontSize = 14.sp, color = DoctorCardSub)
                         }
                     }
                 }

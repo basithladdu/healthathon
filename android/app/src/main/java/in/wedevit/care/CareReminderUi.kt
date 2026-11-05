@@ -75,15 +75,14 @@ import java.time.ZoneId
                 else scheduler.enable(true)
                 revision++
             }) }
-            if (!allowed) OutlinedButton(onClick = { runCatching { context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)) }.onFailure { error = t("Open Android Settings → Apps → Sahara → Notifications.", "Android Settings → Apps → Sahara → Notifications खोलें।") } }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().padding(top = 12.dp).heightIn(min = 48.dp)) { Text(t("Open notification settings", "सूचना सेटिंग खोलें"), fontSize = 15.sp) }
+            if (!allowed) OutlinedButton(onClick = { runCatching { context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)) }.onFailure { error = t("Allow notifications in Settings.", "Settings में सूचनाएँ चालू करें।") } }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().padding(top = 12.dp).heightIn(min = 48.dp)) { Text(t("Open settings", "सेटिंग खोलें"), fontSize = 15.sp) }
             if (enabled && allowed && !exact && Build.VERSION.SDK_INT >= 31) {
-                OutlinedButton(onClick = { runCatching { context.startActivity(Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, android.net.Uri.parse("package:${context.packageName}"))) }.onFailure { error = t("Open Android Settings → Apps → Sahara → Alarms & reminders.", "Android सेटिंग्स → ऐप्स → Sahara → अलार्म और रिमाइंडर खोलें।") } }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().padding(top = 12.dp).heightIn(min = 48.dp).testTag("reminder-exact-off")) { Text(t("Allow on-time alerts", "समय पर सूचना की अनुमति दें"), fontSize = 15.sp) }
+                OutlinedButton(onClick = { runCatching { context.startActivity(Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, android.net.Uri.parse("package:${context.packageName}"))) }.onFailure { error = t("Allow alarms in Settings.", "Settings में अलार्म चालू करें।") } }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().padding(top = 12.dp).heightIn(min = 48.dp).testTag("reminder-exact-off")) { Text(t("Allow on-time alerts", "समय पर सूचना की अनुमति दें"), fontSize = 15.sp) }
             }
         } }
         if (error.isNotBlank()) item { Text(error, color = RustText, fontSize = 15.sp, modifier = Modifier.announce()) }
         val today = java.time.LocalDate.now()
         val eligible = items.filter { it.personId == selected && CareReminderRules.listed(it, today) }
-        // Friendly empty state: icon, one line, and the hint as the next step.
         if (eligible.isEmpty()) item { SurfaceCard { Column(Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Icon(Icons.Default.NotificationsOff, null, Modifier.size(32.dp), tint = DoctorCardSub)
             Text(t("No reminders yet", "अभी कोई रिमाइंडर नहीं"), fontSize = 16.sp, color = DoctorCardInk, textAlign = TextAlign.Center)
@@ -128,10 +127,10 @@ import java.time.ZoneId
                                 modifier = Modifier.heightIn(min = 48.dp).semantics { contentDescription = time + ": " + if (on) t("Reminder on", "रिमाइंडर चालू") else t("Reminder off", "रिमाइंडर बंद") }.testTag("reminder-dose-${item.id}-$time"))
                         }
                     }
-                } else CareField(times, { times = it; error = "" }, t("Times · HH:mm, separated by commas", "समय · HH:mm, कॉमा लगाकर"), singleLine = true)
+                } else CareField(times, { times = it; error = "" }, t("Time, e.g. 08:30", "समय, जैसे 08:30"), singleLine = true)
                 if (dates) {
-                    CareField(starts, { starts = it; error = "" }, t("Start date · YYYY-MM-DD (optional)", "शुरू की तारीख़ · YYYY-MM-DD (चाहें तो)"), singleLine = true)
-                    CareField(ends, { ends = it; error = "" }, t("Last date · YYYY-MM-DD (optional)", "आख़िरी तारीख़ · YYYY-MM-DD (चाहें तो)"), singleLine = true)
+                    CareField(starts, { starts = it; error = "" }, t("Start date", "शुरू की तारीख़"), singleLine = true)
+                    CareField(ends, { ends = it; error = "" }, t("Last date", "आख़िरी तारीख़"), singleLine = true)
                 } else TextButton(onClick = { dates = true }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Start and end dates", "शुरू और आख़िरी तारीख़"), fontSize = 15.sp) }
                 if (error.isNotBlank()) Text(error, color = RustText, fontSize = 15.sp, modifier = Modifier.announce())
                 if (doseTimes.isEmpty() || dates) Button(onClick = { runCatching {
@@ -142,7 +141,7 @@ import java.time.ZoneId
         } else if (dateOnly) {
             // Saved with a date only: no alert until a time on that day is chosen here (never a midnight alert).
             Column(Modifier.padding(top = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                CareField(times, { times = it; error = "" }, t("Alert time on that day (HH:mm)", "उस दिन सूचना का समय (HH:mm)"), singleLine = true)
+                CareField(times, { times = it; error = "" }, t("Time, e.g. 08:30", "समय, जैसे 08:30"), singleLine = true)
                 if (error.isNotBlank()) Text(error, color = RustText, fontSize = 15.sp, modifier = Modifier.announce())
                 Button(onClick = { runCatching {
                     scheduler.configure(item.id, ReminderOption(if (times.isBlank()) emptyList() else times.split(',').map(String::trim), muted = option?.muted == true)); changed()

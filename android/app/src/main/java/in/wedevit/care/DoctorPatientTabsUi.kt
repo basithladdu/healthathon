@@ -144,7 +144,7 @@ private val doctorScoreBands = listOf(ChartBand(0.0, 3.5, ChartBands.Mild), Char
 @Composable internal fun DoctorScoreTrend(name: String, days: List<Pair<LocalDate, Int>>, range: DoctorTrendRange, today: LocalDate, tag: String) {
     val t = careText(); val hindi = careHindi()
     val shown = DoctorTrendRules.within(days, range, today)
-    if (shown.isEmpty()) { Text(t("Nothing noted in this time", "इस समय में कुछ दर्ज नहीं"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.testTag("$tag-empty")); return }
+    if (shown.isEmpty()) { Text(t("No data", "कोई डेटा नहीं"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.testTag("$tag-empty")); return }
     val start = DoctorTrendRules.start(range, shown.first().first, today)
     val (lo, hi) = start.toEpochDay().toDouble() to today.toEpochDay().toDouble()
     val description = "$name: " + shown.joinToString("; ") { (day, v) -> "${day.format(careDateFormat("d MMM yyyy", hindi))} $v ${ChartBands.word(v, hindi)}" }
@@ -162,7 +162,7 @@ private val doctorScoreBands = listOf(ChartBand(0.0, 3.5, ChartBands.Mild), Char
 @Composable internal fun DoctorValueTrend(name: String, unit: String, days: List<Pair<LocalDate, Double>>, printed: Pair<Double?, Double?>, range: DoctorTrendRange, today: LocalDate, tag: String) {
     val t = careText(); val hindi = careHindi()
     val shown = DoctorTrendRules.within(days, range, today)
-    if (shown.isEmpty()) { Text(t("Nothing noted in this time", "इस समय में कुछ दर्ज नहीं"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.testTag("$tag-empty")); return }
+    if (shown.isEmpty()) { Text(t("No data", "कोई डेटा नहीं"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.testTag("$tag-empty")); return }
     val start = DoctorTrendRules.start(range, shown.first().first, today)
     val (lo, hi) = start.toEpochDay().toDouble() to today.toEpochDay().toDouble()
     val edges = shown.map { it.second } + listOfNotNull(printed.first, printed.second)
@@ -253,8 +253,7 @@ internal fun doctorLabRange(data: CareEntry): Pair<Double?, Double?> {
         item {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Heading(t("Lab reports", "जाँच रिपोर्टें"), 26); Spacer(Modifier.weight(1f))
-                if (groups.isNotEmpty()) DoctorInfoIcon(t("Lab reports", "जाँच रिपोर्टें"), t("Values and printed ranges are copied from the reports. Red means outside the printed range.", "मान और छपी सीमा रिपोर्ट से लिए गए हैं। लाल का मतलब छपी सीमा से बाहर।"), "doctor-labs-info")
-                TextButton(onClick = { full = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-labs-all")) { Text(t("All results", "सभी नतीजे"), color = RustText) }
+                if (groups.isNotEmpty()) TextButton(onClick = { full = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-labs-all")) { Text(t("All results", "सभी नतीजे"), color = RustText) }
             }
         }
         item { DoctorRangeSelector(range, { rangeKey = it.name }) }
@@ -288,7 +287,7 @@ internal fun doctorLabRange(data: CareEntry): Pair<Double?, Double?> {
                     if (open == key) {
                         val days = DoctorTrendRules.dailyAt(values.mapNotNull { (item, entry) -> entry.value.toDoubleOrNull()?.takeIf { it.isFinite() }?.let { labEpoch(item) to it } }, zone)
                         DoctorValueTrend(latestItem.title, latest.unit, days, printed, range, today, "doctor-lab-trend-$key")
-                        if (printed.first != null || printed.second != null) Text(t("Band: printed range", "पट्टी: छपी सीमा") + " ${printed.first?.let(::doctorNumber) ?: "–"}–${printed.second?.let(::doctorNumber) ?: "–"} ${latest.unit}", fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.padding(bottom = 8.dp))
+                        if (printed.first != null || printed.second != null) Text("${printed.first?.let(::doctorNumber) ?: "–"}–${printed.second?.let(::doctorNumber) ?: "–"} ${latest.unit}", fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.padding(bottom = 8.dp))
                     }
                 }
             }

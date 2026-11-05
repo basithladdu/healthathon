@@ -82,7 +82,7 @@ private fun doctorRecordedTime(at: Long, zone: ZoneId) = if (at <= 0) "Date not 
         item { DoctorDayTopCards(todayCheck, checks.firstOrNull(), zone, onOverview, onCheckIns, onCalendar, onCareTeam, onLabs) }
         item { DistressHistoryCard(entries, person.id) }
         careTeamSummary?.let { summary -> item { summary() } }
-        latestNote?.let { note -> item { Card(onClick = { onReadNote(note) }, colors = CardDefaults.cardColors(containerColor = DoctorCardReport), border = BorderStroke(1.dp, DoctorHairline), shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().testTag("doctor-latest-note")) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) { Text(t("Latest care note", "नया केयर नोट"), fontSize = 19.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk); Text(doctorRecordedTime(note.published, zone), fontSize = 14.sp, color = DoctorCardSub); Text(ReviewWorkflow.label(note), fontSize = 14.sp, color = DoctorCardSub); Text(note.topics.ifBlank { t("Read the recorded discussion.", "दर्ज चर्चा पढ़ें।") }, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk, maxLines = 3); Text(t("Read", "पढ़ें"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = RustText, modifier = Modifier.heightIn(min = 32.dp)) } } } }
+        latestNote?.let { note -> item { Card(onClick = { onReadNote(note) }, colors = CardDefaults.cardColors(containerColor = DoctorCardReport), border = BorderStroke(1.dp, DoctorHairline), shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().testTag("doctor-latest-note")) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) { Text(t("Latest care note", "नया केयर नोट"), fontSize = 19.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk); Text(doctorRecordedTime(note.published, zone), fontSize = 14.sp, color = DoctorCardSub); Text(ReviewWorkflow.label(note), fontSize = 14.sp, color = DoctorCardSub); Text(note.topics.ifBlank { t("Not recorded", "दर्ज नहीं") },fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk, maxLines = 3); Text(t("Read", "पढ़ें"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = RustText, modifier = Modifier.heightIn(min = 32.dp)) } } } }
         item { Row(Modifier.fillMaxWidth().padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically) { Text(t("Up next", "आगे क्या है"), fontSize = 21.sp, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f), fontFamily = SaharaTitleFont, color = DoctorCardInk); TextButton(onClick = onAddVisit, enabled = canEdit, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-add-visit")) { Icon(Icons.Default.Add, null); Text(t("Add visit", "विज़िट जोड़ें")) } } }
         if (visits.isEmpty()) item { SurfaceCard { Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) { Icon(Icons.Default.EventAvailable, null, tint = DoctorAccent); Text(t("No upcoming visits recorded", "आगे की कोई विज़िट दर्ज नहीं"), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardSub) } } }
         items(visits.take(3), key = { it.id }) { visit -> DoctorVisitSummary(visit, zone, onCalendar) }
@@ -152,7 +152,7 @@ private fun doctorRecordedTime(at: Long, zone: ZoneId) = if (at <= 0) "Date not 
             Column(Modifier.fillMaxWidth().testTag("doctor-condition-body"),verticalArrangement=Arrangement.spacedBy(4.dp),horizontalAlignment=Alignment.Start) {
             Text(todayCheck?.title ?: if(compact) t("No update today", "आज कोई अपडेट नहीं") else t("No update reported today", "आज कोई अपडेट नहीं बताया गया"), modifier=Modifier.testTag("doctor-condition-mood"),textAlign=TextAlign.Start,fontSize = 15.sp, lineHeight = 22.sp, fontWeight = FontWeight.SemiBold, color = todayCheck?.let { doctorMood(it.title) }?.let { doctorMoodColors(it).first } ?: DoctorCardInk)
             Text(todayCheck?.let { if(compact) DateTimeFormatter.ofPattern("h:mm a").withZone(zone).format(Instant.ofEpochMilli(it.created)) else doctorRecordedTime(it.created, zone) } ?: lastCheck?.let { if(compact) "Last: ${DateTimeFormatter.ofPattern("d MMM").withZone(zone).format(Instant.ofEpochMilli(it.created))}" else t("Last report: ${doctorRecordedTime(it.created, zone)}", "पिछली सूचना: ${doctorRecordedTime(it.created, zone)}") } ?: t("No check-ins yet", "अभी कोई हाल नहीं बताया"),modifier=Modifier.testTag("doctor-condition-time"),textAlign=TextAlign.Start, fontSize = 14.sp, color = DoctorCardSub)
-            Text(if(compact) t("Patient / family report", "मरीज़ / परिवार की सूचना") else t("Reported by the patient or family.", "मरीज़ या परिवार ने बताया।"),modifier=Modifier.testTag("doctor-condition-source"),textAlign=TextAlign.Start, fontSize = 13.sp, color = DoctorCardSub)
+            Text(t("Patient / family report", "मरीज़ / परिवार की सूचना"),modifier=Modifier.testTag("doctor-condition-source"),textAlign=TextAlign.Start, fontSize = 13.sp, color = DoctorCardSub)
             }
             if(!compact) Text(t("View dated history", "तारीख़वार इतिहास देखें"), fontSize = 14.sp, color = RustText, fontWeight = FontWeight.SemiBold)
         }
@@ -198,7 +198,6 @@ private fun doctorRecordedTime(at: Long, zone: ZoneId) = if (at <= 0) "Date not 
                     Text(t("Handover at a glance", "एक नज़र में हैंडओवर"),fontSize=22.sp,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont)
                     Text(t("Last recorded reviewer", "पिछले दर्ज समीक्षक"),fontSize=17.sp,fontWeight=FontWeight.SemiBold)
                     Text(latest?.doctor?.ifBlank {t("Not recorded", "दर्ज नहीं")}?:t("Not recorded", "दर्ज नहीं"),fontSize=18.sp,lineHeight=25.sp)
-                    Text(if(latest==null)t("No saved care note", "कोई सहेजा केयर नोट नहीं")else t("From latest saved care note", "नए सहेजे केयर नोट से"),fontSize=14.sp)
                     latest?.let {Text(ReviewWorkflow.label(it),fontSize=15.sp,lineHeight=22.sp,color=RustText)}
                     HorizontalDivider(color=DoctorHairline)
                     Text(t("Clinical assessment", "क्लिनिकल आकलन"),fontSize=17.sp,fontWeight=FontWeight.SemiBold)
@@ -222,7 +221,7 @@ private fun doctorRecordedTime(at: Long, zone: ZoneId) = if (at <= 0) "Date not 
                         listOf(t("What matters", "क्या ज़रूरी है") to note.priorities,t("Who attended", "कौन मौजूद था") to note.participants,t("Discussion", "चर्चा") to note.topics,t("Questions", "सवाल") to note.questions,t("Next steps", "अगले क़दम") to note.nextSteps).forEach {(label,value)->
                             Text(label,fontSize=17.sp,fontWeight=FontWeight.SemiBold);Text(value.ifBlank {t("Not recorded", "दर्ज नहीं")},fontSize=16.sp,lineHeight=24.sp)
                         }
-                        OutlinedButton(onClick={onRead(note)},modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("doctor-handover-read-${note.id}")){Text(t("Read exact note and source", "मूल नोट और स्रोत पढ़ें"))}
+                        OutlinedButton(onClick={onRead(note)},modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("doctor-handover-read-${note.id}")){Text(t("Read", "पढ़ें"))}
                     }
                 }
             }
@@ -266,7 +265,6 @@ private fun doctorToolLabel(label: String, hindi: Boolean) = careTr(hindi, label
         item {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Heading(t("Symptoms & distress", "लक्षण और परेशानी"), 26); Spacer(Modifier.weight(1f))
-                DoctorInfoIcon(t("Symptoms & distress", "लक्षण और परेशानी"), t("Dated self-reports, not a clinical score.", "तारीख़ वाली अपनी सूचनाएँ, क्लिनिकल स्कोर नहीं।"), "doctor-progress-info")
             }
         }
         item { DoctorRangeSelector(range, { rangeKey = it.name }) }
@@ -296,7 +294,7 @@ private fun doctorToolLabel(label: String, hindi: Boolean) = careTr(hindi, label
             if (shown.isEmpty()) item {
                 SurfaceCard { Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.testTag("doctor-checkin-empty")) {
                     Text(t("No updates match", "कोई अपडेट नहीं मिला"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-                    TextButton(onClick = { query = ""; moodKeys = "" }, Modifier.heightIn(min = 48.dp).testTag("doctor-checkin-clear-filters")) { Text(t("Clear search and filters", "खोज और फ़िल्टर हटाएँ"), color = DoctorAccent) }
+                    TextButton(onClick = { query = ""; moodKeys = "" }, Modifier.heightIn(min = 48.dp).testTag("doctor-checkin-clear-filters")) { Text(t("Clear", "हटाएँ"), color = DoctorAccent) }
                 } }
             }
             grouped.forEach { (month, list) ->

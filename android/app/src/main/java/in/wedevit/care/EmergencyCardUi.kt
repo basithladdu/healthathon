@@ -277,14 +277,14 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
             val file = withContext(Dispatchers.IO) { val plain = ensurePdf(c); if (password == null) plain else store.lockedPdf(c).also { it.writeBytes(PdfPasswordLock.lock(plain.readBytes(), password)) } }
             val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
             context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("application/pdf").putExtra(Intent.EXTRA_STREAM, uri).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), t("Share the emergency card", "आपातकालीन कार्ड साझा करें")))
-        } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; vm.message.value = t("No app is available to share the PDF.", "PDF साझा करने के लिए कोई ऐप नहीं है।") }
+        } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; vm.message.value = t("No app to share with.", "साझा करने के लिए ऐप नहीं है।") }
     }
     fun print(c: EmergencyCardRecord) = scope.launch {
         try {
             val file = withContext(Dispatchers.IO) { ensurePdf(c) }
             val manager = context.getSystemService(Context.PRINT_SERVICE) as PrintManager
             manager.print("Sahara emergency card ${c.number}", PdfFilePrintAdapter(file, "Sahara-emergency-card-${c.number}.pdf"), null)
-        } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; vm.message.value = t("Printing isn't available on this phone. Use Save PDF.", "प्रिंट उपलब्ध नहीं है।") }
+        } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; vm.message.value = t("Printing isn't available.", "प्रिंट उपलब्ध नहीं है।") }
     }
     fun remake(sections: Set<EmergencySection>, previous: EmergencyCardRecord?) = scope.launch {
         if (busy) return@launch
@@ -437,7 +437,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
                 Spacer(Modifier.height(6.dp)); Text(preview.text, fontFamily = FontFamily.Monospace, fontSize = 12.sp, lineHeight = 16.sp, modifier = Modifier.testTag("emergency-card-preview"))
                 if (preview.leftOut.isNotEmpty()) Text(t("Left out: ", "छोड़ा गया: ") + preview.leftOut.joinToString("; "), style = MaterialTheme.typography.bodySmall, color = RustText)
             } }
-            item { Button(onClick = { onMake(sections) }, enabled = ready && preview != null, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("emergency-card-make")) { Text(if (!ready) t("Loading…", "लोड हो रहा है…") else if (sections.isEmpty()) t("Choose what to include", "क्या शामिल करें चुनें") else if (previous == null) t("Make card", "कार्ड बनाएँ") else t("Save", "सहेजें")) } }
+            item { Button(onClick = { onMake(sections) }, enabled = ready && preview != null, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("emergency-card-make")) { Text(if (!ready) t("Loading…", "लोड हो रहा है…") else if (sections.isEmpty()) t("Choose", "चुनें") else if (previous == null) t("Make card", "कार्ड बनाएँ") else t("Save", "सहेजें")) } }
             item { extras() }
         }
     }

@@ -95,8 +95,8 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
                     Text(t("Only the owner can invite.", "सिर्फ़ मालिक बुला सकते हैं।"), color = DoctorCardSub)
                 }
             } else {
-                InviteSection(t("Who are you inviting?", "आप किसे बुला रहे हैं?")) {
-                    CareField(name, { name = it.take(40); code = "" }, t("Name", "नाम"), singleLine = true, placeholder = t("For example, Arjun", "जैसे, अर्जुन"))
+                InviteSection(t("Person", "व्यक्ति")) {
+                    CareField(name, { name = it.take(40); code = "" }, t("Name", "नाम"), singleLine = true)
                     Text(t("Relationship", "रिश्ता"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub)
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { CareRelations.forEach { r ->
                         FilterChip(selected = relation == r, onClick = { relation = if (relation == r) "" else r }, modifier = Modifier.heightIn(min = 48.dp), shape = RoundedCornerShape(50),
@@ -117,7 +117,7 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
                 Button(onClick = { send(true) }, enabled = !busy && name.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp).testTag("invite-send-whatsapp"), shape = RoundedCornerShape(14.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = DoctorStatusGood, contentColor = Color.White)) {
                     if (busy) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = Color.White) else Icon(Icons.AutoMirrored.Filled.Send, null)
-                    Spacer(Modifier.width(8.dp)); Text(if (busy) t("Please wait…", "कृपया रुकें…") else t("Send on WhatsApp", "WhatsApp पर भेजें"), fontWeight = FontWeight.SemiBold)
+                    Spacer(Modifier.width(8.dp)); Text(if (busy) t("Please wait…", "कृपया रुकें…") else t("WhatsApp", "व्हाट्सऐप"), fontWeight = FontWeight.SemiBold)
                 }
                 OutlinedButton(onClick = { send(false) }, enabled = !busy && name.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp), shape = RoundedCornerShape(14.dp)) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Other apps", "दूसरे ऐप")) }
             }

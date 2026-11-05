@@ -35,30 +35,19 @@ import androidx.compose.ui.unit.sp
     val visible = DoctorReportsData.filter(reports, query, category)
     val counts = DoctorReportsData.counts(reports)
     Column(modifier.fillMaxWidth().testTag("reports-browser"), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        Surface(color = SaharaApricot, contentColor = Ink, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth()) {
-            Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Surface(color = Rust, contentColor = Paper, shape = RoundedCornerShape(14.dp)) { Icon(Icons.Outlined.FolderOpen, null, Modifier.padding(12.dp).size(28.dp)) }
-                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(t("Reports", "रिपोर्टें"), Modifier.a11yHeading(), fontSize = 24.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
-                    Text("${reports.size} ${if (reports.size == 1) "summary" else "summaries"} · ${reports.count { it.hasAttachedFile }} attached files", fontSize = 14.sp, color = DoctorCardSub)
-                }
-            }
-        }
+        Text(t("Reports", "रिपोर्टें"), Modifier.a11yHeading(), fontSize = 24.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
         OutlinedTextField(value = query, onValueChange = { onQueryChange(it.take(200)) }, label = { Text(t("Search", "खोजें")) }, leadingIcon = { Icon(Icons.Outlined.Search, null, tint = Rust) }, trailingIcon = if (query.isNotBlank()) { { IconButton(onClick = { onQueryChange("") }) { Icon(Icons.Outlined.Close, t("Clear search", "खोज मिटाएँ")) } } } else null, singleLine = true, modifier = Modifier.fillMaxWidth().testTag("reports-search"), shape = RoundedCornerShape(14.dp), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Rust, focusedLabelColor = Rust, cursorColor = Rust))
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                ReportFolder(t("All summaries", "सभी सार"), reports.size, category == null, "All", onClick = { onCategoryChange(null) })
+                ReportFolder(t("All", "सभी"), reports.size, category == null, "All", onClick = { onCategoryChange(null) })
                 DoctorReportCategory.entries.forEach { item -> ReportFolder(item.label, counts.getValue(item), category == item, item.name, onClick = { onCategoryChange(item) }) }
             }
-        }
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text(t("Report summaries", "रिपोर्ट के सार"), fontSize = 20.sp, fontWeight = FontWeight.Medium, color = Ink, modifier = Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont)
         }
         if (visible.isEmpty()) Surface(color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("reports-empty")) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Icon(Icons.Outlined.FindInPage, null, tint = Rust, modifier = Modifier.size(30.dp))
                 Text(if (query.isNotBlank()) t("No matching summaries", "कोई सार नहीं मिला") else t("No summaries in this category", "इस श्रेणी में कोई सार नहीं"), fontSize = 18.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
-                TextButton(onClick = { onQueryChange(""); onCategoryChange(null) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Show all summaries", "सभी सार दिखाएँ"), color = Rust) }
+                TextButton(onClick = { onQueryChange(""); onCategoryChange(null) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Show all", "सभी दिखाएँ"), color = Rust) }
             }
         }
         visible.forEach { report ->
@@ -88,14 +77,14 @@ import androidx.compose.ui.unit.sp
 
 @Composable fun DoctorReportDetail(report: DoctorReportSummary, modifier: Modifier = Modifier) { val t = careText();
     Column(modifier.fillMaxWidth().testTag("report-detail-${report.id}"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Surface(color = SaharaApricot, shape = RoundedCornerShape(20.dp), contentColor = Ink, modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Icon(Icons.Outlined.Description, null, tint = Rust, modifier = Modifier.size(28.dp)); Text(report.title, Modifier.a11yHeading(), fontSize = 24.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont); Text("${report.patientName} · ${report.category.label}", fontSize = 16.sp) } }
+        Text(report.title, Modifier.a11yHeading(), fontSize = 24.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
+        Text("${report.patientName} · ${report.category.label}", fontSize = 14.sp, color = DoctorCardSub)
         Surface(color = Paper, shape = RoundedCornerShape(20.dp), contentColor = Ink, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(t("Summary", "सार"), Modifier.a11yHeading(), fontSize = 19.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
                 Text(report.summary, fontSize = 16.sp, lineHeight = 25.sp, modifier = Modifier.testTag("report-exact-summary"))
                 HorizontalDivider(color = DoctorHairline)
                 Text(t("Source: ${report.sourceLabel}", "स्रोत: ${report.sourceLabel}"), fontSize = 14.sp, color = DoctorCardSub)
-                Text("Author: ${report.author?.takeIf { it.isNotBlank() } ?: t("Not recorded", "दर्ज नहीं")}", fontSize = 14.sp, color = DoctorCardSub)
+                report.author?.takeIf { it.isNotBlank() }?.let { Text("Author: $it", fontSize = 14.sp, color = DoctorCardSub) }
             }
         }
     }

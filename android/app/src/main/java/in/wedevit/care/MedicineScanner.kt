@@ -88,7 +88,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
             runCatching { context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
         }
         val merged = (current + selected.map(Uri::toString)).distinct()
-        if (merged.size > maximum) vm.message.value = t("Use up to $maximum $label. The extra photos weren't added.", "ज़्यादा से ज़्यादा $maximum $label जोड़ें। बाक़ी फ़ोटो नहीं जोड़ी गईं।")
+        if (merged.size > maximum) vm.message.value = t("Use up to $maximum $label.", "ज़्यादा से ज़्यादा $maximum $label जोड़ें।")
         return merged.take(maximum)
     }
 
@@ -244,7 +244,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                 Text(t("Original pages", "असली पेज"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
                 prescriptionUris.forEachIndexed { index, uri -> TextButton(onClick = { runCatching {
                     context.startActivity(Intent(Intent.ACTION_VIEW).setDataAndType(Uri.parse(uri), "image/*").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION))
-                }.onFailure { scanError = t("No image viewer is available. Open this photo in Files to compare it.", "फ़ोटो देखने का ऐप नहीं मिला। मिलाने के लिए यह फ़ोटो Files में खोलें।") } }, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Image, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("View prescription page ${index + 1}", "पर्चे का पेज ${index + 1} देखें"), fontSize = 15.sp) } }
+                }.onFailure { scanError = t("No image viewer available.", "फ़ोटो देखने वाला ऐप नहीं मिला।") } }, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Image, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("View prescription page ${index + 1}", "पर्चे का पेज ${index + 1} देखें"), fontSize = 15.sp) } }
             } }
             warnings.forEach { warning -> item(warning) { SurfaceCard(Peach) { Row(verticalAlignment = Alignment.Top) { Icon(Icons.Default.WarningAmber, null, Modifier.size(20.dp), tint = RustText); Spacer(Modifier.width(12.dp)); Text(warning, fontSize = 15.sp, color = DoctorCardInk) } } } }
             items(drafts.size, key = { drafts[it].id }) { index ->
@@ -261,7 +261,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                     Text(run { val n = unmatched.size; if (n == 1) t("1 medicine photo was not matched", "दवा की 1 फ़ोटो नहीं मिली") else t("$n medicine photos were not matched", "दवा की $n फ़ोटो नहीं मिलीं") }, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
                     unmatched.filter { it in medicineUris.indices }.forEach { index -> TextButton(onClick = { runCatching {
                         context.startActivity(Intent(Intent.ACTION_VIEW).setDataAndType(Uri.parse(medicineUris[index]), "image/*").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION))
-                    }.onFailure { scanError = t("No image viewer is available. Open this photo in Files to compare it.", "फ़ोटो देखने वाला ऐप नहीं मिला। मिलान के लिए यह फ़ोटो Files में खोलें।") } }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("View medicine photo ${index + 1}", "दवा की फ़ोटो ${index + 1} देखें")) } }
+                    }.onFailure { scanError = t("No image viewer available.", "फ़ोटो देखने वाला ऐप नहीं मिला।") } }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("View medicine photo ${index + 1}", "दवा की फ़ोटो ${index + 1} देखें")) } }
                     Spacer(Modifier.height(8.dp)); CheckLine(unmatchedReviewed, { unmatchedReviewed = it }, t("I reviewed the unmatched medicine photos.", "मैंने बिना मिली दवा की फ़ोटो जाँच ली हैं।"))
                 }
             }
@@ -286,9 +286,9 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                             val originals = sourceStore.save(personAtOpen, scanId, prescriptionUris.map(Uri::parse), vm.reportFiles)
                             val references = withContext(Dispatchers.IO) { sourceStore.references(originals, vm.reportFiles) }
                             val linked = drafts.map { draft -> if (references.isBlank()) draft else draft.copy(medicine = draft.medicine.copy(instructions = draft.medicine.instructions + "\nOriginal prescription references:\n" + references)) }
-                            require(vm.selected.value == personAtOpen) { t("The selected person changed. Open this prescription for the right person.", "चुना गया व्यक्ति बदल गया है। सही व्यक्ति के लिए यह पर्चा खोलें।") }
+                            require(vm.selected.value == personAtOpen) { t("The selected person changed.", "चुना गया व्यक्ति बदल गया है।") }
                             if(onReviewedMedicines != null) {
-                                require(stagingAllowed()) { t("This prescription's account or edit access changed. Nothing was saved.", "इस पर्चे का खाता या बदलाव की अनुमति बदल गई है। कुछ सहेजा नहीं गया।") }
+                                require(stagingAllowed()) { t("Access changed. Nothing was saved.", "पहुँच बदल गई। कुछ सहेजा नहीं गया।") }
                                 onReviewedMedicines(linked)
                                 releaseSelectedPhotos()
                             } else vm.saveMedicineList(linked) {
@@ -296,7 +296,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                                 File(context.cacheDir, "medicine-scan").deleteRecursively()
                                 onClose()
                             }
-                        } catch (failure: Exception) { if (failure is CancellationException) throw failure; scanError = failure.message ?: t("Could not keep the original pages. Your medicine list has not been saved.", "असली पेज सँभाले नहीं जा सके। आपकी दवा की सूची सहेजी नहीं गई।") }
+                        } catch (failure: Exception) { if (failure is CancellationException) throw failure; scanError = failure.message ?: t("Could not keep the original pages.", "असली पेज सँभाले नहीं जा सके।") }
                         finally { savingSources = false }
                     }
                 }, enabled = valid && !busy && !savingSources, modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp), shape = RoundedCornerShape(14.dp)) {

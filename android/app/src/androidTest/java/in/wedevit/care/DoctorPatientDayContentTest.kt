@@ -76,7 +76,6 @@ class DoctorPatientDayContentTest {
         } } }
         ui.onNodeWithTag("doctor-condition-chart").assertDoesNotExist()
         ui.onNodeWithText("October 2026").assertExists()
-        ui.onNodeWithTag("doctor-progress-info").assertExists()
         ui.onNodeWithTag("doctor-checkin-summary").assertExists()
         screenshot("doctor-condition-history")
         listOf("good", "okay", "hard").forEach {
@@ -137,8 +136,8 @@ class DoctorPatientDayContentTest {
         ui.onNodeWithTag("doctor-care-story").performScrollToNode(hasText("This person's recorded discussion"))
         ui.onNodeWithText("This person's recorded discussion").assertExists()
         ui.onNodeWithText("Other person's private discussion").assertDoesNotExist()
-        ui.onNodeWithTag("doctor-care-story").performScrollToNode(hasText("Read exact note and source"))
-        ui.onNodeWithText("Read exact note and source").performClick()
+        ui.onNodeWithTag("doctor-care-story").performScrollToNode(hasTestTag("doctor-handover-read-own"))
+        ui.onNodeWithTag("doctor-handover-read-own").performClick()
         assertEquals(listOf("own"), opened)
     }
 

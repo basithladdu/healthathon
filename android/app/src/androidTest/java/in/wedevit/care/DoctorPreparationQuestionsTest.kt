@@ -15,11 +15,11 @@ class DoctorPreparationQuestionsTest {
         compose.setContent { CareTheme { DoctorPreparationQuestions(store,"isolated-test",true,{true},{}) } }
         compose.onNodeWithTag("doctor-add-preparation-question").performClick()
         compose.onNodeWithTag("doctor-preparation-question-input").performTextInput("Who should join?")
-        compose.onNodeWithText("Save question").performClick()
+        compose.onNodeWithText("Save").performClick()
         compose.onNodeWithText("Who should join?").assertIsDisplayed()
         compose.onNodeWithText("Edit").performClick()
         compose.onNodeWithTag("doctor-preparation-question-input").performTextReplacement("What matters?")
-        compose.onNodeWithText("Save question").performClick()
+        compose.onNodeWithText("Save").performClick()
         compose.onNodeWithText("Remove",useUnmergedTree=true).performClick()
         compose.onNodeWithText("Remove question").performClick()
         compose.runOnIdle { assertEquals(emptyList<DoctorPreparationQuestion>(),store.load("isolated-test")) }

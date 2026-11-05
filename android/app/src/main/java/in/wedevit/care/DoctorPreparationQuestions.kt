@@ -163,17 +163,16 @@ private class PrepModel(val store: DoctorPreparationStore, val scope: String, va
     DisposableEffect(busy) { callback(busy); onDispose { callback(false) } }
     PrepCard("doctor-preparation-questions", t("Questions", "सवाल"), "", m) {
         if (m.rows.isEmpty()) Text(t("No questions yet", "अभी कोई सवाल नहीं"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardSub, modifier = Modifier.testTag("doctor-preparation-empty"))
-        m.rows.forEachIndexed { index, row ->
+        m.rows.forEach { row ->
             val shown = drafts[row.id] ?: row.text
             HorizontalDivider(color = DoctorHairline)
             Column(Modifier.fillMaxWidth().testTag("doctor-preparation-row-${row.id}")) {
                 Column(Modifier.padding(vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text(t("Question ${index + 1}", "सवाल ${index + 1}"), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = RustText, modifier = Modifier.testTag("doctor-preparation-number-${row.id}"))
                     if (editable) {
                         OutlinedTextField(shown, { drafts = drafts + (row.id to it.take(DOCTOR_PREPARATION_MAX_QUESTION_CHARS)) }, label = { Text(t("Question", "सवाल")) }, minLines = 2, enabled = m.loaded, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-preparation-question-input-${row.id}"))
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text("${shown.length}/$DOCTOR_PREPARATION_MAX_QUESTION_CHARS", fontSize = 13.sp, color = DoctorCardSub, modifier = Modifier.weight(1f))
-                            if (drafts.containsKey(row.id)) TextButton(onClick = { if (m.persist(m.rows.map { if (it.id == row.id) it.copy(text = shown.trim()) else it })) drafts = drafts - row.id }, enabled = m.loaded && shown.isNotBlank(), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-preparation-save-${row.id}")) { Text(t("Save question", "सवाल सहेजें"), color = RustText) }
+                            if (drafts.containsKey(row.id)) TextButton(onClick = { if (m.persist(m.rows.map { if (it.id == row.id) it.copy(text = shown.trim()) else it })) drafts = drafts - row.id }, enabled = m.loaded && shown.isNotBlank(), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-preparation-save-${row.id}")) { Text(t("Save", "सहेजें"), color = RustText) }
                             TextButton(onClick = { confirmRemove = row.id }, enabled = m.loaded, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-preparation-remove-${row.id}")) { Text(t("Remove", "हटाएँ"), color = RustText) }
                         }
                     } else Text(row.text, fontSize = 16.sp, lineHeight = 23.sp, color = DoctorCardInk)
@@ -197,9 +196,8 @@ private class PrepModel(val store: DoctorPreparationStore, val scope: String, va
 ) { val t = careText();
     val m = rememberPrepModel(store, scope, emptyList(), editable, canSave, onChange, reload)
     var drafts by rememberSaveable(scope) { mutableStateOf(emptyMap<String, String>()) }
-    val unanswered = doctorUnansweredQuestions(m.rows).size
     PrepCard("doctor-preparation-answers", t("Answers", "जवाब"), "", m) {
-        Text(if (m.rows.isEmpty()) t("No questions yet", "अभी कोई सवाल नहीं") else if (unanswered == 0) t("All answered", "सबके जवाब मिले") else t("$unanswered unanswered", "$unanswered के जवाब बाक़ी"), fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, color = if (m.rows.isNotEmpty() && unanswered == 0) DoctorStatusGood else DoctorStatusWarn, modifier = Modifier.testTag("doctor-preparation-answers-status"))
+        if (m.rows.isEmpty()) Text(t("No questions yet", "अभी कोई सवाल नहीं"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardSub, modifier = Modifier.testTag("doctor-preparation-answers-status"))
         NoteRules.labels.indices.forEach { s ->
             val group = m.rows.filter { it.section == s }
             if (group.isNotEmpty()) {
@@ -211,7 +209,6 @@ private class PrepModel(val store: DoctorPreparationStore, val scope: String, va
                             Text(row.text, fontSize = 16.sp, lineHeight = 23.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
                             if (row.answer.isNotBlank()) {
                                 Text(row.answer, fontSize = 16.sp, lineHeight = 23.sp, color = DoctorCardInk, modifier = Modifier.testTag("doctor-preparation-answer-${row.id}"))
-                                Text(t("Answered", "जवाब मिला"), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorStatusGood, modifier = Modifier.testTag("doctor-preparation-answered-${row.id}"))
                             } else {
                                 val shown = drafts[row.id].orEmpty()
                                 Text(t("Unanswered", "जवाब बाक़ी"), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorStatusWarn, modifier = Modifier.testTag("doctor-preparation-unanswered-${row.id}"))
@@ -219,7 +216,7 @@ private class PrepModel(val store: DoctorPreparationStore, val scope: String, va
                                     OutlinedTextField(shown, { drafts = drafts + (row.id to it.take(DOCTOR_PREPARATION_MAX_ANSWER_CHARS)) }, label = { Text(t("Your answer", "आपका जवाब")) }, minLines = 2, enabled = m.loaded, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-preparation-answer-input-${row.id}"))
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Text("${shown.length}/$DOCTOR_PREPARATION_MAX_ANSWER_CHARS", fontSize = 13.sp, color = DoctorCardSub, modifier = Modifier.weight(1f))
-                                        TextButton(onClick = { if (m.persist(m.rows.map { if (it.id == row.id) it.copy(answer = shown.trim()) else it })) drafts = drafts - row.id }, enabled = m.loaded && shown.isNotBlank(), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-preparation-answer-save-${row.id}")) { Text(t("Save answer", "जवाब सहेजें"), color = RustText) }
+                                        TextButton(onClick = { if (m.persist(m.rows.map { if (it.id == row.id) it.copy(answer = shown.trim()) else it })) drafts = drafts - row.id }, enabled = m.loaded && shown.isNotBlank(), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-preparation-answer-save-${row.id}")) { Text(t("Save", "सहेजें"), color = RustText) }
                                     }
                                 }
                             }

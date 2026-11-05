@@ -27,14 +27,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable fun DoctorCareTeamSummary(vm: CareModel, personId: String, onOpen: () -> Unit) { val t = careText();
-    val contacts by vm.careContacts.collectAsStateWithLifecycle()
-    val readable by vm.canReadCareTeam.collectAsStateWithLifecycle()
     Card(onClick = onOpen, colors = CardDefaults.cardColors(containerColor = DoctorCardReport), border = BorderStroke(1.dp, DoctorHairline), shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 72.dp).testTag("doctor-care-team-summary").semantics(mergeDescendants = true) { contentDescription = t("View care team", "देखभाल टीम देखें") }) {
         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Box(Modifier.size(40.dp).background(DoctorCardConversation, CircleShape), contentAlignment = Alignment.Center) { Icon(Icons.Default.Groups, null, tint = DoctorAccent, modifier = Modifier.size(22.dp)) }
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(t("Family & care team", "परिवार और देखभाल टीम"), fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-                Text(if (readable) t("${contacts.count { it.personId == personId }} linked contacts", "${contacts.count { it.personId == personId }} जुड़े संपर्क") else t("Contacts not shared", "संपर्क साझा नहीं"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
             }
             Icon(Icons.Default.ChevronRight, null, tint = DoctorAccent)
         }

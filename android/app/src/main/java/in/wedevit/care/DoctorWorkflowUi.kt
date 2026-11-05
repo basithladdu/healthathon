@@ -161,7 +161,7 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
             0 -> {
                 item { WorkflowSection(t("Previous discussion", "पिछली चर्चा")) }
                 val previous = versions.firstOrNull()
-                if (previous != null) item { WorkflowCard { Text(t("Care note v${previous.number}", "केयर नोट v${previous.number}"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont); Text(previous.draft.nextSteps.ifBlank { t("No next steps recorded.", "कोई अगला क़दम दर्ज नहीं।") }); TextButton(onClick = { selectedVersion = previous.id }, modifier = Modifier.testTag("workflow-version-${previous.id}")) { Text(t("Read", "पढ़ें")) } } }
+                if (previous != null) item { WorkflowCard { Text(t("Care note v${previous.number}", "केयर नोट v${previous.number}"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont); Text(previous.draft.nextSteps.ifBlank { t("Not recorded", "दर्ज नहीं") }); TextButton(onClick = { selectedVersion = previous.id }, modifier = Modifier.testTag("workflow-version-${previous.id}")) { Text(t("Read", "पढ़ें")) } } }
                 else item { WorkflowCard { Text(sources.firstOrNull()?.label ?: t("No previous discussion", "कोई पिछली चर्चा नहीं"), fontWeight = FontWeight.SemiBold); sources.firstOrNull()?.let { Text(it.text) } } }
                 item { WorkflowSection(t("Checklist", "सूची")) }
                 items(draft.checklist.withIndex().toList(), key = { it.index }) { (index, topic) -> WorkflowCard {

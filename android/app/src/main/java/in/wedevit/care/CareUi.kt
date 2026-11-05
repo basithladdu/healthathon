@@ -134,7 +134,7 @@ private val CareSurfaceHigh = Color(0xFFF1E9DE)
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     val language = rememberCareLanguage(vm.accountNamespace)
     val t = { en: String, hi: String -> careTr(language.hindi, en, hi) }
-    val askOwner = t("Ask the person who invited you to allow changes.", "बदलाव करने की अनुमति के लिए उस व्यक्ति से कहें जिसने आपको जोड़ा है।")
+    val askOwner = t("View only", "सिर्फ़ देखने के लिए")
     var tab by rememberSaveable { mutableIntStateOf(0) }
     // Screens opened from inside a tab (Calendar, Care team, Lab history, Symptoms, Docs from More…) remember where they came from.
     // Each entry may also name an overlay or sheet to reopen on the way back (see CareNavTrail), so Back returns to the page it came from.
@@ -364,7 +364,6 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                                     Box(Modifier.fillMaxWidth().weight(1f)) {
                                         if (doctorContent != null) doctorContent.invoke(close) { formBusy = it }
                                         else Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(22.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                                            Heading(t("Doctor sign in", "डॉक्टर साइन इन"), 27)
                                             Button(onClick = onSharedWorkspace, enabled = !formBusy && !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-open-doctor-workspace")) { Text(t("Sign in", "साइन इन")) }
                                         }
                                     }
@@ -495,9 +494,8 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             item(key = "todo-title") { SectionTitle(t("To do", "करने के काम"), if (canEdit) t("Add task", "काम जोड़ें") else null) { onAdd("task") } }
             if (tasks.isEmpty() && loaded) item { SurfaceCard { Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Checklist, null, Modifier.size(22.dp), tint = DoctorAccent); Spacer(Modifier.width(12.dp)); Text(CareTodayRules.emptyText("tasks", canEdit, hindi), color = DoctorCardSub) } } }
             items(tasks.take(4), key = { it.id }) { CareRow(it, vm) }
-            if (tasks.size > 4) item { TextButton(onClick = { onCare("To do") }, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Text(t("See all ${tasks.size} tasks", "सभी ${tasks.size} काम देखें")) } }
+            if (tasks.size > 4) item { TextButton(onClick = { onCare("To do") }, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Text(t("See all", "सब देखें")) } }
         }
-        if (family) item(key = "family-tips") { FamilyCaregiverTipsCard() }
         if (clinician) {
             item { SectionTitle(t("Journal", "डायरी"), t("Write a note", "नोट लिखें")) { onAdd("journal") } }
             val notes = items.filter { it.kind == "journal" && !PatientProfileCodec.isStructured(it.detail) && !SideEffectCodec.isStructured(it.detail) }
@@ -593,9 +591,9 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     }
     val startConsentedRecording = {
         if (vm.canEdit.value && vm.localAudioRecordingAllowed && !vm.recordingSaving.value && vm.recordingSaveError.value == null) vm.startRecording(consentNames.joinToString("\n"), consentNames.toSet(), purposeAccepted, storageAccepted, accessAccepted, transcriptionAccepted, expected = recordingExpected)
-        else vm.message.value = t("Recording is not available. Check that you can make changes, or let the last audio finish saving.", "रिकॉर्डिंग अभी नहीं हो सकती। देखें कि आप बदलाव कर सकते हैं, या पिछला ऑडियो सेव होने दें।")
+        else vm.message.value = t("Recording unavailable", "रिकॉर्डिंग उपलब्ध नहीं")
     }
-    val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted -> if (granted) startConsentedRecording() else vm.message.value = t("Microphone permission wasn't granted. You can still type the conversation.", "माइक की अनुमति नहीं मिली। आप फिर भी बातचीत लिख सकते हैं।") }
+    val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted -> if (granted) startConsentedRecording() else vm.message.value = t("Microphone permission needed.", "माइक की अनुमति चाहिए।") }
     LaunchedEffect(draft.source, draft.priorities, draft.participants, draft.topics, draft.questions, draft.nextSteps) { reviewed = false }
     val captureCallback by rememberUpdatedState(onDoctorCaptureChange)
     val capturing = doctorPresentation && clinician && step == 1
@@ -648,7 +646,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         if (!doctorCapture) item { Heading(if (clinician) t("Conversation", "बातचीत") else t("Care notes", "देखभाल नोट")) }
         if (doctorPresentation && !doctorCapture && onDoctorBack != null) item { TextButton(onClick = onDoctorBack, enabled = !recordingSaving && recordingSaveError == null && !recording && !dictating && !audienceBusy) { Text(t("Back to conversations", "बातचीत पर वापस")) } }
         if (clinician) {
-            if (!doctorCapture) item { Column { ConversationStepper(topStep); val subLabel = ConversationPages.subLabel(topStep, subPage, careHindi()); if (subLabel.isNotBlank()) Text(subLabel, fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(top = 4.dp).testTag("conversation-substep")) } }
+            if (!doctorCapture) item { ConversationStepper(topStep) }
             when (step) {
                 0 -> {
                     if (attendeeScope.isBlank()) item { Text(t("Choose a person first.", "पहले व्यक्ति चुनें।"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub) }
@@ -662,13 +660,12 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                         }
                     }
                     if (preparationScope.isNotBlank()) item { DoctorPreparationQuestions(preparationStore, preparationScope, !busy && !recording && !dictating && !recordingSaving && recordingSaveError == null, canSave = { !vm.recordingSaving.value && vm.recordingSaveError.value == null && canEditCareContext(vm, draft.personId, preparationAccount) && vm.draft.value.conversationId == draft.conversationId }, onInteraction = { preparationBusy = it }, initial = remember(preparationScope, previousVersion?.id) { doctorSuggestQuestions(previousVersion?.let { DoctorPreviousNote(it.priorities, it.participants, it.topics, it.questions, it.nextSteps) }, "") }, onChange = { prepRows = it }, reload = prepReload) }
-                    item { Button(onClick = { nextStep(1) }, enabled = attendeesConsented && !recordingSaving && recordingSaveError == null && !preparationBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Continue to recording", "रिकॉर्डिंग पर आगे बढ़ें")); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null) } }
-                    if (!attendeesConsented) item { Text(if (attendees.isEmpty()) t("Add at least one person before continuing.", "आगे बढ़ने से पहले कम से कम एक व्यक्ति जोड़ें।") else t("Continue unlocks once everyone listed has agreed to being recorded.", "सूची के सभी लोग रिकॉर्डिंग के लिए राज़ी हों, तभी आगे बढ़ सकते हैं।"), fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint, modifier = Modifier.testTag("attendees-continue-reason")) }
+                    item { Button(onClick = { nextStep(1) }, enabled = attendeesConsented && !recordingSaving && recordingSaveError == null && !preparationBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Continue", "आगे बढ़ें")); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null) } }
                 }
                 1 -> {
                     if (doctorPresentation) item { DoctorCaptureHeader(captureMode, { captureMode = it }, recording, dictating, level, seconds.toLong(), vm.demoMode, onDoctorBack, !recording && !dictating && !permissionDialog && !audienceBusy && !recordingSaving && recordingSaveError == null, localRecordingAllowed = vm.localAudioRecordingAllowed && recordingCanEdit && !recordingSaving && recordingSaveError == null, testRecord = vm.demoMode && DoctorTestProfiles.contains(draft.personId)) }
                     if (recordingSaving || recordingSaveError != null) captureItem { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(if(recordingSaving) t("Saving the audio and everyone's agreement on this phone…", "ऑडियो और सबकी सहमति इस फ़ोन पर सेव कर रहे हैं…") else t("The audio was kept, but its details could not be saved. Try again before you continue.", "ऑडियो फ़ाइल रखी गई, पर उसकी जानकारी सहेजी नहीं जा सकी। आगे बढ़ने से पहले फिर कोशिश करें।"))
+                        Text(if(recordingSaving) t("Saving…", "सहेज रहे हैं…") else t("Couldn't save. Try again.", "सेव नहीं हुआ। फिर कोशिश करें।"))
                         if (recordingSaveError != null) OutlinedButton(onClick = vm::retrySavingRecording, enabled = !recordingSaving, modifier = Modifier.heightIn(min = 48.dp).testTag("retry-saving-audio")) { Text(t("Retry saving audio", "ऑडियो फिर से सहेजें")) }
                     } }
                     if (!vm.demoMode && (!doctorPresentation || captureMode == "Dictate")) captureItem { CareDictationPanel(draft.personId, recording, enabled = !busy && draft.personId.isNotBlank(),
@@ -689,12 +686,12 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                             val meter by animateFloatAsState(level.coerceIn(0f, 1f), tween(120), label = "microphone level")
                             Text(t("Recording · ${seconds / 60}:${(seconds % 60).toString().padStart(2, '0')}", "रिकॉर्डिंग · ${seconds / 60}:${(seconds % 60).toString().padStart(2, '0')}"), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk)
                             LinearProgressIndicator(progress = { meter }, modifier = Modifier.fillMaxWidth(), color = DoctorAccent)
-                        } else Text(if (recordingSaving) t("Saving…", "सहेज रहे हैं…") else t("Ready to record", "रिकॉर्ड करने को तैयार"), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk)
+                        }
                         Button(onClick = { if (recording) vm.stopRecording() else {
                             recordingExpected = if (doctorPresentation) doctorConversationIdentity(vm.accountNamespace,draft) else null
                             purposeAccepted = false; storageAccepted = false; accessAccepted = false; transcriptionAccepted = false
                             permissionDialog = true
-                        } }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp), enabled = recordingCanEdit && recordingSaveError == null && vm.localAudioRecordingAllowed && !recordingSaving && draft.personId.isNotBlank() && !dictating && (!busy || recording)) { Icon(if (recording) Icons.Default.Stop else Icons.Default.Mic, null); Spacer(Modifier.width(8.dp)); Text(if (recordingSaving) t("Saving recording on this phone…", "फ़ोन पर रिकॉर्डिंग सहेज रहे हैं…") else if (!vm.localAudioRecordingAllowed) t("Recording unavailable", "रिकॉर्डिंग उपलब्ध नहीं") else if (recording) t("Stop and save", "रोकें और सहेजें") else t("Record conversation", "बातचीत रिकॉर्ड करें")) }
+                        } }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp), enabled = recordingCanEdit && recordingSaveError == null && vm.localAudioRecordingAllowed && !recordingSaving && draft.personId.isNotBlank() && !dictating && (!busy || recording)) { Icon(if (recording) Icons.Default.Stop else Icons.Default.Mic, null); Spacer(Modifier.width(8.dp)); Text(if (recordingSaving) t("Saving…", "सहेज रहे हैं…") else if (!vm.localAudioRecordingAllowed) t("Recording unavailable", "रिकॉर्डिंग उपलब्ध नहीं") else if (recording) t("Stop", "रोकें") else t("Record conversation", "बातचीत रिकॉर्ड करें")) }
                     } } }
                     items(if(recordingSaving || recordingSaveError != null || doctorPresentation) emptyList() else recordings, key = { it.absolutePath }) { file ->
                         Column(Modifier.padding(horizontal = if (doctorCapture) 20.dp else 0.dp)) {
@@ -707,7 +704,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                             onTranscribe = { consent?.let { vm.transcribeAudio(file.absolutePath, it) } },
                             onDelete = { vm.deleteAudio(file.absolutePath) },
                         )
-                        if(doctorPresentation) OutlinedButton(onClick={vm.attachDoctorRecording(file.absolutePath,doctorConversationIdentity(vm.accountNamespace,draft))},enabled=!busy&&!recording&&!dictating,modifier=Modifier.fillMaxWidth().heightIn(min=48.dp)) {Text(t("Link this recording to this conversation", "यह रिकॉर्डिंग इस बातचीत से जोड़ें"))}
+                        if(doctorPresentation) OutlinedButton(onClick={vm.attachDoctorRecording(file.absolutePath,doctorConversationIdentity(vm.accountNamespace,draft))},enabled=!busy&&!recording&&!dictating,modifier=Modifier.fillMaxWidth().heightIn(min=48.dp)) {Text(t("Link recording", "यह रिकॉर्डिंग जोड़ें"))}
                         if (!vm.demoMode) OfflineConversationTranscription(file = file, identity = "${vm.accountNamespace}:${draft.personId}", consent = consent,
                             enabled = !busy && !dictating && !recording && draft.source.isBlank(),
                             onUse = { vm.useOfflineTranscript(file.absolutePath, it) })
@@ -722,10 +719,10 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                         )
                         }
                     }
-                    captureItem { Button(onClick = { nextStep(2) }, enabled = !recordingSaving && recordingSaveError == null && !recording && !dictating, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Continue to written text", "लिखाई पर आगे बढ़ें")); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null) } }
-                    if (doctorPresentation && draft.source.isNotBlank() && onDoctorStartNew != null) captureItem { TextButton(onClick = onDoctorStartNew, enabled = !recordingSaving && recordingSaveError == null && !busy && !recording && !dictating && !permissionDialog && !audienceBusy) { Text(t("Start new · archive this draft", "नया शुरू करें · यह ड्राफ़्ट सँभालकर रखें")) } }
+                    captureItem { Button(onClick = { nextStep(2) }, enabled = !recordingSaving && recordingSaveError == null && !recording && !dictating, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Continue", "आगे बढ़ें")); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null) } }
+                    if (doctorPresentation && draft.source.isNotBlank() && onDoctorStartNew != null) captureItem { TextButton(onClick = onDoctorStartNew, enabled = !recordingSaving && recordingSaveError == null && !busy && !recording && !dictating && !permissionDialog && !audienceBusy) { Text(t("Start new", "नया शुरू करें")) } }
                 
-                    captureItem { TextButton(onClick = { nextStep(0) }, enabled = !recordingSaving && recordingSaveError == null && !recording && !dictating, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Back to who is here", "कौन मौजूद है, उस पर वापस")) } }
+                    captureItem { TextButton(onClick = { nextStep(0) }, enabled = !recordingSaving && recordingSaveError == null && !recording && !dictating, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Back", "वापस")) } }
                 }
                 2 -> {
                     val isSample = doctorTranscriptIsSample(vm.demoMode, draft.source, walkthroughSample)
@@ -738,10 +735,10 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                         } }
                         if (isSample) Surface(shape = RoundedCornerShape(16.dp), color = DoctorStatusWarnBg, modifier = Modifier.fillMaxWidth().testTag("transcript-sample")) { Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(t("Practice", "अभ्यास"), fontWeight = FontWeight.Medium, color = DoctorStatusWarn)
-                            TextButton(onClick = { val current = vm.draft.value; if (current.personId == draft.personId) { vm.edit(current.copy(source = "")); editingTranscript = true; highlightLine = null } }, enabled = !busy && !recording && !dictating, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-sample-clear")) { Text(t("Clear the practice text and type your own", "अभ्यास वाला लिखा हटाकर ख़ुद लिखें"), color = DoctorAccent) }
+                            TextButton(onClick = { val current = vm.draft.value; if (current.personId == draft.personId) { vm.edit(current.copy(source = "")); editingTranscript = true; highlightLine = null } }, enabled = !busy && !recording && !dictating, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-sample-clear")) { Text(t("Clear text", "लिखाई हटाएँ"), color = DoctorAccent) }
                         } }
                         DoctorGoalsChecklist(prepRows, questionMatches)
-                        if (dictating) SurfaceCard { Text(t("Conversation", "बातचीत"), fontWeight = FontWeight.Bold); SelectionContainerText(draft.source); Text(t("Finish this turn to edit the conversation.", "बातचीत बदलने के लिए यह बारी पूरी करें।"), style = MaterialTheme.typography.bodySmall) }
+                        if (dictating) SurfaceCard { Text(t("Conversation", "बातचीत"), fontWeight = FontWeight.Bold); SelectionContainerText(draft.source) }
                         else if (draft.source.isNotBlank() && !editingTranscript) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(if (isSample) t("Practice text", "अभ्यास लिखाई") else t("Written text", "बातचीत की लिखाई"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f))
@@ -750,27 +747,26 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                             Text(origin, fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint, modifier = Modifier.testTag("transcript-origin"))
                             DoctorTranscriptLines(draft.source, highlightLine) { n -> lineRequesters.getOrPut(n) { BringIntoViewRequester() } }
                         } else {
-                            CareField(value = draft.source, onValueChange = { if (it.length <= NoteRules.MAX_SOURCE_CHARS) { val current = vm.draft.value; if (current.personId == draft.personId) { editingTranscript = true; vm.edit(current.copy(source = it)) } } }, label = if (isSample) t("Practice text", "अभ्यास लिखाई") else t("Conversation in writing", "बातचीत की लिखाई"), placeholder = t("Speak, turn a saved recording into text, or type in Hindi or English…", "बोलें, सेव की गई रिकॉर्डिंग को लिखाई में बदलें, या हिन्दी या अंग्रेज़ी में लिखें…"), minLines = 5, supporting = if (draft.source.isBlank()) "" else origin)
-                            if (draft.source.isNotBlank()) TextButton(onClick = { focus.clearFocus(); editingTranscript = false }, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-done")) { Text(t("Done · show numbered lines", "हो गया · क्रम वाली पंक्तियाँ देखें"), color = DoctorAccent) }
+                            CareField(value = draft.source, onValueChange = { if (it.length <= NoteRules.MAX_SOURCE_CHARS) { val current = vm.draft.value; if (current.personId == draft.personId) { editingTranscript = true; vm.edit(current.copy(source = it)) } } }, label = if (isSample) t("Practice text", "अभ्यास लिखाई") else t("Conversation in writing", "बातचीत की लिखाई"), placeholder = t("Type or speak", "लिखें या बोलें"), minLines = 5)
+                            if (draft.source.isNotBlank()) TextButton(onClick = { focus.clearFocus(); editingTranscript = false }, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-done")) { Text(t("Done", "हो गया"), color = DoctorAccent) }
                         }
                     } }
                     item { DoctorTranscriptGoals(prepRows, questionMatches, !busy && !recording && !dictating && !recordingSaving && recordingSaveError == null, onSave = { id, answer -> if (preparationScope.isNotBlank() && !vm.recordingSaving.value && vm.recordingSaveError.value == null && canEditCareContext(vm, draft.personId, preparationAccount) && vm.draft.value.conversationId == draft.conversationId) runCatching { val next = prepRows.map { if (it.id == id) it.copy(answer = answer.take(DOCTOR_PREPARATION_MAX_ANSWER_CHARS)) else it }; preparationStore.save(preparationScope, next); prepRows = next; prepReload++ } }, onBackToWho = { nextStep(0) }, source = draft.source, onShowLine = showLine) }
                     // Suggestions are never saved silently: only answers the doctor accepted, edited or typed move on.
-                    captureItem { Button(onClick = { buildSection = 0; buildOpen = false; nextStep(3) }, enabled = !recordingSaving && recordingSaveError == null && draft.source.isNotBlank() && !recording && !dictating, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Continue to answers", "जवाबों पर आगे बढ़ें")); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null) } }
-                    item { TextButton(onClick = { nextStep(1) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Back to recording", "रिकॉर्डिंग पर वापस")) } }
+                    captureItem { Button(onClick = { buildSection = 0; buildOpen = false; nextStep(3) }, enabled = !recordingSaving && recordingSaveError == null && draft.source.isNotBlank() && !recording && !dictating, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Continue", "आगे बढ़ें")); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null) } }
+                    item { TextButton(onClick = { nextStep(1) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Back", "वापस")) } }
                 }
                 3 -> {
                     if (!buildOpen) {
-                    if (questionMatches != null) item { Text(if (questionMatches.unanswered.isEmpty()) t("Every question has at least one suggested line.", "हर सवाल के लिए कम से कम एक सुझाई पंक्ति है।") else t("${questionMatches.unanswered.size} of ${prepRows.size} questions have no suggested line.", "${prepRows.size} में से ${questionMatches.unanswered.size} सवालों के लिए कोई सुझाई पंक्ति नहीं है।"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub, modifier = Modifier.testTag("answers-match-status")) }
                     questionMatches?.let { result -> items(result.answered, key = { "match-${it.question.id}" }) { qa -> Surface(shape = RoundedCornerShape(20.dp), color = DoctorCardReport, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text(qa.question.text, fontFamily = SaharaTitleFont, fontSize = 19.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-                        qa.matches.forEach { m -> Text(m.quote, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk); TextButton(onClick = { useLine(qa.question.section, m.line) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Use this line in ${NoteRules.labels[qa.question.section]}", "यह पंक्ति ${NoteRules.labels[qa.question.section]} में डालें")) } }
+                        qa.matches.forEach { m -> Text(m.quote, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk); TextButton(onClick = { useLine(qa.question.section, m.line) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Use this line", "यह पंक्ति डालें")) } }
                     } } } }
                     if (preparationScope.isNotBlank()) item { DoctorPreparationAnswers(preparationStore, preparationScope, !busy && !recording && !dictating && !recordingSaving && recordingSaveError == null, canSave = { !vm.recordingSaving.value && vm.recordingSaveError.value == null && canEditCareContext(vm, draft.personId, preparationAccount) && vm.draft.value.conversationId == draft.conversationId }, onChange = { prepRows = it }, reload = prepReload) }
-                    item { OutlinedButton(onClick = addTypedAnswers, enabled = !busy && doctorAnsweredQuestions(prepRows).isNotEmpty(), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Add my typed answers to the note sections", "मेरे लिखे जवाब नोट के हिस्सों में जोड़ें")) } }
-                    item { OutlinedButton(onClick = { buildSection = 0; buildOpen = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Edit the five note sections", "नोट के पाँचों हिस्से बदलें")) } }
-                    item { Button(onClick = { nextStep(4) }, enabled = draft.source.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Continue to review", "जाँच पर आगे बढ़ें")); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null) } }
-                    item { TextButton(onClick = { nextStep(2) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Back to written text", "लिखाई पर वापस")) } }
+                    item { OutlinedButton(onClick = addTypedAnswers, enabled = !busy && doctorAnsweredQuestions(prepRows).isNotEmpty(), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Add typed answers", "मेरे लिखे जवाब जोड़ें")) } }
+                    item { OutlinedButton(onClick = { buildSection = 0; buildOpen = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Edit note", "नोट बदलें")) } }
+                    item { Button(onClick = { nextStep(4) }, enabled = draft.source.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Continue", "आगे बढ़ें")); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null) } }
+                    item { TextButton(onClick = { nextStep(2) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Back", "वापस")) } }
                     } else {
                     item { SurfaceCard(Peach) {
                         Text(if (draft.transcribedAt > 0 && draft.transcriptProvider == OfflineSpeechModel.provider) t("Text made on this phone · not checked by a doctor", "फ़ोन पर बनी लिखाई · डॉक्टर ने नहीं जाँची") else if (draft.transcribedAt > 0) t("Text made online · not checked by a doctor", "ऑनलाइन बनी लिखाई · डॉक्टर ने नहीं जाँची") else t("Draft · not checked by a doctor", "ड्राफ़्ट · डॉक्टर ने नहीं जाँचा"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium)
@@ -783,7 +779,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                         try { val current = vm.draft.value; require(current.personId == draft.personId && vm.selected.value == draft.personId); vm.edit(CareDraftAssist.applyAssisted(current, assisted)) }
                         catch (e: IllegalArgumentException) { vm.message.value = e.message }
                     }) }
-                    if (NoteRules.values(draft).all { it.isBlank() }) item { TextButton(onClick = vm::organise) { Text(t("Organise using section headings", "शीर्षकों से व्यवस्थित करें")) } }
+                    if (NoteRules.values(draft).all { it.isBlank() }) item { TextButton(onClick = vm::organise) { Text(t("Organise", "व्यवस्थित करें")) } }
                     item { val update: (String) -> Unit = { value -> if (value.length <= 4000) { val current = vm.draft.value; if (current.personId == draft.personId) vm.edit(CareDraftAssist.withSection(current, buildSection, value)) } }
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             if (doctorPresentation && buildSection == 0) DoctorGoalsReview(draft) { goal -> updateDoctorGoalFromUi(vm,draft,goal) }
@@ -801,8 +797,8 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                         TextButton(onClick = { buildSection = index; buildOpen = true; nextStep(3) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Edit $label", "$label बदलें")) }
                     } } }
                     item { InfoDisclosure(t("Exact source text", "मूल लिखाई"), Paper) { SelectionContainerText(draft.source) } }
-                    item { Button(onClick = { nextStep(5) }, enabled = draft.source.isNotBlank() && NoteRules.values(draft).any { it.isNotBlank() }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Continue to publish", "प्रकाशित करने पर आगे बढ़ें")) } }
-                    item { OutlinedButton(onClick = { buildSection = 0; buildOpen = true; nextStep(3) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Back to build the note", "नोट बनाने पर वापस")) } }
+                    item { Button(onClick = { nextStep(5) }, enabled = draft.source.isNotBlank() && NoteRules.values(draft).any { it.isNotBlank() }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Continue", "आगे बढ़ें")) } }
+                    item { OutlinedButton(onClick = { buildSection = 0; buildOpen = true; nextStep(3) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Back", "वापस")) } }
                 }
                 else -> {
                     if (doctorPresentation) {
@@ -811,12 +807,12 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                     }
                     if (vm.cloud == null) item { CareField(value = doctor, onValueChange = { doctor = it.take(100) }, label = t("Doctor's name", "डॉक्टर का नाम"), singleLine = true) }
                     item { CheckLine(reviewed, { reviewed = it }, t("I checked every section against the conversation. This records what was discussed, without adding treatment advice.", "मैंने हर हिस्सा बातचीत से मिलाया है। इसमें वही दर्ज है जिस पर बात हुई, इलाज की कोई सलाह नहीं जोड़ी गई।")) }
-                    item { TextButton(onClick = { nextStep(4) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Back to read the note", "नोट पढ़ने पर वापस")) } }
-                    item { Button(onClick = { vm.publish(doctor, reviewed) { buildOpen = false; nextStep(0); reviewed = false } }, enabled = !recordingSaving && recordingSaveError == null && reviewed && (vm.cloud != null || doctor.isNotBlank()) && !busy && draft.source.isNotBlank(), modifier = Modifier.fillMaxWidth().testTag("conversation-publish")) { Text(if (vm.cloud == null) t("Publish reviewed version", "जाँचा संस्करण प्रकाशित करें") else t("Send to a doctor to check", "डॉक्टर को जाँचने के लिए भेजें")) } }
+                    item { TextButton(onClick = { nextStep(4) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Back", "वापस")) } }
+                    item { Button(onClick = { vm.publish(doctor, reviewed) { buildOpen = false; nextStep(0); reviewed = false } }, enabled = !recordingSaving && recordingSaveError == null && reviewed && (vm.cloud != null || doctor.isNotBlank()) && !busy && draft.source.isNotBlank(), modifier = Modifier.fillMaxWidth().testTag("conversation-publish")) { Text(if (vm.cloud == null) t("Publish", "प्रकाशित करें") else t("Send to doctor", "डॉक्टर को भेजें")) } }
                 }
             }
         } else {
-            item { OutlinedButton(onClick = { onRequestConversation?.invoke() ?: vm.saveItem("task", t("Ask for a goals-of-care conversation", "देखभाल के लक्ष्यों पर बातचीत माँगें"), t("Discuss what matters and questions for the care team.", "जो ज़रूरी है और देखभाल टीम से सवाल, उन पर बात करें।")) }, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.Add, null); Spacer(Modifier.width(6.dp)); Text(if (onRequestConversation == null) t("Add a reminder to talk", "बात करने का रिमाइंडर जोड़ें") else t("Ask for a conversation", "बातचीत के लिए कहें")) } }
+            item { OutlinedButton(onClick = { onRequestConversation?.invoke() ?: vm.saveItem("task", t("Ask for a goals-of-care conversation", "देखभाल के लक्ष्यों पर बातचीत माँगें"), t("Discuss what matters and questions for the care team.", "जो ज़रूरी है और देखभाल टीम से सवाल, उन पर बात करें।")) }, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.Add, null); Spacer(Modifier.width(6.dp)); Text(if (onRequestConversation == null) t("Add reminder", "रिमाइंडर जोड़ें") else t("Ask to talk", "बात करने के लिए कहें")) } }
         }
         if (!doctorCapture && !clinician) {
         if (clinician) item { SectionTitle(t("Saved notes", "सहेजे नोट")) }
@@ -830,7 +826,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     val quickConsent = doctorPresentation && (vm.demoMode || !BuildConfig.CLOUD_AUDIO_ENABLED)
     if (permissionDialog && vm.localAudioRecordingAllowed) AlertDialog(onDismissRequest = { permissionDialog = false }, title = { Text(t("Before we record", "रिकॉर्ड करने से पहले")) }, text = {
         Column(Modifier.heightIn(max = 520.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(if (consentNames.isEmpty()) t("Go back to “Who's here” and name everyone present before recording.", "रिकॉर्ड करने से पहले “कौन मौजूद है” पर लौटें और सभी के नाम लिखें।") else t("Everyone named in “Who's here” has agreed: ${consentNames.joinToString(", ")}.", "“कौन मौजूद है” में लिखे सभी लोग राज़ी हैं: ${consentNames.joinToString(", ")}।"), style = MaterialTheme.typography.bodyMedium)
+            Text(if (consentNames.isEmpty()) t("Name everyone present first.", "रिकॉर्ड करने से पहले मौजूद सभी के नाम लिखें।") else t("Everyone named in “Who's here” has agreed: ${consentNames.joinToString(", ")}.", "“कौन मौजूद है” में लिखे सभी लोग राज़ी हैं: ${consentNames.joinToString(", ")}।"), style = MaterialTheme.typography.bodyMedium)
             HorizontalDivider()
             if (quickConsent) Text(t("By starting, everyone listed agrees: this recording is to write and check a note of this talk. It stays private on this phone. People who can open this phone or the shared records may read the written note.", "शुरू करने पर सूची के सभी लोग मानते हैं: यह रिकॉर्डिंग इस बातचीत का नोट लिखने और जाँचने के लिए है। यह इसी फ़ोन पर निजी रहती है। जो लोग यह फ़ोन या साझा रिकॉर्ड खोल सकते हैं, वे लिखा नोट पढ़ सकते हैं।"), style = MaterialTheme.typography.bodySmall) else CheckLine(purposeAccepted, { purposeAccepted = it }, t("We understand this recording is to write and check a note of this talk.", "हम समझते हैं कि यह रिकॉर्डिंग इस बातचीत का नोट लिखने और जाँचने के लिए है।"))
             if (!quickConsent) CheckLine(storageAccepted, { storageAccepted = it }, if (!vm.demoMode && BuildConfig.CLOUD_AUDIO_ENABLED) t("We understand the audio stays private on this phone, unless someone shares it or separately agrees below to send it online to turn speech into text.", "हम समझते हैं कि ऑडियो इसी फ़ोन पर निजी रहता है, जब तक कोई इसे साझा न करे या नीचे इसे लिखाई के लिए ऑनलाइन भेजने पर अलग से राज़ी न हो।") else t("We understand the recording stays private on this phone.", "हम समझते हैं कि रिकॉर्डिंग इसी फ़ोन पर निजी रहती है।"))
@@ -884,7 +880,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             }
         }
     }
-    if (confirmDelete) AlertDialog(onDismissRequest = { confirmDelete = false }, title = { Text(t("Delete this recording?", "यह रिकॉर्डिंग मिटाएँ?")) }, text = { Text(t("Your written care notes stay available.", "आपके लिखे देखभाल नोट बने रहेंगे।")) },
+    if (confirmDelete) AlertDialog(onDismissRequest = { confirmDelete = false }, title = { Text(t("Delete this recording?", "यह रिकॉर्डिंग मिटाएँ?")) },
         confirmButton = { TextButton(onClick = { player?.release(); player = null; playing = false; confirmDelete = false; onDelete() }) { Text(t("Delete recording", "रिकॉर्डिंग मिटाएँ")) } },
         dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text(t("Keep recording", "रिकॉर्डिंग रखें")) } })
 }
@@ -919,7 +915,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         LazyColumn(Modifier.fillMaxWidth().imePadding(), contentPadding = PaddingValues(start = 22.dp, end = 22.dp, bottom = 40.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             item { Heading(if (note.hashScheme == DoctorConversationContext.HASH_SCHEME) t("Conversation notes", "बातचीत के नोट") else t("Goals of care", "देखभाल के लक्ष्य")); Text("${note.personName} · " + t("Version ${note.version}", "संस्करण ${note.version}")); Text(t("Reviewer: ${note.doctor} · ${date(note.published)}", "जाँचने वाले: ${note.doctor} · ${date(note.published)}"), style = MaterialTheme.typography.bodySmall); Text(ReviewWorkflow.label(note, note.id in verifiedReviews), style = MaterialTheme.typography.labelMedium, color = Rust) }
             if(note.hashScheme==DoctorConversationContext.HASH_SCHEME) item { DoctorNoteReaderBody(vm, note) }
-            if (vm.cloud != null) item { OutlinedButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, sharedCareNoteUrl(note)), t("Share exact care-note link", "इसी देखभाल नोट का लिंक भेजें"))) }, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.QrCode, null); Spacer(Modifier.width(8.dp)); Text(t("Share exact-version link", "इसी संस्करण का लिंक भेजें")) } }
+            if (vm.cloud != null) item { OutlinedButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, sharedCareNoteUrl(note)), t("Share exact care-note link", "इसी देखभाल नोट का लिंक भेजें"))) }, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.QrCode, null); Spacer(Modifier.width(8.dp)); Text(t("Share link", "लिंक भेजें")) } }
             item { Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 OutlinedButton(onClick = { exporting = NoteRules.text(note, confirmations); saveNote.launch("Goals-of-care-v${note.version}.txt") }, modifier = Modifier.weight(1f)) { Icon(Icons.Default.FileDownload, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Save copy", "कॉपी सहेजें")) }
                 FilledTonalButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, NoteRules.text(note, confirmations)), t("Share care note", "देखभाल नोट भेजें"))) }, modifier = Modifier.weight(1f), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Gold, contentColor = Ink)) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Share", "भेजें")) }
@@ -946,7 +942,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                         reviewed = false; name = ""; signatureDraft.clear(); signaturesRead++
                         if (signatureFailed) vm.message.value = t("Your confirmation is saved, but the signature could not be saved on this phone.", "आपकी पुष्टि सहेजी गई, पर हस्ताक्षर इस फ़ोन पर सहेजा नहीं जा सका।")
                     }
-                }, enabled = reviewed && name.isNotBlank() && signatureDraft.ready && !busy && !alreadyConfirmed && (relationship == "Patient" || patientConfirmation != null), modifier = Modifier.fillMaxWidth()) { Text(if (alreadyConfirmed) t("Confirmation already saved", "पुष्टि पहले से सहेजी है") else t("Sign and confirm this version", "हस्ताक्षर करके इस संस्करण की पुष्टि करें")) } }
+                }, enabled = reviewed && name.isNotBlank() && signatureDraft.ready && !busy && !alreadyConfirmed && (relationship == "Patient" || patientConfirmation != null), modifier = Modifier.fillMaxWidth()) { Text(if (alreadyConfirmed) t("Confirmation already saved", "पुष्टि पहले से सहेजी है") else t("Sign and confirm", "हस्ताक्षर करके पुष्टि करें")) } }
             }
         }
     }
@@ -1106,15 +1102,15 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         val shortcutsElsewhere = !doctorEmbedded && !clinicianView
         item { MoreGroup(t("Your care", "आपकी देखभाल")) {
             if (!shortcutsElsewhere) MoreRow(Icons.Default.FolderOpen, SaharaSoftBlue, t("Documents", "दस्तावेज़"), "", Modifier.testTag("more-documents-entry"), onDocuments)
-            if (onCarePlan != null) MoreRow(Icons.Default.LocalHospital, Peach, t("Emergency plan & living will", "आपातकालीन योजना और लिविंग विल"), "", Modifier.testTag("more-care-plan-entry"), onCarePlan)
+            if (onCarePlan != null) MoreRow(Icons.Default.LocalHospital, Peach, t("Emergency plan", "आपातकालीन योजना"), "", Modifier.testTag("more-care-plan-entry"), onCarePlan)
             if (!shortcutsElsewhere) MoreRow(Icons.Default.CalendarMonth, Mint, t("Calendar", "कैलेंडर"), "", Modifier.testTag("more-calendar"), onCalendar)
             if (!shortcutsElsewhere) MoreRow(Icons.Default.Science, SaharaApricot, t("Lab history", "जाँच का इतिहास"), "", Modifier.testTag("more-labs"), onLabs)
             if (!walkthrough) MoreRow(Icons.Default.NotificationsNone, SaharaSoftGold, t("Reminders", "रिमाइंडर"), "", Modifier.testTag("more-reminders"), onReminders)
         } }
         if (!walkthrough || doctorEmbedded) item { MoreGroup(t("Help and settings", "मदद और सेटिंग")) {
             if (!walkthrough) MoreRow(Icons.Default.SentimentSatisfiedAlt, Mint, t("Feedback", "राय दें"), "", Modifier.testTag("patient-feedback-entry"), onFeedback)
-            if (doctorEmbedded) MoreRow(Icons.Default.Groups, SaharaSoftBlue, t("Shared care and doctor's check", "साझा देखभाल और डॉक्टर की जाँच"), "", Modifier, onSharedWorkspace)
-            else if (!walkthrough) MoreRow(Icons.Default.MedicalServices, SaharaSoftBlue, t("Doctor sign in", "डॉक्टर साइन इन"), "", Modifier.testTag("more-doctor-workspace-entry"), onSharedWorkspace)
+            if (doctorEmbedded) MoreRow(Icons.Default.Groups, SaharaSoftBlue, t("Shared care", "साझा देखभाल"), "", Modifier, onSharedWorkspace)
+            else if (!walkthrough) MoreRow(Icons.Default.MedicalServices, SaharaSoftBlue, t("I'm a doctor", "मैं डॉक्टर हूँ"), "", Modifier.testTag("more-doctor-workspace-entry"), onSharedWorkspace)
             MoreRow(Icons.Default.Lock, Peach, t("Privacy", "निजता"), "", Modifier.testTag("more-privacy"), { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url)))) })
         } }
         item { SurfaceCard(Gold) {
@@ -1208,7 +1204,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             } else {
                 CareField(value = title, onValueChange = { title = it.take(200) }, label = when (kind) { "medicine" -> t("Medicine name", "दवा का नाम"); "visit" -> t("Doctor or hospital", "डॉक्टर या अस्पताल"); "task" -> t("What needs doing?", "क्या करना है?"); else -> t("Title", "शीर्षक") }, singleLine = kind != "task")
                 if (kind == "medicine") MedicineNameSuggestions(title, enabled = !busy) { title = it }
-                CareField(value = detail, onValueChange = { detail = it.take(4000) }, label = when (kind) { "medicine" -> t("Dose and times, as prescribed", "खुराक और समय, जैसा पर्चे में लिखा है"); "visit" -> t("Time, place and questions (optional)", "समय, जगह और सवाल (ज़रूरी नहीं)"); "task" -> t("Details (optional)", "और जानकारी (ज़रूरी नहीं)"); else -> t("Your note", "आपका नोट") }, minLines = if (kind == "journal") 4 else 2)
+                CareField(value = detail, onValueChange = { detail = it.take(4000) }, label = when (kind) { "medicine" -> t("Dose and times", "खुराक और समय"); "visit" -> t("Time and place", "समय और जगह"); "task" -> t("Details (optional)", "और जानकारी (ज़रूरी नहीं)"); else -> t("Your note", "आपका नोट") }, minLines = if (kind == "journal") 4 else 2)
                 if (kind == "medicine") StripPhotoRow(vm.storageNamespace, capturedPerson, entryId, enabled = !busy)
             }
             if (kind == "visit") Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -1279,7 +1275,6 @@ object ConversationPages {
                 }
             }
         }
-        Text(t("Step ${step + 1} of ${names.size} · ${names[step.coerceIn(0, names.lastIndex)]}", "चरण ${step + 1} / ${names.size} · ${ConversationPages.label(names[step.coerceIn(0, names.lastIndex)], true)}"), fontSize = 13.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.fillMaxWidth())
     }
 }
 

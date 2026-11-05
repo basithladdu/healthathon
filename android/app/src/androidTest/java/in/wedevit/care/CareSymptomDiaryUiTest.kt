@@ -71,9 +71,9 @@ class CareSymptomDiaryUiTest {
         ui.setContent { CareTheme { SymptomNoteForm("fixture-back", "Fictional patient", emptyList(), false, onSave = { _, _ -> }, onClose = { closed = true }) } }
         ui.onNodeWithTag("symptom-choice-Pain").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
-        ui.onNodeWithTag("symptom-step-indicator").assertTextContains("Step 2 of 3")
+        ui.onNodeWithTag("symptom-step-indicator").assertTextContains("2 of 3")
         androidx.test.espresso.Espresso.pressBack()
-        ui.onNodeWithTag("symptom-step-indicator").assertTextContains("Step 1 of 3")
+        ui.onNodeWithTag("symptom-step-indicator").assertTextContains("1 of 3")
         ui.runOnIdle { assertFalse(closed) }
         androidx.test.espresso.Espresso.pressBack()
         ui.runOnIdle { assertTrue(closed) }
@@ -105,7 +105,7 @@ class CareSymptomDiaryUiTest {
         var saved: SymptomNote? = null
         ui.setContent { CareTheme { SymptomNoteForm("fixture-edit", "Fictional patient", listOf(priorRow, initial), false, initial = initial,
             onSave = { id, value -> savedId = id; saved = value }, onClose = {}) } }
-        ui.onNodeWithTag("symptom-step-indicator").assertTextContains("Step 2 of 2")
+        ui.onNodeWithTag("symptom-step-indicator").assertTextContains("2 of 2")
         ui.onNodeWithTag("symptom-rating-5").performScrollTo().assertIsSelected()
         ui.onNodeWithTag("diary-choice-average-24h").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-rating-3").performScrollTo().performClick()

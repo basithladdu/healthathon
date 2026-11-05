@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.sp
     Surface(shape = RoundedCornerShape(20.dp), color = DoctorCardReport, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(noteSectionLabel(NoteRules.labels[section], careHindi()), fontFamily = SaharaTitleFont, fontSize = 21.sp, lineHeight = 26.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.testTag("build-section-heading"))
         Text(NoteRules.values(draft)[section].ifBlank { t("Nothing added yet", "अभी कुछ नहीं जोड़ा") }, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk)
-        if (lines.isEmpty()) Text(t("Add the conversation first.", "पहले बातचीत जोड़ें।"), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk)
         val picks = remember(draft.source, section) { LocalDraftSuggestions.suggest(draft.source).bySection.getOrNull(section).orEmpty() }
             .filterNot { s -> NoteRules.values(draft)[section].lines().any { it.trim() == s.line.words } }
         if (picks.isNotEmpty()) Surface(shape = RoundedCornerShape(20.dp), color = DoctorStatusWarnBg, modifier = Modifier.fillMaxWidth().testTag("build-suggestions-$section")) {
@@ -49,9 +48,9 @@ import androidx.compose.ui.unit.sp
                 Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(t("Line ${line.number}", "पंक्ति ${line.number}"), fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub)
                     SelectionContainerText(line.text)
-                    if (added) Row(Modifier.heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) { Icon(Icons.Default.Check, null, Modifier.size(18.dp), tint = DoctorStatusGood); Text(t("Added to ${NoteRules.labels[section]}", "${NoteRules.labels[section]} में जोड़ा"), fontSize = 14.sp, color = DoctorStatusGood, fontWeight = FontWeight.Medium) }
+                    if (added) Row(Modifier.heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) { Icon(Icons.Default.Check, null, Modifier.size(18.dp), tint = DoctorStatusGood); Text(t("Added", "जोड़ा गया"), fontSize = 14.sp, color = DoctorStatusGood, fontWeight = FontWeight.Medium) }
                     if (!added) TextButton(onClick = { onAssign(section, line) }, colors = ButtonDefaults.textButtonColors(contentColor = DoctorAccent), modifier = Modifier.heightIn(min = 48.dp).testTag("source-add-${line.number}-$section")) {
-                        Icon(Icons.Default.Add, null, Modifier.size(16.dp)); Spacer(Modifier.width(4.dp)); Text(t("Add to ${NoteRules.labels[section]}", "${noteSectionLabel(NoteRules.labels[section], true)} में जोड़ें"), fontSize = 14.sp)
+                        Icon(Icons.Default.Add, null, Modifier.size(16.dp)); Spacer(Modifier.width(4.dp)); Text(t("Add", "जोड़ें"), fontSize = 14.sp)
                     }
                 }
             }
@@ -61,12 +60,10 @@ import androidx.compose.ui.unit.sp
 
 @Composable fun CareSourceLinks(source: String, value: String) { val t = careText();
     val references = remember(source, value) { CareDraftAssist.references(source, value) }
-    val unlinked = remember(source, value) { CareDraftAssist.unlinked(source, value) }
     var chosen by remember(source, value) { mutableStateOf<CareSourceReference?>(null) }
     if (references.isNotEmpty()) Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         references.distinctBy { it.line.id }.forEach { reference -> AssistChip(onClick = { chosen = reference }, shape = RoundedCornerShape(50), label = { Text(t("Source line ${reference.line.number}", "स्रोत पंक्ति ${reference.line.number}")) }, leadingIcon = { Icon(Icons.Default.Link, null, Modifier.size(16.dp)) }) }
     }
-    if (unlinked.isNotEmpty()) Text(run { val n = unlinked.size; if (n == 1) t("1 edited line", "1 बदली हुई पंक्ति") else t("$n edited lines", "$n बदली हुई पंक्तियाँ") }, color = DoctorCardSub, fontSize = 14.sp)
     chosen?.let { reference -> AlertDialog(onDismissRequest = { chosen = null }, title = { Text(t("Original words · line ${reference.line.number}", "मूल शब्द · पंक्ति ${reference.line.number}")) }, text = { SelectionContainerText(reference.line.text) }, confirmButton = { TextButton(onClick = { chosen = null }) { Text(t("Close", "बंद करें")) } }) }
 }
 

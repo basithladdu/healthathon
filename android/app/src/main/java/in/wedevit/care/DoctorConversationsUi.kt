@@ -74,16 +74,16 @@ private fun conversationDate(at: Long?, hindi: Boolean) = at?.takeIf { it > 0 }?
 }
 
 @Composable private fun DiscussionReadingCard(discussion: DoctorOverviewDiscussion, highlighted: Boolean) { val t = careText();
-    val fields = listOf(t("What matters to the patient", "मरीज़ के लिए क्या ज़रूरी है") to discussion.priorities, t("Who participated", "कौन शामिल था") to discussion.participants, t("What was discussed", "किस पर बात हुई") to discussion.topics, t("Questions and concerns", "सवाल और चिंताएँ") to discussion.questions, t("Still undecided", "अभी तय नहीं") to discussion.undecided, t("Next steps", "आगे के कदम") to discussion.nextSteps)
+    val fields = listOf(t("Matters most", "सबसे ज़रूरी") to discussion.priorities, t("Who participated", "कौन शामिल था") to discussion.participants, t("Discussed", "चर्चा हुई") to discussion.topics, t("Questions", "सवाल") to discussion.questions, t("Still undecided", "अभी तय नहीं") to discussion.undecided, t("Next steps", "आगे के कदम") to discussion.nextSteps)
     val author = discussion.reviewerName?.takeIf { it.isNotBlank() } ?: t("Author not recorded", "लेखक दर्ज नहीं")
-    val brief = discussion.topics.ifBlank { discussion.priorities }.ifBlank { t("No summary recorded", "कोई सार दर्ज नहीं") }
+    val brief = discussion.topics.ifBlank { discussion.priorities }
     Surface(color = if (highlighted) DoctorCardConversation else DoctorCardReport, shape = RoundedCornerShape(20.dp), border = if (highlighted) null else BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("conversation-card-${discussion.id}")) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(if (discussion.isPublishedPreview) t("Version ${discussion.versionNumber}", "संस्करण ${discussion.versionNumber}") else t("Earlier discussion", "पहले की चर्चा"), fontSize = 21.sp, lineHeight = 26.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, fontFamily = SaharaTitleFont)
                 Text(conversationDate(discussion.publishedAt, careHindi()) + " · " + author, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
             }
-            Text(brief, fontSize = 16.sp, lineHeight = 24.sp, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            if (brief.isNotBlank()) Text(brief, fontSize = 16.sp, lineHeight = 24.sp, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
             HorizontalDivider(color = DoctorHairline)
             Column(Modifier.testTag("conversation-expand-${discussion.id}"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (discussion.isPublishedPreview) {

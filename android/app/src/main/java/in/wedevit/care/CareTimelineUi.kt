@@ -143,7 +143,7 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
         if (shown.isEmpty()) item { SurfaceCard {
             Surface(shape = CircleShape, color = SaharaApricot) { Icon(Icons.Default.Timeline, null, Modifier.padding(12.dp).size(28.dp), tint = DoctorAccent) }
             Spacer(Modifier.height(12.dp))
-            Text(if (all.isEmpty()) t("Nothing on the timeline yet", "समय-रेखा में अभी कुछ नहीं") else t("Nothing here", "यहाँ कुछ नहीं"), fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk)
+            Text(if (all.isEmpty()) t("Nothing yet", "अभी कुछ नहीं") else t("Nothing here", "यहाँ कुछ नहीं"), fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk)
             if (all.isNotEmpty()) TextButton(onClick = { filterName = TimelineFilter.ALL.name }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Show all", "सब दिखाएँ")) }
         } }
         items(months, key = { "month-${it.first}" }) { (month, events) ->

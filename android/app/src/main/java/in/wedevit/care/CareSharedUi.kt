@@ -72,7 +72,7 @@ import kotlinx.coroutines.launch
     BackHandler { if (!busy) onClose() }
     val content: @Composable (PaddingValues) -> Unit = { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding).imePadding(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            if (cloud == null) item { SurfaceCard { Heading(t("Sign in", "साइन इन"), 25); Button(onClick = onAccount) { Text(t("Sign in", "साइन इन")) } } }
+            if (cloud == null) item { SurfaceCard { Button(onClick = onAccount) { Text(t("Sign in", "साइन इन")) } } }
             else {
                 item { Text(people.firstOrNull { it.id == selected }?.name.orEmpty(), style = MaterialTheme.typography.titleLarge); OutlinedButton(onClick = { run { refresh(); vm.refresh() } }, enabled = !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Refresh, null); Spacer(Modifier.width(8.dp)); Text(t("Refresh", "ताज़ा करें")) } }
                 if (error.isNotBlank()) item { SurfaceCard(Peach) { Text(error, Modifier.announce()); TextButton(onClick = { run { refresh() } }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Retry", "फिर कोशिश करें"), color = RustText, fontWeight = FontWeight.Bold) } } }
@@ -96,7 +96,6 @@ import kotlinx.coroutines.launch
                 if (drafts.isEmpty()) item { SurfaceCard { Text(t("No shared conversation yet", "अभी कोई साझा बातचीत नहीं")) } }
                 items(drafts, key = { it.id }) { draft -> SurfaceCard {
                     Text(when (draft.status) { "submitted" -> t("Waiting for clinician review", "डॉक्टर की समीक्षा का इंतज़ार"); "reviewed" -> t("Reviewed conversation", "समीक्षा की गई बातचीत"); else -> t("Account draft", "खाते का ड्राफ़्ट") }, fontWeight = FontWeight.Bold)
-                    Text(t("Revision ${draft.revision}", "संशोधन ${draft.revision}"), style = MaterialTheme.typography.bodySmall)
                     Text(draft.conversation.source.take(180) + if (draft.conversation.source.length > 180) "…" else "")
                     TextButton(onClick = { reading = draft }) { Text(t("Open", "खोलें")) }
                 } }
@@ -109,12 +108,12 @@ import kotlinx.coroutines.launch
         var confirmed by remember(draft.id, draft.revision) { mutableStateOf(false) }
         ModalBottomSheet(onDismissRequest = { if (!busy) reading = null }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
             LazyColumn(Modifier.imePadding().fillMaxWidth(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                item { Heading(t("Review conversation", "बातचीत की समीक्षा"), 26); Text(t("Revision ${draft.revision}", "संशोधन ${draft.revision}") + " · ${draft.status}", style = MaterialTheme.typography.bodySmall) }
+                item { Heading(t("Review conversation", "बातचीत की समीक्षा"), 26) }
                 item { SurfaceCard(Gold) { Text(t("Original words", "मूल शब्द"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont); SelectionContainerText(draft.conversation.source) } }
                 items(NoteRules.labels.zip(NoteRules.values(draft.conversation)), key = { it.first }) { (label, value) -> SurfaceCard { Text(label, fontWeight = FontWeight.Bold); SelectionContainerText(value.ifBlank { t("Not recorded", "दर्ज नहीं") }); CareSourceLinks(draft.conversation.source, value) } }
                 if (profile?.status == "approved" && draft.status == "submitted" && !owner && cloud != null) {
                     item { CheckLine(confirmed, { confirmed = it }, t("I checked this exact source and every section as the patient's invited clinician.", "मरीज़ के बुलाए डॉक्टर के रूप में मैंने यही मूल और हर हिस्सा जाँचा है।")) }
-                    item { Button(onClick = { run { cloud.reviewSharedDraft(draft); reading = null; refresh(); vm.refresh(); notice = t("Published", "प्रकाशित") } }, enabled = confirmed && !busy, modifier = Modifier.fillMaxWidth()) { Text(t("Publish reviewed care note", "समीक्षा किया केयर नोट प्रकाशित करें")) } }
+                    item { Button(onClick = { run { cloud.reviewSharedDraft(draft); reading = null; refresh(); vm.refresh(); notice = t("Published", "प्रकाशित") } }, enabled = confirmed && !busy, modifier = Modifier.fillMaxWidth()) { Text(t("Publish", "प्रकाशित करें")) } }
                 }
                 if (error.isNotBlank()) item { Text(error, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
                 item { TextButton(onClick = { reading = null }, enabled = !busy) { Text(t("Close", "बंद करें")) } }

@@ -55,7 +55,6 @@ object PainHistoryRules {
         Heading(t("Past pain on the body", "पहले का दर्द शरीर पर"), 27)
         if (index < 0) ChartEmpty(hindi, "pain-history") else {
             val note = history[index].second
-            Text(t("Which entry?", "कौन-सा नोट?"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
             LazyRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(history, key = { it.first.id }) { (item, value) ->
                     FilterChip(selected == item.id, { preferred = item.id }, label = { Text("${friendlyWhen(value.observedDate, value.observedTime, hindi)} · ${SymptomDiaryRules.ratingLabel(value.rating, hindi)}", fontSize = 14.sp) }, shape = CircleShape,

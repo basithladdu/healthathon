@@ -50,7 +50,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     SideEffectRules.effects.keys.forEach { key -> PickChip(key in picked, SideEffectRules.effectLabel(key, hindi), Mint, Modifier.testTag("side-effect-chip-$key")) { pickedKeys = (if (key in picked) picked - key else picked + key).joinToString(",") } }
                 }
-                CareField(other, { other = it.take(SideEffectRules.MAX_OTHER) }, t("In your own words (optional)", "अपने शब्दों में (ज़रूरी नहीं)"), minLines = 2)
+                CareField(other, { other = it.take(SideEffectRules.MAX_OTHER) }, t("Details (optional)", "विवरण (चाहें तो)"), minLines = 2)
             }
             SideEffectStep(2, t("How bad was it?", "कितना ज़्यादा था?")) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -116,7 +116,7 @@ private val SeverityTints = listOf(DoctorStatusGoodBg, DoctorStatusWarnBg, Docto
             val (fg, bg) = when (n.severity) { "severe" -> DoctorStatusRest to DoctorStatusRestBg; "moderate" -> DoctorStatusWarn to DoctorStatusWarnBg; else -> DoctorStatusGood to DoctorStatusGoodBg }
             val severity = SideEffectRules.severityLabel(n.severity, hindi)
             if (severity.isNotBlank()) { Surface(shape = RoundedCornerShape(50), color = bg) { Text(severity, Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = fg, maxLines = 1) }; Spacer(Modifier.width(8.dp)) }
-            Text(date(n.happenedAt) + (if (n.stoppedTaking) " · " + t("They stopped taking it.", "उन्होंने इसे लेना बंद कर दिया।") else ""), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = if (n.severity == "severe") RustText else DoctorCardSub, modifier = Modifier.weight(1f))
+            Text(date(n.happenedAt) + (if (n.stoppedTaking) " · " + t("Stopped", "बंद किया") else ""), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = if (n.severity == "severe") RustText else DoctorCardSub, modifier = Modifier.weight(1f))
         }
         Text(t("Reported by ", "बताने वाले: ") + n.reporter.ifBlank { t("Not recorded", "दर्ज नहीं") } + " · " + (if (n.discussedAt > 0) t("Discussed ", "बात हो चुकी ") + date(n.discussedAt) + n.discussedBy.takeIf { it.isNotBlank() }?.let { " · $it" }.orEmpty() else t("Not discussed yet", "अभी बात नहीं हुई")), fontSize = 14.sp, color = DoctorCardSub)
         trailing?.invoke(this)
@@ -126,7 +126,7 @@ private val SeverityTints = listOf(DoctorStatusGoodBg, DoctorStatusWarnBg, Docto
 @Composable private fun MarkDiscussedButton(entry: SideEffectEntry, vm: CareModel, who: String) {
     val t = careText(); val busy by vm.busy.collectAsStateWithLifecycle(); val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     val capturedAccount = remember(entry.item.id) { vm.accountNamespace }
-    if (entry.note.discussedAt == 0L && canEdit) TextButton(onClick = { if (canEditCareContext(vm, entry.item.personId, capturedAccount)) vm.updateItem(SideEffectLog.markDiscussed(entry, who, System.currentTimeMillis())) {} }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp).testTag("side-effect-discussed-${entry.item.id}")) { Text(t("Mark as discussed", "बात हो गई, चिह्नित करें"), color = DoctorAccent) }
+    if (entry.note.discussedAt == 0L && canEdit) TextButton(onClick = { if (canEditCareContext(vm, entry.item.personId, capturedAccount)) vm.updateItem(SideEffectLog.markDiscussed(entry, who, System.currentTimeMillis())) {} }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp).testTag("side-effect-discussed-${entry.item.id}")) { Text(t("Mark discussed", "बात हो गई"), color = DoctorAccent) }
 }
 
 /** Under one medicine's History: every side effect noted for it, newest first. */

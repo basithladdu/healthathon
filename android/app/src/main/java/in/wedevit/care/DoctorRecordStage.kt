@@ -84,7 +84,7 @@ internal fun doctorCaptureModeLabel(mode: String, hindi: Boolean): String = care
                 Spacer(Modifier.weight(1f))
                 Box { IconButton(onClick = { menu = true }, enabled = menuEnabled, modifier = Modifier.size(48.dp).testTag("doctor-capture-mode")) { Icon(Icons.Default.MoreVert, t("More options", "और विकल्प"), tint = white.copy(alpha = if (menuEnabled) 1f else .5f)) }
                     DropdownMenu(menu, { menu = false }) {
-                        listOf("Record", "Dictate", "Type").forEach { value -> val available = when (value) { "Record" -> localRecordingAllowed; "Dictate" -> !demo; else -> true }; DropdownMenuItem(text = { Text(doctorCaptureModeLabel(value, careHindi()) + if (!available) t(" · unavailable", " · उपलब्ध नहीं") else if (value == mode) t(" · current", " · अभी यही") else "") }, enabled = available, onClick = { onMode(value); menu = false }) }
+                        listOf("Record", "Dictate", "Type").forEach { value -> val available = when (value) { "Record" -> localRecordingAllowed; "Dictate" -> !demo; else -> true }; DropdownMenuItem(text = { Text(doctorCaptureModeLabel(value, careHindi()) + if (!available) t(" · unavailable", " · उपलब्ध नहीं") else "") }, enabled = available, onClick = { onMode(value); menu = false }) }
                         HorizontalDivider()
                         if (onStartNew != null) DropdownMenuItem(text = { Text(t("Start new", "नया शुरू करें")) }, enabled = menuEnabled, onClick = { menu = false; onStartNew() }, modifier = Modifier.testTag("record-stage-start-new"))
                         DropdownMenuItem(text = { Text(t("Who's here", "कौन मौजूद है")) }, enabled = backToWhoEnabled, onClick = { menu = false; onBackToWho() }, modifier = Modifier.testTag("record-stage-who"))
@@ -92,7 +92,7 @@ internal fun doctorCaptureModeLabel(mode: String, hindi: Boolean): String = care
             }
             Column(Modifier.fillMaxWidth().padding(end = 12.dp)) {
                 Text(t("Conversation", "बातचीत"), fontFamily = SaharaTitleFont, fontSize = 36.sp, lineHeight = 42.sp, fontWeight = FontWeight.Medium, color = white)
-                Text(doctorStageStatus(recording, saving, seconds, careHindi()), fontSize = 16.sp, lineHeight = 22.sp, color = white, modifier = Modifier.testTag("record-stage-status"))
+                if (recording || saving) Text(doctorStageStatus(recording, saving, seconds, careHindi()), fontSize = 16.sp, lineHeight = 22.sp, color = white, modifier = Modifier.testTag("record-stage-status"))
             }
             // The goals-of-care checklist sits between the title and the waveform and scrolls if it is long.
             Column(Modifier.weight(1f).fillMaxWidth().padding(top = 12.dp, end = 12.dp).verticalScroll(rememberScrollState())) { checklist() }

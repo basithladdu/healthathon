@@ -42,7 +42,7 @@ class DoctorWorkflowFlowTest {
                 assertEquals(WorkflowRequestStatus.ACCEPTED, workflow.requests("demo-asha").single().status)
                 screenshot("workflow-requests-large")
                 clickTag("workflow-schedule-request-demo-asha", "workflow-request-list")
-                ui.onNodeWithText("Patient linked to the conversation request").assertExists()
+                ui.onNodeWithTag("demo-visit-patient").assertExists()
                 ui.onNodeWithTag("demo-change-patient").assertDoesNotExist()
                 ui.onNodeWithTag("demo-appointment-note").performScrollTo().performTextInput("Fictional requested discussion")
                 closeSoftKeyboard()

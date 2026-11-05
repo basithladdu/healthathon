@@ -121,7 +121,7 @@ object PatientWalkthrough {
     SaharaScreenHost(state, Modifier.fillMaxSize().background(Cream), label = "Patient walkthrough") { shown -> when (shown) {
         "closing" -> SaharaLoading(t("Leaving the walkthrough…", "डेमो से बाहर जा रहे हैं…"))
         "error" -> Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.Center) { SaharaEmpty(error ?: "", icon = Icons.Default.ErrorOutline, actionLabel = t("Retry", "फिर कोशिश करें"), onAction = { error = null; attempt++ }, secondaryLabel = t("Leave walkthrough", "डेमो से बाहर जाएँ"), onSecondary = ::leave) }
-        "removed" -> Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.Center) { SaharaEmpty(t("Rahul's walkthrough record was removed. It will not be recreated automatically.", "राहुल का डेमो रिकॉर्ड हटा दिया गया। यह अपने-आप दोबारा नहीं बनेगा।"), secondaryLabel = t("Leave walkthrough", "डेमो से बाहर जाएँ"), onSecondary = ::leave) }
+        "removed" -> Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.Center) { SaharaEmpty(t("Demo record removed.", "डेमो रिकॉर्ड हटा दिया गया।"), secondaryLabel = t("Leave walkthrough", "डेमो से बाहर जाएँ"), onSecondary = ::leave) }
         "opening" -> SaharaLoading(t("Opening care records…", "देखभाल रिकॉर्ड खुल रहे हैं…"))
         else -> CareApp(vm, onAccount = { vm.message.value = t("Not available in the demo.", "डेमो में उपलब्ध नहीं।") }, walkthrough = user, onLeaveWalkthrough = ::leave, onSwitchWalkthrough = ::switchTo)
     } }

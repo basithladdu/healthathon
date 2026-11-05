@@ -128,7 +128,6 @@ object TrendChartRules {
             val title = TrendChartRules.title(name, window, hindi)
             val summary = TrendChartRules.summary(window, points, hindi, today)
             Text(title, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = DoctorCardInk)
-            Text(summary, fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.testTag("$tag-summary"))
             val chartPoints = window.days.mapIndexed { i, d -> ChartPoint(i.toDouble(), d.value?.toDouble(), d.value?.let { ChartBands.color(it) }) }
             val xLabels = window.days.mapIndexed { i, d ->
                 val top = if (d.date == today) t("Today", "आज") else d.date.format(careDateFormat("EEE", hindi))

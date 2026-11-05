@@ -132,7 +132,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         try {
             val intent = vm.reportFiles.intent(report, share)
             open(context, if (share) Intent.createChooser(intent, t("Share report", "रिपोर्ट भेजें")) else intent)
-        } catch (_: Exception) { vm.message.value = t("Couldn't open this report. Add it again from Files.", "यह रिपोर्ट नहीं खुल सकी। Files से इसे फिर जोड़ें।") }
+        } catch (_: Exception) { vm.message.value = t("Couldn't open this report.", "यह रिपोर्ट नहीं खुल सकी।") }
     }
 
     var addSheet by rememberSaveable { mutableStateOf(false) }

@@ -28,7 +28,7 @@ import java.util.Locale
 @Composable fun DoctorProgressTimeline(reports: List<DoctorProgressReport>, onOpenReport: (String) -> Unit, modifier: Modifier = Modifier) { val t = careText();
     Column(modifier.fillMaxWidth().testTag("doctor-progress-timeline"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(t("Reported updates", "बताए अपडेट"), Modifier.a11yHeading(), fontSize = 22.sp, fontWeight = FontWeight.Medium, color = Ink, fontFamily = SaharaTitleFont)
-        if (reports.isEmpty()) Surface(color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) { Icon(Icons.Outlined.Notes, null, tint = Rust, modifier = Modifier.size(24.dp)); Text(t("No reported updates recorded.", "कोई बताया अपडेट दर्ज नहीं।"), fontSize = 16.sp, color = DoctorCardInk) } }
+        if (reports.isEmpty()) Surface(color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) { Icon(Icons.Outlined.Notes, null, tint = Rust, modifier = Modifier.size(24.dp)); Text(t("No updates yet.", "अभी कोई अपडेट नहीं।"), fontSize = 16.sp, color = DoctorCardInk) } }
         reports.forEachIndexed { index, report ->
             Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Column(Modifier.width(48.dp).fillMaxHeight(), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -70,7 +70,6 @@ import java.util.Locale
                 Text(t("Planned: ${progressTimestamp(dose.scheduledAt, report.zoneId)}", "तय: ${progressTimestamp(dose.scheduledAt, report.zoneId)}"), fontSize = 14.sp)
                 Text(t("Reported taken: ", "लेने का बताया समय: ") + "${dose.reportedTakenAt?.let { progressTimestamp(it, report.zoneId) } ?: t("Not reported", "सूचना नहीं")}", fontSize = 14.sp)
                 Text(t("Logged: ", "दर्ज: ") + "${dose.loggedAt?.let { progressTimestamp(it, report.zoneId) } ?: t("Not logged", "दर्ज नहीं")}", fontSize = 14.sp)
-                dose.source?.let { Text(if (it == SampleReportSource.PATIENT) t("Patient report", "मरीज़ की सूचना") else t("Family report", "परिवार की सूचना"), fontSize = 14.sp, color = DoctorCardSub) }
             }
         }
         report.linkedDiscussion?.let { discussion -> ProgressDetailCard(t("Linked discussion", "जुड़ी चर्चा"), Icons.Outlined.Forum, SaharaApricot) { Text(discussion.text, lineHeight = 24.sp) } }

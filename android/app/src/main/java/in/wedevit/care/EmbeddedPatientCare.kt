@@ -172,12 +172,10 @@ fun EmbeddedPatientCare(
             }
         } else {
             // Only what changes what the doctor can do stays on screen; the demo label sits behind the info icon.
-            val demoLabel = vm.demoMode && !DoctorTestProfiles.contains(personId)
-            if ((section != "Conversations" || tool.isNotEmpty() || !conversationCapture) && (demoLabel || !canEdit)) Surface(color = if (vm.cloud == null) Peach.copy(alpha = .5f) else Paper) {
+            if ((section != "Conversations" || tool.isNotEmpty() || !conversationCapture) && !canEdit) Surface(color = if (vm.cloud == null) Peach.copy(alpha = .5f) else Paper) {
                 Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                     if (!canEdit) { Icon(Icons.Default.Lock, null, Modifier.size(16.dp), tint = DoctorCardSub); Spacer(Modifier.width(8.dp)); Text(t("View only", "सिर्फ़ देखने के लिए"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.weight(1f).padding(vertical = 8.dp).testTag("embedded-read-only")) }
                     else Spacer(Modifier.weight(1f))
-                    if (demoLabel) DoctorInfoIcon(t("Demo care record · not saved to an account", "डेमो देखभाल रिकॉर्ड · किसी खाते में सेव नहीं"), t("No prescription is issued and no appointment is booked.", "न कोई पर्चा जारी होता है, न कोई अपॉइंटमेंट बुक होती है।"), "embedded-care-source")
                 }
             }
             if (tool.isNotEmpty() && tool !in listOf("scanner", "feedback", "reminders", "symptoms")) Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {

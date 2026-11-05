@@ -41,7 +41,7 @@ class DoctorReportsUiTest {
             ui.onNodeWithContentDescription("Clear search").performScrollTo().performClick()
             ui.onNodeWithTag("reports-category-SCANS").performScrollTo().performClick()
             ui.onNodeWithTag("reports-empty").assertExists()
-            ui.onNodeWithText("Show all summaries").performScrollTo().performClick()
+            ui.onNodeWithText("Show all").performScrollTo().performClick()
             ui.onNodeWithTag("reports-search").performScrollTo().performTextReplacement("laboratory")
             Espresso.closeSoftKeyboard()
             val report=DoctorReportsData.reports("demo-leela").single()
