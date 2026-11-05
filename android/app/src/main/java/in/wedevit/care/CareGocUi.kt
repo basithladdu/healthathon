@@ -299,7 +299,9 @@ private val GocTickSoft get() = DoctorStatusGoodBg
     // Everyone in the room agreed on one tick; names are optional, so the consent sidecar records "Everyone present" when none were typed.
     val consentNames = names.ifEmpty { listOf(t("Everyone present", "सभी मौजूद लोग")) }
     val text = GocLines.text(lines)
-    val extraction = remember(text) { GocExtract.extract(text) }
+    // Gemini's reading of the whole talk onto the legal form wins while the transcript is unchanged; otherwise (offline, Gemini failed, or lines edited) the on-phone reading is used.
+    var geminiReading by remember(d.patientId) { mutableStateOf<Pair<String, GocGeminiAnalysis>?>(null) }
+    val extraction = remember(text, geminiReading) { geminiReading?.takeIf { it.first == text }?.second?.extraction ?: GocExtract.extract(text) }
     val busy = operation.isNotBlank()
     val covered = remember(text) { GocGuide.covered(text) }
     val undiscussed = GocGuide.undiscussed(extraction, covered, guideTicked, topics, consentAt > 0)
@@ -344,6 +346,7 @@ private val GocTickSoft get() = DoctorStatusGoodBg
         }
         lines = lines + added.filter { new -> lines.none { it.key == new.key } }
         model = result.model; transcribedBy = "Google Gemini (${result.model})"
+        result.analysis?.let { geminiReading = GocLines.text(lines) to it }
         added.isNotEmpty()
     } catch (c: CancellationException) { throw c } catch (_: Exception) { false }
 

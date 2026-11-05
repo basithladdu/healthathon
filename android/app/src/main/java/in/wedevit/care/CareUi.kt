@@ -518,6 +518,17 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     val recordings by vm.recordings.collectAsStateWithLifecycle()
     val recordingConsents by vm.recordingConsents.collectAsStateWithLifecycle()
     val transcribingPath by vm.transcribingPath.collectAsStateWithLifecycle()
+    // Stop = transcribe: when the newest recording has Gemini consent, send it at once (no extra tap). The audio stays on the phone if it fails.
+    var autoTranscribed by rememberSaveable { mutableStateOf("") }
+    LaunchedEffect(recordings.size, recordingConsents.size, recording, recordingSaving) {
+        if (recording || recordingSaving || !BuildConfig.CLOUD_AUDIO_ENABLED) return@LaunchedEffect
+        val file = recordings.maxByOrNull { it.lastModified() } ?: return@LaunchedEffect
+        if (file.absolutePath == autoTranscribed || System.currentTimeMillis() - file.lastModified() > 10 * 60_000L) return@LaunchedEffect
+        val consent = recordingConsents.firstOrNull { it.audioPath == file.absolutePath } ?: return@LaunchedEffect
+        if (consent.transcriptionConsentAt <= 0) return@LaunchedEffect
+        autoTranscribed = file.absolutePath
+        vm.transcribeAudio(file.absolutePath, consent)
+    }
     val busy by vm.busy.collectAsStateWithLifecycle()
     var topStep by rememberSaveable { mutableIntStateOf(0) }
     var subPage by rememberSaveable { mutableIntStateOf(0) }

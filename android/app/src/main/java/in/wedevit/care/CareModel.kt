@@ -865,7 +865,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         action {
             requireEdit(personId)
             require(path == consent.audioPath && consent.personId == personId) { "Choose a recording for this person." }
-            require(draft.value.personId == personId && draft.value.source.isBlank()) { "Clear the conversation text before creating a new transcript." }
+            require(draft.value.personId == personId && (demoMode || draft.value.source.isBlank())) { "Clear the conversation text before creating a new transcript." }
             transcribingPath.value = path
             try {
                 // Doctor recordings go through the same Gemini goals-of-care route as the patient side (sahara.wedevit.in/api/goc-transcribe, Vercel GEMINI_API_KEY_1..5).
@@ -890,7 +890,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
                 require(text.isNotBlank()) { "No speech was found in this recording." }
                 val result = ConversationTranscript(text = text, provider = engineName, model = engineModel, languages = langs)
                 require(result.text.length <= NoteRules.MAX_SOURCE_CHARS) { "This transcript is too long for a shared care note. Keep the recording and enter a shorter selection." }
-                require(selected.value == personId && draft.value.personId == personId && draft.value.source.isBlank()) { "The conversation changed while transcription was running. The transcript was not inserted." }
+                require(selected.value == personId && draft.value.personId == personId && (demoMode || draft.value.source.isBlank())) { "The conversation changed while transcription was running. The transcript was not inserted." }
                 edit(DoctorConversationContext.acceptedTranscript(draft.value.copy(
                     source = result.text,
                     transcriptProvider = result.provider,
