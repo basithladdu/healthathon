@@ -206,7 +206,7 @@ test('an unusable Gemini answer is retried, and a too-long answer splits the win
 
 test('the key and model come from SAHARA_AI_API_KEY / SAHARA_AI_MODEL, with GEMINI_API_KEY as the fallback name', () => {
   const sahara = gocTranscribeConfig({ SAHARA_AI_API_KEY: 'a', SAHARA_AI_MODEL: 'gemini-3.1-flash-lite', GEMINI_API_KEY: 'b' });
-  assert.equal(sahara.gemini, 'a'); assert.deepEqual(sahara.geminiModels, ['gemini-3.1-flash-lite', ...GOC_GEMINI_MODELS]);
+  assert.equal(sahara.gemini, 'a'); assert.deepEqual(sahara.geminiModels, [...new Set(['gemini-3.1-flash-lite', ...GOC_GEMINI_MODELS])]);
   assert.equal(gocTranscribeConfig({ GEMINI_API_KEY: 'b' }).gemini, 'b');
   // A custom non-Gemini service in SAHARA_AI_* is not a Gemini key.
   const custom = gocTranscribeConfig({ SAHARA_AI_BASE_URL: 'https://api.example.com/v1', SAHARA_AI_API_KEY: 'x', SAHARA_AI_MODEL: 'llama' });
