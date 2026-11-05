@@ -22,7 +22,7 @@ SC, PH, IC = B / "assets/screens", B / "assets/photos", B / "assets/icons"
 
 GREEN, MUTED, RUST, TEAL, PURPLE, BLUE, LINK = '173F33', '53655C', 'B75E43', '157B68', '7353AC', '4357C7', '2D5F9A'
 BG = {'cream': 'FFF6E5', 'blue': 'DCE6F4', 'peach': 'F7E3D5', 'lilac': 'F1E9F6', 'mint': 'E6F2EC', 'sand': 'F6EFE2'}
-TEAM_CODE = '[add team code]'
+TEAM_CODE = '37MYUP'
 VIDEO = '[add demo video link]'
 MVP = 'https://sahara.wedevit.in'
 REPO = 'https://github.com/basithladdu/healthathon'
