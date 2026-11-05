@@ -243,7 +243,7 @@ export async function geminiTranscribeWindow(config: Config, request: GeminiWind
   const body = JSON.stringify({
     systemInstruction: { parts: [{ text: gocGeminiPrompt(request.lang, request.overlapSec) }] },
     contents: [{ role: 'user', parts: [{ text: 'Transcribe this audio.' }, { file_data: { mime_type: request.file.mimeType, file_uri: request.file.uri } }] }],
-    generationConfig: { responseMimeType: 'application/json', responseSchema: GOC_RESPONSE_SCHEMA, maxOutputTokens: 32_768 },
+    generationConfig: { temperature: 0, responseMimeType: 'application/json', responseSchema: GOC_RESPONSE_SCHEMA, maxOutputTokens: 32_768 },
   });
   for (const model of config.geminiModels) {
     for (let attempt = 0; attempt < 2; attempt++) {
