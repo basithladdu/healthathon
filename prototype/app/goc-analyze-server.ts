@@ -130,7 +130,7 @@ export async function analyzeGoc(lines: GocAnalyzeLine[], options: GocAnalyzeOpt
   let unusable = false;
   try {
     const result = await withGeminiKeys(options.slots, async (slot) => {
-      let missing = 0;
+      let missing = 0; let busyError: GeminiCallError | null = null;
       for (const model of options.models) {
         const left = deadline - now();
         if (left < 3000) break;
@@ -144,11 +144,14 @@ export async function analyzeGoc(lines: GocAnalyzeLine[], options: GocAnalyzeOpt
           console.warn('goc_analyze_gemini_error', model, response.status, detail.slice(0, 300));
           const retry = Number(response.headers.get('retry-after'));
           if (response.status === 404 || (response.status === 400 && /model/iu.test(detail) && /not found|not supported|unknown/iu.test(detail))) { missing++; continue; }
+          // A busy or failing model (429, 5xx): try the next model on this key before giving up on the key.
+          if (response.status === 429 || response.status >= 500) { busyError = new GeminiCallError(response.status, detail, Number.isFinite(retry) && retry > 0 ? retry : undefined); continue; }
           throw new GeminiCallError(response.status, detail, Number.isFinite(retry) && retry > 0 ? retry : undefined);
         }
         try { return { analysis: readAnswer(await response.json().catch(() => null), lines), model }; }
         catch (error) { if (error instanceof UnusableAnswer) { unusable = true; continue; } throw error; }
       }
+      if (busyError) throw busyError;
       if (unusable) throw new UnusableAnswer();
       if (missing) throw new ModelMissing();
       console.warn('goc_analyze_no_model_tried', options.models.join(','));
