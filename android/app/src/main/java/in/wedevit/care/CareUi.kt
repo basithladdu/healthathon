@@ -478,7 +478,8 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
     val tasks = items.filter { it.kind == "task" && !CareEntryCodec.isStructured(it.detail) }.sortedBy { it.doneOn.isNotBlank() }
     // Signed in: pull the list down to refresh (Material 3), as well as the Refresh button in the header.
     SaharaPullRefresh(vm.refreshing, vm::refresh, enabled = vm.cloud != null) {
-    LazyColumn(Modifier.fillMaxSize().saharaScreenEnter().testTag("today-list"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    // A soft warm wash behind Today so the white and tinted cards stand off the ground.
+    LazyColumn(Modifier.fillMaxSize().background(SaharaColors.GroundWarm).saharaScreenEnter().testTag("today-list"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item(key = "today-header") { Row(Modifier.fillMaxWidth().saharaStagger(0), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text(CareTodayRules.greetingLine(hour, hindi, personName, patient = !family && !clinician), Modifier.a11yHeading().testTag("today-greeting"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 22.sp, lineHeight = 28.sp, color = DoctorCardInk)
@@ -1070,12 +1071,12 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
         if (tile.count == 0) t("Nothing yet", "अभी कुछ नहीं") else "${tile.count}") { openModule = name } }
     fun page(label: String, icon: ImageVector, tone: SaharaTone, tag: String, open: (() -> Unit)?): CareToolRow? = open?.let { CareToolRow(label, icon, tone, tag, null, it) }
     val groups = listOf(
-        t("Every day", "हर दिन") to listOfNotNull(module("Medicines"), page(t("Symptoms", "लक्षण"), Icons.Default.MonitorHeart, SaharaTone.Rose, "symptom-tracker-entry", onSymptoms), module("Check-ins"), module("To do"), module("Journal")),
-        t("Visits and records", "मुलाक़ातें और रिकॉर्ड") to listOfNotNull(module("Visits"), page(t("Calendar", "कैलेंडर"), Icons.Default.CalendarMonth, SaharaTone.Indigo, "shortcut-calendar", onCalendar),
-            page(t("Documents", "कागज़ात"), Icons.Default.FolderOpen, SaharaTone.Teal, "care-tool-documents", onDocuments), page(t("Lab history", "जाँच रिपोर्टें"), Icons.Default.Science, SaharaTone.Marigold, "shortcut-labs", onLabs), module("Conversations")),
-        t("Plans and support", "योजना और सहारा") to listOfNotNull(page(t("Emergency plan", "आपातकालीन योजना"), Icons.Default.LocalHospital, SaharaTone.Rust, "care-tool-plan", onCarePlan),
-            page(t("Tubes and lines", "नलियाँ और लाइनें"), Icons.Default.Healing, SaharaTone.Plum, "shortcut-devices", onDevices), page(t("Community", "समुदाय"), Icons.Default.Groups, SaharaTone.Leaf, "shortcut-community", onCommunity)),
-    ).filter { it.second.isNotEmpty() }
+        Triple(t("Every day", "हर दिन"), SaharaTone.Teal, listOfNotNull(module("Medicines"), page(t("Symptoms", "लक्षण"), Icons.Default.MonitorHeart, SaharaTone.Rose, "symptom-tracker-entry", onSymptoms), module("Check-ins"), module("To do"), module("Journal"))),
+        Triple(t("Visits and records", "मुलाक़ातें और रिकॉर्ड"), SaharaTone.Indigo, listOfNotNull(module("Visits"), page(t("Calendar", "कैलेंडर"), Icons.Default.CalendarMonth, SaharaTone.Indigo, "shortcut-calendar", onCalendar),
+            page(t("Documents", "कागज़ात"), Icons.Default.FolderOpen, SaharaSection.Documents, "care-tool-documents", onDocuments), page(t("Lab history", "जाँच रिपोर्टें"), Icons.Default.Science, SaharaSection.Labs, "shortcut-labs", onLabs), module("Conversations"))),
+        Triple(t("Plans and support", "योजना और सहारा"), SaharaTone.Rose, listOfNotNull(page(t("Emergency plan", "आपातकालीन योजना"), Icons.Default.LocalHospital, SaharaSection.Emergency, "care-tool-plan", onCarePlan),
+            page(t("Tubes and lines", "नलियाँ और लाइनें"), Icons.Default.Healing, SaharaTone.Plum, "shortcut-devices", onDevices), page(t("Community", "समुदाय"), Icons.Default.Groups, SaharaSection.Community, "shortcut-community", onCommunity))),
+    ).filter { it.third.isNotEmpty() }
     if (opened != null) CareModuleScreen(opened) { closeModule() } else
     LazyColumn(Modifier.fillMaxSize().saharaScreenEnter().testTag("care-list"), state = listState, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         // One title and the one main action (Add) on top; then the list.
@@ -1083,11 +1084,12 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
             Box(Modifier.weight(1f)) { Heading(title ?: t("Daily care", "रोज़ की देखभाल"), 26) }
             CareAddMenuButton(onAdd, onScanPrescription)
         } }
-        groups.forEachIndexed { g, (group, rows) -> item(key = "care-group-$group") {
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(group, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = RustText, modifier = Modifier.padding(start = 4.dp).a11yHeading())
-                SaharaRegister { rows.forEachIndexed { index, row ->
-                    if (index > 0) HorizontalDivider(color = DoctorHairline, modifier = Modifier.padding(horizontal = 12.dp))
+        groups.forEachIndexed { g, (group, groupTone, rows) -> item(key = "care-group-$group") {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Each group's name sits on a solid pill in its colour; its register takes the matching wash and edge bar.
+                Text(group, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = groupTone.onSolid, modifier = Modifier.clip(RoundedCornerShape(SaharaRadius.Pill)).background(groupTone.solid).padding(horizontal = 12.dp, vertical = 4.dp).a11yHeading())
+                SaharaRegister(tone = groupTone) { rows.forEachIndexed { index, row ->
+                    if (index > 0) HorizontalDivider(color = groupTone.solid.copy(alpha = .35f), modifier = Modifier.padding(horizontal = 12.dp))
                     SaharaListRow(row.label, Modifier.saharaStagger(g * 3 + index).testTag(row.tag), detail = row.detail, icon = row.icon, tone = row.tone, onClick = row.onClick)
                 } }
             }
@@ -1101,13 +1103,14 @@ private class CareToolRow(val label: String, val icon: ImageVector, val tone: Sa
 /** The emergency numbers (tap to open the dialler) and a hospitals map link. Shown in Nearby and in Today's SOS sheet. */
 @Composable fun EmergencyNumbersCard() {
     val t = careText(); val context = LocalContext.current
-    SurfaceCard(Peach) {
-        Text(t("Emergency", "आपातकाल"), fontWeight = FontWeight.SemiBold, fontSize = 19.sp, modifier = Modifier.testTag("nearby-emergency"))
+    // Emergency red wash; each number is a white button with a solid red call chip.
+    SurfaceCard(SaharaSection.Emergency.wash) {
+        Text(t("Emergency", "आपातकाल"), fontWeight = FontWeight.Bold, fontSize = 19.sp, color = SaharaSection.Emergency.ink, modifier = Modifier.testTag("nearby-emergency"))
         NearbyHelp.emergency.forEach { e ->
             Spacer(Modifier.height(8.dp))
             Button(onClick = { open(context, Intent(Intent.ACTION_DIAL, Uri.parse(NearbyHelp.dialUri(e.number)))) }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Paper, contentColor = Ink),
-                modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("emergency-${e.number}")) {
-                Icon(Icons.Default.Call, null, Modifier.size(20.dp), tint = Rust); Spacer(Modifier.width(10.dp))
+                border = BorderStroke(1.5.dp, SaharaSection.Emergency.solid), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("emergency-${e.number}")) {
+                SaharaIconChip(Icons.Default.Call, SaharaSection.Emergency, size = 32); Spacer(Modifier.width(10.dp))
                 Text(e.number, fontWeight = FontWeight.Bold, fontSize = 20.sp, modifier = Modifier.widthIn(min = 64.dp)); Spacer(Modifier.width(8.dp))
                 Column(Modifier.weight(1f)) {
                     Text(t(e.label, e.labelHindi), fontWeight = FontWeight.SemiBold)
@@ -1117,8 +1120,8 @@ private class CareToolRow(val label: String, val icon: ImageVector, val tone: Sa
         }
         Spacer(Modifier.height(8.dp))
         // The maps app searches near the phone using its own location setting; this app does not read location.
-        OutlinedButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q=" + Uri.encode("hospital")))) }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("nearby-hospitals-map")) {
-            Icon(Icons.Default.LocalHospital, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(t("Hospitals near you on the map", "नक्शे पर पास के अस्पताल"))
+        OutlinedButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q=" + Uri.encode("hospital")))) }, shape = RoundedCornerShape(14.dp), border = BorderStroke(2.dp, SaharaSection.Emergency.solid), colors = ButtonDefaults.outlinedButtonColors(containerColor = Paper, contentColor = SaharaSection.Emergency.ink), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("nearby-hospitals-map")) {
+            Icon(Icons.Default.LocalHospital, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(t("Hospitals near you on the map", "नक्शे पर पास के अस्पताल"), fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -1140,7 +1143,7 @@ private class CareToolRow(val label: String, val icon: ImageVector, val tone: Sa
     var menu by remember { mutableStateOf(false) }
     SurfaceCard(color) { Row(verticalAlignment = Alignment.Top) {
         if (item.kind in listOf("medicine", "task")) Checkbox(checked = done, onCheckedChange = { if (!busy && canEditCareContext(vm, item.personId, capturedAccount)) vm.toggle(item) }, enabled = canEdit, modifier = Modifier.semantics { contentDescription = "${if (item.kind == "medicine") t("Taken today", "आज ली") else t("Done", "हो गया")}: ${item.title}" })
-        else Surface(shape = RoundedCornerShape(12.dp), color = if (item.kind == "visit") Mint else Peach, modifier = Modifier.padding(end = 12.dp)) { Icon(careIcon(item.kind), null, tint = Ink, modifier = Modifier.padding(10.dp).size(22.dp)) }
+        else SaharaIconChip(careIcon(item.kind), when (item.kind) { "visit" -> SaharaSection.Visits; "checkin" -> SaharaSection.CheckIns; "journal" -> SaharaTone.Rose; else -> SaharaTone.Leaf }, Modifier.padding(end = 12.dp), size = 42)
         Column(Modifier.weight(1f)) { Text(if (item.kind == "checkin") checkInMoodLabel(item.title, hindi) else item.title, fontWeight = FontWeight.SemiBold); if (item.due > 0) Text(date(item.due), color = if (done) RustText else Rust, fontSize = 13.sp); if (item.detail.isNotBlank()) Text(item.detail, style = MaterialTheme.typography.bodyMedium); if (item.kind in listOf("checkin", "journal")) Text(date(item.created), style = MaterialTheme.typography.bodySmall) }
         // Edit and Remove live behind a three-dot menu at the card's top-right.
         if (canEdit) Box {
@@ -1182,11 +1185,11 @@ private class CareToolRow(val label: String, val icon: ImageVector, val tone: Sa
             open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), t("Export care notes", "देखभाल नोट भेजें")))
         }
         if (!shortcutsElsewhere) item { MoreGroup(t("Care", "देखभाल")) {
-            MoreRow(Icons.Default.FolderOpen, FamilyAccent.Teal, t("Documents", "दस्तावेज़"), "", Modifier.saharaStagger(3).testTag("more-documents-entry"), onDocuments)
-            if (onCarePlan != null) MoreRow(Icons.Default.LocalHospital, FamilyAccent.Marigold, t("Emergency plan", "आपातकालीन योजना"), t("Plan, pocket emergency card, living will", "योजना, जेब वाला आपातकालीन कार्ड, लिविंग विल"), Modifier.saharaStagger(4).testTag("more-care-plan-entry"), onCarePlan)
+            MoreRow(Icons.Default.FolderOpen, SaharaSection.Documents.solid, t("Documents", "दस्तावेज़"), "", Modifier.saharaStagger(3).testTag("more-documents-entry"), onDocuments)
+            if (onCarePlan != null) MoreRow(Icons.Default.LocalHospital, SaharaSection.Emergency.solid, t("Emergency plan", "आपातकालीन योजना"), t("Plan, pocket emergency card, living will", "योजना, जेब वाला आपातकालीन कार्ड, लिविंग विल"), Modifier.saharaStagger(4).testTag("more-care-plan-entry"), onCarePlan)
             if (onDevices != null && !clinicianView) MoreRow(Icons.Default.Healing, FamilyAccent.Plum, t("Tubes and lines", "नलियाँ और लाइनें"), "", Modifier.saharaStagger(5).testTag("more-devices"), onDevices)
-            MoreRow(Icons.Default.CalendarMonth, FamilyAccent.Leaf, t("Calendar", "कैलेंडर"), "", Modifier.saharaStagger(6).testTag("more-calendar"), onCalendar)
-            MoreRow(Icons.Default.Science, FamilyAccent.Marigold, t("Lab history", "जाँच का इतिहास"), "", Modifier.saharaStagger(7).testTag("more-labs"), onLabs)
+            MoreRow(Icons.Default.CalendarMonth, SaharaSection.Visits.solid, t("Calendar", "कैलेंडर"), "", Modifier.saharaStagger(6).testTag("more-calendar"), onCalendar)
+            MoreRow(Icons.Default.Science, SaharaSection.Labs.solid, t("Lab history", "जाँच का इतिहास"), "", Modifier.saharaStagger(7).testTag("more-labs"), onLabs)
             MoreRow(Icons.Default.Share, FamilyAccent.Brick, t("Export care notes", "देखभाल नोट भेजें"), t("${versions.size} saved", "${versions.size} सहेजे गए"), Modifier.saharaStagger(8).testTag("more-export-notes"), enabled = versions.isNotEmpty(), onClick = exportNotes)
         } }
         item { MoreGroup(t("Settings", "सेटिंग")) {

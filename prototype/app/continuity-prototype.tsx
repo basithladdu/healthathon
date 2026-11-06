@@ -727,7 +727,7 @@ function IconIdCard({ className = 'w-4 h-4' }: { className?: string }) {
 }
 
 const navItems: Array<{ view: View; label: string; icon: React.FC<{ className?: string }> }> = [
-  { view: 'caregiver', label: 'Care journey', icon: IconUsers },
+  { view: 'caregiver', label: 'Care', icon: IconUsers },
   { view: 'home', label: 'Home', icon: IconShieldCheck },
   { view: 'guide', label: 'Conversations', icon: IconFileEdit },
   { view: 'worklist', label: 'Follow-ups', icon: IconClipboardList },
@@ -741,7 +741,7 @@ const patientNavItems: Array<{ view: View; label: string; icon: React.FC<{ class
   { view: 'my-plan', label: 'My care plan', icon: IconShieldCheck },
   { view: 'daily-care', label: 'Daily care', icon: IconCalendar },
   { view: 'prepare-conversation', label: 'Prepare for a conversation', icon: IconFileEdit },
-  { view: 'my-timeline', label: 'My care journey', icon: IconHistory },
+  { view: 'my-timeline', label: 'My care so far', icon: IconHistory },
   { view: 'care-near-me', label: 'Care near me', icon: IconMapPin },
   { view: 'my-doctors', label: 'My doctors', icon: IconUsers },
   { view: 'emergency-card', label: 'Emergency card', icon: IconIdCard },
@@ -750,7 +750,7 @@ const patientNavItems: Array<{ view: View; label: string; icon: React.FC<{ class
 ];
 
 const familyNavItems: Array<{ view: View; label: string; icon: React.FC<{ className?: string }> }> = [
-  { view: 'caregiver', label: 'Care journey', icon: IconUsers },
+  { view: 'caregiver', label: 'Care', icon: IconUsers },
   { view: 'daily-care', label: 'Daily care', icon: IconCalendar },
   { view: 'prepare-conversation', label: 'Prepare for a conversation', icon: IconFileEdit },
   { view: 'care-near-me', label: 'Care near me', icon: IconMapPin },
@@ -3482,7 +3482,7 @@ export function ContinuityPrototype() {
               <section className="detail-card">
                 <div className="card-header">
                   <div className="card-header-titles">
-                    <h2>Workflow actions</h2>
+                    <h2>Actions</h2>
                     <span>Role-aware tasks</span>
                   </div>
                 </div>
@@ -3868,7 +3868,7 @@ export function ContinuityPrototype() {
         <button className="back-button" type="button" onClick={() => navigate('patient')}>
           ← Back
         </button>
-        {renderPageHeading('Care Coordinator Workflow', `Follow-up outreach · ${selectedItem.patient}`)}
+        {renderPageHeading('Care coordinator follow-up', `Follow-up outreach · ${selectedItem.patient}`)}
 
         <div className="form-page-grid outreach-page-grid">
           <section className="detail-card task-context-card">
@@ -6594,7 +6594,7 @@ export function ContinuityPrototype() {
                 id: `AUDIT-SIM-${Date.now().toString().slice(-4)}`,
                 time: 'Just now',
                 actor: currentRole,
-                event: 'Workflow review run',
+                event: 'Review run',
                 record: line,
                 badge: 'PUBLISH',
               },

@@ -2,6 +2,31 @@
 
 > **30 Oct 2026:** SVK spec build (emergency care plan, living will, QR card, languages): see [docs/SAHARA_SVK_BUILD_HANDOFF.md](docs/SAHARA_SVK_BUILD_HANDOFF.md).
 
+## 6 Nov: Awaiz, switch on the community
+
+The app's Community works without the server: anyone can read the groups; signing in (or creating an account) lets a person join groups, post, reply, react ("I've been there", hugs), save posts and choose the name others see (it starts as the first name from their email). Until the server part below is on, what a signed-in person writes stays on their phone, under their account. After it is on, everyone sees each other's posts.
+
+- [ ] **1. Check it offline first** (from the repository root, no project touched):
+  ```bash
+  PGLITE_MODULE=<path to node_modules>/@electric-sql/pglite/dist/index.js node android/scripts/test-community-sql.mjs
+  ```
+  It must end with `Community SQL: 47 checks PASS`.
+- [ ] **2. Apply the migration** `android/supabase/migrations/20261106120000_community.sql` to Saanthvana (`kjnhtakqzboayqorrlue`). From `android/`:
+  ```bash
+  supabase link --project-ref kjnhtakqzboayqorrlue
+  supabase db push --dry-run
+  ```
+  If the dry run lists **only** `20261106120000_community.sql`, run `supabase db push`. If it lists older files too (they were applied by hand), don't push: open Supabase → SQL Editor, paste the whole file and run it once.
+- [ ] **3. Give the moderators their role** (they can hide and restore posts and see reports). For each team member, replace `TEAM_EMAIL`, in the SQL Editor:
+  ```sql
+  insert into healthathon_private.staff_roles(user_id, role) select id, 'clinical_verifier' from auth.users where email = 'TEAM_EMAIL' on conflict do nothing;
+  ```
+  Their posts and replies then show the "Sahara team" badge.
+- [ ] **4. Confirm the groups with the doctors** (Sujay, Sharada, Shirin): Family carers, Living with cancer, Grief and loss, Ask the care team, and their one-line descriptions. They are rows in `public.community_groups`; set `active = false` to close one. The same four are built into the app, so tell Basith if a name changes.
+- [ ] **5. Phone check:** signed out, open Community: groups readable, "Sign in or create an account to join" opens the account screen. Signed in: join a group (it moves to "Your groups"), post, reply, save a post, change your name; sign in as a second account and see the first account's post.
+
+The help card (Tele-MANAS 14416, free, 24 hours; 112 for emergencies) opens the phone's dialler; it never calls by itself.
+
 ## 5 Nov: Awaiz's tasks from the 4 Nov handoff (Awaiz, with Claude Code)
 
 Done:
@@ -575,3 +600,4 @@ Sources: `docs/research/CARE_DEEP_DIVE_2026-10-27.md`, `CARE_VS_SAHARA_FOR_TEAM.
 - **Sahara-complete lane (28 Oct, branch `sahara-complete`):** the doctor-visit card on Today / Daily care opens the Calendar on the visit's day (was today); read-only doctors see why Plan visit is greyed out; the care-note export says "on-device speech-to-text" instead of "AI-generated" for phone transcripts; the note reader shows the transcript lines each goals answer came from (B7); the Medicines "Intake history" tab was titled "Past". Directory: 3 heading rows removed (1,628 listings), the Vasai listings moved to Palghar, the scraper rejects such rows. KPI draft and query README now match what `kpi-queries.sql` counts.
 - **Sahara-complete lane, Hindi:** reminder notifications and checks; doctor record stage, Who is in the room, preparation questions, transcript goals, Saved Audio, recording review, conversation history, conversation stepper, medicine chips and the doctor walkthrough shell. Left English: `DoctorAudioCapture`, `DoctorLocalPreviewCapture` and the medicine-organizer messages (online-AI/preview paths, real-sahara lane), the 8 standard goals questions (saved text the matcher reads). `CareHindiCoverageTest` now guards the doctor panels too.
 - **Sahara-complete lane, daily flow:** Today has a "How was today?" card: one tap on a mood saves today's check-in (6 taps → 1); "Note a symptom" opens the symptom form directly, a new note starts with last time's "who reported", and "Save now" skips the optional last step (7 → 4); medicines still to tick are listed first (4th medicine 3 → 1). Sharing with the doctor stays automatic when signed in (0 taps). Tests: `CareDailyFlowTest`, `CareCalendarStartTest`, `NoteSourceLinesTest`, `CareReminderHindiTest`. Not tried on a phone.
+- **Prefill lane (6 Nov, branch `r3-prefill`):** forms no longer ask what the app already knows; every prefilled value shows filled with a small "Change". Doctor name + registration come from the doctor's own approved verification row (`healthathon_clinician_requests`, status `approved`, fetched when online; pending/rejected never used) or, in Practice, Dr Meera Nair with the made-up number `PRACTICE-DEMO`. Patient sex/phone/address/illness/allergies come from the patient profile when a new plan starts. Optional empty slots (3rd+ witness, co-signature, "could not reach", family discussion note) are behind one "+ Add" tap. **Owner, needs your context:** (1) prefill the doctor's hospital/clinic, phone and which care-team role (main treating / palliative) once the approval data holds them — the verification row has only name, council and registration, so `careTeam.*` and the 24-hour phone are still typed; (2) cache the approved name/registration on the phone so offline signing is also prefilled (today offline falls back to the last registration typed on this phone, name blank); (3) decision-makers are not prefilled from family contacts, because who the legal decision-maker is must be chosen, not guessed.

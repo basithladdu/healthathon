@@ -45,9 +45,9 @@ data class CarePlanState(
 object CarePlanBook {
     private fun CarePlanState.log(at: String, actor: String, action: AuditAction, type: AuditRecordType, id: String, detail: String? = null) = copy(audit = audit.append(at, actor, action, type, id, detail))
 
-    fun startPlan(s: CarePlanState, patientId: String, actor: String, now: String, patient: EctprPatient, createdInEd: Boolean = false): Pair<CarePlanState, EctprRecord> {
+    fun startPlan(s: CarePlanState, patientId: String, actor: String, now: String, patient: EctprPatient, createdInEd: Boolean = false, clinical: ClinicalDetails = ClinicalDetails()): Pair<CarePlanState, EctprRecord> {
         require(EctprLifecycle.draft(s.ectprs, patientId) == null) { "A draft is already open." }
-        val d = EctprLifecycle.newDraft(patientId, actor, now, patient, createdInEd)
+        val d = EctprLifecycle.newDraft(patientId, actor, now, patient, createdInEd).copy(clinical = clinical)
         return s.copy(ectprs = s.ectprs + d).log(now, actor, AuditAction.CREATE, AuditRecordType.ECTPR, d.id, if (createdInEd) "started in ED" else null) to d
     }
 

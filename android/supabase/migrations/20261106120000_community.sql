@@ -1,5 +1,5 @@
 -- OWNER APPLIES (Awaiz). Not applied by the app lane (6 Nov 2026).
--- Sahara community: groups, posts, inline replies, gentle reactions, reports and moderation.
+-- Sahara community: groups members join, posts, inline replies, gentle reactions, saved posts, reports and moderation.
 -- * Signed-in members with an open Sahara account only. Nothing is readable by anon; no table is granted to
 --   authenticated: every read and write goes through the functions below, which check the caller themselves.
 -- * Authors are shown by the community name they choose (sahara_community_set_name), never by email or phone.
@@ -7,6 +7,8 @@
 -- * Moderation reuses the existing staff role 'clinical_verifier' (or 'admin') from 20261019151322.
 -- * Limits: 10 posts, 30 replies and 20 reports per member per 24 hours; post 2-1000 characters, reply 1-500;
 --   no links, email addresses or phone numbers in posts, replies or names; no images in v1.
+-- * Members join and leave groups (sahara_community_join); posting in a group joins it. "Your groups" come first in the app.
+-- * Reactions: 'helpful', 'hugs' and 'been-there' ("I've been there"). Members can save posts to read again ('_saved' feed).
 -- * Three different members reporting the same post or reply hides it until the team looks at it.
 -- * The group list is data: clinicians confirm it, then edit rows of public.community_groups in the dashboard.
 -- Until this is applied the app says the community is not open yet; nothing is sent.
@@ -59,9 +61,24 @@ create index community_replies_author_time on public.community_replies(author_id
 create table public.community_reactions (
   post_id uuid not null references public.community_posts(id) on delete cascade,
   user_id uuid not null references auth.users(id) on delete cascade,
-  kind text not null check (kind in ('helpful','hugs')),
+  kind text not null check (kind in ('helpful','hugs','been-there')),
   created_at timestamptz not null default now(),
   primary key (post_id, user_id, kind)
+);
+
+create table public.community_memberships (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  group_id text not null references public.community_groups(id) on update cascade on delete cascade,
+  joined_at timestamptz not null default now(),
+  primary key (user_id, group_id)
+);
+create index community_memberships_group on public.community_memberships(group_id);
+
+create table public.community_saves (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  post_id uuid not null references public.community_posts(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (user_id, post_id)
 );
 
 create table public.community_reports (
@@ -87,8 +104,10 @@ alter table public.community_posts enable row level security;
 alter table public.community_replies enable row level security;
 alter table public.community_reactions enable row level security;
 alter table public.community_reports enable row level security;
+alter table public.community_memberships enable row level security;
+alter table public.community_saves enable row level security;
 revoke all on public.community_groups, public.community_profiles, public.community_posts, public.community_replies,
-  public.community_reactions, public.community_reports from public, anon, authenticated;
+  public.community_reactions, public.community_reports, public.community_memberships, public.community_saves from public, anon, authenticated;
 grant select on public.community_groups, public.community_posts, public.community_replies, public.community_reports to service_role;
 
 -- Neutral starting groups. Clinicians confirm or change this list (blockers.md).
@@ -129,7 +148,7 @@ $$;
 revoke all on function healthathon_private.community_caller(), healthathon_private.community_is_team(uuid),
   healthathon_private.community_has_contact(text), healthathon_private.community_visible(timestamptz, uuid, uuid, boolean) from public, anon, authenticated;
 
--- Groups with their visible post counts, plus the caller's community name and whether they moderate.
+-- Groups with their visible post and member counts and whether the caller joined, plus the caller's community name and whether they moderate.
 create function public.sahara_community_home() returns jsonb
 language plpgsql security definer set search_path = '' as $$
 declare caller uuid := healthathon_private.community_caller(); team boolean := healthathon_private.community_is_team(caller);
@@ -138,7 +157,9 @@ begin
     'my_name', (select display_name from public.community_profiles where user_id = caller),
     'can_moderate', team,
     'groups', coalesce((select jsonb_agg(jsonb_build_object('id', g.id, 'name_en', g.name_en, 'name_hi', g.name_hi, 'about_en', g.about_en, 'about_hi', g.about_hi, 'tone', g.tone,
-        'posts', (select count(*) from public.community_posts p where p.group_id = g.id and p.hidden_at is null)) order by g.sort, g.id)
+        'posts', (select count(*) from public.community_posts p where p.group_id = g.id and p.hidden_at is null),
+        'members', (select count(*) from public.community_memberships m where m.group_id = g.id),
+        'joined', exists(select 1 from public.community_memberships m where m.group_id = g.id and m.user_id = caller)) order by g.sort, g.id)
       from public.community_groups g where g.active), '[]'::jsonb));
 end; $$;
 
@@ -154,12 +175,44 @@ begin
   return jsonb_build_object('my_name', clean);
 end; $$;
 
+-- Join or leave a group. Leaving keeps the member's posts; it only takes the group out of "Your groups".
+create function public.sahara_community_join(p_group text, p_on boolean) returns jsonb
+language plpgsql security definer set search_path = '' as $$
+declare caller uuid := healthathon_private.community_caller();
+begin
+  if not exists(select 1 from public.community_groups where id = p_group and active) then raise exception 'Group not found.' using errcode = 'P0001'; end if;
+  if coalesce(p_on, false) then
+    insert into public.community_memberships(user_id, group_id) values (caller, p_group) on conflict do nothing;
+  else
+    delete from public.community_memberships where user_id = caller and group_id = p_group;
+  end if;
+  return jsonb_build_object('joined', exists(select 1 from public.community_memberships where user_id = caller and group_id = p_group));
+end; $$;
+
+-- Save a post to read again (only the member sees what they saved).
+create function public.sahara_community_save(p_post uuid, p_on boolean) returns jsonb
+language plpgsql security definer set search_path = '' as $$
+declare caller uuid := healthathon_private.community_caller(); team boolean := healthathon_private.community_is_team(caller); parent public.community_posts%rowtype;
+begin
+  if coalesce(p_on, false) then
+    select * into parent from public.community_posts where id = p_post;
+    if not found or not healthathon_private.community_visible(parent.hidden_at, parent.author_id, caller, team) then
+      raise exception 'This post is no longer available.' using errcode = 'P0001';
+    end if;
+    insert into public.community_saves(user_id, post_id) values (caller, p_post) on conflict do nothing;
+  else
+    delete from public.community_saves where user_id = caller and post_id = p_post;
+  end if;
+  return jsonb_build_object('saved', exists(select 1 from public.community_saves where user_id = caller and post_id = p_post));
+end; $$;
+
 -- One page of a group's feed, newest first, each post with its replies (oldest first).
+-- p_group '_saved' (never a group id: ids have no underscore) is the caller's saved posts from every group.
 create function public.sahara_community_feed(p_group text, p_before_ms bigint default null, p_limit integer default 30) returns jsonb
 language plpgsql security definer set search_path = '' as $$
 declare caller uuid := healthathon_private.community_caller(); team boolean := healthathon_private.community_is_team(caller);
 begin
-  if not exists(select 1 from public.community_groups where id = p_group and active) then raise exception 'Group not found.' using errcode = 'P0001'; end if;
+  if p_group is distinct from '_saved' and not exists(select 1 from public.community_groups where id = p_group and active) then raise exception 'Group not found.' using errcode = 'P0001'; end if;
   return jsonb_build_object('can_moderate', team, 'my_name', (select display_name from public.community_profiles where user_id = caller), 'posts', coalesce((
     select jsonb_agg(item order by created desc) from (
       select p.created_at as created, jsonb_build_object(
@@ -170,6 +223,9 @@ begin
         'hugs', (select count(*) from public.community_reactions r where r.post_id = p.id and r.kind = 'hugs'),
         'my_helpful', exists(select 1 from public.community_reactions r where r.post_id = p.id and r.user_id = caller and r.kind = 'helpful'),
         'my_hugs', exists(select 1 from public.community_reactions r where r.post_id = p.id and r.user_id = caller and r.kind = 'hugs'),
+        'been_there', (select count(*) from public.community_reactions r where r.post_id = p.id and r.kind = 'been-there'),
+        'my_been_there', exists(select 1 from public.community_reactions r where r.post_id = p.id and r.user_id = caller and r.kind = 'been-there'),
+        'saved', exists(select 1 from public.community_saves s where s.post_id = p.id and s.user_id = caller),
         'reported', exists(select 1 from public.community_reports x where x.post_id = p.id and x.reporter_id = caller),
         'reports', case when team then (select count(*) from public.community_reports x where x.post_id = p.id and x.resolved_at is null) else 0 end,
         'replies', coalesce((select jsonb_agg(jsonb_build_object(
@@ -182,7 +238,8 @@ begin
           where c.post_id = p.id and healthathon_private.community_visible(c.hidden_at, c.author_id, caller, team)), '[]'::jsonb)
       ) as item
       from public.community_posts p
-      where p.group_id = p_group and healthathon_private.community_visible(p.hidden_at, p.author_id, caller, team)
+      where (p.group_id = p_group or (p_group = '_saved' and exists(select 1 from public.community_saves s where s.post_id = p.id and s.user_id = caller)))
+        and healthathon_private.community_visible(p.hidden_at, p.author_id, caller, team)
         and (p_before_ms is null or p.created_at < to_timestamp(p_before_ms / 1000.0))
       order by p.created_at desc, p.id
       limit least(greatest(coalesce(p_limit, 30), 1), 50)
@@ -209,6 +266,7 @@ begin
     raise exception 'Daily post limit reached.' using errcode = 'P0001';
   end if;
   insert into public.community_posts(id, group_id, author_id, body) values (p_id, p_group, caller, clean);
+  insert into public.community_memberships(user_id, group_id) values (caller, p_group) on conflict do nothing;
   return jsonb_build_object('id', p_id, 'status', 'received');
 end; $$;
 
@@ -242,7 +300,7 @@ create function public.sahara_community_react(p_post uuid, p_kind text, p_on boo
 language plpgsql security definer set search_path = '' as $$
 declare caller uuid := healthathon_private.community_caller(); parent public.community_posts%rowtype;
 begin
-  if p_kind not in ('helpful','hugs') then raise exception 'Group not found.' using errcode = 'P0001'; end if;
+  if p_kind not in ('helpful','hugs','been-there') then raise exception 'Group not found.' using errcode = 'P0001'; end if;
   select * into parent from public.community_posts where id = p_post;
   if not found or parent.hidden_at is not null or not healthathon_private.community_visible(parent.hidden_at, parent.author_id, caller, false) then
     raise exception 'This post is no longer available.' using errcode = 'P0001';
@@ -319,9 +377,11 @@ end; $$;
 
 revoke all on function public.sahara_community_home(), public.sahara_community_set_name(text), public.sahara_community_feed(text, bigint, integer),
   public.sahara_community_post(uuid, text, text), public.sahara_community_reply(uuid, uuid, text), public.sahara_community_react(uuid, text, boolean),
-  public.sahara_community_report(uuid, uuid, text, text), public.sahara_community_remove_mine(text, uuid), public.sahara_community_moderate(text, uuid, boolean) from public, anon;
+  public.sahara_community_report(uuid, uuid, text, text), public.sahara_community_remove_mine(text, uuid), public.sahara_community_moderate(text, uuid, boolean),
+  public.sahara_community_join(text, boolean), public.sahara_community_save(uuid, boolean) from public, anon;
 grant execute on function public.sahara_community_home(), public.sahara_community_set_name(text), public.sahara_community_feed(text, bigint, integer),
   public.sahara_community_post(uuid, text, text), public.sahara_community_reply(uuid, uuid, text), public.sahara_community_react(uuid, text, boolean),
-  public.sahara_community_report(uuid, uuid, text, text), public.sahara_community_remove_mine(text, uuid), public.sahara_community_moderate(text, uuid, boolean) to authenticated;
+  public.sahara_community_report(uuid, uuid, text, text), public.sahara_community_remove_mine(text, uuid), public.sahara_community_moderate(text, uuid, boolean),
+  public.sahara_community_join(text, boolean), public.sahara_community_save(uuid, boolean) to authenticated;
 
 commit;

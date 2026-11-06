@@ -175,12 +175,12 @@ internal object DoctorCareDemoData {
     val back:()->Unit={if(!closing&&!childBlocked&&(ready||error!=null||closeFailed)){if(section=="Hub")leave() else section="Hub"}}
     DisposableEffect(vm) {onDispose {vm.closeDoctorDemo();onNavigationBlockedChange(false);onHeaderBackChange(null)}}
     SideEffect {if(closing || (!ready&&error==null))onNavigationBlockedChange(true)}
-    LaunchedEffect(vm,attempt,initialPersonId) {try {if(DoctorTestProfiles.contains(initialPersonId)) DoctorTestProfiles.seed(vm,context) else DoctorCareDemoData.seed(vm,context);vm.select(initialPersonId);vm.refreshCareContacts();vm.refreshMedicineHistory();ready=true;onNavigationBlockedChange(false)}catch(e:Exception){if(e is CancellationException)throw e;android.util.Log.e("SaharaSeed","walkthrough load failed",e);error="The walkthrough could not load. Your own profiles were not changed.";onNavigationBlockedChange(false)}}
+    LaunchedEffect(vm,attempt,initialPersonId) {try {if(DoctorTestProfiles.contains(initialPersonId)) DoctorTestProfiles.seed(vm,context) else DoctorCareDemoData.seed(vm,context);vm.select(initialPersonId);vm.refreshCareContacts();vm.refreshMedicineHistory();ready=true;onNavigationBlockedChange(false)}catch(e:Exception){if(e is CancellationException)throw e;android.util.Log.e("SaharaSeed","walkthrough load failed",e);error="Practice could not open. Your own profiles were not changed.";onNavigationBlockedChange(false)}}
     DisposableEffect(section) {onHeaderBackChange(back);onDispose{onHeaderBackChange(null)}}
     BackHandler(enabled=!childBlocked&&!closing&&(ready||error!=null||closeFailed)) {back()}
     if(closing) Column(Modifier.padding(20.dp)){SaharaProgressBar(null);Text(if(DoctorTestProfiles.contains(initialPersonId)) "Saving this discussion…" else "Saving your practice draft…")}
     else if(closeFailed) Column(Modifier.padding(20.dp)){Text("Practice draft was not saved. Leaving may lose its latest practice edits; your own patient records are unchanged.");Button(onClick=::leave){Text("Retry saving practice draft")};TextButton(onClick=onExit){Text("Leave practice without saving")}}
-    else if(error!=null) Column(Modifier.padding(20.dp)) {Text(error!!);Button(onClick={error=null;attempt++}){Text("Retry walkthrough setup")};TextButton(onClick=::leave){Text("Back to patients")}}
+    else if(error!=null) Column(Modifier.padding(20.dp)) {Text(error!!);Button(onClick={error=null;attempt++}){Text("Try again")};TextButton(onClick=::leave){Text("Back to patients")}}
     else if(ready && person==null && DoctorTestProfiles.contains(initialPersonId)) Column(Modifier.padding(20.dp)) {Text("This test record was removed. It will not be recreated automatically.");TextButton(onClick=::leave){Text("Back to patients")}}
     else if(!ready || person==null || selected!=person.id || draft.personId!=person.id) Column(Modifier.padding(20.dp)) {SaharaProgressBar(null);Text(if(DoctorTestProfiles.contains(initialPersonId)) "Opening care records…" else "Opening care records…")}
     else DoctorPatientWorkspace(vm,person.id,section,{section=it},
@@ -188,6 +188,6 @@ internal object DoctorCareDemoData {
             if(!DoctorTestProfiles.contains(initialPersonId)) Text("Practice record · not a live patient",Modifier.fillMaxWidth().padding(horizontal=20.dp,vertical=10.dp),color=Rust)
             Box(Modifier.weight(1f)){DoctorSharedPatientHub(person,{section=it},deviceLocal=true,items=vm.items,pane=pane,selected=open)}
         }},
-        care={shown->EmbeddedPatientCare(vm,person.id,shown,{section=it},{vm.message.value="Account and sharing are unavailable in this offline practice walkthrough."},::leave,
+        care={shown->EmbeddedPatientCare(vm,person.id,shown,{section=it},{vm.message.value="Account and sharing are off in Practice."},::leave,
             onNavigationBlockedChange={childBlocked=it;onNavigationBlockedChange(it||closing)},allowDeviceLocal=true,onHeaderBackChange={nested->onHeaderBackChange(nested ?: back)})})
 }

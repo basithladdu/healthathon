@@ -276,12 +276,13 @@ private val SosRed = SaharaColors.Error
     val time = if (day != null && (day.hour != 0 || day.minute != 0)) " · " + day.format(careDateFormat("h:mm a", hindi)) else ""
     ActionCard(tint, Modifier.fillMaxWidth().testTag("up-next-${item.id}"), onOpen) {
         Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Surface(shape = RoundedCornerShape(14.dp), color = Paper, shadowElevation = 1.dp, modifier = Modifier.size(width = 62.dp, height = 68.dp)) {
+            // Visits indigo: a solid date badge with white month and day.
+            Surface(shape = RoundedCornerShape(14.dp), color = SaharaSection.Visits.solid, shadowElevation = 1.dp, modifier = Modifier.size(width = 62.dp, height = 68.dp)) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                     if (day != null) {
-                        Text(day.format(careDateFormat("MMM", hindi)).uppercase(), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = RustText, maxLines = 1)
-                        Text("${day.dayOfMonth}", fontSize = 26.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk, maxLines = 1)
-                    } else Icon(Icons.Default.Event, null, Modifier.size(28.dp), tint = DoctorAccent)
+                        Text(day.format(careDateFormat("MMM", hindi)).uppercase(), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = SaharaSection.Visits.onSolid, maxLines = 1)
+                        Text("${day.dayOfMonth}", fontSize = 26.sp, fontWeight = FontWeight.Bold, color = SaharaSection.Visits.onSolid, maxLines = 1)
+                    } else Icon(Icons.Default.Event, null, Modifier.size(28.dp), tint = SaharaSection.Visits.onSolid)
                 }
             }
             Spacer(Modifier.width(16.dp))
@@ -292,7 +293,7 @@ private val SosRed = SaharaColors.Error
                 Text(item.title.ifBlank { t("Visit", "मुलाक़ात") }, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 if (detail.isNotBlank()) Text(detail, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
-            Icon(Icons.Default.ChevronRight, null, tint = DoctorAccent)
+            Icon(Icons.Default.ChevronRight, null, tint = SaharaSection.Visits.ink)
         }
     }
 }

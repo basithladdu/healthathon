@@ -492,7 +492,7 @@ export function ScenarioReviewModal({ onClose, onRecordResult }: ScenarioReviewP
   const report = useMemo(() => {
     if (!finished) return '';
     const lines = [
-      `# Conversation review — workflow results`,
+      `# Conversation review — results`,
       '',
       'Programmed conversation cases. These results do not measure patient outcomes.',
       '',
@@ -744,8 +744,8 @@ export function ScenarioReviewModal({ onClose, onRecordResult }: ScenarioReviewP
                 </strong>
                 <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#78350f', lineHeight: 1.55 }}>
                   {missed.length > 0
-                    ? `The three defects are workflow gaps, not clinical ones: ${missed.map((m) => m.name.toLowerCase()).join(', ')}. Each names the case that caused it, which is what makes this run worth presenting.`
-                    : 'No defects surfaced in this run.'}
+                    ? `The three problems are process gaps, not clinical ones: ${missed.map((m) => m.name.toLowerCase()).join(', ')}.`
+                    : 'No problems found in this run.'}
                 </p>
               </div>
             </div>

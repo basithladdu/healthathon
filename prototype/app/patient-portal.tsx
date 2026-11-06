@@ -382,7 +382,7 @@ export function MyCarePlan(props: {
 
 export function MyTimeline(props: { audience: 'patient' | 'family'; patientName: string; entries: TimelineEntry[] }) {
   const { audience, patientName, entries } = props;
-  const eyebrow = audience === 'family' ? 'Care journey' : 'My care journey';
+  const eyebrow = audience === 'family' ? 'Care so far' : 'My care so far';
   const heading = audience === 'family' ? `${patientName}'s care so far` : 'Everything so far, in order';
 
   return (

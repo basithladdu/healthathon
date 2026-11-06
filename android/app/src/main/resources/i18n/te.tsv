@@ -2627,7 +2627,7 @@ The conversation changed. Your checked text is kept here. Open this person's con
 Use checked words	సరిచూసిన పదాలు వాడండి
 Patient ID: 	పేషెంట్ ID: 
  · after joining, your doctor can find you by this ID.	 · చేరిన తర్వాత, మీ డాక్టర్ ఈ ID తో మిమ్మల్ని కనుగొనగలరు.
-The walkthrough could not load. Your own profiles were not changed.	వాక్‌త్రూ లోడ్ కాలేదు. మీ సొంత ప్రొఫైల్‌లు మారలేదు.
+Practice could not open. Your own profiles were not changed.	అభ్యాసం తెరవలేకపోయాం. మీ సొంత ప్రొఫైల్‌లు మారలేదు.
 Leaving the walkthrough…	వాక్‌త్రూ నుండి బయటికి వెళ్తున్నాం…
 Rahul's walkthrough record was removed. It will not be recreated automatically.	రాహుల్ వాక్‌త్రూ రికార్డ్ తీసేయబడింది. ఇది దానంతట అదే మళ్ళీ తయారవదు.
 Opening care records…	కేర్ రికార్డ్‌లు తెరుచుకుంటున్నాయి…
@@ -4715,7 +4715,7 @@ Couldn't load the demo.	డెమో తెరవలేకపోయాం.
 Web link not available yet.	వెబ్ లింక్ ఇంకా అందుబాటులో లేదు.
 Sign in to add a web link.	వెబ్ లింక్ జోడించడానికి సైన్ ఇన్ చేయండి.
 Only the profile owner can make a web link.	ప్రొఫైల్ యజమాని మాత్రమే వెబ్ లింక్ చేయగలరు.
-Web links are off in the walkthrough.	వాక్‌థ్రూలో వెబ్ లింక్‌లు ఆఫ్‌లో ఉన్నాయి.
+Web links are off in Practice.	అభ్యాసంలో వెబ్ లింక్‌లు ఆఫ్‌లో ఉన్నాయి.
 This link is off or expired.	ఈ లింక్ ఆఫ్ అయింది లేదా గడువు ముగిసింది.
 Couldn't connect. Try again.	కనెక్ట్ కాలేదు. మళ్లీ ప్రయత్నించండి.
 Locked PDF saved	లాక్ చేసిన PDF సేవ్ అయింది
@@ -5103,3 +5103,26 @@ Ask documents	పత్రాలను అడగండి
 Search didn't work. Your documents are safe. Try again.	వెతకడం పని చేయలేదు. మీ పత్రాలు సురక్షితంగా ఉన్నాయి. మళ్లీ ప్రయత్నించండి.
 No answer this time. Your documents are safe. Try again.	ఈసారి జవాబు రాలేదు. మీ పత్రాలు సురక్షితంగా ఉన్నాయి. మళ్లీ ప్రయత్నించండి.
 Review not saved. Try again.	పరిశీలన సేవ్ కాలేదు. మళ్లీ ప్రయత్నించండి.
+Join the community	సముదాయంలో చేరండి
+Sign in or create an account to join groups, post and reply. Others see only the name you choose.	గ్రూపుల్లో చేరడానికి, పోస్ట్ చేయడానికి, జవాబు ఇవ్వడానికి సైన్ ఇన్ చేయండి లేదా ఖాతా తెరవండి. ఇతరులకు మీరు ఎంచుకున్న పేరు మాత్రమే కనిపిస్తుంది.
+Share memories freely. Listen more than advise. Everyone grieves in their own time.	జ్ఞాపకాలను స్వేచ్ఛగా పంచుకోండి. సలహా కంటే ఎక్కువగా వినండి. ప్రతి ఒక్కరూ తమ సమయంలో దుఃఖం నుంచి కోలుకుంటారు.
+Need to talk to someone now?	ఇప్పుడే ఎవరితోనైనా మాట్లాడాలా?
+Tele-MANAS is free, day and night. In an emergency, call 112.	టెలి-మనస్ ఉచితం, పగలూ రాత్రీ. అత్యవసరమైతే 112 కి కాల్ చేయండి.
+Call Tele-MANAS 14416	టెలి-మనస్ 14416 కి కాల్ చేయండి
+Sign in or create an account to join	చేరడానికి సైన్ ఇన్ చేయండి లేదా ఖాతా తెరవండి
+You appear as $myName	మీరు $myName పేరుతో కనిపిస్తారు
+Choose the name others will see	ఇతరులు చూసే పేరును ఎంచుకోండి
+Your groups	మీ గ్రూపులు
+More groups	మరిన్ని గ్రూపులు
+Saved posts	సేవ్ చేసిన పోస్టులు
+No saved posts yet	ఇంకా సేవ్ చేసిన పోస్టులు లేవు
+Open the menu on a post and choose Save to keep it here.	పోస్ట్ మెనూ తెరిచి సేవ్ ఎంచుకోండి, అది ఇక్కడ ఉంటుంది.
+Remove from saved	సేవ్ చేసినవాటి నుంచి తీసివేయండి
+I've been there ${post.beenThere}	నాకూ ఇలా జరిగింది ${post.beenThere}
+I've been there	నాకూ ఇలా జరిగింది
+Ask a question	ప్రశ్న అడగండి
+My question:	నా ప్రశ్న:
+Share a good moment	ఒక మంచి క్షణం పంచుకోండి
+A good moment today:	ఈరోజు మంచి క్షణం:
+Say thank you	ధన్యవాదాలు చెప్పండి
+Thank you to	ధన్యవాదాలు,

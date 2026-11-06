@@ -44,6 +44,12 @@ class SaharaPaletteTest {
         listOf(DoctorStatusGood to DoctorStatusGoodBg, DoctorStatusWarn to DoctorStatusWarnBg, DoctorStatusRest to DoctorStatusRestBg).forEach { (fg, bg) -> aa("status text", fg, bg) }
     }
 
+    /** Round 3: section header bands carry small white subtitles, so every band fill keeps 4.5:1; Today's warm wash keeps body ink at 7:1. */
+    @Test fun sectionBandsAndWarmGroundStayReadable() {
+        SaharaTone.entries.forEach { tone -> aa("${tone.name} text on band", tone.onSolid, tone.band) }
+        aa("ink on warm ground", SaharaColors.Ink, SaharaColors.GroundWarm, 7f); aa("sub on warm ground", SaharaColors.InkSub, SaharaColors.GroundWarm, 7f)
+    }
+
     @Test fun readableOnPicksTheBetterInk() {
         assertEquals(Color.White, readableOn(SaharaColors.Primary))
         assertEquals(SaharaColors.Ink, readableOn(SaharaTone.Gold.wash))

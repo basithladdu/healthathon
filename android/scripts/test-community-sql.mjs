@@ -82,6 +82,28 @@ f = await feed(u.b); ok(f.posts[0].hugs === 1 && f.posts[0].my_hugs === true && 
 await as(u.b, () => db.query("select public.sahara_community_react($1,'hugs',false)", [id(1)]));
 ok((await feed(u.b)).posts[0].hugs === 0, 'reaction removed');
 
+// Groups: posting joins the group; members join and leave; counts and "joined" come from the server.
+const homeOf = (user) => as(user, () => one('select public.sahara_community_home()'));
+const group = (h, gid) => h.groups.find((g) => g.id === gid);
+ok(group(await homeOf(u.a), 'family-carers').joined === true && group(await homeOf(u.b), 'family-carers').joined === false, 'posting joins the group; replying alone does not');
+await as(u.b, async () => { await db.query("select public.sahara_community_join('grief-loss',true)"); await db.query("select public.sahara_community_join('grief-loss',true)"); });
+let hb = await homeOf(u.b); ok(group(hb, 'grief-loss').joined === true && group(hb, 'grief-loss').members === 1 && group(await homeOf(u.c), 'grief-loss').joined === false, 'join is per member, once');
+await as(u.b, () => db.query("select public.sahara_community_join('grief-loss',false)"));
+ok(group(await homeOf(u.b), 'grief-loss').joined === false && group(await homeOf(u.b), 'grief-loss').members === 0, 'leave');
+await as(u.b, () => deny(() => db.query("select public.sahara_community_join('nope',true)"), /Group not found/, 'unknown group join'));
+await as(u.b, () => deny(() => db.query('select * from public.community_memberships'), /permission denied/, 'no direct membership select'));
+await as(u.b, () => deny(() => db.query("select public.sahara_community_post($1,'_saved','Hello there')", [id(3)]), /Group not found/, 'saved list is not a group'));
+
+// "I've been there" and saved posts (only the saver sees them).
+await as(u.d, () => db.query("select public.sahara_community_react($1,'been-there',true)", [id(1)]));
+f = await feed(u.d); ok(f.posts[0].been_there === 1 && f.posts[0].my_been_there === true && (await feed(u.b)).posts[0].my_been_there === false, 'been-there reaction');
+await as(u.b, () => db.query('select public.sahara_community_save($1,true)', [id(1)]));
+ok((await feed(u.b)).posts[0].saved === true && (await feed(u.c)).posts[0].saved === false, 'saved flag per member');
+ok((await feed(u.b, '_saved')).posts.length === 1 && (await feed(u.c, '_saved')).posts.length === 0, 'saved list per member');
+await as(u.b, () => db.query('select public.sahara_community_save($1,false)', [id(1)]));
+ok((await feed(u.b, '_saved')).posts.length === 0, 'unsave');
+await as(u.b, () => deny(() => db.query('select * from public.community_saves'), /permission denied/, 'no direct saves select'));
+
 // Reports: once per member; three members hide the post; team sees counts and can restore.
 await as(u.b, async () => { await db.query("select public.sahara_community_report($1,null,'unkind')", [id(1)]); await db.query("select public.sahara_community_report($1,null,'unkind')", [id(1)]); });
 ok(await one('select count(*)::int from public.community_reports') === 1, 'one report per member');
@@ -116,4 +138,4 @@ await db.query('insert into healthathon_private.closed_accounts(user_id) values(
 await as(u.c, () => deny(() => db.query('select public.sahara_community_home()'), /account is closed/, 'closed account blocked'));
 ok((await feed(u.b, 'grief-loss')).posts.length === 0, 'closed account posts hidden');
 
-console.log(`Community SQL: ${checks} checks PASS (deny-by-default, names only, idempotent posts, reactions, reports and auto-hide, team moderation, rate limits, removal, closed accounts)`);
+console.log(`Community SQL: ${checks} checks PASS (deny-by-default, names only, idempotent posts, reactions, reports and auto-hide, groups join/leave, been-there, saved posts, team moderation, rate limits, removal, closed accounts)`);

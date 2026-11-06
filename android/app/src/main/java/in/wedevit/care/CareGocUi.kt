@@ -115,7 +115,9 @@ private enum class GocStage { CAPTURE, REVIEW, NOTE }
 private val GocSand get() = Cream
 private val GocTickSoft get() = DoctorStatusGoodBg
 /** The page band and speaker chips (6 Nov AI-FIR grammar): a dark Sahara band, and two distinct speaker colours that carry white text above 4.5:1. */
-private val GocBandColor get() = SaharaColors.Band
+/** Goals of care keeps its section colour (indigo) on the band, as on Today and the doctor's hub. */
+private val GocBandColor get() = SaharaSection.GoalsOfCare.band
+private val GocBandSub get() = SaharaSection.GoalsOfCare.wash
 private val GocBandDone = Color(0xFF9BDDB0)
 private val GocDoctorChip get() = SaharaTone.Rust.ink
 private val GocPatientChip get() = SaharaTone.Teal.solid
@@ -313,7 +315,10 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
     val restored = remember(d.id) { draftFile?.read() }
     val initial = remember(d.id) { restored?.transcript ?: d.gocTranscript?.takeIf { it.planVersion == d.version } }
 
+    val signedInDoctor = LocalSignedInDoctor.current
     var participants by rememberSaveable(d.id) { mutableStateOf(initial?.participants.orEmpty()) }
+    // The signed-in doctor is in the room; their name is not asked again (still editable).
+    LaunchedEffect(d.id, signedInDoctor?.name) { if (participants.isBlank() && initial == null && signedInDoctor != null) participants = signedInDoctor.name }
     var consentAt by rememberSaveable(d.id) { mutableStateOf(initial?.consentAt?.takeIf { it > 0 } ?: agreedAt) }
     var lines by remember { mutableStateOf(initial?.lines.orEmpty()) }
     var note by remember { mutableStateOf(initial?.note.orEmpty()) }
@@ -637,7 +642,8 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
             item(key = "form") { GocFormView(GocForm.sections(d, topics, signOff?.formSigners().orEmpty()), Modifier.testTag("goc-form")) }
             item(key = "sign") {
                 PlanCard {
-                    if (note.isNotBlank()) GocSignOff(noteId = "${d.id}:v${d.version}:goc", noteText = note, store = signStore, doctorPrefill = d.createdBy, signerPrefill = d.patient.name, showNote = false,
+                    if (note.isNotBlank()) GocSignOff(noteId = "${d.id}:v${d.version}:goc", noteText = note, store = signStore, doctorPrefill = signedInDoctor?.name.orEmpty(), signerPrefill = d.patient.name, showNote = false,
+                        doctorRegistrationPrefill = signedInDoctor?.registration.orEmpty(), familyPrefill = d.decisionMakers.primary?.takeIf { it.name.isNotBlank() }?.let { it.name to it.relation },
                         onComplete = { record ->
                             signOff = GocSignOffSummary(record.id, record.sealSha256.orEmpty(), record.lockedAt.orEmpty(), record.signatures.map { it.name },
                                 record.signatures.map { it.role }, record.signatures.map { it.registrationNo.orEmpty() }, record.signatures.map { it.method }, record.signatures.map { it.signedAt })
@@ -663,7 +669,7 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
                 IconButton(onClick = onBack, modifier = Modifier.testTag("goc-header-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस"), tint = Color.White) }
                 Column(Modifier.weight(1f)) {
                     Text(title, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.SemiBold, fontSize = 22.sp, lineHeight = 28.sp, color = Color.White)
-                    if (name.isNotBlank()) Text(name, fontSize = 15.sp, lineHeight = 20.sp, color = SaharaColors.OnBandSub, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.testTag("goc-header-name"))
+                    if (name.isNotBlank()) Text(name, fontSize = 15.sp, lineHeight = 20.sp, color = GocBandSub, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.testTag("goc-header-name"))
                 }
                 if (locked) Surface(color = GocBandDone, contentColor = SaharaColors.Ink, shape = CircleShape) {
                     Row(Modifier.padding(horizontal = 10.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -679,7 +685,7 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
                         Box(Modifier.fillMaxWidth().height(6.dp).clip(CircleShape).background(fill))
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             if (done) { Icon(Icons.Default.Check, null, Modifier.size(16.dp), tint = GocBandDone); Spacer(Modifier.width(4.dp)) }
-                            Text(label, fontSize = 15.sp, fontWeight = if (now) FontWeight.Bold else FontWeight.Medium, color = if (now || done) Color.White else SaharaColors.OnBandSub, maxLines = 1, softWrap = false,
+                            Text(label, fontSize = 15.sp, fontWeight = if (now) FontWeight.Bold else FontWeight.Medium, color = if (now || done) Color.White else GocBandSub, maxLines = 1, softWrap = false,
                                 modifier = if (now) Modifier.testTag("goc-step-now") else Modifier)
                         }
                     }

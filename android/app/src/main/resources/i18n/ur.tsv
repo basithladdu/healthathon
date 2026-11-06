@@ -2627,7 +2627,7 @@ The conversation changed. Your checked text is kept here. Open this person's con
 Use checked words	جانچے گئے الفاظ استعمال کریں
 Patient ID: 	مریض ID: 
  · after joining, your doctor can find you by this ID.	 · جڑنے کے بعد آپ کے ڈاکٹر اس ID سے آپ کو ڈھونڈ سکتے ہیں۔
-The walkthrough could not load. Your own profiles were not changed.	ڈیمو نہیں کھل سکا۔ آپ کی اپنی پروفائل نہیں بدلیں۔
+Practice could not open. Your own profiles were not changed.	مشق نہیں کھل سکی۔ آپ کی اپنی پروفائل نہیں بدلیں۔
 Leaving the walkthrough…	ڈیمو سے باہر جا رہے ہیں…
 Rahul's walkthrough record was removed. It will not be recreated automatically.	راہل کا ڈیمو ریکارڈ ہٹا دیا گیا۔ یہ اپنے آپ دوبارہ نہیں بنے گا۔
 Opening care records…	دیکھ بھال ریکارڈ کھل رہے ہیں…
@@ -4715,7 +4715,7 @@ Couldn't load the demo.	ڈیمو نہیں کھل سکا۔
 Web link not available yet.	ویب لنک ابھی دستیاب نہیں ہے۔
 Sign in to add a web link.	ویب لنک شامل کرنے کے لیے سائن ان کریں۔
 Only the profile owner can make a web link.	صرف پروفائل کا مالک ویب لنک بنا سکتا ہے۔
-Web links are off in the walkthrough.	واک تھرو میں ویب لنک بند ہیں۔
+Web links are off in Practice.	مشق میں ویب لنک بند ہیں۔
 This link is off or expired.	یہ لنک بند ہے یا اس کی مدت ختم ہو گئی ہے۔
 Couldn't connect. Try again.	رابطہ نہیں ہو سکا۔ دوبارہ کوشش کریں۔
 Locked PDF saved	لاک شدہ PDF محفوظ ہو گئی
@@ -5103,3 +5103,26 @@ Ask documents	کاغذات سے پوچھیں
 Search didn't work. Your documents are safe. Try again.	تلاش نہیں ہو سکی۔ آپ کے کاغذات محفوظ ہیں۔ دوبارہ کوشش کریں۔
 No answer this time. Your documents are safe. Try again.	اس بار جواب نہیں ملا۔ آپ کے کاغذات محفوظ ہیں۔ دوبارہ کوشش کریں۔
 Review not saved. Try again.	جانچ محفوظ نہیں ہوئی۔ دوبارہ کوشش کریں۔
+Join the community	کمیونٹی میں شامل ہوں
+Sign in or create an account to join groups, post and reply. Others see only the name you choose.	گروپوں میں شامل ہونے، پوسٹ اور جواب لکھنے کے لیے سائن ان کریں یا اکاؤنٹ بنائیں۔ دوسروں کو صرف آپ کا چنا ہوا نام دکھے گا۔
+Share memories freely. Listen more than advise. Everyone grieves in their own time.	یادیں کھل کر بانٹیں۔ مشورے سے زیادہ سنیں۔ ہر کوئی اپنے وقت میں غم سے گزرتا ہے۔
+Need to talk to someone now?	کیا ابھی کسی سے بات کرنی ہے؟
+Tele-MANAS is free, day and night. In an emergency, call 112.	ٹیلی مانس مفت ہے، دن رات۔ ہنگامی حالت میں 112 پر کال کریں۔
+Call Tele-MANAS 14416	ٹیلی مانس 14416 پر کال کریں
+Sign in or create an account to join	شامل ہونے کے لیے سائن ان کریں یا اکاؤنٹ بنائیں
+You appear as $myName	آپ $myName نام سے دکھتے ہیں
+Choose the name others will see	وہ نام چنیں جو دوسرے دیکھیں گے
+Your groups	آپ کے گروپ
+More groups	مزید گروپ
+Saved posts	محفوظ پوسٹیں
+No saved posts yet	ابھی کوئی محفوظ پوسٹ نہیں
+Open the menu on a post and choose Save to keep it here.	کسی پوسٹ کا مینو کھول کر محفوظ کریں چنیں، وہ یہاں رہے گی۔
+Remove from saved	محفوظ سے ہٹائیں
+I've been there ${post.beenThere}	میرے ساتھ بھی ہوا ${post.beenThere}
+I've been there	میرے ساتھ بھی ہوا
+Ask a question	سوال پوچھیں
+My question:	میرا سوال:
+Share a good moment	اچھا لمحہ بانٹیں
+A good moment today:	آج کا اچھا لمحہ:
+Say thank you	شکریہ کہیں
+Thank you to	شکریہ،

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material3.*
@@ -27,6 +28,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -167,10 +172,60 @@ internal fun splitsWord(text: String, lineEnds: List<Int>): Boolean {
     }
 }
 
-/** A white register card holding rows separated by hairlines (AI-FIR register). */
-@Composable fun SaharaRegister(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
-    Surface(modifier.fillMaxWidth().saharaAppear(), shape = RoundedCornerShape(SaharaRadius.Lg), color = SaharaColors.Surface, border = BorderStroke(1.dp, SaharaColors.Edge)) {
-        Column(Modifier.padding(vertical = 4.dp), content = content)
+/**
+ * A register card holding rows separated by hairlines (AI-FIR register). White by default; with a section [tone] it
+ * takes that section's wash, a 1.5 dp border in its solid and a solid accent bar down the leading edge.
+ */
+@Composable fun SaharaRegister(modifier: Modifier = Modifier, tone: SaharaTone? = null, content: @Composable ColumnScope.() -> Unit) {
+    Surface(modifier.fillMaxWidth().saharaAppear(), shape = RoundedCornerShape(SaharaRadius.Lg), color = tone?.wash ?: SaharaColors.Surface,
+        border = BorderStroke(if (tone != null) 1.5.dp else 1.dp, tone?.solid ?: SaharaColors.Edge)) {
+        Column(Modifier.then(if (tone != null) Modifier.saharaAccentBar(tone) else Modifier).padding(vertical = 4.dp), content = content)
+    }
+}
+
+/** A solid 6 dp bar in the tone's colour down the leading edge, with the content padded clear of it. */
+fun Modifier.saharaAccentBar(tone: SaharaTone): Modifier = drawWithContent {
+    val w = 6.dp.toPx()
+    drawRect(tone.solid, topLeft = Offset(if (layoutDirection == LayoutDirection.Rtl) size.width - w else 0f, 0f), size = Size(w, size.height))
+    drawContent()
+}.padding(start = 6.dp)
+
+/**
+ * Round 3 section header band (AI-FIR hero band): a rounded solid block in the section's colour with a white back arrow,
+ * a bold white title, an optional one-line subtitle and a trailing slot (art or one action). Every screen of a section
+ * opts in with that section's tone (see [SaharaSection]), so the colour says where you are.
+ */
+@Composable fun SaharaSectionBand(title: String, tone: SaharaTone, modifier: Modifier = Modifier, onBack: (() -> Unit)? = null, subtitle: String? = null,
+    backTag: String? = null, trailing: (@Composable RowScope.() -> Unit)? = null) {
+    val t = careText()
+    Surface(modifier.fillMaxWidth(), shape = RoundedCornerShape(SaharaRadius.Lg + 4.dp), color = tone.band, contentColor = tone.onSolid, shadowElevation = 3.dp) {
+        Row(Modifier.heightIn(min = 72.dp).padding(start = if (onBack != null) 4.dp else 18.dp, end = 12.dp, top = 10.dp, bottom = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+            if (onBack != null) IconButton(onClick = onBack, modifier = Modifier.size(48.dp).then(if (backTag != null) Modifier.testTag(backTag) else Modifier)) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस"), tint = tone.onSolid)
+            }
+            Column(Modifier.weight(1f).padding(start = 4.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(title, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Bold, fontSize = 24.sp, lineHeight = 30.sp, color = tone.onSolid)
+                if (!subtitle.isNullOrBlank()) Text(subtitle, fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.SemiBold, color = tone.onSolid, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            }
+            if (trailing != null) { Spacer(Modifier.width(8.dp)); trailing() }
+        }
+    }
+}
+
+/** The one action on a section band: a solid white button with the section's ink label, so it still reads as a button on the colour. */
+@Composable fun SaharaBandButton(text: String, onClick: () -> Unit, tone: SaharaTone, modifier: Modifier = Modifier, icon: ImageVector? = null, enabled: Boolean = true) {
+    Button(onClick = onClick, enabled = enabled, shape = RoundedCornerShape(SaharaRadius.Md),
+        colors = ButtonDefaults.buttonColors(containerColor = SaharaColors.Surface, contentColor = tone.ink, disabledContainerColor = SaharaColors.Well, disabledContentColor = SaharaColors.InkFaint),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp, pressedElevation = 0.dp), contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp), modifier = modifier.heightIn(min = 48.dp)) {
+        if (icon != null) { Icon(icon, null, Modifier.size(20.dp)); Spacer(Modifier.width(6.dp)) }
+        Text(text, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
+    }
+}
+
+/** Section art on a band: the illustration sits on a white disc so it never melts into the colour. Decorative. */
+@Composable fun SaharaBandArt(art: Int, size: Int = 52, modifier: Modifier = Modifier) {
+    Box(modifier.size(size.dp).clip(CircleShape).background(SaharaColors.Surface), contentAlignment = Alignment.Center) {
+        androidx.compose.foundation.Image(saharaImage(art, (size - 8).dp), null, Modifier.size((size - 8).dp), contentScale = androidx.compose.ui.layout.ContentScale.Fit)
     }
 }
 
@@ -228,7 +283,7 @@ internal fun splitsWord(text: String, lineEnds: List<Int>): Boolean {
     Row(modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
         if (icon != null) SaharaIconChip(icon, tone, size = 32) else Box(Modifier.size(width = 5.dp, height = 22.dp).clip(CircleShape).background(tone.solid))
         Spacer(Modifier.width(10.dp))
-        Text(title, Modifier.weight(1f).a11yHeading(), style = MaterialTheme.typography.titleMedium, fontSize = 18.sp, color = SaharaColors.Ink)
+        Text(title, Modifier.weight(1f).a11yHeading(), style = MaterialTheme.typography.titleMedium, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = tone.ink)
         if (actionLabel != null && onAction != null) TextButton(onClick = onAction, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = tone.ink)) {
             Text(actionLabel, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
             Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, Modifier.size(20.dp))
