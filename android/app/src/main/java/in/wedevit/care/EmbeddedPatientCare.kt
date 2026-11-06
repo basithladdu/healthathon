@@ -165,7 +165,7 @@ fun EmbeddedPatientCare(
             // Loading shows a spinner; unavailable shows an icon, one line and the way back.
             Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 32.dp).testTag(if (unavailable) "embedded-care-unavailable" else "embedded-care-loading"), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (unavailable) Icon(Icons.Default.PersonOff, null, Modifier.size(40.dp), tint = DoctorCardSub)
-                else CircularProgressIndicator(Modifier.size(32.dp), color = Rust)
+                else SaharaBrandMark(size = 56)
                 Text(if (unavailable) t("Profile unavailable", "प्रोफ़ाइल उपलब्ध नहीं") else t("Loading…", "लोड हो रहा है…"), fontFamily = SaharaTitleFont, fontSize = 20.sp, color = DoctorCardInk, textAlign = TextAlign.Center)
                 OutlinedButton(onClick = onExit, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Back", "वापस")) }
                 refreshError?.let { Text(it, color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center, modifier = Modifier.announce()); TextButton(onClick = vm::refresh, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Retry", "फिर कोशिश करें"), color = RustText) } }
@@ -182,7 +182,7 @@ fun EmbeddedPatientCare(
                 TextButton(onClick = ::leaveTool, enabled = !navigating, modifier = Modifier.heightIn(min = 48.dp).testTag("embedded-care-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = RustText); Spacer(Modifier.width(8.dp)); Text(color = RustText, fontWeight = FontWeight.SemiBold, text = t("Back", "वापस")) }
             }
             Box(Modifier.weight(1f).fillMaxWidth()) {
-                if (refreshing) Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) { LinearProgressIndicator(Modifier.fillMaxWidth(), color = Rust) }
+                if (refreshing) Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) { SaharaSkeleton(rows = 4) }
                 else key(account, personId, section, tool) { screens.SaveableStateProvider("$account:$personId:$section:$tool") {
                     when (tool) {
                         "scanner" -> if (canEdit) MedicineScanner(vm, onClose = { tool = "" }, onAccount = onAccount) else Text(t("View only", "सिर्फ़ देखने के लिए"), Modifier.padding(20.dp))

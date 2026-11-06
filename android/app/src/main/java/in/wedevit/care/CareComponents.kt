@@ -196,7 +196,7 @@ import androidx.compose.ui.unit.sp
     Surface(color = Paper, shape = RoundedCornerShape(SaharaRadius.Lg), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.saharaAppear()) {
         Column(Modifier.fillMaxWidth().saharaContentSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.size(36.dp).clip(CircleShape).background(SaharaApricot), contentAlignment = Alignment.Center) { Icon(icon, null, Modifier.size(20.dp), tint = RustText) }
+                SaharaIconChip(icon, SaharaTone.Rust, size = 36)
                 Spacer(Modifier.width(12.dp)); Text(title, fontWeight = FontWeight.Medium, fontSize = 18.sp, lineHeight = 24.sp, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont)
             }
             content()
@@ -292,7 +292,7 @@ private val SosRedText = Color(0xFF8C1D18)
             }
             Spacer(Modifier.width(16.dp))
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Surface(shape = RoundedCornerShape(50), color = Paper) {
+                Surface(shape = RoundedCornerShape(50), color = Paper, modifier = Modifier.saharaShimmer()) {
                     Text(whenLabel + time, Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = RustText, maxLines = 1)
                 }
                 Text(item.title.ifBlank { t("Visit", "मुलाक़ात") }, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis)

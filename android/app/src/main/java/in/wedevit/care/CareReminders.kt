@@ -158,8 +158,8 @@ class CareReminderScheduler(private val context: Context, private val account: S
     private fun createChannel() { context.getSystemService(NotificationManager::class.java).createNotificationChannel(NotificationChannel(CHANNEL, reminderText("Care reminders"), NotificationManager.IMPORTANCE_DEFAULT).apply { description = reminderText("Reminders for your chosen medicine times and dated care activities. Android may delay alerts."); lockscreenVisibility = android.app.Notification.VISIBILITY_PRIVATE }) }
     companion object {
         const val CHANNEL = "sahara-care-reminders"
-        /** Sahara Rust (#B9472C), the accent Android uses for the small icon and app name in the shade. */
-        private const val SAHARA_RUST = 0xFFB9472C.toInt()
+        /** Sahara Rust (#D2390B), the accent Android uses for the small icon and app name in the shade. */
+        private const val SAHARA_RUST = 0xFFD2390B.toInt()
         fun active(context: Context): String? = context.getSharedPreferences("care-reminder-active", 0).getString("account", null)
         private fun notificationId(account: String, key: String) = ("$account:$key".hashCode() and Int.MAX_VALUE)
     }

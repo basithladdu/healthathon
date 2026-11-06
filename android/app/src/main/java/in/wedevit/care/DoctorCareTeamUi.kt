@@ -55,7 +55,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
             Text(t("Family & care team", "परिवार और देखभाल टीम"), Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
             IconButton(onClick = onRefresh, enabled = !loading, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Refresh, t("Refresh contacts", "संपर्क ताज़ा करें"), tint = DoctorAccent) }
         }
-        if (loading) LinearProgressIndicator(Modifier.fillMaxWidth(), color = DoctorAccent)
+        if (loading) SaharaSkeleton(rows = 2)
         error?.let { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Text(it, Modifier.weight(1f).announce(), color = MaterialTheme.colorScheme.error); TextButton(onClick = onRefresh, enabled = !loading, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Refresh contacts", "संपर्क ताज़ा करें"), color = RustText) } } }
         if (!readable && !loading) CareTeamEmpty(Icons.Default.Lock, t("Contacts not shared", "संपर्क साझा नहीं"))
         if (readable && contacts.isEmpty() && !loading) CareTeamEmpty(Icons.Default.Groups, t("No contacts yet", "अभी कोई संपर्क नहीं"))

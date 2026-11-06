@@ -74,7 +74,7 @@ val Gold = SaharaTone.Gold.solid
 val Sage = SaharaTone.Leaf.wash
 val Mint = SaharaTone.Teal.wash
 val Peach = SaharaColors.PrimaryWash
-/** The welcome panel is the header band: deep maroon-brown with white text. */
+/** The welcome panel is the header band: deep oxblood with white text. */
 internal val WelcomePanelOrange = SaharaColors.Band
 internal val WelcomePanelInk = SaharaColors.OnBand
 internal fun welcomePanelGapDp(screenHeightDp: Int, fontScale: Float): Int =
@@ -96,10 +96,10 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
  */
 internal val saharaColorScheme = lightColorScheme(primary = SaharaColors.Primary, onPrimary = SaharaColors.OnPrimary,
     primaryContainer = SaharaColors.PrimaryWash, onPrimaryContainer = SaharaColors.PrimaryPressed,
-    // secondaryContainer is Material's selected state (chips, tonal buttons, nav indicator): solid rust so it shows at 3:1+.
-    secondary = SaharaTone.Teal.solid, onSecondary = Color.White, secondaryContainer = SaharaColors.PrimaryPressed, onSecondaryContainer = Color.White,
+    // secondaryContainer is Material's selected state (chips, tonal buttons, nav indicator): the bright solid rust, white on it at 4.85:1.
+    secondary = SaharaTone.Teal.solid, onSecondary = Color.White, secondaryContainer = SaharaColors.Primary, onSecondaryContainer = Color.White,
     tertiary = SaharaTone.Plum.solid, onTertiary = Color.White, tertiaryContainer = SaharaTone.Plum.wash, onTertiaryContainer = SaharaTone.Plum.ink,
-    error = SaharaColors.Error, onError = Color.White, errorContainer = SaharaColors.ErrorWash, onErrorContainer = SaharaColors.Error,
+    error = SaharaColors.Error, onError = Color.White, errorContainer = SaharaColors.ErrorWash, onErrorContainer = SaharaTone.Error.ink,
     background = SaharaColors.Ground, onBackground = SaharaColors.Ink, surface = SaharaColors.Surface, onSurface = SaharaColors.Ink,
     surfaceVariant = SaharaColors.Well, onSurfaceVariant = SaharaColors.InkSub,
     surfaceTint = SaharaColors.Surface, surfaceBright = SaharaColors.Surface, surfaceDim = SaharaColors.Well,
