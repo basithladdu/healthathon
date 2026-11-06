@@ -112,7 +112,7 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
                 else Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Heading(rt("I'm a doctor", "मैं डॉक्टर हूँ"), 26)
                     Text(session!!.email, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-                    Button(onClick = { doctorOpen = true; doctorEntryPending = false }, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(rt("Continue", "आगे बढ़ें")) }
+                    Button(onClick = { doctorOpen = true; doctorEntryPending = false }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(rt("Continue", "आगे बढ़ें")) }
                 }
             }, onWelcomePanelChanged = { doctorEntryPending = it == "doctor" },
             openToday = openToday, onOpenTodayHandled = { root.openToday.value = null })
@@ -249,10 +249,10 @@ private fun clipboardText(context: android.content.Context): String? = (context.
     fun day(ms: Long) = java.time.Instant.ofEpochMilli(ms).atZone(java.time.ZoneId.systemDefault()).format(careDateFormat(CARE_SHORT_DATE, hindi))
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = 16.dp).padding(bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             if (heading != "") Heading(heading ?: if (session == null) if (create) t("Create an account", "खाता बनाएँ") else t("Sign in", "साइन इन करें") else t("Your account", "आपका खाता"), 28)
-            banner?.let { Surface(color = Mint, shape = RoundedCornerShape(12.dp)) { Text(it, Modifier.fillMaxWidth().padding(16.dp), fontWeight = FontWeight.Medium) } }
+            banner?.let { Surface(color = Mint, shape = RoundedCornerShape(14.dp)) { Text(it, Modifier.fillMaxWidth().padding(16.dp), fontWeight = FontWeight.Medium) } }
             if (session == null) {
-                OutlinedTextField(email, { email = it }, label = { Text(t("Email", "ईमेल")) }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(password, { password = it }, label = { Text(t("Password", "पासवर्ड")) }, singleLine = true, visualTransformation = PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth(),
+                OutlinedTextField(email, { email = it }, label = { Text(t("Email", "ईमेल")) }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(password, { password = it }, label = { Text(t("Password", "पासवर्ड")) }, singleLine = true, visualTransformation = PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth(),
                     placeholder = if (create) { { Text(t("At least 10 characters", "कम से कम 10 अक्षर")) } } else null)
                 Button(onClick = { authRun {
                     if (create) when (cloud.signUp(email, password)) {
@@ -261,11 +261,11 @@ private fun clipboardText(context: android.content.Context): String? = (context.
                         CareSignUp.ALREADY_REGISTERED -> { create = false; password = ""; error = careAuthMessage(CARE_ALREADY_REGISTERED, hindi) }
                     }
                     else { cloud.signIn(email, password); awaitingConfirmation = "" }
-                } }, enabled = !busy && email.contains('@') && password.isNotEmpty(), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) {
+                } }, enabled = !busy && email.contains('@') && password.isNotEmpty(), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) {
                     if (busy) { CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = LocalContentColor.current); Spacer(Modifier.width(8.dp)) }
                     Text(if (busy) t("Please wait…", "कृपया रुकें…") else if (create) t("Create account", "खाता बनाएँ") else t("Sign in", "साइन इन करें"))
                 }
-                if (awaitingConfirmation.isNotBlank()) OutlinedButton(onClick = { authRun { cloud.resendConfirmation(awaitingConfirmation); notice = t("Email sent again.", "ईमेल फिर भेजा गया।") } }, enabled = !busy, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.MailOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Resend email", "ईमेल फिर भेजें")) }
+                if (awaitingConfirmation.isNotBlank()) OutlinedButton(onClick = { authRun { cloud.resendConfirmation(awaitingConfirmation); notice = t("Email sent again.", "ईमेल फिर भेजा गया।") } }, enabled = !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.MailOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Resend email", "ईमेल फिर भेजें")) }
                 // Secondary links side by side, so the form stays short.
                 FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     if (!create) TextButton(onClick = { authRun {
@@ -274,7 +274,7 @@ private fun clipboardText(context: android.content.Context): String? = (context.
                     } }, enabled = !busy && email.contains('@') && CareEmailAvailability.ready, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Forgot password?", "पासवर्ड भूल गए?")) }
                     TextButton(onClick = { create = !create; error = null; notice = null }, enabled = !busy && (create || CareEmailAvailability.ready), modifier = Modifier.heightIn(min = 48.dp)) { Text(if (create) t("Already have an account? Sign in", "पहले से खाता है? साइन इन करें") else t("Create an account", "खाता बनाएँ"), fontWeight = FontWeight.SemiBold) }
                 }
-                if (onInvite != null) OutlinedButton(onClick = { val pasted = clipboardText(context); if (CareInviteLink.parse(pasted) != null) { onInvite(pasted.orEmpty()); error = null; notice = t("Invite saved. Sign in to join.", "निमंत्रण रख लिया। जुड़ने के लिए साइन इन करें।") } else { notice = null; error = t("No invite copied.", "कोई निमंत्रण कॉपी नहीं हुआ।") } }, enabled = !busy, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.ContentPaste, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Paste invite", "निमंत्रण चिपकाएँ")) }
+                if (onInvite != null) OutlinedButton(onClick = { val pasted = clipboardText(context); if (CareInviteLink.parse(pasted) != null) { onInvite(pasted.orEmpty()); error = null; notice = t("Invite saved. Sign in to join.", "निमंत्रण रख लिया। जुड़ने के लिए साइन इन करें।") } else { notice = null; error = t("No invite copied.", "कोई निमंत्रण कॉपी नहीं हुआ।") } }, enabled = !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.ContentPaste, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Paste invite", "निमंत्रण चिपकाएँ")) }
             } else {
                 // Who is signed in, with refresh beside it: one row instead of a line and a separate button.
                 Surface(shape = RoundedCornerShape(12.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
