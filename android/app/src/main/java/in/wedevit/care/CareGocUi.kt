@@ -315,7 +315,10 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
     val restored = remember(d.id) { draftFile?.read() }
     val initial = remember(d.id) { restored?.transcript ?: d.gocTranscript?.takeIf { it.planVersion == d.version } }
 
+    val signedInDoctor = LocalSignedInDoctor.current
     var participants by rememberSaveable(d.id) { mutableStateOf(initial?.participants.orEmpty()) }
+    // The signed-in doctor is in the room; their name is not asked again (still editable).
+    LaunchedEffect(d.id, signedInDoctor?.name) { if (participants.isBlank() && initial == null && signedInDoctor != null) participants = signedInDoctor.name }
     var consentAt by rememberSaveable(d.id) { mutableStateOf(initial?.consentAt?.takeIf { it > 0 } ?: agreedAt) }
     var lines by remember { mutableStateOf(initial?.lines.orEmpty()) }
     var note by remember { mutableStateOf(initial?.note.orEmpty()) }
@@ -639,7 +642,8 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
             item(key = "form") { GocFormView(GocForm.sections(d, topics, signOff?.formSigners().orEmpty()), Modifier.testTag("goc-form")) }
             item(key = "sign") {
                 PlanCard {
-                    if (note.isNotBlank()) GocSignOff(noteId = "${d.id}:v${d.version}:goc", noteText = note, store = signStore, doctorPrefill = d.createdBy, signerPrefill = d.patient.name, showNote = false,
+                    if (note.isNotBlank()) GocSignOff(noteId = "${d.id}:v${d.version}:goc", noteText = note, store = signStore, doctorPrefill = signedInDoctor?.name.orEmpty(), signerPrefill = d.patient.name, showNote = false,
+                        doctorRegistrationPrefill = signedInDoctor?.registration.orEmpty(), familyPrefill = d.decisionMakers.primary?.takeIf { it.name.isNotBlank() }?.let { it.name to it.relation },
                         onComplete = { record ->
                             signOff = GocSignOffSummary(record.id, record.sealSha256.orEmpty(), record.lockedAt.orEmpty(), record.signatures.map { it.name },
                                 record.signatures.map { it.role }, record.signatures.map { it.registrationNo.orEmpty() }, record.signatures.map { it.method }, record.signatures.map { it.signedAt })
