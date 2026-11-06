@@ -210,13 +210,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
     var phone by remember { mutableStateOf(initial.phone) }
     var address by remember { mutableStateOf(initial.address) }
     var error by remember { mutableStateOf<ProfileError?>(null) }
+    var showAllergies by remember { mutableStateOf(false) }; var showPhone by remember { mutableStateOf(false) }; var showAddress by remember { mutableStateOf(false) }
     fun sexLabel(v: String) = when (v) { "Female" -> t("Female", "महिला"); "Male" -> t("Male", "पुरुष"); else -> t("Other", "अन्य") }
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         // The fields scroll; Save stays pinned at the bottom above the keyboard, so it is never a scroll away.
         Column(Modifier.fillMaxWidth().imePadding().padding(horizontal = 16.dp).padding(bottom = 16.dp).saharaScreenEnter()) {
           Text(t("Edit profile", "प्रोफ़ाइल बदलें"), Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
           Spacer(Modifier.height(8.dp))
-          Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+          Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()).saharaContentSize(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             ProfileStep(1, t("About", "परिचय")) {
                 ProfileField(age, { age = it.filter(Char::isDigit).take(3) }, t("Age (years)", "उम्र (साल)"), Icons.Default.Cake, KeyboardType.Number)
                 Text(t("Sex", "लिंग"), fontSize = 14.sp, color = DoctorCardSub)
@@ -232,11 +233,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
             }
             ProfileStep(3, t("Health", "सेहत")) {
                 ProfileField(illness, { illness = it.take(120) }, t("Main illness / diagnosis", "मुख्य बीमारी / निदान"), Icons.Default.MedicalInformation)
-                ProfileField(allergies, { allergies = it.take(200) }, t("Allergies (optional)", "एलर्जी (ज़रूरी नहीं)"), Icons.Default.WarningAmber)
+                // Optional fields that are still empty wait behind a "+ Add" chip; anything already filled stays open.
+                if (showAllergies || allergies.isNotBlank()) ProfileField(allergies, { allergies = it.take(200) }, t("Allergies (optional)", "एलर्जी (ज़रूरी नहीं)"), Icons.Default.WarningAmber)
+                else SaharaAddChip(t("Add allergies", "एलर्जी जोड़ें"), { showAllergies = true }, Modifier.testTag("patient-profile-add-allergies"), tone = SaharaTone.Plum)
             }
             ProfileStep(4, t("Contact", "संपर्क")) {
-                ProfileField(phone, { phone = it.take(20) }, t("Phone", "फ़ोन"), Icons.Default.Phone, KeyboardType.Phone)
-                ProfileField(address, { address = it.take(160) }, t("City / address", "शहर / पता"), Icons.Default.Place)
+                if (showPhone || phone.isNotBlank()) ProfileField(phone, { phone = it.take(20) }, t("Phone", "फ़ोन"), Icons.Default.Phone, KeyboardType.Phone)
+                if (showAddress || address.isNotBlank()) ProfileField(address, { address = it.take(160) }, t("City / address", "शहर / पता"), Icons.Default.Place)
+                SaharaAddChips(listOfNotNull(
+                    (t("Add phone", "फ़ोन जोड़ें") to { showPhone = true }).takeIf { !showPhone && phone.isBlank() },
+                    (t("Add city / address", "शहर / पता जोड़ें") to { showAddress = true }).takeIf { !showAddress && address.isBlank() },
+                ), Modifier.testTag("patient-profile-add-contact"), tone = SaharaTone.Leaf)
             }
             error?.let { Text(t(it.en, it.hi), color = RustText, fontSize = 14.sp, fontWeight = FontWeight.Medium, modifier = Modifier.announce()) }
           }

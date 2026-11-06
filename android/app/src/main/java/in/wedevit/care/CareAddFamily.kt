@@ -56,7 +56,7 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
     val context = LocalContext.current; val scope = rememberCoroutineScope()
     var name by rememberSaveable { mutableStateOf("") }; var relation by rememberSaveable { mutableStateOf("") }
     var canAdd by rememberSaveable { mutableStateOf(false) }; var careTeam by rememberSaveable { mutableStateOf(false) }
-    var code by rememberSaveable { mutableStateOf("") }
+    var code by rememberSaveable { mutableStateOf("") }; var moreOptions by rememberSaveable { mutableStateOf(false) }
     var busy by remember { mutableStateOf(false) }; var error by remember { mutableStateOf<String?>(null) }
     val hindi = careHindi(); val t = careText()
     fun send(whatsApp: Boolean) {
@@ -103,7 +103,7 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
                 }
             } else {
                 // The form scrolls on its own; the send button stays pinned above the keyboard, so it is never below the fold.
-                Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()).saharaContentSize(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     // The name field is focused on open and the keyboard's Send key sends on WhatsApp.
                     LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }
                     OutlinedTextField(name, { name = it.take(40); code = "" }, label = { Text(t("Name", "नाम")) }, singleLine = true, shape = RoundedCornerShape(12.dp),
@@ -122,7 +122,9 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
                         SegmentedButton(selected = canAdd, onClick = { canAdd = true; code = "" }, shape = SegmentedButtonDefaults.itemShape(1, 2), modifier = Modifier.heightIn(min = 52.dp).testTag("invite-access-add"),
                             icon = { Icon(Icons.Default.Edit, null, Modifier.size(18.dp)) }) { Text(t("Can view and add", "देख सकें और जोड़ सकें")) }
                     }
-                    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).toggleable(careTeam, role = Role.Switch) { careTeam = it; code = "" }.heightIn(min = 48.dp).padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                    // Rarely used: the care-team switch waits behind one "+ More options" chip (it opens still off) unless already on.
+                    if (!moreOptions && !careTeam) SaharaAddChip(t("More options", "और विकल्प"), { moreOptions = true }, Modifier.testTag("invite-more-options"), tone = SaharaTone.Leaf)
+                    else Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).toggleable(careTeam, role = Role.Switch) { careTeam = it; code = "" }.heightIn(min = 48.dp).padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(t("Share care-team contacts", "देखभाल टीम के नंबर भी साझा करें"), Modifier.weight(1f), fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = DoctorCardInk)
                         Switch(checked = careTeam, onCheckedChange = null)
                     }

@@ -55,6 +55,8 @@ import java.time.ZoneId
     var labUnit by rememberSaveable(report.id) { mutableStateOf("") }
     var labLow by rememberSaveable(report.id) { mutableStateOf("") }
     var labHigh by rememberSaveable(report.id) { mutableStateOf("") }
+    var showRange by rememberSaveable(report.id) { mutableStateOf(false) }
+    var copying by rememberSaveable(report.id) { mutableStateOf(false) }
     // What was just saved, shown with a tick beside the button that saved it (not a toast).
     var doneNote by remember(report.id) { mutableStateOf("") }
     fun suggestLab(line: String) {
@@ -110,7 +112,9 @@ import java.time.ZoneId
                     DoseStateIcon(MedicineDoseState.TAKEN, DoctorStatusGood, 20); Spacer(Modifier.width(8.dp))
                     Text(doneNote, color = DoctorStatusGood, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
                 } }
-                if (document.reviewedAt > 0 && canEdit) {
+                // Copying a fact is the less common step: its line list waits behind one "+ Copy a checked fact" chip.
+                if (document.reviewedAt > 0 && canEdit && !copying && factLine == 0) item(key = "copy-fact-chip") { SaharaAddChip(t("Copy a checked fact", "जाँची हुई बात कॉपी करें"), { copying = true }, Modifier.animateItem().testTag("document-copy-open"), tone = SaharaTone.Teal) }
+                if (document.reviewedAt > 0 && canEdit && (copying || factLine > 0)) {
                     item { SectionTitle(t("Copy a checked fact", "जाँची हुई बात कॉपी करें")) }
                     shown.reviewedText.split('\n').forEachIndexed { index, line -> if (line.isNotBlank() && line.length <= 2000) item("line-$page-$index") {
                         FilterChip(selected = factLine == index + 1, onClick = { factLine = index + 1; if (kind == "Lab result") suggestLab(line) else title = line.take(160); factChecked = false }, label = { Text("${index + 1}. $line", Modifier.padding(vertical = 8.dp)) }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth())
@@ -126,7 +130,9 @@ import java.time.ZoneId
                                 Box(Modifier.weight(1f)) { CareField(labValue, { labValue = it.take(40); factChecked = false }, t("Value", "नतीजा"), singleLine = true) }
                                 Box(Modifier.weight(1f)) { CareField(labUnit, { labUnit = it.take(40); factChecked = false }, t("Printed unit", "छपी इकाई"), singleLine = true) }
                             } }
-                            item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            // The printed range is optional: shown when the line had one or when asked for.
+                            if (!showRange && labLow.isBlank() && labHigh.isBlank()) item(key = "lab-range-chip") { SaharaAddChip(t("Add printed range", "छपी सीमा जोड़ें"), { showRange = true }, Modifier.animateItem().testTag("document-lab-range-open"), tone = SaharaTone.Teal) }
+                            else item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 Box(Modifier.weight(1f)) { CareField(labLow, { labLow = it.take(40); factChecked = false }, t("Printed lower (optional)", "छपी निचली सीमा (ज़रूरी नहीं)"), singleLine = true) }
                                 Box(Modifier.weight(1f)) { CareField(labHigh, { labHigh = it.take(40); factChecked = false }, t("Printed upper (optional)", "छपी ऊपरी सीमा (ज़रूरी नहीं)"), singleLine = true) }
                             } }

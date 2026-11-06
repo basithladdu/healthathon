@@ -32,7 +32,7 @@ import java.util.UUID
     var confirmed by remember { mutableStateOf(false) };var reviewed by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
     AlertDialog(onDismissRequest={if(!busy)onDismiss()},title={Text(if(replacing)t("New prescription", "नया पर्चा") else t("Edit current list", "अभी की सूची बदलें"))},text={
-        Column(Modifier.fillMaxWidth().heightIn(max=560.dp).verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.fillMaxWidth().heightIn(max=560.dp).verticalScroll(rememberScrollState()).saharaContentSize(),verticalArrangement=Arrangement.spacedBy(12.dp)) {
             OutlinedTextField(title,{title=it.take(200)},label={Text(t("Name", "नाम"))},enabled=!busy,singleLine=true,shape=RoundedCornerShape(14.dp),modifier=Modifier.fillMaxWidth())
             OutlinedTextField(date,{date=it.take(10)},label={Text(t("Date (YYYY-MM-DD)", "तारीख़ (YYYY-MM-DD)"))},enabled=!busy,singleLine=true,shape=RoundedCornerShape(14.dp),modifier=Modifier.fillMaxWidth())
             rows.forEachIndexed { index,row ->

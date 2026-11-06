@@ -234,6 +234,9 @@ class MedicineStripPhotos(context: Context, storage: String) {
                 modifier = Modifier.heightIn(min = 48.dp).testTag("dose-time-$time"))
         }
     }
+    // Most doses fit the quick chips; a typed time waits behind "+ Add another time" until one is needed or already saved.
+    var showOther by rememberSaveable { mutableStateOf(other.isNotBlank()) }
+    if (!showOther && other.isBlank()) { SaharaAddChip(t("Add another time", "दूसरा समय जोड़ें"), { showOther = true }, Modifier.testTag("dose-time-other"), tone = SaharaTone.Plum); return }
     CareField(other, { value ->
         other = value.take(60)
         val typed = other.split(',').map(String::trim).filter(String::isNotEmpty)
@@ -275,9 +278,16 @@ class MedicineStripPhotos(context: Context, storage: String) {
             FilterChip(selected = entry.food == timing, enabled = !busy, onClick = { change(entry.copy(food = if (entry.food == timing) MedicineMealTiming.NOT_STATED else timing)) }, label = { Text(t(label.first, label.second), fontSize = 15.sp) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp))
         }
     }
-    CareField(entry.days?.toString().orEmpty(), { value -> if (value.isBlank()) change(entry.copy(days = null)) else value.toIntOrNull()?.takeIf { it in 1..365 }?.let { change(entry.copy(days = it)) } },
+    // Days and directions are often left empty: each waits behind a "+ Add" chip unless it already holds something.
+    var showDays by rememberSaveable(itemId) { mutableStateOf(entry.days != null) }
+    var showDirections by rememberSaveable(itemId) { mutableStateOf(entry.directions.isNotBlank()) }
+    if (showDays || entry.days != null) CareField(entry.days?.toString().orEmpty(), { value -> if (value.isBlank()) change(entry.copy(days = null)) else value.toIntOrNull()?.takeIf { it in 1..365 }?.let { change(entry.copy(days = it)) } },
         t("For how many days", "कितने दिन"), singleLine = true, placeholder = t("e.g. 5 · leave empty if ongoing", "जैसे 5 · चलती रहे तो ख़ाली छोड़ें"))
-    CareField(entry.directions, { change(entry.copy(directions = it.take(500))) }, t("Directions", "तरीक़ा"), placeholder = t("e.g. as written: dissolve in water", "जैसे पर्चे में लिखा: पानी में घोलकर"))
+    if (showDirections || entry.directions.isNotBlank()) CareField(entry.directions, { change(entry.copy(directions = it.take(500))) }, t("Directions", "तरीक़ा"), placeholder = t("e.g. as written: dissolve in water", "जैसे पर्चे में लिखा: पानी में घोलकर"))
+    SaharaAddChips(listOfNotNull(
+        (t("Add number of days", "कितने दिन, यह जोड़ें") to { showDays = true }).takeIf { !showDays && entry.days == null },
+        (t("Add directions", "तरीक़ा जोड़ें") to { showDirections = true }).takeIf { !showDirections && entry.directions.isBlank() },
+    ), Modifier.testTag("medicine-add-more"), tone = SaharaTone.Plum)
 }
 
 /**

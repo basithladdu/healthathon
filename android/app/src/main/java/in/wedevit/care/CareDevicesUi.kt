@@ -165,10 +165,10 @@ import java.time.LocalDate
     var centre by remember { mutableStateOf(initial.centre) }
     var notes by remember { mutableStateOf(initial.notes) }
     var error by remember { mutableStateOf<CareDeviceError?>(null) }
-    var confirmRemove by remember { mutableStateOf(false) }
+    var confirmRemove by remember { mutableStateOf(false) }; var showCentre by remember { mutableStateOf(false) }
     fun pick(start: LocalDate?, set: (LocalDate) -> Unit) { val d = start ?: LocalDate.now(); DatePickerDialog(context, { _, y, m, day -> set(LocalDate.of(y, m + 1, day)) }, d.year, d.monthValue - 1, d.dayOfMonth).show() }
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
-        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = 16.dp).padding(bottom = 32.dp).testTag("device-edit-sheet"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = 16.dp).padding(bottom = 32.dp).saharaContentSize().testTag("device-edit-sheet"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(if (existing) t("Edit tube or line", "नली या लाइन बदलें") else t("Add tube or line", "नली या लाइन जोड़ें"), fontFamily = SaharaTitleFont, fontSize = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
             Text(t("Type", "प्रकार"), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -178,11 +178,12 @@ import java.time.LocalDate
                 DevicesDateButton(t("Date put in", "लगाने की तारीख़"), inserted?.format(fmt), Modifier.weight(1f).testTag("device-inserted")) { pick(inserted) { inserted = it } }
                 DevicesDateButton(t("Next change due", "अगली बार बदलना"), changeDue?.format(fmt), Modifier.weight(1f).testTag("device-change-due")) { pick(changeDue ?: inserted) { changeDue = it } }
             }
-            OutlinedTextField(centre, { centre = it.take(120) }, Modifier.fillMaxWidth().testTag("device-centre"), label = { Text(t("Centre where it was put in", "कहाँ लगाई गई (अस्पताल)")) },
+            // The centre is optional: it waits behind "+ Add centre" until needed or already filled; notes start as one line.
+            if (!showCentre && centre.isBlank()) SaharaAddChip(t("Add centre", "अस्पताल जोड़ें"), { showCentre = true }, Modifier.testTag("device-add-centre"), tone = SaharaTone.Teal)
+            else OutlinedTextField(centre, { centre = it.take(120) }, Modifier.fillMaxWidth().testTag("device-centre"), label = { Text(t("Centre where it was put in", "कहाँ लगाई गई (अस्पताल)")) },
                 leadingIcon = { Icon(Icons.Default.LocalHospital, null, Modifier.size(20.dp), tint = DoctorAccent) }, singleLine = true, shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper, focusedBorderColor = Rust, focusedLabelColor = RustText, cursorColor = Rust))
-            OutlinedTextField(notes, { notes = it.take(500) }, Modifier.fillMaxWidth().testTag("device-notes"), label = { Text(t("Problems or notes (optional)", "दिक़्क़तें या नोट (ज़रूरी नहीं)")) },
-                minLines = 2, shape = RoundedCornerShape(12.dp), colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper, focusedBorderColor = Rust, focusedLabelColor = RustText, cursorColor = Rust))
+            CareNoteField(notes, { notes = it.take(500) }, t("Problems or notes (optional)", "दिक़्क़तें या नोट (ज़रूरी नहीं)"), Modifier.testTag("device-notes"), lines = 2)
             error?.let { Text(t(it.en, it.hi), color = RustText, fontSize = 14.sp, fontWeight = FontWeight.Medium, modifier = Modifier.announce()) }
             // One Save; swiping the sheet down or Back cancels.
             SaharaPrimaryButton(t("Save", "सहेजें"), onClick = {

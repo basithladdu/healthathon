@@ -84,7 +84,7 @@ internal fun doctorAttendeesAllConsented(rows: List<DoctorAttendee>): Boolean = 
     LaunchedEffect(store, scope) { load() }
     val all = doctorAttendeesAllConsented(rows)
     Card(Modifier.fillMaxWidth().testTag("doctor-attendees"), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = DoctorCardReport), border = BorderStroke(1.dp, DoctorHairline)) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.saharaContentSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(t("Who's here", "कौन मौजूद है"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
             error?.let { Text(it, fontSize = 15.sp, lineHeight = 21.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag("doctor-attendees-error").announce()) }
             if (!loaded) TextButton(onClick = { load() }, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-attendees-retry")) { Text(t("Retry", "फिर कोशिश करें"), color = RustText, fontSize = 16.sp) }
@@ -107,7 +107,11 @@ internal fun doctorAttendeesAllConsented(rows: List<DoctorAttendee>): Boolean = 
                 val add = { if (persist(rows + DoctorAttendee(newId(), name.trim(), role.trim(), false))) { name = ""; role = ""; adding = false } }
                 OutlinedTextField(name, { name = it.take(100) }, label = { Text(t("Name", "नाम")) }, singleLine = true, enabled = loaded, shape = RoundedCornerShape(14.dp), keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-attendee-name-input"))
                 OutlinedTextField(role, { role = it.take(40) }, label = { Text(t("Role", "भूमिका")) }, placeholder = { Text(t("Daughter, nurse…", "बेटी, नर्स…")) }, singleLine = true, enabled = loaded, shape = RoundedCornerShape(14.dp), keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done), keyboardActions = KeyboardActions(onDone = { if (canAdd) add() }), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-attendee-role-input"))
-                OutlinedButton(onClick = add, enabled = canAdd, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.outlinedButtonColors(contentColor = RustText), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-add-attendee")) { Icon(Icons.Default.PersonAdd, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(t("Add person", "व्यक्ति जोड़ें"), fontSize = 16.sp) }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    OutlinedButton(onClick = add, enabled = canAdd, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.outlinedButtonColors(contentColor = RustText), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-add-attendee")) { Icon(Icons.Default.PersonAdd, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(t("Add person", "व्यक्ति जोड़ें"), fontSize = 16.sp) }
+                    // Closes the two fields again without adding anyone, so no blank person rows stay open.
+                    TextButton(onClick = { name = ""; role = ""; adding = false }, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-add-attendee-cancel")) { Text(t("Cancel", "रद्द करें"), color = DoctorCardSub, fontSize = 16.sp) }
+                }
             }
             if (all) Text(t("Everyone agreed", "सभी सहमत"), fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, color = DoctorStatusGood, modifier = Modifier.testTag("doctor-attendees-status").announce())
             else Button(onClick = { persist(rows.map { it.copy(consented = true) }) }, enabled = loaded && editable && rows.isNotEmpty(), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-attendees-status")) { Text(t("Everyone agrees", "सभी सहमत हैं"), fontSize = 16.sp) }
