@@ -74,7 +74,7 @@ private fun demoDate(millis: Long) = Instant.ofEpochMilli(millis).atZone(demoZon
 private fun demoTime(millis: Long) = Instant.ofEpochMilli(millis).atZone(demoZone).format(DateTimeFormatter.ofPattern("h:mm a"))
 private fun demoDay(day: LocalDate) = day.format(DateTimeFormatter.ofPattern("EEE, d MMM yyyy"))
 private fun DoctorDemoPatient.displayName() = name.removeSuffix(" Demo")
-// Keep the doctor's workspace within Sahara's original orange and cream palette.
+// The doctor's workspace uses the same Sahara colour system as the family side.
 private val DoctorForest = Rust
 private val DoctorTeal = Rust
 private val DoctorBackground = Cream
@@ -96,12 +96,8 @@ private val DoctorMist = Peach
 
 /** A separate walkthrough workspace: no CareModel, account token, Room or network operations. */
 @Composable fun DoctorDemo(onExit: () -> Unit, store: DoctorDemoStore? = null, workflowStore: DoctorWorkflowStore? = null, cloud:CareCloud? = null, enableOnlineAi:Boolean=false, initialPatientId:String?=null, careModel: CareModel? = null, onCareAccount: () -> Unit = {}) {
-    val scheme = lightColorScheme(primary = DoctorForest, onPrimary = Color.White, primaryContainer = DoctorMist, onPrimaryContainer = DoctorForest,
-        secondary = DoctorTeal, onSecondary = Color.White, secondaryContainer = DoctorMist, onSecondaryContainer = DoctorForest,
-        background = DoctorBackground, onBackground = DoctorInk, surface = Paper, onSurface = DoctorInk,
-        surfaceVariant = Color(0xFFF1E9DE), onSurfaceVariant = DoctorMuted, outline = Color(0xFF8D7B70), outlineVariant = Color(0xFFD7C8BC))
     var authOpen by remember { mutableStateOf(false) }
-    MaterialTheme(colorScheme = scheme, typography = saharaTitleTypography()) {
+    MaterialTheme(colorScheme = saharaColorScheme, shapes = saharaShapes, typography = saharaTypography()) {
         DoctorWorkspace(onExit, store, workflowStore, if(enableOnlineAi) cloud else null, enableOnlineAi, onSignIn={if(enableOnlineAi) authOpen=true}, initialPatientId=initialPatientId, careModel = careModel, onCareAccount = onCareAccount)
         if(enableOnlineAi && authOpen && cloud!=null) DoctorAiAccountSheet(cloud,onDismiss={authOpen=false})
     }
@@ -116,7 +112,7 @@ private val DoctorMist = Peach
         val window = (owner as? Activity)?.window
         val controller = window?.let { WindowCompat.getInsetsController(it, it.decorView) }
         val previous = controller?.isAppearanceLightStatusBars
-        controller?.isAppearanceLightStatusBars = true
+        controller?.isAppearanceLightStatusBars = false // light icons on the dark header band
         onDispose { if (previous != null) controller?.isAppearanceLightStatusBars = previous }
     }
     val demoStore = store ?: remember { DoctorDemoStore(context.applicationContext) }
@@ -218,12 +214,13 @@ private val DoctorMist = Peach
         return
     }
     Scaffold(containerColor = DoctorBackground, topBar = {
-        Column(Modifier.background(Paper).statusBarsPadding()) {
+        // The header band: dark maroon-brown with white title and icons, as on the family side.
+        Surface(color = SaharaColors.Band, contentColor = SaharaColors.OnBand) { Column(Modifier.statusBarsPadding()) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 if(sampleCareOpen) IconButton(onClick={sampleCareBack?.invoke() ?: run {sampleCareOpen=false}},enabled=!careNavigationBlocked){Icon(Icons.AutoMirrored.Filled.ArrowBack,t("Back to patient care", "मरीज़ की देखभाल पर वापस"))}
                 else if (carePersonId != null) IconButton(onClick = { if (careNestedBack != null) careNestedBack?.invoke() else navigateCare { if (careSection == "Hub") carePersonId = null else careSection = "Hub" } }, enabled = !careNavigationBlocked) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back to patient care", "मरीज़ की देखभाल पर वापस")) }
                 else if (patient != null) IconButton(onClick = ::backPatient,modifier=Modifier.testTag("demo-patient-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, if(reportId!=null) t("Back to reports", "रिपोर्टों पर वापस") else if(progressReportId!=null) t("Back to progress", "प्रगति पर वापस") else if(recordTab=="Hub") t("Back to patients", "मरीज़ों की सूची पर वापस") else t("Back to patient profile", "मरीज़ की प्रोफ़ाइल पर वापस")) }
-                else { Image(saharaImage(R.drawable.sahara_professional_logo, 34.dp), null, Modifier.size(34.dp)); Spacer(Modifier.width(8.dp)) }
+                else { Image(saharaImage(R.drawable.sahara_professional_logo, 34.dp), null, Modifier.size(36.dp).clip(CircleShape).background(SaharaColors.Surface).padding(3.dp)); Spacer(Modifier.width(8.dp)) }
                 Column(Modifier.weight(1f)) {
                     Text(if(sampleCareOpen) DoctorTestProfiles.profiles.firstOrNull {DoctorTestProfiles.personId(it)==testCarePerson}?.name ?: t("Earlier practice care", "पहले की अभ्यास देखभाल") else if (carePersonId != null) carePerson?.name ?: t("Care profile unavailable", "देखभाल प्रोफ़ाइल उपलब्ध नहीं") else if (patient != null) patient.displayName() else "Sahara", fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 20.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
@@ -231,15 +228,14 @@ private val DoctorMist = Peach
                 Spacer(Modifier.width(10.dp))
                 if (!sampleCareOpen && patient == null && carePersonId == null) DoctorAvatar("Meera", 34)
             }
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-        }
+        } }
     }, bottomBar = {
         NavigationBar(containerColor = Paper, tonalElevation = 0.dp) {
             val labels = listOf("Home", "Patients", "Schedule", "Account")
             val icons = listOf(Icons.Default.Home, Icons.Default.PeopleOutline, Icons.Default.CalendarMonth, Icons.Default.PersonOutline)
             labels.forEachIndexed { i, label -> NavigationBarItem(selected = if (sampleCareOpen || patientId != null || carePersonId != null) i == 1 else tab == i, enabled = !careNavigationBlocked, onClick = { navigateCare { sampleCareOpen=false;tab = i; carePersonId = null; patientId = null; progressReportId=null;reportId=null;workflowRoute=null; notice = null } },
                 icon = { Icon(icons[i], null) }, label = { Text(when (label) { "Home" -> t("Home", "होम"); "Patients" -> t("Patients", "मरीज़"); "Schedule" -> t("Schedule", "समय-सूची"); else -> t("Account", "खाता") }) }, modifier = Modifier.testTag("demo-nav-$label"),
-                colors = NavigationBarItemDefaults.colors(indicatorColor = DoctorMist, selectedIconColor = DoctorForest, selectedTextColor = DoctorForest, unselectedIconColor = DoctorMuted, unselectedTextColor = DoctorMuted)) }
+                colors = NavigationBarItemDefaults.colors(indicatorColor = SaharaColors.Primary, selectedIconColor = SaharaColors.OnPrimary, selectedTextColor = RustText, unselectedIconColor = SaharaColors.InkSub, unselectedTextColor = SaharaColors.InkSub)) }
         }
     }) { padding ->
         Column(Modifier.padding(padding).consumeWindowInsets(padding).fillMaxSize()) {

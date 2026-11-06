@@ -1,6 +1,8 @@
 package `in`.wedevit.care
 
 import android.animation.ValueAnimator
+import android.content.Context
+import android.os.PowerManager
 import android.os.SystemClock
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.expandVertically
@@ -17,6 +19,8 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.height
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Snackbar
@@ -127,8 +131,18 @@ object SaharaMotion {
 
     enum class Direction { Forward, Back, Switch }
 
-    /** False while the system "Remove animations" setting is on. Read live, so changing the setting applies at once. */
-    val enabled: Boolean get() = runCatching { ValueAnimator.areAnimatorsEnabled() }.getOrDefault(true)
+    /** A whole screen arriving (the per-screen enter in [saharaScreenEnter]). */
+    const val SCREEN_MS = 260
+
+    private var power: PowerManager? = null
+    /** Called once by the theme so Battery Saver can switch motion off as well. */
+    fun bind(context: Context) { if (power == null) power = context.applicationContext.getSystemService(Context.POWER_SERVICE) as? PowerManager }
+
+    /** True while Battery Saver is on: Sahara then moves nothing, as with "Remove animations". */
+    val powerSave: Boolean get() = runCatching { power?.isPowerSaveMode == true }.getOrDefault(false)
+
+    /** False while the system "Remove animations" setting or Battery Saver is on. Read live, so changing either applies at once. */
+    val enabled: Boolean get() = runCatching { ValueAnimator.areAnimatorsEnabled() }.getOrDefault(true) && !powerSave
 
     /** A duration or delay, collapsed to 0 when animations are off. */
     fun ms(base: Int, enabled: Boolean = this.enabled): Int = if (enabled) base else 0
@@ -296,11 +310,45 @@ fun Modifier.saharaContentSize(): Modifier = animateContentSize(SaharaMotion.twe
     actionLabel: String? = null, onAction: (() -> Unit)? = null, secondaryLabel: String? = null, onSecondary: (() -> Unit)? = null) {
     Column(modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 32.dp).testTag("sahara-empty"), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
         // Icon in a soft circle, one line, then the one thing to do (outlined) and an optional quieter way out.
-        if (icon != null) Box(Modifier.size(64.dp).clip(CircleShape).background(SaharaApricot), contentAlignment = Alignment.Center) { Icon(icon, null, Modifier.size(30.dp), tint = RustText) }
+        if (icon != null) Box(Modifier.size(64.dp).clip(CircleShape).background(SaharaColors.PrimaryWash), contentAlignment = Alignment.Center) { Icon(icon, null, Modifier.size(30.dp), tint = RustText) }
         Text(title, fontFamily = SaharaTitleFont, fontSize = 20.sp, lineHeight = 26.sp, color = Ink, textAlign = TextAlign.Center)
         if (detail != null) Text(detail, fontSize = 16.sp, lineHeight = 22.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
-        if (actionLabel != null && onAction != null) OutlinedButton(onClick = onAction, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, Rust.copy(alpha = .6f)),
+        if (actionLabel != null && onAction != null) OutlinedButton(onClick = onAction, shape = RoundedCornerShape(SaharaRadius.Pill), border = BorderStroke(1.5.dp, Rust),
             colors = ButtonDefaults.outlinedButtonColors(containerColor = Paper, contentColor = RustText), modifier = Modifier.heightIn(min = 48.dp)) { Text(actionLabel) }
         if (secondaryLabel != null && onSecondary != null) TextButton(onClick = onSecondary, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Text(secondaryLabel) }
+    }
+}
+
+/**
+ * Per-screen enter: the screen's content fades in and rises 12 dp once, when the screen first opens.
+ * Put it on the outermost content of a page (not on the scaffold). Draw-only, so layout and tests are unaffected;
+ * nothing moves when animations are off or Battery Saver is on.
+ */
+@Composable fun Modifier.saharaScreenEnter(): Modifier {
+    if (!SaharaMotion.enabled) return this
+    val progress = remember { Animatable(0f) }
+    LaunchedEffect(Unit) { progress.animateTo(1f, SaharaMotion.tween(SaharaMotion.SCREEN_MS, easing = SaharaMotion.Emphasized)) }
+    return graphicsLayer { val p = progress.value; alpha = p; translationY = (1f - p) * 12.dp.toPx() }
+}
+
+/** Success tick: a filled circle that pops in with its check (180 ms, no bounce). Static when motion is off. */
+@Composable fun SaharaSuccessTick(modifier: Modifier = Modifier, size: Int = 56, tone: SaharaTone = SaharaTone.Success, description: String? = null) {
+    val shown = remember { MutableTransitionState(!SaharaMotion.enabled).apply { targetState = true } }
+    Box(modifier.size(size.dp).semantics { if (description != null) contentDescription = description }, contentAlignment = Alignment.Center) {
+        AnimatedVisibility(shown, enter = fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)) + scaleIn(SaharaMotion.tween(SaharaMotion.SAVED_MS + 60, easing = SaharaMotion.Emphasized), initialScale = .6f)) {
+            Box(Modifier.size(size.dp).clip(CircleShape).background(tone.solid).testTag("sahara-success-tick"), contentAlignment = Alignment.Center) {
+                Icon(Icons.Default.Check, null, Modifier.size((size * .58f).dp), tint = tone.onSolid)
+            }
+        }
+    }
+}
+
+/** Determinate progress that glides to each new value; [progress] is 0..1. Indeterminate when null. */
+@Composable fun SaharaProgressBar(progress: Float?, modifier: Modifier = Modifier, tone: SaharaTone = SaharaTone.Rust, label: String? = null) {
+    val m = modifier.fillMaxWidth().height(6.dp).clip(CircleShape).semantics { if (label != null) { contentDescription = label; liveRegion = LiveRegionMode.Polite } }
+    if (progress == null) LinearProgressIndicator(m, color = tone.solid, trackColor = tone.wash)
+    else {
+        val shown by animateFloatAsState(progress.coerceIn(0f, 1f), SaharaMotion.tween(SaharaMotion.VALUE_MS + 120), label = "progress")
+        LinearProgressIndicator(progress = { shown }, modifier = m, color = tone.solid, trackColor = tone.wash, drawStopIndicator = {})
     }
 }

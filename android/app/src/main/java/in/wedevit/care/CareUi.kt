@@ -69,16 +69,18 @@ import java.io.File
 import java.time.*
 import java.time.format.DateTimeFormatter
 
-val Ink = Color(0xFF382E29)
-val Cream = Color(0xFFFFF8EE)
-val Paper = Color(0xFFFFFDF9)
-val Rust = Color(0xFFB9472C)
-val Gold = Color(0xFFFFCF5C)
-val Sage = Color(0xFFD9EAA8)
-val Mint = Color(0xFFDCEBE4)
-val Peach = Color(0xFFFFD1B3)
-internal val WelcomePanelOrange = Color(0xFFD97757)
-internal val WelcomePanelInk = Color(0xFF2B1F19)
+// Older names for the Sahara colour system (SaharaPalette.kt); new code reads SaharaColors and SaharaTone.
+val Ink = SaharaColors.Ink
+val Cream = SaharaColors.Ground
+val Paper = SaharaColors.Surface
+val Rust = SaharaColors.Primary
+val Gold = SaharaTone.Gold.solid
+val Sage = SaharaTone.Leaf.wash
+val Mint = SaharaTone.Teal.wash
+val Peach = SaharaColors.PrimaryWash
+/** The welcome panel is the header band: deep maroon-brown with white text. */
+internal val WelcomePanelOrange = SaharaColors.Band
+internal val WelcomePanelInk = SaharaColors.OnBand
 internal fun welcomePanelGapDp(screenHeightDp: Int, fontScale: Float): Int =
     if (screenHeightDp < 640 || fontScale >= 1.3f) 32 else 64
 internal fun welcomeHeroTopPaddingDp(screenHeightDp: Int, fontScale: Float): Int =
@@ -91,25 +93,31 @@ internal fun careEditContextMatches(expectedAccount: String, modelAccount: Strin
 internal fun canEditCareContext(vm: CareModel, person: String, account: String): Boolean =
     careEditContextMatches(account, vm.accountNamespace, vm.cloud?.session?.value?.userId.orEmpty(), person, vm.selected.value, vm.canEdit.value) && vm.people.value.any { it.id == person }
 
-/** Warm surface for raised containers (menus, chips, the walkthrough cards); same value as surfaceVariant. */
-private val CareSurfaceHigh = Color(0xFFF1E9DE)
-
 /**
- * One theme for every family-side screen. Material's default container roles are cool lavender greys, so they are all
- * mapped onto Sahara's cream and paper; that keeps dialogs, menus, sheets, chips and dividers warm everywhere at once.
- * Shapes: inputs and menus 14, chips fully rounded, cards 20, dialogs and sheets 28 (see the UI brief).
+ * One theme for every screen (family side, doctor side, sign-in). Material's container roles are mapped onto
+ * Sahara's ground and white surfaces; the outline is strong enough (3:1) that outlined buttons and fields read as controls.
+ * Shapes follow the AI-FIR radii: 12 inputs and menus, pills for chips, 14 cards, 16 large cards, 22 dialogs and sheets.
  */
+internal val saharaColorScheme = lightColorScheme(primary = SaharaColors.Primary, onPrimary = SaharaColors.OnPrimary,
+    primaryContainer = SaharaColors.PrimaryWash, onPrimaryContainer = SaharaColors.PrimaryPressed,
+    // secondaryContainer is Material's selected state (chips, tonal buttons, nav indicator): solid rust so it shows at 3:1+.
+    secondary = SaharaTone.Teal.solid, onSecondary = Color.White, secondaryContainer = SaharaColors.PrimaryPressed, onSecondaryContainer = Color.White,
+    tertiary = SaharaTone.Plum.solid, onTertiary = Color.White, tertiaryContainer = SaharaTone.Plum.wash, onTertiaryContainer = SaharaTone.Plum.ink,
+    error = SaharaColors.Error, onError = Color.White, errorContainer = SaharaColors.ErrorWash, onErrorContainer = SaharaColors.Error,
+    background = SaharaColors.Ground, onBackground = SaharaColors.Ink, surface = SaharaColors.Surface, onSurface = SaharaColors.Ink,
+    surfaceVariant = SaharaColors.Well, onSurfaceVariant = SaharaColors.InkSub,
+    surfaceTint = SaharaColors.Surface, surfaceBright = SaharaColors.Surface, surfaceDim = SaharaColors.Well,
+    surfaceContainerLowest = SaharaColors.Surface, surfaceContainerLow = SaharaColors.Ground, surfaceContainer = SaharaColors.Surface,
+    surfaceContainerHigh = SaharaColors.Surface, surfaceContainerHighest = SaharaColors.Well,
+    inverseSurface = SaharaColors.Ink, inverseOnSurface = Color.White, inversePrimary = SaharaTone.Marigold.wash,
+    outline = SaharaColors.LineStrong, outlineVariant = SaharaColors.Line, scrim = Color(0x99000000))
+
+internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.Sm), small = RoundedCornerShape(SaharaRadius.Pill),
+    medium = RoundedCornerShape(SaharaRadius.Md), large = RoundedCornerShape(SaharaRadius.Lg), extraLarge = RoundedCornerShape(SaharaRadius.Hero))
+
 @Composable fun CareTheme(content: @Composable () -> Unit) {
-    MaterialTheme(colorScheme = lightColorScheme(primary = Rust, onPrimary = Color.White, primaryContainer = Peach, onPrimaryContainer = Ink,
-        secondary = Color(0xFF465E45), onSecondary = Color.White,
-        tertiary = RustText, onTertiary = Color.White, tertiaryContainer = SaharaSoftGold, onTertiaryContainer = Ink,
-        background = Cream, surface = Paper, onSurface = Ink, onBackground = Ink, surfaceVariant = CareSurfaceHigh,
-        onSurfaceVariant = Color(0xFF56483F), secondaryContainer = Mint, onSecondaryContainer = Ink,
-        surfaceTint = Paper, surfaceBright = Paper, surfaceDim = CareSurfaceHigh,
-        surfaceContainerLowest = Paper, surfaceContainerLow = Cream, surfaceContainer = Paper, surfaceContainerHigh = Paper, surfaceContainerHighest = CareSurfaceHigh,
-        outline = Color(0xFF8D7B70), outlineVariant = Color(0xFFD7C8BC)),
-        shapes = Shapes(extraSmall = RoundedCornerShape(14.dp), small = RoundedCornerShape(50), medium = RoundedCornerShape(20.dp), large = RoundedCornerShape(20.dp), extraLarge = RoundedCornerShape(28.dp)),
-        typography = saharaTypography(), content = content)
+    SaharaMotion.bind(LocalContext.current)
+    MaterialTheme(colorScheme = saharaColorScheme, shapes = saharaShapes, typography = saharaTypography(), content = content)
 }
 
 @Composable fun CareApp(vm: CareModel, onAccount: () -> Unit, onDoctorDemo: () -> Unit = {}, onDoctorWorkspace: (() -> Unit)? = null,
@@ -192,7 +200,9 @@ private val CareSurfaceHigh = Color(0xFFF1E9DE)
         }
         owner.lifecycle.addObserver(observer); onDispose { owner.lifecycle.removeObserver(observer) }
     }
-    LaunchedEffect(message) { message?.let { snackbar.showSnackbar(it); vm.message.value = null } }
+    // Important results and problems open a small dialog; a plain "Saved" stays a quiet toast (SaharaNotice routes them).
+    var noticeDialog by rememberSaveable { mutableStateOf<String?>(null) }
+    LaunchedEffect(message) { message?.let { if (SaharaNotice.route(it) == SaharaNotice.Route.Dialog) noticeDialog = it else snackbar.showSnackbar(SaharaNotice.quietText(it)); vm.message.value = null } }
     val peopleLoaded by vm.peopleLoaded.collectAsStateWithLifecycle()
     // After the last person is removed (from More), the next person added starts on Today, not on a leftover tab.
     LaunchedEffect(peopleLoaded, people.isEmpty()) { if (peopleLoaded && people.isEmpty()) { tab = 0; tabTrail = ""; careFilter = "All" } }
@@ -221,12 +231,14 @@ private val CareSurfaceHigh = Color(0xFFF1E9DE)
     BackHandler(careTabBackEnabled(person != null, medicineScanner, tab, activeRecording)) { if (activeRecording) vm.stopRecording() else back() }
     BackHandler(walkthrough != null && !medicineScanner && tab == 0 && !activeRecording) { onLeaveWalkthrough() }
     Scaffold(containerColor = Cream, snackbarHost = { CareToastHost(snackbar) }, topBar = {
-        if (!medicineScanner) Column {
+        // Inside a person's care the top bar is the dark header band (white text); on the welcome screen it stays on the cream ground.
+        if (!medicineScanner) Surface(color = if (person != null) SaharaColors.Band else Color.Transparent, contentColor = if (person != null) SaharaColors.OnBand else Ink) { Column {
+        if (person != null) SaharaStatusBarIcons(lightIcons = true)
         Row(Modifier.statusBarsPadding().fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            Image(saharaImage(R.drawable.sahara_professional_logo, 44.dp), null, Modifier.size(44.dp), contentScale = ContentScale.Fit)
+            Image(saharaImage(R.drawable.sahara_professional_logo, 44.dp), null, Modifier.size(44.dp).then(if (person != null) Modifier.clip(CircleShape).background(SaharaColors.Surface).padding(3.dp) else Modifier), contentScale = ContentScale.Fit)
             Spacer(Modifier.width(4.dp))
             Column(Modifier.weight(1f).padding(vertical = 8.dp, horizontal = 2.dp)) {
-                    Text(androidx.compose.ui.res.stringResource(R.string.app_name), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 22.sp, lineHeight = 28.sp, color = Ink, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis)
+                    Text(androidx.compose.ui.res.stringResource(R.string.app_name), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 22.sp, lineHeight = 28.sp, color = LocalContentColor.current, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis)
             }
             // The one language choice, on the header of every family-side screen (welcome and sign-in included).
             CareLanguageMenu(compact = compactWelcomeHeader || person != null)
@@ -238,7 +250,7 @@ private val CareSurfaceHigh = Color(0xFFF1E9DE)
                 onInvite = { inviteFamilyOpen = true }, canInvite = !clinician && isOwnerTop,
                 inviteLabel = if (vm.cloud == null) t("Add family", "परिवार जोड़ें") else t("Invite family", "परिवार को बुलाएँ"))
         }
-        if (person != null) HorizontalDivider(color = DoctorHairline)
+        }
         }
     }, bottomBar = {
         if (person != null && !medicineScanner) CareNavigation(CareNavTrail.rootTab(tabTrail, tab), clinician) { next ->
@@ -294,6 +306,7 @@ private val CareSurfaceHigh = Color(0xFFF1E9DE)
     }
     } }
     if (overlay.isNotEmpty() && overlay != "starting") CareToastHost(snackbar, Modifier.align(Alignment.BottomCenter).navigationBarsPadding().imePadding())
+    noticeDialog?.let { SaharaNoticeDialog(it) { noticeDialog = null } }
     }
     }
 }
