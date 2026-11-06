@@ -385,6 +385,8 @@ private fun gocRoleText(t: (String, String) -> String, role: String): String = w
     modifier: Modifier = Modifier, steps: List<String> = GocSignOffRules.DEFAULT_STEPS, onInvalidated: (GocSignOffRecord) -> Unit = {},
     /** Prefills, so the usual case is: sign, sign, done. The registration number is remembered on this phone. */
     doctorPrefill: String = "", signerPrefill: String = "",
+    /** The approved (or Practice) registration number; when blank, the one remembered on this phone. [familyPrefill]: name to relation, from the plan's decision-maker. */
+    doctorRegistrationPrefill: String = "", familyPrefill: Pair<String, String>? = null,
     /** Lock as soon as the last person has signed: the signature is the confirmation. */
     autoLock: Boolean = true,
     /** Shows the note text again at the patient step. Off when the form is already on screen above. */
@@ -400,10 +402,20 @@ private fun gocRoleText(t: (String, String) -> String, role: String): String = w
     var error by remember { mutableStateOf<String?>(null) }
     var saveFailed by remember { mutableStateOf(false) }
     var doctorName by remember { mutableStateOf(doctorPrefill) }
-    var registrationNo by remember { mutableStateOf(prefs.getString("registration", "").orEmpty()) }
+    val rememberedRegistration = remember { prefs.getString("registration", "").orEmpty() }
+    val knownRegistration = doctorRegistrationPrefill.ifBlank { rememberedRegistration }
+    var registrationNo by remember { mutableStateOf(knownRegistration) }
     var signerRole by remember { mutableStateOf(GocSignOffRules.PATIENT) }
     var signerName by remember { mutableStateOf(signerPrefill) }
     var relation by remember { mutableStateOf("") }
+    // The doctor's approved details can arrive after the first frame; fill only what is still blank.
+    LaunchedEffect(doctorPrefill, knownRegistration) { if (doctorName.isBlank()) doctorName = doctorPrefill; if (registrationNo.isBlank()) registrationNo = knownRegistration }
+    fun knownSigner(role: String) = if (role == GocSignOffRules.FAMILY) familyPrefill?.first.orEmpty() else signerPrefill
+    fun chooseSigner(role: String) {
+        if (signerName.isBlank() || signerName == knownSigner(signerRole)) signerName = knownSigner(role)
+        if (role == GocSignOffRules.FAMILY && relation.isBlank()) relation = familyPrefill?.second.orEmpty()
+        signerRole = role
+    }
     var canRead by remember { mutableStateOf<Boolean?>(true) }
     var witnessName by remember { mutableStateOf("") }
     var witnessRole by remember { mutableStateOf("") }
@@ -457,8 +469,8 @@ private fun gocRoleText(t: (String, String) -> String, role: String): String = w
         when (GocSignOffRules.nextStep(r, steps)) {
             GocSignOffRules.DOCTOR -> {
                 GocStepHeading(t("1. Doctor", "1. डॉक्टर"))
-                GocSignField(doctorName, { doctorName = it.take(GocSignOffRules.NAME_MAX) }, t("Name", "नाम"), "goc-doctor-name")
-                GocSignField(registrationNo, { registrationNo = it.take(60) }, t("Registration no.", "रजिस्ट्रेशन नंबर"), "goc-doctor-reg")
+                PrefilledField(doctorName, doctorPrefill, t("Name", "नाम"), "goc-doctor-name") { GocSignField(doctorName, { doctorName = it.take(GocSignOffRules.NAME_MAX) }, t("Name", "नाम"), "goc-doctor-name") }
+                PrefilledField(registrationNo, knownRegistration, t("Registration no.", "रजिस्ट्रेशन नंबर"), "goc-doctor-reg") { GocSignField(registrationNo, { registrationNo = it.take(60) }, t("Registration no.", "रजिस्ट्रेशन नंबर"), "goc-doctor-reg") }
                 GocSignaturePad(onDone = { p -> sign(GocSignatureInput(GocSignOffRules.DOCTOR, doctorName, registrationNo = registrationNo, consent = true, method = GocSignOffRules.DRAWN, png = p.png, strokeCount = p.strokeCount)) })
             }
             GocSignOffRules.PATIENT_OR_FAMILY -> {
@@ -467,11 +479,11 @@ private fun gocRoleText(t: (String, String) -> String, role: String): String = w
                     Text(noteText, Modifier.fillMaxWidth().heightIn(max = 240.dp).padding(12.dp), fontSize = 15.sp, lineHeight = 21.sp)
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    GocChoice(t("Patient", "मरीज़"), signerRole == GocSignOffRules.PATIENT, { signerRole = GocSignOffRules.PATIENT }, Modifier.weight(1f))
-                    GocChoice(t("Family member", "परिवार के सदस्य"), signerRole == GocSignOffRules.FAMILY, { signerRole = GocSignOffRules.FAMILY }, Modifier.weight(1f))
+                    GocChoice(t("Patient", "मरीज़"), signerRole == GocSignOffRules.PATIENT, { chooseSigner(GocSignOffRules.PATIENT) }, Modifier.weight(1f))
+                    GocChoice(t("Family member", "परिवार के सदस्य"), signerRole == GocSignOffRules.FAMILY, { chooseSigner(GocSignOffRules.FAMILY) }, Modifier.weight(1f))
                 }
-                GocSignField(signerName, { signerName = it.take(GocSignOffRules.NAME_MAX) }, t("Name", "नाम"), "goc-signer-name")
-                if (signerRole == GocSignOffRules.FAMILY) GocSignField(relation, { relation = it.take(GocSignOffRules.NAME_MAX) }, t("Relation to the patient", "मरीज़ से रिश्ता"), "goc-signer-relation")
+                PrefilledField(signerName, knownSigner(signerRole), t("Name", "नाम"), "goc-signer-name-$signerRole") { GocSignField(signerName, { signerName = it.take(GocSignOffRules.NAME_MAX) }, t("Name", "नाम"), "goc-signer-name") }
+                if (signerRole == GocSignOffRules.FAMILY) PrefilledField(relation, familyPrefill?.second.orEmpty(), t("Relation to the patient", "मरीज़ से रिश्ता"), "goc-signer-relation") { GocSignField(relation, { relation = it.take(GocSignOffRules.NAME_MAX) }, t("Relation to the patient", "मरीज़ से रिश्ता"), "goc-signer-relation") }
                 GocTick(t("Note read to them", "नोट पढ़कर सुनाया गया"), canRead == false, { canRead = !it }, "goc-signer-read-aloud")
                 Surface(color = Cream, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
                     Text(t("I have read or heard this note and it records what we discussed", "मैंने यह नोट पढ़ा या सुना है और इसमें वही लिखा है जिस पर हमने बात की"), fontFamily = SaharaTitleFont, fontSize = 17.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.padding(16.dp).testTag("goc-signer-consent"))

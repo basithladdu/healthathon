@@ -16,6 +16,8 @@ data class DoctorDemoAppointment(
 /** Isolated walkthrough fixtures. Nothing here is a clinical instruction. */
 object DoctorDemoData {
     const val doctorName = "Dr Meera Nair"
+    /** Practice only: an obviously made-up number so practice forms come prefilled. Never a real registration. */
+    const val registrationNo = "PRACTICE-DEMO"
     const val disclaimer = "Identity not verified · not a clinical record"
     val appointmentTypes = listOf("In person", "Phone", "Video")
     val statuses = listOf("Scheduled", "Completed", "Cancelled")

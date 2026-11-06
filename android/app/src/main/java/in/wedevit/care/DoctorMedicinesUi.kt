@@ -144,7 +144,7 @@ private fun medicineTime(at: Long?) = at?.let { DateTimeFormatter.ofPattern("d M
         val before=prescriptionBase
         if(before!=null&&loaded) {
             val currentRows=prescriptionLegacyRows
-            DoctorPrescriptionEditor(prescriptionDraftRows ?: if(replacing)emptyList()else currentRows.map {PrescriptionMedicineInput(it.id,it.title,it.detail)},replacing,currentRows.isNotEmpty(),prescriptionDraftTitle ?: if(replacing)"Prescription"else before.current?.title?:"Prescription",prescriptionDraftDate ?: if(replacing)""else before.current?.prescribedOn.orEmpty(),busy,
+            DoctorPrescriptionEditor(prescriptionDraftRows ?: if(replacing)emptyList()else currentRows.map {PrescriptionMedicineInput(it.id,it.title,it.detail)},replacing,currentRows.isNotEmpty(),prescriptionDraftTitle ?: if(replacing)"Prescription"else before.current?.title?:"Prescription",prescriptionDraftDate ?: if(replacing)java.time.LocalDate.now().toString()else before.current?.prescribedOn.orEmpty(),busy,
                 onDismiss={prescriptionEditor=null},onScan={title,date,rows->prescriptionDraftTitle=title;prescriptionDraftDate=date;prescriptionDraftRows=rows;scannerOpen=true},
                 onSave={title,date,rows,confirmed ->if(same(true)&&loaded)run {
                     val request=SaveDoctorPrescription(prescriptionRequestId,personId,prescriptionGroupId,before.state.revision,before.current?.revision?:0,replacing,confirmed,title,date,rows,currentRows.map {it.id},DoctorPrescriptionRules.legacyFingerprint(currentRows))

@@ -41,7 +41,9 @@ fun DoctorVisitEditor(vm: CareModel, personId: String, onDismiss: () -> Unit, in
     val priorSummary = remember(entryId) { DoctorVisitDetails.decode(previous?.detail ?: initial?.detail.orEmpty()) }
     val created = rememberSaveable(entryId) { System.currentTimeMillis() }
     var startsAt by rememberSaveable(entryId) { mutableLongStateOf(LocalDateTime.now().plusDays(1).withHour(10).withMinute(0).withSecond(0).withNano(0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()) }
-    var doctor by rememberSaveable(entryId) { mutableStateOf(previous?.sender.orEmpty()) }
+    // Practice: the Practice doctor; signed in: the name the doctor submitted for verification (below).
+    var knownDoctor by rememberSaveable(entryId) { mutableStateOf(if (vm.demoMode && vm.walkthroughRole == null) DoctorDemoData.doctorName else "") }
+    var doctor by rememberSaveable(entryId) { mutableStateOf(previous?.sender.orEmpty().ifBlank { knownDoctor }) }
     var location by rememberSaveable(entryId) { mutableStateOf(previous?.location.orEmpty()) }
     var note by rememberSaveable(entryId) { mutableStateOf(priorSummary.note) }
     var conditionRef by rememberSaveable(entryId) { mutableStateOf(priorSummary.conditionRef) }
@@ -53,7 +55,7 @@ fun DoctorVisitEditor(vm: CareModel, personId: String, onDismiss: () -> Unit, in
         vm.actionError.value = null
         if (vm.cloud != null) try {
             val name = vm.cloud.clinicianProfile()?.name.orEmpty()
-            if (vm.selected.value == personId && vm.cloud.session.value?.userId == account && doctor.isBlank()) doctor = name
+            if (vm.selected.value == personId && vm.cloud.session.value?.userId == account) { knownDoctor = name; if (doctor.isBlank()) doctor = name }
         } catch (e: Exception) { if (e is CancellationException) throw e }
     }
     LaunchedEffect(selected) { if (selected != personId && !busy) onDismiss() }
@@ -64,6 +66,7 @@ fun DoctorVisitEditor(vm: CareModel, personId: String, onDismiss: () -> Unit, in
             onDate = { DatePickerDialog(context, { _, year, month, day -> startsAt = java.time.LocalDate.of(year, month + 1, day).atTime(chosen.toLocalTime()).atZone(chosen.zone).toInstant().toEpochMilli() }, chosen.year, chosen.monthValue - 1, chosen.dayOfMonth).show() },
             onTime = { TimePickerDialog(context, { _, hour, minute -> startsAt = chosen.withHour(hour).withMinute(minute).withSecond(0).withNano(0).toInstant().toEpochMilli() }, chosen.hour, chosen.minute, false).show() },
             onSave = { try { vm.saveDoctorVisit(personId, account, doctor, startsAt, location, DoctorVisitDetails.encode(conditionRef, discussionRef, note), onDismiss, entryId, created, initial) } catch (e: IllegalArgumentException) { vm.actionError.value = e.message ?: t("Check the linked records and shorten the note.", "जुड़े रिकॉर्ड जाँचें और नोट छोटा करें।") } }, onCancel = onDismiss,
+            knownDoctor = knownDoctor,
             sourceLinks = {
                 HorizontalDivider(color = DoctorHairline)
                 Text(t("Linked records", "जुड़े रिकॉर्ड"), Modifier.a11yHeading(), fontSize = 18.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk)
@@ -78,10 +81,10 @@ fun DoctorVisitEditor(vm: CareModel, personId: String, onDismiss: () -> Unit, in
 }
 
 /** Stateless production form. Tests can render it without opening an account or database. */
-@Composable fun DoctorVisitForm(doctor: String, onDoctor: (String) -> Unit, location: String, onLocation: (String) -> Unit, note: String, onNote: (String) -> Unit, dateLabel: String, timeLabel: String, zoneLabel: String, deviceLocal: Boolean, busy: Boolean, canSave: Boolean, error: String?, onDate: () -> Unit, onTime: () -> Unit, onSave: () -> Unit, onCancel: () -> Unit, sourceLinks: @Composable () -> Unit = {}) { val t = careText();
+@Composable fun DoctorVisitForm(doctor: String, onDoctor: (String) -> Unit, location: String, onLocation: (String) -> Unit, note: String, onNote: (String) -> Unit, dateLabel: String, timeLabel: String, zoneLabel: String, deviceLocal: Boolean, busy: Boolean, canSave: Boolean, error: String?, onDate: () -> Unit, onTime: () -> Unit, onSave: () -> Unit, onCancel: () -> Unit, knownDoctor: String = "", sourceLinks: @Composable () -> Unit = {}) { val t = careText();
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 16.dp, end = 16.dp, bottom = 24.dp).testTag("doctor-real-visit-editor"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Heading(t("Plan a visit", "विज़िट तय करें"), 26)
-            CareField(doctor, onDoctor, t("Doctor's name", "डॉक्टर का नाम"), singleLine = true)
+            PrefilledField(doctor, knownDoctor, t("Doctor's name", "डॉक्टर का नाम"), "doctor-visit-name") { CareField(doctor, onDoctor, t("Doctor's name", "डॉक्टर का नाम"), singleLine = true) }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(onClick = onDate, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1.4f).heightIn(min = 48.dp), enabled = !busy) { Icon(Icons.Default.CalendarMonth, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(dateLabel, maxLines = 2) }
                 OutlinedButton(onClick = onTime, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("doctor-visit-time"), enabled = !busy) { Icon(Icons.Default.Schedule, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(timeLabel, maxLines = 1) }
