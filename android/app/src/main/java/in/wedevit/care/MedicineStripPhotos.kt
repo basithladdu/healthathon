@@ -382,7 +382,7 @@ class MedicineStripPhotos(context: Context, storage: String) {
                         onClickLabel = if (pending) t("Mark taken", "ली हुई दर्ज करें") else t("Change", "बदलें"), onLongClickLabel = t("Taken or missed", "ली या छूटी"), onLongClick = { menu = true }) { if (pending) onMark(true) else menu = true }
                     .semantics { contentDescription = "${item.title}, $label: $stateWord" }.testTag("today-dose-${item.id}-${dose.key}")) { StripThumb(photo, 80) }
             // The tick or cross pops in on the corner the moment the dose is marked.
-            AnimatedVisibility(!pending, Modifier.align(Alignment.TopEnd).padding(4.dp), enter = fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)) + scaleIn(SaharaMotion.tween(SaharaMotion.SAVED_MS, easing = SaharaMotion.Emphasized), initialScale = 0.3f), exit = fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS))) {
+            androidx.compose.animation.AnimatedVisibility(visible = !pending, modifier = Modifier.align(Alignment.TopEnd).padding(4.dp), enter = fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)) + scaleIn(SaharaMotion.tween(SaharaMotion.SAVED_MS, easing = SaharaMotion.Emphasized), initialScale = 0.3f), exit = fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS))) {
                 val badge by animateColorAsState(if (state == MedicineDoseState.MISSED) DoctorStatusRest else DoctorStatusGood, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "pillbox-badge")
                 Surface(shape = RoundedCornerShape(50), color = badge, modifier = Modifier.size(26.dp)) {
                     Box(Modifier.padding(3.dp), contentAlignment = Alignment.Center) { DoseStateIcon(state, Paper, 20) }
