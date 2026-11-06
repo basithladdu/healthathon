@@ -22,12 +22,12 @@
 .copy-recipient-card { min-width: 0; padding: 18px; border: 1px solid var(--care-line); border-radius: var(--care-radius-card); background: var(--care-surface); }
 .copy-recipient-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; align-items: flex-start; }
 .copy-recipient-heading > div { min-width: 0; }
-.copy-recipient-heading h2 { margin: 0; font-size: 18px; line-height: 1.4; overflow-wrap: anywhere; }
+.copy-recipient-heading h2 { margin: 0; font-size: 18px; line-height: 1.4; overflow-wrap: normal; }
 .copy-version-state { margin: 6px 0; font-size: 14px; color: var(--care-muted); }
 .copy-version-state.is-older { color: #7a4f12; }
 .copy-version-state.is-unavailable { color: #796754; }
 .copy-last-entry { margin: 14px 0 8px; color: var(--care-muted); font-size: 14px; line-height: 1.6; }
-.copy-location-note { margin: 10px 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 15px; line-height: 1.6; }
+.copy-location-note { margin: 10px 0; white-space: pre-wrap; overflow-wrap: normal; font-size: 15px; line-height: 1.6; }
 .copy-history { border-top: 1px solid var(--care-line); margin-top: 14px; }
 .copy-history summary { min-height: 44px; padding: 13px 0; box-sizing: border-box; cursor: pointer; font-size: 14px; }
 .copy-history ol { list-style: none; margin: 0; padding: 0; }

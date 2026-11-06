@@ -159,7 +159,7 @@ function SymptomDiaryForPatient({ patientId, author, today, lang, entries, onCha
   }
 
   return <section className="family-symptom-diary" aria-labelledby={`${id}-title`}>
-    <div className="family-workspace-heading"><h1 id={`${id}-title`}>{t('How are you feeling?', 'तबीयत कैसी है?')}</h1><button type="button" className="secondary-button" disabled={!patientEntries.length} onClick={download}>{t('Save a copy', 'कॉपी डाउनलोड करें')}</button></div>
+    <div className="family-workspace-heading"><h1 id={`${id}-title`}>{t('How are you feeling?', 'तबीयत कैसी है?')}</h1>{patientEntries.length > 0 && <button type="button" className="secondary-button" onClick={download}>{t('Save a copy', 'कॉपी डाउनलोड करें')}</button>}</div>
     <div className="symptom-diary-layout">
       <form ref={formRef} tabIndex={-1} className="symptom-diary-form" onSubmit={save} aria-label={t(editingId ? 'Edit your note' : 'Add a feeling note', editingId ? 'अपना नोट बदलें' : 'तबीयत का नोट जोड़ें')}>
         <h2>{t(editingId ? 'Edit your note' : 'Add a note', editingId ? 'अपना नोट बदलें' : 'नोट जोड़ें')}</h2>

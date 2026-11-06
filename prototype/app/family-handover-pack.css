@@ -12,7 +12,7 @@
 .handover-choice.is-selected { background: var(--care-sage); border-color: color-mix(in srgb, var(--care-sage) 60%, var(--care-sage-ink)); font-weight: 600; }
 .handover-choice input { width: 19px; height: 19px; flex: 0 0 19px; margin: 0; accent-color: var(--care-primary); }
 .handover-choice.is-unavailable { color: var(--care-muted); cursor: default; }
-.handover-preview { min-width: 0; border: 1px solid var(--care-line); border-radius: 20px; background: var(--care-surface); overflow-wrap: anywhere; box-shadow: var(--care-shadow); }
+.handover-preview { min-width: 0; border: 1px solid var(--care-line); border-radius: 20px; background: var(--care-surface); overflow-wrap: normal; box-shadow: var(--care-shadow); }
 .handover-preview-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px; padding: 23px 26px 20px; border-bottom: 1px solid var(--care-line); background: var(--care-surface-2); border-radius: 20px 20px 0 0; }
 .handover-paper-label { display: block; margin-bottom: 8px; color: var(--care-primary); letter-spacing: 2px; font-weight: 750; font-size: 14px; }
 .handover-preview-heading h2 { margin: 0; font-size: 25px; line-height: 1.15; letter-spacing: -.65px; }
@@ -50,15 +50,15 @@
 .handover-contact-list { margin: 0 0 14px; padding: 0; list-style: none; }
 .handover-contact-list li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; padding: 13px 0; border-top: 1px solid var(--care-line); }
 .handover-contact-list li > div:first-child { display: grid; gap: 4px; min-width: 0; }
-.handover-contact-list strong { font-size: 14px; overflow-wrap: anywhere; }
-.handover-contact-list span { font-size: 14px; color: var(--care-muted); overflow-wrap: anywhere; }
+.handover-contact-list strong { font-size: 14px; overflow-wrap: normal; }
+.handover-contact-list span { font-size: 14px; color: var(--care-muted); overflow-wrap: normal; }
 .handover-contact-actions button, .handover-form-actions > button:not(.secondary-button), .handover-undo button { padding-inline: 8px; border-color: transparent; background: transparent; text-decoration: underline; text-underline-offset: 3px; font-weight: 500; }
 .handover-contact-form { display: grid; gap: 12px; margin-top: 8px; }
 .handover-contact-form label { display: grid; gap: 6px; min-width: 0; font-size: 14px; font-weight: 650; }
 .handover-contact-form input { width: 100%; min-width: 0; min-height: 46px; box-sizing: border-box; border: 1px solid var(--care-line-strong); border-radius: var(--care-radius-control); padding: 9px 11px; background: var(--care-surface); color: var(--care-ink); font: inherit; font-size: 15px; }
 .handover-contact-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .handover-undo { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-top: 12px; font-size: 14px; }
-.handover-undo span { overflow-wrap: anywhere; }
+.handover-undo span { overflow-wrap: normal; }
 .handover-message { margin: 14px 0 0; font-size: 14px; color: var(--care-muted); }
 .handover-message:empty { margin: 0; }
 .handover-print-frame { position: fixed; width: 1px; height: 1px; border: 0; right: 0; bottom: 0; }

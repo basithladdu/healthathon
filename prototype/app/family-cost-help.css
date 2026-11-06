@@ -9,7 +9,7 @@
 .family-paperwork-panel { background: color-mix(in srgb, var(--care-lavender) 22%, var(--care-surface)); border-color: color-mix(in srgb, var(--care-lavender) 70%, var(--care-surface)); }
 .family-cost-section-heading { justify-content: space-between; flex-wrap: wrap; }
 .family-cost-panel h2 { margin: 0; font-size: 20px; line-height: 1.35; color: var(--care-ink); }
-.family-cost-panel h3 { margin: 0 0 var(--care-space-2); font-size: 17px; line-height: 1.45; overflow-wrap: anywhere; }
+.family-cost-panel h3 { margin: 0 0 var(--care-space-2); font-size: 17px; line-height: 1.45; overflow-wrap: normal; }
 .family-cost-help :is(button, input:not([type='checkbox']), select, a) { min-height: 44px; }
 .family-cost-help :is(button, input, select, textarea, a):focus-visible { outline: 3px solid var(--care-focus); outline-offset: 3px; }
 .family-cost-help :is(input:not([type='checkbox']), select, textarea) { min-width: 0; width: 100%; border: 1px solid var(--care-line-strong); border-radius: var(--care-radius-control); padding: 10px 12px; background: var(--care-surface); color: var(--care-ink); font: inherit; font-size: 16px; }
@@ -26,7 +26,7 @@
 .family-cost-totals > div:nth-child(2) { background: var(--care-sage); }
 .family-cost-totals > div:nth-child(3) { background: var(--care-peach); }
 .family-cost-totals dt { color: #5b4a3d; font-size: 14px; font-weight: 600; line-height: 1.4; }
-.family-cost-totals dd { margin: var(--care-space-1) 0 0; font-size: clamp(17px, 1.7vw, 22px); font-weight: 700; line-height: 1.3; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.family-cost-totals dd { margin: var(--care-space-1) 0 0; font-size: clamp(17px, 1.7vw, 22px); font-weight: 700; line-height: 1.3; font-variant-numeric: tabular-nums; overflow-wrap: normal; }
 .family-cost-form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--care-space-3); margin: var(--care-space-4) 0; padding: var(--care-space-4); border: 1px solid var(--care-line); border-radius: var(--care-radius-card); background: var(--care-surface-2); }
 .family-cost-form h3 { grid-column: 1 / -1; margin: 0; }
 .family-cost-form label:not(.family-cost-checkbox) { display: grid; gap: var(--care-space-2); font-size: 14px; font-weight: 600; min-width: 0; }
@@ -37,7 +37,7 @@
 .family-expense-list, .family-paperwork-list { list-style: none; margin: 0; padding: 0; }
 .family-expense-list li { border-top: 1px solid var(--care-line); padding: var(--care-space-3) 0 var(--care-space-1); }
 .family-expense-title { align-items: flex-start; justify-content: space-between; }
-.family-expense-title strong { min-width: 0; overflow-wrap: anywhere; font-size: 16px; line-height: 1.5; }
+.family-expense-title strong { min-width: 0; overflow-wrap: normal; font-size: 16px; line-height: 1.5; }
 .family-expense-title > span { flex-shrink: 0; padding: 2px 12px; border-radius: var(--care-radius-pill); background: var(--care-surface-2); font-size: 15px; line-height: 1.5; font-weight: 700; font-variant-numeric: tabular-nums; }
 .family-expense-list p { color: var(--care-muted); font-size: 14px; line-height: 1.5; margin: var(--care-space-1) 0; }
 .family-expense-list .family-cost-actions { gap: var(--care-space-2); }
@@ -52,7 +52,7 @@
 .family-paperwork-list { margin-top: var(--care-space-3); }
 .family-paperwork-list li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 var(--care-space-2); padding: var(--care-space-1) 0; border-bottom: 1px solid #e3d6f7; }
 .family-paperwork-list .family-cost-checkbox { align-items: flex-start; padding-top: var(--care-space-2); flex: 1 1 200px; }
-.family-paperwork-list .family-cost-checkbox > span { overflow-wrap: anywhere; min-width: 0; }
+.family-paperwork-list .family-cost-checkbox > span { overflow-wrap: normal; min-width: 0; }
 .family-paperwork-list .is-done { text-decoration: line-through; color: var(--care-muted); }
 .family-paperwork-list .family-cost-actions { justify-content: flex-end; gap: var(--care-space-1); }
 .family-paperwork-add { margin-top: var(--care-space-4); }
@@ -62,7 +62,7 @@
 .family-cost-message { margin: 0; color: var(--care-muted); font-size: 14px; line-height: 1.5; }
 .family-cost-message:not(:empty) { margin-bottom: var(--care-space-3); }
 .family-cost-undo { justify-content: space-between; margin: 0 0 var(--care-space-3); padding: var(--care-space-1) var(--care-space-4); border: 1px solid #dfc891; border-radius: var(--care-radius-control); background: #fff0c5; color: #5b391f; font-size: 14px; }
-.family-cost-undo span { min-width: 0; overflow-wrap: anywhere; }
+.family-cost-undo span { min-width: 0; overflow-wrap: normal; }
 .family-cost-undo button { flex-shrink: 0; color: #5b391f; text-decoration: underline; text-underline-offset: 3px; }
 @media (max-width: 700px) {
   .family-cost-grid { grid-template-columns: minmax(0, 1fr); gap: var(--care-space-3); }

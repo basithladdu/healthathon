@@ -11,7 +11,7 @@
 .doctor-overview-cards > :nth-child(3) { background:#e9e2f5; color:#605076; }
 .doctor-overview-cards > :nth-child(4) { background:#e3edda; color:#4a633f; }
 .doctor-overview-cards svg { grid-column:2; grid-row:1; width:25px; height:25px; }
-.doctor-overview-cards strong { grid-column:1; grid-row:1; font:500 36px/1.1 Georgia,serif; }
+.doctor-overview-cards strong { grid-column:1; grid-row:1; font:500 36px/1.1 var(--care-font-display); }
 .doctor-overview-cards span { grid-column:1/-1; font-size:14px; margin-top:7px; }
 .doctor-home-grid { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); gap:20px; align-items:start; }
 .doctor-home-panel { background:#fffdf9; border:1px solid #e0e5eb; border-radius:20px; padding:16px; min-width:0; box-shadow:0 5px 20px #664b3008; }
@@ -22,7 +22,7 @@
 .doctor-conversation-person { display:flex; align-items:center; gap:10px; min-width:0; }
 .doctor-conversation-person > div:last-child { min-width:0; }
 .doctor-conversation-person strong { display:block; font-size:14px; }
-.doctor-conversation-person span,.doctor-conversation-person small { display:block; margin-top:4px; color:#766657; font-size:14px; line-height:1.45; overflow-wrap:anywhere; }
+.doctor-conversation-person span,.doctor-conversation-person small { display:block; margin-top:4px; color:#766657; font-size:14px; line-height:1.45; overflow-wrap: normal; }
 .doctor-conversation-status { display:grid; justify-items:end; gap:5px; }
 .doctor-conversation-status > span { color:#766657; font-size:14px; }
 .doctor-conversation-status button { display:flex; align-items:center; gap:4px; min-height:44px; padding:8px 12px; border:1px solid #cdb99d; border-radius:999px; color:#684d35; background:#fffaf1; font-size:14px; white-space:nowrap; }
@@ -38,7 +38,7 @@
 .doctor-patient-queue > li:last-child { border-bottom:0; }
 .doctor-patient-initial { display:grid; place-items:center; height:40px; background:#dde8f2; color:#536d86; border-radius:14px; font-size:14px; }
 .doctor-patient-queue strong,.doctor-visit-list strong { display:block; font-size:15px; }
-.doctor-patient-queue span,.doctor-visit-list span { display:block; font-size:14px; color:#67727c; margin-top:4px; line-height:1.5; overflow-wrap:anywhere; }
+.doctor-patient-queue span,.doctor-visit-list span { display:block; font-size:14px; color:#67727c; margin-top:4px; line-height:1.5; overflow-wrap: normal; }
 .doctor-patient-queue small,.doctor-visit-list small { display:block; font-size:14px; color:#786f62; margin-top:6px; }
 .doctor-patient-queue button { display:flex; gap:6px; align-items:center; }
 .doctor-schedule-toggle { display:flex; gap:4px; padding:4px; border-radius:14px; background:#edf1f4; }
@@ -51,7 +51,7 @@
 .visit-instructions { min-width:0; grid-column:1/-1; }
 .visit-instructions-copy { padding:12px; background:#fff5db; border:1px solid #ede1bf; border-radius:12px; }
 .visit-instructions-copy strong { font-size:14px!important; }
-.visit-instructions-copy p { margin:5px 0; white-space:pre-wrap; overflow-wrap:anywhere; font-size:14px; line-height:1.55; }
+.visit-instructions-copy p { margin:5px 0; white-space:pre-wrap; overflow-wrap: normal; font-size:14px; line-height:1.55; }
 .visit-instructions-copy small { color:#7c6a56; font-size:14px; }
 .visit-instructions form { display:grid; gap:10px; background:#fffdf8; padding:12px; border:1px solid #e5d8c6; border-radius:12px; }
 .visit-instructions label { display:grid; gap:6px; font-size:14px; }

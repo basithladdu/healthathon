@@ -23,7 +23,7 @@
 .report-library-content > p { margin: 12px 0 0; padding: 18px; border: 1px solid var(--care-line); border-radius: var(--care-radius-control); background: var(--care-surface-2); color: var(--care-muted); font-size: 14px; }
 .report-library-file { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 3px 18px; padding: 12px 14px; margin-bottom: 8px; border: 1px solid var(--care-line); border-radius: 14px; background: var(--care-surface); }
 .report-library-file > div:first-child { flex: 1; min-width: min(100%, 220px); }
-.report-library-file a { display: inline-flex; align-items: center; min-height: 44px; color: #664a70; font-size: 14px; text-underline-offset: 3px; overflow-wrap: anywhere; max-width: 100%; }
+.report-library-file a { display: inline-flex; align-items: center; min-height: 44px; color: #664a70; font-size: 14px; text-underline-offset: 3px; overflow-wrap: normal; max-width: 100%; }
 .report-library-file > div:first-child > span { display: block; color: var(--care-muted); font-size: 14px; line-height: 1.5; }
 .report-library-file-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 14px; }
 .report-library-file-actions button { min-height: 44px; padding: 8px 0; border: 0; background: transparent; color: #725479; font: 500 14px var(--font-inter), sans-serif; cursor: pointer; }

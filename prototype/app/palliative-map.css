@@ -31,7 +31,7 @@
 .palliative-map-cluster-list { display: grid; gap: 4px; max-height: clamp(90px, 22svh, 190px); overflow-y: auto; scrollbar-width: thin; }
 .palliative-map-cluster-list > button { display: grid; grid-template-columns: 24px minmax(0, 1fr); align-items: center; gap: 8px; width: 100%; min-width: 0; min-height: 48px; padding: 9px 7px; border: 1px solid #e7dbcc; border-radius: 8px; background: #fffdf8; color: #503e30; text-align: left; cursor: pointer; }
 .palliative-map-cluster-list > button > span { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 7px; background: #ffebce; color: #7a4c2e; font: 700 11px/1 var(--font-inter, sans-serif); }
-.palliative-map-cluster-list > button > strong { color: #503e30; font: 600 14px/1.4 var(--font-inter, sans-serif); overflow-wrap: anywhere; }
+.palliative-map-cluster-list > button > strong { color: #503e30; font: 600 14px/1.4 var(--font-inter, sans-serif); overflow-wrap: normal; }
 .palliative-map-origin { width: 19px; height: 19px; border: 3px solid #fff; border-radius: 50%; background: #258780; box-shadow: 0 0 0 6px #2587802e, 0 2px 6px #29433c45; pointer-events: none; }
 .palliative-map-origin > span { position: absolute; top: 23px; left: 50%; transform: translateX(-50%); padding: 4px 8px; border: 1px solid #94bfb8; border-radius: 999px; background: #f4fffa; color: #245b52; font: 700 13px/1.2 var(--font-inter, sans-serif); white-space: nowrap; }
 .palliative-map-selected { z-index: 6; }
@@ -43,7 +43,7 @@
 .palliative-map-place.listed > span { color: #14735e; }
 .palliative-map-place.community > span { color: #a66d1d; }
 .palliative-map-place.openstreetmap > span { color: #5d6b69; }
-.palliative-map-place > strong { color: #46382b; font: 650 15px/1.4 var(--font-inter, sans-serif); overflow-wrap: anywhere; }
+.palliative-map-place > strong { color: #46382b; font: 650 15px/1.4 var(--font-inter, sans-serif); overflow-wrap: normal; }
 .palliative-map-shell .palliative-map-fit { position: absolute; top: 10px; left: 10px; z-index: 7; display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; padding: 8px 12px; margin: 0; border: 1px solid var(--care-line, #e6ddd1); border-radius: 14px; background: #fffdf9f5; color: var(--care-ink, #382e29); box-shadow: 0 3px 12px #45322218; font: 650 14px/1.2 var(--font-inter, sans-serif); cursor: pointer; }
 .palliative-map-fit svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .palliative-map-fit:disabled { opacity: .55; cursor: default; }

@@ -23,7 +23,7 @@
 }
 
 .brand {
-  font-family: Georgia, serif;
+  font-family: var(--care-font-display);
   font-size: 30px;
   font-weight: 700;
   letter-spacing: -0.05em;
@@ -33,7 +33,7 @@
   color: #973b25;
   text-decoration: underline;
   text-underline-offset: 4px;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
 }
 
 .page a:focus-visible {
@@ -56,7 +56,7 @@
 
 .page h1 {
   margin: 28px 0 12px;
-  font-family: Georgia, serif;
+  font-family: var(--care-font-display);
   font-size: clamp(32px, 6vw, 44px);
   font-weight: 700;
   line-height: 1.12;
@@ -126,3 +126,12 @@
   .request { padding: 16px; }
   .page .button { width: 100%; }
 }
+
+/* Sahara band header (shared palette with the app) and a short entrance. */
+.header { margin-top: -24px; padding: 12px 0; border-bottom: 0; background: #5c2518; box-shadow: 0 0 0 100vmax #5c2518; clip-path: inset(0 -100vmax); color: #fff; }
+.header .brand, .page .header a { color: #fff; font-family: var(--font-anek), var(--font-noto), sans-serif; font-weight: 800; letter-spacing: 0; }
+.page .header a:focus-visible { outline-color: #f5c060; }
+.page h1, .page h2 { font-family: var(--font-anek), var(--font-noto), sans-serif; letter-spacing: 0; }
+.content > :not(header) { animation: policy-rise 260ms cubic-bezier(.22, 1, .36, 1) both; }
+@keyframes policy-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .content > :not(header) { animation: none; } }

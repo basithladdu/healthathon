@@ -1714,7 +1714,8 @@ export function ContinuityPrototype() {
   }
 
   useEffect(() => {
-    if (!toast) return;
+    // The simple care space shows results in a dialog that stays until it is closed.
+    if (!toast || simpleMode) return;
     const timer = window.setTimeout(() => setToast(null), 3500);
     return () => window.clearTimeout(timer);
   }, [toast]);
@@ -5817,12 +5818,22 @@ export function ContinuityPrototype() {
       }} />;
   }
 
+  // Results a patient or family member should not miss. Other messages belong to the older workspace.
+  const CARE_NOTICES: Record<string, string> = {
+    'Your review request was sent to your care team.': 'आपका समीक्षा अनुरोध आपकी देखभाल टीम को भेज दिया गया।',
+    'Your consent was recorded.': 'आपकी सहमति दर्ज हो गई।',
+    'Your emergency card was issued.': 'आपका इमरजेंसी कार्ड बन गया।',
+    'Choose a doctor to view this note.': 'यह नोट देखने के लिए डॉक्टर चुनें।',
+  };
+  const careNotice = toast && toast.message in CARE_NOTICES ? careText(lang, toast.message, CARE_NOTICES[toast.message]) : null;
+
   if (simpleMode && authScreen === null) {
     const saves = [preparationSave, taskSave, eventSave, checkSave, reportSave, appointmentSave, noteSave, symptomSave, storySave, contactSave, helpSave, placesSave, questionSave, copySave, comfortSave, voiceSave, costSave, labSave, conversationSave, profileSave, documentSave, acknowledgementSave, librarySave, circleSave, requestSave, requestLinkSave, medicineAccessSave];
     if (saves.includes('loading')) return <CareLoading lang={lang} />;
     const saveStatus = saves.includes('unavailable') ? 'unavailable' : saves.includes('saving') ? 'saving' : 'saved';
     const role = isFamilySession ? 'family' : isPatientSession ? 'patient' : 'doctor';
     return <SimpleCareShell view={view} role={role} lang={lang} saveStatus={saveStatus}
+      notice={careNotice} onNoticeClose={() => setToast(null)}
       onSignOut={signOut}
       onLanguage={setLang} onNavigate={navigate}
       onRole={(next) => {

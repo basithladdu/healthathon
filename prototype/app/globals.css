@@ -5514,7 +5514,7 @@ td {
 
 .verified-record-heading strong,
 .verified-record-heading small {
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
 }
 
 @media (max-width: 900px) {
@@ -7855,7 +7855,7 @@ h3,
   color: #38bdf8;
   line-height: 1.5;
   white-space: pre-wrap;
-  word-break: break-word;
+  word-break: normal;
 }
 
 .fhir-footer {

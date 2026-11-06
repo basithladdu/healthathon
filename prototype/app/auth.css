@@ -697,7 +697,7 @@
 
   .auth-demo-text span {
     font-size: 11.5px;
-    overflow-wrap: anywhere;
+    overflow-wrap: normal;
   }
 
   .auth-demo-label {

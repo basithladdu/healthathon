@@ -134,7 +134,7 @@
   max-width: 11ch;
   margin: 0 0 7px;
   color: var(--care-ink, #382e29);
-  font: 500 34px/1.14 var(--care-font-display, Georgia, serif);
+  font: 500 34px/1.14 var(--care-font-display, var(--care-font-display));
   letter-spacing: -1px;
   text-wrap: balance;
 }
