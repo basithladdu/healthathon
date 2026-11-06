@@ -20,7 +20,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.ui.semantics.Role
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -37,9 +36,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -50,6 +49,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.Dispatchers
@@ -156,11 +158,20 @@ class MedicineStripPhotos(context: Context, storage: String) {
 }
 
 @Composable internal fun StripThumb(file: File?, size: Int, modifier: Modifier = Modifier) {
-    val image by produceState<android.graphics.Bitmap?>(null, file?.path) { value = file?.let { withContext(Dispatchers.IO) { MedicineStripPhotos.thumbnail(it, size * 2) } } }
+    val context = LocalContext.current
+    val pixels = with(LocalDensity.current) { size.dp.roundToPx() }
+    val motion = SaharaMotion.enabled
     Surface(shape = RoundedCornerShape(14.dp), color = SaharaSoftBlue, modifier = modifier.size(size.dp)) {
-        val bitmap = image
-        if (bitmap != null) Image(bitmap.asImageBitmap(), null, Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp)), contentScale = ContentScale.Crop)
-        else Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Icon(Icons.Default.Medication, null, tint = DoctorAccent, modifier = Modifier.size((size / 2).dp)) }
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            // The pill icon shows while the photo loads, and stays when there is none (or it cannot be read).
+            Icon(Icons.Default.Medication, null, tint = DoctorAccent, modifier = Modifier.size((size / 2).dp))
+            // Coil (Apache-2.0): decodes off the main thread at the drawn size, keeps it in memory for the next screen,
+            // and fades it in (no fade when animations are off). Local files only; Coil writes no disk cache for them.
+            if (file != null) {
+                val request = remember(file.path, pixels, motion) { ImageRequest.Builder(context).data(file).size(pixels).crossfade(motion).build() }
+                AsyncImage(request, null, Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp)), contentScale = ContentScale.Crop)
+            }
+        }
     }
 }
 

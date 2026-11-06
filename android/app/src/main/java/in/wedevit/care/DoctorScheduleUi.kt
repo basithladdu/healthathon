@@ -59,7 +59,6 @@ private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone
     }
     val byDay = remember(visits) { visits.groupBy { visitDay(it.second.due, zone) } }
     val dayVisits = byDay[selected].orEmpty().sortedBy { it.second.due }
-    val weekStart = selected.minusDays((selected.dayOfWeek.value - 1).toLong())
     fun pick(day: LocalDate) { selectedText = day.toString() }
 
     LazyColumn(modifier.fillMaxSize().testTag("doctor-schedule"), contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -88,12 +87,13 @@ private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 // Arrows stay narrow so seven day columns still fit a 360dp phone; height keeps the 48dp touch target.
                 IconButton(onClick = { pick(selected.minusWeeks(1)) }, Modifier.size(width = 32.dp, height = 48.dp)) { Icon(Icons.Default.ChevronLeft, t("Previous week", "पिछला हफ़्ता"), tint = DoctorCardInk) }
-                (0L..6L).forEach { offset ->
-                    val day = weekStart.plusDays(offset); val isSelected = day == selected; val has = byDay.containsKey(day)
+                // Swipe the strip for the next or previous week (kizitonwose Calendar); the arrows do the same.
+                SaharaWeekPager(selected, { pick(it) }, Modifier.weight(1f)) { day ->
+                    val isSelected = day == selected; val has = byDay.containsKey(day)
                     val label = careDateFormat("EEEE, d MMMM", hindi).format(day)
                     Surface(onClick = { pick(day) }, shape = RoundedCornerShape(14.dp), color = if (isSelected) DoctorTones.Rust.solid else Color.Transparent,
                         border = if (!isSelected && day == today) BorderStroke(1.5.dp, DoctorAccent) else null,
-                        modifier = Modifier.weight(1f).heightIn(min = 64.dp).semantics { contentDescription = label }.testTag("doctor-schedule-day-$day")) {
+                        modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp).semantics { contentDescription = label }.testTag("doctor-schedule-day-$day")) {
                       Box(contentAlignment = Alignment.Center) {
                         val ink = if (isSelected) Color.White else DoctorCardInk
                         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(2.dp)) {
