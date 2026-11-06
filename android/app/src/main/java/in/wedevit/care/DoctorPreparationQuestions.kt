@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -161,7 +162,7 @@ private class PrepModel(val store: DoctorPreparationStore, val scope: String, va
     val callback by rememberUpdatedState(onInteraction)
     val busy = drafts.isNotEmpty() || newText.isNotEmpty()
     DisposableEffect(busy) { callback(busy); onDispose { callback(false) } }
-    PrepCard("doctor-preparation-questions", t("Questions", "सवाल"), "", m) {
+    PrepCard("doctor-preparation-questions", t("Questions to ask today (optional)", "आज पूछने के सवाल (ज़रूरी नहीं)"), "", m) {
         if (m.rows.isEmpty()) Text(t("No questions yet", "अभी कोई सवाल नहीं"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardSub, modifier = Modifier.testTag("doctor-preparation-empty"))
         m.rows.forEach { row ->
             val shown = drafts[row.id] ?: row.text
@@ -181,8 +182,9 @@ private class PrepModel(val store: DoctorPreparationStore, val scope: String, va
         }
         if (editable) {
             HorizontalDivider(color = DoctorHairline)
-            OutlinedTextField(newText, { newText = it.take(DOCTOR_PREPARATION_MAX_QUESTION_CHARS) }, label = { Text(t("New question", "नया सवाल")) }, minLines = 2, enabled = m.loaded, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-preparation-question-input"))
-            TextButton(onClick = { if (m.persist(m.rows + DoctorPreparationQuestion(newId(), newText.trim(), DOCTOR_PREPARATION_DEFAULT_SECTION))) newText = "" }, enabled = m.loaded && m.rows.size < DOCTOR_PREPARATION_MAX_QUESTIONS && newText.isNotBlank(), shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-add-preparation-question")) { Text(t("Add question", "सवाल जोड़ें"), color = RustText, fontSize = 16.sp) }
+            // One field; the + inside it adds the question.
+            OutlinedTextField(newText, { newText = it.take(DOCTOR_PREPARATION_MAX_QUESTION_CHARS) }, label = { Text(t("Add question", "सवाल जोड़ें")) }, enabled = m.loaded, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-preparation-question-input"),
+                trailingIcon = { androidx.compose.material3.IconButton(onClick = { if (m.persist(m.rows + DoctorPreparationQuestion(newId(), newText.trim(), DOCTOR_PREPARATION_DEFAULT_SECTION))) newText = "" }, enabled = m.loaded && m.rows.size < DOCTOR_PREPARATION_MAX_QUESTIONS && newText.isNotBlank(), modifier = Modifier.testTag("doctor-add-preparation-question")) { androidx.compose.material3.Icon(androidx.compose.material.icons.Icons.Default.Add, t("Add question", "सवाल जोड़ें"), tint = RustText) } })
         }
     }
 }

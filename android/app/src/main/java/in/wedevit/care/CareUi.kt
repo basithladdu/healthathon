@@ -606,6 +606,15 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             .onSuccess { playingPath = row.id; playingNow = true }
             .onFailure { playingNow = false; vm.message.value = t("That recording could not be played.", "वह रिकॉर्डिंग नहीं चल सकी।") }
     }
+    // Stop = done: the new recording is linked and the doctor lands on the text, no "saved audio" page or extra Continue.
+    var recordingCount by remember { mutableIntStateOf(recordings.size) }
+    LaunchedEffect(recordings.size, recording, recordingSaving) {
+        if (doctorPresentation && clinician && step == 1 && !recording && !recordingSaving && recordingSaveError == null && recordings.size > recordingCount) {
+            recordings.maxByOrNull { it.lastModified() }?.let { f -> savedAudioPicked = setOf(f.absolutePath); runCatching { vm.attachDoctorRecording(f.absolutePath, doctorConversationIdentity(vm.accountNamespace, draft)) } }
+            nextStep(2)
+        }
+        if (!recording && !recordingSaving) recordingCount = recordings.size
+    }
     BackHandler(doctorPresentation && clinician && step > 0 && !recording && !dictating && !recordingSaving && recordingSaveError == null && !permissionDialog && !audienceBusy) { previousPage() }
     // Pages move with the app's shared motion in the direction of travel; each page keeps its own list position while the other fades out.
     AnimatedContent(step, transitionSpec = { SaharaMotion.transform(if (targetState >= initialState) SaharaMotion.Direction.Forward else SaharaMotion.Direction.Back) }, label = "conversation-page") { step ->
@@ -644,7 +653,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             })
     } else LazyColumn(Modifier.fillMaxSize().background(if (doctorPresentation) Color.White else MaterialTheme.colorScheme.background).imePadding().testTag("conversation-list"), state = scroll, contentPadding = if (doctorCapture) PaddingValues(bottom = 20.dp) else PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         if (!doctorCapture) item { Heading(if (clinician) t("Conversation", "बातचीत") else t("Care notes", "देखभाल नोट")) }
-        if (doctorPresentation && !doctorCapture && onDoctorBack != null) item { TextButton(onClick = onDoctorBack, enabled = !recordingSaving && recordingSaveError == null && !recording && !dictating && !audienceBusy) { Text(t("Back to conversations", "बातचीत पर वापस")) } }
+        if (doctorPresentation && !doctorCapture && onDoctorBack != null) item { TextButton(onClick = onDoctorBack, enabled = !recordingSaving && recordingSaveError == null && !recording && !dictating && !audienceBusy) { Text(t("Back", "वापस")) } }
         if (clinician) {
             if (!doctorCapture) item { ConversationStepper(topStep) }
             when (step) {
@@ -736,13 +745,9 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                                 if (BuildConfig.CLOUD_AUDIO_ENABLED && clipConsent != null && autoTranscribed != file.absolutePath && vm.draft.value.source.isBlank() && transcribingPath == null) { autoTranscribed = file.absolutePath; vm.transcribeAudio(file.absolutePath, clipConsent) }
                             }
                             if (clipConsent != null) Button(onClick = { vm.transcribeAudio(file.absolutePath, clipConsent) }, enabled = BuildConfig.CLOUD_AUDIO_ENABLED && transcribingPath == null && !busy && !dictating && !recording, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-gemini-transcribe")) {
-                                if (transcribingPath == file.absolutePath) { CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = Color.White); Spacer(Modifier.width(8.dp)); Text(t("Turning into text…", "लिखाई बन रही है…")) }
-                                else { Icon(Icons.Default.AutoAwesome, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Turn into text", "लिखाई बनाएँ")) }
+                                if (transcribingPath == file.absolutePath) { CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = Color.White); Spacer(Modifier.width(8.dp)); Text(t("Writing it down…", "लिख रहे हैं…")) }
+                                else { Icon(Icons.Default.AutoAwesome, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Write it down", "लिख दें")) }
                             }
-                        } }
-                        if (isSample) Surface(shape = RoundedCornerShape(16.dp), color = DoctorStatusWarnBg, modifier = Modifier.fillMaxWidth().testTag("transcript-sample")) { Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text(t("Practice", "अभ्यास"), fontWeight = FontWeight.Medium, color = DoctorStatusWarn)
-                            TextButton(onClick = { val current = vm.draft.value; if (current.personId == draft.personId) { vm.edit(current.copy(source = "")); editingTranscript = true; highlightLine = null } }, enabled = !busy && !recording && !dictating, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-sample-clear")) { Text(t("Clear text", "लिखाई हटाएँ"), color = DoctorAccent) }
                         } }
                         DoctorGoalsChecklist(prepRows, questionMatches)
                         if (dictating) SurfaceCard { Text(t("Conversation", "बातचीत"), fontWeight = FontWeight.Bold); SelectionContainerText(draft.source) }
@@ -830,22 +835,21 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         }
     }
     }
-    val quickConsent = doctorPresentation && (vm.demoMode || !BuildConfig.CLOUD_AUDIO_ENABLED)
-    if (permissionDialog && vm.localAudioRecordingAllowed) AlertDialog(onDismissRequest = { permissionDialog = false }, title = { Text(t("Before we record", "रिकॉर्ड करने से पहले")) }, text = {
+    val quickConsent = doctorPresentation
+    if (permissionDialog && vm.localAudioRecordingAllowed) AlertDialog(onDismissRequest = { permissionDialog = false }, title = { Text(t("Record this talk?", "यह बातचीत रिकॉर्ड करें?")) }, text = {
         Column(Modifier.heightIn(max = 520.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text(if (consentNames.isEmpty()) t("Name everyone present first.", "रिकॉर्ड करने से पहले मौजूद सभी के नाम लिखें।") else t("Everyone named in “Who's here” has agreed: ${consentNames.joinToString(", ")}.", "“कौन मौजूद है” में लिखे सभी लोग राज़ी हैं: ${consentNames.joinToString(", ")}।"), style = MaterialTheme.typography.bodyMedium)
             HorizontalDivider()
-            if (quickConsent) Text(t("By starting, everyone listed agrees: this recording is to write and check a note of this talk. It stays private on this phone. People who can open this phone or the shared records may read the written note.", "शुरू करने पर सूची के सभी लोग मानते हैं: यह रिकॉर्डिंग इस बातचीत का नोट लिखने और जाँचने के लिए है। यह इसी फ़ोन पर निजी रहती है। जो लोग यह फ़ोन या साझा रिकॉर्ड खोल सकते हैं, वे लिखा नोट पढ़ सकते हैं।"), style = MaterialTheme.typography.bodySmall) else CheckLine(purposeAccepted, { purposeAccepted = it }, t("We understand this recording is to write and check a note of this talk.", "हम समझते हैं कि यह रिकॉर्डिंग इस बातचीत का नोट लिखने और जाँचने के लिए है।"))
+            if (quickConsent) Text(t("The audio stays on this phone.", "ऑडियो इसी फ़ोन पर रहता है।"), style = MaterialTheme.typography.bodySmall) else CheckLine(purposeAccepted, { purposeAccepted = it }, t("We understand this recording is to write and check a note of this talk.", "हम समझते हैं कि यह रिकॉर्डिंग इस बातचीत का नोट लिखने और जाँचने के लिए है।"))
             if (!quickConsent) CheckLine(storageAccepted, { storageAccepted = it }, if (!vm.demoMode && BuildConfig.CLOUD_AUDIO_ENABLED) t("We understand the audio stays private on this phone, unless someone shares it or separately agrees below to send it online to turn speech into text.", "हम समझते हैं कि ऑडियो इसी फ़ोन पर निजी रहता है, जब तक कोई इसे साझा न करे या नीचे इसे लिखाई के लिए ऑनलाइन भेजने पर अलग से राज़ी न हो।") else t("We understand the recording stays private on this phone.", "हम समझते हैं कि रिकॉर्डिंग इसी फ़ोन पर निजी रहती है।"))
             if (!quickConsent) CheckLine(accessAccepted, { accessAccepted = it }, t("We understand people with access to this person's phone or shared records may be able to read the written note.", "हम समझते हैं कि इस व्यक्ति के फ़ोन या साझा रिकॉर्ड तक पहुँच वाले लोग लिखा नोट पढ़ सकते हैं।"))
             if (BuildConfig.CLOUD_AUDIO_ENABLED) {
-            HorizontalDivider()
-            Text(t("Online transcription", "ऑनलाइन लिखाई"), fontWeight = FontWeight.Bold)
-            CheckLine(transcriptionAccepted, { transcriptionAccepted = it }, t("Everyone agrees to send this audio to Google Gemini.", "सभी इस ऑडियो को Google Gemini को भेजने पर राज़ी हैं।"))
+            if (!quickConsent) { HorizontalDivider(); Text(t("Online transcription", "ऑनलाइन लिखाई"), fontWeight = FontWeight.Bold) }
+            CheckLine(transcriptionAccepted, { transcriptionAccepted = it }, t("Use Google Gemini to write it down", "Google Gemini से लिखवाएँ"))
             }
         }
     }, confirmButton = {
-        TextButton(onClick = { if (vm.canEdit.value && vm.localAudioRecordingAllowed && !vm.recordingSaving.value && vm.recordingSaveError.value == null) { if (quickConsent) { purposeAccepted = true; storageAccepted = true; accessAccepted = true }; permissionDialog = false; if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) startConsentedRecording() else permission.launch(Manifest.permission.RECORD_AUDIO) } }, enabled = recordingCanEdit && recordingSaveError == null && !recordingSaving && vm.localAudioRecordingAllowed && allParticipantsAgreed && (quickConsent || (purposeAccepted && storageAccepted && accessAccepted)), modifier = Modifier.testTag("start-recording-confirm")) { Text(if (quickConsent) t("Everyone listed agreed · Start recording", "सूची के सभी राज़ी · रिकॉर्डिंग शुरू करें") else t("Start recording", "रिकॉर्डिंग शुरू करें")) }
+        TextButton(onClick = { if (vm.canEdit.value && vm.localAudioRecordingAllowed && !vm.recordingSaving.value && vm.recordingSaveError.value == null) { if (quickConsent) { purposeAccepted = true; storageAccepted = true; accessAccepted = true }; permissionDialog = false; if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) startConsentedRecording() else permission.launch(Manifest.permission.RECORD_AUDIO) } }, enabled = recordingCanEdit && recordingSaveError == null && !recordingSaving && vm.localAudioRecordingAllowed && allParticipantsAgreed && (quickConsent || (purposeAccepted && storageAccepted && accessAccepted)), modifier = Modifier.testTag("start-recording-confirm")) { Text(t("Start recording", "रिकॉर्डिंग शुरू करें")) }
     }, dismissButton = { TextButton(onClick = { permissionDialog = false }) { Text(t("Cancel", "रद्द करें")) } })
 }
 
@@ -883,7 +887,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             Button(onClick = onTranscribe, enabled = canTranscribe && !transcribing, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) {
                 if (transcribing) { CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = Color.White); Spacer(Modifier.width(8.dp)) }
                 else { Icon(Icons.Default.AutoAwesome, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)) }
-                Text(if (transcribing) t("Turning speech into text…", "बात लिखाई में बदल रही है…") else t("Turn speech into text", "बात को लिखाई में बदलें"))
+                Text(if (transcribing) t("Writing it down…", "लिख रहे हैं…") else t("Write it down", "लिख दें"))
             }
         }
     }

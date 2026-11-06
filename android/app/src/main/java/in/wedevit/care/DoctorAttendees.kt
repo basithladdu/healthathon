@@ -76,6 +76,7 @@ internal fun doctorAttendeesAllConsented(rows: List<DoctorAttendee>): Boolean = 
     var error by remember(store, scope) { mutableStateOf<String?>(null) }
     // A half-typed person survives scrolling this card away and rotation.
     var name by rememberSaveable(scope) { mutableStateOf("") }
+    var adding by rememberSaveable(scope) { mutableStateOf(false) }
     var role by rememberSaveable(scope) { mutableStateOf("") }
     val callback by rememberUpdatedState(onChange)
     fun persist(next: List<DoctorAttendee>): Boolean = try { check(editable) { t("This list can no longer be changed.", "यह सूची अब बदली नहीं जा सकती।") }; store.save(scope, next); rows = next; error = null; callback(next); true } catch (e: Exception) { error = e.message?.let { m -> t(m, DoctorAttendeeErrorsHindi[m] ?: m) } ?: t("Couldn't save. Try again.", "सहेजा नहीं गया। फिर कोशिश करें।"); false }
@@ -99,14 +100,17 @@ internal fun doctorAttendeesAllConsented(rows: List<DoctorAttendee>): Boolean = 
                 }
             } }
             if (rows.isNotEmpty()) HorizontalDivider(color = DoctorHairline)
-            if (editable) {
+            if (editable && !adding) OutlinedButton(onClick = { adding = true }, enabled = loaded && rows.size < 12, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.outlinedButtonColors(contentColor = RustText), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-add-attendee-open")) { Icon(Icons.Default.PersonAdd, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(t("Add person", "व्यक्ति जोड़ें"), fontSize = 16.sp) }
+            // Name and role open only when the doctor adds someone.
+            if (editable && adding) {
                 val canAdd = loaded && rows.size < 12 && name.isNotBlank() && role.isNotBlank()
-                val add = { if (persist(rows + DoctorAttendee(newId(), name.trim(), role.trim(), false))) { name = ""; role = "" } }
+                val add = { if (persist(rows + DoctorAttendee(newId(), name.trim(), role.trim(), false))) { name = ""; role = ""; adding = false } }
                 OutlinedTextField(name, { name = it.take(100) }, label = { Text(t("Name", "नाम")) }, singleLine = true, enabled = loaded, shape = RoundedCornerShape(14.dp), keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-attendee-name-input"))
                 OutlinedTextField(role, { role = it.take(40) }, label = { Text(t("Role", "भूमिका")) }, placeholder = { Text(t("Daughter, nurse…", "बेटी, नर्स…")) }, singleLine = true, enabled = loaded, shape = RoundedCornerShape(14.dp), keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done), keyboardActions = KeyboardActions(onDone = { if (canAdd) add() }), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-attendee-role-input"))
                 OutlinedButton(onClick = add, enabled = canAdd, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.outlinedButtonColors(contentColor = RustText), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-add-attendee")) { Icon(Icons.Default.PersonAdd, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(t("Add person", "व्यक्ति जोड़ें"), fontSize = 16.sp) }
             }
-            Text(if (all) t("Everyone agreed", "सभी सहमत") else t("Everyone must agree", "सबकी सहमति ज़रूरी"), fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, color = if (all) DoctorStatusGood else DoctorStatusWarn, modifier = Modifier.testTag("doctor-attendees-status").announce())
+            if (all) Text(t("Everyone agreed", "सभी सहमत"), fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, color = DoctorStatusGood, modifier = Modifier.testTag("doctor-attendees-status").announce())
+            else Button(onClick = { persist(rows.map { it.copy(consented = true) }) }, enabled = loaded && editable && rows.isNotEmpty(), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-attendees-status")) { Text(t("Everyone agrees", "सभी सहमत हैं"), fontSize = 16.sp) }
         }
     }
 }
