@@ -190,7 +190,9 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
             if (pickNote.isNotBlank()) item { Text(pickNote, color = RustText, fontSize = 15.sp, modifier = Modifier.animateItem().announce()) }
             item {
                 Spacer(Modifier.height(8.dp))
-                Button(
+                SaharaPrimaryButton(
+                    t("Read prescription", "पर्चा पढ़ें"),
+                    icon = Icons.Default.DocumentScanner,
                     onClick = {
                         scanError = null; phase = MedicineScannerPhase.Scanning
                         scanJob = scope.launch {
@@ -212,13 +214,12 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                         }
                     },
                     enabled = prescriptionUris.isNotEmpty(),
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp),
-                    shape = RoundedCornerShape(14.dp),
-                ) { Icon(Icons.Default.DocumentScanner, null); Spacer(Modifier.width(8.dp)); Text(t("Read prescription", "पर्चा पढ़ें"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold) }
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
+                )
                 Spacer(Modifier.height(8.dp))
-                OutlinedButton(onClick = {
+                SaharaSecondaryButton(t("Add one manually", "एक दवा ख़ुद लिखें"), icon = Icons.Default.Edit, onClick = {
                     drafts = listOf(MedicineDraft(newId(), manualMedicine(), false)); warnings = emptyList(); unmatched = emptyList(); unmatchedReviewed = true; phase = MedicineScannerPhase.Review
-                }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Edit, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Add one manually", "एक दवा ख़ुद लिखें"), fontSize = 15.sp) }
+                }, modifier = Modifier.fillMaxWidth())
             }
         }
 
@@ -277,7 +278,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                 val valid = drafts.isNotEmpty() && unmatchedReviewed && names.size == names.distinct().size && drafts.all {
                     it.confirmed && it.medicine.medicineName.isNotBlank() && (it.medicine.strength.isNotBlank() || it.medicine.quantity.isNotBlank() || it.medicine.form.isNotBlank())
                 }
-                Button(onClick = {
+                SaharaPrimaryButton(if (busy || savingSources) t("Saving…", "सहेज रहे हैं…") else if(onReviewedMedicines != null) t("Use ${drafts.size} reviewed medicines", "जाँची गई ${drafts.size} दवाएँ लें") else run { val n = drafts.size; if (n == 1) t("Save 1 medicine", "1 दवा सहेजें") else t("Save $n medicines", "$n दवा सहेजें") }, onClick = {
                     scanError = null
                     savingSources = true
                     scope.launch {
@@ -300,16 +301,13 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                         } catch (failure: Exception) { if (failure is CancellationException) throw failure; scanError = failure.message ?: t("Could not keep the original pages.", "असली पेज सँभाले नहीं जा सके।") }
                         finally { savingSources = false }
                     }
-                }, enabled = valid && !busy && !savingSources, modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp), shape = RoundedCornerShape(14.dp)) {
-                    Text(fontSize = 16.sp, fontWeight = FontWeight.SemiBold, text = if (busy || savingSources) t("Saving…", "सहेज रहे हैं…") else if(onReviewedMedicines != null) t("Use ${drafts.size} reviewed medicines", "जाँची गई ${drafts.size} दवाएँ लें") else run { val n = drafts.size; if (n == 1) t("Save 1 medicine", "1 दवा सहेजें") else t("Save $n medicines", "$n दवा सहेजें") })
-                }
+                }, enabled = valid, busy = busy || savingSources, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp))
                 Spacer(Modifier.height(8.dp))
                 TextButton(onClick = { cleanAndClose() }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें"), fontSize = 15.sp) }
             }
         }
     } }
-    scanError?.let { error -> AlertDialog(onDismissRequest = { scanError = null }, title = { Text(t("Not done", "पूरा नहीं हुआ")) }, text = { Text(error) },
-        confirmButton = { TextButton(onClick = { scanError = null }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("OK", "ठीक है")) } }) }
+    scanError?.let { error -> SaharaDialog(t("Not done", "पूरा नहीं हुआ"), onDismiss = { scanError = null }, text = error, tone = SaharaTone.Error) }
 }
 
 @Composable

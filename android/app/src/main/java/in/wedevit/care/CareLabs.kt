@@ -170,7 +170,7 @@ private fun labRange(data: CareEntry): Pair<Double?, Double?> {
     val context = LocalContext.current
     val report = reports.firstOrNull { it.id == data.reportId && it.personId == item.personId }
     var openFailed by remember { mutableStateOf(false) }
-    if (openFailed) AlertDialog(onDismissRequest = { openFailed = false }, text = { Text(t("Couldn't open this report.", "यह रिपोर्ट नहीं खुल सकी।")) }, confirmButton = { TextButton(onClick = { openFailed = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("OK", "ठीक है")) } })
+    if (openFailed) SaharaDialog(t("Couldn't open this report.", "यह रिपोर्ट नहीं खुल सकी।"), onDismiss = { openFailed = false }, tone = SaharaTone.Error)
     HorizontalDivider(Modifier.padding(top = 12.dp, bottom = 8.dp), color = DoctorHairline)
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {

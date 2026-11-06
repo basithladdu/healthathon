@@ -154,9 +154,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
             Column(Modifier.weight(1f).padding(end = 8.dp)) {
                 Heading(t("Documents", "कागज़ात"), 30)
             }
-            if (canEdit) Button(onClick = { addSheet = true }, enabled = !busy, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), contentPadding = PaddingValues(horizontal = 16.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("document-add")) {
-                Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Add document", "कागज़ जोड़ें"), fontWeight = FontWeight.SemiBold)
-            }
+            if (canEdit) SaharaPrimaryButton(t("Add document", "कागज़ जोड़ें"), onClick = { addSheet = true }, icon = Icons.Default.Add, enabled = !busy, modifier = Modifier.testTag("document-add"))
         } }
         item { Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             DocsTile(t("Care timeline", "देखभाल की समय-रेखा"), Icons.Default.Timeline, Peach, Modifier.weight(1f).fillMaxHeight().testTag("care-timeline-open")) { timeline = true }
@@ -277,8 +275,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         }
         if (search.isBlank() && filter != "Reports") item { TextButton(onClick = onTalk, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Forum, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(if (clinician) t("Start a conversation", "बातचीत शुरू करें") else t("Talk with your doctor", "अपने डॉक्टर से बात करें")) } }
     }
-    if (docProblem.isNotBlank()) AlertDialog(onDismissRequest = { docProblem = "" }, text = { Text(docProblem) },
-        confirmButton = { TextButton(onClick = { docProblem = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("OK", "ठीक है")) } })
+    if (docProblem.isNotBlank()) SaharaDialog(docProblem, onDismiss = { docProblem = "" }, tone = SaharaTone.Error)
     remove?.let { report -> AlertDialog(onDismissRequest = { if (!busy) remove = null }, title = { Text(t("Remove this report?", "यह रिपोर्ट हटाएँ?")) }, text = { Text(report.name) },
         confirmButton = { TextButton(onClick = { vm.removeReport(report) { remove = null; cancerStore.remove(report.id); cancerChoices = cancerStore.all(); folderStore.remove(report.id); folders = folderStore.all() } }, enabled = !busy, colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Text(t("Remove", "हटाएँ"), fontWeight = FontWeight.SemiBold) } },
         dismissButton = { TextButton(onClick = { remove = null }, enabled = !busy) { Text(t("Keep", "रखें")) } }) }
@@ -341,14 +338,14 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
 /** Each auto-sorted folder keeps one colour everywhere: its tile, its file icons, its pills and the Ask badge. */
 internal data class FolderTone(val accent: androidx.compose.ui.graphics.Color, val soft: androidx.compose.ui.graphics.Color, val icon: androidx.compose.ui.graphics.vector.ImageVector)
 internal fun documentFolderTone(folder: String?): FolderTone = when (folder) {
-    // Sahara section accents (HUMAN_APP_GUIDE §3): each main tone carries white text, each light tint carries the main tone at AA.
-    DocumentFolderRules.BILLS -> FolderTone(androidx.compose.ui.graphics.Color(0xFF8F5A00), androidx.compose.ui.graphics.Color(0xFFFCEBC7), Icons.AutoMirrored.Filled.ReceiptLong)      // Marigold
-    DocumentFolderRules.LAB -> FolderTone(androidx.compose.ui.graphics.Color(0xFF0F6E6A), androidx.compose.ui.graphics.Color(0xFFD3EEEC), Icons.Default.Science)                        // Teal
-    DocumentFolderRules.PRESCRIPTIONS -> FolderTone(androidx.compose.ui.graphics.Color(0xFF8A3B78), androidx.compose.ui.graphics.Color(0xFFF4DDEE), Icons.Default.Medication)           // Plum, the medicines colour
-    DocumentFolderRules.DISCHARGE -> FolderTone(androidx.compose.ui.graphics.Color(0xFF3F51A3), androidx.compose.ui.graphics.Color(0xFFE0E4F7), Icons.Default.LocalHospital)             // Indigo
-    else -> FolderTone(DoctorCardSub, androidx.compose.ui.graphics.Color(0xFFEFE7DF), Icons.Default.Folder)                                              // Ink sub
+    // The design lane's section tones (SaharaTone): solid for the icon and an open tile, wash for chips, ink for text on the wash.
+    DocumentFolderRules.BILLS -> FolderTone(SaharaTone.Marigold.ink, SaharaTone.Marigold.wash, Icons.AutoMirrored.Filled.ReceiptLong)
+    DocumentFolderRules.LAB -> FolderTone(SaharaTone.Teal.ink, SaharaTone.Teal.wash, Icons.Default.Science)
+    DocumentFolderRules.PRESCRIPTIONS -> FolderTone(SaharaTone.Plum.ink, SaharaTone.Plum.wash, Icons.Default.Medication)
+    DocumentFolderRules.DISCHARGE -> FolderTone(SaharaTone.Indigo.ink, SaharaTone.Indigo.wash, Icons.Default.LocalHospital)
+    else -> FolderTone(SaharaColors.InkSub, SaharaColors.Well, Icons.Default.Folder)
 }
-internal val CancerTone = FolderTone(androidx.compose.ui.graphics.Color(0xFF386D29), androidx.compose.ui.graphics.Color(0xFFDDEFD5), Icons.Default.LocalHospital)                       // Leaf
+internal val CancerTone = FolderTone(SaharaTone.Rose.ink, SaharaTone.Rose.wash, Icons.Default.LocalHospital)
 
 /** One folder tile: coloured icon chip, name and count. The open folder fills with its colour. */
 @Composable private fun FolderTile(title: String, folder: String, count: Int, open: Boolean, modifier: Modifier, onClick: () -> Unit) {

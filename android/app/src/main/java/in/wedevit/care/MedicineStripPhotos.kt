@@ -281,9 +281,6 @@ class MedicineStripPhotos(context: Context, storage: String) {
     CareField(entry.directions, { change(entry.copy(directions = it.take(500))) }, t("Directions", "तरीक़ा"), placeholder = t("e.g. as written: dissolve in water", "जैसे पर्चे में लिखा: पानी में घोलकर"))
 }
 
-/** The Medicines section accent (HUMAN_APP_GUIDE §3, Plum); white text on it is 7.1:1. */
-internal val MedicinesPlum = androidx.compose.ui.graphics.Color(0xFF8A3B78)
-
 /**
  * Today's doses grouped by time ("Morning · 08:00 · 3 medicines"), each with its strip photo in the pillbox, so a family
  * member can match strips by sight. Every dose is its own tick: tap a pillbox to mark that dose taken or missed.
@@ -321,7 +318,7 @@ internal val MedicinesPlum = androidx.compose.ui.graphics.Color(0xFF8A3B78)
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 // Medicines keep the plum section colour on their icon tile.
-                Surface(shape = RoundedCornerShape(12.dp), color = MedicinesPlum) { Icon(Icons.Default.Medication, null, Modifier.padding(8.dp).size(20.dp), tint = Paper) }
+                SaharaIconChip(Icons.Default.Medication, SaharaTone.Plum, size = 36)
                 Spacer(Modifier.width(12.dp))
                 Text(t("Today's doses", "आज की दवाएँ"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
                 // The count as a status pill, green once every dose is ticked; the number rises in when it changes.
@@ -362,8 +359,7 @@ internal val MedicinesPlum = androidx.compose.ui.graphics.Color(0xFF8A3B78)
             }
         }
     }
-    if (problem.isNotBlank()) AlertDialog(onDismissRequest = { problem = "" }, title = { Text(t("Not saved", "सहेजा नहीं गया")) }, text = { Text(problem) },
-        confirmButton = { TextButton(onClick = { problem = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("OK", "ठीक है")) } })
+    if (problem.isNotBlank()) SaharaDialog(t("Not saved", "सहेजा नहीं गया"), onDismiss = { problem = "" }, text = problem, tone = SaharaTone.Error)
 }
 
 /**

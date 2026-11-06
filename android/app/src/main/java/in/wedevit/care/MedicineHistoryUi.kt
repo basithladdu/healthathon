@@ -160,8 +160,7 @@ internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: C
         }
         if (showHistory) DoseChip(Icons.Default.History, t("History", "इतिहास"), "care-medicine-history-${item.id}", true) { history = true }
     }
-    if (problem.isNotBlank()) AlertDialog(onDismissRequest = { problem = "" }, title = { Text(t("Not saved", "सहेजा नहीं गया")) }, text = { Text(problem) },
-        confirmButton = { TextButton(onClick = { problem = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("OK", "ठीक है")) } })
+    if (problem.isNotBlank()) SaharaDialog(t("Not saved", "सहेजा नहीं गया"), onDismiss = { problem = "" }, text = problem, tone = SaharaTone.Error)
     if (history) MedicineHistorySheet(item, vm) { history = false }
 }
 
