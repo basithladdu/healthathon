@@ -23,12 +23,12 @@ import androidx.compose.ui.unit.sp
 @Composable fun CareSourcePicker(draft: Conversation, sectionIndex: Int = 0, onAssign: (Int, CareSourceLine) -> Unit) { val t = careText();
     val section = sectionIndex.coerceIn(0, NoteRules.labels.lastIndex)
     val lines = remember(draft.source) { CareDraftAssist.lines(draft.source) }
-    Surface(shape = RoundedCornerShape(20.dp), color = DoctorCardReport, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Surface(shape = RoundedCornerShape(12.dp), color = DoctorCardReport, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(noteSectionLabel(NoteRules.labels[section], careHindi()), fontFamily = SaharaTitleFont, fontSize = 21.sp, lineHeight = 26.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.testTag("build-section-heading"))
         Text(NoteRules.values(draft)[section].ifBlank { t("Nothing added yet", "अभी कुछ नहीं जोड़ा") }, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk)
         val picks = remember(draft.source, section) { LocalDraftSuggestions.suggest(draft.source).bySection.getOrNull(section).orEmpty() }
             .filterNot { s -> NoteRules.values(draft)[section].lines().any { it.trim() == s.line.words } }
-        if (picks.isNotEmpty()) Surface(shape = RoundedCornerShape(20.dp), color = DoctorStatusWarnBg, modifier = Modifier.fillMaxWidth().testTag("build-suggestions-$section")) {
+        if (picks.isNotEmpty()) Surface(shape = RoundedCornerShape(12.dp), color = DoctorStatusWarnBg, modifier = Modifier.fillMaxWidth().testTag("build-suggestions-$section")) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(t("Suggested", "सुझाव"), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorStatusWarn)
                 picks.forEach { s ->
@@ -44,7 +44,7 @@ import androidx.compose.ui.unit.sp
         }
         lines.forEach { line ->
             val added = NoteRules.values(draft)[section].lines().any { it.trim() == line.words }
-            Surface(shape = RoundedCornerShape(20.dp), color = if (added) DoctorStatusGoodBg else DoctorCardConversation, modifier = Modifier.fillMaxWidth()) {
+            Surface(shape = RoundedCornerShape(12.dp), color = if (added) DoctorStatusGoodBg else DoctorCardConversation, modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(t("Line ${line.number}", "पंक्ति ${line.number}"), fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub)
                     SelectionContainerText(line.text)
@@ -72,8 +72,8 @@ import androidx.compose.ui.unit.sp
         Text("${section + 1} of $count", fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub, modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
         LinearProgressIndicator(progress = { (section + 1f) / count }, modifier = Modifier.fillMaxWidth(), color = DoctorAccent, trackColor = DoctorHairline)
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            OutlinedButton(onClick = onBack, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("build-back")) { Text(t("Back", "वापस")) }
-            Button(onClick = onNext, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("build-next")) { Text(if (section == count - 1) t("Review note", "नोट जाँचें") else t("Next", "आगे"), fontWeight = FontWeight.SemiBold) }
+            OutlinedButton(onClick = onBack, shape = RoundedCornerShape(12.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("build-back")) { Text(t("Back", "वापस")) }
+            Button(onClick = onNext, shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("build-next")) { Text(if (section == count - 1) t("Review note", "नोट जाँचें") else t("Next", "आगे"), fontWeight = FontWeight.SemiBold) }
         }
     }
 }

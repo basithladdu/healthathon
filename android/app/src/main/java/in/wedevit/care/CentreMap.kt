@@ -167,7 +167,7 @@ import org.maplibre.geojson.Point
         key(retry) { AndroidView(factory = { view }, modifier = Modifier.fillMaxSize()) }
         if (!loaded && !failed) CircularProgressIndicator(Modifier.size(28.dp).align(Alignment.Center), color = Rust)
         // One plain line and a retry; the list below still works without the map.
-        if (failed) Surface(Modifier.align(Alignment.Center).padding(16.dp), shape = RoundedCornerShape(20.dp), color = Paper) {
+        if (failed) Surface(Modifier.align(Alignment.Center).padding(16.dp), shape = RoundedCornerShape(12.dp), color = Paper) {
             Row(Modifier.padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.ErrorOutline, null, Modifier.size(20.dp), tint = RustText); Spacer(Modifier.width(8.dp))
                 Text(t("Couldn't load the map.", "नक्शा नहीं खुल सका।"), color = DoctorCardInk, modifier = Modifier.weight(1f, fill = false))
@@ -178,7 +178,7 @@ import org.maplibre.geojson.Point
         if (loaded && located.isNotEmpty()) FilledTonalButton(onClick = {
             val update = bounds(located)
             if (ValueAnimator.areAnimatorsEnabled()) map?.animateCamera(update, 350) else map?.moveCamera(update)
-        }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Paper, contentColor = Ink),
+        }, shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Paper, contentColor = Ink),
             modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).heightIn(min = 48.dp)) { Text(t("Show all", "सभी दिखाएँ"), fontWeight = FontWeight.SemiBold) }
         if (loaded && (userLocation != null || onLocate != null)) SmallFloatingActionButton(onClick = {
             if (userLocation == null) onLocate?.invoke() else {

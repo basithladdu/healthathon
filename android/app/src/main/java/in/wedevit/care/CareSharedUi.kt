@@ -15,7 +15,19 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.Hyphens
+import androidx.compose.ui.text.style.LineBreak
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -74,7 +86,7 @@ import kotlinx.coroutines.launch
         LazyColumn(Modifier.fillMaxSize().padding(padding).imePadding(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             if (cloud == null) item { SurfaceCard { Button(onClick = onAccount) { Text(t("Sign in", "साइन इन")) } } }
             else {
-                item { Text(people.firstOrNull { it.id == selected }?.name.orEmpty(), style = MaterialTheme.typography.titleLarge); OutlinedButton(onClick = { run { refresh(); vm.refresh() } }, enabled = !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Refresh, null); Spacer(Modifier.width(8.dp)); Text(t("Refresh", "ताज़ा करें")) } }
+                item { Text(people.firstOrNull { it.id == selected }?.name.orEmpty(), style = MaterialTheme.typography.titleLarge); OutlinedButton(onClick = { run { refresh(); vm.refresh() } }, enabled = !busy, shape = RoundedCornerShape(12.dp), modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Refresh, null); Spacer(Modifier.width(8.dp)); Text(t("Refresh", "ताज़ा करें")) } }
                 if (error.isNotBlank()) item { SurfaceCard(Peach) { Text(error, Modifier.announce()); TextButton(onClick = { run { refresh() } }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Retry", "फिर कोशिश करें"), color = RustText, fontWeight = FontWeight.Bold) } } }
                 if (notice.isNotBlank()) item { Text(notice, color = Rust, modifier = Modifier.announce()) }
                 item { SurfaceCard(Mint) {
@@ -84,7 +96,7 @@ import kotlinx.coroutines.launch
                         CareField(name, { name = it.take(100) }, t("Registered name", "रजिस्टर्ड नाम"), singleLine = true)
                         CareField(council, { council = it.take(160) }, t("Medical council", "मेडिकल काउंसिल"), singleLine = true)
                         CareField(registration, { registration = it.take(80) }, t("Registration number", "रजिस्ट्रेशन नंबर"), singleLine = true)
-                        Button(onClick = { run { cloud.requestClinician(name, council, registration); refresh(); notice = t("Request received. Verification is pending.", "अनुरोध मिल गया। पुष्टि बाक़ी है।") } }, enabled = !busy && name.isNotBlank() && council.length >= 2 && registration.length >= 2, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(t("Submit", "भेजें")) }
+                        Button(onClick = { run { cloud.requestClinician(name, council, registration); refresh(); notice = t("Request received. Verification is pending.", "अनुरोध मिल गया। पुष्टि बाक़ी है।") } }, enabled = !busy && name.isNotBlank() && council.length >= 2 && registration.length >= 2, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(t("Submit", "भेजें")) }
                     }
                 } }
                 if (verifier) item { CareClinicianReviewPanel(cloud) }
@@ -121,3 +133,68 @@ import kotlinx.coroutines.launch
         }
     }
 }
+
+/** Status tones for the family, care-team and Nearby registers. One place, so the design tokens can replace these values. */
+internal enum class FamilyTone(val fill: Color, val ink: Color) {
+    GOOD(DoctorStatusGoodBg, DoctorStatusGood), WAIT(DoctorStatusWarnBg, DoctorStatusWarn), STOP(Color(0xFFF9DEDC), Color(0xFFB3261E)),
+    INFO(Color(0xFFE0E4F7), Color(0xFF3F51A3)), NEUTRAL(Color(0xFFEFE7DF), DoctorCardSub)
+}
+
+/** Section accents from the Sahara palette (HUMAN_APP_GUIDE §3): each section its own colour; all carry white text at 5.2:1 or better. */
+internal object FamilyAccent {
+    val Teal = Color(0xFF0F6E6A); val Indigo = Color(0xFF3F51A3); val Plum = Color(0xFF8A3B78); val Leaf = Color(0xFF386D29); val Marigold = Color(0xFF8F5A00); val Brick get() = RustText
+}
+
+/** A status pill: a dot plus a word, so the state never rests on colour alone. The word slides when it changes. */
+@Composable internal fun FamilyPill(text: String, tone: FamilyTone, modifier: Modifier = Modifier) {
+    Surface(shape = RoundedCornerShape(50), color = tone.fill, contentColor = tone.ink, modifier = modifier) {
+        Row(Modifier.padding(horizontal = 10.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(8.dp).clip(CircleShape).background(tone.ink)); Spacer(Modifier.width(6.dp))
+            SaharaAnimatedText(text) { Text(it, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false) }
+        }
+    }
+}
+
+/** A coloured section tile: a solid accent badge and title on a light ground, then the section's register or action. */
+@Composable internal fun FamilyTile(title: String, icon: ImageVector, accent: Color, modifier: Modifier = Modifier, trailing: @Composable RowScope.() -> Unit = {}, content: @Composable ColumnScope.() -> Unit) {
+    Surface(shape = RoundedCornerShape(12.dp), color = Paper, border = BorderStroke(1.dp, accent.copy(alpha = .35f)), modifier = modifier.fillMaxWidth().saharaAppear()) {
+        Column(Modifier.saharaContentSize()) {
+            Box(Modifier.fillMaxWidth().height(4.dp).background(accent))
+            Column(Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Surface(shape = RoundedCornerShape(10.dp), color = accent, contentColor = Color.White, modifier = Modifier.size(36.dp)) { Box(contentAlignment = Alignment.Center) { Icon(icon, null, Modifier.size(20.dp)) } }
+                    Spacer(Modifier.width(12.dp))
+                    Text(title, Modifier.weight(1f).a11yHeading(), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk, style = LocalTextStyle.current.copy(lineBreak = LineBreak.Heading, hyphens = Hyphens.None))
+                    trailing()
+                }
+                content()
+            }
+        }
+    }
+}
+
+/** One register row: a title, an optional pill and one quiet line beneath; actions sit at the end. */
+@Composable internal fun FamilyRegisterRow(title: String, meta: String = "", pill: Pair<String, FamilyTone>? = null, modifier: Modifier = Modifier, actions: @Composable RowScope.() -> Unit = {}) {
+    Row(modifier.fillMaxWidth().heightIn(min = 52.dp).saharaAppear(), verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f).padding(vertical = 6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(title, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            if (pill != null || meta.isNotBlank()) Row(verticalAlignment = Alignment.CenterVertically) {
+                pill?.let { (text, tone) -> FamilyPill(text, tone); if (meta.isNotBlank()) Spacer(Modifier.width(8.dp)) }
+                if (meta.isNotBlank()) Text(meta, fontSize = 14.sp, color = DoctorCardSub, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            }
+        }
+        actions()
+    }
+}
+
+/** Before Android's own permission prompt (location, notifications): an icon, one line of why, Allow / Not now. Also the "turned off, open Settings" dialog. */
+@Composable internal fun FamilyPermissionDialog(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, why: String, confirm: String, onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    val t = careText()
+    AlertDialog(onDismissRequest = onDismiss, containerColor = Paper, modifier = Modifier.testTag("permission-dialog"),
+        icon = { Surface(shape = CircleShape, color = FamilyAccent.Teal, contentColor = Color.White, modifier = Modifier.size(52.dp)) { Box(contentAlignment = Alignment.Center) { Icon(icon, null, Modifier.size(28.dp)) } } },
+        title = { Text(title, fontWeight = FontWeight.Bold, textAlign = androidx.compose.ui.text.style.TextAlign.Center) },
+        text = { Text(why, fontSize = 16.sp, color = DoctorCardInk) },
+        confirmButton = { Button(onClick = onConfirm, shape = RoundedCornerShape(12.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("permission-allow")) { Text(confirm, fontWeight = FontWeight.Bold) } },
+        dismissButton = { TextButton(onClick = onDismiss, modifier = Modifier.heightIn(min = 48.dp).testTag("permission-not-now")) { Text(t("Not now", "अभी नहीं"), color = RustText) } })
+}
+

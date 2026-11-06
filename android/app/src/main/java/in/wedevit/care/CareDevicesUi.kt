@@ -61,14 +61,14 @@ import java.time.LocalDate
             Text(t("Couldn't save. Try again.", "सहेजा नहीं जा सका। फिर कोशिश करें।"), color = RustText, fontWeight = FontWeight.Medium)
         } }
         // Empty state: icon, one line, and the one action (the add button sits inside it, so it is never shown twice).
-        if (devices.isEmpty()) item { Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("devices-empty")) {
+        if (devices.isEmpty()) item { Surface(shape = RoundedCornerShape(12.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("devices-empty")) {
             Column(Modifier.padding(horizontal = 16.dp, vertical = 24.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Surface(shape = CircleShape, color = Mint, contentColor = DoctorCardInk, modifier = Modifier.size(48.dp)) { Box(contentAlignment = Alignment.Center) { Icon(Icons.Default.Medication, null, Modifier.size(24.dp)) } }
                 Text(t("No tubes or lines added", "कोई नली या लाइन नहीं जोड़ी गई"), fontSize = 16.sp, color = DoctorCardInk)
             }
         } }
         items(CareDeviceRules.sorted(devices), key = { it.id }) { d -> DevicesCard(d, today, hindi, onCheck = { checking = d }, onEdit = { editing = d }) }
-        item { Button(onClick = { editing = CareDevice() }, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("devices-add"), shape = RoundedCornerShape(14.dp)) {
+        item { Button(onClick = { editing = CareDevice() }, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("devices-add"), shape = RoundedCornerShape(12.dp)) {
             Icon(Icons.Default.Add, null); Spacer(Modifier.width(8.dp)); Text(t("Add tube or line", "नली या लाइन जोड़ें"), fontWeight = FontWeight.SemiBold)
         } }
     }
@@ -86,11 +86,11 @@ import java.time.LocalDate
 
 /** The only advice the screen gives: tell the care team today, with the palliative phone when the care plan has one. */
 @Composable private fun DevicesTellTeam(phone: String, onCall: () -> Unit) { val t = careText()
-    Surface(shape = RoundedCornerShape(20.dp), color = Peach, contentColor = DoctorCardInk, modifier = Modifier.fillMaxWidth().testTag("devices-tell-team").announce()) {
+    Surface(shape = RoundedCornerShape(12.dp), color = Peach, contentColor = DoctorCardInk, modifier = Modifier.fillMaxWidth().testTag("devices-tell-team").announce()) {
         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.WarningAmber, null, tint = RustText); Spacer(Modifier.width(12.dp))
             Text(t("Tell your care team today", "आज ही अपनी देखभाल टीम को बताएँ"), Modifier.weight(1f), fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            if (phone.any(Char::isDigit)) Button(onClick = onCall, modifier = Modifier.heightIn(min = 48.dp).testTag("devices-call-team"), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Paper, contentColor = RustText)) {
+            if (phone.any(Char::isDigit)) Button(onClick = onCall, modifier = Modifier.heightIn(min = 48.dp).testTag("devices-call-team"), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(containerColor = Paper, contentColor = RustText)) {
                 Icon(Icons.Default.Call, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(phone, maxLines = 1)
             }
         }
@@ -100,7 +100,7 @@ import java.time.LocalDate
 @Composable private fun DevicesCard(d: CareDevice, today: LocalDate, hindi: Boolean, onCheck: () -> Unit, onEdit: () -> Unit) { val t = careText()
     val fmt = careDateFormat("d MMM yyyy", hindi)
     val check = CareDeviceRules.checkOn(d, today)
-    Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("device-${d.id}")) {
+    Surface(shape = RoundedCornerShape(12.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().saharaAppear().testTag("device-${d.id}")) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             // Title row: a colour dot for how soon the change is due, the type, and Edit.
             val dueSoon = CareDeviceRules.due(d, today)
@@ -114,16 +114,12 @@ import java.time.LocalDate
             if (line.isNotBlank()) Text(line, fontSize = 14.sp, color = DoctorCardSub, maxLines = 2, overflow = TextOverflow.Ellipsis)
             dueSoon?.let { due ->
                 val n = due.days
-                val (text, color) = when (due.kind) {
-                    CareDeviceDueKind.LATER -> (if (n == 1L) t("Change due in 1 day", "1 दिन में बदलनी है") else t("Change due in $n days", "$n दिन में बदलनी है")) to (if (n <= 7) SaharaSoftGold else Mint)
-                    CareDeviceDueKind.TODAY -> t("Change due today", "आज बदलनी है") to Peach
-                    CareDeviceDueKind.OVERDUE -> (if (n == 1L) t("Change was due 1 day ago", "1 दिन पहले बदलनी थी") else t("Change was due $n days ago", "$n दिन पहले बदलनी थी")) to Peach
+                val (text, tone) = when (due.kind) {
+                    CareDeviceDueKind.LATER -> (if (n == 1L) t("Change due in 1 day", "1 दिन में बदलनी है") else t("Change due in $n days", "$n दिन में बदलनी है")) to (if (n <= 7) FamilyTone.WAIT else FamilyTone.GOOD)
+                    CareDeviceDueKind.TODAY -> t("Change due today", "आज बदलनी है") to FamilyTone.STOP
+                    CareDeviceDueKind.OVERDUE -> (if (n == 1L) t("Change was due 1 day ago", "1 दिन पहले बदलनी थी") else t("Change was due $n days ago", "$n दिन पहले बदलनी थी")) to FamilyTone.STOP
                 }
-                Surface(shape = RoundedCornerShape(50), color = color, contentColor = DoctorCardInk, modifier = Modifier.testTag("device-due-${d.id}")) {
-                    Row(Modifier.padding(horizontal = 10.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Event, null, Modifier.size(16.dp)); Spacer(Modifier.width(6.dp)); Text(text, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-                    }
-                }
+                FamilyPill(text, tone, Modifier.testTag("device-due-${d.id}"))
             }
             if (d.notes.isNotBlank()) Text(d.notes, fontSize = 14.sp, color = DoctorCardInk, maxLines = 3, overflow = TextOverflow.Ellipsis)
             val checkText = when {
@@ -136,7 +132,7 @@ import java.time.LocalDate
                 Icon(if (fine) Icons.Default.CheckCircle else Icons.Default.WarningAmber, null, Modifier.size(18.dp), tint = if (fine) DoctorStatusGood else RustText); Spacer(Modifier.width(6.dp))
                 Text(it, fontSize = 14.sp, color = if (fine) DoctorCardSub else RustText, fontWeight = FontWeight.Medium)
             } }
-            OutlinedButton(onClick = onCheck, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("device-check-${d.id}"), shape = RoundedCornerShape(14.dp)) {
+            OutlinedButton(onClick = onCheck, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("device-check-${d.id}"), shape = RoundedCornerShape(12.dp), border = BorderStroke(1.5.dp, RustText)) {
                 Icon(Icons.Default.Checklist, null, Modifier.size(18.dp), tint = RustText); Spacer(Modifier.width(8.dp)); Text(if (check == null) t("Daily check", "रोज़ की जाँच") else t("Check again", "फिर से जाँचें"), color = RustText, fontWeight = FontWeight.SemiBold)
             }
         }
@@ -158,7 +154,7 @@ import java.time.LocalDate
                 Text(t("Tell your care team today", "आज ही अपनी देखभाल टीम को बताएँ"), fontWeight = FontWeight.Bold, color = RustText)
             }
         } },
-        confirmButton = { Button(onClick = { onSave(signs) }, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("device-check-save")) { Text(if (signs.isEmpty()) t("All fine", "सब ठीक") else t("Save", "सहेजें"), fontWeight = FontWeight.SemiBold) } },
+        confirmButton = { Button(onClick = { onSave(signs) }, shape = RoundedCornerShape(12.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("device-check-save")) { Text(if (signs.isEmpty()) t("All fine", "सब ठीक") else t("Save", "सहेजें"), fontWeight = FontWeight.SemiBold) } },
         dismissButton = { TextButton(onClick = onDismiss, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें")) } })
 }
 
@@ -184,17 +180,17 @@ import java.time.LocalDate
                 DevicesDateButton(t("Next change due", "अगली बार बदलना"), changeDue?.format(fmt), Modifier.weight(1f).testTag("device-change-due")) { pick(changeDue ?: inserted) { changeDue = it } }
             }
             OutlinedTextField(centre, { centre = it.take(120) }, Modifier.fillMaxWidth().testTag("device-centre"), label = { Text(t("Centre where it was put in", "कहाँ लगाई गई (अस्पताल)")) },
-                leadingIcon = { Icon(Icons.Default.LocalHospital, null, Modifier.size(20.dp), tint = DoctorAccent) }, singleLine = true, shape = RoundedCornerShape(14.dp),
+                leadingIcon = { Icon(Icons.Default.LocalHospital, null, Modifier.size(20.dp), tint = DoctorAccent) }, singleLine = true, shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper, focusedBorderColor = Rust, focusedLabelColor = RustText, cursorColor = Rust))
             OutlinedTextField(notes, { notes = it.take(500) }, Modifier.fillMaxWidth().testTag("device-notes"), label = { Text(t("Problems or notes (optional)", "दिक़्क़तें या नोट (ज़रूरी नहीं)")) },
-                minLines = 2, shape = RoundedCornerShape(14.dp), colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper, focusedBorderColor = Rust, focusedLabelColor = RustText, cursorColor = Rust))
+                minLines = 2, shape = RoundedCornerShape(12.dp), colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper, focusedBorderColor = Rust, focusedLabelColor = RustText, cursorColor = Rust))
             error?.let { Text(t(it.en, it.hi), color = RustText, fontSize = 14.sp, fontWeight = FontWeight.Medium, modifier = Modifier.announce()) }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                OutlinedButton(onClick = onDismiss, modifier = Modifier.weight(1f).heightIn(min = 52.dp), shape = RoundedCornerShape(14.dp)) { Text(t("Cancel", "रद्द करें")) }
+                OutlinedButton(onClick = onDismiss, modifier = Modifier.weight(1f).heightIn(min = 52.dp), shape = RoundedCornerShape(12.dp)) { Text(t("Cancel", "रद्द करें")) }
                 Button(onClick = {
                     val bad = CareDeviceRules.error(inserted, changeDue, LocalDate.now())
                     if (bad != null) error = bad else onSave(initial.copy(type = type, inserted = inserted, changeDue = changeDue, centre = centre.trim(), notes = notes.trim()))
-                }, modifier = Modifier.weight(1f).heightIn(min = 52.dp).testTag("device-save"), shape = RoundedCornerShape(14.dp)) { Text(t("Save", "सहेजें"), fontWeight = FontWeight.SemiBold) }
+                }, modifier = Modifier.weight(1f).heightIn(min = 52.dp).testTag("device-save"), shape = RoundedCornerShape(12.dp)) { Text(t("Save", "सहेजें"), fontWeight = FontWeight.SemiBold) }
             }
             if (existing) TextButton(onClick = { confirmRemove = true }, modifier = Modifier.align(Alignment.CenterHorizontally).heightIn(min = 48.dp).testTag("device-remove")) {
                 Icon(Icons.Default.Delete, null, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.error); Spacer(Modifier.width(6.dp)); Text(t("Remove", "हटाएँ"), color = MaterialTheme.colorScheme.error)
@@ -203,12 +199,12 @@ import java.time.LocalDate
     }
     if (confirmRemove) AlertDialog(onDismissRequest = { confirmRemove = false }, containerColor = Cream,
         title = { Text(t("Remove this tube or line?", "यह नली या लाइन हटाएँ?"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium) },
-        confirmButton = { Button(onClick = { confirmRemove = false; onRemove() }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error, contentColor = MaterialTheme.colorScheme.onError), modifier = Modifier.heightIn(min = 48.dp).testTag("device-remove-confirm")) { Text(t("Remove", "हटाएँ")) } },
+        confirmButton = { Button(onClick = { confirmRemove = false; onRemove() }, shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error, contentColor = MaterialTheme.colorScheme.onError), modifier = Modifier.heightIn(min = 48.dp).testTag("device-remove-confirm")) { Text(t("Remove", "हटाएँ")) } },
         dismissButton = { TextButton(onClick = { confirmRemove = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें")) } })
 }
 
 @Composable private fun DevicesDateButton(label: String, value: String?, modifier: Modifier, onClick: () -> Unit) {
-    OutlinedButton(onClick = onClick, modifier = modifier.heightIn(min = 56.dp), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.outlinedButtonColors(containerColor = Paper),
+    OutlinedButton(onClick = onClick, modifier = modifier.heightIn(min = 56.dp), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.outlinedButtonColors(containerColor = Paper),
         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)) {
         Column(Modifier.fillMaxWidth()) {
             Text(label, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)

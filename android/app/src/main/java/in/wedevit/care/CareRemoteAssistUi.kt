@@ -81,7 +81,7 @@ import kotlinx.coroutines.withContext
                         catch (error: Exception) { message = error.message ?: t("Could not turn speech into text.", "बात लिखाई में नहीं बदल सकी।") }
                         finally { busy = false }
                     }
-                }, enabled = consent && recordingConsent != null && !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("care-transcribe-turn")) { CareAssistBusy(busy); Text(if (busy) t("Turning speech into text…", "बात लिखाई में बदल रही है…") else t("Turn speech into text", "बात को लिखाई में बदलें")) }
+                }, enabled = consent && recordingConsent != null && !busy, shape = RoundedCornerShape(12.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("care-transcribe-turn")) { CareAssistBusy(busy); Text(if (busy) t("Turning speech into text…", "बात लिखाई में बदल रही है…") else t("Turn speech into text", "बात को लिखाई में बदलें")) }
                 if (busy) TextButton(onClick = { job?.cancel() }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Stop", "रोकें"), color = RustText) }
             }
         }
@@ -99,7 +99,7 @@ import kotlinx.coroutines.withContext
             Button(onClick = {
                 try { latestAppend(CareDraftAssist.appendReviewedTranscript(latestSource, transcript.original, words, speaker, transcript.language, checked)); result = null; checked = false }
                 catch (error: IllegalArgumentException) { message = error.message.orEmpty() }
-            }, enabled = checked && words.isNotBlank(), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-transcript-use")) { Text(t("Add checked text", "जाँची लिखाई जोड़ें"), fontWeight = FontWeight.SemiBold) }
+            }, enabled = checked && words.isNotBlank(), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-transcript-use")) { Text(t("Add checked text", "जाँची लिखाई जोड़ें"), fontWeight = FontWeight.SemiBold) }
         }
         if (message.isNotBlank()) Text(message, fontSize = 14.sp, color = DoctorCardInk, modifier = Modifier.announce())
     }
@@ -149,7 +149,7 @@ import kotlinx.coroutines.withContext
                         catch (error: Exception) { message = error.message ?: t("The draft could not be made.", "ड्राफ़्ट नहीं बन सका।") }
                         finally { busy = false }
                     }
-                }, enabled = consent && source.isNotBlank() && source.length <= 12000 && !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("care-assist-draft")) { CareAssistBusy(busy); Text(if (busy) t("Preparing draft…", "ड्राफ़्ट बन रहा है…") else t("Make draft", "ड्राफ़्ट बनाएँ")) }
+                }, enabled = consent && source.isNotBlank() && source.length <= 12000 && !busy, shape = RoundedCornerShape(12.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("care-assist-draft")) { CareAssistBusy(busy); Text(if (busy) t("Preparing draft…", "ड्राफ़्ट बन रहा है…") else t("Make draft", "ड्राफ़्ट बनाएँ")) }
                 if (busy) TextButton(onClick = { job?.cancel() }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Stop", "रोकें"), color = RustText) }
             }
         }
@@ -167,7 +167,7 @@ import kotlinx.coroutines.withContext
             Button(onClick = {
                 if (draft.sourceHash == careAssistSourceHash(latestSource)) { latestUse(draft); result = null; checked = false }
                 else message = t("The conversation changed. Prepare a fresh draft.", "बातचीत बदल गई। नया ड्राफ़्ट बनाएँ।")
-            }, enabled = checked && !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-assist-use")) { Text(t("Use checked draft", "जाँचा ड्राफ़्ट इस्तेमाल करें"), fontWeight = FontWeight.SemiBold) }
+            }, enabled = checked && !busy, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-assist-use")) { Text(t("Use checked draft", "जाँचा ड्राफ़्ट इस्तेमाल करें"), fontWeight = FontWeight.SemiBold) }
         }
         if (message.isNotBlank()) Text(message, fontSize = 14.sp, color = DoctorCardInk, modifier = Modifier.announce())
     }
@@ -216,7 +216,7 @@ import kotlinx.coroutines.withContext
                         catch (error: Exception) { message = error.message ?: t("Could not translate.", "अनुवाद नहीं हो सका।") }
                         finally { busy = false }
                     }
-                }, enabled = consent && !busy && from != to && source.isNotBlank(), shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("care-translate")) { CareAssistBusy(busy); Text(if (busy) t("Translating…", "अनुवाद हो रहा है…") else t("Translate note", "नोट का अनुवाद करें")) }
+                }, enabled = consent && !busy && from != to && source.isNotBlank(), shape = RoundedCornerShape(12.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("care-translate")) { CareAssistBusy(busy); Text(if (busy) t("Translating…", "अनुवाद हो रहा है…") else t("Translate note", "नोट का अनुवाद करें")) }
                 if (busy) TextButton(onClick = { job?.cancel() }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Stop", "रोकें"), color = RustText) }
             }
         }

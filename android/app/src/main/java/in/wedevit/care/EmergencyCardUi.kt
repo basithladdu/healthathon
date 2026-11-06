@@ -32,6 +32,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Print
@@ -207,6 +208,8 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
     var linkBusy by remember(selected) { mutableStateOf(false) }
     var linkStatus by remember(selected) { mutableStateOf<EmergencyLinkStatus?>(null) }
     var busy by remember(selected) { mutableStateOf(false) }
+    // Failures open a small dialog instead of a passing toast; routine "saved" lines stay as the quiet tick.
+    var alert by remember(selected) { mutableStateOf<String?>(null) }
     val name = people.firstOrNull { it.id == selected }?.name.orEmpty()
     val source = remember(name, items, versions, acknowledgements, trustedAcks, contacts) {
         EmergencySource(
@@ -259,7 +262,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
         val c = record
         if (uri != null && c != null) scope.launch {
             try { withContext(Dispatchers.IO) { val file = ensurePdf(c); (context.contentResolver.openOutputStream(uri) ?: error("File unavailable")).use { out -> file.inputStream().use { it.copyTo(out) } } }; vm.message.value = t("Card PDF saved", "कार्ड PDF सहेजा गया") }
-            catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; vm.message.value = t("Couldn't save the PDF. Try again.", "PDF सहेजा नहीं जा सका।") }
+            catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; alert = t("Couldn't save the PDF. Try again.", "PDF सहेजा नहीं जा सका।") }
         }
     }
     val saveLocked = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { uri ->
@@ -269,7 +272,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
             try {
                 withContext(Dispatchers.IO) { val locked = PdfPasswordLock.lock(ensurePdf(c).readBytes(), password); (context.contentResolver.openOutputStream(uri) ?: error("File unavailable")).use { it.write(locked) } }
                 vm.message.value = t("Locked PDF saved", "पासवर्ड वाला PDF सहेजा गया")
-            } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; vm.message.value = t("Couldn't save the locked PDF. Try again.", "PDF सहेजा नहीं जा सका।") }
+            } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; alert = t("Couldn't save the locked PDF. Try again.", "PDF सहेजा नहीं जा सका।") }
         }
     }
     fun share(c: EmergencyCardRecord, password: String? = null) = scope.launch {
@@ -277,14 +280,14 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
             val file = withContext(Dispatchers.IO) { val plain = ensurePdf(c); if (password == null) plain else store.lockedPdf(c).also { it.writeBytes(PdfPasswordLock.lock(plain.readBytes(), password)) } }
             val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
             context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("application/pdf").putExtra(Intent.EXTRA_STREAM, uri).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), t("Share the emergency card", "आपातकालीन कार्ड साझा करें")))
-        } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; vm.message.value = t("No app to share with.", "साझा करने के लिए ऐप नहीं है।") }
+        } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; alert = t("No app to share with.", "साझा करने के लिए ऐप नहीं है।") }
     }
     fun print(c: EmergencyCardRecord) = scope.launch {
         try {
             val file = withContext(Dispatchers.IO) { ensurePdf(c) }
             val manager = context.getSystemService(Context.PRINT_SERVICE) as PrintManager
             manager.print("Sahara emergency card ${c.number}", PdfFilePrintAdapter(file, "Sahara-emergency-card-${c.number}.pdf"), null)
-        } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; vm.message.value = t("Printing isn't available.", "प्रिंट उपलब्ध नहीं है।") }
+        } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; alert = t("Printing isn't available.", "प्रिंट उपलब्ध नहीं है।") }
     }
     fun remake(sections: Set<EmergencySection>, previous: EmergencyCardRecord?) = scope.launch {
         if (busy) return@launch
@@ -294,7 +297,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
             record = made; setup = false
             if (blocked == null) try { record = syncLink(made, fresh = made.link == null) } catch (e: EmergencyLinkException) { linkProblem = e.problem } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; linkProblem = EmergencyLinkProblem.OFFLINE }
             vm.message.value = if (previous == null) t("Card ready", "कार्ड तैयार") else t("Card updated", "कार्ड अपडेट हुआ")
-        } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; vm.message.value = e.message ?: t("Couldn't make the card. Try again.", "कार्ड नहीं बना।") }
+        } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; alert = e.message ?: t("Couldn't make the card. Try again.", "कार्ड नहीं बना।") }
         finally { busy = false }
     }
 
@@ -302,6 +305,9 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
     LaunchedEffect(selected, ready, card == null) {
         if (card == null && ready && selected.isNotBlank() && !busy) remake(EmergencySection.entries.toSet(), null)
     }
+    alert?.let { message -> AlertDialog(onDismissRequest = { alert = null }, containerColor = Paper, modifier = Modifier.testTag("emergency-card-alert"),
+        icon = { Icon(Icons.Default.ErrorOutline, null, tint = DoctorStatusRest) }, text = { Text(message, fontSize = 16.sp, color = Ink) },
+        confirmButton = { TextButton(onClick = { alert = null }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("OK", "ठीक है"), fontWeight = FontWeight.Bold) } }) }
     if (selected.isBlank()) return
     if (card == null || qr == null) {
         ActionCard(Peach, modifier = Modifier.fillMaxWidth().testTag("emergency-card-entry"), onClick = { if (ready && !busy) remake(EmergencySection.entries.toSet(), null) }) {
@@ -316,31 +322,34 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
         val stale = ready && runCatching { card.outOfDate(source) }.getOrDefault(false)
         val shownQr = linkQr ?: qr
         val link = card.link
-        Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = androidx.compose.foundation.BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("emergency-card")) {
-            Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Surface(shape = RoundedCornerShape(12.dp), color = Paper, border = androidx.compose.foundation.BorderStroke(1.5.dp, FamilyAccent.Marigold.copy(alpha = .5f)), modifier = Modifier.fillMaxWidth().testTag("emergency-card")) {
+            Column(Modifier.saharaContentSize().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 QrImage(shownQr, if (link != null) t("Emergency web link QR code", "आपातकालीन वेब लिंक QR कोड") else t("Emergency card offline QR code", "आपातकालीन कार्ड ऑफ़लाइन QR कोड"), Modifier.fillMaxWidth().widthIn(max = 340.dp).clickable(onClickLabel = t("Show full screen", "पूरी स्क्रीन पर दिखाएँ")) { fullScreen = true }.testTag("emergency-card-qr"))
                 if (name.isNotBlank()) Text(name, fontWeight = FontWeight.Bold, fontSize = 22.sp, color = Ink, textAlign = TextAlign.Center, modifier = Modifier.testTag("emergency-card-name"))
                 Text(t("Scan in an emergency", "आपातकाल में स्कैन करें"), fontSize = 16.sp, color = DoctorCardSub, textAlign = TextAlign.Center)
                 val problem = linkProblem
+                // Which code the QR carries, as a pill: the live web link or the offline code only.
+                if (!linkBusy) FamilyPill(when { link != null && problem == null -> t("Web link on", "वेब लिंक चालू"); stale -> t("Out of date", "पुराना है"); else -> t("Offline code", "ऑफ़लाइन कोड") },
+                    when { stale -> FamilyTone.WAIT; link != null && problem == null -> FamilyTone.GOOD; else -> FamilyTone.NEUTRAL }, Modifier.testTag("emergency-card-status"))
                 if (linkBusy) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = Rust)
-                else if (problem != null) Column(Modifier.fillMaxWidth().background(DoctorStatusWarnBg, RoundedCornerShape(14.dp)).padding(12.dp).testTag("emergency-link-problem")) {
+                else if (problem != null) Column(Modifier.fillMaxWidth().background(DoctorStatusWarnBg, RoundedCornerShape(12.dp)).padding(12.dp).testTag("emergency-link-problem")) {
                     Text(t(problem.en, problem.hi), fontSize = 14.sp, color = DoctorStatusWarn)
                     if (problem == EmergencyLinkProblem.OFFLINE || problem == EmergencyLinkProblem.NOT_SET_UP || problem == EmergencyLinkProblem.LINK_OFF) TextButton(onClick = {
                         scope.launch {
                             linkBusy = true
                             try { record = syncLink(record ?: return@launch, fresh = problem == EmergencyLinkProblem.LINK_OFF || record?.link == null); vm.message.value = t("Web link is live", "वेब लिंक चालू है") }
-                            catch (e: EmergencyLinkException) { linkProblem = e.problem; vm.message.value = t(e.problem.en, e.problem.hi) }
+                            catch (e: EmergencyLinkException) { linkProblem = e.problem; alert = t(e.problem.en, e.problem.hi) }
                             catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; linkProblem = EmergencyLinkProblem.OFFLINE }
                             finally { linkBusy = false }
                         }
                     }, enabled = !linkBusy, modifier = Modifier.heightIn(min = 48.dp)) { Text(if (problem == EmergencyLinkProblem.LINK_OFF) t("Make a new link", "नया लिंक बनाएँ") else t("Try again", "फिर कोशिश करें")) }
                 }
-                if (stale) Column(Modifier.fillMaxWidth().background(DoctorStatusWarnBg, RoundedCornerShape(14.dp)).padding(12.dp).testTag("emergency-card-stale")) {
+                if (stale) Column(Modifier.fillMaxWidth().background(DoctorStatusWarnBg, RoundedCornerShape(12.dp)).padding(12.dp).testTag("emergency-card-stale")) {
                     TextButton(onClick = { remake(card.sections, card) }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp).testTag("emergency-card-update")) { Text(t("Update card", "कार्ड अपडेट करें")) }
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(onClick = { share(card) }, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("emergency-card-share")) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Share", "साझा करें")) }
-                    OutlinedButton(onClick = { print(card) }, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("emergency-card-print")) { Icon(Icons.Default.Print, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Print / Save", "प्रिंट / सहेजें")) }
+                    Button(onClick = { share(card) }, shape = RoundedCornerShape(12.dp), elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp, pressedElevation = 0.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("emergency-card-share")) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Share", "साझा करें")) }
+                    OutlinedButton(onClick = { print(card) }, shape = RoundedCornerShape(12.dp), border = androidx.compose.foundation.BorderStroke(1.5.dp, Ink), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("emergency-card-print")) { Icon(Icons.Default.Print, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Print / Save", "प्रिंट / सहेजें")) }
                 }
                 TextButton(onClick = { setup = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp).testTag("emergency-card-replace")) { Text(t("Edit", "बदलें")) }
             }
@@ -354,8 +363,8 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
                 scope.launch {
                     linkBusy = true
                     try { record = syncLink(record ?: return@launch, fresh = true); vm.message.value = t("Link replaced", "लिंक बदल दिया गया") }
-                    catch (e: EmergencyLinkException) { linkProblem = e.problem; vm.message.value = t(e.problem.en, e.problem.hi) }
-                    catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; vm.message.value = t(EmergencyLinkProblem.OFFLINE.en, EmergencyLinkProblem.OFFLINE.hi) }
+                    catch (e: EmergencyLinkException) { linkProblem = e.problem; alert = t(e.problem.en, e.problem.hi) }
+                    catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; alert = t(EmergencyLinkProblem.OFFLINE.en, EmergencyLinkProblem.OFFLINE.hi) }
                     finally { linkBusy = false }
                 }
             }, modifier = Modifier.testTag("emergency-link-replace-confirm")) { Text(t("Replace link", "लिंक बदलें")) } },
@@ -369,8 +378,8 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
             readNote?.takeIf { EmergencySection.GOALS in c.sections }?.let { note ->
                 OutlinedButton(onClick = { setup = false; onRead(note) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("emergency-card-note")) { Icon(Icons.Default.Description, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Read note", "नोट पढ़ें")) }
             }
-            OutlinedButton(onClick = { setup = false; savePdf.launch("Sahara-emergency-card-${c.number}.pdf") }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("emergency-card-save")) { Icon(Icons.Default.FileDownload, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Save PDF", "PDF सहेजें")) }
-            OutlinedButton(onClick = { setup = false; lockFor = "" }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("emergency-card-lock")) { Icon(Icons.Default.Lock, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Locked PDF", "लॉक PDF")) }
+            OutlinedButton(onClick = { setup = false; savePdf.launch("Sahara-emergency-card-${c.number}.pdf") }, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("emergency-card-save")) { Icon(Icons.Default.FileDownload, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Save PDF", "PDF सहेजें")) }
+            OutlinedButton(onClick = { setup = false; lockFor = "" }, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("emergency-card-lock")) { Icon(Icons.Default.Lock, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Locked PDF", "लॉक PDF")) }
             if (c.link != null && blocked == null) TextButton(onClick = { setup = false; confirmNewLink = true }, enabled = !linkBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("emergency-link-replace")) { Text(t("Replace link", "लिंक बदलें"), color = RustText) }
         }
     }
@@ -406,7 +415,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
                 Spacer(Modifier.height(16.dp))
                 Text(t("Card ${card.number} · ID ${card.id} · made ${cardDay(card.madeAt)}", "कार्ड ${card.number} · ID ${card.id} · बना ${cardDay(card.madeAt)}"), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black, textAlign = TextAlign.Center)
                 Spacer(Modifier.height(12.dp))
-                if (linkQr != null) OutlinedButton(onClick = { offline = !offline }, shape = RoundedCornerShape(14.dp), border = androidx.compose.foundation.BorderStroke(1.5.dp, RustText), modifier = Modifier.heightIn(min = 48.dp).testTag("emergency-fullscreen-toggle")) { Text(if (offline) t("Web link code", "वेब लिंक कोड") else t("Offline code", "ऑफ़लाइन कोड"), color = RustText) }
+                if (linkQr != null) OutlinedButton(onClick = { offline = !offline }, shape = RoundedCornerShape(12.dp), border = androidx.compose.foundation.BorderStroke(1.5.dp, RustText), modifier = Modifier.heightIn(min = 48.dp).testTag("emergency-fullscreen-toggle")) { Text(if (offline) t("Web link code", "वेब लिंक कोड") else t("Offline code", "ऑफ़लाइन कोड"), color = RustText) }
             }
         }
     }
@@ -437,7 +446,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
                 Spacer(Modifier.height(6.dp)); Text(preview.text, fontFamily = FontFamily.Monospace, fontSize = 12.sp, lineHeight = 16.sp, modifier = Modifier.testTag("emergency-card-preview"))
                 if (preview.leftOut.isNotEmpty()) Text(t("Left out: ", "छोड़ा गया: ") + preview.leftOut.joinToString("; "), style = MaterialTheme.typography.bodySmall, color = RustText)
             } }
-            item { Button(onClick = { onMake(sections) }, enabled = ready && preview != null, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("emergency-card-make")) { Text(if (!ready) t("Loading…", "लोड हो रहा है…") else if (sections.isEmpty()) t("Choose", "चुनें") else if (previous == null) t("Make card", "कार्ड बनाएँ") else t("Save", "सहेजें")) } }
+            item { Button(onClick = { onMake(sections) }, enabled = ready && preview != null, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("emergency-card-make")) { Text(if (!ready) t("Loading…", "लोड हो रहा है…") else if (sections.isEmpty()) t("Choose", "चुनें") else if (previous == null) t("Make card", "कार्ड बनाएँ") else t("Save", "सहेजें")) } }
             item { extras() }
         }
     }
