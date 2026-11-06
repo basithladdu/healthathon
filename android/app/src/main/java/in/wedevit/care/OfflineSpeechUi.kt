@@ -99,8 +99,7 @@ import java.io.File
             OfflineSpeechLanguage.entries.forEach { choice -> FilterChip(selected = language == choice.name, onClick = { language = choice.name }, enabled = !busy, label = { Text(choice.label) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp).testTag("offline-language-${choice.name}")) }
         }
         if (!ready) {
-            Text(t("Hindi / English language pack · 987 MB", "हिन्दी / अंग्रेज़ी भाषा पैक · 987 MB"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.padding(vertical = 4.dp))
-            Button(onClick = { runOperation(t("Downloading…", "डाउनलोड हो रहा है…")) { models.download { done, total -> progressFlow.value = done to total }; ready = true } }, enabled = enabled && !checking && !busy, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("offline-model-download")) { Icon(Icons.Default.Download, null); Spacer(Modifier.width(8.dp)); Text(if (checking) t("Checking language pack…", "भाषा पैक जाँच रहे हैं…") else t("Download", "डाउनलोड करें")) }
+            Button(onClick = { runOperation(t("Downloading…", "डाउनलोड हो रहा है…")) { models.download { done, total -> progressFlow.value = done to total }; ready = true } }, enabled = enabled && !checking && !busy, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("offline-model-download")) { Icon(Icons.Default.Download, null); Spacer(Modifier.width(8.dp)); Text(if (checking) t("Checking language pack…", "भाषा पैक जाँच रहे हैं…") else t("Download Hindi / English pack (987 MB)", "हिन्दी / अंग्रेज़ी पैक डाउनलोड करें (987 MB)")) }
         } else {
             Button(onClick = { runOperation(t("Turning into text", "लिखाई बन रही है")) {
                 val next = engine.transcribe(file, consent, consent.personId, OfflineSpeechLanguage.valueOf(language)) { done, total -> progressFlow.value = done to total }

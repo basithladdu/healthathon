@@ -5075,6 +5075,17 @@ Make the full care plan	పూర్తి సంరక్షణ ప్రణా
 Plan, pocket emergency card, living will	ప్రణాళిక, జేబులో ఉంచే అత్యవసర కార్డ్, లివింగ్ విల్
 Pocket emergency card	జేబులో ఉంచే అత్యవసర కార్డ్
 Step ${step + 1} · $name	దశ ${step + 1} · $name
+Card file	కార్డ్ ఫైల్
+Change access for ${member.email}	${member.email} యాక్సెస్ మార్చండి
+Download Hindi / English pack (987 MB)	హిందీ / ఇంగ్లీష్ ప్యాక్ డౌన్‌లోడ్ చేయండి (987 MB)
+Edit card and PDF	కార్డ్ మరియు PDF మార్చండి
+Filters	ఫిల్టర్లు
+Filters · $filterCount	ఫిల్టర్లు · $filterCount
+Save card	కార్డ్ సేవ్ చేయండి
+Send suggestion	సూచన పంపండి
+Share invite	ఆహ్వానం పంపండి
+Show $count centres	$count కేంద్రాలు చూపించండి
+Show 1 centre	1 కేంద్రం చూపించండి
 SOS · Emergency help	SOS · అత్యవసర సహాయం
 None planned · Add a visit	ఏదీ నిర్ణయించలేదు · సందర్శన జోడించండి
 All care tools	అన్ని సంరక్షణ సాధనాలు

@@ -119,7 +119,7 @@ internal suspend fun CareCloud.myCentreSuggestions(account: String): List<Centre
     ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Cream) {
         val fieldShape = RoundedCornerShape(12.dp)
         val fieldColors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper, focusedBorderColor = Rust, focusedLabelColor = RustText, cursorColor = Rust)
-        Column(Modifier.padding(horizontal = 16.dp).padding(bottom = 32.dp).verticalScroll(rememberScrollState()).testTag("centre-suggestion-sheet"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.padding(horizontal = 16.dp).padding(bottom = 32.dp).imePadding().verticalScroll(rememberScrollState()).saharaScreenEnter().testTag("centre-suggestion-sheet"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(t("Suggest a centre", "केंद्र सुझाएँ"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 22.sp, color = DoctorCardInk, modifier = Modifier.a11yHeading())
             when {
                 vm.cloud == null -> {
@@ -129,10 +129,10 @@ internal suspend fun CareCloud.myCentreSuggestions(account: String): List<Centre
                 result.isNotBlank() -> {
                     val (en, hi) = CentreSuggestionRules.statusText(result)
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Outlined.CheckCircle, null, Modifier.size(28.dp), tint = DoctorStatusGood); Spacer(Modifier.width(10.dp))
+                        SaharaSuccessTick(size = 32); Spacer(Modifier.width(10.dp))
                         FamilyPill(t(en, hi), if (result == "kept") FamilyTone.NEUTRAL else FamilyTone.WAIT, Modifier.testTag("centre-suggestion-result").announce())
                     }
-                    Button(onClick = onDismiss, shape = fieldShape, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(t("Done", "हो गया"), fontWeight = FontWeight.SemiBold) }
+                    SaharaPrimaryButton(t("Done", "हो गया"), onClick = onDismiss, tone = SaharaTone.Marigold, modifier = Modifier.fillMaxWidth())
                 }
                 else -> {
                     OutlinedTextField(name, { name = it.take(CentreSuggestionRules.NAME_MAX) }, label = { Text(t("Centre name", "केंद्र का नाम")) }, singleLine = true, shape = fieldShape, colors = fieldColors, modifier = Modifier.fillMaxWidth().testTag("suggest-name"))
@@ -148,14 +148,11 @@ internal suspend fun CareCloud.myCentreSuggestions(account: String): List<Centre
                         Icon(Icons.Default.Add, null, Modifier.size(18.dp), tint = RustText); Spacer(Modifier.width(8.dp)); Text(t("More details", "और जानकारी"), color = RustText)
                     }
                     problem?.let { (en, hi) -> Text(t(en, hi), color = MaterialTheme.colorScheme.error, fontSize = 14.sp, modifier = Modifier.announce()) }
-                    Button(onClick = {
+                    SaharaPrimaryButton(t("Send suggestion", "सुझाव भेजें"), onClick = {
                         val draft = CentreSuggestionDraft(name, city, state, address, phone, note)
                         problem = CentreSuggestionRules.error(draft)
                         if (problem == null) vm.suggestCentre(draft) { status -> result = status }
-                    }, enabled = !sending, shape = fieldShape, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("suggest-send")) {
-                        if (sending) { CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary); Spacer(Modifier.width(8.dp)) }
-                        Text(t("Send", "भेजें"), fontWeight = FontWeight.SemiBold)
-                    }
+                    }, busy = sending, tone = SaharaTone.Marigold, icon = Icons.Default.AddLocationAlt, modifier = Modifier.fillMaxWidth().testTag("suggest-send"))
                 }
             }
         }

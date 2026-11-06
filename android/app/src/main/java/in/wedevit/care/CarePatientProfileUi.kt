@@ -212,8 +212,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
     var error by remember { mutableStateOf<ProfileError?>(null) }
     fun sexLabel(v: String) = when (v) { "Female" -> t("Female", "महिला"); "Male" -> t("Male", "पुरुष"); else -> t("Other", "अन्य") }
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
-        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = 16.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(t("Edit profile", "प्रोफ़ाइल बदलें"), fontFamily = SaharaTitleFont, fontSize = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+        // The fields scroll; Save stays pinned at the bottom above the keyboard, so it is never a scroll away.
+        Column(Modifier.fillMaxWidth().imePadding().padding(horizontal = 16.dp).padding(bottom = 16.dp).saharaScreenEnter()) {
+          Text(t("Edit profile", "प्रोफ़ाइल बदलें"), Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+          Spacer(Modifier.height(8.dp))
+          Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             ProfileStep(1, t("About", "परिचय")) {
                 ProfileField(age, { age = it.filter(Char::isDigit).take(3) }, t("Age (years)", "उम्र (साल)"), Icons.Default.Cake, KeyboardType.Number)
                 Text(t("Sex", "लिंग"), fontSize = 14.sp, color = DoctorCardSub)
@@ -235,32 +238,27 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                 ProfileField(phone, { phone = it.take(20) }, t("Phone", "फ़ोन"), Icons.Default.Phone, KeyboardType.Phone)
                 ProfileField(address, { address = it.take(160) }, t("City / address", "शहर / पता"), Icons.Default.Place)
             }
-            error?.let { Text(t(it.en, it.hi), color = RustText, fontSize = 14.sp, fontWeight = FontWeight.Medium) }
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                OutlinedButton(onClick = onDismiss, modifier = Modifier.weight(1f).heightIn(min = 52.dp), shape = RoundedCornerShape(12.dp)) { Text(t("Cancel", "रद्द करें")) }
-                Button(onClick = {
-                    val a = CarePatientProfileRules.age(age); val w = CarePatientProfileRules.weight(weight); val h = CarePatientProfileRules.height(height)
-                    val bad = a.second ?: w.second ?: h.second
-                    if (bad != null) error = bad
-                    else onSave(CarePatientProfile(a.first, sex, w.first, h.first, blood, illness.trim(), allergies.trim(), phone.trim(), address.trim(), CareWeightHistory.afterSave(initial, w.first, java.time.LocalDate.now())))
-                }, enabled = !busy, modifier = Modifier.weight(1f).heightIn(min = 52.dp).testTag("patient-profile-save"), shape = RoundedCornerShape(12.dp)) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Save", "सहेजें")) }
-            }
+            error?.let { Text(t(it.en, it.hi), color = RustText, fontSize = 14.sp, fontWeight = FontWeight.Medium, modifier = Modifier.announce()) }
+          }
+          Spacer(Modifier.height(12.dp))
+          // One Save; swiping the sheet down or Back cancels.
+          SaharaPrimaryButton(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Save", "सहेजें"), onClick = {
+              val a = CarePatientProfileRules.age(age); val w = CarePatientProfileRules.weight(weight); val h = CarePatientProfileRules.height(height)
+              val bad = a.second ?: w.second ?: h.second
+              if (bad != null) error = bad
+              else onSave(CarePatientProfile(a.first, sex, w.first, h.first, blood, illness.trim(), allergies.trim(), phone.trim(), address.trim(), CareWeightHistory.afterSave(initial, w.first, java.time.LocalDate.now())))
+          }, busy = busy, modifier = Modifier.fillMaxWidth().testTag("patient-profile-save"))
         }
     }
 }
 
 
-/** One numbered group of the profile editor on its own card. */
+/** One group of the profile editor: a section header and its fields, no card around them (no card inside the sheet). */
 @Composable private fun ProfileStep(number: Int, title: String, content: @Composable ColumnScope.() -> Unit) {
-    Surface(shape = RoundedCornerShape(12.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(shape = CircleShape, color = DoctorAccent, modifier = Modifier.size(26.dp)) { Box(contentAlignment = Alignment.Center) { Text("$number", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold) } }
-                Spacer(Modifier.width(10.dp))
-                Text(title, fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
-            }
-            content()
-        }
+    val tone = when (number) { 1 -> SaharaTone.Teal; 2 -> SaharaTone.Indigo; 3 -> SaharaTone.Plum; else -> SaharaTone.Leaf }
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        SaharaSectionHeader(title, tone = tone)
+        content()
     }
 }
 
@@ -268,7 +266,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable private fun ProfileField(value: String, onChange: (String) -> Unit, label: String, icon: ImageVector, keyboard: KeyboardType = KeyboardType.Text, modifier: Modifier = Modifier.fillMaxWidth()) {
     OutlinedTextField(value, onChange, modifier, label = { Text(label) }, leadingIcon = { Icon(icon, null, Modifier.size(20.dp), tint = DoctorAccent) },
         singleLine = keyboard != KeyboardType.Text, keyboardOptions = KeyboardOptions(keyboardType = keyboard), shape = RoundedCornerShape(12.dp),
-        colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Cream, focusedContainerColor = Paper))
+        colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper))
 }
 
 /** A choice chip that shows a tick and a soft fill when picked. */

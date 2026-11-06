@@ -49,17 +49,15 @@ import java.time.LocalDate
     val today = LocalDate.now()
     fun persist(next: List<CareDevice>): Boolean = runCatching { store.save(personId, next) }.isSuccess.also { ok -> saveError = !ok; if (ok) devices = next }
     BackHandler(onBack = onBack)
-    LazyColumn(Modifier.fillMaxSize().testTag("devices-screen"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    // The add action is one labelled button pinned at the bottom (reachable however long the list is), not after the last card.
+    Box(Modifier.fillMaxSize()) {
+    LazyColumn(Modifier.fillMaxSize().saharaScreenEnter().testTag("devices-screen"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 96.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack, modifier = Modifier.size(48.dp).testTag("devices-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) }
             Spacer(Modifier.width(4.dp))
             Heading(t("Tubes and lines", "नलियाँ और लाइनें"), 26)
         } }
         if (CareDeviceRules.tellCareTeam(devices, today)) item { DevicesTellTeam(phone) { open(context, Intent(Intent.ACTION_DIAL, Uri.parse(NearbyHelp.dialUri(phone)))) } }
-        if (saveError) item { Row(Modifier.fillMaxWidth().announce(), verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.ErrorOutline, null, Modifier.size(20.dp), tint = RustText); Spacer(Modifier.width(8.dp))
-            Text(t("Couldn't save. Try again.", "सहेजा नहीं जा सका। फिर कोशिश करें।"), color = RustText, fontWeight = FontWeight.Medium)
-        } }
         // Empty state: icon, one line, and the one action (the add button sits inside it, so it is never shown twice).
         if (devices.isEmpty()) item { Surface(shape = RoundedCornerShape(12.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("devices-empty")) {
             Column(Modifier.padding(horizontal = 16.dp, vertical = 24.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -68,10 +66,11 @@ import java.time.LocalDate
             }
         } }
         items(CareDeviceRules.sorted(devices), key = { it.id }) { d -> DevicesCard(d, today, hindi, onCheck = { checking = d }, onEdit = { editing = d }) }
-        item { Button(onClick = { editing = CareDevice() }, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("devices-add"), shape = RoundedCornerShape(12.dp)) {
-            Icon(Icons.Default.Add, null); Spacer(Modifier.width(8.dp)); Text(t("Add tube or line", "नली या लाइन जोड़ें"), fontWeight = FontWeight.SemiBold)
-        } }
     }
+    SaharaPrimaryButton(t("Add tube or line", "नली या लाइन जोड़ें"), onClick = { editing = CareDevice() }, icon = Icons.Default.Add, tone = SaharaTone.Teal,
+        modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(horizontal = 16.dp, vertical = 16.dp).testTag("devices-add"))
+    }
+    if (saveError) SaharaDialog(t("Couldn't save. Try again.", "सहेजा नहीं जा सका। फिर कोशिश करें।"), onDismiss = { saveError = false }, tone = SaharaTone.Error)
     editing?.let { d ->
         val existing = devices.any { it.id == d.id }
         DevicesEditSheet(d, existing, hindi, onDismiss = { editing = null }, onRemove = { if (persist(devices.filter { it.id != d.id })) editing = null }) { saved -> if (persist(CareDeviceRules.upsert(devices, saved))) editing = null }
@@ -185,13 +184,11 @@ import java.time.LocalDate
             OutlinedTextField(notes, { notes = it.take(500) }, Modifier.fillMaxWidth().testTag("device-notes"), label = { Text(t("Problems or notes (optional)", "दिक़्क़तें या नोट (ज़रूरी नहीं)")) },
                 minLines = 2, shape = RoundedCornerShape(12.dp), colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper, focusedBorderColor = Rust, focusedLabelColor = RustText, cursorColor = Rust))
             error?.let { Text(t(it.en, it.hi), color = RustText, fontSize = 14.sp, fontWeight = FontWeight.Medium, modifier = Modifier.announce()) }
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                OutlinedButton(onClick = onDismiss, modifier = Modifier.weight(1f).heightIn(min = 52.dp), shape = RoundedCornerShape(12.dp)) { Text(t("Cancel", "रद्द करें")) }
-                Button(onClick = {
-                    val bad = CareDeviceRules.error(inserted, changeDue, LocalDate.now())
-                    if (bad != null) error = bad else onSave(initial.copy(type = type, inserted = inserted, changeDue = changeDue, centre = centre.trim(), notes = notes.trim()))
-                }, modifier = Modifier.weight(1f).heightIn(min = 52.dp).testTag("device-save"), shape = RoundedCornerShape(12.dp)) { Text(t("Save", "सहेजें"), fontWeight = FontWeight.SemiBold) }
-            }
+            // One Save; swiping the sheet down or Back cancels.
+            SaharaPrimaryButton(t("Save", "सहेजें"), onClick = {
+                val bad = CareDeviceRules.error(inserted, changeDue, LocalDate.now())
+                if (bad != null) error = bad else onSave(initial.copy(type = type, inserted = inserted, changeDue = changeDue, centre = centre.trim(), notes = notes.trim()))
+            }, tone = SaharaTone.Teal, modifier = Modifier.fillMaxWidth().testTag("device-save"))
             if (existing) TextButton(onClick = { confirmRemove = true }, modifier = Modifier.align(Alignment.CenterHorizontally).heightIn(min = 48.dp).testTag("device-remove")) {
                 Icon(Icons.Default.Delete, null, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.error); Spacer(Modifier.width(6.dp)); Text(t("Remove", "हटाएँ"), color = MaterialTheme.colorScheme.error)
             }

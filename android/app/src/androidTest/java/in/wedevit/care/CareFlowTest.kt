@@ -250,16 +250,18 @@ class CareFlowTest {
     @Test fun directoryFiltersRecoverFromNoResults() {
         ui.onNodeWithText("Nearby", useUnmergedTree = true).performClick()
         ui.onNodeWithText("All India · ${vm.centres.size} centres").assertIsDisplayed()
-        // State is a searchable picker (3 Nov review), not a sideways row of chips.
-        ui.onNodeWithTag("nearby-list").performScrollToNode(hasTestTag("nearby-state-picker"))
+        // State is a searchable picker inside the one Filters sheet (6 Nov), not a sideways row of chips.
+        ui.onNodeWithTag("nearby-filters").performClick()
         ui.onNodeWithTag("nearby-state-picker").performClick()
         ui.onNodeWithTag("nearby-state-picker-search").performTextInput("karna")
         ui.onNodeWithTag("nearby-option-Karnataka").performClick()
+        ui.onNodeWithTag("nearby-filters-done").performClick()
         ui.onNodeWithTag("nearby-list").performScrollToIndex(0)
         ui.onNodeWithText("Karnataka · ${vm.centres.count { it.state == "Karnataka" }} centres").assertIsDisplayed()
-        ui.onNodeWithTag("nearby-list").performScrollToNode(hasTestTag("nearby-state-picker"))
+        ui.onNodeWithTag("nearby-filters").performClick()
         ui.onNodeWithTag("nearby-state-picker").performClick()
         ui.onNodeWithTag("nearby-option-${NearbyHelp.ALL_INDIA}").performClick()
+        ui.onNodeWithTag("nearby-filters-done").performClick()
         screenshot("nearby")
         ui.onNode(hasSetTextAction()).performTextInput("No such hospital xyz")
         ui.onNodeWithText("No centres found").assertIsDisplayed()
@@ -358,7 +360,7 @@ class CareFlowTest {
         ui.onNodeWithTag("nav-Care").performClick()
         ui.onAllNodesWithTag("care-add-button").onFirst().performClick()
         ui.onNodeWithTag("care-add-checkin").performClick()
-        // The check-in is now the slider screen: pick the middle mood, which stores "An okay day".
+        // The check-in screen has three mood buttons: pick the middle one, which stores "An okay day".
         ui.onNodeWithTag("checkin-mood-0.5").performScrollTo().performClick()
         screenshot("checkin")
         ui.onNode(hasSetTextAction() and hasText("Anything to add? (optional)")).performScrollTo().performTextInput("Spent time with family")

@@ -5075,6 +5075,17 @@ Make the full care plan	دیکھ بھال کا پورا منصوبہ بنائی�
 Plan, pocket emergency card, living will	منصوبہ، جیب میں رکھنے کا ہنگامی کارڈ، لِوِنگ وِل
 Pocket emergency card	جیب میں رکھنے کا ہنگامی کارڈ
 Step ${step + 1} · $name	مرحلہ ${step + 1} · $name
+Card file	کارڈ کی فائل
+Change access for ${member.email}	${member.email} کی رسائی بدلیں
+Download Hindi / English pack (987 MB)	ہندی / انگریزی پیک ڈاؤن لوڈ کریں (987 MB)
+Edit card and PDF	کارڈ اور PDF بدلیں
+Filters	فلٹر
+Filters · $filterCount	فلٹر · $filterCount
+Save card	کارڈ محفوظ کریں
+Send suggestion	تجویز بھیجیں
+Share invite	دعوت نامہ بھیجیں
+Show $count centres	$count مراکز دکھائیں
+Show 1 centre	1 مرکز دکھائیں
 SOS · Emergency help	SOS · ہنگامی مدد
 None planned · Add a visit	کوئی طے نہیں · ملاقات شامل کریں
 All care tools	دیکھ بھال کے سبھی ٹولز

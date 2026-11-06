@@ -121,50 +121,75 @@ internal enum class FeedbackSendState { NONE, LOCAL, SENDING, SENT, QUEUED }
     // Retries anything this account queued earlier (offline, or before the server table existed).
     LaunchedEffect(account) { if (account != null && store.pending().any { it.accountId == account }) send(account) }
 
-    Column(Modifier.fillMaxSize().background(wash).safeDrawingPadding().imePadding().testTag("feedback-screen").verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(top = 12.dp, bottom = 24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+    fun save() {
+        focus.clearFocus()
+        if (saved) return /* already saved and unchanged: a second tap must not add a second check-in before the list refreshes */
+        if (checkIn) { val model = careModel!!; val mood = CheckInMood.title(score); if (!canEditCareContext(model, personId!!, model.accountNamespace)) { model.message.value = t("Care access changed. Reopen this person's records before saving.", "देखभाल की अनुमति बदल गई है। सहेजने से पहले इस व्यक्ति के रिकॉर्ड फिर खोलें।"); onClose() } else if (today != null) model.updateItem(today.copy(title = mood, detail = note), onSaved) else model.saveItem("checkin", mood, note, 0, onSaved) }
+        else { val to = account; error = store.save(score, note, to); if (error == null) { onSaved(); if (to != null) send(to) else sendState = FeedbackSendState.LOCAL } }
+    }
+    val moods = if (checkIn) listOf(CheckInMood.HARD to 0f, CheckInMood.OKAY to .5f, CheckInMood.GOOD to 1f) else listOf("Not great" to 0f, "Okay" to .5f, "Good" to 1f)
+    val moodHindi = careHindi()
+    fun moodText(name: String) = if (checkIn) checkInMoodLabel(name, moodHindi) else when (name) { "Not great" -> t("Not great", "अच्छा नहीं"); "Okay" -> t("Okay", "ठीक"); else -> t("Good", "अच्छा") }
+    // One screen that fits 360 x 800 without scrolling: title, face, the three choices, a note, Save. Extras for the check-in come after Save.
+    Column(Modifier.fillMaxSize().background(wash).safeDrawingPadding().imePadding().testTag("feedback-screen").verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(top = 8.dp, bottom = 24.dp).saharaScreenEnter(), horizontalAlignment = Alignment.CenterHorizontally) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = close, modifier = Modifier.sizeIn(minWidth = 48.dp, minHeight = 48.dp).testTag("feedback-close")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, if (checkIn) t("Close check-in", "आज का हाल बंद करें") else t("Close feedback", "राय बंद करें"), tint = Ink) }
             Spacer(Modifier.weight(1f))
             CareLanguageMenu(compact = true)
         }
-        Spacer(Modifier.height(16.dp))
-        Text(if (checkIn) t("How was your day?", "आज का दिन कैसा रहा?") else t("How was Sahara?", "सहारा कैसा रहा?"), color = Ink, fontFamily = SaharaTitleFont, fontSize = 32.sp, lineHeight = 37.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-        Spacer(Modifier.height(12.dp))
-        CareMoodFace(expression, Modifier.sizeIn(maxWidth = 210.dp, maxHeight = 210.dp).fillMaxWidth().aspectRatio(1f).clearAndSetSemantics { })
+        Text(if (checkIn) t("How was your day?", "आज का दिन कैसा रहा?") else t("How was Sahara?", "सहारा कैसा रहा?"), color = Ink, fontFamily = SaharaTitleFont, fontSize = 26.sp, lineHeight = 32.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.a11yHeading())
         Spacer(Modifier.height(8.dp))
-        Text(shownLabel, fontSize = 26.sp, fontWeight = FontWeight.Medium, color = Ink, modifier = Modifier.testTag("feedback-state"), fontFamily = SaharaTitleFont)
+        CareMoodFace(expression, Modifier.size(120.dp).clearAndSetSemantics { })
+        Text(shownLabel, fontSize = 22.sp, fontWeight = FontWeight.Medium, color = Ink, modifier = Modifier.testTag("feedback-state"), fontFamily = SaharaTitleFont)
         Spacer(Modifier.height(12.dp))
-        Box(Modifier.fillMaxWidth()) { // up/down page scroll over the slider must not change the score
-            Slider(value = score, onValueChange = { score = it; saved = false; error = null }, valueRange = 0f..1f, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("feedback-slider").semantics { contentDescription = if (checkIn) t("Rate how your day went", "आज का दिन कैसा रहा, बताएँ") else t("Rate your Sahara experience", "सहारा का अनुभव बताएँ"); stateDescription = shownLabel }, thumb = { Box(Modifier.size(30.dp).background(Rust, CircleShape).border(3.dp, Paper, CircleShape)) }, colors = SliderDefaults.colors(thumbColor = Rust, activeTrackColor = Rust, inactiveTrackColor = Ink.copy(alpha = .14f)))
-            Box(Modifier.matchParentSize().sliderTouchOverlay(30.dp) { score = it; saved = false; error = null })
-        }
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            (if (checkIn) listOf(CheckInMood.HARD to 0f, CheckInMood.OKAY to .5f, CheckInMood.GOOD to 1f) else listOf("Not great" to 0f, "Okay" to .5f, "Good" to 1f)).forEach { (name, value) ->
-                TextButton(onClick = { score = value; saved = false; error = null }, contentPadding = PaddingValues(horizontal = 8.dp), modifier = Modifier.heightIn(min = 48.dp).then(if (checkIn) Modifier.weight(1f).testTag("checkin-mood-$value") else Modifier.weight(1f).testTag("feedback-mood-$value"))) { Text(if (checkIn) checkInMoodLabel(name, careHindi()) else when (name) { "Not great" -> t("Not great", "अच्छा नहीं"); "Okay" -> t("Okay", "ठीक"); else -> t("Good", "अच्छा") }, textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontSize = 14.sp, color = if (label == name) RustText else DoctorCardSub, fontWeight = if (label == name) FontWeight.Bold else FontWeight.Normal) }
-            }
-        }
-        OutlinedTextField(value = note, onValueChange = { if (it.length <= limit) { note = it; saved = false; error = null } }, label = { Text(t("Anything to add? (optional)", "कुछ और बताना है? (चाहें तो)")) }, placeholder = { Text(if (checkIn) t("How are you feeling today?", "आज आप कैसा महसूस कर रहे हैं?") else t("What felt easy, or what could be clearer?", "क्या आसान लगा, या क्या और साफ़ हो सकता है?")) }, supportingText = { Text("${note.length}/$limit", fontSize = 14.sp, color = DoctorCardSub) }, minLines = 2, maxLines = 5, modifier = Modifier.fillMaxWidth().testTag("feedback-note"), shape = RoundedCornerShape(12.dp), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Rust, focusedLabelColor = RustText, cursorColor = Rust, unfocusedBorderColor = DoctorCardFaint.copy(alpha = .5f), focusedContainerColor = Paper, unfocusedContainerColor = Paper))
-        Spacer(Modifier.height(12.dp))
-        // The check-in also asks about distress and links to a symptom note, as the old Today card did.
-        if (checkIn && careModel != null) {
-            Surface(shape = RoundedCornerShape(12.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("checkin-extras")) {
-                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    DistressQuestion(careModel, onYes = onDistress)
-                    TextButton(onClick = onSymptom, modifier = Modifier.heightIn(min = 48.dp).testTag("today-symptom-note")) {
-                        Icon(Icons.Default.Healing, null, Modifier.size(20.dp), tint = Rust); Spacer(Modifier.width(8.dp)); Text(t("Note a symptom", "तबीयत का नोट लिखें"), color = RustText, fontWeight = FontWeight.SemiBold)
+        if (checkIn) {
+            // Three choices for a three-way answer: big buttons, not a slider.
+            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                moods.forEach { (name, value) ->
+                    val on = label == name
+                    val tone = when (value) { 0f -> SaharaTone.Rose; .5f -> SaharaTone.Marigold; else -> SaharaTone.Teal }
+                    val fill by animateColorAsState(if (on) tone.solid else Paper, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "checkin-mood")
+                    val press = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+                    Surface(selected = on, onClick = { score = value; saved = false; error = null }, shape = RoundedCornerShape(SaharaRadius.Md), color = fill, contentColor = if (on) tone.onSolid else tone.ink,
+                        border = BorderStroke(2.dp, tone.solid), interactionSource = press, modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = 64.dp).saharaPress(press).testTag("checkin-mood-$value")) {
+                        Box(Modifier.padding(horizontal = 6.dp, vertical = 10.dp), contentAlignment = Alignment.Center) {
+                            Text(moodText(name), textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontSize = 15.sp, fontWeight = FontWeight.Bold,
+                                style = LocalTextStyle.current.copy(lineBreak = androidx.compose.ui.text.style.LineBreak.Heading, hyphens = androidx.compose.ui.text.style.Hyphens.None))
+                        }
                     }
                 }
             }
-            Spacer(Modifier.height(12.dp))
+        } else {
+            Box(Modifier.fillMaxWidth()) { // up/down page scroll over the slider must not change the score
+                Slider(value = score, onValueChange = { score = it; saved = false; error = null }, valueRange = 0f..1f, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("feedback-slider").semantics { contentDescription = t("Rate your Sahara experience", "सहारा का अनुभव बताएँ"); stateDescription = shownLabel }, thumb = { Box(Modifier.size(30.dp).background(Rust, CircleShape).border(3.dp, Paper, CircleShape)) }, colors = SliderDefaults.colors(thumbColor = Rust, activeTrackColor = Rust, inactiveTrackColor = Ink.copy(alpha = .14f)))
+                Box(Modifier.matchParentSize().sliderTouchOverlay(30.dp) { score = it; saved = false; error = null })
+            }
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                moods.forEach { (name, value) ->
+                    TextButton(onClick = { score = value; saved = false; error = null }, contentPadding = PaddingValues(horizontal = 8.dp), modifier = Modifier.heightIn(min = 48.dp).weight(1f).testTag("feedback-mood-$value")) { Text(moodText(name), textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontSize = 14.sp, color = if (label == name) RustText else DoctorCardSub, fontWeight = if (label == name) FontWeight.Bold else FontWeight.Normal) }
+                }
+            }
         }
+        Spacer(Modifier.height(12.dp))
+        // The label says it all; the counter shows only near the limit.
+        OutlinedTextField(value = note, onValueChange = { if (it.length <= limit) { note = it; saved = false; error = null } }, label = { Text(t("Anything to add? (optional)", "कुछ और बताना है? (चाहें तो)")) }, supportingText = if (note.length > limit - 200) { { Text("${note.length}/$limit", fontSize = 14.sp, color = DoctorCardSub) } } else null, minLines = 2, maxLines = 5, modifier = Modifier.fillMaxWidth().testTag("feedback-note"), shape = RoundedCornerShape(12.dp), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Rust, focusedLabelColor = RustText, cursorColor = Rust, unfocusedBorderColor = DoctorCardFaint.copy(alpha = .5f), focusedContainerColor = Paper, unfocusedContainerColor = Paper))
+        Spacer(Modifier.height(12.dp))
         (modelError.takeIf { checkIn } ?: error)?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite }); Spacer(Modifier.height(8.dp)) }
-        Button(onClick = { focus.clearFocus(); if (saved) return@Button /* already saved and unchanged: a second tap must not add a second check-in before the list refreshes */; if (checkIn) { val model = careModel!!; val mood = CheckInMood.title(score); if (!canEditCareContext(model, personId!!, model.accountNamespace)) { model.message.value = t("Care access changed. Reopen this person's records before saving.", "देखभाल की अनुमति बदल गई है। सहेजने से पहले इस व्यक्ति के रिकॉर्ड फिर खोलें।"); onClose() } else if (today != null) model.updateItem(today.copy(title = mood, detail = note), onSaved) else model.saveItem("checkin", mood, note, 0, onSaved) } else { val to = account; error = store.save(score, note, to); if (error == null) { onSaved(); if (to != null) send(to) else sendState = FeedbackSendState.LOCAL } } }, enabled = !busy && sendState != FeedbackSendState.SENDING, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("feedback-save"), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust, contentColor = Color.White)) {
-            if (saved && (checkIn || sendState == FeedbackSendState.SENT || sendState == FeedbackSendState.LOCAL)) { Icon(Icons.Outlined.CheckCircle, null); Spacer(Modifier.width(8.dp)) }
-            Text(if (checkIn) (if (saved) t("Check-in saved", "आज का हाल सहेज लिया") else if (today != null) t("Update today's check-in", "आज का हाल बदलें") else t("Save check-in", "आज का हाल सहेजें")) else if (sendState == FeedbackSendState.SENDING) t("Sending…", "भेजा जा रहा है…") else if (saved && sendState == FeedbackSendState.SENT) t("Sent to Sahara", "Sahara को भेजा") else if (saved) t("Saved on this phone", "फ़ोन पर सहेजा") else if (account != null) t("Send", "भेजें") else t("Save", "सहेजें"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-        }
+        // Saved check-in: the button turns into Done (closes), so the person never wonders whether to tap again.
+        val savedCheckIn = checkIn && saved
+        SaharaPrimaryButton(if (savedCheckIn) t("Done", "हो गया") else if (checkIn) (if (today != null) t("Update today's check-in", "आज का हाल बदलें") else t("Save check-in", "आज का हाल सहेजें")) else if (sendState == FeedbackSendState.SENDING) t("Sending…", "भेजा जा रहा है…") else if (saved && sendState == FeedbackSendState.SENT) t("Sent to Sahara", "Sahara को भेजा") else if (saved) t("Saved on this phone", "फ़ोन पर सहेजा") else if (account != null) t("Send", "भेजें") else t("Save", "सहेजें"),
+            onClick = { if (savedCheckIn) onClose() else save() }, enabled = !busy && sendState != FeedbackSendState.SENDING, busy = busy || sendState == FeedbackSendState.SENDING,
+            icon = if (saved && (checkIn || sendState == FeedbackSendState.SENT || sendState == FeedbackSendState.LOCAL)) Icons.Outlined.CheckCircle else null, modifier = Modifier.fillMaxWidth().testTag("feedback-save"))
+        if (savedCheckIn) Text(t("Check-in saved", "आज का हाल सहेज लिया"), Modifier.padding(top = 8.dp).announce(), color = DoctorStatusGood, fontWeight = FontWeight.SemiBold)
         Spacer(Modifier.height(12.dp))
         if (checkIn && saved) SaharaIllustration(SaharaArtKind.CheckInSaved)
         if (account != null && sendState == FeedbackSendState.QUEUED) TextButton(onClick = { send(account) }, modifier = Modifier.heightIn(min = 48.dp).testTag("feedback-retry")) { Text(t("Try again", "फिर कोशिश करें"), color = RustText) }
+        // The check-in also asks about distress and links to a symptom note: secondary, so below the main action, without a card around them.
+        if (checkIn && careModel != null) Column(Modifier.fillMaxWidth().testTag("checkin-extras"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            HorizontalDivider(color = DoctorHairline)
+            DistressQuestion(careModel, onYes = onDistress)
+            SaharaSecondaryButton(t("Note a symptom", "तबीयत का नोट लिखें"), onClick = onSymptom, icon = Icons.Default.Healing, tone = SaharaTone.Teal, navigates = true, modifier = Modifier.fillMaxWidth().testTag("today-symptom-note"))
+        }
     }
     if (discard) AlertDialog(onDismissRequest = { discard = false }, containerColor = Paper, title = { Text(t("Leave without saving?", "बिना सहेजे जाएँ?")) }, confirmButton = { TextButton(onClick = { discard = false; onClose() }) { Text(t("Leave", "जाएँ"), color = Rust) } }, dismissButton = { TextButton(onClick = { discard = false }) { Text(t("Keep editing", "लिखते रहें"), color = Rust) } })
 }
