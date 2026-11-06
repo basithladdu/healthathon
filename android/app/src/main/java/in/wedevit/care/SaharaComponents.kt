@@ -20,6 +20,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -38,12 +39,30 @@ import androidx.core.view.WindowCompat
  * Colours come only from SaharaColors and SaharaTone; page code should not hard-code colours.
  */
 
-/** Text for fixed-width slots (tabs, chips, tile labels): shrinks a little before it would ever break a word, never below [min] sp. */
+/** True when a wrapped line of [layout] ends inside a word (a letter or mark on both sides of the break). */
+internal fun splitsWord(text: String, lineEnds: List<Int>): Boolean {
+    fun word(c: Char) = Character.isLetterOrDigit(c) || Character.getType(c).let { it == Character.NON_SPACING_MARK.toInt() || it == Character.COMBINING_SPACING_MARK.toInt() }
+    return lineEnds.dropLast(1).any { end -> end in 1 until text.length && word(text[end - 1]) && word(text[end]) }
+}
+
+/**
+ * Text for fixed-width slots (tabs, chips, tile labels, quick actions). It may wrap to [maxLines] lines at spaces,
+ * but if a word would split ("PATIEN / T") or the text would not fit, it steps the size down (to [min] sp at least)
+ * until it fits whole. Hidden until settled, so nobody sees the steps.
+ */
 @Composable fun SaharaFitText(text: String, modifier: Modifier = Modifier, style: TextStyle = MaterialTheme.typography.labelLarge, color: Color = Color.Unspecified,
-    maxLines: Int = 1, min: Float = 11f, fontWeight: FontWeight? = null) {
-    val max = if (style.fontSize.isSp) style.fontSize.value else 15f
-    Text(text, modifier, color = color, style = style, fontWeight = fontWeight, maxLines = maxLines, softWrap = maxLines > 1, overflow = TextOverflow.Ellipsis,
-        autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(minFontSize = minOf(min, max).sp, maxFontSize = max.sp, stepSize = 0.5.sp))
+    maxLines: Int = 2, min: Float = 11f, fontWeight: FontWeight? = null, textAlign: androidx.compose.ui.text.style.TextAlign? = androidx.compose.ui.text.style.TextAlign.Center) {
+    val base = if (style.fontSize.isSp) style.fontSize.value else 15f
+    var size by remember(text, base) { mutableFloatStateOf(base) }
+    var settled by remember(text, base) { mutableStateOf(false) }
+    Text(text, modifier.drawWithContent { if (settled) drawContent() }, color = color, fontWeight = fontWeight, maxLines = maxLines, softWrap = maxLines > 1,
+        overflow = TextOverflow.Clip, textAlign = textAlign,
+        style = style.copy(fontSize = size.sp, lineHeight = (size * 1.3f).sp, lineBreak = androidx.compose.ui.text.style.LineBreak.Heading, hyphens = androidx.compose.ui.text.style.Hyphens.None),
+        onTextLayout = { layout ->
+            val ends = (0 until layout.lineCount).map { layout.getLineEnd(it) }
+            val bad = layout.hasVisualOverflow || splitsWord(text, ends)
+            if (bad && size > min) size = maxOf(min, size - 1f) else settled = true
+        })
 }
 
 /** Light or dark status-bar icons while this screen is shown; the band needs light icons. Restores the previous look on leave. */
@@ -96,7 +115,7 @@ import androidx.core.view.WindowCompat
     value: String? = null, caption: String? = null) {
     val interaction = remember { MutableInteractionSource() }
     Column(modifier.saharaAppear().saharaPress(interaction).heightIn(min = 112.dp).clip(RoundedCornerShape(SaharaRadius.Lg)).background(tone.wash)
-        .border(1.dp, tone.solid.copy(alpha = .28f), RoundedCornerShape(SaharaRadius.Lg))
+        .border(1.dp, tone.solid, RoundedCornerShape(SaharaRadius.Lg))
         .clickable(interactionSource = interaction, indication = androidx.compose.material3.ripple(), role = Role.Button, onClick = onClick).a11yCard().padding(14.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -143,14 +162,14 @@ import androidx.core.view.WindowCompat
 
 /** A white register card holding rows separated by hairlines (AI-FIR register). */
 @Composable fun SaharaRegister(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
-    Surface(modifier.fillMaxWidth().saharaAppear(), shape = RoundedCornerShape(SaharaRadius.Lg), color = SaharaColors.Surface, border = BorderStroke(1.dp, SaharaColors.Line)) {
+    Surface(modifier.fillMaxWidth().saharaAppear(), shape = RoundedCornerShape(SaharaRadius.Lg), color = SaharaColors.Surface, border = BorderStroke(1.dp, SaharaColors.Edge)) {
         Column(Modifier.padding(vertical = 4.dp), content = content)
     }
 }
 
 /** Status pill: the tone's wash and ink, content-sized, never breaks a word. */
 @Composable fun SaharaStatusPill(text: String, tone: SaharaTone, modifier: Modifier = Modifier, icon: ImageVector? = null) {
-    Row(modifier.clip(RoundedCornerShape(SaharaRadius.Pill)).background(tone.wash).border(1.dp, tone.solid.copy(alpha = .35f), RoundedCornerShape(SaharaRadius.Pill))
+    Row(modifier.clip(RoundedCornerShape(SaharaRadius.Pill)).background(tone.wash).border(1.dp, tone.solid, RoundedCornerShape(SaharaRadius.Pill))
         .padding(horizontal = 10.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
         if (icon != null) { Icon(icon, null, Modifier.size(14.dp), tint = tone.ink); Spacer(Modifier.width(4.dp)) }
         Text(text, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold, color = tone.ink, maxLines = 1, softWrap = false)
@@ -180,7 +199,7 @@ import androidx.core.view.WindowCompat
     val pressed by interaction.collectIsPressedAsState()
     val fill by animateColorAsState(if (pressed) tone.wash else SaharaColors.Surface, SaharaMotion.tween(SaharaMotion.PRESS_MS), label = "button press")
     OutlinedButton(onClick = onClick, enabled = enabled, interactionSource = interaction, shape = RoundedCornerShape(SaharaRadius.Md),
-        border = BorderStroke(1.5.dp, if (enabled) tone.solid else SaharaColors.Line),
+        border = BorderStroke(1.5.dp, if (enabled) tone.solid else SaharaColors.Edge),
         colors = ButtonDefaults.outlinedButtonColors(containerColor = fill, contentColor = tone.ink, disabledContentColor = SaharaColors.InkFaint),
         contentPadding = PaddingValues(horizontal = 18.dp, vertical = 10.dp), modifier = modifier.heightIn(min = 48.dp).saharaPress(interaction)) {
         if (icon != null) { Icon(icon, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)) }
@@ -210,7 +229,7 @@ import androidx.core.view.WindowCompat
 
 /** Error state: what went wrong in one line and the one thing to do (usually Try again). */
 @Composable fun SaharaErrorState(title: String, modifier: Modifier = Modifier, detail: String? = null, actionLabel: String? = null, onAction: (() -> Unit)? = null) {
-    Surface(modifier.fillMaxWidth(), shape = RoundedCornerShape(SaharaRadius.Lg), color = SaharaColors.ErrorWash, border = BorderStroke(1.dp, SaharaColors.Error.copy(alpha = .35f))) {
+    Surface(modifier.fillMaxWidth(), shape = RoundedCornerShape(SaharaRadius.Lg), color = SaharaColors.ErrorWash, border = BorderStroke(1.dp, SaharaColors.Error)) {
         Row(Modifier.padding(14.dp).announce(), verticalAlignment = Alignment.CenterVertically) {
             SaharaIconChip(Icons.Default.ErrorOutline, SaharaTone.Error, size = 36)
             Spacer(Modifier.width(12.dp))

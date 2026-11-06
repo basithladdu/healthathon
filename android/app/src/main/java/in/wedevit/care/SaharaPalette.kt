@@ -18,7 +18,10 @@ object SaharaColors {
     val Ink = Color(0xFF382E29)
     val InkSub = Color(0xFF4A3E36)
     val InkFaint = Color(0xFF5E5249)
+    /** Decorative dividers only. */
     val Line = Color(0xFFE6D8CC)
+    /** Edges of cards, tiles and controls: 3:1 on cream and paper (WCAG 1.4.11), so a tappable card reads as one. */
+    val Edge = Color(0xFF9C887B)
     val LineStrong = Color(0xFF8D7B70)
 
     // Header band (top bar, welcome panel): deep maroon-brown with white text.
@@ -79,7 +82,7 @@ internal val DoctorCardMint = SaharaTone.Teal.wash
 internal val DoctorCardInk = SaharaColors.Ink
 internal val DoctorCardSub = SaharaColors.InkSub
 internal val DoctorCardFaint = SaharaColors.InkFaint
-internal val DoctorHairline = SaharaColors.Line
+internal val DoctorHairline = SaharaColors.Edge
 internal val DoctorAccent = SaharaColors.Primary
 
 /** Status tints for intake, visits and review stages. */

@@ -310,10 +310,10 @@ fun Modifier.saharaContentSize(): Modifier = animateContentSize(SaharaMotion.twe
     actionLabel: String? = null, onAction: (() -> Unit)? = null, secondaryLabel: String? = null, onSecondary: (() -> Unit)? = null) {
     Column(modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 32.dp).testTag("sahara-empty"), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
         // Icon in a soft circle, one line, then the one thing to do (outlined) and an optional quieter way out.
-        if (icon != null) Box(Modifier.size(64.dp).clip(CircleShape).background(SaharaApricot), contentAlignment = Alignment.Center) { Icon(icon, null, Modifier.size(30.dp), tint = RustText) }
+        if (icon != null) Box(Modifier.size(64.dp).clip(CircleShape).background(SaharaColors.PrimaryWash), contentAlignment = Alignment.Center) { Icon(icon, null, Modifier.size(30.dp), tint = RustText) }
         Text(title, fontFamily = SaharaTitleFont, fontSize = 20.sp, lineHeight = 26.sp, color = Ink, textAlign = TextAlign.Center)
         if (detail != null) Text(detail, fontSize = 16.sp, lineHeight = 22.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
-        if (actionLabel != null && onAction != null) OutlinedButton(onClick = onAction, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, Rust.copy(alpha = .6f)),
+        if (actionLabel != null && onAction != null) OutlinedButton(onClick = onAction, shape = RoundedCornerShape(SaharaRadius.Pill), border = BorderStroke(1.5.dp, Rust),
             colors = ButtonDefaults.outlinedButtonColors(containerColor = Paper, contentColor = RustText), modifier = Modifier.heightIn(min = 48.dp)) { Text(actionLabel) }
         if (secondaryLabel != null && onSecondary != null) TextButton(onClick = onSecondary, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Text(secondaryLabel) }
     }

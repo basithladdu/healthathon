@@ -100,7 +100,8 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
  */
 internal val saharaColorScheme = lightColorScheme(primary = SaharaColors.Primary, onPrimary = SaharaColors.OnPrimary,
     primaryContainer = SaharaColors.PrimaryWash, onPrimaryContainer = SaharaColors.PrimaryPressed,
-    secondary = SaharaTone.Teal.solid, onSecondary = Color.White, secondaryContainer = SaharaTone.Teal.wash, onSecondaryContainer = SaharaTone.Teal.ink,
+    // secondaryContainer is Material's selected state (chips, tonal buttons, nav indicator): solid rust so it shows at 3:1+.
+    secondary = SaharaTone.Teal.solid, onSecondary = Color.White, secondaryContainer = SaharaColors.PrimaryPressed, onSecondaryContainer = Color.White,
     tertiary = SaharaTone.Plum.solid, onTertiary = Color.White, tertiaryContainer = SaharaTone.Plum.wash, onTertiaryContainer = SaharaTone.Plum.ink,
     error = SaharaColors.Error, onError = Color.White, errorContainer = SaharaColors.ErrorWash, onErrorContainer = SaharaColors.Error,
     background = SaharaColors.Ground, onBackground = SaharaColors.Ink, surface = SaharaColors.Surface, onSurface = SaharaColors.Ink,
@@ -199,7 +200,9 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
         }
         owner.lifecycle.addObserver(observer); onDispose { owner.lifecycle.removeObserver(observer) }
     }
-    LaunchedEffect(message) { message?.let { snackbar.showSnackbar(it); vm.message.value = null } }
+    // Important results and problems open a small dialog; a plain "Saved" stays a quiet toast (SaharaNotice routes them).
+    var noticeDialog by rememberSaveable { mutableStateOf<String?>(null) }
+    LaunchedEffect(message) { message?.let { if (SaharaNotice.route(it) == SaharaNotice.Route.Dialog) noticeDialog = it else snackbar.showSnackbar(SaharaNotice.quietText(it)); vm.message.value = null } }
     val peopleLoaded by vm.peopleLoaded.collectAsStateWithLifecycle()
     // After the last person is removed (from More), the next person added starts on Today, not on a leftover tab.
     LaunchedEffect(peopleLoaded, people.isEmpty()) { if (peopleLoaded && people.isEmpty()) { tab = 0; tabTrail = ""; careFilter = "All" } }
@@ -303,6 +306,7 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
     }
     } }
     if (overlay.isNotEmpty() && overlay != "starting") CareToastHost(snackbar, Modifier.align(Alignment.BottomCenter).navigationBarsPadding().imePadding())
+    noticeDialog?.let { SaharaNoticeDialog(it) { noticeDialog = null } }
     }
     }
 }
