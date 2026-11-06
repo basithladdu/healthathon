@@ -21,6 +21,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.shadow
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -100,31 +102,36 @@ internal fun splitsWord(text: String, lineEnds: List<Int>): Boolean {
     }
 }
 
-/** A coloured icon chip: the section's solid colour with its icon. Decorative; the label beside it carries the meaning. */
-@Composable fun SaharaIconChip(icon: ImageVector, tone: SaharaTone, modifier: Modifier = Modifier, size: Int = 40) {
-    Box(modifier.size(size.dp).clip(RoundedCornerShape(SaharaRadius.Sm)).background(tone.solid), contentAlignment = Alignment.Center) {
+/** A coloured icon chip: the section's bright solid with its white icon. Decorative; the label beside it carries the meaning. [breathe]: a slow idle swell for the one main card on a screen. */
+@Composable fun SaharaIconChip(icon: ImageVector, tone: SaharaTone, modifier: Modifier = Modifier, size: Int = 40, breathe: Boolean = false) {
+    Box(modifier.then(if (breathe) Modifier.saharaBreathe() else Modifier).size(size.dp).clip(RoundedCornerShape(SaharaRadius.Sm)).background(tone.solid), contentAlignment = Alignment.Center) {
         Icon(icon, null, Modifier.size((size * .55f).dp), tint = tone.onSolid)
     }
 }
 
 /**
- * Launchpad tile (AI-FIR bento): the section's wash, a coloured icon chip, a bold title in the section's ink,
- * an optional big count and one short caption. The whole tile is one button with a press settle.
+ * Launchpad tile (AI-FIR bento): a solid bright block in the section's colour with a white icon, a bold white title,
+ * an optional big count and one short caption. One idea, one action: the whole tile is one button, with a soft
+ * shadow that sinks and a fill that darkens while pressed.
  */
 @Composable fun SaharaBentoTile(title: String, icon: ImageVector, tone: SaharaTone, onClick: () -> Unit, modifier: Modifier = Modifier,
     value: String? = null, caption: String? = null) {
     val interaction = remember { MutableInteractionSource() }
-    Column(modifier.saharaAppear().saharaPress(interaction).heightIn(min = 112.dp).clip(RoundedCornerShape(SaharaRadius.Lg)).background(tone.wash)
-        .border(1.dp, tone.solid, RoundedCornerShape(SaharaRadius.Lg))
-        .clickable(interactionSource = interaction, indication = androidx.compose.material3.ripple(), role = Role.Button, onClick = onClick).a11yCard().padding(14.dp),
+    val pressed by interaction.collectIsPressedAsState()
+    val fill by animateColorAsState(if (pressed) tone.ink else tone.solid, SaharaMotion.tween(SaharaMotion.PRESS_MS), label = "tile-press")
+    val shape = RoundedCornerShape(SaharaRadius.Lg)
+    Column(modifier.saharaAppear().saharaPress(interaction).heightIn(min = 112.dp).shadow(if (pressed) 1.dp else 4.dp, shape).clip(shape).background(fill)
+        .clickable(interactionSource = interaction, indication = androidx.compose.material3.ripple(color = tone.onSolid), role = Role.Button, onClick = onClick).a11yCard().padding(14.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            SaharaIconChip(icon, tone, size = 36)
+            Box(Modifier.size(40.dp).clip(CircleShape).background(tone.onSolid.copy(alpha = .2f)), contentAlignment = Alignment.Center) {
+                Icon(icon, null, Modifier.size(24.dp), tint = tone.onSolid)
+            }
             Spacer(Modifier.weight(1f))
-            if (value != null) Text(value, style = MaterialTheme.typography.headlineSmall, color = tone.ink, maxLines = 1)
+            if (value != null) Text(value, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = tone.onSolid, maxLines = 1)
         }
-        Text(title, style = MaterialTheme.typography.titleMedium, fontSize = 17.sp, lineHeight = 22.sp, color = tone.ink, maxLines = 2, overflow = TextOverflow.Ellipsis)
-        if (caption != null) Text(caption, style = MaterialTheme.typography.bodySmall, color = SaharaColors.InkSub, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        Text(title, style = MaterialTheme.typography.titleMedium, fontSize = 17.sp, lineHeight = 22.sp, fontWeight = FontWeight.Bold, color = tone.onSolid, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        if (caption != null) Text(caption, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold, color = tone.onSolid, maxLines = 2, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -156,7 +163,7 @@ internal fun splitsWord(text: String, lineEnds: List<Int>): Boolean {
         }
         if (status != null) { Spacer(Modifier.width(8.dp)); SaharaStatusPill(status.first, status.second) }
         if (trailing != null) { Spacer(Modifier.width(8.dp)); trailing() }
-        else if (onClick != null) Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, Modifier.size(22.dp), tint = SaharaColors.InkFaint)
+        else if (onClick != null) Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, Modifier.size(24.dp), tint = tone.ink)
     }
 }
 
@@ -167,54 +174,64 @@ internal fun splitsWord(text: String, lineEnds: List<Int>): Boolean {
     }
 }
 
-/** Status pill: the tone's wash and ink, content-sized, never breaks a word. */
-@Composable fun SaharaStatusPill(text: String, tone: SaharaTone, modifier: Modifier = Modifier, icon: ImageVector? = null) {
-    Row(modifier.clip(RoundedCornerShape(SaharaRadius.Pill)).background(tone.wash).border(1.dp, tone.solid, RoundedCornerShape(SaharaRadius.Pill))
+/** Status pill: the tone's bright solid with bold white text, content-sized, never breaks a word. [shimmer]: a soft idle sweep (the "next dose" pill). */
+@Composable fun SaharaStatusPill(text: String, tone: SaharaTone, modifier: Modifier = Modifier, icon: ImageVector? = null, shimmer: Boolean = false) {
+    Row(modifier.clip(RoundedCornerShape(SaharaRadius.Pill)).background(tone.solid).then(if (shimmer) Modifier.saharaShimmer() else Modifier)
         .padding(horizontal = 10.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-        if (icon != null) { Icon(icon, null, Modifier.size(14.dp), tint = tone.ink); Spacer(Modifier.width(4.dp)) }
-        Text(text, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold, color = tone.ink, maxLines = 1, softWrap = false)
+        if (icon != null) { Icon(icon, null, Modifier.size(16.dp), tint = tone.onSolid); Spacer(Modifier.width(4.dp)) }
+        Text(text, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = tone.onSolid, maxLines = 1, softWrap = false)
     }
 }
 
-/** The one main action: solid rust (or [tone]) fill, white text, darker while pressed, at least 52 dp. */
+/** Trailing arrow for a button that opens another screen: it says where it goes and shows the way. */
+@Composable private fun GoesArrow() { Spacer(Modifier.width(6.dp)); Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, Modifier.size(22.dp)) }
+
+/**
+ * The one main action: a solid bright fill (rust, or [tone]), bold white label, a soft shadow that sinks and a darker
+ * fill while pressed, at least 56 dp. [navigates]: it opens another screen, so a chevron follows the label.
+ */
 @Composable fun SaharaPrimaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, icon: ImageVector? = null, enabled: Boolean = true,
-    tone: SaharaTone = SaharaTone.Rust, busy: Boolean = false) {
+    tone: SaharaTone = SaharaTone.Rust, busy: Boolean = false, navigates: Boolean = false) {
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
-    val fill by animateColorAsState(if (pressed) tone.ink else tone.solid, SaharaMotion.tween(SaharaMotion.PRESS_MS), label = "button press")
+    val fill by animateColorAsState(if (pressed) tone.ink else tone.solid, SaharaMotion.tween(SaharaMotion.PRESS_MS), label = "button-press")
     Button(onClick = onClick, enabled = enabled && !busy, interactionSource = interaction, shape = RoundedCornerShape(SaharaRadius.Md),
         colors = ButtonDefaults.buttonColors(containerColor = fill, contentColor = tone.onSolid, disabledContainerColor = SaharaColors.Well, disabledContentColor = SaharaColors.InkFaint),
-        elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp, pressedElevation = 0.dp, disabledElevation = 0.dp),
-        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp), modifier = modifier.heightIn(min = 52.dp).saharaPress(interaction)) {
-        if (busy) { CircularProgressIndicator(Modifier.size(18.dp), color = tone.onSolid, strokeWidth = 2.dp); Spacer(Modifier.width(10.dp)) }
-        else if (icon != null) { Icon(icon, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)) }
-        Text(text, style = MaterialTheme.typography.labelLarge, fontSize = 16.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 3.dp, pressedElevation = 1.dp, disabledElevation = 0.dp),
+        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp), modifier = modifier.heightIn(min = 56.dp).saharaPress(interaction)) {
+        if (busy) { CircularProgressIndicator(Modifier.size(20.dp), color = tone.onSolid, strokeWidth = 2.5.dp); Spacer(Modifier.width(10.dp)) }
+        else if (icon != null) { Icon(icon, null, Modifier.size(22.dp)); Spacer(Modifier.width(8.dp)) }
+        Text(text, style = MaterialTheme.typography.labelLarge, fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+        if (navigates && !busy) GoesArrow()
     }
 }
 
-/** Second action: white fill with a strong 1.5 dp border in the tone's colour, tinted while pressed, at least 48 dp. */
+/** Second action: white fill with a strong 2 dp border in the tone's bright colour, bold ink label, tinted while pressed, at least 56 dp. */
 @Composable fun SaharaSecondaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, icon: ImageVector? = null, enabled: Boolean = true,
-    tone: SaharaTone = SaharaTone.Rust) {
+    tone: SaharaTone = SaharaTone.Rust, navigates: Boolean = false) {
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
-    val fill by animateColorAsState(if (pressed) tone.wash else SaharaColors.Surface, SaharaMotion.tween(SaharaMotion.PRESS_MS), label = "button press")
+    val fill by animateColorAsState(if (pressed) tone.wash else SaharaColors.Surface, SaharaMotion.tween(SaharaMotion.PRESS_MS), label = "outline-press")
     OutlinedButton(onClick = onClick, enabled = enabled, interactionSource = interaction, shape = RoundedCornerShape(SaharaRadius.Md),
-        border = BorderStroke(1.5.dp, if (enabled) tone.solid else SaharaColors.Edge),
+        border = BorderStroke(2.dp, if (enabled) tone.solid else SaharaColors.Edge),
         colors = ButtonDefaults.outlinedButtonColors(containerColor = fill, contentColor = tone.ink, disabledContentColor = SaharaColors.InkFaint),
-        contentPadding = PaddingValues(horizontal = 18.dp, vertical = 10.dp), modifier = modifier.heightIn(min = 48.dp).saharaPress(interaction)) {
-        if (icon != null) { Icon(icon, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)) }
-        Text(text, style = MaterialTheme.typography.labelLarge, fontSize = 16.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+        contentPadding = PaddingValues(horizontal = 18.dp, vertical = 10.dp), modifier = modifier.heightIn(min = 56.dp).saharaPress(interaction)) {
+        if (icon != null) { Icon(icon, null, Modifier.size(22.dp)); Spacer(Modifier.width(8.dp)) }
+        Text(text, style = MaterialTheme.typography.labelLarge, fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+        if (navigates) GoesArrow()
     }
 }
 
-/** Section header: a short coloured bar, the title, and an optional "See all" style action on the right. */
-@Composable fun SaharaSectionHeader(title: String, modifier: Modifier = Modifier, tone: SaharaTone = SaharaTone.Rust, actionLabel: String? = null, onAction: (() -> Unit)? = null) {
+/** Section header: the section's icon chip (or a short bright bar), the title, and an optional "See all" style action with a chevron. */
+@Composable fun SaharaSectionHeader(title: String, modifier: Modifier = Modifier, tone: SaharaTone = SaharaTone.Rust, actionLabel: String? = null, onAction: (() -> Unit)? = null,
+    icon: ImageVector? = null) {
     Row(modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.size(width = 4.dp, height = 20.dp).clip(CircleShape).background(tone.solid))
+        if (icon != null) SaharaIconChip(icon, tone, size = 32) else Box(Modifier.size(width = 5.dp, height = 22.dp).clip(CircleShape).background(tone.solid))
         Spacer(Modifier.width(10.dp))
         Text(title, Modifier.weight(1f).a11yHeading(), style = MaterialTheme.typography.titleMedium, fontSize = 18.sp, color = SaharaColors.Ink)
         if (actionLabel != null && onAction != null) TextButton(onClick = onAction, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = tone.ink)) {
-            Text(actionLabel, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false)
+            Text(actionLabel, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, Modifier.size(20.dp))
         }
     }
 }
@@ -222,24 +239,24 @@ internal fun splitsWord(text: String, lineEnds: List<Int>): Boolean {
 /** Inline loading for part of a screen: a small ring and one line, in place of the content that is coming. */
 @Composable fun SaharaInlineLoading(text: String, modifier: Modifier = Modifier) {
     Row(modifier.fillMaxWidth().heightIn(min = 56.dp).padding(horizontal = 16.dp).announce(), verticalAlignment = Alignment.CenterVertically) {
-        CircularProgressIndicator(Modifier.size(22.dp), color = SaharaColors.Primary, strokeWidth = 2.5.dp)
+        CircularProgressIndicator(Modifier.size(24.dp), color = SaharaColors.Primary, trackColor = SaharaColors.PrimaryWash, strokeWidth = 3.dp)
         Spacer(Modifier.width(12.dp)); Text(text, style = MaterialTheme.typography.bodyMedium, color = SaharaColors.InkSub)
     }
 }
 
-/** Error state: what went wrong in one line and the one thing to do (usually Try again). */
+/** Error state: a bright icon, what went wrong in one line, and the one thing to do (usually Try again) as a real button. */
 @Composable fun SaharaErrorState(title: String, modifier: Modifier = Modifier, detail: String? = null, actionLabel: String? = null, onAction: (() -> Unit)? = null) {
-    Surface(modifier.fillMaxWidth(), shape = RoundedCornerShape(SaharaRadius.Lg), color = SaharaColors.ErrorWash, border = BorderStroke(1.dp, SaharaColors.Error)) {
-        Row(Modifier.padding(14.dp).announce(), verticalAlignment = Alignment.CenterVertically) {
-            SaharaIconChip(Icons.Default.ErrorOutline, SaharaTone.Error, size = 36)
-            Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold, color = SaharaColors.Ink)
-                if (detail != null) Text(detail, style = MaterialTheme.typography.bodySmall, color = SaharaColors.InkSub)
+    Surface(modifier.fillMaxWidth().saharaAppear(), shape = RoundedCornerShape(SaharaRadius.Lg), color = SaharaColors.ErrorWash, border = BorderStroke(1.dp, SaharaColors.Error)) {
+        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(Modifier.announce(), verticalAlignment = Alignment.CenterVertically) {
+                SaharaIconChip(Icons.Default.ErrorOutline, SaharaTone.Error, size = 40)
+                Spacer(Modifier.width(12.dp))
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold, color = SaharaColors.Ink)
+                    if (detail != null) Text(detail, style = MaterialTheme.typography.bodySmall, color = SaharaColors.InkSub)
+                }
             }
-            if (actionLabel != null && onAction != null) TextButton(onClick = onAction, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = SaharaColors.Error)) {
-                Text(actionLabel, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
-            }
+            if (actionLabel != null && onAction != null) SaharaPrimaryButton(actionLabel, onAction, Modifier.fillMaxWidth(), icon = Icons.Default.Refresh)
         }
     }
 }

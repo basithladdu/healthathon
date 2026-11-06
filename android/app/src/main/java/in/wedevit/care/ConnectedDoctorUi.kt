@@ -163,14 +163,14 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
             colors = NavigationBarItemDefaults.colors(selectedIconColor = Color.White, selectedTextColor = DoctorTones.Rust.ink, indicatorColor = DoctorTones.Rust.solid, unselectedIconColor = DoctorCardSub, unselectedTextColor = DoctorCardSub)) } }
     }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
-            if (busy) LinearProgressIndicator(Modifier.fillMaxWidth(), color = Rust)
+            if (busy) SaharaProgressBar(null)
             error?.let { message -> Surface(color = Peach) { Row(Modifier.fillMaxWidth().padding(12.dp)) { Text(message, Modifier.weight(1f).announce()); TextButton(onClick = ::refresh, enabled = !busy) { Text(t("Retry", "फिर कोशिश करें"), color = RustText) } } } }
             if (isolatedDemo) DoctorCareDemoHost(onExit = { isolatedDemo = false; nestedBack = null; navigationBlocked = false;testInitialSection="Hub" }, onNavigationBlockedChange = { navigationBlocked = it }, onHeaderBackChange = { nestedBack = it },initialPersonId=testCarePerson,initialSection=testInitialSection)
             else if (shared) EmbeddedSharedCare(vm, onAccount, { shared = false }, onNavigationBlockedChange = { navigationBlocked = it })
             else if (realPatientId != null) {
                 if (!doctorSharedPatientReady(selection, userId, realPeople.map { it.id }.toSet(), selectedRealId, realDraft.personId)) {
                     Column(Modifier.fillMaxWidth().padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                        if (realRefreshing || (realPatient != null && realDraft.personId != realPatientId)) CircularProgressIndicator(color = WelcomePanelOrange)
+                        if (realRefreshing || (realPatient != null && realDraft.personId != realPatientId)) SaharaBrandMark(size = 56)
                         Text(if (realPatient == null && !realRefreshing) t("Not available", "उपलब्ध नहीं") else t("Opening…", "खुल रहा है…"), style = MaterialTheme.typography.titleLarge)
                         realRefreshError?.let { Text(it) }
                         OutlinedButton(onClick = { vm.refresh() }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Retry", "फिर कोशिश करें")) }

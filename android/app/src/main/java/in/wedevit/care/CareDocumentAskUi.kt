@@ -127,7 +127,7 @@ import kotlinx.coroutines.withContext
             Heading(t("Ask your documents", "अपने कागज़ों से पूछें"), 26)
         } }
         if (checked && service == null) item { DocumentAskPill(t("Offline", "ऑफ़लाइन"), Mint, Modifier.testTag("document-ask-off")) }
-        if (!checked) item { LinearProgressIndicator(Modifier.fillMaxWidth(), color = DoctorAccent, trackColor = DoctorHairline) }
+        if (!checked) item { SaharaProgressBar(null) }
         else {
             item { OutlinedTextField(question, { question = it.take(DocumentQuestionRules.MAX_QUESTION); clear() }, label = { Text(t("Your question", "आपका सवाल")) }, minLines = 2, enabled = job == null, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag("document-ask-question")) }
             if (reports.isNotEmpty()) item { FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.testTag("document-ask-suggestions")) {
@@ -170,7 +170,7 @@ import kotlinx.coroutines.withContext
                 else OutlinedButton(onClick = { ask(false) }, enabled = ready, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("document-ask-local")) { Text(t("Search", "खोजें")) }
                 if (job != null) TextButton(onClick = { job?.cancel() }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Stop", "रोकें")) }
             } }
-            if (progress.isNotBlank()) item { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { LinearProgressIndicator(Modifier.fillMaxWidth(), color = DoctorAccent, trackColor = DoctorHairline); Text(progress, fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.announce()) } }
+            if (progress.isNotBlank()) item { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { SaharaProgressBar(null); Text(progress, fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.announce()) } }
         }
         if (message.isNotBlank()) item { Row(verticalAlignment = Alignment.CenterVertically) {
             Text(message, Modifier.weight(1f).announce(), color = MaterialTheme.colorScheme.error, fontSize = 14.sp)

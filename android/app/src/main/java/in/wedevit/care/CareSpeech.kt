@@ -176,7 +176,7 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
         }
         CareLanguageMenu(languageTag, enabled = !active, includeMixed = true) { languageTag = it }
         if (dictation.available) {
-            if (dictation.processing) LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), color = Rust)
+            if (dictation.processing) SaharaProgressBar(null, Modifier.padding(vertical = 8.dp))
             else if (dictation.listening) LinearProgressIndicator(progress = { dictation.level }, modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), color = Rust)
             if (dictation.partial.isNotBlank()) Text(dictation.partial, fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.padding(vertical = 8.dp))
             Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
