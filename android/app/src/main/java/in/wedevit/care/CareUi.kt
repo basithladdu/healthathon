@@ -599,7 +599,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         if (vm.canEdit.value && vm.localAudioRecordingAllowed && !vm.recordingSaving.value && vm.recordingSaveError.value == null) vm.startRecording(consentNames.joinToString("\n"), consentNames.toSet(), purposeAccepted, storageAccepted, accessAccepted, transcriptionAccepted, expected = recordingExpected)
         else vm.message.value = t("Recording unavailable", "रिकॉर्डिंग उपलब्ध नहीं")
     }
-    val mic = rememberSaharaMicGate()
+    val mic = rememberSaharaPermission(SaharaPermission.Microphone)
     LaunchedEffect(draft.source, draft.priorities, draft.participants, draft.topics, draft.questions, draft.nextSteps) { reviewed = false }
     val captureCallback by rememberUpdatedState(onDoctorCaptureChange)
     val capturing = doctorPresentation && clinician && step == 1

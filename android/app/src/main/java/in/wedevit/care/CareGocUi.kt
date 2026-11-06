@@ -117,15 +117,15 @@ private enum class GocStage { CAPTURE, REVIEW, NOTE }
 private val GocSand get() = Cream
 private val GocTickSoft get() = DoctorStatusGoodBg
 /** The page band and speaker chips (6 Nov AI-FIR grammar): a dark Sahara band, and two distinct speaker colours that carry white text above 4.5:1. */
-private val GocBandColor get() = DoctorStageDeep
+private val GocBandColor get() = SaharaColors.Band
 private val GocBandDone = Color(0xFF9BDDB0)
-private val GocDoctorChip get() = RustText
-private val GocPatientChip = Color(0xFF0F5E6B)
+private val GocDoctorChip get() = SaharaTone.Rust.ink
+private val GocPatientChip get() = SaharaTone.Teal.solid
 
 /** The card in the wizard's treatment step (V4 and V5 already passed there). Opens the talk over the wizard. */
 @Composable internal fun GocConversationCard(d: EctprRecord, update: ((EctprRecord) -> EctprRecord) -> Unit) {
     val t = careText(); val hindi = careHindi()
-    val mic = rememberSaharaMicGate()
+    val mic = rememberSaharaPermission(SaharaPermission.Microphone)
     var open by rememberSaveable(d.id) { mutableStateOf(false) }
     // Consent is ticked here, so one Record tap opens the talk already recording (6 Nov: 8 taps to a locked note became 6).
     var agreedAt by rememberSaveable(d.id) { mutableStateOf(0L) }
@@ -160,7 +160,7 @@ private val GocPatientChip = Color(0xFF0F5E6B)
         }
     }
     if (open) Dialog(onDismissRequest = { open = false }, properties = DialogProperties(usePlatformDefaultWidth = false, dismissOnClickOutside = false)) {
-        Surface(color = Cream, modifier = Modifier.fillMaxSize().imePadding()) { GocConversationPage(d, update, LocalGocFolder.current, mic.request, agreedAt = agreedAt, startRecording = startNow, onClose = { open = false; startNow = false }) }
+        Surface(color = Cream, modifier = Modifier.fillMaxSize().imePadding()) { GocConversationPage(d, update, LocalGocFolder.current, mic::request, agreedAt = agreedAt, startRecording = startNow, onClose = { open = false; startNow = false }) }
     }
 }
 

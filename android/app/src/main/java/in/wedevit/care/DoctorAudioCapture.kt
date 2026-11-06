@@ -45,7 +45,7 @@ import java.time.format.DateTimeFormatter
     val owner=LocalLifecycleOwner.current
     var approved by remember { mutableStateOf<ApprovedDoctorRecording?>(null) }
     DisposableEffect(controller) { onDispose { approved=null } }
-    val mic=rememberSaharaMicGate()
+    val mic=rememberSaharaPermission(SaharaPermission.Microphone)
     Surface(color=Peach.copy(alpha=.45f),shape=RoundedCornerShape(20.dp),modifier=Modifier.fillMaxWidth().testTag("doctor-live-capture")) {
         Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment=Alignment.CenterVertically) { Icon(Icons.Default.Mic,null,tint=Rust);Spacer(Modifier.width(10.dp));Text(if(state.recording) "Recording ${state.seconds/60}:${(state.seconds%60).toString().padStart(2,'0')}" else "Record",fontWeight=FontWeight.SemiBold) }

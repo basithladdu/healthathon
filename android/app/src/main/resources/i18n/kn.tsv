@@ -4893,9 +4893,6 @@ Use Google Gemini to write it down	Google Gemini ಮೂಲಕ ಬರೆಸಿ
 Questions to ask today (optional)	ಇಂದು ಕೇಳಬೇಕಾದ ಪ್ರಶ್ನೆಗಳು (ಐಚ್ಛಿಕ)
 Allow	ಅನುಮತಿಸಿ
 Confirm ${suggestions.size} and continue	${suggestions.size} ಖಚಿತಪಡಿಸಿ, ಮುಂದುವರಿಯಿರಿ
-Microphone is off	ಮೈಕ್ ಆಫ್ ಆಗಿದೆ
 Open Settings	ಸೆಟ್ಟಿಂಗ್ಸ್ ತೆರೆಯಿರಿ
-Sahara needs it to record this talk.	ಈ ಮಾತುಕತೆಯನ್ನು ರೆಕಾರ್ಡ್ ಮಾಡಲು ಸಹಾರಾಗೆ ಇದು ಬೇಕು.
 Step ${step + 1} of 5	ಹಂತ ${step + 1} / 5
-Turn it on in Settings to record.	ರೆಕಾರ್ಡ್ ಮಾಡಲು ಸೆಟ್ಟಿಂಗ್ಸ್‌ನಲ್ಲಿ ಆನ್ ಮಾಡಿ.
 Use the microphone?	ಮೈಕ್ ಬಳಸಬೇಕೇ?

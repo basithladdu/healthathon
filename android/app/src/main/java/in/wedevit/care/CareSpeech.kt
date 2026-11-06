@@ -154,7 +154,7 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
     val dictation = remember(personId) { CareDictation(context, { revision++ }, { words -> heldWords = words }) { words ->
         latestWords(words, pendingSpeaker, careSpeechLanguages.first { it.tag == pendingLanguageTag }.label).also { added -> heldWords = if (added) "" else words }
     } }
-    val mic = rememberSaharaMicGate()
+    val mic = rememberSaharaPermission(SaharaPermission.Microphone)
     DisposableEffect(dictation, owner) {
         val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_STOP) dictation.cancel() }
         owner.lifecycle.addObserver(observer)

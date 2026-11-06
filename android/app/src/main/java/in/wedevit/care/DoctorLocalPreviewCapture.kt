@@ -31,7 +31,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
         owner.lifecycle.addObserver(observer)
         onDispose {approved=null;owner.lifecycle.removeObserver(observer)}
     }
-    val mic=rememberSaharaMicGate()
+    val mic=rememberSaharaPermission(SaharaPermission.Microphone)
     // Review annotations belong to this source/clip, never to another recording or patient.
     var coverage by remember(controller,sourceText,clip?.id,state.recording) {mutableStateOf(defaultDoctorCoverage())}
     var reviewing by remember(controller,sourceText,clip?.id,state.recording) {mutableStateOf<Int?>(null)}
