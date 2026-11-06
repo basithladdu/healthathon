@@ -63,7 +63,7 @@ object DoctorWorkflowPdf {
             paragraph("Source references\n" + if(d.transcribedAt>0) "Consented conversation recording and exact transcript below" else DoctorWorkflowData.sources(version.patientId).filter { it.id in d.sourceIds }.joinToString("\n") { it.label }.ifBlank { "Manually entered source" })
             if(d.evidence.isNotEmpty()) paragraph("Source evidence\n"+d.evidence.joinToString("\n") { "${it.section}: ${it.quote}" })
             paragraph("Original source text\n${d.sourceText}")
-            paragraph("This is a practice document. No professional identity was verified. This document is not a prescription, treatment order, consent form, advance directive or verified signature. No external patient/family delivery has occurred.")
+            paragraph("This is a practice walkthrough document. No professional identity was verified. This document is not a prescription, treatment order, consent form, advance directive or verified signature. No external patient/family delivery has occurred.")
             finish()
             file.outputStream().use { pdf.writeTo(it) }
         } finally { pdf.close() }
