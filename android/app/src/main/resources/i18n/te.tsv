@@ -4891,3 +4891,19 @@ Record this talk?	ఈ సంభాషణను రికార్డ్ చే�
 The audio stays on this phone.	ఆడియో ఈ ఫోన్‌లోనే ఉంటుంది.
 Use Google Gemini to write it down	Google Gemini తో రాయించండి
 Questions to ask today (optional)	ఈరోజు అడగాల్సిన ప్రశ్నలు (ఐచ్ఛికం)
+# Onboarding lane, 6 Nov: role tiles and Practice naming.
+Practice user, currently ${user.name}, ${user.role}	అభ్యాస యూజర్, ప్రస్తుతం ${user.name}, ${user.role}
+Leave Practice	అభ్యాసం నుంచి బయటకు వెళ్ళండి
+Who is using Sahara?	సహారాను ఎవరు ఉపయోగిస్తున్నారు?
+Add the person you care for	మీరు చూసుకునే వ్యక్తిని జోడించండి
+Start with your name	మీ పేరుతో మొదలుపెట్టండి
+Look around with a ready-made record. No account needed.	సిద్ధంగా ఉన్న రికార్డుతో యాప్‌ను చూడండి. ఖాతా అవసరం లేదు.
+Open Dr Meera's practice workspace. No account needed.	డా. మీరా అభ్యాస వర్క్‌స్పేస్ తెరవండి. ఖాతా అవసరం లేదు.
+Practice as	ఎవరిగా అభ్యాసం చేయాలి
+Patient · sees his own care record	రోగి · తన సంరక్షణ రికార్డును చూస్తారు
+Family · Rahul's brother	కుటుంబం · రాహుల్ సోదరుడు
+Couldn't open Practice.	అభ్యాసం తెరవలేకపోయాం.
+Leaving Practice…	అభ్యాసం నుంచి బయటకు వెళ్తున్నాం…
+Practice record removed.	అభ్యాస రికార్డు తీసివేయబడింది.
+Not available in Practice	అభ్యాసంలో అందుబాటులో లేదు
+Leave Practice to sign in or use an account.	సైన్ ఇన్ చేయడానికి లేదా ఖాతా వాడటానికి అభ్యాసం నుంచి బయటకు వెళ్ళండి.

@@ -61,7 +61,7 @@ class CareHeaderUiTest {
         ui.onNodeWithTag("walkthrough-switch-rahul").assertIsSelected()
         ui.onNodeWithTag("leave-walkthrough").assertIsDisplayed()
         ui.onNodeWithTag("walkthrough-switch-arjun").performClick()
-        ui.onNodeWithContentDescription("Walkthrough user, currently Arjun, Family").assertIsDisplayed()
+        ui.onNodeWithContentDescription("Practice user, currently Arjun, Family").assertIsDisplayed()
         ui.runOnIdle { assertEquals("second", selected.value); assertEquals(1, additions); assertEquals(1, invites); assertEquals("arjun", user.value.key); assertEquals(0, left) }
     }
 
@@ -93,7 +93,7 @@ class CareHeaderUiTest {
         ui.setContent { CareTheme { Welcome({ accounts++ }, { started++ }, { workspaces++ }, { walkthroughs++ }) } }
         ui.onNodeWithText("Explore what Sahara can help with").assertDoesNotExist()
         ui.onNodeWithText("Care notes, medicines and visits.").assertDoesNotExist()
-        ui.onNodeWithText("Get started").assertIsDisplayed()
+        ui.onNodeWithText("Who is using Sahara?").assertIsDisplayed()
         ui.onNodeWithTag("doctor-demo-entry").assertDoesNotExist()
         ui.onNodeWithTag("welcome-patient-family").performScrollTo().performClick()
         ui.onNodeWithTag("welcome-add-person").performScrollTo().performClick()

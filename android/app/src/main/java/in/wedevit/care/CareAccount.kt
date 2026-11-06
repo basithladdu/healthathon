@@ -21,8 +21,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -110,7 +112,7 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
                 else Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Heading(rt("I'm a doctor", "मैं डॉक्टर हूँ"), 26)
                     Text(session!!.email, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-                    Button(onClick = { doctorOpen = true; doctorEntryPending = false }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(rt("Continue", "आगे बढ़ें")) }
+                    SaharaPrimaryButton(rt("Open doctor workspace", "डॉक्टर वर्कस्पेस खोलें"), onClick = { doctorOpen = true; doctorEntryPending = false }, icon = Icons.Default.MedicalServices, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp))
                 }
             }, onWelcomePanelChanged = { doctorEntryPending = it == "doctor" },
             openToday = openToday, onOpenTodayHandled = { root.openToday.value = null })
@@ -141,7 +143,7 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
                 OutlinedTextField(password,{password=it},singleLine=true,label={Text(t("Password", "पासवर्ड"))},visualTransformation=PasswordVisualTransformation(),keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Password),modifier=Modifier.fillMaxWidth())
                 Button(onClick={if(!busy){busy=true;error=null;scope.launch {try {cloud.signIn(email,password);password="";onDismiss()}catch(e:Exception){if(e is CancellationException)throw e;error=t("Wrong email or password.", "ईमेल या पासवर्ड ग़लत है।")}finally{busy=false}}}},enabled=!busy && email.contains('@') && password.isNotEmpty(),modifier=Modifier.fillMaxWidth().heightIn(min=52.dp)) { Text(if(busy) t("Please wait…", "कृपया रुकें…") else t("Sign in", "साइन इन करें")) }
             }
-            error?.let {Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce())}
+            error?.let { SaharaDialog(it, onDismiss = { error = null }, tone = SaharaTone.Error) }
             TextButton(onClick=onDismiss,enabled=!busy) {Text(t("Close", "बंद करें"))}
         }
     }
@@ -169,6 +171,7 @@ private fun clipboardText(context: android.content.Context): String? = (context.
     val scope = rememberCoroutineScope()
     var email by rememberSaveable { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var passwordShown by remember { mutableStateOf(false) }
     var create by rememberSaveable { mutableStateOf(false) }
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -233,24 +236,24 @@ private fun clipboardText(context: android.content.Context): String? = (context.
     }
     fun day(ms: Long) = java.time.Instant.ofEpochMilli(ms).atZone(java.time.ZoneId.systemDefault()).format(careDateFormat(CARE_SHORT_DATE, hindi))
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = 16.dp).padding(bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Heading(heading ?: if (session == null) if (create) t("Create an account", "खाता बनाएँ") else t("Sign in", "साइन इन करें") else t("Your account", "आपका खाता"), 28)
+            Heading(heading ?: if (session == null) if (create) t("Create an account", "खाता बनाएँ") else t("Sign in", "साइन इन करें") else t("Your account", "आपका खाता"), if (session == null) 24 else 28)
             banner?.let { Surface(color = Mint, shape = RoundedCornerShape(14.dp)) { Text(it, Modifier.fillMaxWidth().padding(16.dp), fontWeight = FontWeight.Medium) } }
             if (session == null) {
-                OutlinedTextField(email, { email = it }, label = { Text(t("Email", "ईमेल")) }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(password, { password = it }, label = { Text(t("Password", "पासवर्ड")) }, singleLine = true, visualTransformation = PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth(),
+                OutlinedTextField(email, { email = it }, label = { Text(t("Email", "ईमेल")) }, singleLine = true, leadingIcon = { Icon(Icons.Default.MailOutline, null) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next), shape = RoundedCornerShape(SaharaRadius.Sm), modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(password, { password = it }, label = { Text(t("Password", "पासवर्ड")) }, singleLine = true, leadingIcon = { Icon(Icons.Default.Lock, null) },
+                    trailingIcon = { IconButton(onClick = { passwordShown = !passwordShown }) { Icon(if (passwordShown) Icons.Default.VisibilityOff else Icons.Default.Visibility, if (passwordShown) t("Hide password", "पासवर्ड छिपाएँ") else t("Show password", "पासवर्ड दिखाएँ")) } },
+                    visualTransformation = if (passwordShown) VisualTransformation.None else PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done), shape = RoundedCornerShape(SaharaRadius.Sm), modifier = Modifier.fillMaxWidth(),
                     placeholder = if (create) { { Text(t("At least 10 characters", "कम से कम 10 अक्षर")) } } else null)
-                Button(onClick = { authRun {
+                SaharaPrimaryButton(if (busy) t("Please wait…", "कृपया रुकें…") else if (create) t("Create account", "खाता बनाएँ") else t("Sign in", "साइन इन करें"), onClick = { authRun {
                     if (create) when (cloud.signUp(email, password)) {
                         CareSignUp.SIGNED_IN -> password = ""
                         CareSignUp.CONFIRMATION_SENT -> { awaitingConfirmation = email.trim(); create = false; password = ""; notice = t("Check your email to confirm, then sign in.", "पुष्टि के लिए अपना ईमेल देखें, फिर साइन इन करें।") }
                         CareSignUp.ALREADY_REGISTERED -> { create = false; password = ""; error = careAuthMessage(CARE_ALREADY_REGISTERED, hindi) }
                     }
                     else { cloud.signIn(email, password); awaitingConfirmation = "" }
-                } }, enabled = !busy && email.contains('@') && password.isNotEmpty(), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) {
-                    if (busy) { CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = LocalContentColor.current); Spacer(Modifier.width(8.dp)) }
-                    Text(if (busy) t("Please wait…", "कृपया रुकें…") else if (create) t("Create account", "खाता बनाएँ") else t("Sign in", "साइन इन करें"))
-                }
-                if (awaitingConfirmation.isNotBlank()) OutlinedButton(onClick = { authRun { cloud.resendConfirmation(awaitingConfirmation); notice = t("Email sent again.", "ईमेल फिर भेजा गया।") } }, enabled = !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.MailOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Resend email", "ईमेल फिर भेजें")) }
+                } },
+                    enabled = email.contains('@') && password.isNotEmpty(), busy = busy, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp))
+                if (awaitingConfirmation.isNotBlank()) SaharaSecondaryButton(t("Resend email", "ईमेल फिर भेजें"), onClick = { authRun { cloud.resendConfirmation(awaitingConfirmation); notice = t("Email sent again.", "ईमेल फिर भेजा गया।") } }, enabled = !busy, icon = Icons.Default.MailOutline, modifier = Modifier.fillMaxWidth())
                 // Secondary links side by side, so the form stays short.
                 FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     if (!create) TextButton(onClick = { authRun {
@@ -259,7 +262,7 @@ private fun clipboardText(context: android.content.Context): String? = (context.
                     } }, enabled = !busy && email.contains('@') && CareEmailAvailability.ready, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Forgot password?", "पासवर्ड भूल गए?")) }
                     TextButton(onClick = { create = !create; error = null; notice = null }, enabled = !busy && (create || CareEmailAvailability.ready), modifier = Modifier.heightIn(min = 48.dp)) { Text(if (create) t("Already have an account? Sign in", "पहले से खाता है? साइन इन करें") else t("Create an account", "खाता बनाएँ"), fontWeight = FontWeight.SemiBold) }
                 }
-                if (onInvite != null) OutlinedButton(onClick = { val pasted = clipboardText(context); if (CareInviteLink.parse(pasted) != null) { onInvite(pasted.orEmpty()); error = null; notice = t("Invite saved. Sign in to join.", "निमंत्रण रख लिया। जुड़ने के लिए साइन इन करें।") } else { notice = null; error = t("No invite copied.", "कोई निमंत्रण कॉपी नहीं हुआ।") } }, enabled = !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.ContentPaste, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Paste invite", "निमंत्रण चिपकाएँ")) }
+                if (onInvite != null) SaharaSecondaryButton(t("Paste invite", "निमंत्रण चिपकाएँ"), onClick = { val pasted = clipboardText(context); if (CareInviteLink.parse(pasted) != null) { onInvite(pasted.orEmpty()); error = null; notice = t("Invite saved. Sign in to join.", "निमंत्रण रख लिया। जुड़ने के लिए साइन इन करें।") } else { notice = null; error = t("No invite copied.", "कोई निमंत्रण कॉपी नहीं हुआ।") } }, enabled = !busy, icon = Icons.Default.ContentPaste, modifier = Modifier.fillMaxWidth())
             } else {
                 // Who is signed in, with refresh beside it: one row instead of a line and a separate button.
                 Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
@@ -335,11 +338,14 @@ private fun clipboardText(context: android.content.Context): String? = (context.
                 TextButton(onClick = { deleteUnderstood = false; deleting = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Icon(Icons.Default.DeleteOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Delete account", "खाता मिटाएँ")) }
                 if (deletionByEmail) TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.delete_account_url)))) }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Request deletion by email", "ईमेल से मिटाने का अनुरोध भेजें")) }
             }
-            notice?.let { Text(it, color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Medium, modifier = Modifier.announce()) }
-            error?.let { Text(it, color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Medium, modifier = Modifier.announce()) }
+            // Signed out, results of sign-in and sign-up come as a short dialog so they are never missed below the keyboard.
+            if (session != null) notice?.let { Text(it, color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Medium, modifier = Modifier.announce()) }
+            if (session != null) error?.let { Text(it, color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Medium, modifier = Modifier.announce()) }
             TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url)))) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Privacy policy", "निजता नीति"), color = DoctorCardSub) }
             if (session != null) OutlinedButton(onClick = { signingOut = true }, enabled = !busy, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, MaterialTheme.colorScheme.error), colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("account-sign-out")) { Icon(Icons.AutoMirrored.Filled.Logout, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(t("Sign out", "साइन आउट करें"), fontWeight = FontWeight.SemiBold) }
         }
+    if (session == null) error?.let { SaharaDialog(it, onDismiss = { error = null }, tone = SaharaTone.Error) }
+    if (session == null && error == null) notice?.let { SaharaDialog(it, onDismiss = { notice = null }, tone = SaharaTone.Info) }
     if (addFamily) AddFamilySheet(vm, onDismiss = { addFamily = false }, onSignIn = {}, onInvited = { inviteTick++ })
     removing?.let { member -> AlertDialog(onDismissRequest = { removing = null }, title = { Text(t("Stop sharing with this person?", "इस व्यक्ति के साथ साझा करना बंद करें?")) }, confirmButton = { TextButton(onClick = { removing = null; val person = selected; run { cloud.removeMember(person, member.userId); loadSharing(person); if (vm.selected.value == person) notice = t("${member.email} no longer has access.", "${member.email} की पहुँच हटा दी गई।") } }) { Text(t("Stop sharing", "साझा करना बंद करें")) } }, dismissButton = { TextButton(onClick = { removing = null }) { Text(t("Keep sharing", "साझा करते रहें")) } }) }
     if (deleting) AlertDialog(onDismissRequest = { deleting = false }, title = { Text(t("Delete account?", "खाता मिटाएँ?")) },

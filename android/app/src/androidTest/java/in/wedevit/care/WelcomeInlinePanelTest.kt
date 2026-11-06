@@ -14,7 +14,6 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import org.junit.Assert.assertEquals
@@ -46,9 +45,9 @@ class WelcomeInlinePanelTest {
             ui.onNodeWithText(label).performSemanticsAction(SemanticsActions.GetTextLayoutResult) { action -> action(layouts) }
             org.junit.Assert.assertTrue("Collapsed welcome copy is centred", layouts.any { it.layoutInput.style.textAlign == TextAlign.Center })
         }
-        val doctorLayouts = mutableListOf<TextLayoutResult>()
-        ui.onNodeWithText("I'm a doctor", useUnmergedTree = true).performSemanticsAction(SemanticsActions.GetTextLayoutResult) { action -> action(doctorLayouts) }
-        org.junit.Assert.assertTrue("Doctor entry remains a clearly underlined text link", doctorLayouts.any { it.layoutInput.style.textDecoration?.contains(TextDecoration.Underline) == true })
+        // Three labelled role tiles: patient, family, doctor.
+        ui.onNodeWithTag("welcome-family").assertHasClickAction().assertHeightIsAtLeast(48.dp)
+        listOf("Patient", "Family", "Doctor").forEach { ui.onNodeWithText(it, useUnmergedTree = true).assertExists() }
         val screen = ui.onNodeWithTag("welcome-panel-screen").fetchSemanticsNode().boundsInRoot
         val illustration = ui.onNodeWithTag("welcome-hero-illustration").fetchSemanticsNode().boundsInRoot
         org.junit.Assert.assertTrue(kotlin.math.abs(screen.center.x - illustration.center.x) <= 2f)
@@ -87,6 +86,19 @@ class WelcomeInlinePanelTest {
             assertEquals(0, legacyCallbacks)
             assertEquals(1, walkthroughs)
         }
+    }
+
+    @Test fun familyTileOpensTheSamePanelAsPatientWithFamilyWording() {
+        val selections = mutableListOf<String>()
+        ui.setContent { CareTheme { Welcome({}, {}, addPersonContent = { _ -> Text("Synthetic person form") }, onPanelChanged = { selections += it }) } }
+        ui.onNodeWithTag("welcome-family").performScrollTo().performClick()
+        ui.onNodeWithTag("welcome-add-person").assertIsDisplayed()
+        ui.onNodeWithText("Add the person you care for").assertIsDisplayed()
+        ui.onNodeWithTag("patient-walkthrough-entry").assertIsDisplayed()
+        ui.onNodeWithTag("welcome-panel-back").performClick()
+        ui.onNodeWithTag("welcome-patient-family").performScrollTo().performClick()
+        ui.onNodeWithText("Start with your name").assertIsDisplayed()
+        ui.runOnIdle { assertEquals(listOf("family", "", "family"), selections) }
     }
 
     @Test fun doctorFormRemainsReadableAtLargeTextAndCannotCloseWhileBusy() {

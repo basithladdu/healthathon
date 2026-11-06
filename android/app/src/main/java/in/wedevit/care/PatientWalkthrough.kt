@@ -3,27 +3,27 @@ package `in`.wedevit.care
 import android.app.Application
 import android.content.Context
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.PeopleOutline
 import androidx.compose.material.icons.filled.PersonOutline
+import androidx.compose.material.icons.filled.School
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -71,24 +71,49 @@ object PatientWalkthrough {
     }
 }
 
-/** Two ready-made users. Choosing one enters the walkthrough as that user. */
+/** Two ready-made users. Choosing one enters Practice as that user. */
 @Composable fun PatientWalkthroughChooser(onPick: (String) -> Unit, onDismiss: () -> Unit) { val t = careText();
-    AlertDialog(onDismissRequest = onDismiss, modifier = Modifier.testTag("patient-walkthrough-chooser"), title = { Text(t("Try a demo", "डेमो देखें")) },
-        text = { Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    AlertDialog(onDismissRequest = onDismiss, modifier = Modifier.testTag("patient-walkthrough-chooser"), shape = RoundedCornerShape(SaharaRadius.Hero), containerColor = SaharaColors.Surface,
+        icon = { SaharaIconChip(Icons.Default.School, SaharaTone.Marigold, size = 48) },
+        title = { Text(t("Practice as", "किसके रूप में अभ्यास करें"), Modifier.a11yHeading(), style = MaterialTheme.typography.titleLarge, color = SaharaColors.Ink, textAlign = TextAlign.Center) },
+        text = { Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             PatientWalkthrough.users.forEach { user ->
                 val patient = user.role == "Patient"
-                Surface(shape = RoundedCornerShape(20.dp), color = if (patient) SaharaApricot else SaharaLavender,
-                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).testTag("patient-walkthrough-${user.key}").clickable(role = Role.Button) { onPick(user.key) }) {
-                    Row(Modifier.padding(16.dp).heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Surface(shape = CircleShape, color = Paper) { Icon(if (patient) Icons.Default.PersonOutline else Icons.Default.PeopleOutline, null, Modifier.padding(10.dp).size(22.dp), tint = RustText) }
+                val tone = if (patient) SaharaTone.Teal else SaharaTone.Leaf
+                val interaction = remember(user.key) { MutableInteractionSource() }
+                Surface(onClick = { onPick(user.key) }, shape = RoundedCornerShape(SaharaRadius.Lg), color = tone.wash, contentColor = SaharaColors.Ink, border = BorderStroke(1.5.dp, tone.solid), interactionSource = interaction,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp).saharaPress(interaction).testTag("patient-walkthrough-${user.key}")) {
+                    Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                        SaharaIconChip(if (patient) Icons.Default.PersonOutline else Icons.Default.PeopleOutline, tone, size = 40)
                         Spacer(Modifier.width(12.dp))
-                        Text("${user.name} — " + if (patient) t("Patient", "मरीज़") else t("Family", "परिवार"), Modifier.weight(1f), fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = Ink)
-                        Icon(Icons.Default.ChevronRight, null, tint = RustText)
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text(user.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = tone.ink)
+                            Text(if (patient) t("Patient · sees his own care record", "मरीज़ · अपना देखभाल रिकॉर्ड देखते हैं") else t("Family · Rahul's brother", "परिवार · राहुल के भाई"), style = MaterialTheme.typography.bodyMedium, color = SaharaColors.InkSub)
+                        }
+                        Icon(Icons.Default.ChevronRight, null, tint = tone.ink)
                     }
                 }
             }
-        } }, containerColor = Paper,
-        confirmButton = {}, dismissButton = { TextButton(onClick = onDismiss) { Text(t("Cancel", "रद्द करें")) } })
+        } },
+        confirmButton = {}, dismissButton = { TextButton(onClick = onDismiss, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें"), fontWeight = FontWeight.SemiBold) } })
+}
+
+/** The Practice entry on the welcome panels: a marigold row that reads as a button, with one line saying what it opens. */
+@Composable internal fun SaharaPracticeEntry(title: String, detail: String, enabled: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val interaction = remember { MutableInteractionSource() }
+    val tone = SaharaTone.Marigold
+    Surface(onClick = onClick, enabled = enabled, shape = RoundedCornerShape(SaharaRadius.Lg), color = tone.wash, contentColor = SaharaColors.Ink, border = BorderStroke(1.5.dp, tone.solid), interactionSource = interaction,
+        modifier = modifier.fillMaxWidth().heightIn(min = 64.dp).saharaPress(interaction)) {
+        Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+            SaharaIconChip(Icons.Default.School, tone, size = 40)
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = tone.ink)
+                Text(detail, style = MaterialTheme.typography.bodyMedium, color = SaharaColors.InkSub)
+            }
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = tone.ink)
+        }
+    }
 }
 
 /** Hosts the normal patient app on a local model fixed to one walkthrough user. Leaving restores the real app. */
@@ -100,13 +125,15 @@ object PatientWalkthrough {
     val scope = rememberCoroutineScope()
     var ready by remember(userKey) { mutableStateOf(false) }; var error by remember(userKey) { mutableStateOf<String?>(null) }
     var closing by remember(userKey) { mutableStateOf(false) }; var attempt by remember { mutableIntStateOf(0) }
+    // Account actions are not part of Practice; a short dialog says so instead of a toast.
+    var accountUnavailable by remember(userKey) { mutableStateOf(false) }
     val people by vm.people.collectAsState(); val selected by vm.selected.collectAsState(); val draft by vm.draft.collectAsState()
     fun leave() { if (!closing) { closing = true; scope.launch { val job = vm.closeDoctorDemo(); job.join(); onExit() } } }
     fun switchTo(key: String) { if (key == userKey) return; if (!closing) { closing = true; scope.launch { val job = vm.closeDoctorDemo(); job.join(); onSwitch(key) } } }
     DisposableEffect(vm) { onDispose { vm.closeDoctorDemo() } }
     LaunchedEffect(vm, attempt) {
         try { PatientWalkthrough.seed(vm, context); vm.select(PatientWalkthrough.personId); vm.refreshCareContacts(); vm.refreshMedicineHistory(); ready = true }
-        catch (e: Exception) { if (e is CancellationException) throw e; android.util.Log.e("SaharaSeed", "patient walkthrough load failed", e); error = t("Couldn't load the demo.", "डेमो नहीं खुल सका।") }
+        catch (e: Exception) { if (e is CancellationException) throw e; android.util.Log.e("SaharaSeed", "patient walkthrough load failed", e); error = t("Couldn't open Practice.", "अभ्यास नहीं खुल सका।") }
     }
     val person = PatientWalkthrough.visiblePeople(people).firstOrNull()
     val state = when {
@@ -119,10 +146,12 @@ object PatientWalkthrough {
     // Back while the walkthrough is still opening, failed or removed leaves it; back while leaving waits.
     BackHandler(state != "open") { leave() }
     SaharaScreenHost(state, Modifier.fillMaxSize().background(Cream), label = "Patient walkthrough") { shown -> when (shown) {
-        "closing" -> SaharaLoading(t("Leaving the walkthrough…", "डेमो से बाहर जा रहे हैं…"))
-        "error" -> Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.Center) { SaharaEmpty(error ?: "", icon = Icons.Default.ErrorOutline, actionLabel = t("Retry", "फिर कोशिश करें"), onAction = { error = null; attempt++ }, secondaryLabel = t("Leave walkthrough", "डेमो से बाहर जाएँ"), onSecondary = ::leave) }
-        "removed" -> Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.Center) { SaharaEmpty(t("Demo record removed.", "डेमो रिकॉर्ड हटा दिया गया।"), secondaryLabel = t("Leave walkthrough", "डेमो से बाहर जाएँ"), onSecondary = ::leave) }
+        "closing" -> SaharaLoading(t("Leaving Practice…", "अभ्यास से बाहर जा रहे हैं…"))
+        "error" -> Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.Center) { SaharaEmpty(error ?: "", icon = Icons.Default.ErrorOutline, actionLabel = t("Retry", "फिर कोशिश करें"), onAction = { error = null; attempt++ }, secondaryLabel = t("Leave Practice", "अभ्यास से बाहर जाएँ"), onSecondary = ::leave) }
+        "removed" -> Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.Center) { SaharaEmpty(t("Practice record removed.", "अभ्यास रिकॉर्ड हटा दिया गया।"), secondaryLabel = t("Leave Practice", "अभ्यास से बाहर जाएँ"), onSecondary = ::leave) }
         "opening" -> SaharaLoading(t("Opening care records…", "देखभाल रिकॉर्ड खुल रहे हैं…"))
-        else -> CareApp(vm, onAccount = { vm.message.value = t("Not available in the demo.", "डेमो में उपलब्ध नहीं।") }, walkthrough = user, onLeaveWalkthrough = ::leave, onSwitchWalkthrough = ::switchTo)
+        else -> CareApp(vm, onAccount = { accountUnavailable = true }, walkthrough = user, onLeaveWalkthrough = ::leave, onSwitchWalkthrough = ::switchTo)
     } }
+    if (accountUnavailable) SaharaDialog(t("Not available in Practice", "अभ्यास में उपलब्ध नहीं"), onDismiss = { accountUnavailable = false },
+        text = t("Leave Practice to sign in or use an account.", "साइन इन या खाते के लिए अभ्यास से बाहर जाएँ।"), confirmLabel = t("OK", "ठीक है"))
 }

@@ -49,7 +49,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -186,7 +185,8 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
     val screens = rememberSaveableStateHolder()
     val snackbar = remember { SnackbarHostState() }
     val person = people.firstOrNull { it.id == selected }
-    val compactWelcomeHeader = LocalConfiguration.current.screenWidthDp < 360 || LocalDensity.current.fontScale > 1.15f
+    // The language name stays beside the icon on the welcome screen up to 1.3x text, so the choice is easy to find before sign-in.
+    val compactWelcomeHeader = LocalConfiguration.current.screenWidthDp < 340 || LocalDensity.current.fontScale > 1.3f
     LaunchedEffect(selected) {
         reading = null
         if (medicineScanner && medicineScannerPerson != selected) medicineScanner = false
@@ -317,21 +317,30 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     doctorContent: (@Composable (() -> Unit, (Boolean) -> Unit) -> Unit)? = null,
     onPanelChanged: (String) -> Unit = {}, entryBusy: Boolean = false) {
     var panel by rememberSaveable { mutableStateOf("") }
+    // Which role tile opened the shared patient/family panel. It changes only the wording there; both open the same panel.
+    var role by rememberSaveable { mutableStateOf("patient") }
     var formBusy by remember { mutableStateOf(false) }
     var walkthroughChooser by rememberSaveable { mutableStateOf(false) }
     val focus = LocalFocusManager.current; val t = careText()
     val panelGap = welcomePanelGapDp(LocalConfiguration.current.screenHeightDp, LocalDensity.current.fontScale)
     val heroTopPadding = welcomeHeroTopPaddingDp(LocalConfiguration.current.screenHeightDp, LocalDensity.current.fontScale)
+    // Three tiles side by side on a normal phone; stacked rows on a narrow screen or at large text, so no label is ever split.
+    val stackRoles = welcomeRolesStacked(LocalConfiguration.current.screenWidthDp, LocalDensity.current.fontScale)
     fun select(value: String) { if (!formBusy && !entryBusy) { focus.clearFocus(); panel = value; onPanelChanged(value) } }
     val close = { if (!formBusy && !entryBusy) select(if (panel == "person" || panel == "account") "family" else "") }
     BackHandler(panel.isNotEmpty()) { close() }
     if (walkthroughChooser) PatientWalkthroughChooser(onPick = { walkthroughChooser = false; onPatientWalkthrough(it) }, onDismiss = { walkthroughChooser = false })
-    // One value drives the whole change: the orange panel rises over the picture while the picture fades and drifts up.
+    // One value drives the whole change: the band panel rises over the picture while the picture fades and drifts up.
     // Nothing is re-measured per frame, so it stays smooth; the panel's own contents cross-fade.
     val open = panel.isNotEmpty()
     val progress by animateFloatAsState(if (open) 1f else 0f, SaharaMotion.tween(SaharaMotion.PANEL_MS, easing = SaharaMotion.Emphasized))
     var closedPanelPx by remember { mutableIntStateOf(0) }
     val density = LocalDensity.current
+    val roles = listOf(
+        WelcomeRole("patient", t("Patient", "मरीज़"), Icons.Default.Person, SaharaTone.Teal, "welcome-patient-family"),
+        WelcomeRole("family", t("Family", "परिवार"), Icons.Default.People, SaharaTone.Leaf, "welcome-family"),
+        WelcomeRole("doctor", t("Doctor", "डॉक्टर"), Icons.Default.MedicalServices, SaharaTone.Indigo, "doctor-workspace-entry"))
+    fun pick(key: String) { if (key == "doctor") select("doctor") else if (!formBusy && !entryBusy) { role = key; select("family") } }
     BoxWithConstraints(Modifier.fillMaxSize().imePadding().testTag("welcome-panel-screen")) {
         val fullPx = constraints.maxHeight
         val closedPx = closedPanelPx.coerceIn(0, fullPx)
@@ -347,36 +356,49 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         }
         if (!open) Spacer(Modifier.align(Alignment.BottomCenter).padding(bottom = with(density) { closedPx.toDp() }).fillMaxWidth().height(panelGap.dp).testTag("welcome-panel-gap"))
         val panelHeight = if (!open && progress <= 0f) Modifier.wrapContentHeight() else Modifier.height(with(density) { (closedPx + (fullPx - closedPx) * progress).toInt().toDp() })
-        Surface(color = WelcomePanelOrange, contentColor = WelcomePanelInk, shape = RoundedCornerShape(topStart = 48.dp, topEnd = 48.dp),
+        Surface(color = WelcomePanelOrange, contentColor = WelcomePanelInk, shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
             modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().then(panelHeight).onSizeChanged { if (!open && progress <= 0f) closedPanelPx = it.height }.testTag("welcome-orange-panel")) {
             AnimatedContent(panel, transitionSpec = { fadeIn(SaharaMotion.tween(SaharaMotion.ENTER_MS - 60, 80)) togetherWith fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS)) using null },
                 contentAlignment = Alignment.TopCenter) { shown ->
                 Column(if (shown.isEmpty()) Modifier.fillMaxWidth() else Modifier.fillMaxSize()) {
-                    if (shown.isEmpty()) Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 22.dp, end = 22.dp, top = 22.dp, bottom = 14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Text(t("Welcome to Sahara", "सहारा में आपका स्वागत है"), modifier = Modifier.fillMaxWidth().testTag("welcome-panel-heading"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 26.sp, textAlign = TextAlign.Center)
-                        Button(onClick = { select("family") }, enabled = !entryBusy, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Paper, contentColor = RustText), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("welcome-patient-family")) { Text(t("Get started", "शुरू करें")) }
-                        TextButton(onClick = { select("doctor") }, enabled = !entryBusy, colors = ButtonDefaults.textButtonColors(contentColor = WelcomePanelInk), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-workspace-entry")) { Text(t("I'm a doctor", "मैं डॉक्टर हूँ"), textDecoration = TextDecoration.Underline) }
-                    } else {
-                        Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                            IconButton(onClick = close, enabled = !formBusy && !entryBusy, modifier = Modifier.testTag("welcome-panel-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस"), tint = WelcomePanelInk) }
-                            Text(when(shown) { "family" -> t("Get started", "शुरू करें"); "person" -> t("Add a person", "व्यक्ति जोड़ें"); "doctor" -> t("Doctor", "डॉक्टर"); else -> t("Sign in", "साइन इन") }, fontFamily = SaharaTitleFont, fontSize = 22.sp, fontWeight = FontWeight.Medium)
+                    if (shown.isEmpty()) Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 14.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Text(t("Welcome to Sahara", "सहारा में आपका स्वागत है"), modifier = Modifier.fillMaxWidth().a11yHeading().testTag("welcome-panel-heading"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 26.sp, lineHeight = 32.sp, textAlign = TextAlign.Center)
+                        Text(t("Who is using Sahara?", "सहारा कौन इस्तेमाल कर रहा है?"), Modifier.fillMaxWidth(), color = SaharaColors.OnBandSub, fontSize = 16.sp, lineHeight = 22.sp, textAlign = TextAlign.Center)
+                        if (stackRoles) Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            roles.forEachIndexed { index, item -> WelcomeRoleTile(item, index, stacked = true, enabled = !entryBusy, onClick = { pick(item.key) }, modifier = Modifier.fillMaxWidth()) }
+                        } else Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            roles.forEachIndexed { index, item -> WelcomeRoleTile(item, index, stacked = false, enabled = !entryBusy, onClick = { pick(item.key) }, modifier = Modifier.weight(1f).fillMaxHeight()) }
                         }
-                        Surface(color = Paper, contentColor = Ink, shape = RoundedCornerShape(topStart = 26.dp, topEnd = 26.dp), modifier = Modifier.fillMaxWidth().weight(1f)) {
-                            Box(Modifier.fillMaxSize().padding(top = 20.dp)) { when(shown) {
-                                "family" -> Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                                    Button(onClick = { if (addPersonContent == null) onStart() else select("person") }, enabled = !entryBusy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-add-person")) { Icon(Icons.Default.PersonAdd, null); Spacer(Modifier.width(10.dp)); Text(t("Add a person", "व्यक्ति जोड़ें")) }
-                                    OutlinedButton(onClick = { if (accountContent == null) onAccount() else select("account") }, enabled = !entryBusy, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, Rust.copy(alpha = .6f)), colors = ButtonDefaults.outlinedButtonColors(contentColor = RustText), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-account")) { Icon(Icons.Default.AccountCircle, null); Spacer(Modifier.width(10.dp)); Text(t("Sign in", "साइन इन")) }
-                                    TextButton(onClick = { walkthroughChooser = true }, enabled = !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("patient-walkthrough-entry")) { Text(t("Try a demo", "डेमो देखें")) }
+                    } else {
+                        Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                            IconButton(onClick = close, enabled = !formBusy && !entryBusy, modifier = Modifier.size(48.dp).testTag("welcome-panel-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस"), tint = WelcomePanelInk) }
+                            Spacer(Modifier.width(4.dp))
+                            Text(when(shown) { "family" -> if (role == "family") t("Family", "परिवार") else t("Patient", "मरीज़"); "person" -> t("Add a person", "व्यक्ति जोड़ें"); "doctor" -> t("Doctor", "डॉक्टर"); else -> t("Sign in", "साइन इन") },
+                                Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Medium, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                        }
+                        Surface(color = Paper, contentColor = Ink, shape = RoundedCornerShape(topStart = SaharaRadius.Hero, topEnd = SaharaRadius.Hero), modifier = Modifier.fillMaxWidth().weight(1f)) {
+                            Box(Modifier.fillMaxSize().padding(top = 16.dp)) { when(shown) {
+                                "family" -> Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 16.dp).saharaScreenEnter(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                                    SaharaPrimaryButton(if (role == "family") t("Add the person you care for", "जिनकी देखभाल करते हैं, उन्हें जोड़ें") else t("Start with your name", "अपने नाम से शुरू करें"),
+                                        onClick = { if (addPersonContent == null) onStart() else select("person") }, enabled = !entryBusy, icon = Icons.Default.PersonAdd, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("welcome-add-person"))
+                                    SaharaSecondaryButton(t("Sign in", "साइन इन"), onClick = { if (accountContent == null) onAccount() else select("account") }, enabled = !entryBusy, icon = Icons.Default.AccountCircle,
+                                        modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("welcome-account"))
+                                    Spacer(Modifier.height(4.dp))
+                                    SaharaPracticeEntry(t("Practice", "अभ्यास करें"), t("Look around with a ready-made record. No account needed.", "तैयार रिकॉर्ड के साथ ऐप देखें। खाते की ज़रूरत नहीं।"),
+                                        enabled = !entryBusy, onClick = { walkthroughChooser = true }, modifier = Modifier.testTag("patient-walkthrough-entry"))
                                 }
                                 "person" -> addPersonContent?.invoke(close)
                                 "doctor" -> Column(Modifier.fillMaxSize()) {
                                     Box(Modifier.fillMaxWidth().weight(1f)) {
                                         if (doctorContent != null) doctorContent.invoke(close) { formBusy = it }
-                                        else Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(22.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                                            Button(onClick = onSharedWorkspace, enabled = !formBusy && !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-open-doctor-workspace")) { Text(t("Sign in", "साइन इन")) }
+                                        else Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                                            SaharaPrimaryButton(t("Sign in", "साइन इन"), onClick = onSharedWorkspace, enabled = !formBusy && !entryBusy, modifier = Modifier.fillMaxWidth().testTag("welcome-open-doctor-workspace"))
                                         }
                                     }
-                                    TextButton(onClick = onDoctorDemo, enabled = !formBusy && !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-demo-entry")) { Text(t("Try a demo", "डेमो देखें")) }
+                                    // Practice stays in view below the sign-in form, whatever the form's length.
+                                    HorizontalDivider(color = SaharaColors.Line)
+                                    SaharaPracticeEntry(t("Practice", "अभ्यास करें"), t("Open Dr Meera's practice workspace. No account needed.", "डॉ. मीरा का अभ्यास वर्कस्पेस खोलें। खाते की ज़रूरत नहीं।"),
+                                        enabled = !formBusy && !entryBusy, onClick = onDoctorDemo, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp).testTag("doctor-demo-entry"))
                                 }
                                 else -> accountContent?.invoke(close) { formBusy = it }
                             } }
@@ -384,6 +406,31 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                     }
                 }
             }
+        }
+    }
+}
+
+/** Role tiles stack as rows below 360 dp or at 1.3x text and above, so a label never has to break. */
+internal fun welcomeRolesStacked(screenWidthDp: Int, fontScale: Float): Boolean = screenWidthDp < 360 || fontScale >= 1.3f
+
+private class WelcomeRole(val key: String, val label: String, val icon: ImageVector, val tone: SaharaTone, val tag: String)
+
+/** One big labelled role choice on the welcome band: white tile, the role's colour as chip and edge, a press settle and a short staggered entrance. */
+@Composable private fun WelcomeRoleTile(role: WelcomeRole, index: Int, stacked: Boolean, enabled: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val interaction = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+    val shown = remember { Animatable(if (SaharaMotion.enabled) 0f else 1f) }
+    LaunchedEffect(Unit) { shown.animateTo(1f, SaharaMotion.tween(SaharaMotion.LIST_ITEM_MS, SaharaMotion.staggerDelay(index + 1), LinearOutSlowInEasing)) }
+    Surface(onClick = onClick, enabled = enabled, shape = RoundedCornerShape(SaharaRadius.Lg), color = SaharaColors.Surface, contentColor = SaharaColors.Ink,
+        border = BorderStroke(2.dp, role.tone.solid), shadowElevation = 2.dp, interactionSource = interaction,
+        modifier = modifier.heightIn(min = if (stacked) 64.dp else 112.dp).graphicsLayer { alpha = shown.value; translationY = (1f - shown.value) * 12.dp.toPx() }.saharaPress(interaction).testTag(role.tag)) {
+        if (stacked) Row(Modifier.padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+            SaharaIconChip(role.icon, role.tone, size = 40)
+            Spacer(Modifier.width(12.dp))
+            Text(role.label, Modifier.weight(1f), style = MaterialTheme.typography.titleMedium, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = role.tone.ink)
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = role.tone.ink)
+        } else Column(Modifier.padding(horizontal = 6.dp, vertical = 14.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)) {
+            SaharaIconChip(role.icon, role.tone, size = 48)
+            SaharaFitText(role.label, style = MaterialTheme.typography.titleMedium, color = role.tone.ink, fontWeight = FontWeight.SemiBold, min = 13f)
         }
     }
 }
