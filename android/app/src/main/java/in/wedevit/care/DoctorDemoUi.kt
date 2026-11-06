@@ -74,7 +74,7 @@ private fun demoDate(millis: Long) = Instant.ofEpochMilli(millis).atZone(demoZon
 private fun demoTime(millis: Long) = Instant.ofEpochMilli(millis).atZone(demoZone).format(DateTimeFormatter.ofPattern("h:mm a"))
 private fun demoDay(day: LocalDate) = day.format(DateTimeFormatter.ofPattern("EEE, d MMM yyyy"))
 private fun DoctorDemoPatient.displayName() = name.removeSuffix(" Demo")
-// Keep the doctor's workspace within Sahara's original orange and cream palette.
+// The doctor's workspace uses the same Sahara colour system as the family side.
 private val DoctorForest = Rust
 private val DoctorTeal = Rust
 private val DoctorBackground = Cream
@@ -96,12 +96,8 @@ private val DoctorMist = Peach
 
 /** A separate walkthrough workspace: no CareModel, account token, Room or network operations. */
 @Composable fun DoctorDemo(onExit: () -> Unit, store: DoctorDemoStore? = null, workflowStore: DoctorWorkflowStore? = null, cloud:CareCloud? = null, enableOnlineAi:Boolean=false, initialPatientId:String?=null, careModel: CareModel? = null, onCareAccount: () -> Unit = {}) {
-    val scheme = lightColorScheme(primary = DoctorForest, onPrimary = Color.White, primaryContainer = DoctorMist, onPrimaryContainer = DoctorForest,
-        secondary = DoctorTeal, onSecondary = Color.White, secondaryContainer = DoctorMist, onSecondaryContainer = DoctorForest,
-        background = DoctorBackground, onBackground = DoctorInk, surface = Paper, onSurface = DoctorInk,
-        surfaceVariant = Color(0xFFF1E9DE), onSurfaceVariant = DoctorMuted, outline = Color(0xFF8D7B70), outlineVariant = Color(0xFFD7C8BC))
     var authOpen by remember { mutableStateOf(false) }
-    MaterialTheme(colorScheme = scheme, typography = saharaTitleTypography()) {
+    MaterialTheme(colorScheme = saharaColorScheme, shapes = saharaShapes, typography = saharaTypography()) {
         DoctorWorkspace(onExit, store, workflowStore, if(enableOnlineAi) cloud else null, enableOnlineAi, onSignIn={if(enableOnlineAi) authOpen=true}, initialPatientId=initialPatientId, careModel = careModel, onCareAccount = onCareAccount)
         if(enableOnlineAi && authOpen && cloud!=null) DoctorAiAccountSheet(cloud,onDismiss={authOpen=false})
     }
