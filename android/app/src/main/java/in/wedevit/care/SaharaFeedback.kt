@@ -89,7 +89,7 @@ object SaharaNotice {
     }
     FilledIconButton(onClick = { if (reader.busy) reader.stop() else reader.read(text, tag) }, modifier = modifier.size(if (big) 56.dp else 48.dp).testTag("speak-button")
         .semantics { contentDescription = if (on) t("Stop reading", "पढ़ना रोकें") else t("Read aloud", "पढ़कर सुनाएँ"); stateDescription = if (on) t("Reading", "पढ़ रहे हैं") else "" },
-        colors = IconButtonDefaults.filledIconButtonColors(containerColor = if (on) tone.solid else tone.wash, contentColor = if (on) tone.onSolid else tone.ink)) {
+        colors = IconButtonDefaults.filledIconButtonColors(containerColor = if (on) tone.ink else tone.solid, contentColor = tone.onSolid)) {
         Icon(if (on) Icons.Default.Stop else Icons.AutoMirrored.Filled.VolumeUp, null, Modifier.size(if (big) 28.dp else 24.dp))
     }
 }
@@ -160,7 +160,7 @@ class SaharaSaid internal constructor() {
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onClose, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Close", "बंद करें"), color = SaharaColors.Success, fontWeight = FontWeight.SemiBold) } })
+        confirmButton = { TextButton(onClick = onClose, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Close", "बंद करें"), color = SaharaTone.Success.ink, fontWeight = FontWeight.Bold) } })
 }
 
 // ---------------------------------------------------------------- offline chip

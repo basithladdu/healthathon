@@ -735,8 +735,7 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
                 Spacer(Modifier.width(12.dp))
                 Text(if (progress.second > 0) "$operation · $percent%" else "$operation…", fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.weight(1f).announce())
             }
-            if (progress.second > 0) LinearProgressIndicator(progress = { (progress.first.toFloat() / progress.second).coerceIn(0f, 1f) }, modifier = Modifier.fillMaxWidth().height(6.dp).clip(CircleShape), color = Rust, trackColor = Paper)
-            else LinearProgressIndicator(Modifier.fillMaxWidth().height(6.dp).clip(CircleShape), color = Rust, trackColor = Paper)
+            SaharaProgressBar(if (progress.second > 0) (progress.first.toFloat() / progress.second).coerceIn(0f, 1f) else null)
             OutlinedButton(onClick = onStop, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, RustText), modifier = Modifier.heightIn(min = 48.dp).testTag("goc-cancel")) {
                 Icon(Icons.Default.Stop, null, tint = RustText); Spacer(Modifier.width(6.dp)); Text(t("Stop", "रोकें"), color = RustText)
             }

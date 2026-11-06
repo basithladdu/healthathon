@@ -53,7 +53,7 @@ import java.time.format.DateTimeFormatter
             Button(onClick={ if(state.recording) controller.stop() else { agreements.clear();purpose=false;storage=false;access=false;cloud=false;consentOpen=true } },enabled=!busy && (signedIn || state.recording),modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("doctor-record-audio")) { Icon(if(state.recording) Icons.Default.Stop else Icons.Default.Mic,null);Spacer(Modifier.width(8.dp));Text(if(state.recording) "Stop & save" else "Record conversation") }
             if(!signedIn) OutlinedButton(onClick=onSignIn,enabled=!busy && !state.recording,modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("doctor-ai-sign-in")) { Text("Sign in") }
             state.error?.let { Text(it,color=MaterialTheme.colorScheme.error,modifier=Modifier.testTag("doctor-audio-error").announce()) }
-            if(busy) { LinearProgressIndicator(Modifier.fillMaxWidth(),color=Rust);Text("Transcribing…",modifier=Modifier.testTag("doctor-ai-busy"),style=MaterialTheme.typography.bodySmall) }
+            if(busy) { SaharaProgressBar(null);Text("Transcribing…",modifier=Modifier.testTag("doctor-ai-busy"),style=MaterialTheme.typography.bodySmall) }
         }
     }
     state.clips.forEach { clip -> Surface(color=Paper,shape=RoundedCornerShape(20.dp),border=androidx.compose.foundation.BorderStroke(1.dp,DoctorHairline),modifier=Modifier.fillMaxWidth().padding(top=12.dp).testTag("doctor-audio-clip-${clip.id}")) {

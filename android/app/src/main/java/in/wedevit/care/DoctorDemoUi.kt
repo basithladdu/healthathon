@@ -291,7 +291,7 @@ private val DoctorMist = Peach
                     if (careModel != null) {
                         if (carePeople.isNotEmpty()) item { DoctorSection(t("Care profiles", "देखभाल प्रोफ़ाइल"), Modifier.padding(top = 4.dp)) }
                         if (careModel.cloud == null) item { OutlinedButton(onClick = { addingCarePerson = true }, enabled = !careBusy && pendingCreatedProfileId == null, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("doctor-add-device-profile")) { Icon(Icons.Default.PersonAdd, null); Spacer(Modifier.width(8.dp)); Text(t("Add profile", "प्रोफ़ाइल जोड़ें")) } }
-                        if (pendingCreatedProfileId != null) item { LinearProgressIndicator(Modifier.fillMaxWidth()) }
+                        if (pendingCreatedProfileId != null) item { SaharaSkeleton(rows = 1) }
                         items(shownCare, key = { "care:${careAccount}:${it.id}" }) { person -> DoctorPatientListCard(person.name, "", { openCare(person.id) }) }
                     }
                     if (shownTest.isNotEmpty()) item { DoctorSection(t("People in your care", "आपकी देखभाल में लोग"), Modifier.padding(top = 12.dp)) }
@@ -654,10 +654,10 @@ private val DoctorMist = Peach
 @Composable private fun DemoEmpty(title: String, detail: String?, action: String, onAction: () -> Unit, icon: ImageVector = Icons.Default.CalendarToday) {
     Surface(color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.fillMaxWidth().padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Box(Modifier.size(48.dp).background(DoctorMist, CircleShape), contentAlignment = Alignment.Center) { Icon(icon, null, tint = DoctorAccent, modifier = Modifier.size(24.dp)) }
+            Box(Modifier.size(56.dp).background(DoctorAccent, CircleShape), contentAlignment = Alignment.Center) { Icon(icon, null, tint = SaharaColors.OnPrimary, modifier = Modifier.size(28.dp)) }
             Text(title, fontSize = 18.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorInk)
             if (!detail.isNullOrBlank()) Text(detail, color = DoctorMuted, fontSize = 14.sp)
-            OutlinedButton(onClick = onAction, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Text(action) }
+            SaharaPrimaryButton(action, onAction)
         }
     }
 }

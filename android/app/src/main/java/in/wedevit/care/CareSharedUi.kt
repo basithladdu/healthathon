@@ -136,13 +136,13 @@ import kotlinx.coroutines.launch
 
 /** Status tones for the family, care-team and Nearby registers. One place, so the design tokens can replace these values. */
 internal enum class FamilyTone(val fill: Color, val ink: Color) {
-    GOOD(DoctorStatusGoodBg, DoctorStatusGood), WAIT(DoctorStatusWarnBg, DoctorStatusWarn), STOP(Color(0xFFF9DEDC), Color(0xFFB3261E)),
-    INFO(Color(0xFFE0E4F7), Color(0xFF3F51A3)), NEUTRAL(Color(0xFFEFE7DF), DoctorCardSub)
+    GOOD(DoctorStatusGoodBg, DoctorStatusGood), WAIT(DoctorStatusWarnBg, DoctorStatusWarn), STOP(SaharaColors.ErrorWash, SaharaTone.Error.ink),
+    INFO(SaharaColors.InfoWash, SaharaTone.Info.ink), NEUTRAL(Color(0xFFEFE7DF), DoctorCardSub)
 }
 
-/** Section accents from the Sahara palette (HUMAN_APP_GUIDE §3): each section its own colour; all carry white text at 5.2:1 or better. */
+/** Section accents from the Sahara palette: each section its own bright solid (SaharaTone), white text on it. */
 internal object FamilyAccent {
-    val Teal = Color(0xFF0F6E6A); val Indigo = Color(0xFF3F51A3); val Plum = Color(0xFF8A3B78); val Leaf = Color(0xFF386D29); val Marigold = Color(0xFF8F5A00); val Brick get() = RustText
+    val Teal get() = SaharaTone.Teal.solid; val Indigo get() = SaharaTone.Indigo.solid; val Plum get() = SaharaTone.Plum.solid; val Leaf get() = SaharaTone.Leaf.solid; val Marigold get() = SaharaTone.Marigold.solid; val Brick get() = RustText
 }
 
 /** A status pill: a dot plus a word, so the state never rests on colour alone. The word slides when it changes. */
