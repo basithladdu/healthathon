@@ -1,7 +1,11 @@
 package `in`.wedevit.care
 
 import android.animation.ValueAnimator
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.MyLocation
@@ -180,6 +184,17 @@ import org.maplibre.geojson.Point
             if (ValueAnimator.areAnimatorsEnabled()) map?.animateCamera(update, 350) else map?.moveCamera(update)
         }, shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Paper, contentColor = Ink),
             modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).heightIn(min = 48.dp)) { Text(t("Show all", "सभी दिखाएँ"), fontWeight = FontWeight.SemiBold) }
+        // Legend: the pin colours, because the layer tiles now sit in the Filters sheet.
+        if (loaded) Surface(Modifier.align(Alignment.BottomStart).padding(8.dp).testTag("centre-map-legend"), shape = RoundedCornerShape(12.dp), color = Paper.copy(alpha = .94f)) {
+            Column(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                listOf(NearbyHelp.LAYER_PALLIATIVE to t("Palliative care", "पैलिएटिव देखभाल"), NearbyHelp.LAYER_MORPHINE to t("Morphine listed", "मॉर्फ़ीन सूची में")).forEach { (layer, label) ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(Modifier.size(10.dp).background(Color(NearbyHelp.layerColor(layer)), CircleShape)); Spacer(Modifier.width(6.dp))
+                        Text(label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Ink)
+                    }
+                }
+            }
+        }
         if (loaded && (userLocation != null || onLocate != null)) SmallFloatingActionButton(onClick = {
             if (userLocation == null) onLocate?.invoke() else {
                 val update = centreMapAround(userLocation, centres)

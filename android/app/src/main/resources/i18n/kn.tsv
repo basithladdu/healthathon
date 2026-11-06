@@ -5062,3 +5062,14 @@ Make the full care plan	ಪೂರ್ಣ ಆರೈಕೆ ಯೋಜನೆ ಮಾ�
 Plan, pocket emergency card, living will	ಯೋಜನೆ, ಜೇಬಿನಲ್ಲಿಡುವ ತುರ್ತು ಕಾರ್ಡ್, ಲಿವಿಂಗ್ ವಿಲ್
 Pocket emergency card	ಜೇಬಿನಲ್ಲಿಡುವ ತುರ್ತು ಕಾರ್ಡ್
 Step ${step + 1} · $name	ಹಂತ ${step + 1} · $name
+Card file	ಕಾರ್ಡ್ ಫೈಲ್
+Change access for ${member.email}	${member.email} ಪ್ರವೇಶ ಬದಲಿಸಿ
+Download Hindi / English pack (987 MB)	ಹಿಂದಿ / ಇಂಗ್ಲಿಷ್ ಪ್ಯಾಕ್ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ (987 MB)
+Edit card and PDF	ಕಾರ್ಡ್ ಮತ್ತು PDF ಬದಲಿಸಿ
+Filters	ಫಿಲ್ಟರ್‌ಗಳು
+Filters · $filterCount	ಫಿಲ್ಟರ್‌ಗಳು · $filterCount
+Save card	ಕಾರ್ಡ್ ಉಳಿಸಿ
+Send suggestion	ಸಲಹೆ ಕಳುಹಿಸಿ
+Share invite	ಆಹ್ವಾನ ಕಳುಹಿಸಿ
+Show $count centres	$count ಕೇಂದ್ರಗಳನ್ನು ತೋರಿಸಿ
+Show 1 centre	1 ಕೇಂದ್ರ ತೋರಿಸಿ

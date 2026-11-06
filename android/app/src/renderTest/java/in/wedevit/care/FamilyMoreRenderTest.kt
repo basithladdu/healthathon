@@ -45,8 +45,7 @@ class FamilyMoreRenderTest {
         back()
         step("03-nearby-location-why") { click("nav-Nearby") }
         step("03b-nearby") { click("permission-not-now") }
-        step("03c-nearby-layers") { click("nearby-layer-palliative") }
-        step("04-suggest-centre") { click("nearby-suggest-centre") }
+        step("03c-nearby-filters") { click("nearby-filters"); click("nearby-layer-palliative") }
         back()
         step("05-devices") { click("nav-Care"); click("shortcut-devices") }
         back()
