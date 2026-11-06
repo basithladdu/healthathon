@@ -27,11 +27,11 @@ object DoctorWorkflowPdf {
             number++
             page = pdf.startPage(PdfDocument.PageInfo.Builder(595, 842, number).create())
             page!!.canvas.drawText("Sahara | Practice care note", 42f, 44f, heading)
-            page!!.canvas.drawText("PRACTICE WALKTHROUGH - NOT A CLINICAL RECORD", 42f, 63f, footer)
+            page!!.canvas.drawText("PRACTICE ONLY - NOT A CLINICAL RECORD", 42f, 63f, footer)
             y = 94f
         }
         fun finish() {
-            page!!.canvas.drawText("Practice walkthrough only | Page $number", 42f, 812f, footer)
+            page!!.canvas.drawText("Practice only | Page $number", 42f, 812f, footer)
             pdf.finishPage(page!!)
         }
         fun line(value: String) {
@@ -56,14 +56,14 @@ object DoctorWorkflowPdf {
             paragraph("$patientName | Version ${version.number}")
             paragraph("Reviewer (self-entered): ${version.reviewerName}\nPublished locally: ${DateTimeFormatter.ofPattern("d MMM yyyy, h:mm a").withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(version.publishedAt))}\n${version.reviewLabel}")
             val d = version.draft
-            if(d.transcribedAt>0) paragraph("Transcript provenance\n${d.transcriptProvider} / ${d.transcriptModel}\nCreated ${Instant.ofEpochMilli(d.transcribedAt)} from a consented local conversation recording.")
-            if(d.aiModel.isNotBlank()) paragraph("AI drafting provenance\n${d.aiProvider} / ${d.aiModel}\n"+d.aiWarnings.joinToString("\n"))
+            if(d.transcribedAt>0) paragraph("Transcript made by\n${d.transcriptProvider} / ${d.transcriptModel}\nCreated ${Instant.ofEpochMilli(d.transcribedAt)} from a consented local conversation recording.")
+            if(d.aiModel.isNotBlank()) paragraph("AI draft made by\n${d.aiProvider} / ${d.aiModel}\n"+d.aiWarnings.joinToString("\n"))
             listOf("What matters" to d.priorities, "Participants" to d.participants, "Discussion" to d.topics, "Questions" to d.questions, "Undecided" to d.undecided, "Next steps" to d.nextSteps).forEach { (title, text) -> paragraph("$title\n${text.ifBlank { "Not recorded" }}") }
             paragraph("Discussion checklist\n" + d.checklist.joinToString("\n") { "${it.title}: ${it.status.name.lowercase().replace('_', ' ')}" })
             paragraph("Source references\n" + if(d.transcribedAt>0) "Consented conversation recording and exact transcript below" else DoctorWorkflowData.sources(version.patientId).filter { it.id in d.sourceIds }.joinToString("\n") { it.label }.ifBlank { "Manually entered source" })
             if(d.evidence.isNotEmpty()) paragraph("Source evidence\n"+d.evidence.joinToString("\n") { "${it.section}: ${it.quote}" })
             paragraph("Original source text\n${d.sourceText}")
-            paragraph("This is a practice walkthrough document. No professional identity was verified. This document is not a prescription, treatment order, consent form, advance directive or verified signature. No external patient/family delivery has occurred.")
+            paragraph("This is a practice document. No professional identity was verified. This document is not a prescription, treatment order, consent form, advance directive or verified signature. No external patient/family delivery has occurred.")
             finish()
             file.outputStream().use { pdf.writeTo(it) }
         } finally { pdf.close() }

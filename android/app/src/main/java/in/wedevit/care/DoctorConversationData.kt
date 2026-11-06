@@ -144,7 +144,7 @@ object DoctorConversationContext {
                     g.evidence.forEach { appendLine("Original words: “${it.quote}”") }
                 }
                 if(!j.isNull("englishDraft")) { val e=j.getJSONObject("englishDraft");appendLine("\nEnglish draft · ${if(e.getBoolean("reviewed")) "review recorded" else "not reviewed"} · ${e.getString("origin")}");appendLine(e.getString("text")) }
-                if(!j.isNull("transcription")) { val t=j.getJSONObject("transcription");appendLine("\nTranscript provenance: ${t.getString("provider")} / ${t.getString("model")} · ${java.time.Instant.ofEpochMilli(t.getLong("at"))}")
+                if(!j.isNull("transcription")) { val t=j.getJSONObject("transcription");appendLine("\nTranscript made by: ${t.getString("provider")} / ${t.getString("model")} · ${java.time.Instant.ofEpochMilli(t.getLong("at"))}")
                     appendLine(if(t.isNull("sourceHash")) "Original transcript text binding not recorded" else if(t.getString("sourceHash")==j.getString("sourceHash")) "Source matches the captured transcript text; accuracy still requires review" else "The written source was edited after this transcript was captured") }
                 if(j.getString("recorderLabel").isNotBlank())appendLine("Recorder label (self-entered): ${j.getString("recorderLabel")}")
                 if(!j.isNull("audioRef"))appendLine("Audio reference retained on its original device only. Audio is not included in this written note.")

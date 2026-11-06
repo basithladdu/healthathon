@@ -29,11 +29,11 @@ const DEMO_FAMILY_MEMBER = {
 const CARE_TEAM_BRAND = {
   kicker: 'Care team',
   headline: 'Care, together.',
-  lede: 'A source-linked, physician-reviewed plan for the next handoff.',
+  lede: 'A doctor-checked plan for the next visit, linked to its source.',
   features: [
     { num: '01', title: 'Source-linked', body: 'Each field starts with what was said.' },
-    { num: '02', title: 'Physician-verified', body: 'Every release keeps the previous version.' },
-    { num: '03', title: 'Purpose-logged', body: 'Access opens with a stated reason.' },
+    { num: '02', title: 'Doctor-checked', body: 'Every release keeps the previous version.' },
+    { num: '03', title: 'Reason recorded', body: 'Access opens with a stated reason.' },
   ],
 };
 
@@ -536,7 +536,7 @@ export function FamilyLoginScreen(props: {
             </button>
           )}
           <span className="auth-door-chip is-family">Patient & family</span>
-          <h1 className="auth-title">Your care journey</h1>
+          <h1 className="auth-title">Your care</h1>
 
           {error && <div className="auth-alert" role="alert">{error}</div>}
 
@@ -599,7 +599,7 @@ export function FamilyLoginScreen(props: {
                 />
               </div>
 
-              <button type="submit" className="auth-submit">View care journey</button>
+              <button type="submit" className="auth-submit">View your care</button>
             </div>
           </details>
 

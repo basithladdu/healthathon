@@ -2627,7 +2627,7 @@ The conversation changed. Your checked text is kept here. Open this person's con
 Use checked words	ಪರಿಶೀಲಿಸಿದ ಪದಗಳನ್ನು ಬಳಸಿ
 Patient ID: 	ರೋಗಿಯ ID: 
  · after joining, your doctor can find you by this ID.	 · ಸೇರಿದ ನಂತರ ನಿಮ್ಮ ಡಾಕ್ಟರ್ ಈ ID ಯಿಂದ ನಿಮ್ಮನ್ನು ಹುಡುಕಬಹುದು.
-The walkthrough could not load. Your own profiles were not changed.	ಡೆಮೊ ತೆರೆಯಲು ಆಗಲಿಲ್ಲ. ನಿಮ್ಮ ಸ್ವಂತ ಪ್ರೊಫೈಲ್‌ಗಳು ಬದಲಾಗಿಲ್ಲ.
+Practice could not open. Your own profiles were not changed.	ಅಭ್ಯಾಸ ತೆರೆಯಲಾಗಲಿಲ್ಲ. ನಿಮ್ಮ ಸ್ವಂತ ಪ್ರೊಫೈಲ್‌ಗಳು ಬದಲಾಗಿಲ್ಲ.
 Leaving the walkthrough…	ಡೆಮೊದಿಂದ ಹೊರಬರಲಾಗುತ್ತಿದೆ…
 Rahul's walkthrough record was removed. It will not be recreated automatically.	ರಾಹುಲ್ ಅವರ ಡೆಮೊ ದಾಖಲೆಯನ್ನು ತೆಗೆಯಲಾಗಿದೆ. ಇದು ತಾನಾಗಿ ಮತ್ತೆ ಬರುವುದಿಲ್ಲ.
 Opening care records…	ಆರೈಕೆ ದಾಖಲೆಗಳನ್ನು ತೆರೆಯಲಾಗುತ್ತಿದೆ…
@@ -4715,7 +4715,7 @@ Couldn't load the demo.	ಡೆಮೊ ತೆರೆಯಲಾಗಲಿಲ್ಲ.
 Web link not available yet.	ವೆಬ್ ಲಿಂಕ್ ಇನ್ನೂ ಲಭ್ಯವಿಲ್ಲ.
 Sign in to add a web link.	ವೆಬ್ ಲಿಂಕ್ ಸೇರಿಸಲು ಸೈನ್ ಇನ್ ಮಾಡಿ.
 Only the profile owner can make a web link.	ಪ್ರೊಫೈಲ್ ಮಾಲೀಕರು ಮಾತ್ರ ವೆಬ್ ಲಿಂಕ್ ಮಾಡಬಹುದು.
-Web links are off in the walkthrough.	ವಾಕ್‌ಥ್ರೂನಲ್ಲಿ ವೆಬ್ ಲಿಂಕ್‌ಗಳು ಆಫ್ ಆಗಿವೆ.
+Web links are off in Practice.	ಅಭ್ಯಾಸದಲ್ಲಿ ವೆಬ್ ಲಿಂಕ್‌ಗಳು ಆಫ್ ಆಗಿವೆ.
 This link is off or expired.	ಈ ಲಿಂಕ್ ಆಫ್ ಆಗಿದೆ ಅಥವಾ ಅವಧಿ ಮುಗಿದಿದೆ.
 Couldn't connect. Try again.	ಸಂಪರ್ಕವಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
 Locked PDF saved	ಲಾಕ್ ಮಾಡಿದ PDF ಉಳಿಸಲಾಗಿದೆ

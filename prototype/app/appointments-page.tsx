@@ -1057,7 +1057,7 @@ export function AppointmentsPage(props: AppointmentsPageProps): React.JSX.Elemen
                   <div className="ap-doc-row">
                     <IconFile />
                     <div className="ap-doc-body">
-                      <div className="ap-doc-title">Handoff print sheet</div>
+                      <div className="ap-doc-title">Print sheet for the next team</div>
                       <div className="ap-doc-sub">Open the summary to print it.</div>
                     </div>
                     <button className="ap-icon-btn" aria-label="Open" title="Open" disabled={!hasVerifiedRecord(selectedPatient.hospitalId)} onClick={() => onRetrieve(selectedPatient.hospitalId)}><IconOpenArrow /></button>
