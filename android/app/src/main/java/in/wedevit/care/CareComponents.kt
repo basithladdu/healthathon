@@ -44,19 +44,22 @@ import androidx.compose.ui.unit.sp
     val labels = listOf(t("Today", "आज"), if (clinician) t("Talk", "बातचीत") else t("Docs", "कागज़ात"), t("Care", "देखभाल"), t("Nearby", "आसपास"), if (clinician) t("More", "और") else t("Account", "खाता"))
     val routes = listOf(0, if (clinician) 1 else 5, 2, 3, 4)
     val icons = listOf(Icons.Default.WbSunny, if (clinician) Icons.Default.Forum else Icons.Default.FolderOpen, Icons.Default.FavoriteBorder, Icons.Default.Place, if (clinician) Icons.Default.MoreHoriz else Icons.Default.AccountCircle)
-    // Material-style bar: a hairline on top, and the selected tab's icon sits in a soft gold pill above a bold label.
-    Surface(color = Paper) { Column {
+    // Material 3 bar in Sahara colours: a hairline on top; the selected tab's icon sits white in a solid rust pill above a bold rust label.
+    Surface(color = SaharaColors.Surface, shadowElevation = 3.dp) { Column {
         HorizontalDivider(color = DoctorHairline)
-        Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 8.dp, vertical = 4.dp).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 4.dp, vertical = 4.dp).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
             labels.forEachIndexed { index, label ->
                 val active = selected == routes[index] || (!clinician && index == 1 && selected == 1)
-                val pill by animateColorAsState(if (active) SaharaSoftGold else Color.Transparent, SaharaMotion.tween(SaharaMotion.VALUE_MS), label = "selected tab")
-                Column(Modifier.weight(1f).testTag("nav-${keys[index]}").clip(RoundedCornerShape(16.dp))
-                    .selectable(selected = active, role = Role.Tab, onClick = { onSelect(routes[index]) }).heightIn(min = 60.dp).padding(vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                    Box(Modifier.size(width = 56.dp, height = 30.dp).clip(RoundedCornerShape(50)).background(pill), contentAlignment = Alignment.Center) {
-                        Icon(icons[index], null, Modifier.size(22.dp), tint = if (active) RustText else MaterialTheme.colorScheme.onSurfaceVariant)
+                val pill by animateColorAsState(if (active) SaharaColors.Primary else Color.Transparent, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "selected tab")
+                val iconTint by animateColorAsState(if (active) SaharaColors.OnPrimary else SaharaColors.InkSub, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "selected tab icon")
+                Column(Modifier.weight(1f).testTag("nav-${keys[index]}").clip(RoundedCornerShape(SaharaRadius.Lg))
+                    .selectable(selected = active, role = Role.Tab, onClick = { onSelect(routes[index]) }).heightIn(min = 64.dp).padding(vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                    Box(Modifier.size(width = 56.dp, height = 32.dp).clip(RoundedCornerShape(SaharaRadius.Pill)).background(pill), contentAlignment = Alignment.Center) {
+                        Icon(icons[index], null, Modifier.size(24.dp), tint = iconTint)
                     }
-                    Spacer(Modifier.height(4.dp)); Text(label, fontSize = cappedLabelSize(12f), fontWeight = if (active) FontWeight.Bold else FontWeight.Medium, color = if (active) Ink else DoctorCardSub, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis)
+                    Spacer(Modifier.height(4.dp))
+                    SaharaFitText(label, style = MaterialTheme.typography.labelMedium.copy(fontSize = cappedLabelSize(13f)), fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
+                        color = if (active) RustText else SaharaColors.InkSub, min = 10f)
                 }
             }
         }
@@ -71,7 +74,7 @@ import androidx.compose.ui.unit.sp
     var expanded by remember { mutableStateOf(false) }
     Box {
         TextButton(onClick = { expanded = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("walkthrough-user-menu").semantics { contentDescription = t("Walkthrough user, currently ${user.name}, ${user.role}", "डेमो उपयोगकर्ता, अभी ${user.name}, ${user.role}") },
-            shape = RoundedCornerShape(14.dp), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp), colors = ButtonDefaults.textButtonColors(contentColor = Rust)) {
+            shape = RoundedCornerShape(SaharaRadius.Pill), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp), colors = ButtonDefaults.textButtonColors(containerColor = SaharaColors.BandRaised, contentColor = SaharaColors.OnBand)) {
             Text("${user.name} · " + (if (user.role == "Family") t("Family", "परिवार") else t("Patient", "मरीज़")), fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1)
             Spacer(Modifier.width(4.dp)); Icon(Icons.Default.ExpandMore, null, Modifier.size(18.dp))
         }
@@ -144,9 +147,9 @@ import androidx.compose.ui.unit.sp
     Box {
         TextButton(onClick = { expanded = true }, enabled = enabled, modifier = Modifier.heightIn(min = 48.dp).widthIn(max = 130.dp).testTag("selected-care-profile").semantics { contentDescription = t("Switch care profile, $name", "देखभाल प्रोफ़ाइल बदलें, $name") },
             shape = RoundedCornerShape(50), contentPadding = PaddingValues(start = 6.dp, end = 10.dp, top = 6.dp, bottom = 6.dp),
-            colors = ButtonDefaults.textButtonColors(containerColor = SaharaApricot, contentColor = RustText, disabledContainerColor = SaharaApricot.copy(alpha = .5f))) {
-            Box(Modifier.size(28.dp).clip(CircleShape).background(Paper), contentAlignment = Alignment.Center) {
-                Text(name.trim().take(1).uppercase(), fontFamily = SaharaTitleFont, fontSize = 15.sp, fontWeight = FontWeight.Medium, color = RustText)
+            colors = ButtonDefaults.textButtonColors(containerColor = SaharaColors.BandRaised, contentColor = SaharaColors.OnBand, disabledContainerColor = SaharaColors.BandRaised.copy(alpha = .6f), disabledContentColor = SaharaColors.OnBandSub)) {
+            Box(Modifier.size(28.dp).clip(CircleShape).background(SaharaColors.Primary), contentAlignment = Alignment.Center) {
+                Text(name.trim().take(1).uppercase(), fontFamily = SaharaTitleFont, fontSize = 15.sp, fontWeight = FontWeight.Medium, color = SaharaColors.OnPrimary)
             }
             Spacer(Modifier.width(6.dp))
             Text(if (roleLabel.isBlank()) name else "$name · $roleLabel", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
@@ -214,7 +217,7 @@ fun careIcon(kind: String): ImageVector = when (kind) {
 @Composable fun CareToastHost(state: SnackbarHostState, modifier: Modifier = Modifier) = SnackbarHost(state, modifier) { data ->
     val t = careText()
     val kind = CareToastRules.kind(data.visuals.message)
-    val fill = when (kind) { CareToastKind.SAVED -> DoctorStatusGood; CareToastKind.PROBLEM -> Color(0xFF7A2E1C); CareToastKind.INFO -> Ink }
+    val fill = when (kind) { CareToastKind.SAVED -> SaharaColors.Success; CareToastKind.PROBLEM -> SaharaColors.Error; CareToastKind.INFO -> SaharaColors.Ink }
     val icon = when (kind) { CareToastKind.SAVED -> Icons.Default.CheckCircle; CareToastKind.PROBLEM -> Icons.Default.ErrorOutline; CareToastKind.INFO -> Icons.Default.Info }
     val shown = remember { MutableTransitionState(false).apply { targetState = true } }
     AnimatedVisibility(shown, enter = fadeIn(SaharaMotion.tween(SaharaMotion.ENTER_MS)) + slideInVertically(SaharaMotion.tween(SaharaMotion.ENTER_MS)) { it / 2 }) {
@@ -247,7 +250,7 @@ fun careIcon(kind: String): ImageVector = when (kind) {
         confirmButton = { TextButton(onClick = { open = false }, modifier = Modifier.testTag("care-help-close")) { Text(t("Got it", "समझ गए")) } }, containerColor = Paper)
 }
 
-private val SosRed = Color(0xFFB3261E)
+private val SosRed = SaharaColors.Error
 private val SosRedText = Color(0xFF8C1D18)
 
 /** SOS on Today: one large red button for the emergency sheet, and the emergency QR card one tap away beside it. */
