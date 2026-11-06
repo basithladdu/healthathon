@@ -28,6 +28,16 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.semantics.progressBarRangeInfo
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.foundation.Image
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.material3.Surface
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentScope
@@ -66,6 +76,9 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.layout.widthIn
 import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.OnBackPressedDispatcherOwner
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -128,6 +141,9 @@ object SaharaMotion {
     const val VALUE_MS = 180
     /** The saved tick. */
     const val SAVED_MS = 180
+    /** Idle motion: one slow breath in (and the same out), and one shimmer sweep. Both rest after a few cycles. */
+    const val BREATHE_MS = 1600
+    const val SHIMMER_MS = 1100
 
     enum class Direction { Forward, Back, Switch }
 
@@ -282,15 +298,87 @@ fun Modifier.saharaContentSize(): Modifier = animateContentSize(SaharaMotion.twe
     }
 }
 
-/** Calm full-screen loading: a small progress ring and one line, shown only if loading lasts long enough to notice. */
+/**
+ * Calm full-screen loading, branded: the Sahara mark breathing slowly, one plain line ("Opening Rahul's care…") and a
+ * bright moving bar. It fades in only if loading lasts long enough to notice; with motion off it is still.
+ */
 @Composable fun SaharaLoading(text: String, modifier: Modifier = Modifier, background: Color = Cream) {
     val shown = remember { MutableTransitionState(false).apply { targetState = true } }
     Box(modifier.fillMaxSize().background(background).safeDrawingPadding().testTag("sahara-loading"), contentAlignment = Alignment.Center) {
         AnimatedVisibility(shown, enter = fadeIn(SaharaMotion.tween(SaharaMotion.ENTER_MS, 150))) {
-            Column(Modifier.a11yCard().announce(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                CircularProgressIndicator(Modifier.size(32.dp), color = Rust, strokeWidth = 3.dp)
-                Text(text, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 15.sp, textAlign = TextAlign.Center)
+            Column(Modifier.padding(horizontal = 32.dp).a11yCard().announce(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                SaharaBrandMark(size = 80)
+                Text(text, color = Ink, fontSize = 18.sp, lineHeight = 24.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
+                SaharaProgressBar(null, Modifier.widthIn(max = 180.dp))
             }
+        }
+    }
+}
+
+/** The Sahara mark (the app icon) in a circle, breathing gently while something loads. Decorative. */
+@Composable fun SaharaBrandMark(modifier: Modifier = Modifier, size: Int = 64) {
+    Image(painterResource(R.drawable.ic_care), null, modifier.saharaBreathe(cycles = 40).size(size.dp).shadow(4.dp, CircleShape).clip(CircleShape).clearAndSetSemantics { })
+}
+
+/**
+ * Skeleton placeholders for a list or a card that is loading: [rows] grey rows (icon, title, detail) in a white card,
+ * with a soft shimmer passing over while motion is on. TalkBack hears one "Loading…" progress item.
+ */
+@Composable fun SaharaSkeleton(modifier: Modifier = Modifier, rows: Int = 3) {
+    val busy = careText()("Loading…", "लोड हो रहा है…")
+    Surface(modifier.fillMaxWidth().testTag("sahara-skeleton").semantics { contentDescription = busy; progressBarRangeInfo = ProgressBarRangeInfo.Indeterminate },
+        shape = RoundedCornerShape(SaharaRadius.Lg), color = SaharaColors.Surface, border = BorderStroke(1.dp, SaharaColors.Line)) {
+        Column(Modifier.saharaShimmer(cycles = 60, pauseMs = 300).padding(vertical = 6.dp)) {
+            repeat(rows.coerceAtLeast(1)) { index ->
+                Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Box(Modifier.size(36.dp).clip(RoundedCornerShape(SaharaRadius.Sm)).background(SaharaColors.Well))
+                    Spacer(Modifier.width(12.dp))
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Box(Modifier.fillMaxWidth(if (index % 2 == 0) .7f else .55f).height(14.dp).clip(CircleShape).background(SaharaColors.Well))
+                        Box(Modifier.fillMaxWidth(.4f).height(10.dp).clip(CircleShape).background(SaharaColors.Well))
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Idle "breathing" for the one thing that matters on a screen (today's main icon, the loading mark): a slow 4% swell
+ * and settle. It rests after [cycles] breaths and never moves when animations or Battery Saver are off.
+ */
+@Composable fun Modifier.saharaBreathe(cycles: Int = 6, amount: Float = .04f): Modifier {
+    val p = remember { Animatable(0f) }
+    LaunchedEffect(cycles) {
+        repeat(cycles) {
+            if (!SaharaMotion.enabled) { p.snapTo(0f); return@LaunchedEffect }
+            p.animateTo(1f, androidx.compose.animation.core.tween(SaharaMotion.BREATHE_MS, easing = FastOutSlowInEasing))
+            p.animateTo(0f, androidx.compose.animation.core.tween(SaharaMotion.BREATHE_MS, easing = FastOutSlowInEasing))
+        }
+    }
+    return graphicsLayer { val s = 1f + amount * p.value; scaleX = s; scaleY = s }
+}
+
+/**
+ * A soft light sweep across a pill or card (the "next dose" pill, skeletons): one pass every [pauseMs] plus
+ * [SaharaMotion.SHIMMER_MS], [cycles] times, then still. Nothing is drawn when motion is off.
+ */
+@Composable fun Modifier.saharaShimmer(cycles: Int = 3, pauseMs: Long = 1800): Modifier {
+    val p = remember { Animatable(-1f) }
+    LaunchedEffect(cycles) {
+        repeat(cycles) {
+            delay(pauseMs)
+            if (!SaharaMotion.enabled) { p.snapTo(-1f); return@LaunchedEffect }
+            p.snapTo(0f); p.animateTo(1f, androidx.compose.animation.core.tween(SaharaMotion.SHIMMER_MS, easing = LinearEasing))
+        }
+        p.snapTo(-1f)
+    }
+    return drawWithContent {
+        drawContent()
+        val v = p.value
+        if (v in 0f..1f) {
+            val band = size.width * .4f; val x = -band + v * (size.width + band)
+            drawRect(Brush.linearGradient(listOf(Color.Transparent, Color.White.copy(alpha = .45f), Color.Transparent), start = Offset(x, 0f), end = Offset(x + band, size.height)))
         }
     }
 }
@@ -305,17 +393,15 @@ fun Modifier.saharaContentSize(): Modifier = animateContentSize(SaharaMotion.twe
     }
 }
 
-/** Shared empty / dead-end state: what is missing, and the one thing to do next. */
+/** Shared empty / dead-end state: a bright icon, what is missing in one line, and the one thing to do next (a solid button). */
 @Composable fun SaharaEmpty(title: String, detail: String? = null, modifier: Modifier = Modifier, icon: ImageVector? = null,
-    actionLabel: String? = null, onAction: (() -> Unit)? = null, secondaryLabel: String? = null, onSecondary: (() -> Unit)? = null) {
-    Column(modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 32.dp).testTag("sahara-empty"), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        // Icon in a soft circle, one line, then the one thing to do (outlined) and an optional quieter way out.
-        if (icon != null) Box(Modifier.size(64.dp).clip(CircleShape).background(SaharaColors.PrimaryWash), contentAlignment = Alignment.Center) { Icon(icon, null, Modifier.size(30.dp), tint = RustText) }
+    actionLabel: String? = null, onAction: (() -> Unit)? = null, secondaryLabel: String? = null, onSecondary: (() -> Unit)? = null, tone: SaharaTone = SaharaTone.Rust) {
+    Column(modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 32.dp).saharaScreenEnter().testTag("sahara-empty"), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        if (icon != null) Box(Modifier.saharaBreathe(cycles = 3).size(72.dp).shadow(3.dp, CircleShape).clip(CircleShape).background(tone.solid), contentAlignment = Alignment.Center) { Icon(icon, null, Modifier.size(36.dp), tint = tone.onSolid) }
         Text(title, fontFamily = SaharaTitleFont, fontSize = 20.sp, lineHeight = 26.sp, color = Ink, textAlign = TextAlign.Center)
         if (detail != null) Text(detail, fontSize = 16.sp, lineHeight = 22.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
-        if (actionLabel != null && onAction != null) OutlinedButton(onClick = onAction, shape = RoundedCornerShape(SaharaRadius.Pill), border = BorderStroke(1.5.dp, Rust),
-            colors = ButtonDefaults.outlinedButtonColors(containerColor = Paper, contentColor = RustText), modifier = Modifier.heightIn(min = 48.dp)) { Text(actionLabel) }
-        if (secondaryLabel != null && onSecondary != null) TextButton(onClick = onSecondary, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Text(secondaryLabel) }
+        if (actionLabel != null && onAction != null) SaharaPrimaryButton(actionLabel, onAction, tone = tone)
+        if (secondaryLabel != null && onSecondary != null) TextButton(onClick = onSecondary, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = tone.ink)) { Text(secondaryLabel, fontWeight = FontWeight.Bold) }
     }
 }
 
@@ -336,7 +422,7 @@ fun Modifier.saharaContentSize(): Modifier = animateContentSize(SaharaMotion.twe
     val shown = remember { MutableTransitionState(!SaharaMotion.enabled).apply { targetState = true } }
     Box(modifier.size(size.dp).semantics { if (description != null) contentDescription = description }, contentAlignment = Alignment.Center) {
         AnimatedVisibility(shown, enter = fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)) + scaleIn(SaharaMotion.tween(SaharaMotion.SAVED_MS + 60, easing = SaharaMotion.Emphasized), initialScale = .6f)) {
-            Box(Modifier.size(size.dp).clip(CircleShape).background(tone.solid).testTag("sahara-success-tick"), contentAlignment = Alignment.Center) {
+            Box(Modifier.size(size.dp).shadow(3.dp, CircleShape).clip(CircleShape).background(tone.solid).testTag("sahara-success-tick"), contentAlignment = Alignment.Center) {
                 Icon(Icons.Default.Check, null, Modifier.size((size * .58f).dp), tint = tone.onSolid)
             }
         }
@@ -345,10 +431,10 @@ fun Modifier.saharaContentSize(): Modifier = animateContentSize(SaharaMotion.twe
 
 /** Determinate progress that glides to each new value; [progress] is 0..1. Indeterminate when null. */
 @Composable fun SaharaProgressBar(progress: Float?, modifier: Modifier = Modifier, tone: SaharaTone = SaharaTone.Rust, label: String? = null) {
-    val m = modifier.fillMaxWidth().height(6.dp).clip(CircleShape).semantics { if (label != null) { contentDescription = label; liveRegion = LiveRegionMode.Polite } }
+    val m = modifier.fillMaxWidth().height(8.dp).clip(CircleShape).semantics { if (label != null) { contentDescription = label; liveRegion = LiveRegionMode.Polite } }
     if (progress == null) LinearProgressIndicator(m, color = tone.solid, trackColor = tone.wash)
     else {
-        val shown by animateFloatAsState(progress.coerceIn(0f, 1f), SaharaMotion.tween(SaharaMotion.VALUE_MS + 120), label = "progress")
+        val shown by animateFloatAsState(progress.coerceIn(0f, 1f), SaharaMotion.tween(SaharaMotion.VALUE_MS + 120), label = "progress-glide")
         LinearProgressIndicator(progress = { shown }, modifier = m, color = tone.solid, trackColor = tone.wash, drawStopIndicator = {})
     }
 }
