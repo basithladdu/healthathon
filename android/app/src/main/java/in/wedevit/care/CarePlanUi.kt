@@ -129,7 +129,7 @@ internal fun planStepOf(field: String): Int = when {
         "wizard" -> {
             val draft = EctprLifecycle.draft(state.ectprs, selected)
             if (draft == null) { LaunchedEffect(Unit) { page = "home" }; return@SaharaScreenHost }
-            CompositionLocalProvider(LocalGocFolder provides runCatching { store.folder(selected) }.getOrNull()) { EctprWizard(draft, clinician, canEdit, familyReadOnly = actor == "Family" && !clinician, personName = person.name, startStep = if (gocDirect) 5 else 0,
+            CompositionLocalProvider(LocalGocFolder provides runCatching { store.folder(selected) }.getOrNull(), LocalGocOpenNow provides gocDirect) { EctprWizard(draft, clinician, canEdit, familyReadOnly = actor == "Family" && !clinician, personName = person.name, startStep = if (gocDirect) 5 else 0,
                 onSave = { r -> commit { CarePlanBook.saveDraft(it, r, actor, planNow(), today) } },
                 onSign = { r -> commit { CarePlanBook.sign(CarePlanBook.saveDraft(it, r, actor, planNow(), today), r.id, actor, planNow(), today) }.also { ok -> if (ok) page = "ed" } },
                 onClose = { gocDirect = false; page = "home" }) }

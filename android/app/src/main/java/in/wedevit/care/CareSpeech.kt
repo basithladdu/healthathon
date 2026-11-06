@@ -1,9 +1,7 @@
 package `in`.wedevit.care
 
-import android.Manifest
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -13,8 +11,6 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -31,7 +27,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -153,17 +148,13 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
     var pendingSpeaker by rememberSaveable(personId) { mutableStateOf(speaker) }
     var pendingLanguageTag by rememberSaveable(personId) { mutableStateOf(languageTag) }
     val pendingLanguage = careSpeechLanguages.first { it.tag == pendingLanguageTag }
-    var permissionError by remember { mutableStateOf("") }
     var heldWords by rememberSaveable(personId) { mutableStateOf("") }
     val latestWords by rememberUpdatedState(onWords)
     val latestConsent by rememberUpdatedState(onConsent)
     val dictation = remember(personId) { CareDictation(context, { revision++ }, { words -> heldWords = words }) { words ->
         latestWords(words, pendingSpeaker, careSpeechLanguages.first { it.tag == pendingLanguageTag }.label).also { added -> heldWords = if (added) "" else words }
     } }
-    val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        if (granted && consent && enabled && !recording) { latestConsent(); dictation.start(pendingLanguage.tag) }
-        else if (!granted) permissionError = t("Microphone access wasn't granted. You can type the conversation.", "माइक की अनुमति नहीं मिली। आप बातचीत लिख सकते हैं।")
-    }
+    val mic = rememberSaharaPermission(SaharaPermission.Microphone)
     DisposableEffect(dictation, owner) {
         val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_STOP) dictation.cancel() }
         owner.lifecycle.addObserver(observer)
@@ -192,7 +183,7 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
                 Button(onClick = {
                     if (dictation.listening) dictation.stop() else {
                         pendingSpeaker = speaker; pendingLanguageTag = languageTag
-                        permissionError = ""; consent = false; showConsent = true
+                        consent = false; showConsent = true
                     }
                 }, enabled = enabled && !recording && !dictation.processing && (heldWords.isBlank() || dictation.listening), shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("dictation-toggle")) {
                     Icon(if (dictation.listening) Icons.Default.Stop else Icons.Default.Mic, null, Modifier.size(18.dp)); Spacer(Modifier.width(7.dp)); Text(if (dictation.listening) t("Finish turn", "बोलना पूरा करें") else "Dictate")
@@ -201,7 +192,6 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
             }
             if (dictation.status.isNotBlank()) Text(dictation.status, fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.padding(top = 8.dp).announce())
         } else Text(t("Not available on this phone. Type instead.", "इस फ़ोन पर उपलब्ध नहीं। टाइप करें।"), style = MaterialTheme.typography.bodySmall)
-        if (permissionError.isNotBlank()) Text(permissionError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall, modifier = Modifier.announce())
         if (heldWords.isNotBlank() && !active) {
             Text(t("Unfinished words · $pendingSpeaker · ${pendingLanguage.label}", "अधूरे शब्द · $pendingSpeaker · ${pendingLanguage.label}"), style = MaterialTheme.typography.labelMedium)
             CareField(heldWords, { heldWords = it }, t("Words to keep", "रखने वाले शब्द"), minLines = 2)
@@ -213,8 +203,7 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
         text = { Column { CheckLine(consent, { consent = it }, t("Everyone here agrees to the microphone being used for this turn.", "यहाँ मौजूद सभी इस बार माइक इस्तेमाल करने के लिए राज़ी हैं।")) } },
         confirmButton = { TextButton(onClick = {
             showConsent = false
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) { latestConsent(); dictation.start(pendingLanguage.tag) }
-            else permission.launch(Manifest.permission.RECORD_AUDIO)
+            mic.request { if (consent && enabled && !recording) { latestConsent(); dictation.start(pendingLanguage.tag) } }
         }, enabled = consent && enabled && !recording) { Text(t("Start listening", "सुनना शुरू करें")) } },
         dismissButton = { TextButton(onClick = { showConsent = false }) { Text(t("Cancel", "रद्द करें")) } })
 }

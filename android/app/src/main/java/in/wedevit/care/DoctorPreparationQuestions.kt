@@ -198,8 +198,9 @@ private class PrepModel(val store: DoctorPreparationStore, val scope: String, va
 ) { val t = careText();
     val m = rememberPrepModel(store, scope, emptyList(), editable, canSave, onChange, reload)
     var drafts by rememberSaveable(scope) { mutableStateOf(emptyMap<String, String>()) }
+    // No questions were added: there is nothing to answer, so the card is not shown (it used to say "No questions yet").
+    if (m.loaded && m.error == null && m.rows.isEmpty()) return
     PrepCard("doctor-preparation-answers", t("Answers", "जवाब"), "", m) {
-        if (m.rows.isEmpty()) Text(t("No questions yet", "अभी कोई सवाल नहीं"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardSub, modifier = Modifier.testTag("doctor-preparation-answers-status"))
         NoteRules.labels.indices.forEach { s ->
             val group = m.rows.filter { it.section == s }
             if (group.isNotEmpty()) {

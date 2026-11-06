@@ -1,11 +1,11 @@
 package `in`.wedevit.care
 
-import android.Manifest
-import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.border
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
@@ -51,6 +51,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.PlayArrow
@@ -92,7 +93,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -108,40 +108,59 @@ import java.time.LocalDate
 
 /** This person's plan folder, given by CarePlanScreen, so recordings go when the person's records go. Null means no recording: typing and pasting still work. */
 internal val LocalGocFolder = staticCompositionLocalOf<File?> { null }
+/** True when the doctor came from the Goals of care tab: the talk opens straight away, with no card tap first. */
+internal val LocalGocOpenNow = staticCompositionLocalOf { false }
 
 private const val GOC_NONE = "__none__"
 private enum class GocStage { CAPTURE, REVIEW, NOTE }
 /** Token aliases (5 Nov polish): the warm canvas for headings and table heads, the soft green for "done". */
 private val GocSand get() = Cream
 private val GocTickSoft get() = DoctorStatusGoodBg
+/** The page band and speaker chips (6 Nov AI-FIR grammar): a dark Sahara band, and two distinct speaker colours that carry white text above 4.5:1. */
+private val GocBandColor get() = SaharaColors.Band
+private val GocBandDone = Color(0xFF9BDDB0)
+private val GocDoctorChip get() = SaharaTone.Rust.ink
+private val GocPatientChip get() = SaharaTone.Teal.solid
 
 /** The card in the wizard's treatment step (V4 and V5 already passed there). Opens the talk over the wizard. */
 @Composable internal fun GocConversationCard(d: EctprRecord, update: ((EctprRecord) -> EctprRecord) -> Unit) {
-    val t = careText(); val hindi = careHindi(); val context = LocalContext.current
+    val t = careText(); val hindi = careHindi()
+    val mic = rememberSaharaPermission(SaharaPermission.Microphone)
     var open by rememberSaveable(d.id) { mutableStateOf(false) }
-    var afterGrant by remember { mutableStateOf<(() -> Unit)?>(null) }
-    val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted -> val run = afterGrant; afterGrant = null; if (granted) run?.invoke() }
-    fun withMic(run: () -> Unit) {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) run()
-        else { afterGrant = run; permission.launch(Manifest.permission.RECORD_AUDIO) }
-    }
+    // Consent is ticked here, so one Record tap opens the talk already recording (6 Nov: 8 taps to a locked note became 6).
+    var agreedAt by rememberSaveable(d.id) { mutableStateOf(0L) }
+    var startNow by rememberSaveable(d.id) { mutableStateOf(false) }
+    var gemini by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { gemini = gocOnlineEngines().gemini }
     val own = d.gocTranscript?.takeIf { it.planVersion == d.version }
+    val canRecord = own == null && LocalGocFolder.current != null
+    // From the Goals of care tab the talk (or the locked note) opens at once, once per visit.
+    val openNow = LocalGocOpenNow.current
+    var openedOnce by rememberSaveable(d.id) { mutableStateOf(false) }
+    LaunchedEffect(openNow) { if (openNow && !openedOnce) { openedOnce = true; open = true } }
     PlanCard {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(40.dp).background(DoctorCardConversation, CircleShape), contentAlignment = Alignment.Center) { Icon(if (own?.signOff != null) Icons.Default.Lock else Icons.Default.GraphicEq, null, tint = RustText, modifier = Modifier.size(22.dp)) }
+            Box(Modifier.size(44.dp).background(if (own?.signOff != null) DoctorStatusGood else Rust, RoundedCornerShape(14.dp)), contentAlignment = Alignment.Center) { Icon(if (own?.signOff != null) Icons.Default.Lock else Icons.Default.GraphicEq, null, tint = Color.White, modifier = Modifier.size(24.dp)) }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                Text(t("Goals-of-care conversation", "देखभाल के लक्ष्यों की बातचीत"), fontWeight = FontWeight.Bold, fontSize = 17.sp, modifier = Modifier.a11yHeading())
+                Text(t("Goals of care", "देखभाल के लक्ष्य"), fontWeight = FontWeight.Bold, fontSize = 18.sp, fontFamily = SaharaTitleFont, color = DoctorCardInk, modifier = Modifier.a11yHeading())
                 own?.let { g -> Text(GocNote.kindLabel(g.noteKind).pick(hindi), fontSize = 14.sp, color = DoctorCardSub) }
             }
+            own?.let { g -> GocStatusChip(if (g.signOff != null) t("Locked", "लॉक") else t("Saved", "सहेजा गया"), done = g.signOff != null) }
         }
-        own?.let { g -> GocStatusChip(if (g.signOff != null) t("Signed and locked", "साइन होकर बंद") else t("Saved", "सहेजा गया"), done = g.signOff != null) }
-        Button(onClick = { open = true }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("goc-open")) {
-            Icon(Icons.Default.Mic, null); Spacer(Modifier.width(8.dp)); Text(if (own != null) t("Open", "खोलें") else t("Record", "रिकॉर्ड करें"))
+        if (canRecord) Surface(color = if (agreedAt > 0) GocTickSoft else Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(if (agreedAt > 0) 1.5.dp else 1.dp, if (agreedAt > 0) DoctorStatusGood else DoctorCardSub.copy(alpha = .5f)), modifier = Modifier.fillMaxWidth().testTag("goc-card-consent-box")) {
+            Column(Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
+                Box(Modifier.testTag("goc-card-consent")) { CheckLine(agreedAt > 0, { agreedAt = if (it) System.currentTimeMillis() else 0L }, t("Everyone present agrees to this conversation being recorded and written down", "मौजूद सभी लोग इस बातचीत को रिकॉर्ड करने और लिखने के लिए राज़ी हैं")) }
+                if (gemini) Text(t("Audio is sent to Google Gemini to transcribe.", "ऑडियो लिखने के लिए Google Gemini को भेजा जाता है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.padding(start = 12.dp, end = 8.dp, bottom = 10.dp))
+            }
+        }
+        val press = remember { MutableInteractionSource() }
+        Button(onClick = { startNow = canRecord && agreedAt > 0; open = true }, interactionSource = press, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust, contentColor = Color.White), elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp, pressedElevation = 0.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).saharaPress(press).testTag("goc-open")) {
+            Icon(if (own != null) Icons.AutoMirrored.Filled.ArrowForward else Icons.Default.Mic, null); Spacer(Modifier.width(8.dp)); Text(if (own != null) t("Open", "खोलें") else t("Record", "रिकॉर्ड करें"), fontSize = 17.sp, fontWeight = FontWeight.Bold)
         }
     }
     if (open) Dialog(onDismissRequest = { open = false }, properties = DialogProperties(usePlatformDefaultWidth = false, dismissOnClickOutside = false)) {
-        Surface(color = Paper, modifier = Modifier.fillMaxSize().imePadding()) { GocConversationPage(d, update, LocalGocFolder.current, ::withMic, onClose = { open = false }) }
+        Surface(color = Cream, modifier = Modifier.fillMaxSize().imePadding()) { GocConversationPage(d, update, LocalGocFolder.current, mic::request, agreedAt = agreedAt, startRecording = startNow, onClose = { open = false; startNow = false }) }
     }
 }
 
@@ -176,13 +195,14 @@ private val GocTickSoft get() = DoctorStatusGoodBg
  * [framed] false drops the sheet's own border when the caller already sits it on a card.
  */
 @Composable internal fun GocFormView(sections: List<GocFormSection>, modifier: Modifier = Modifier, framed: Boolean = true) { val hindi = careHindi()
-    val sheet = if (framed) Modifier.background(Paper, RoundedCornerShape(20.dp)).border(1.dp, DoctorHairline, RoundedCornerShape(20.dp)).padding(horizontal = 16.dp, vertical = 8.dp) else Modifier
-    Column(modifier.fillMaxWidth().then(sheet)) {
+    // Framed: each section of the form is its own card, so the long form reads as clear blocks.
+    val card = if (framed) Modifier.background(Paper, RoundedCornerShape(16.dp)).border(1.dp, DoctorHairline, RoundedCornerShape(16.dp)).padding(16.dp) else Modifier
+    Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(if (framed) 12.dp else 0.dp)) {
         sections.forEachIndexed { index, section ->
-            Column(Modifier.fillMaxWidth().padding(top = if (index == 0) 8.dp else 24.dp, bottom = 8.dp).testTag("goc-form-section-${section.id}"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(Modifier.fillMaxWidth().then(card).padding(top = if (framed || index == 0) 0.dp else 24.dp, bottom = if (framed) 0.dp else 8.dp).testTag("goc-form-section-${section.id}"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Box(Modifier.size(40.dp).border(1.5.dp, Rust, RoundedCornerShape(10.dp)).background(GocSand, RoundedCornerShape(10.dp)), contentAlignment = Alignment.Center) {
-                        Text(section.id, color = RustText, fontWeight = FontWeight.Bold, fontFamily = SaharaTitleFont, fontSize = 17.sp)
+                    Box(Modifier.widthIn(min = 40.dp).heightIn(min = 40.dp).background(Rust, RoundedCornerShape(12.dp)).padding(horizontal = 6.dp), contentAlignment = Alignment.Center) {
+                        Text(section.id, color = Color.White, fontWeight = FontWeight.Bold, fontFamily = SaharaTitleFont, fontSize = 17.sp, maxLines = 1, softWrap = false)
                     }
                     Spacer(Modifier.width(12.dp))
                     Text(section.title.pick(hindi), Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 19.sp, lineHeight = 25.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
@@ -264,7 +284,7 @@ private val GocTickSoft get() = DoctorStatusGoodBg
     }
 }
 
-@Composable private fun GocConversationPage(d: EctprRecord, update: ((EctprRecord) -> EctprRecord) -> Unit, folder: File?, withMic: (() -> Unit) -> Unit, onClose: () -> Unit) {
+@Composable private fun GocConversationPage(d: EctprRecord, update: ((EctprRecord) -> EctprRecord) -> Unit, folder: File?, withMic: (() -> Unit) -> Unit, agreedAt: Long = 0L, startRecording: Boolean = false, onClose: () -> Unit) {
     val t = careText(); val hindi = careHindi(); val context = LocalContext.current; val scope = rememberCoroutineScope(); val owner = LocalLifecycleOwner.current; val view = LocalView.current
     val recorder = remember(folder, d.patientId) { folder?.let { GocRecorder(context, it, d.patientId, scope) } }
     val engine = remember { GocSpeechEngine(context) }
@@ -273,7 +293,7 @@ private val GocTickSoft get() = DoctorStatusGoodBg
     val initial = remember(d.id) { restored?.transcript ?: d.gocTranscript?.takeIf { it.planVersion == d.version } }
 
     var participants by rememberSaveable(d.id) { mutableStateOf(initial?.participants.orEmpty()) }
-    var consentAt by rememberSaveable(d.id) { mutableStateOf(initial?.consentAt ?: 0L) }
+    var consentAt by rememberSaveable(d.id) { mutableStateOf(initial?.consentAt?.takeIf { it > 0 } ?: agreedAt) }
     var lines by remember { mutableStateOf(initial?.lines.orEmpty()) }
     var note by remember { mutableStateOf(initial?.note.orEmpty()) }
     var topics by remember { mutableStateOf(initial?.topics.orEmpty().associateBy { it.decision }) }
@@ -317,7 +337,8 @@ private val GocTickSoft get() = DoctorStatusGoodBg
     LaunchedEffect(Unit) { gemini = gocOnlineEngines().gemini }
     // Autosave, so a killed app or a long job loses nothing the doctor already corrected.
     LaunchedEffect(lines, note, topics, consentAt, participants) {
-        if (consentAt > 0 && draftFile != null) { delay(1200); val snapshot = GocDraft(build(), emptySet()); withContext(Dispatchers.IO) { draftFile.write(snapshot) } }
+        // A locked note is saved on the plan and its draft is gone; never bring the draft back after the lock.
+        if (consentAt > 0 && draftFile != null && signOff == null) { delay(1200); if (signOff == null) { val snapshot = GocDraft(build(), emptySet()); withContext(Dispatchers.IO) { draftFile.write(snapshot) } } }
     }
     DisposableEffect(recorder, owner) {
         val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_STOP) { recorder?.stop(); recorder?.stopPlayback(); task?.cancel() } }
@@ -326,6 +347,13 @@ private val GocTickSoft get() = DoctorStatusGoodBg
     }
     val awake = recorderState.recording || busy
     DisposableEffect(awake) { view.keepScreenOn = awake; onDispose { view.keepScreenOn = false } }
+    // Consent was ticked on the card, so its Record tap starts recording here, once.
+    var autoStarted by rememberSaveable(d.id) { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        if (startRecording && !autoStarted && recorder != null && consentAt > 0 && stage == GocStage.CAPTURE && !recorderState.recording) {
+            autoStarted = true; withMic { recorder.start(consentNames.joinToString("\n"), consentNames.toSet(), purpose = true, storage = true, access = true) }
+        }
+    }
 
     fun run(label: String, action: suspend () -> Unit) {
         if (busy) return
@@ -397,35 +425,33 @@ private val GocTickSoft get() = DoctorStatusGoodBg
     /** Rule V1: only what the conversation stated, one clear option each; never a default, nothing undiscussed. */
     fun confirmAll() { suggestions.forEach { (dd, id, quotes) -> confirm(dd, id, quotes) } }
     fun continueToNote() {
-        note = GocNote.draft(d, topics, names.joinToString("\n"), hindi, undiscussed.map(GocGuide::title))
+        note = GocNote.draft(d, topics, names.joinToString("\n"), hindi, GocGuide.undiscussed(extraction, covered, guideTicked, topics, consentAt > 0).map(GocGuide::title))
         update { it.copy(gocTranscript = build(planNow())) }
         stage = GocStage.NOTE
     }
-    fun finish() {
+    fun finish(close: Boolean = true) {
         update { it.copy(gocTranscript = build(planNow())) }
         recorderState.clips.forEach { recorder?.delete(it) }
         draftFile?.delete()
-        onClose()
+        if (close) onClose()
     }
 
-    LazyColumn(Modifier.fillMaxSize().testTag("goc-page"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item(key = "header") {
-            Column(Modifier.padding(bottom = 8.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                PlanHeader(t("Goals-of-care conversation", "देखभाल के लक्ष्यों की बातचीत"), onClose, "goc-header")
-                GocStepper(listOf(GocStage.CAPTURE to t("Record", "रिकॉर्ड करें"), GocStage.REVIEW to t("Review", "जाँच"), GocStage.NOTE to t("Sign", "हस्ताक्षर")), stage, signOff != null)
-            }
-        }
+    // Record → Text → Form → Sign → Locked: where the talk is now, always on screen in the band.
+    val step = when (stage) { GocStage.CAPTURE -> if (busy) 1 else 0; GocStage.REVIEW -> 2; GocStage.NOTE -> if (signOff != null) 4 else 3 }
+    Column(Modifier.fillMaxSize().testTag("goc-page")) {
+    GocBand(t("Goals of care", "देखभाल के लक्ष्य"), step, signOff != null, onClose)
+    SaharaStateSwitch(stage, Modifier.weight(1f), label = "goc stage") { shown ->
+    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
 
-        if (stage == GocStage.CAPTURE) item(key = "capture") {
+        if (shown == GocStage.CAPTURE) item(key = "capture") {
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                // Step 1: consent. One tick for everyone in the room; the record button stays off until it is ticked.
-                Surface(color = if (consentAt > 0) GocTickSoft else Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(if (consentAt > 0) 1.5.dp else 1.dp, if (consentAt > 0) DoctorStatusGood else DoctorHairline), modifier = Modifier.fillMaxWidth()) {
+                // Consent: one tick for everyone in the room; the record button stays off until it is ticked. Hidden while recording (it was given).
+                if (!recorderState.recording && !busy) Surface(color = if (consentAt > 0) GocTickSoft else Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(if (consentAt > 0) 1.5.dp else 1.dp, if (consentAt > 0) DoctorStatusGood else DoctorCardSub.copy(alpha = .5f)), modifier = Modifier.fillMaxWidth().testTag("goc-consent")) {
                     Column(Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
                         CheckLine(consentAt > 0, { consentAt = if (it) System.currentTimeMillis() else 0L }, t("Everyone present agrees to this conversation being recorded and written down", "मौजूद सभी लोग इस बातचीत को रिकॉर्ड करने और लिखने के लिए राज़ी हैं"))
                         if (gemini) Text(t("Audio is sent to Google Gemini to transcribe.", "ऑडियो लिखने के लिए Google Gemini को भेजा जाता है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.padding(start = 12.dp, end = 8.dp, bottom = 10.dp).testTag("goc-gemini-line"))
                     }
                 }
-                if (!recorderState.recording && !busy) CareField(participants, { participants = it.take(600) }, t("Who's present", "कौन मौजूद है"))
                 if (busy) GocWorkingCard(operation, progress) { task?.cancel() }
                 else if (recorder != null) {
                     // Step 2: record. A big calm button, the timer above it and the voice level as a soft ring around it.
@@ -440,17 +466,18 @@ private val GocTickSoft get() = DoctorStatusGoodBg
                         if (recorderState.recording) recorder.stopAndGet()?.let { transcribe(it) }
                         else withMic { recorder.start(consentNames.joinToString("\n"), consentNames.toSet(), purpose = true, storage = true, access = true) }
                     }
-                    if (recorderState.recording) OutlinedButton(onClick = { if (recorderState.paused) recorder.resume() else recorder.pause() }, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("goc-pause")) {
+                    if (recorderState.recording) OutlinedButton(onClick = { if (recorderState.paused) recorder.resume() else recorder.pause() }, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, RustText), modifier = Modifier.heightIn(min = 48.dp).testTag("goc-pause")) {
                         Icon(if (recorderState.paused) Icons.Default.PlayArrow else Icons.Default.Pause, null, tint = RustText); Spacer(Modifier.width(8.dp))
                         Text(if (recorderState.paused) t("Resume", "फिर शुरू") else t("Pause", "रोकें"), color = RustText, fontSize = 16.sp)
                     }
                     recorderState.error?.let { Text(it.pick(hindi), color = MaterialTheme.colorScheme.error, fontSize = 15.sp, textAlign = TextAlign.Center, modifier = Modifier.announce()) }
                 }
+                if (!recorderState.recording && !busy) CareField(participants, { participants = it.take(600) }, t("Who's present", "कौन मौजूद है"))
                 if (!recorderState.recording && !busy) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                    if (recorder != null) OutlinedButton(onClick = { upload.launch(arrayOf("audio/*", "video/webm")) }, enabled = consentAt > 0, shape = RoundedCornerShape(14.dp), contentPadding = PaddingValues(horizontal = 12.dp), modifier = Modifier.weight(1f).heightIn(min = 52.dp).testTag("goc-upload")) {
-                        Icon(Icons.Default.UploadFile, null, tint = if (consentAt > 0) RustText else DoctorCardFaint); Spacer(Modifier.width(6.dp)); Text(t("Upload", "अपलोड करें"), color = if (consentAt > 0) RustText else DoctorCardFaint, textAlign = TextAlign.Center)
+                    if (recorder != null) OutlinedButton(onClick = { upload.launch(arrayOf("audio/*", "video/webm")) }, enabled = consentAt > 0, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, if (consentAt > 0) RustText else DoctorCardSub.copy(alpha = .4f)), colors = ButtonDefaults.outlinedButtonColors(contentColor = RustText), contentPadding = PaddingValues(horizontal = 12.dp), modifier = Modifier.weight(1f).heightIn(min = 52.dp).testTag("goc-upload")) {
+                        Icon(Icons.Default.UploadFile, null); Spacer(Modifier.width(6.dp)); Text(t("Upload", "अपलोड करें"), textAlign = TextAlign.Center)
                     }
-                    OutlinedButton(onClick = { typing = !typing }, shape = RoundedCornerShape(14.dp), contentPadding = PaddingValues(horizontal = 12.dp), modifier = Modifier.weight(1f).heightIn(min = 52.dp).testTag("goc-type")) {
+                    OutlinedButton(onClick = { typing = !typing }, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, RustText), contentPadding = PaddingValues(horizontal = 12.dp), modifier = Modifier.weight(1f).heightIn(min = 52.dp).testTag("goc-type")) {
                         Icon(Icons.Default.Keyboard, null, tint = RustText); Spacer(Modifier.width(6.dp)); Text(t("Type or paste", "टाइप या पेस्ट करें"), color = RustText, textAlign = TextAlign.Center)
                     }
                 }
@@ -467,12 +494,12 @@ private val GocTickSoft get() = DoctorStatusGoodBg
                 }
                 if (typing) Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     CareField(typed, { typed = it.take(OfflineSpeechModel.maxOriginalChars) }, t("Type or paste", "टाइप या पेस्ट करें"), minLines = 4)
-                    Button(onClick = { lines = lines + GocLines.fromText(typed); typed = ""; typing = false; stage = GocStage.REVIEW }, enabled = typed.isNotBlank(), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("goc-add-typed")) { Text(t("Use", "इस्तेमाल करें"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold) }
+                    Button(onClick = { lines = lines + GocLines.fromText(typed); typed = ""; typing = false; stage = GocStage.REVIEW }, enabled = typed.isNotBlank(), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust, contentColor = Color.White), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("goc-add-typed")) { Text(t("Use", "इस्तेमाल करें"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold) }
                 }
             }
         }
 
-        if (stage == GocStage.REVIEW) {
+        if (shown == GocStage.REVIEW) {
             item(key = "checklist") {
                 PlanCard {
                     val doneCount = GocGuide.ORDER.size - undiscussed.size
@@ -504,16 +531,8 @@ private val GocTickSoft get() = DoctorStatusGoodBg
                         Icon(Icons.Default.Info, null, tint = DoctorStatusWarn); Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(t("Who’s the doctor?", "डॉक्टर कौन हैं?"), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = DoctorCardInk)
+                            Text(t("Tap a line the doctor said.", "डॉक्टर की कोई पंक्ति दबाएँ।"), fontSize = 15.sp, color = DoctorCardSub)
                         }
-                    }
-                }
-            }
-            item(key = "suggest") {
-                Column(Modifier.padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text(t("Suggestions", "सुझाव"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.SemiBold, fontSize = 20.sp, color = DoctorCardInk, modifier = Modifier.a11yHeading())
-                    Button(onClick = ::confirmAll, enabled = suggestions.isNotEmpty(), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust), modifier = Modifier.fillMaxWidth().heightIn(min = 58.dp).testTag("goc-confirm-all")) {
-                        Icon(Icons.Default.DoneAll, null); Spacer(Modifier.width(8.dp))
-                        Text(if (suggestions.isNotEmpty()) t("Confirm all", "सब पक्का करें") + " (${suggestions.size})" else t("All confirmed", "सब पक्के"), fontSize = 17.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -522,7 +541,7 @@ private val GocTickSoft get() = DoctorStatusGoodBg
                 if (items.isNotEmpty()) {
                     item(key = "sec-$sec") {
                         Row(Modifier.padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Box(Modifier.size(32.dp).border(1.5.dp, Rust, RoundedCornerShape(8.dp)).background(GocSand, RoundedCornerShape(8.dp)), contentAlignment = Alignment.Center) { Text(sec, color = RustText, fontWeight = FontWeight.Bold, fontFamily = SaharaTitleFont, fontSize = 14.sp) }
+                            Box(Modifier.widthIn(min = 32.dp).heightIn(min = 32.dp).background(Rust, RoundedCornerShape(10.dp)).padding(horizontal = 4.dp), contentAlignment = Alignment.Center) { Text(sec, color = Color.White, fontWeight = FontWeight.Bold, fontFamily = SaharaTitleFont, fontSize = 14.sp, maxLines = 1, softWrap = false) }
                             Spacer(Modifier.width(12.dp)); Text(secTitle, color = RustText, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.a11yHeading())
                         }
                     }
@@ -530,17 +549,12 @@ private val GocTickSoft get() = DoctorStatusGoodBg
                 }
             }
             item(key = "transcript") {
-                InfoDisclosure(t("Transcript", "लिखाई") + " · " + lines.size) {
-                    lines.forEachIndexed { index, line ->
-                        if (index > 0) HorizontalDivider(color = DoctorHairline)
-                        Column(Modifier.fillMaxWidth().clickable { if (askDoctor) { val who = line.who; lines = lines.map { l -> if (who.isNotBlank() && l.who == who || l === line) l.copy(party = GocParty.DOCTOR_SIDE, guessed = false) else if (who.isNotBlank() && l.who.startsWith("Speaker ") && l.party != GocParty.DOCTOR_SIDE) l.copy(party = GocParty.PATIENT_PARTY, guessed = false) else l }; askDoctor = false } else editing = if (editing == index) -1 else index }.padding(vertical = 4.dp).testTag("goc-line-$index"), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            FilterChip(selected = line.party != GocParty.UNSET, onClick = { lines = lines.toMutableList().also { it[index] = line.copy(party = GocLines.nextParty(line.party), guessed = false) } }, label = { Text((if (line.who.isNotBlank()) line.who + " · " else "") + GocLines.label(line.party).pick(hindi)) }, shape = CircleShape, modifier = Modifier.testTag("goc-party-$index"))
-                            if (editing == index) CareField(line.text, { v -> lines = lines.toMutableList().also { it[index] = line.copy(text = v) } }, t("Edit", "बदलें"))
-                            else Text(line.text, fontSize = 16.sp, lineHeight = 23.sp, color = DoctorCardInk)
-                        }
-                    }
-                    OutlinedButton(onClick = { stage = GocStage.CAPTURE }, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Mic, null, tint = RustText); Spacer(Modifier.width(6.dp)); Text(t("Add more", "और जोड़ें"), color = RustText) }
-                }
+                GocTranscriptCard(lines, hindi, onAddMore = { stage = GocStage.CAPTURE }, editing = editing,
+                    onLine = { index -> val line = lines[index]
+                        if (askDoctor) { val who = line.who; lines = lines.map { l -> if (who.isNotBlank() && l.who == who || l === line) l.copy(party = GocParty.DOCTOR_SIDE, guessed = false) else if (who.isNotBlank() && l.who.startsWith("Speaker ") && l.party != GocParty.DOCTOR_SIDE) l.copy(party = GocParty.PATIENT_PARTY, guessed = false) else l }; askDoctor = false }
+                        else editing = if (editing == index) -1 else index },
+                    onParty = { index -> val line = lines[index]; lines = lines.toMutableList().also { it[index] = line.copy(party = GocLines.nextParty(line.party), guessed = false) } },
+                    onEdit = { index, v -> lines = lines.toMutableList().also { it[index] = lines[index].copy(text = v) } })
             }
             item(key = "finish") {
                 Column(Modifier.padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -559,19 +573,37 @@ private val GocTickSoft get() = DoctorStatusGoodBg
                             }
                         }
                     }
-                    Button(onClick = ::continueToNote, enabled = !busy && text.isNotBlank(), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag(if (undiscussed.isNotEmpty()) "goc-continue-anyway" else "goc-finish")) {
-                        Text(if (undiscussed.isNotEmpty()) t("Continue anyway", "फिर भी आगे बढ़ें") else t("Continue", "आगे बढ़ें"), fontSize = 17.sp, fontWeight = FontWeight.Bold)
+                    // One tap confirms the suggestions shown above (each still has Change) and opens the form to sign.
+                    Button(onClick = { confirmAll(); continueToNote() }, enabled = !busy && text.isNotBlank(), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust, contentColor = Color.White), elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp, pressedElevation = 0.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag(if (suggestions.isNotEmpty()) "goc-confirm-all" else if (undiscussed.isNotEmpty()) "goc-continue-anyway" else "goc-finish")) {
+                        if (suggestions.isNotEmpty()) { Icon(Icons.Default.DoneAll, null); Spacer(Modifier.width(8.dp)) }
+                        Text(if (suggestions.isNotEmpty()) t("Confirm ${suggestions.size} and continue", "${suggestions.size} पक्के करें, आगे बढ़ें") else if (undiscussed.isNotEmpty()) t("Continue anyway", "फिर भी आगे बढ़ें") else t("Continue", "आगे बढ़ें"), fontSize = 17.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, modifier = Modifier.weight(1f, fill = false))
                         Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null)
                     }
                 }
             }
         }
 
-        if (stage == GocStage.NOTE) {
+        if (shown == GocStage.NOTE) {
+            // Locked: the result first, with its status pill and who signed; the form follows below.
+            if (signOff != null) item(key = "done") {
+                Surface(color = GocTickSoft, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.5.dp, DoctorStatusGood), modifier = Modifier.fillMaxWidth().testTag("goc-signed")) {
+                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            GocSuccessTick()
+                            Spacer(Modifier.width(12.dp))
+                            Column(Modifier.weight(1f).announce(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                GocStatusChip(t("Signed and locked", "साइन होकर बंद"), done = true)
+                                Text(signOff?.signers.orEmpty().joinToString(", "), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
+                            }
+                        }
+                        Button(onClick = onClose, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust, contentColor = Color.White), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("goc-done")) { Text(t("Done", "हो गया"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold) }
+                    }
+                }
+            }
             item(key = "note-tools") {
                 var problem by remember { mutableStateOf("") }
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    TextButton(onClick = { stage = GocStage.REVIEW }, enabled = signOff == null, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = if (signOff == null) RustText else DoctorCardFaint); Spacer(Modifier.width(6.dp)); Text(t("Back", "वापस"), color = if (signOff == null) RustText else DoctorCardFaint) }
+                    if (signOff == null) TextButton(onClick = { stage = GocStage.REVIEW }, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = RustText); Spacer(Modifier.width(6.dp)); Text(t("Back", "वापस"), color = RustText) }
                     Spacer(Modifier.weight(1f))
                     OutlinedButton(onClick = { scope.launch {
                         val file = runCatching { withContext(Dispatchers.IO) { File(File(context.cacheDir, "doctor-preview-exports").apply { mkdirs() }, "goals-of-care-${d.id.filter { it.isLetterOrDigit() || it == '-' }.take(48)}.pdf").also {
@@ -588,43 +620,74 @@ private val GocTickSoft get() = DoctorStatusGoodBg
                         onComplete = { record ->
                             signOff = GocSignOffSummary(record.id, record.sealSha256.orEmpty(), record.lockedAt.orEmpty(), record.signatures.map { it.name },
                                 record.signatures.map { it.role }, record.signatures.map { it.registrationNo.orEmpty() }, record.signatures.map { it.method }, record.signatures.map { it.signedAt })
-                            update { it.copy(gocTranscript = build(planNow())) }
+                            // Locked is the end: the note is saved and the audio and draft are cleared now, so Done only closes.
+                            finish(close = false)
                         },
                         onInvalidated = { signOff = null })
                 }
             }
-            if (signOff != null) item(key = "done") {
-                Surface(color = GocTickSoft, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.5.dp, DoctorStatusGood), modifier = Modifier.fillMaxWidth().testTag("goc-signed")) {
-                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(Modifier.size(40.dp).background(DoctorStatusGood, CircleShape), contentAlignment = Alignment.Center) { Icon(Icons.Default.Lock, null, tint = Color.White, modifier = Modifier.size(22.dp)) }
-                            Spacer(Modifier.width(12.dp))
-                            Text(t("Signed and locked", "साइन होकर बंद") + ": " + signOff?.signers.orEmpty().joinToString(", "), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.weight(1f).announce())
-                        }
-                        Button(onClick = ::finish, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("goc-done")) { Text(t("Done", "हो गया"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold) }
+        }
+    }
+    }
+    }
+}
+
+/** The page's dark band: back, title, and the five steps (Record, Text, Form, Sign, Locked) as a segmented bar with the current one named. */
+@Composable private fun GocBand(title: String, step: Int, locked: Boolean, onBack: () -> Unit) { val t = careText()
+    val labels = listOf(t("Record", "रिकॉर्ड"), t("Text", "लिखाई"), t("Form", "फ़ॉर्म"), t("Sign", "हस्ताक्षर"), t("Locked", "लॉक"))
+    Surface(color = GocBandColor, contentColor = Color.White, modifier = Modifier.fillMaxWidth().testTag("goc-header")) {
+        Column(Modifier.padding(start = 4.dp, end = 16.dp, top = 4.dp, bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = onBack, modifier = Modifier.testTag("goc-header-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस"), tint = Color.White) }
+                Text(title, Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.SemiBold, fontSize = 22.sp, lineHeight = 28.sp, color = Color.White)
+            }
+            Column(Modifier.padding(start = 12.dp).testTag("goc-steps").semantics(mergeDescendants = true) {}, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    labels.indices.forEach { i ->
+                        val done = i < step || locked
+                        val fill by androidx.compose.animation.animateColorAsState(if (done) GocBandDone else if (i == step) Color.White else Color.White.copy(alpha = .28f), SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "goc step")
+                        Box(Modifier.weight(1f).height(6.dp).clip(CircleShape).background(fill))
                     }
+                }
+                SaharaAnimatedText(if (locked) labels.last() else labels[step.coerceIn(0, labels.lastIndex)]) { now ->
+                    Text(t("Step ${step + 1} of 5", "चरण ${step + 1} / 5") + " · " + now, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Color.White, modifier = Modifier.testTag("goc-step-now"))
                 }
             }
         }
     }
 }
 
-/** The three stages as numbered dots joined by a line: done ones ticked in green, the current one filled Rust. [locked] ticks the last one too. */
-@Composable private fun GocStepper(steps: List<Pair<GocStage, String>>, stage: GocStage, locked: Boolean) {
-    Row(Modifier.fillMaxWidth().testTag("goc-steps"), verticalAlignment = Alignment.Top) {
-        steps.forEachIndexed { index, (s, label) ->
-            val done = s.ordinal < stage.ordinal || (locked && s == stage)
-            val now = s == stage && !done
-            Column(Modifier.weight(1f).semantics(mergeDescendants = true) {}, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    HorizontalDivider(Modifier.weight(1f), thickness = 2.dp, color = if (index == 0) Color.Transparent else if (s.ordinal <= stage.ordinal) DoctorStatusGood else DoctorHairline)
-                    Box(Modifier.size(32.dp).background(if (now) Rust else if (done) DoctorStatusGood else Paper, CircleShape).border(1.5.dp, if (now) Rust else if (done) DoctorStatusGood else DoctorCardSub.copy(alpha = .5f), CircleShape), contentAlignment = Alignment.Center) {
-                        if (done) Icon(Icons.Default.Check, null, tint = Color.White, modifier = Modifier.size(18.dp))
-                        else Text("${index + 1}", color = if (now) Color.White else DoctorCardSub, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+/** The tick on a locked note: it pops in once (no motion when animations are off). */
+@Composable private fun GocSuccessTick() {
+    val shown = remember { androidx.compose.animation.core.MutableTransitionState(!SaharaMotion.enabled).apply { targetState = true } }
+    Box(Modifier.size(44.dp), contentAlignment = Alignment.Center) {
+        androidx.compose.animation.AnimatedVisibility(shown, enter = androidx.compose.animation.scaleIn(SaharaMotion.tween(SaharaMotion.SAVED_MS + 80), initialScale = .6f) + androidx.compose.animation.fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS))) {
+            Box(Modifier.size(44.dp).background(DoctorStatusGood, CircleShape), contentAlignment = Alignment.Center) { Icon(Icons.Default.Lock, null, tint = Color.White, modifier = Modifier.size(24.dp)) }
+        }
+    }
+}
+
+/** The words of the talk as compact lines, always shown below the decisions: a speaker chip (tap to change who said it), then the words (tap to edit). */
+@Composable private fun GocTranscriptCard(lines: List<GocLine>, hindi: Boolean, editing: Int, onLine: (Int) -> Unit, onParty: (Int) -> Unit, onEdit: (Int, String) -> Unit, onAddMore: () -> Unit) { val t = careText()
+    Surface(color = Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().saharaContentSize().testTag("goc-transcript")) {
+        Column(Modifier.padding(bottom = 12.dp)) {
+            Row(Modifier.fillMaxWidth().heightIn(min = 52.dp).padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.GraphicEq, null, tint = RustText, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(10.dp))
+                Text(t("Transcript", "लिखाई"), Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+                Text("${lines.size}", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = DoctorCardSub)
+            }
+            Column(Modifier.padding(horizontal = 12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                lines.forEachIndexed { index, line ->
+                    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).clickable { onLine(index) }.padding(horizontal = 4.dp, vertical = 4.dp).testTag("goc-line-$index"), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        val (bg, fg) = when (line.party) { GocParty.DOCTOR_SIDE -> GocDoctorChip to Color.White; GocParty.PATIENT_PARTY -> GocPatientChip to Color.White; else -> Paper to DoctorCardSub }
+                        Surface(onClick = { onParty(index) }, color = bg, contentColor = fg, shape = CircleShape, border = if (line.party == GocParty.UNSET) BorderStroke(1.dp, DoctorCardSub.copy(alpha = .6f)) else null, modifier = Modifier.testTag("goc-party-$index")) {
+                            Text((if (line.who.isNotBlank()) line.who + " · " else "") + GocLines.label(line.party).pick(hindi), fontSize = 13.sp, lineHeight = 16.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp))
+                        }
+                        if (editing == index) CareField(line.text, { v -> onEdit(index, v) }, t("Edit", "बदलें"))
+                        else Text(line.text, fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardInk, modifier = Modifier.padding(start = 2.dp))
                     }
-                    HorizontalDivider(Modifier.weight(1f), thickness = 2.dp, color = if (index == steps.lastIndex) Color.Transparent else if (s.ordinal < stage.ordinal) DoctorStatusGood else DoctorHairline)
                 }
-                Text(label, color = if (now) RustText else if (done) DoctorStatusGood else DoctorCardSub, fontSize = 14.sp, lineHeight = 18.sp, fontWeight = if (now) FontWeight.Bold else FontWeight.Medium, textAlign = TextAlign.Center, modifier = Modifier.padding(horizontal = 4.dp))
+                OutlinedButton(onClick = onAddMore, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, RustText), modifier = Modifier.padding(top = 8.dp).heightIn(min = 48.dp)) { Icon(Icons.Default.Mic, null, tint = RustText); Spacer(Modifier.width(6.dp)); Text(t("Add more", "और जोड़ें"), color = RustText) }
             }
         }
     }
@@ -652,11 +715,14 @@ private val GocTickSoft get() = DoctorStatusGoodBg
 /** The big, calm record button: a soft ring that breathes with the voice level while recording. */
 @Composable private fun GocRecordButton(recording: Boolean, paused: Boolean, level: Float, enabled: Boolean, onClick: () -> Unit) { val t = careText()
     val ring by animateFloatAsState(if (recording && !paused) level.coerceIn(0f, 1f) else 0f, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "voice level")
+    // A slow breath while recording (about one every 2.4 s), only while the screen records and animations are on.
+    val breathing = recording && !paused && SaharaMotion.enabled
+    val breath = if (breathing) androidx.compose.animation.core.rememberInfiniteTransition(label = "record pulse").animateFloat(0f, 1f, androidx.compose.animation.core.infiniteRepeatable(androidx.compose.animation.core.tween(1200, easing = androidx.compose.animation.core.FastOutSlowInEasing), androidx.compose.animation.core.RepeatMode.Reverse), label = "breath").value else 0f
     Box(Modifier.size(196.dp), contentAlignment = Alignment.Center) {
-        if (recording) Box(Modifier.size(156.dp + 40.dp * ring).background(Rust.copy(alpha = .10f + .12f * ring), CircleShape))
+        if (recording) Box(Modifier.size(156.dp + 24.dp * breath + 16.dp * ring).background(Rust.copy(alpha = .08f + .10f * breath + .10f * ring), CircleShape))
         if (recording) Box(Modifier.size(156.dp + 16.dp * ring).background(Rust.copy(alpha = .14f), CircleShape))
-        Button(onClick = onClick, enabled = enabled, shape = CircleShape, colors = ButtonDefaults.buttonColors(containerColor = if (recording) DoctorCardInk else Rust),
-            contentPadding = PaddingValues(0.dp), modifier = Modifier.size(148.dp).testTag("goc-record")) {
+        Button(onClick = onClick, enabled = enabled, shape = CircleShape, colors = ButtonDefaults.buttonColors(containerColor = if (recording) DoctorCardInk else Rust, contentColor = Color.White),
+            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp, pressedElevation = 1.dp), contentPadding = PaddingValues(0.dp), modifier = Modifier.size(148.dp).testTag("goc-record")) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(if (recording) Icons.Default.Stop else Icons.Default.Mic, null, Modifier.size(44.dp))
                 Spacer(Modifier.height(4.dp))

@@ -4891,3 +4891,8 @@ Record this talk?	ಈ ಸಂಭಾಷಣೆಯನ್ನು ರೆಕಾರ್ಡ
 The audio stays on this phone.	ಆಡಿಯೋ ಈ ಫೋನ್‌ನಲ್ಲೇ ಇರುತ್ತದೆ.
 Use Google Gemini to write it down	Google Gemini ಮೂಲಕ ಬರೆಸಿ
 Questions to ask today (optional)	ಇಂದು ಕೇಳಬೇಕಾದ ಪ್ರಶ್ನೆಗಳು (ಐಚ್ಛಿಕ)
+Allow	ಅನುಮತಿಸಿ
+Confirm ${suggestions.size} and continue	${suggestions.size} ಖಚಿತಪಡಿಸಿ, ಮುಂದುವರಿಯಿರಿ
+Open Settings	ಸೆಟ್ಟಿಂಗ್ಸ್ ತೆರೆಯಿರಿ
+Step ${step + 1} of 5	ಹಂತ ${step + 1} / 5
+Use the microphone?	ಮೈಕ್ ಬಳಸಬೇಕೇ?

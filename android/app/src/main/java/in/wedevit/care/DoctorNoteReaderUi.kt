@@ -3,20 +3,16 @@ package `in`.wedevit.care
 import android.media.MediaPlayer
 import android.net.Uri
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Forward10
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Replay10
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.animation.animateContentSize
@@ -24,7 +20,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -100,35 +95,30 @@ private fun readerFallbackGoals(note: CareVersion): List<ReaderGoal> = listOf(no
 
 @Composable private fun ReaderHeading(text: String) { Text(text, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 21.sp, lineHeight = 26.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk) }
 
+/** The whole transcript, always shown (no Show all toggle; 20 Oct rule: no click-to-expand sections). */
 @Composable private fun NoteReaderTranscript(source: String) { val t = careText();
-    var all by rememberSaveable(source) { mutableStateOf(false) }
-    var overflow by remember(source) { mutableStateOf(false) }
-    Surface(color = DoctorCardReport, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("note-reader-transcript")) {
+    Surface(color = DoctorCardReport, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("note-reader-transcript")) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             if (source.isBlank()) Text(t("No transcript", "कोई लिखाई नहीं"), fontSize = 16.sp, lineHeight = 24.sp, color = DoctorCardSub)
-            else {
-                SelectionContainer { Text(source, fontSize = 16.sp, lineHeight = 25.sp, color = DoctorCardInk, maxLines = if (all) Int.MAX_VALUE else 12, overflow = TextOverflow.Ellipsis, onTextLayout = { if (!all) overflow = it.hasVisualOverflow }) }
-                if (overflow || all) TextButton(onClick = { all = !all }, modifier = Modifier.heightIn(min = 48.dp).testTag("note-reader-transcript-toggle")) { Text(if (all) t("Show less", "कम दिखाएँ") else t("Show all", "सभी दिखाएँ"), color = RustText, fontSize = 16.sp) }
-            }
+            else SelectionContainer { Text(source, fontSize = 16.sp, lineHeight = 25.sp, color = DoctorCardInk) }
         }
     }
 }
 
-@Composable private fun NoteReaderGoalCard(goal: ReaderGoal, source: String) { val t = careText()
-    var open by rememberSaveable(goal.id) { mutableStateOf(false) }
+/** One goal of the note with its words and what was said, always open. */
+@Composable private fun NoteReaderGoalCard(goal: ReaderGoal, source: String) {
     val said = remember(goal.answer, source) { NoteSourceLines.find(goal.answer, source) }
     val expandable = goal.body.isNotBlank()
     Surface(color = DoctorCardReport, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("note-reader-goal-${goal.id}")) {
-        Column(Modifier.then(if (expandable) Modifier.clickable { open = !open } else Modifier).padding(horizontal = 16.dp, vertical = 4.dp)) {
+        Column(Modifier.padding(horizontal = 16.dp, vertical = 4.dp).saharaAppear()) {
             Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(goal.title, fontFamily = SaharaTitleFont, fontSize = 18.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).padding(vertical = 8.dp))
-                if (expandable) Icon(if (open) Icons.Default.ExpandLess else Icons.Default.ExpandMore, if (open) t("Collapse", "बंद करें") else t("Expand", "खोलें"), tint = DoctorCardSub)
             }
-            if (open && expandable) Column(Modifier.fillMaxWidth().padding(bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (expandable) Column(Modifier.fillMaxWidth().padding(bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 HorizontalDivider(color = DoctorHairline)
                 SelectionContainer { Text(goal.body, fontSize = 16.sp, lineHeight = 24.sp, color = DoctorCardInk) }
             }
-            if (open && said.isNotEmpty()) Column(Modifier.fillMaxWidth().padding(bottom = 12.dp).testTag("note-reader-said-${goal.id}"), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            if (said.isNotEmpty()) Column(Modifier.fillMaxWidth().padding(bottom = 12.dp).testTag("note-reader-said-${goal.id}"), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 said.forEach { line -> SelectionContainer { Text("“$line”", fontSize = 16.sp, lineHeight = 24.sp, fontStyle = androidx.compose.ui.text.font.FontStyle.Italic, color = DoctorCardSub) } }
             }
         }

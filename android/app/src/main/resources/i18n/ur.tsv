@@ -4891,3 +4891,8 @@ Record this talk?	یہ بات چیت ریکارڈ کریں؟
 The audio stays on this phone.	آڈیو اسی فون پر رہتا ہے۔
 Use Google Gemini to write it down	Google Gemini سے لکھوائیں
 Questions to ask today (optional)	آج پوچھنے کے سوال (اختیاری)
+Allow	اجازت دیں
+Confirm ${suggestions.size} and continue	${suggestions.size} پکے کریں، آگے بڑھیں
+Open Settings	سیٹنگز کھولیں
+Step ${step + 1} of 5	مرحلہ ${step + 1} / 5
+Use the microphone?	مائیک استعمال کریں؟

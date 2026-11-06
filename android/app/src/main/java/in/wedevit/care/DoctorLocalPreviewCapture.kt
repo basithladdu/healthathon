@@ -1,19 +1,13 @@
 package `in`.wedevit.care
 
-import android.Manifest
-import android.content.pm.PackageManager
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -23,7 +17,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
     require(controller.storageMode==DoctorAudioStorage.LOCAL_PREVIEW)
     val state by controller.state.collectAsState()
     val clip=state.clips.firstOrNull()
-    val context=LocalContext.current
     val owner=LocalLifecycleOwner.current
     var consentOpen by remember {mutableStateOf(false)}
     var participants by remember {mutableStateOf("")}
@@ -38,10 +31,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
         owner.lifecycle.addObserver(observer)
         onDispose {approved=null;owner.lifecycle.removeObserver(observer)}
     }
-    val permission=rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {granted ->
-        val request=approved;approved=null
-        if(granted && request!=null && request.controller===controller && !controller.isClosed() && owner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) request.start()
-    }
+    val mic=rememberSaharaPermission(SaharaPermission.Microphone)
     // Review annotations belong to this source/clip, never to another recording or patient.
     var coverage by remember(controller,sourceText,clip?.id,state.recording) {mutableStateOf(defaultDoctorCoverage())}
     var reviewing by remember(controller,sourceText,clip?.id,state.recording) {mutableStateOf<Int?>(null)}
@@ -70,8 +60,8 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
         consentOpen=false
         val request=PreviewRecordingApproval(controller,participants,agreements.filterValues {it}.keys.toSet(),purpose,storage,access)
         if(!controller.isClosed() && owner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-            if(ContextCompat.checkSelfPermission(context,Manifest.permission.RECORD_AUDIO)==PackageManager.PERMISSION_GRANTED) request.start()
-            else {approved=request;permission.launch(Manifest.permission.RECORD_AUDIO)}
+            approved=request
+            mic.request { val r=approved;approved=null; if(r!=null && r.controller===controller && !controller.isClosed() && owner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) r.start() }
         }
     },enabled=names.isNotEmpty() && names.all {agreements[it]==true} && purpose && storage && access,modifier=Modifier.testTag("preview-record-start")) {Text("Start recording")}},dismissButton={TextButton(onClick={consentOpen=false}) {Text("Cancel")}})
     reviewing?.let {index -> AlertDialog(containerColor=Paper,onDismissRequest={reviewing=null},title={Text(coverage[index].question)},text={
