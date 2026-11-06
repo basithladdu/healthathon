@@ -68,7 +68,7 @@ internal fun doctorTabTone(section: String): DoctorTone = when (section) {
     val tone = doctorTabTone(tab.section)
     val press = remember { MutableInteractionSource() }
     Surface(onClick = { onSection(tab.section) }, interactionSource = press, modifier = modifier.fillMaxWidth().saharaAppear().saharaPress(press).heightIn(min = if (wide) 64.dp else 84.dp).testTag("$tagPrefix-${tab.section}").semantics { role = Role.Button }, shape = RoundedCornerShape(16.dp), color = if (selected) tone.wash else Paper, contentColor = DoctorCardInk,
-        border = BorderStroke(if (selected) 2.dp else 1.dp, if (selected) tone.ink else DoctorHairline), shadowElevation = if (selected) 0.dp else 1.dp) {
+        border = BorderStroke(if (selected) 2.dp else 1.dp, if (selected) tone.solid else DoctorHairline), shadowElevation = if (selected) 0.dp else 1.dp) {
         if (wide) Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
             DoctorIconChip(tab.icon, tone, 40.dp)
             Spacer(Modifier.width(12.dp))

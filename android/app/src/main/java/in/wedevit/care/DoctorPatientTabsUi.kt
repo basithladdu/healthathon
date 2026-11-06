@@ -213,12 +213,12 @@ internal fun doctorLabRange(data: CareEntry): Pair<Double?, Double?> {
             doctorPatientTabs.forEach { tab ->
                 val on = tab.section == selected
                 val tone = doctorTabTone(tab.section)
-                val fill by animateColorAsState(if (on) tone.ink else Color.Transparent, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "tab fill")
-                val ink by animateColorAsState(if (on) Color.White else DoctorCardSub, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "tab ink")
+                val fill by animateColorAsState(if (on) tone.solid else Color.Transparent, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "tab fill")
+                val ink by animateColorAsState(if (on) tone.onSolid else DoctorCardSub, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "tab ink")
                 Row(Modifier.onGloballyPositioned { positions[tab.section] = it.positionInParent().x.toInt() }.heightIn(min = 48.dp).background(fill, RoundedCornerShape(10.dp))
                     .selectable(selected = on, role = Role.Tab) { if (!on) onSection(tab.section) }.padding(horizontal = 12.dp).testTag("doctor-tab-${tab.section}"),
                     verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Icon(tab.icon, null, Modifier.size(18.dp), tint = if (on) Color.White else tone.ink)
+                    Icon(tab.icon, null, Modifier.size(18.dp), tint = if (on) tone.onSolid else tone.ink)
                     Text(t(tab.en, tab.hi), fontSize = 14.sp, fontWeight = if (on) FontWeight.Bold else FontWeight.SemiBold, color = ink, maxLines = 1, softWrap = false)
                 }
             }

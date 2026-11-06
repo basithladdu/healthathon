@@ -139,24 +139,24 @@ internal fun doctorWhen(item: CareItem, hindi: Boolean, zone: ZoneId = ZoneId.sy
         shape = RoundedCornerShape(14.dp), keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), keyboardActions = KeyboardActions(onSearch = { focus.clearFocus() }))
 }
 
-/** Sahara section and status tones (HUMAN_APP_GUIDE §3): the main tone for icon tiles and pill text, its light container for fills. Main on light and white on main are both AA. */
-internal data class DoctorTone(val ink: Color, val wash: Color)
+/** The design lane's section and status tones (SaharaTone), named for the doctor screens. [SaharaTone.solid] fills chips and bars; [SaharaTone.ink] is text on [SaharaTone.wash]. */
+internal typealias DoctorTone = SaharaTone
 internal object DoctorTones {
-    val Rust = DoctorTone(Color(0xFFB9472C), Color(0xFFFFE3D6))
-    val Teal = DoctorTone(Color(0xFF0F6E6A), Color(0xFFD3EEEC))
-    val Indigo = DoctorTone(Color(0xFF3F51A3), Color(0xFFE0E4F7))
-    val Plum = DoctorTone(Color(0xFF8A3B78), Color(0xFFF4DDEE))
-    val Leaf = DoctorTone(Color(0xFF386D29), Color(0xFFDDEFD5))
-    val Marigold = DoctorTone(Color(0xFF8F5A00), Color(0xFFFCEBC7))
-    val Good = DoctorTone(Color(0xFF2F6B46), Color(0xFFDBEADF))
-    val Attention = DoctorTone(Color(0xFF8A5A1B), Color(0xFFFBE8C8))
-    val Red = DoctorTone(Color(0xFFB3261E), Color(0xFFF9DEDC))
+    val Rust = SaharaTone.Rust
+    val Teal = SaharaTone.Teal
+    val Indigo = SaharaTone.Indigo
+    val Plum = SaharaTone.Plum
+    val Leaf = SaharaTone.Leaf
+    val Marigold = SaharaTone.Marigold
+    val Good = SaharaTone.Success
+    val Attention = SaharaTone.Warning
+    val Red = SaharaTone.Error
     private val cycle = listOf(Rust, Teal, Indigo, Plum, Leaf, Marigold)
     /** A stable tone per name so the same patient always gets the same avatar colour. */
     fun forName(name: String): DoctorTone = cycle[Math.floorMod(name.trim().lowercase().hashCode(), cycle.size)]
 }
-/** The dark header band, in Sahara's brown family. */
-internal val DoctorBand = Color(0xFF4A1D14)
+/** The dark header band. */
+internal val DoctorBand get() = SaharaColors.Band
 
 /** Status pill: tone wash, tone ink, never colour alone (it always carries a word). */
 @Composable internal fun DoctorPill(text: String, tone: DoctorTone, modifier: Modifier = Modifier) {
@@ -167,8 +167,8 @@ internal val DoctorBand = Color(0xFF4A1D14)
 
 /** u-FIR icon chip: a small flat tile in the section colour with a white glyph. */
 @Composable internal fun DoctorIconChip(icon: ImageVector, tone: DoctorTone, size: Dp = 44.dp) {
-    Box(Modifier.size(size).background(tone.ink, RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) {
-        Icon(icon, null, tint = Color.White, modifier = Modifier.size(size * .5f))
+    Box(Modifier.size(size).background(tone.solid, RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) {
+        Icon(icon, null, tint = tone.onSolid, modifier = Modifier.size(size * .5f))
     }
 }
 
@@ -294,7 +294,7 @@ private fun doctorTimeOrDay(item: CareItem, hindi: Boolean, zone: ZoneId): Strin
 /** Section title with a tone bar and count: scannable at a glance. */
 @Composable private fun DoctorHomeSection(title: String, count: Int, tone: DoctorTone) {
     Row(Modifier.fillMaxWidth().padding(top = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Box(Modifier.size(width = 4.dp, height = 18.dp).background(tone.ink, RoundedCornerShape(2.dp)))
+        Box(Modifier.size(width = 4.dp, height = 18.dp).background(tone.solid, RoundedCornerShape(2.dp)))
         Text(title, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
         if (count > 0) Text("$count", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = tone.ink)
     }

@@ -68,7 +68,7 @@ private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     Icon(Icons.Default.CalendarMonth, null, tint = DoctorAccent, modifier = Modifier.size(28.dp))
                     Text(t("Schedule", "शेड्यूल"), Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 28.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-                    Button(onClick = { picking = true }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorTones.Rust.ink, contentColor = Color.White), elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-schedule-add")) {
+                    Button(onClick = { picking = true }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorTones.Rust.solid, contentColor = Color.White), elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-schedule-add")) {
                         Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Add", "जोड़ें"))
                     }
                 }
@@ -91,7 +91,7 @@ private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone
                 (0L..6L).forEach { offset ->
                     val day = weekStart.plusDays(offset); val isSelected = day == selected; val has = byDay.containsKey(day)
                     val label = careDateFormat("EEEE, d MMMM", hindi).format(day)
-                    Surface(onClick = { pick(day) }, shape = RoundedCornerShape(14.dp), color = if (isSelected) DoctorTones.Rust.ink else Color.Transparent,
+                    Surface(onClick = { pick(day) }, shape = RoundedCornerShape(14.dp), color = if (isSelected) DoctorTones.Rust.solid else Color.Transparent,
                         border = if (!isSelected && day == today) BorderStroke(1.5.dp, DoctorAccent) else null,
                         modifier = Modifier.weight(1f).heightIn(min = 64.dp).semantics { contentDescription = label }.testTag("doctor-schedule-day-$day")) {
                       Box(contentAlignment = Alignment.Center) {
@@ -140,7 +140,7 @@ private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone
     Surface(onClick = onOpen, interactionSource = press, color = Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), shadowElevation = 1.dp,
         modifier = Modifier.fillMaxWidth().saharaAppear().saharaPress(press).testTag("doctor-schedule-card-${item.id}")) {
         Row(Modifier.height(IntrinsicSize.Min)) {
-            Box(Modifier.width(5.dp).fillMaxHeight().background(tone.ink))
+            Box(Modifier.width(5.dp).fillMaxHeight().background(tone.solid))
             Column(Modifier.weight(1f).padding(horizontal = 14.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(time, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = tone.ink, softWrap = false)

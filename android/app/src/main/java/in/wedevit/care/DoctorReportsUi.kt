@@ -68,7 +68,7 @@ import androidx.compose.ui.unit.sp
 /** One-line category chip (u-FIR chip): label and count, solid when chosen. */
 @Composable private fun ReportFolder(label: String, count: Int, selected: Boolean, tag: String, onClick: () -> Unit) {
     val categorySelected = selected
-    Surface(onClick = onClick, color = if (selected) DoctorTones.Marigold.ink else Paper, contentColor = if (selected) Color.White else Ink, shape = RoundedCornerShape(50), border = BorderStroke(1.dp, if (selected) DoctorTones.Marigold.ink else DoctorHairline), modifier = Modifier.heightIn(min = 48.dp).testTag("reports-category-$tag").semantics { this.selected = categorySelected }) {
+    Surface(onClick = onClick, color = if (selected) DoctorTones.Marigold.solid else Paper, contentColor = if (selected) Color.White else Ink, shape = RoundedCornerShape(50), border = BorderStroke(1.dp, if (selected) DoctorTones.Marigold.solid else DoctorHairline), modifier = Modifier.heightIn(min = 48.dp).testTag("reports-category-$tag").semantics { this.selected = categorySelected }) {
         Row(Modifier.padding(horizontal = 14.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             Text(label, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false)
             Text(count.toString(), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = if (selected) Color.White else DoctorTones.Marigold.ink)
