@@ -52,7 +52,7 @@ class DoctorHomeRenderTest {
                 CareTheme {
                     LazyColumn(Modifier.fillMaxSize().background(Cream), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         doctorConnectedHomeItems(listOf(asha, ravi, meena), items, now, hindi, {}, {}, {})
-                        item { DoctorPatientTabRow("CarePlan", {}) }
+                        item { DoctorPatientSectionBar("CarePlan", {}) }
                         item { DoctorPatientNavigationTiles({}) }
                         listOf(asha, ravi, meena).forEach { p -> item { DoctorPatientListCard(p.name, DoctorConnectedHome.patientCode(p.id), {}, pill = doctorPatientStatus(p, items, now, hindi)) } }
                     }

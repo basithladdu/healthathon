@@ -176,7 +176,7 @@ internal val DoctorBand get() = SaharaColors.Band
 @Composable internal fun doctorCountUp(value: Int): Int {
     var target by remember { mutableIntStateOf(0) }
     LaunchedEffect(value) { target = value }
-    val shown by animateIntAsState(target, SaharaMotion.tween(SaharaMotion.ENTER_MS * 2, easing = SaharaMotion.Emphasized), label = "tile count")
+    val shown by animateIntAsState(target, SaharaMotion.tween(SaharaMotion.ENTER_MS * 2, easing = SaharaMotion.Emphasized), label = "tilecount")
     return shown
 }
 
@@ -231,11 +231,11 @@ internal fun doctorPatientStatus(person: Person, items: List<CareItem>, now: Lon
 }
 
 /**
- * Doctor Home as a launchpad: four real counts as tiles, then the Today queue, then what is coming up and the week's check-ins.
+ * Doctor Home: three real counts as tiles (each jumps to its list below), then the Today queue, what is coming up and the week's check-ins.
  * [firstIndex] is how many list items the caller drew above, so the Check-ins tile can scroll to its section.
  */
 internal fun LazyListScope.doctorConnectedHomeItems(people: List<Person>, items: List<CareItem>, now: Long, hindi: Boolean, onVisit: (String) -> Unit, onProgress: (String) -> Unit, onPatients: () -> Unit,
-    onSchedule: () -> Unit = onPatients, onScrollTo: (Int) -> Unit = {}, firstIndex: Int = 0, zone: ZoneId = ZoneId.systemDefault()) {
+    onScrollTo: (Int) -> Unit = {}, firstIndex: Int = 0, zone: ZoneId = ZoneId.systemDefault()) {
     val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     val today = Instant.ofEpochMilli(now).atZone(zone).toLocalDate()
     val visits = DoctorConnectedHome.upcomingVisits(people, items, now, zone)
@@ -247,14 +247,16 @@ internal fun LazyListScope.doctorConnectedHomeItems(people: List<Person>, items:
     val todayRows = (todayVisits.size + todayChecks.size).coerceAtLeast(1)
     val laterRows = if (laterVisits.isEmpty()) 0 else 1 + laterVisits.take(5).size
     val checksIndex = firstIndex + 2 + todayRows + laterRows
+    val todayIndex = firstIndex + 1
+    val laterIndex = if (laterVisits.isEmpty()) checksIndex else firstIndex + 2 + todayRows
+    // Each tile is a count that jumps to its own list on this page. Patients is not repeated here: the bottom bar opens it.
     item(key = "home-tiles") {
         BoxWithConstraints {
             val paired = doctorTilesPaired(maxWidth.value, LocalDensity.current.fontScale)
             val tiles: List<@Composable (Modifier) -> Unit> = listOf(
-                { m -> DoctorStatTile(Icons.Default.People, people.size, t("Patients", "मरीज़"), DoctorTones.Rust, onPatients, "doctor-home-tile-patients", m) },
-                { m -> DoctorStatTile(Icons.Default.Today, todayVisits.size, t("Visits today", "आज की विज़िट"), DoctorTones.Indigo, onSchedule, "doctor-home-tile-today", m) },
-                { m -> DoctorStatTile(Icons.Default.EventAvailable, laterVisits.size, t("Coming up", "आगे की विज़िट"), DoctorTones.Plum, onSchedule, "doctor-home-tile-upcoming", m) },
-                { m -> DoctorStatTile(Icons.Default.Favorite, checks.size, t("Check-ins, 7 days", "हालचाल, 7 दिन"), DoctorTones.Teal, { onScrollTo(checksIndex) }, "doctor-home-tile-checkins", m,
+                { m -> DoctorStatTile(Icons.Default.Today, todayVisits.size, t("Visits today", "आज की विज़िट"), DoctorTones.Indigo, { if (people.isEmpty()) onPatients() else onScrollTo(todayIndex) }, "doctor-home-tile-today", m) },
+                { m -> DoctorStatTile(Icons.Default.EventAvailable, laterVisits.size, t("Coming up", "आगे की विज़िट"), DoctorTones.Plum, { if (people.isEmpty()) onPatients() else onScrollTo(laterIndex) }, "doctor-home-tile-upcoming", m) },
+                { m -> DoctorStatTile(Icons.Default.Favorite, checks.size, t("Check-ins, 7 days", "हालचाल, 7 दिन"), DoctorTones.Teal, { if (people.isEmpty()) onPatients() else onScrollTo(checksIndex) }, "doctor-home-tile-checkins", m,
                     pill = if (hard > 0) t("$hard hard", "$hard मुश्किल") to DoctorTones.Attention else null) },
             )
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
