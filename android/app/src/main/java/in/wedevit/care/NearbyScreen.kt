@@ -133,7 +133,7 @@ internal const val NEARBY_PAGE = 10
         // Empty results: one icon, one line, one way out.
         if (visible.isEmpty()) item(key = "nearby-empty") { SurfaceCard {
             Column(Modifier.fillMaxWidth().testTag("nearby-empty"), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Icon(Icons.Default.SearchOff, null, Modifier.size(32.dp), tint = DoctorCardSub)
+                SaharaIllustration(SaharaArtKind.Nearby)
                 Text(t("No centres found", "कोई केंद्र नहीं मिला"), fontSize = 16.sp, color = DoctorCardInk)
                 if (filtersOn) OutlinedButton(onClick = clear, shape = RoundedCornerShape(12.dp), modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Clear filters", "सभी चुनाव हटाएँ"), color = RustText) }
             }

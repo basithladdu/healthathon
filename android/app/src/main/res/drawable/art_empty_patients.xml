@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- No patients yet: a doctor with an empty clipboard. Original Sahara art (CC0), see android/licenses/art/README.md. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="240dp" android:height="180dp" android:viewportWidth="240" android:viewportHeight="180">
+    <path android:fillColor="#E0E4F7" android:pathData="M18,98C18,36.8 84.3,26.6 130.2,30C191.4,33.4 224,64 222,101.4C220,145.6 171,166 114.9,166C58.8,166 18,138.8 18,98z"/>
+    <group>
+        <clip-path android:pathData="M18,98C18,36.8 84.3,26.6 130.2,30C191.4,33.4 224,64 222,101.4C220,145.6 171,166 114.9,166C58.8,166 18,138.8 18,98zM0,0h240a0,0 0 0 1 0,0v120a0,0 0 0 1 0,0h-240a0,0 0 0 1 0,0v-120a0,0 0 0 1 0,0z"/>
+        <path android:fillColor="#2A1B14" android:pathData="M87.7,58.1a8.3,8.3 0 1,0 16.6,0a8.3,8.3 0 1,0 -16.6,0z"/>
+        <path android:fillColor="#FFFDF9" android:pathData="M61.4,172V122.1a21.8,21.8 0 0 1 21.8,-21.8h25.6a21.8,21.8 0 0 1 21.8,21.8V172z"/>
+        <path android:strokeColor="#9C887B" android:strokeWidth="1.5" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M61.4,172V122.1a21.8,21.8 0 0 1 21.8,-21.8h25.6a21.8,21.8 0 0 1 21.8,21.8V172z"/>
+        <path android:fillColor="#0F6E6A" android:pathData="M84.5,100.3L107.5,100.3L96,125.9z"/>
+        <path android:strokeColor="#9C887B" android:strokeWidth="1.5" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M84.5,101.6L92.2,138.7M107.5,101.6L99.8,138.7"/>
+        <path android:fillColor="#84522F" android:pathData="M94.1,86.2h3.8a3.8,3.8 0 0 1 3.8,3.8v11.5a3.8,3.8 0 0 1 -3.8,3.8h-3.8a3.8,3.8 0 0 1 -3.8,-3.8v-11.5a3.8,3.8 0 0 1 3.8,-3.8z"/>
+        <path android:strokeColor="#5E5249" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M85.8,101.6Q83.2,128.5 94.7,132.3M106.2,101.6Q108.8,118.2 108.8,125.9"/>
+        <path android:fillColor="#5E5249" android:pathData="M105,128.5a3.8,3.8 0 1,0 7.7,0a3.8,3.8 0 1,0 -7.7,0z"/>
+        <path android:fillColor="#EFE7DF" android:pathData="M107,128.5a1.8,1.8 0 1,0 3.6,0a1.8,1.8 0 1,0 -3.6,0z"/>
+        <path android:fillColor="#9C6440" android:pathData="M78.8,77.3a3.1,4.1 0 1,0 6.1,0a3.1,4.1 0 1,0 -6.1,0z"/>
+        <path android:fillColor="#9C6440" android:pathData="M107,77.3a3.1,4.1 0 1,0 6.1,0a3.1,4.1 0 1,0 -6.1,0z"/>
+        <path android:fillColor="#9C6440" android:pathData="M81.9,76a14.1,16.6 0 1,0 28.2,0a14.1,16.6 0 1,0 -28.2,0z"/>
+        <path android:fillColor="#2A1B14" android:pathData="M81.2,78.6C79.4,51 112.6,51 110.8,78.6C107.5,69.6 99.8,66.4 96,67C90.9,66.4 84.5,69.6 81.2,78.6z"/>
+        <path android:fillColor="#382E29" android:pathData="M89.2,77.9a1.7,1.7 0 1,0 3.3,0a1.7,1.7 0 1,0 -3.3,0z"/>
+        <path android:fillColor="#382E29" android:pathData="M99.5,77.9a1.7,1.7 0 1,0 3.3,0a1.7,1.7 0 1,0 -3.3,0z"/>
+        <path android:strokeColor="#84522F" android:strokeWidth="1.7" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M91.5,84.3Q96,87.8 100.5,84.3"/>
+        <path android:fillColor="#B9472C" android:pathData="M94.6,71.4a1.4,1.4 0 1,0 2.8,0a1.4,1.4 0 1,0 -2.8,0z"/>
+    </group>
+    <path android:fillColor="#8F5A00" android:pathData="M147,72h42a7,7 0 0 1 7,7v62a7,7 0 0 1 -7,7h-42a7,7 0 0 1 -7,-7v-62a7,7 0 0 1 7,-7z"/>
+    <path android:fillColor="#FFFDF9" android:pathData="M149,82h38a3,3 0 0 1 3,3v54a3,3 0 0 1 -3,3h-38a3,3 0 0 1 -3,-3v-54a3,3 0 0 1 3,-3z"/>
+    <path android:fillColor="#5E5249" android:pathData="M160,66h16a4,4 0 0 1 4,4v4a4,4 0 0 1 -4,4h-16a4,4 0 0 1 -4,-4v-4a4,4 0 0 1 4,-4z"/>
+    <path android:fillColor="#E0E4F7" android:pathData="M157,104a11,11 0 1,0 22,0a11,11 0 1,0 -22,0z"/>
+    <path android:strokeColor="#3F51A3" android:strokeWidth="3" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M168,98V110M162,104H174"/>
+    <path android:strokeColor="#E6D8CC" android:strokeWidth="3" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M154,124H182M154,132H176"/>
+    <path android:fillColor="#9C6440" android:pathData="M138,134a6,6 0 1,0 12,0a6,6 0 1,0 -12,0z"/>
+    <path android:strokeColor="#F2B33D" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M208,47V57M203,52H213"/>
+</vector>

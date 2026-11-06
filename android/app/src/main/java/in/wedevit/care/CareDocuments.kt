@@ -206,7 +206,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
             }
         }
         if (visibleNotes.isEmpty() && visibleReports.isEmpty()) item { SurfaceCard {
-            Surface(shape = CircleShape, color = SaharaApricot) { Icon(Icons.Default.FolderOpen, null, Modifier.padding(12.dp).size(28.dp), tint = DoctorAccent) }
+            SaharaIllustration(SaharaArtKind.NoDocuments)
             Spacer(Modifier.height(12.dp)); Text(if (search.isNotBlank()) t("No documents found", "कोई कागज़ नहीं मिला") else when (filter) { "Reports" -> t("No reports yet", "अभी कोई रिपोर्ट नहीं"); "Care notes" -> t("No care notes yet", "अभी कोई देखभाल नोट नहीं"); "Cancer" -> t("No cancer documents yet", "अभी कैंसर का कोई कागज़ नहीं"); else -> t("No documents yet", "अभी कोई कागज़ नहीं") }, fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk)
             Spacer(Modifier.height(4.dp))
             if (search.isNotBlank()) TextButton(onClick = { search = ""; filter = "All" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Clear search", "खोज मिटाएँ")) }

@@ -380,6 +380,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                         Surface(color = Paper, contentColor = Ink, shape = RoundedCornerShape(topStart = SaharaRadius.Hero, topEnd = SaharaRadius.Hero), modifier = Modifier.fillMaxWidth().weight(1f)) {
                             Box(Modifier.fillMaxSize().padding(top = 16.dp)) { when(shown) {
                                 "family" -> Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 16.dp).saharaScreenEnter(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                                    SaharaIllustration(SaharaArtKind.Welcome, Modifier.fillMaxWidth())
                                     SaharaPrimaryButton(if (role == "family") t("Add the person you care for", "जिनकी देखभाल करते हैं, उन्हें जोड़ें") else t("Start with your name", "अपने नाम से शुरू करें"),
                                         onClick = { if (addPersonContent == null) onStart() else select("person") }, enabled = !entryBusy, icon = Icons.Default.PersonAdd, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("welcome-add-person"))
                                     SaharaSecondaryButton(t("Sign in", "साइन इन"), onClick = { if (accountContent == null) onAccount() else select("account") }, enabled = !entryBusy, icon = Icons.Default.AccountCircle,
@@ -1038,7 +1039,7 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
         CareModuleTile("Medicines", t("Medicines", "दवाइयाँ"), "", SaharaSoftBlue, R.drawable.care_medicines_art, currentMeds.size + pastMeds.size) {
                 SideEffectsToRaiseCard(vm)
                 MedicineScanAction(onScanPrescription) { onAdd("medicine") }
-                if (currentMeds.isEmpty() && pastMeds.isEmpty()) QuietLine(t("No medicines yet.", "अभी कोई दवा नहीं।")) else {
+                if (currentMeds.isEmpty() && pastMeds.isEmpty()) { SaharaIllustration(SaharaArtKind.NoMedicines, Modifier.fillMaxWidth()); QuietLine(t("No medicines yet.", "अभी कोई दवा नहीं।")) } else {
                     CareModuleList("medicines-current", currentMeds, t("No current medicines.", "अभी कोई दवा नहीं चल रही।"), t("Current", "अभी चल रही"), { it.id }) { CareRow(it, vm) }
                     CareModuleList("medicines-past", pastMeds, t("No past medicines yet.", "पहले की कोई दवा नहीं।"), t("Past", "पहले की"), { it.id }) { CareRow(it, vm) }
                 }

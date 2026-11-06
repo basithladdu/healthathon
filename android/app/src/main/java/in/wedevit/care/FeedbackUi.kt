@@ -163,6 +163,7 @@ internal enum class FeedbackSendState { NONE, LOCAL, SENDING, SENT, QUEUED }
             Text(if (checkIn) (if (saved) t("Check-in saved", "आज का हाल सहेज लिया") else if (today != null) t("Update today's check-in", "आज का हाल बदलें") else t("Save check-in", "आज का हाल सहेजें")) else if (sendState == FeedbackSendState.SENDING) t("Sending…", "भेजा जा रहा है…") else if (saved && sendState == FeedbackSendState.SENT) t("Sent to Sahara", "Sahara को भेजा") else if (saved) t("Saved on this phone", "फ़ोन पर सहेजा") else if (account != null) t("Send", "भेजें") else t("Save", "सहेजें"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
         }
         Spacer(Modifier.height(12.dp))
+        if (checkIn && saved) SaharaIllustration(SaharaArtKind.CheckInSaved)
         if (account != null && sendState == FeedbackSendState.QUEUED) TextButton(onClick = { send(account) }, modifier = Modifier.heightIn(min = 48.dp).testTag("feedback-retry")) { Text(t("Try again", "फिर कोशिश करें"), color = RustText) }
     }
     if (discard) AlertDialog(onDismissRequest = { discard = false }, containerColor = Paper, title = { Text(t("Leave without saving?", "बिना सहेजे जाएँ?")) }, confirmButton = { TextButton(onClick = { discard = false; onClose() }) { Text(t("Leave", "जाएँ"), color = Rust) } }, dismissButton = { TextButton(onClick = { discard = false }) { Text(t("Keep editing", "लिखते रहें"), color = Rust) } })
