@@ -273,7 +273,7 @@ private val CareSurfaceHigh = Color(0xFFF1E9DE)
                     8 -> CareLabs(vm)
                     9 -> CareSymptomDiary(vm, onBack = { back() }, startAdding = symptomAddPending, onStartAddingHandled = { symptomAddPending = false })
                     10 -> CarePlanScreen(vm, clinician, onBack = { back() })
-                    11 -> CareCommunityScreen(onBack = { back() })
+                    11 -> CareCommunityScreen(vm.cloud, onAccount = onAccount, onBack = { back() })
                     12 -> CareDevicesScreen(onBack = { back() }, namespace = vm.storageNamespace, personId = selected)
                     else -> More(vm, person, onAccount = onAccount, onDelete = { dialog = "delete" }, onCalendar = { openCalendar() }, onWorkflow = { go(7) }, onLabs = { go(8) }, walkthrough = walkthrough != null, onFeedback = { if (activeRecording) vm.stopRecording(); feedbackOpen = true }, onReminders = { if (activeRecording) vm.stopRecording(); remindersOpen = true }, onSharedWorkspace = { if (activeRecording) vm.stopRecording(); openDoctorWorkspace() }, onDocuments = { if (activeRecording) vm.stopRecording(); go(5) }, onCarePlan = { if (activeRecording) vm.stopRecording(); go(10) })
                 } }
