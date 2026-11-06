@@ -10,7 +10,7 @@ Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. T
 Goals of care must follow Rituparna's legal form (`source-materials/team-context/legal-review-2026-10-31/`). Anything not in it was hidden, not deleted:
 - [ ] **Screening helper (surprise question + ECOG 0-5)** at the start of the doctor's goals-of-care flow: hidden (`CareUi.kt`, the `GoalsScreeningHelper` item). It came from the 28 Oct meeting, not the legal form. The code is still in `GoalsScreening.kt`. Bring back?
 - [ ] **ICU "Yes / Time-limited trial / No" ticks** on the form: removed, because the legal form has only the label "Requirement of ICU?". The app still records the ICU choice; it is just not printed on the form. Print it as text?
-- [ ] **Community "Discussions" posts** (sample posts): removed from the screen; only support groups show. Data still in `CareCommunitySample.posts`.
+- [x] **Community "Discussions" posts** (sample posts): replaced on 6 Nov by a real community (see "Sahara community, 6 Nov" below); the sample groups and posts are gone.
 - [ ] **Emergency card** now makes itself automatically with all four parts (name, goals of care, contacts, medicines), with no ticking first. Should goals of care be left off by default?
 - [ ] Earlier today: the pilot audit-log button, "Older practice records" and the doctor practice cards were removed from the screens (routes still exist).
 
@@ -181,6 +181,13 @@ Details in [docs/SAHARA_SVK_BUILD_HANDOFF.md](docs/SAHARA_SVK_BUILD_HANDOFF.md).
 - [ ] Ask organiser for the confirmed submission deadline, portal, video duration and evaluator-access method; the 27 Oct email does not specify them.
 - [ ] Prepare evaluator access privately and verify the actual join/install path; `/join` is live since 29 Oct; the app-link signing fingerprint is still a placeholder.
 - [ ] Record and review the narrated real-phone walkthrough with Awaiz and an approved doctor account; do not use screenshots or a silent capture as the video deliverable.
+
+### Sahara community, 6 Nov (ui-community lane)
+The owner asked for a real community. The app side is built; it stays on "The community isn't open yet" until this is done:
+- [ ] **Awaiz:** apply `android/supabase/migrations/20261106120000_community.sql` (groups, posts, replies, reactions, reports, moderation; signed-in members only, nothing public). Offline check: `PGLITE_MODULE=<pglite>/dist/index.js node android/scripts/test-community-sql.mjs` (36 checks).
+- [ ] **Clinicians (Sujay, Sharada, Shirin):** confirm the starting groups (Family carers, Living with cancer, Grief and loss, Ask the care team) and their one-line descriptions, or send changes; they are rows in `public.community_groups` (set `active = false` to close one). The 28 Oct meeting asked for research first; the owner asked on 6 Nov to build it.
+- [ ] **Owner/team:** name who moderates. Moderators are accounts with the existing `clinical_verifier` (or `admin`) staff role; they see report counts and can hide or show posts in the app. Three reports from different members hide a post until a moderator looks.
+- [ ] **Team:** who answers in "Ask the care team"? Replies from staff-role accounts show a "Sahara team" label.
 
 ### Sahara team meeting 28 Oct: people-only items
 - [ ] Doctors: share the exact goals-of-care screening tool on WhatsApp (the app has a pluggable helper using the surprise question + ECOG until then).
