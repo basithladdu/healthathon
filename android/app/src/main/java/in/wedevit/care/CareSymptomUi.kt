@@ -315,6 +315,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
     var startedOn by rememberSaveable(id) { mutableStateOf(seed?.startedOn.orEmpty()) }
     var note by rememberSaveable(id) { mutableStateOf(original?.note.orEmpty()) }
     var location by rememberSaveable(id) { mutableStateOf(seed?.painLocation.orEmpty()) }
+    var showLocation by rememberSaveable(id) { mutableStateOf(false) }
     var bodySites by rememberSaveable(id) { mutableStateOf(seed?.painBodySites?.joinToString("|").orEmpty()) }
     var bodyPoints by rememberSaveable(id) { mutableStateOf(PainBodyMapRules.encodePoints(seed?.painBodyPoints.orEmpty()).toString()) }
     var bodyRatings by rememberSaveable(id) { mutableStateOf(PainBodyMapRules.ratingsKey(seed?.let { n -> n.painBodyRatings.ifEmpty { n.rating?.let { r -> n.painBodySites.associateWith { r } }.orEmpty() } }.orEmpty())) }
@@ -377,7 +378,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
             }
             Column(Modifier.weight(1f, fill = false).verticalScroll(scroll).padding(horizontal = 16.dp, vertical = 12.dp)) {
               AnimatedContent(cur, transitionSpec = { SaharaMotion.transform(if (steps.indexOf(targetState) >= steps.indexOf(initialState)) SaharaMotion.Direction.Forward else SaharaMotion.Direction.Back) }, label = "symptom-step") { cur ->
-              Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+              Column(Modifier.saharaContentSize(), verticalArrangement = Arrangement.spacedBy(14.dp)) {
                 if (prior != null && initial == null) {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         FilterChip(!fullDetails, { fullDetails = false }, label = { Text(t("Quick rating", "सिर्फ़ नया अंक")) }, modifier = Modifier.heightIn(min = 48.dp).testTag("symptom-quick-mode"))
@@ -404,7 +405,9 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
                 }
                 if (!quick && cur == "where" && symptom == "Pain") Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
                     CarePainBodyMap(value.painBodySites, value.painBodyPoints, ratingNow.takeIf { it >= 0 }, hindi, ratings = spotRatings, onSpotRating = { site, r -> bodyRatings = PainBodyMapRules.ratingsKey(spotRatings + (site to r)) }) { sites, points -> bodySites = sites.joinToString("|"); bodyPoints = PainBodyMapRules.encodePoints(points).toString(); bodyRatings = PainBodyMapRules.ratingsKey(spotRatings.filterKeys { it in sites }) }
-                    CareField(location, { location = it.take(100) }, t("Pain location (optional)", "दर्द की जगह (वैकल्पिक)"), singleLine = true)
+                    // The typed location is optional (the body map is the main answer): it waits behind "+ Add pain location" unless filled.
+                    if (showLocation || location.isNotBlank()) CareField(location, { location = it.take(100) }, t("Pain location (optional)", "दर्द की जगह (वैकल्पिक)"), singleLine = true)
+                    else SaharaAddChip(t("Add pain location in words", "दर्द की जगह शब्दों में जोड़ें"), { showLocation = true }, Modifier.testTag("symptom-add-location"))
                     Text(t("When does it happen? (optional)", "कब होता है? (वैकल्पिक)"), color = DoctorCardInk, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { SymptomDiaryRules.triggers.forEach { (key, labels) ->
                         SymptomPill(key in value.painTriggers, careTr(hindi, labels.first, labels.second), null, multi = true) { val next = value.painTriggers.toMutableSet(); if (!next.add(key)) next.remove(key); triggerValues = next.sorted().joinToString("|") }
@@ -475,7 +478,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
                 if (!quick && cur == "how") SymptomSection(null, t("Anything else? (optional)", "कुछ और? (वैकल्पिक)")) {
                     OutlinedButton(onClick = { val d = runCatching { LocalDate.parse(startedOn) }.getOrDefault(LocalDate.parse(observedDate)); DatePickerDialog(context, { _, y, m, day -> startedOn = LocalDate.of(y, m + 1, day).toString() }, d.year, d.monthValue - 1, d.dayOfMonth).apply { datePicker.maxDate = LocalDate.parse(observedDate).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli() }.show() }, modifier = Modifier.heightIn(min = 48.dp)) { Text(if (startedOn.isBlank()) t("Started on… (optional)", "कब शुरू हुआ… (वैकल्पिक)") else "${t("Started", "शुरू हुआ")}: $startedOn", color = DoctorCardInk) }
                     if (startedOn.isNotBlank()) TextButton(onClick = { startedOn = "" }) { Text(t("Clear start date", "शुरू होने की तारीख हटाएँ")) }
-                    CareField(note, { note = it.take(500) }, t("Note (optional)", "नोट (वैकल्पिक)"), minLines = 2)
+                    CareNoteField(note, { note = it.take(500) }, t("Note (optional)", "नोट (वैकल्पिक)"), lines = 2, collapsedLabel = t("Add a note", "नोट जोड़ें"))
                 }
               }
               }

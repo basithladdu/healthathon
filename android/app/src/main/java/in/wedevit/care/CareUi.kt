@@ -1279,12 +1279,12 @@ private class CareToolRow(val label: String, val icon: ImageVector, val tone: Sa
     val hindi = careHindi(); val t = careText()
     val headings = mapOf("medicine" to t("Add a medicine", "दवा जोड़ें"), "visit" to t("Add a visit", "मुलाक़ात जोड़ें"), "task" to t("Add a task", "काम जोड़ें"), "checkin" to t("How is today?", "आज कैसा है?"), "journal" to t("Write a note", "नोट लिखें"))
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
-        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 16.dp, end = 16.dp, bottom = 32.dp).saharaContentSize(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Heading(if (initial != null && kind != "checkin") when (kind) { "medicine" -> t("Edit medicine", "दवा बदलें"); "visit" -> t("Edit visit", "मुलाक़ात बदलें"); "task" -> t("Edit task", "काम बदलें"); else -> t("Edit note", "नोट बदलें") } else headings[kind] ?: t("Add an entry", "जानकारी जोड़ें"), 28)
             if (kind == "checkin") {
                 val moods = listOf(Triple(CheckInMood.GOOD, Icons.Default.SentimentSatisfiedAlt, Sage), Triple(CheckInMood.OKAY, Icons.Default.SentimentNeutral, Gold), Triple(CheckInMood.HARD, Icons.Default.SentimentDissatisfied, Peach))
                 moods.forEach { (mood, icon, tint) -> ChoiceRow(checkInMoodLabel(mood, hindi), icon, tint, title == mood) { title = mood } }
-                CareField(value = detail, onValueChange = { detail = it.take(4000) }, label = t("Anything to add? (optional)", "कुछ और बताना है? (ज़रूरी नहीं)"), minLines = 2)
+                CareNoteField(detail, { detail = it.take(4000) }, t("Anything to add? (optional)", "कुछ और बताना है? (ज़रूरी नहीं)"), lines = 2)
             } else if (kind == "medicine" && MedicineEntryText.parse(detail) != null) {
                 MedicineEntryForm(title, { title = it.take(200) }, detail, { detail = it.take(4000) }, vm.storageNamespace, capturedPerson, entryId, busy)
             } else if (kind == "journal" && initial == null) {
@@ -1292,7 +1292,9 @@ private class CareToolRow(val label: String, val icon: ImageVector, val tone: Sa
             } else {
                 CareField(value = title, onValueChange = { title = it.take(200) }, label = when (kind) { "medicine" -> t("Medicine name", "दवा का नाम"); "visit" -> t("Doctor or hospital", "डॉक्टर या अस्पताल"); "task" -> t("What needs doing?", "क्या करना है?"); else -> t("Title", "शीर्षक") }, singleLine = kind != "task")
                 if (kind == "medicine") MedicineNameSuggestions(title, enabled = !busy) { title = it }
-                CareField(value = detail, onValueChange = { detail = it.take(4000) }, label = when (kind) { "medicine" -> t("Dose and times", "खुराक और समय"); "visit" -> t("Time and place", "समय और जगह"); "task" -> t("Details (optional)", "और जानकारी (ज़रूरी नहीं)"); else -> t("Your note", "आपका नोट") }, minLines = if (kind == "journal") 4 else 2)
+                // A task's details are optional, so they start as one "Add a note" line that grows when used.
+                if (kind == "task") CareNoteField(detail, { detail = it.take(4000) }, t("Details (optional)", "और जानकारी (ज़रूरी नहीं)"), lines = 2)
+                else CareField(value = detail, onValueChange = { detail = it.take(4000) }, label = when (kind) { "medicine" -> t("Dose and times", "खुराक और समय"); "visit" -> t("Time and place", "समय और जगह"); else -> t("Your note", "आपका नोट") }, minLines = if (kind == "journal") 4 else 2)
                 if (kind == "medicine") StripPhotoRow(vm.storageNamespace, capturedPerson, entryId, enabled = !busy)
             }
             if (kind == "visit") Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

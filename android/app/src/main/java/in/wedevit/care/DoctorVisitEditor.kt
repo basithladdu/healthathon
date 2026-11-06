@@ -65,6 +65,9 @@ fun DoctorVisitEditor(vm: CareModel, personId: String, onDismiss: () -> Unit, in
             onTime = { TimePickerDialog(context, { _, hour, minute -> startsAt = chosen.withHour(hour).withMinute(minute).withSecond(0).withNano(0).toInstant().toEpochMilli() }, chosen.hour, chosen.minute, false).show() },
             onSave = { try { vm.saveDoctorVisit(personId, account, doctor, startsAt, location, DoctorVisitDetails.encode(conditionRef, discussionRef, note), onDismiss, entryId, created, initial) } catch (e: IllegalArgumentException) { vm.actionError.value = e.message ?: t("Check the linked records and shorten the note.", "जुड़े रिकॉर्ड जाँचें और नोट छोटा करें।") } }, onCancel = onDismiss,
             sourceLinks = {
+                // Linked records are rarely set: they wait behind one "+ Link a record" chip unless one is already linked.
+                var linking by rememberSaveable(entryId) { mutableStateOf(conditionRef.isNotBlank() || discussionRef.isNotBlank()) }
+                if (!linking) SaharaAddChip(t("Link a record", "रिकॉर्ड जोड़ें"), { linking = true }, Modifier.testTag("doctor-visit-link-record")) else {
                 HorizontalDivider(color = DoctorHairline)
                 Text(t("Linked records", "जुड़े रिकॉर्ड"), Modifier.a11yHeading(), fontSize = 18.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk)
                 Text(t("Condition update", "हालत का अपडेट"), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub)
@@ -73,13 +76,14 @@ fun DoctorVisitEditor(vm: CareModel, personId: String, onDismiss: () -> Unit, in
                 Text(t("Care discussion", "देखभाल चर्चा"), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub)
                 SourceChoice(t("None", "कोई नहीं"), discussionRef.isBlank()) { discussionRef = "" }
                 versions.filter { it.personId == personId }.take(20).forEach { row -> SourceChoice("Version ${row.version} · ${date(row.published)}", discussionRef == row.id) { discussionRef = row.id } }
+                }
             })
     }
 }
 
 /** Stateless production form. Tests can render it without opening an account or database. */
 @Composable fun DoctorVisitForm(doctor: String, onDoctor: (String) -> Unit, location: String, onLocation: (String) -> Unit, note: String, onNote: (String) -> Unit, dateLabel: String, timeLabel: String, zoneLabel: String, deviceLocal: Boolean, busy: Boolean, canSave: Boolean, error: String?, onDate: () -> Unit, onTime: () -> Unit, onSave: () -> Unit, onCancel: () -> Unit, sourceLinks: @Composable () -> Unit = {}) { val t = careText();
-        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 16.dp, end = 16.dp, bottom = 24.dp).testTag("doctor-real-visit-editor"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 16.dp, end = 16.dp, bottom = 24.dp).saharaContentSize().testTag("doctor-real-visit-editor"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Heading(t("Plan a visit", "विज़िट तय करें"), 26)
             CareField(doctor, onDoctor, t("Doctor's name", "डॉक्टर का नाम"), singleLine = true)
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -87,7 +91,7 @@ fun DoctorVisitEditor(vm: CareModel, personId: String, onDismiss: () -> Unit, in
                 OutlinedButton(onClick = onTime, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("doctor-visit-time"), enabled = !busy) { Icon(Icons.Default.Schedule, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(timeLabel, maxLines = 1) }
             }
             CareField(location, onLocation, t("Place", "जगह"), singleLine = true)
-            CareField(note, onNote, t("Notes", "नोट"), minLines = 2)
+            CareNoteField(note, onNote, t("Notes", "नोट"), lines = 2)
             sourceLinks()
             error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
             Button(onClick = onSave, enabled = canSave && !busy && doctor.isNotBlank(), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("doctor-save-real-visit")) { if (busy) { CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary); Spacer(Modifier.width(8.dp)) }; Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Save visit", "विज़िट सहेजें")) }

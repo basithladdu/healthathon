@@ -221,7 +221,7 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
 @Composable private fun EpisodeForm(versions: List<EctprRecord>, audit: List<AuditEvent>, edViewDetail: String, onCancel: () -> Unit, onSave: (EpisodeLog) -> Unit) { val t = careText(); val hindi = careHindi()
     var arrival by rememberSaveable { mutableStateOf("") }; var access by rememberSaveable { mutableStateOf("") }; var support by remember { mutableStateOf<Int?>(null) }
     var cpr by remember { mutableStateOf<Boolean?>(null) }; var icu by remember { mutableStateOf<Boolean?>(null) }; var reason by rememberSaveable { mutableStateOf("") }
-    var problems by remember { mutableStateOf<List<EpisodeProblem>>(emptyList()) }; var hint by remember { mutableStateOf("") }
+    var problems by remember { mutableStateOf<List<EpisodeProblem>>(emptyList()) }; var hint by remember { mutableStateOf("") }; var showReason by rememberSaveable { mutableStateOf(false) }
     val arrivalIso = Pilot.iso(arrival).orEmpty(); val plan = if (arrivalIso.isBlank()) null else Pilot.planInForceAt(versions, arrivalIso)
     val draft = EpisodeLog(CardTokens.random(8), "", plan?.id, arrivalIso, Pilot.iso(access), support, icu, null, null, cpr, reason.trim())
     val preview = if (arrivalIso.isBlank()) null else Pilot.row(draft, versions)
@@ -237,7 +237,9 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
         OptionGroup(t("Highest breathing support", "साँस की सबसे ऊँची मदद"), support, (0..5).toList(), PlanText::ceiling, tag = "pilot-support", noneLabel = NOT_RECORDED) { support = it }
         YesNoField(t("CPR given?", "CPR दिया गया?"), cpr, "pilot-cpr") { cpr = it }
         YesNoField(t("Admitted to ICU?", "ICU में भर्ती?"), icu, "pilot-icu") { icu = it }
-        CareField(reason, { reason = it }, t("Why care differed", "इलाज अलग क्यों हुआ"), minLines = 2)
+        // Only needed when care differed from the plan: it opens by itself then, otherwise it waits behind "+ Add" until asked for.
+        if (showReason || reason.isNotBlank() || preview?.concordant == false || EpisodeProblem.REASON_NEEDED in problems) CareField(reason, { reason = it }, t("Why care differed", "इलाज अलग क्यों हुआ"), minLines = 2)
+        else SaharaAddChip(t("Add why care differed", "इलाज अलग क्यों हुआ, जोड़ें"), { showReason = true }, Modifier.testTag("pilot-add-reason"))
         if (preview != null) { val v = plan?.version
             Text(when { plan == null -> t("No signed plan at this time.", "उस समय कोई साइन की गई योजना नहीं।")
                 preview.concordant == null -> t("v$v: nothing to compare", "v$v: तुलना के लिए कुछ नहीं")
@@ -275,7 +277,7 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
     PlanCard {
         CheckLine(reversible, { reversible = it }, t("The plan was applied to a reversible illness", "ठीक होने वाली बीमारी पर योजना लागू की गई"))
         CheckLine(pushed, { pushed = it }, t("The family felt pushed", "परिवार को दबाव महसूस हुआ"))
-        CareField(details, { details = it }, t("Notes", "नोट"), minLines = 3)
+        CareNoteField(details, { details = it }, t("Notes", "नोट"))
         if (empty) Text(t("Tick a box or write what happened.", "कोई बॉक्स चुनें या लिखें कि क्या हुआ।"), color = RustText, style = MaterialTheme.typography.bodyMedium)
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             OutlinedButton(onClick = onCancel, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Text(t("Not now", "अभी नहीं")) }
