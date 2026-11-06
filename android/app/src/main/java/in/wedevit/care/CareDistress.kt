@@ -201,6 +201,8 @@ internal object DistressCodec {
     var doneSteps by rememberSaveable { mutableStateOf("") }
     val finished = doneSteps.split(",").mapNotNull { it.toIntOrNull() }.toSet()
     fun markDone(step: Int) { doneSteps = (finished + step).joinToString(",") }
+    // Moving on counts as done: closing a group, or opening the next one, marks the one that was open; no "Done" tap needed.
+    fun toggle(step: Int) { if (open > 0) markDone(open); open = if (open == step) -1 else step }
     LaunchedEffect(Unit) { vm.actionError.value = null }
     BackHandler { onClose() }
     Column(Modifier.fillMaxSize().background(Cream).safeDrawingPadding().imePadding().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 16.dp).testTag("distress-screen"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -218,9 +220,9 @@ internal object DistressCodec {
                 DistressRules.categories.forEachIndexed { index, category ->
                     val step = index + 1
                     val (icon, colour) = distressGroupStyle(category.en)
-                    DistressGroupTile(t(category.en, category.hi), category.items.count { it.first in chosen }, step in finished, open == step, icon, colour, "distress-step-$step") { open = if (open == step) -1 else step }
+                    DistressGroupTile(t(category.en, category.hi), category.items.count { it.first in chosen }, step in finished, open == step, icon, colour, "distress-step-$step") { toggle(step) }
                 }
-                DistressGroupTile(t("Any other concern", "कोई और चिंता"), if (other.isNotBlank()) 1 else 0, 6 in finished, open == 6, Icons.Filled.Edit, DoctorCardSub, "distress-step-other") { open = if (open == 6) -1 else 6 }
+                DistressGroupTile(t("Any other concern", "कोई और चिंता"), if (other.isNotBlank()) 1 else 0, 6 in finished, open == 6, Icons.Filled.Edit, DoctorCardSub, "distress-step-other") { toggle(6) }
             }
         }
         DistressRules.categories.forEachIndexed { index, category ->

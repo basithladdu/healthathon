@@ -3,11 +3,20 @@ package `in`.wedevit.care
 import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -60,27 +69,78 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
 }
 
 /**
- * Today's check-in in one tap: a mood button saves today's check-in (or changes the one already saved) through the same
- * save as the full check-in screen. Words and a symptom note are one more tap away. Shown only to people who may edit.
+ * Today's one main action: "How was today?" with the three moods as big buttons. A tap saves today's check-in (or changes
+ * the one already saved) through the same save as the full check-in screen; no extra screen, no Save button. Words, the
+ * distress question and a symptom note stay one tap away on the full screen. Shown only to people who may edit.
  */
-/** Today's check-in as one slim bar; tapping it opens the full "How was your day?" screen. */
-@Composable fun TodayCheckInBar(vm: CareModel, onOpen: () -> Unit) {
+@Composable fun TodayCheckInBar(vm: CareModel, onOpen: () -> Unit, onSymptom: () -> Unit = {}) {
     val t = careText(); val hindi = careHindi()
-    val items by vm.items.collectAsStateWithLifecycle(); val person by vm.selected.collectAsStateWithLifecycle()
+    val items by vm.items.collectAsStateWithLifecycle(); val person by vm.selected.collectAsStateWithLifecycle(); val busy by vm.busy.collectAsStateWithLifecycle()
     val dayStart = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
     val today = CheckInMood.today(items, person, dayStart)
-    val subtitle = today?.let { checkInMoodLabel(it.title, hindi) }
-    ActionCard(Paper, Modifier.fillMaxWidth().testTag("today-checkin"), onOpen) {
-        Row(Modifier.fillMaxWidth().heightIn(min = 68.dp).padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Surface(shape = androidx.compose.foundation.shape.CircleShape, color = if (today != null) Mint else Peach) { Icon(Icons.Default.WbSunny, null, Modifier.padding(9.dp).size(24.dp), tint = DoctorAccent) }
-            Spacer(Modifier.width(14.dp))
-            Column(Modifier.weight(1f)) {
-                Text(t("How was today?", "आज का दिन कैसा रहा?"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-                if (subtitle != null) Text(subtitle, fontSize = 14.sp, color = DoctorCardSub)
+    val capturedAccount = remember(person) { vm.accountNamespace }
+    val done = today != null
+    val band by animateColorAsState(if (done) TodayHero.doneBand else TodayHero.dueBand, SaharaMotion.tween(SaharaMotion.VALUE_MS))
+    Surface(shape = RoundedCornerShape(TodayHero.radius), color = band, contentColor = Color.White, modifier = Modifier.fillMaxWidth().saharaAppear().testTag("today-checkin")) {
+        Column(Modifier.saharaContentSize().padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 6.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(t("How was today?", "आज का दिन कैसा रहा?"), fontFamily = SaharaTitleFont, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Medium, color = Color.White, modifier = Modifier.weight(1f).a11yHeading())
+                // The saved tick pops in once the check-in is stored (it follows the saved record, not a timer).
+                AnimatedVisibility(done, enter = scaleIn(spring(dampingRatio = Spring.DampingRatioMediumBouncy), initialScale = .6f) + fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)), exit = fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS))) {
+                    Surface(shape = CircleShape, color = Color.White, modifier = Modifier.testTag("today-checkin-saved")) {
+                        Row(Modifier.padding(horizontal = 10.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.Check, null, Modifier.size(16.dp), tint = TodayHero.doneBand); Spacer(Modifier.width(4.dp))
+                            Text(t("Saved", "सहेजा"), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = TodayHero.doneBand)
+                        }
+                    }
+                }
             }
-            Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(20.dp), tint = Rust)
+            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                CareDailyFlow.moods.forEachIndexed { index, mood ->
+                    TodayMoodButton(checkInMoodLabel(mood, hindi), index / 2f, selected = today?.title == mood, enabled = !busy, ink = band, modifier = Modifier.weight(1f).fillMaxHeight().testTag("today-checkin-$index")) {
+                        val change = CareDailyFlow.checkInChange(today, mood)
+                        if (change != null && canEditCareContext(vm, person, capturedAccount)) { if (today != null) vm.updateItem(change) {} else vm.saveItem("checkin", mood, "") }
+                    }
+                }
+            }
+            today?.detail?.takeIf { it.isNotBlank() }?.let { Text(it, fontSize = 15.sp, lineHeight = 20.sp, color = Color.White, maxLines = 2, overflow = TextOverflow.Ellipsis) }
+            // Secondary links: words (and the distress question) on the full check-in screen, and a symptom note.
+            FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                TextButton(onClick = onOpen, colors = ButtonDefaults.textButtonColors(contentColor = Color.White), contentPadding = PaddingValues(horizontal = 4.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("today-checkin-words")) {
+                    Text(if (today?.detail.isNullOrBlank()) t("Add a few words", "कुछ शब्द लिखें") else t("Change the words", "शब्द बदलें"), fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                    Spacer(Modifier.width(4.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(18.dp))
+                }
+                TextButton(onClick = onSymptom, colors = ButtonDefaults.textButtonColors(contentColor = Color.White), contentPadding = PaddingValues(horizontal = 4.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("today-checkin-symptom")) {
+                    Icon(Icons.Default.Healing, null, Modifier.size(18.dp)); Spacer(Modifier.width(4.dp))
+                    Text(t("Note a symptom", "तबीयत का नोट लिखें"), fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                }
+            }
         }
     }
+}
+
+/** One mood on the Today hero: a small face over its label. Solid white once chosen; a press shrinks it slightly. */
+@Composable private fun TodayMoodButton(label: String, face: Float, selected: Boolean, enabled: Boolean, ink: Color, modifier: Modifier, onClick: () -> Unit) {
+    val press = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+    val fill by animateColorAsState(if (selected) Color.White else Color.White.copy(alpha = .14f), SaharaMotion.tween(SaharaMotion.SELECT_MS))
+    val text by animateColorAsState(if (selected) ink else Color.White, SaharaMotion.tween(SaharaMotion.SELECT_MS))
+    Surface(shape = RoundedCornerShape(TodayHero.buttonRadius), color = fill, border = BorderStroke(2.dp, Color.White.copy(alpha = if (selected) 1f else .7f)),
+        modifier = modifier.heightIn(min = 76.dp).saharaPress(press).selectable(selected = selected, enabled = enabled, role = Role.RadioButton, interactionSource = press, indication = androidx.compose.material3.ripple(), onClick = onClick)) {
+        Column(Modifier.padding(horizontal = 4.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+            CareMoodFace(face, Modifier.size(32.dp).clearAndSetSemantics { })
+            Spacer(Modifier.height(4.dp))
+            Text(label, fontSize = 15.sp, lineHeight = 18.sp, fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold, color = text, textAlign = TextAlign.Center,
+                style = LocalTextStyle.current.copy(lineBreak = androidx.compose.ui.text.style.LineBreak.Heading, hyphens = androidx.compose.ui.text.style.Hyphens.None))
+        }
+    }
+}
+
+/** The Today hero's colours and shapes; one place so the theme tokens can replace them. */
+internal object TodayHero {
+    val dueBand get() = SaharaTone.Teal.solid
+    val doneBand get() = SaharaTone.Success.solid
+    val radius = 12.dp
+    val buttonRadius = 12.dp
 }
 
 @Composable fun QuickCheckInCard(vm: CareModel, onAddWords: () -> Unit, onSymptom: () -> Unit, onDistress: () -> Unit = {}) {
@@ -128,7 +188,6 @@ internal object CareAddDrafts {
 /** Pure grouping rules for the Daily care modules. */
 internal object CareModules {
     val order = listOf("Conversations", "Medicines", "Visits", "To do", "Check-ins", "Journal")
-    const val PREVIEW = 5
     /** Current = what vm.items shows (not moved to Past, not excluded by a prescription); Past = every other medicine of the person. */
     fun splitMedicines(all: List<CareItem>, visible: List<CareItem>): Pair<List<CareItem>, List<CareItem>> { val current = visible.filter { it.kind == "medicine" }; val ids = current.map { it.id }.toSet(); return current to all.filter { it.kind == "medicine" && it.id !in ids } }
     /** Upcoming = undated or due now/later, soonest first; Past = dated before now, newest first. */
@@ -150,13 +209,11 @@ internal object CareModules {
 
 @Composable fun QuietLine(text: String) { Text(text, fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)) }
 
-/** Up to CareModules.PREVIEW rows, with "Show all (N)" expanding in place. [label] adds a small sub-group heading. */
+/** Every row of one module group, always open (a module already has its own screen, so no "Show all" toggle). [label] adds a small sub-group heading. */
 @Composable fun <T> CareModuleList(key: String, items: List<T>, empty: String, label: String? = null, keyOf: (T) -> Any, row: @Composable (T) -> Unit) {
-    var all by rememberSaveable(key) { mutableStateOf(false) }; val t = careText()
-    if (label != null) Text("$label · ${items.size}".uppercase(), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 0.4.sp, color = DoctorCardFaint, modifier = Modifier.padding(start = 4.dp, top = 4.dp))
-    SaharaStateSwitch(items.isEmpty(), Modifier.fillMaxWidth(), label = "care-module-$key") { isEmpty -> if (isEmpty) QuietLine(empty) else Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-    (if (all) items else items.take(CareModules.PREVIEW)).forEach { item -> key(keyOf(item)) { row(item) } }
-    if (items.size > CareModules.PREVIEW) TextButton(onClick = { all = !all }, modifier = Modifier.heightIn(min = 48.dp).testTag("care-module-$key-more")) { Text(if (all) t("Show fewer", "कम दिखाएँ") else t("Show all (${items.size})", "सभी दिखाएँ (${items.size})"), color = DoctorAccent) }
+    if (label != null) Text("$label · ${items.size}", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub, modifier = Modifier.padding(start = 4.dp, top = 4.dp).a11yHeading())
+    SaharaStateSwitch(items.isEmpty(), Modifier.fillMaxWidth(), label = "care-module-$key") { isEmpty -> if (isEmpty) QuietLine(empty) else Column(Modifier.saharaContentSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    items.forEach { item -> key(keyOf(item)) { row(item) } }
     } }
 }
 
@@ -201,15 +258,15 @@ internal class CareModuleTile(val name: String, val title: String, val subtitle:
     val byName = tiles.associateBy { it.name }
     @Composable fun tile(name: String, modifier: Modifier, layout: Int) { byName[name]?.let { CareBentoTile(it, modifier, layout) { onOpen(name) } } }
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        tile("Conversations", Modifier.fillMaxWidth().height(116.dp), BENTO_WIDE)
-        Row(Modifier.fillMaxWidth().height(220.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        tile("Conversations", Modifier.fillMaxWidth().heightIn(min = 108.dp), BENTO_WIDE)
+        Row(Modifier.fillMaxWidth().heightIn(min = 208.dp).height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             tile("Medicines", Modifier.weight(1f).fillMaxHeight(), BENTO_TALL)
             Column(Modifier.weight(1f).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                tile("Visits", Modifier.fillMaxWidth().weight(1f), BENTO_SMALL)
-                tile("To do", Modifier.fillMaxWidth().weight(1f), BENTO_SMALL)
+                tile("Visits", Modifier.fillMaxWidth().weight(1f).heightIn(min = 98.dp), BENTO_SMALL)
+                tile("To do", Modifier.fillMaxWidth().weight(1f).heightIn(min = 98.dp), BENTO_SMALL)
             }
         }
-        Row(Modifier.fillMaxWidth().height(132.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(Modifier.fillMaxWidth().heightIn(min = 124.dp).height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             tile("Check-ins", Modifier.weight(1f).fillMaxHeight(), BENTO_TALL)
             tile("Journal", Modifier.weight(1f).fillMaxHeight(), BENTO_TALL)
         }
@@ -220,14 +277,25 @@ private const val BENTO_WIDE = 0
 private const val BENTO_TALL = 1
 private const val BENTO_SMALL = 2
 
+/** Each Daily care module keeps one section colour everywhere (tile wash, count, icon tile): medicines plum, visits indigo, check-ins teal. */
+internal fun careModuleTone(name: String): SaharaTone = when (name) {
+    "Conversations" -> SaharaTone.Marigold; "Medicines" -> SaharaTone.Plum; "Visits" -> SaharaTone.Indigo
+    "To do" -> SaharaTone.Leaf; "Check-ins" -> SaharaTone.Teal; else -> SaharaTone.Rose
+}
+
 @Composable private fun CareBentoTile(tile: CareModuleTile, modifier: Modifier, layout: Int, onClick: () -> Unit) {
     val t = careText()
+    val tone = careModuleTone(tile.name)
     val count = if (tile.count == 0) t("Nothing yet", "अभी कुछ नहीं") else "${tile.count}"
     val label = "${tile.title}, $count"
-    ActionCard(tile.tint, modifier.testTag("care-module-${tile.key}-toggle").semantics(mergeDescendants = true) { contentDescription = label }, onClick) {
+    ActionCard(tone.wash, modifier.testTag("care-module-${tile.key}-toggle").semantics(mergeDescendants = true) { contentDescription = label }, onClick) {
         @Composable fun art(size: Dp, m: Modifier = Modifier) = Image(saharaImage(tile.art, size), null, m.size(size), contentScale = ContentScale.Fit)
-        @Composable fun number() = SaharaAnimatedText(count) { Text(it, fontSize = if (tile.count == 0) 13.sp else 26.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk) }
-        @Composable fun title() = Text(tile.title, fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 1, modifier = Modifier.a11yHeading())
+        @Composable fun number() = SaharaAnimatedText(count) {
+            if (tile.count == 0) Text(it, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = tone.ink)
+            else Text(it, fontSize = 26.sp, fontWeight = FontWeight.Bold, color = tone.ink)
+        }
+        @Composable fun title() = Text(tile.title, fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 2, modifier = Modifier.a11yHeading(),
+            style = LocalTextStyle.current.copy(lineBreak = androidx.compose.ui.text.style.LineBreak.Heading, hyphens = androidx.compose.ui.text.style.Hyphens.None))
         when (layout) {
             BENTO_WIDE -> Row(Modifier.fillMaxSize().padding(start = 18.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) { title(); Spacer(Modifier.height(10.dp)); number() }
@@ -250,18 +318,19 @@ private const val BENTO_SMALL = 2
 @Composable fun CareTabShortcuts(onCalendar: () -> Unit, onLabs: () -> Unit, onCommunity: () -> Unit, onDevices: () -> Unit) {
     val t = careText()
     val rows = listOf(
-        listOf(CareShortcut(t("Calendar", "कैलेंडर"), Icons.Default.CalendarMonth, SaharaSoftBlue, "shortcut-calendar", onCalendar), CareShortcut(t("Lab history", "जाँच रिपोर्टें"), Icons.Default.Science, SaharaApricot, "shortcut-labs", onLabs)),
-        listOf(CareShortcut(t("Community", "समुदाय"), Icons.Default.Groups, SaharaLavender, "shortcut-community", onCommunity), CareShortcut(t("Tubes and lines", "नलियाँ और लाइनें"), Icons.Default.Healing, Mint, "shortcut-devices", onDevices)),
+        listOf(CareShortcut(t("Calendar", "कैलेंडर"), Icons.Default.CalendarMonth, SaharaTone.Indigo, "shortcut-calendar", onCalendar), CareShortcut(t("Lab history", "जाँच रिपोर्टें"), Icons.Default.Science, SaharaTone.Marigold, "shortcut-labs", onLabs)),
+        listOf(CareShortcut(t("Community", "समुदाय"), Icons.Default.Groups, SaharaTone.Leaf, "shortcut-community", onCommunity), CareShortcut(t("Tubes and lines", "नलियाँ और लाइनें"), Icons.Default.Healing, SaharaTone.Teal, "shortcut-devices", onDevices)),
     )
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         rows.forEach { row ->
             Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 row.forEach { s ->
-                    ActionCard(s.tint, Modifier.weight(1f).fillMaxHeight().heightIn(min = 64.dp).testTag(s.tag), s.onClick) {
-                        Row(Modifier.fillMaxSize().padding(horizontal = 14.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Surface(shape = androidx.compose.foundation.shape.CircleShape, color = Paper) { Icon(s.icon, null, Modifier.padding(8.dp).size(22.dp), tint = DoctorAccent) }
+                    ActionCard(s.tone.wash, Modifier.weight(1f).fillMaxHeight().heightIn(min = 64.dp).testTag(s.tag), s.onClick) {
+                        Row(Modifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Surface(shape = RoundedCornerShape(12.dp), color = s.tone.solid) { Icon(s.icon, null, Modifier.padding(8.dp).size(22.dp), tint = s.tone.onSolid) }
                             Spacer(Modifier.width(10.dp))
-                            Text(s.label, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.weight(1f))
+                            Text(s.label, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.weight(1f),
+                                style = LocalTextStyle.current.copy(lineBreak = androidx.compose.ui.text.style.LineBreak.Heading, hyphens = androidx.compose.ui.text.style.Hyphens.None))
                         }
                     }
                 }
@@ -270,7 +339,7 @@ private const val BENTO_SMALL = 2
     }
 }
 
-private class CareShortcut(val label: String, val icon: ImageVector, val tint: Color, val tag: String, val onClick: () -> Unit)
+private class CareShortcut(val label: String, val icon: ImageVector, val tone: SaharaTone, val tag: String, val onClick: () -> Unit)
 
 /** A module on its own screen, with a back arrow to the grid. */
 @Composable internal fun CareModuleScreen(tile: CareModuleTile, onBack: () -> Unit) {

@@ -35,7 +35,8 @@ private fun timelineIcon(kind: TimelineKind): ImageVector = when (kind) {
     TimelineKind.LAB -> Icons.Default.Science; TimelineKind.TEST -> Icons.Default.Biotech; TimelineKind.VISIT -> Icons.Default.MedicalServices
     TimelineKind.NOTE -> Icons.Default.Description; TimelineKind.DOCUMENT -> Icons.Default.Folder
 }
-private fun timelineColor(kind: TimelineKind): Color = when (kind.filter) { TimelineFilter.TREATMENT -> Peach; TimelineFilter.SCANS -> Sage; TimelineFilter.LAB -> Mint; else -> Gold }
+/** One section colour per filter, so a scan reads the same in the summary tiles and on the line. */
+private fun timelineTone(kind: TimelineKind): SaharaTone = when (kind.filter) { TimelineFilter.TREATMENT -> SaharaTone.Rose; TimelineFilter.SCANS -> SaharaTone.Indigo; TimelineFilter.LAB -> SaharaTone.Teal; else -> SaharaTone.Marigold }
 
 /** "PET-CT scan", "Chemotherapy day" and so on, in the chosen language. */
 private fun timelineLabel(e: TimelineEvent, t: (String, String) -> String): String = when {
@@ -112,10 +113,10 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
         } }
         item { Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             val tiles = listOf(
-                GlanceTile(t("Last chemotherapy", "आख़िरी कीमो"), summary.chemo, "chemo", Icons.Default.Vaccines, Peach),
-                GlanceTile(t("Last radiotherapy", "आख़िरी रेडियोथेरेपी"), summary.radio, "radio", Icons.Default.Healing, SaharaLavender),
-                GlanceTile(t("Last scan", "आख़िरी स्कैन"), summary.scan, "scan", Icons.Default.DocumentScanner, SaharaSoftBlue),
-                GlanceTile(t("Last biopsy or histopathology", "आख़िरी बायोप्सी या हिस्टोपैथोलॉजी"), summary.biopsy, "biopsy", Icons.Default.Science, Mint),
+                GlanceTile(t("Last chemotherapy", "आख़िरी कीमो"), summary.chemo, "chemo", Icons.Default.Vaccines, SaharaTone.Rose),
+                GlanceTile(t("Last radiotherapy", "आख़िरी रेडियोथेरेपी"), summary.radio, "radio", Icons.Default.Healing, SaharaTone.Plum),
+                GlanceTile(t("Last scan", "आख़िरी स्कैन"), summary.scan, "scan", Icons.Default.DocumentScanner, SaharaTone.Indigo),
+                GlanceTile(t("Last biopsy or histopathology", "आख़िरी बायोप्सी या हिस्टोपैथोलॉजी"), summary.biopsy, "biopsy", Icons.Default.Science, SaharaTone.Teal),
             )
             tiles.chunked(2).forEach { pair -> Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 pair.forEach { tile ->
@@ -123,11 +124,11 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
                     val value = event?.let { dateText(it) } ?: t("Not recorded", "दर्ज नहीं")
                     val source = event?.let { t("From: ", "स्रोत: ") + timelineSource(it, t) }
                     val tappable = event != null && canOpen(event)
-                    Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline),
-                        modifier = Modifier.weight(1f).fillMaxHeight().then(if (tappable) Modifier.clickable { open(event!!) } else Modifier)
+                    Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline),
+                        modifier = Modifier.weight(1f).fillMaxHeight().saharaAppear().then(if (tappable) Modifier.clickable { open(event!!) } else Modifier)
                             .semantics(mergeDescendants = true) { contentDescription = listOfNotNull(tile.label, value, source).joinToString(". ") }.testTag("timeline-summary-${tile.tag}")) {
                         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Surface(shape = CircleShape, color = tile.tint) { Icon(tile.icon, null, Modifier.padding(8.dp).size(18.dp), tint = DoctorAccent) }
+                            Surface(shape = RoundedCornerShape(12.dp), color = tile.tone.solid) { Icon(tile.icon, null, Modifier.padding(8.dp).size(18.dp), tint = tile.tone.onSolid) }
                             Spacer(Modifier.height(4.dp))
                             Text(tile.label, fontSize = 14.sp, lineHeight = 18.sp, color = DoctorCardSub, maxLines = 2)
                             Text(value, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = if (event == null) DoctorCardSub else DoctorCardInk)
@@ -167,7 +168,7 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
                             val tappable = canOpen(e)
                             Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
                                 Column(Modifier.width(36.dp).fillMaxHeight(), horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Surface(shape = CircleShape, color = timelineColor(e.kind), modifier = Modifier.size(32.dp)) { Box(contentAlignment = Alignment.Center) { Icon(timelineIcon(e.kind), null, Modifier.size(18.dp), tint = DoctorCardInk) } }
+                                    Surface(shape = CircleShape, color = timelineTone(e.kind).solid, modifier = Modifier.size(32.dp)) { Box(contentAlignment = Alignment.Center) { Icon(timelineIcon(e.kind), null, Modifier.size(18.dp), tint = timelineTone(e.kind).onSolid) } }
                                     Box(Modifier.width(2.dp).weight(1f).background(DoctorHairline))
                                 }
                                 // A row that opens something sits on a light card with an arrow, so it reads as tappable.
@@ -183,10 +184,7 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
                                         Text(timelineHeadline(e, t), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                                         Text(timelineSource(e, t), fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                                     }
-                                    if (tappable) Row(Modifier.padding(end = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-                                        Text(t("View", "देखें"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = RustText)
-                                        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, Modifier.size(20.dp), tint = RustText)
-                                    }
+                                    if (tappable) Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, Modifier.padding(end = 10.dp).size(22.dp), tint = RustText)
                                     }
                                 }
                             }
@@ -202,4 +200,4 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
 }
 
 /** One "At a glance" tile: what it is, the newest matching event (or none), and its colour. */
-private class GlanceTile(val label: String, val event: TimelineEvent?, val tag: String, val icon: androidx.compose.ui.graphics.vector.ImageVector, val tint: androidx.compose.ui.graphics.Color)
+private class GlanceTile(val label: String, val event: TimelineEvent?, val tag: String, val icon: androidx.compose.ui.graphics.vector.ImageVector, val tone: SaharaTone)
