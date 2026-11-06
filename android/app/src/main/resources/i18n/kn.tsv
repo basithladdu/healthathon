@@ -4920,3 +4920,138 @@ Leaving Practice…	ಅಭ್ಯಾಸದಿಂದ ಹೊರಹೋಗುತ್�
 Practice record removed.	ಅಭ್ಯಾಸ ದಾಖಲೆ ತೆಗೆದುಹಾಕಲಾಗಿದೆ.
 Not available in Practice	ಅಭ್ಯಾಸದಲ್ಲಿ ಲಭ್ಯವಿಲ್ಲ
 Leave Practice to sign in or use an account.	ಸೈನ್ ಇನ್ ಮಾಡಲು ಅಥವಾ ಖಾತೆ ಬಳಸಲು ಅಭ್ಯಾಸದಿಂದ ಹೊರಬನ್ನಿ.
+Family and care team	ಕುಟುಂಬ ಮತ್ತು ಆರೈಕೆ ತಂಡ
+${members.size} joined	${members.size} ಜನ ಸೇರಿದ್ದಾರೆ
+Invite link made · expires in 3 days	ಆಹ್ವಾನ ಲಿಂಕ್ ಸಿದ್ಧವಾಗಿದೆ · 3 ದಿನಗಳಲ್ಲಿ ಅವಧಿ ಮುಗಿಯುತ್ತದೆ
+You're offline	ನೀವು ಆಫ್‌ಲೈನ್‌ನಲ್ಲಿದ್ದೀರಿ
+Your words are saved on this phone. They will be sent when you're online and open Community.	ನಿಮ್ಮ ಮಾತುಗಳು ಈ ಫೋನ್‌ನಲ್ಲಿ ಉಳಿದಿವೆ. ನೀವು ಆನ್‌ಲೈನ್‌ಗೆ ಬಂದು ಸಮುದಾಯ ತೆರೆದಾಗ ಅವು ಕಳುಹಿಸಲ್ಪಡುತ್ತವೆ.
+Delete your post?	ನಿಮ್ಮ ಪೋಸ್ಟ್ ಅಳಿಸಬೇಕೇ?
+Delete your reply?	ನಿಮ್ಮ ಉತ್ತರ ಅಳಿಸಬೇಕೇ?
+It hasn't been sent yet. It will be removed from this phone.	ಇದನ್ನು ಇನ್ನೂ ಕಳುಹಿಸಿಲ್ಲ. ಇದನ್ನು ಈ ಫೋನ್‌ನಿಂದ ತೆಗೆಯಲಾಗುತ್ತದೆ.
+It will be removed for everyone. This can't be undone.	ಇದನ್ನು ಎಲ್ಲರಿಗೂ ತೆಗೆಯಲಾಗುತ್ತದೆ. ಇದನ್ನು ಮತ್ತೆ ಹಿಂಪಡೆಯಲು ಆಗುವುದಿಲ್ಲ.
+Be kind. This isn't medical advice. For symptoms, talk to your care team.	ದಯೆಯಿಂದ ಇರಿ. ಇದು ವೈದ್ಯಕೀಯ ಸಲಹೆಯಲ್ಲ. ಲಕ್ಷಣಗಳ ಬಗ್ಗೆ ನಿಮ್ಮ ಆರೈಕೆ ತಂಡದೊಂದಿಗೆ ಮಾತನಾಡಿ.
+Talk with families and patients who understand	ನಿಮ್ಮನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವ ಕುಟುಂಬಗಳು ಮತ್ತು ರೋಗಿಗಳೊಂದಿಗೆ ಮಾತನಾಡಿ
+Only signed-in members can read and write posts.	ಸೈನ್ ಇನ್ ಮಾಡಿದ ಸದಸ್ಯರು ಮಾತ್ರ ಪೋಸ್ಟ್‌ಗಳನ್ನು ಓದಬಹುದು ಮತ್ತು ಬರೆಯಬಹುದು.
+Sign in to join	ಸೇರಲು ಸೈನ್ ಇನ್ ಮಾಡಿ
+1 post or reply is waiting to send.	1 ಪೋಸ್ಟ್ ಅಥವಾ ಉತ್ತರ ಕಳುಹಿಸಲು ಕಾಯುತ್ತಿದೆ.
+$waiting posts or replies are waiting to send.	$waiting ಪೋಸ್ಟ್‌ಗಳು ಅಥವಾ ಉತ್ತರಗಳು ಕಳುಹಿಸಲು ಕಾಯುತ್ತಿವೆ.
+Groups	ಗುಂಪುಗಳು
+No groups are open right now.	ಈಗ ಯಾವ ಗುಂಪೂ ತೆರೆದಿಲ್ಲ.
+1 post	1 ಪೋಸ್ಟ್
+${group.posts} posts	${group.posts} ಪೋಸ್ಟ್‌ಗಳು
+You	ನೀವು
+No posts here yet	ಇಲ್ಲಿ ಇನ್ನೂ ಪೋಸ್ಟ್‌ಗಳಿಲ್ಲ
+Say hello, or ask what helped others. Your words could help someone today.	ನಮಸ್ಕಾರ ಹೇಳಿ, ಅಥವಾ ಬೇರೆಯವರಿಗೆ ಏನು ಸಹಾಯವಾಯಿತು ಎಂದು ಕೇಳಿ. ನಿಮ್ಮ ಮಾತು ಇಂದು ಯಾರಿಗಾದರೂ ಸಹಾಯವಾಗಬಹುದು.
+Write the first post	ಮೊದಲ ಪೋಸ್ಟ್ ಬರೆಯಿರಿ
+Write a post first to choose the name others will see.	ಬೇರೆಯವರಿಗೆ ಕಾಣುವ ಹೆಸರನ್ನು ಆರಿಸಲು ಮೊದಲು ಒಂದು ಪೋಸ್ಟ್ ಬರೆಯಿರಿ.
+Write a post	ಪೋಸ್ಟ್ ಬರೆಯಿರಿ
+Hidden	ಮರೆಮಾಡಲಾಗಿದೆ
+Posted	ಕಳುಹಿಸಲಾಗಿದೆ
+Sahara team	ಸಹಾರಾ ತಂಡ
+$reports reports	$reports ದೂರುಗಳು
+Reported	ದೂರು ನೀಡಲಾಗಿದೆ
+Helpful ${post.helpful}	ಸಹಾಯವಾಯಿತು ${post.helpful}
+Helpful	ಸಹಾಯವಾಯಿತು
+Hugs ${post.hugs}	ಅಪ್ಪುಗೆ ${post.hugs}
+Hugs	ಅಪ್ಪುಗೆ
+Reply	ಉತ್ತರಿಸಿ
+Report	ದೂರು ನೀಡಿ
+Show again	ಮತ್ತೆ ತೋರಿಸಿ
+Your reply	ನಿಮ್ಮ ಉತ್ತರ
+Send reply	ಉತ್ತರ ಕಳುಹಿಸಿ
+Your name in the community	ಸಮುದಾಯದಲ್ಲಿ ನಿಮ್ಮ ಹೆಸರು
+Others see only this name, never your phone or email.	ಬೇರೆಯವರಿಗೆ ಈ ಹೆಸರು ಮಾತ್ರ ಕಾಣುತ್ತದೆ, ನಿಮ್ಮ ಫೋನ್ ಅಥವಾ ಈಮೇಲ್ ಎಂದಿಗೂ ಕಾಣುವುದಿಲ್ಲ.
+Your post	ನಿಮ್ಮ ಪೋಸ್ಟ್
+Share how you are, or ask what helped others.	ನೀವು ಹೇಗಿದ್ದೀರಿ ಎಂದು ಹಂಚಿಕೊಳ್ಳಿ, ಅಥವಾ ಬೇರೆಯವರಿಗೆ ಏನು ಸಹಾಯವಾಯಿತು ಎಂದು ಕೇಳಿ.
+Share post	ಪೋಸ್ಟ್ ಹಂಚಿಕೊಳ್ಳಿ
+Report this post	ಈ ಪೋಸ್ಟ್ ಬಗ್ಗೆ ದೂರು ನೀಡಿ
+Report this reply	ಈ ಉತ್ತರದ ಬಗ್ಗೆ ದೂರು ನೀಡಿ
+The Sahara team will look at it. The writer isn't told who reported.	ಸಹಾರಾ ತಂಡ ಇದನ್ನು ನೋಡುತ್ತದೆ. ಯಾರು ದೂರು ನೀಡಿದರು ಎಂದು ಬರೆದವರಿಗೆ ತಿಳಿಸುವುದಿಲ್ಲ.
+Send report	ದೂರು ಕಳುಹಿಸಿ
+Text	ಬರಹ
+Pick a part to zoom in. Left and right mean the patient's sides. If the pain has gone, tap Pain has gone (0) on the note.	ಹತ್ತಿರದಿಂದ ನೋಡಲು ಒಂದು ಭಾಗ ಆರಿಸಿ. ಎಡ ಮತ್ತು ಬಲ ಎಂದರೆ ರೋಗಿಯ ಸ್ವಂತ ಬದಿಗಳು. ನೋವು ಹೋಗಿದ್ದರೆ, ನೋಟ್‌ನಲ್ಲಿ "ನೋವು ಹೋಗಿದೆ (0)" ಒತ್ತಿ.
+Plan v${active.version} active	ಯೋಜನೆ v${active.version} ಜಾರಿಯಲ್ಲಿದೆ
+Get a gentle reminder when a medicine is due?	ಔಷಧಿ ತೆಗೆದುಕೊಳ್ಳುವ ಸಮಯಕ್ಕೆ ಒಂದು ಮೃದುವಾದ ನೆನಪು ಬೇಕೇ?
+Reminders come at the times you choose, for medicines and visits.	ನೀವು ಆರಿಸುವ ಸಮಯಕ್ಕೆ ಔಷಧಿಗಳು ಮತ್ತು ಭೇಟಿಗಳ ನೆನಪುಗಳು ಬರುತ್ತವೆ.
+Turn on reminders	ನೆನಪುಗಳನ್ನು ಆನ್ ಮಾಡಿ
+Notifications are off	ನೋಟಿಫಿಕೇಶನ್‌ಗಳು ಆಫ್ ಆಗಿವೆ
+Turn on notifications for Sahara in Settings to get reminders.	ನೆನಪುಗಳು ಬರಲು ಸೆಟ್ಟಿಂಗ್ಸ್‌ನಲ್ಲಿ ಸಹಾರಾಗೆ ನೋಟಿಫಿಕೇಶನ್‌ಗಳನ್ನು ಆನ್ ಮಾಡಿ.
+All symptoms	ಎಲ್ಲಾ ಲಕ್ಷಣಗಳು
+Score 0–10	ಅಂಕ 0–10
+Entries	ದಾಖಲೆಗಳು
+Account and sharing	ಖಾತೆ ಮತ್ತು ಹಂಚಿಕೆ
+Share care with family	ಕುಟುಂಬದೊಂದಿಗೆ ಆರೈಕೆ ಹಂಚಿಕೊಳ್ಳಿ
+Send a link on WhatsApp	WhatsApp ನಲ್ಲಿ ಲಿಂಕ್ ಕಳುಹಿಸಿ
+Plan, wallet card, living will	ಯೋಜನೆ, ವಾಲೆಟ್ ಕಾರ್ಡ್, ಲಿವಿಂಗ್ ವಿಲ್
+Settings	ಸೆಟ್ಟಿಂಗ್ಸ್
+Notifications	ನೋಟಿಫಿಕೇಶನ್‌ಗಳು
+Privacy and data	ಗೌಪ್ಯತೆ ಮತ್ತು ಡೇಟಾ
+Help	ಸಹಾಯ
+Help and feedback	ಸಹಾಯ ಮತ್ತು ಅಭಿಪ್ರಾಯ
+Unkind or hurtful	ಒರಟು ಅಥವಾ ನೋವುಂಟುಮಾಡುವ
+Medical advice that could harm	ಹಾನಿ ಮಾಡಬಹುದಾದ ವೈದ್ಯಕೀಯ ಸಲಹೆ
+Selling or spam	ಮಾರಾಟ ಅಥವಾ ಸ್ಪ್ಯಾಮ್
+Shares someone's private details	ಯಾರದೋ ಖಾಸಗಿ ವಿವರಗಳನ್ನು ಹಂಚುತ್ತಿದೆ
+Something else	ಬೇರೆ ಏನೋ
+Please leave out phone numbers, email addresses and links. They keep everyone safe.	ದಯವಿಟ್ಟು ಫೋನ್ ನಂಬರ್, ಈಮೇಲ್ ವಿಳಾಸ ಮತ್ತು ಲಿಂಕ್‌ಗಳನ್ನು ಬರೆಯಬೇಡಿ. ಇದು ಎಲ್ಲರನ್ನೂ ಸುರಕ್ಷಿತವಾಗಿಡುತ್ತದೆ.
+Write a few words first.	ಮೊದಲು ಕೆಲವು ಪದಗಳನ್ನು ಬರೆಯಿರಿ.
+Keep your post under $POST_MAX characters.	ನಿಮ್ಮ ಪೋಸ್ಟ್ $POST_MAX ಅಕ್ಷರಗಳ ಒಳಗೆ ಇರಲಿ.
+Write your reply first.	ಮೊದಲು ನಿಮ್ಮ ಉತ್ತರ ಬರೆಯಿರಿ.
+Keep your reply under $REPLY_MAX characters.	ನಿಮ್ಮ ಉತ್ತರ $REPLY_MAX ಅಕ್ಷರಗಳ ಒಳಗೆ ಇರಲಿ.
+Choose a name others will see, like \"Asha's daughter\".	ಬೇರೆಯವರಿಗೆ ಕಾಣುವ ಒಂದು ಹೆಸರನ್ನು ಆರಿಸಿ, ಉದಾಹರಣೆಗೆ \"ಆಶಾ ಅವರ ಮಗಳು\".
+Keep your name under $NAME_MAX characters.	ನಿಮ್ಮ ಹೆಸರು $NAME_MAX ಅಕ್ಷರಗಳ ಒಳಗೆ ಇರಲಿ.
+Don't use a phone number or email as your name.	ಫೋನ್ ನಂಬರ್ ಅಥವಾ ಈಮೇಲ್ ಅನ್ನು ನಿಮ್ಮ ಹೆಸರಾಗಿ ಬಳಸಬೇಡಿ.
+Only the Sahara team can use the name Sahara.	Sahara ಎಂಬ ಹೆಸರನ್ನು ಸಹಾರಾ ತಂಡ ಮಾತ್ರ ಬಳಸಬಹುದು.
+You're offline. Connect to the internet and try again.	ನೀವು ಆಫ್‌ಲೈನ್‌ನಲ್ಲಿದ್ದೀರಿ. ಇಂಟರ್ನೆಟ್‌ಗೆ ಸಂಪರ್ಕಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+The community isn't open yet. Please try again later.	ಸಮುದಾಯ ಇನ್ನೂ ತೆರೆದಿಲ್ಲ. ದಯವಿಟ್ಟು ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+You've shared $POSTS_PER_DAY posts today. You can post again tomorrow.	ನೀವು ಇಂದು $POSTS_PER_DAY ಪೋಸ್ಟ್‌ಗಳನ್ನು ಹಂಚಿಕೊಂಡಿದ್ದೀರಿ. ನಾಳೆ ಮತ್ತೆ ಪೋಸ್ಟ್ ಮಾಡಬಹುದು.
+You've sent $REPLIES_PER_DAY replies today. You can reply again tomorrow.	ನೀವು ಇಂದು $REPLIES_PER_DAY ಉತ್ತರಗಳನ್ನು ಕಳುಹಿಸಿದ್ದೀರಿ. ನಾಳೆ ಮತ್ತೆ ಉತ್ತರಿಸಬಹುದು.
+You've sent many reports today. The Sahara team will look at them.	ನೀವು ಇಂದು ಹಲವು ದೂರುಗಳನ್ನು ಕಳುಹಿಸಿದ್ದೀರಿ. ಸಹಾರಾ ತಂಡ ಅವುಗಳನ್ನು ನೋಡುತ್ತದೆ.
+Choose the name others will see first.	ಮೊದಲು ಬೇರೆಯವರಿಗೆ ಕಾಣುವ ಹೆಸರನ್ನು ಆರಿಸಿ.
+Choose a different name, without a phone number, email or the word Sahara.	ಬೇರೆ ಹೆಸರನ್ನು ಆರಿಸಿ — ಫೋನ್ ನಂಬರ್, ಈಮೇಲ್ ಅಥವಾ Sahara ಎಂಬ ಪದ ಇಲ್ಲದೆ.
+Keep your post between $POST_MIN and $POST_MAX characters.	ನಿಮ್ಮ ಪೋಸ್ಟ್ $POST_MIN ರಿಂದ $POST_MAX ಅಕ್ಷರಗಳ ನಡುವೆ ಇರಲಿ.
+This post is no longer here.	ಈ ಪೋಸ್ಟ್ ಈಗ ಇಲ್ಲಿ ಇಲ್ಲ.
+This group is no longer here.	ಈ ಗುಂಪು ಈಗ ಇಲ್ಲಿ ಇಲ್ಲ.
+Only the Sahara team can hide posts.	ಸಹಾರಾ ತಂಡ ಮಾತ್ರ ಪೋಸ್ಟ್‌ಗಳನ್ನು ಮರೆಮಾಡಬಹುದು.
+Your Sahara account is closed. Write to workwithdevit@gmail.com for help.	ನಿಮ್ಮ ಸಹಾರಾ ಖಾತೆ ಮುಚ್ಚಲಾಗಿದೆ. ಸಹಾಯಕ್ಕಾಗಿ workwithdevit@gmail.com ಗೆ ಬರೆಯಿರಿ.
+Sign in again to use the community.	ಸಮುದಾಯ ಬಳಸಲು ಮತ್ತೆ ಸೈನ್ ಇನ್ ಮಾಡಿ.
+Please wait a moment and try again.	ದಯವಿಟ್ಟು ಸ್ವಲ್ಪ ಕಾಯಿರಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Couldn't reach the community. Please try again.	ಸಮುದಾಯವನ್ನು ತಲುಪಲಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+$minutes min ago	$minutes ನಿಮಿಷಗಳ ಹಿಂದೆ
+$it h ago	$it ಗಂಟೆಗಳ ಹಿಂದೆ
+$it days ago	$it ದಿನಗಳ ಹಿಂದೆ
+No patients yet. Add one with their invitation code.	ಇನ್ನೂ ರೋಗಿಗಳಿಲ್ಲ. ಅವರ ಆಹ್ವಾನ ಕೋಡ್‌ನಿಂದ ಒಬ್ಬರನ್ನು ಸೇರಿಸಿ.
+Later	ನಂತರ
+Practice draft · not from your recording	ಅಭ್ಯಾಸ ಕರಡು · ನಿಮ್ಮ ರೆಕಾರ್ಡಿಂಗ್‌ನಿಂದ ಅಲ್ಲ
+Visit today	ಇಂದು ಭೇಟಿ
+Hard day	ಕಷ್ಟದ ದಿನ
+Check-ins, 7 days	ದಿನದ ಸ್ಥಿತಿ, 7 ದಿನಗಳು
+$hard hard	$hard ಕಷ್ಟದ
+Nothing due today	ಇಂದು ಬಾಕಿ ಏನೂ ಇಲ್ಲ
+No other check-ins this week	ಈ ವಾರ ಬೇರೆ ಸ್ಥಿತಿ ದಾಖಲೆಗಳಿಲ್ಲ
+Missed · recorded	ತಪ್ಪಿದೆ · ದಾಖಲಿಸಲಾಗಿದೆ
+Past · completion not recorded	ಕಳೆದಿದೆ · ಪೂರ್ಣಗೊಂಡಿದ್ದು ದಾಖಲಾಗಿಲ್ಲ
+Web link on	ವೆಬ್ ಲಿಂಕ್ ಆನ್
+Out of date	ಹಳೆಯದು
+Show centres near you?	ನಿಮ್ಮ ಹತ್ತಿರದ ಕೇಂದ್ರಗಳನ್ನು ತೋರಿಸಬೇಕೇ?
+Your location puts the closest centres first. It stays on this phone.	ನಿಮ್ಮ ಸ್ಥಳದಿಂದ ಹತ್ತಿರದ ಕೇಂದ್ರಗಳು ಮೊದಲು ಕಾಣುತ್ತವೆ. ಅದು ಈ ಫೋನ್‌ನಲ್ಲೇ ಉಳಿಯುತ್ತದೆ.
+Location is off for Sahara	ಸಹಾರಾಗೆ ಸ್ಥಳ ಆಫ್ ಆಗಿದೆ
+Turn on Location in Settings to see the closest centres first.	ಹತ್ತಿರದ ಕೇಂದ್ರಗಳನ್ನು ಮೊದಲು ನೋಡಲು ಸೆಟ್ಟಿಂಗ್ಸ್‌ನಲ್ಲಿ ಸ್ಥಳ ಆನ್ ಮಾಡಿ.
+Use the camera?	ಕ್ಯಾಮೆರಾ ಬಳಸಬೇಕೇ?
+Use your location?	ನಿಮ್ಮ ಸ್ಥಳ ಬಳಸಬೇಕೇ?
+Allow reminders?	ನೆನಪುಗಳಿಗೆ ಅನುಮತಿ ನೀಡಬೇಕೇ?
+Sahara records the conversation only while you press record.	ನೀವು ರೆಕಾರ್ಡ್ ಒತ್ತಿದಾಗ ಮಾತ್ರ ಸಹಾರಾ ಸಂಭಾಷಣೆಯನ್ನು ರೆಕಾರ್ಡ್ ಮಾಡುತ್ತದೆ.
+To photograph a prescription or report. Photos stay on this phone until you save them.	ಪ್ರಿಸ್ಕ್ರಿಪ್ಶನ್ ಅಥವಾ ರಿಪೋರ್ಟ್‌ನ ಫೋಟೋ ತೆಗೆಯಲು. ನೀವು ಉಳಿಸುವವರೆಗೆ ಫೋಟೋಗಳು ಈ ಫೋನ್‌ನಲ್ಲೇ ಇರುತ್ತವೆ.
+To show care centres near you. Your location is not saved.	ನಿಮ್ಮ ಹತ್ತಿರದ ಆರೈಕೆ ಕೇಂದ್ರಗಳನ್ನು ತೋರಿಸಲು. ನಿಮ್ಮ ಸ್ಥಳವನ್ನು ಉಳಿಸಲಾಗುವುದಿಲ್ಲ.
+To remind you about medicines and visits on time.	ಔಷಧಿಗಳು ಮತ್ತು ಭೇಟಿಗಳ ಬಗ್ಗೆ ಸಮಯಕ್ಕೆ ಸರಿಯಾಗಿ ನೆನಪಿಸಲು.
+The microphone is turned off for Sahara. Turn it on in Settings, under Permissions.	ಸಹಾರಾಗೆ ಮೈಕ್ರೋಫೋನ್ ಆಫ್ ಆಗಿದೆ. ಸೆಟ್ಟಿಂಗ್ಸ್‌ನಲ್ಲಿ, ಅನುಮತಿಗಳು ವಿಭಾಗದಲ್ಲಿ ಅದನ್ನು ಆನ್ ಮಾಡಿ.
+The camera is turned off for Sahara. Turn it on in Settings, under Permissions.	ಸಹಾರಾಗೆ ಕ್ಯಾಮೆರಾ ಆಫ್ ಆಗಿದೆ. ಸೆಟ್ಟಿಂಗ್ಸ್‌ನಲ್ಲಿ, ಅನುಮತಿಗಳು ವಿಭಾಗದಲ್ಲಿ ಅದನ್ನು ಆನ್ ಮಾಡಿ.
+Location is turned off for Sahara. Turn it on in Settings, under Permissions.	ಸಹಾರಾಗೆ ಸ್ಥಳ ಆಫ್ ಆಗಿದೆ. ಸೆಟ್ಟಿಂಗ್ಸ್‌ನಲ್ಲಿ, ಅನುಮತಿಗಳು ವಿಭಾಗದಲ್ಲಿ ಅದನ್ನು ಆನ್ ಮಾಡಿ.
+Notifications are turned off for Sahara. Turn them on in Settings.	ಸಹಾರಾಗೆ ನೋಟಿಫಿಕೇಶನ್‌ಗಳು ಆಫ್ ಆಗಿವೆ. ಸೆಟ್ಟಿಂಗ್ಸ್‌ನಲ್ಲಿ ಅವುಗಳನ್ನು ಆನ್ ಮಾಡಿ.
+Reading	ಓದುತ್ತಿದೆ
+No internet	ಇಂಟರ್ನೆಟ್ ಇಲ್ಲ
+1 change kept on this phone	1 ಬದಲಾವಣೆ ಈ ಫೋನ್‌ನಲ್ಲಿ ಉಳಿದಿದೆ
+$kept changes kept on this phone	$kept ಬದಲಾವಣೆಗಳು ಈ ಫೋನ್‌ನಲ್ಲಿ ಉಳಿದಿವೆ
+done	ಮುಗಿದಿದೆ
+now	ಈಗ
+next	ಮುಂದೆ

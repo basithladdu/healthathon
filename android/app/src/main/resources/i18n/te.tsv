@@ -4920,3 +4920,138 @@ Leaving Practice…	అభ్యాసం నుంచి బయటకు వె
 Practice record removed.	అభ్యాస రికార్డు తీసివేయబడింది.
 Not available in Practice	అభ్యాసంలో అందుబాటులో లేదు
 Leave Practice to sign in or use an account.	సైన్ ఇన్ చేయడానికి లేదా ఖాతా వాడటానికి అభ్యాసం నుంచి బయటకు వెళ్ళండి.
+Family and care team	కుటుంబం, సంరక్షణ టీమ్
+${members.size} joined	${members.size} మంది చేరారు
+Invite link made · expires in 3 days	ఆహ్వాన లింక్ తయారైంది · 3 రోజుల్లో గడువు ముగుస్తుంది
+You're offline	మీరు ఆఫ్‌లైన్‌లో ఉన్నారు
+Your words are saved on this phone. They will be sent when you're online and open Community.	మీ మాటలు ఈ ఫోన్‌లో దాచి ఉన్నాయి. మీరు ఆన్‌లైన్‌లోకి వచ్చి సమాజం తెరిచినప్పుడు అవి పంపబడతాయి.
+Delete your post?	మీ పోస్ట్ తొలగించాలా?
+Delete your reply?	మీ జవాబు తొలగించాలా?
+It hasn't been sent yet. It will be removed from this phone.	ఇది ఇంకా పంపలేదు. ఇది ఈ ఫోన్ నుండి తీసివేయబడుతుంది.
+It will be removed for everyone. This can't be undone.	ఇది అందరికీ తీసివేయబడుతుంది. దీన్ని మళ్ళీ వెనక్కి తేలేరు.
+Be kind. This isn't medical advice. For symptoms, talk to your care team.	దయగా ఉండండి. ఇది వైద్య సలహా కాదు. లక్షణాల గురించి మీ సంరక్షణ టీమ్‌తో మాట్లాడండి.
+Talk with families and patients who understand	అర్థం చేసుకునే కుటుంబాలు, పేషెంట్లతో మాట్లాడండి
+Only signed-in members can read and write posts.	సైన్ ఇన్ చేసిన సభ్యులు మాత్రమే పోస్ట్‌లు చదవగలరు, రాయగలరు.
+Sign in to join	చేరడానికి సైన్ ఇన్ చేయండి
+1 post or reply is waiting to send.	1 పోస్ట్ లేదా జవాబు పంపడానికి ఎదురుచూస్తోంది.
+$waiting posts or replies are waiting to send.	$waiting పోస్ట్‌లు లేదా జవాబులు పంపడానికి ఎదురుచూస్తున్నాయి.
+Groups	గ్రూపులు
+No groups are open right now.	ప్రస్తుతం ఏ గ్రూపూ తెరిచి లేదు.
+1 post	1 పోస్ట్
+${group.posts} posts	${group.posts} పోస్ట్‌లు
+You	మీరు
+No posts here yet	ఇక్కడ ఇంకా పోస్ట్‌లు లేవు
+Say hello, or ask what helped others. Your words could help someone today.	నమస్కారం చెప్పండి, లేదా ఇతరులకు ఏది సహాయపడిందో అడగండి. మీ మాటలు ఈరోజు ఎవరికైనా సహాయపడవచ్చు.
+Write the first post	మొదటి పోస్ట్ రాయండి
+Write a post first to choose the name others will see.	ఇతరులకు కనిపించే పేరు ఎంచుకోవడానికి ముందు ఒక పోస్ట్ రాయండి.
+Write a post	పోస్ట్ రాయండి
+Hidden	దాచబడింది
+Posted	పంపాం
+Sahara team	సహారా టీమ్
+$reports reports	$reports ఫిర్యాదులు
+Reported	ఫిర్యాదు చేశారు
+Helpful ${post.helpful}	సహాయపడింది ${post.helpful}
+Helpful	సహాయపడింది
+Hugs ${post.hugs}	ఆప్యాయత ${post.hugs}
+Hugs	ఆప్యాయత
+Reply	జవాబు ఇవ్వండి
+Report	ఫిర్యాదు చేయండి
+Show again	మళ్ళీ చూపించండి
+Your reply	మీ జవాబు
+Send reply	జవాబు పంపండి
+Your name in the community	సమాజంలో మీ పేరు
+Others see only this name, never your phone or email.	ఇతరులకు ఈ పేరు మాత్రమే కనిపిస్తుంది, మీ ఫోన్ నంబర్ గానీ ఈమెయిల్ గానీ ఎప్పుడూ కనిపించవు.
+Your post	మీ పోస్ట్
+Share how you are, or ask what helped others.	మీరు ఎలా ఉన్నారో పంచుకోండి, లేదా ఇతరులకు ఏది సహాయపడిందో అడగండి.
+Share post	పోస్ట్ పంపండి
+Report this post	ఈ పోస్ట్‌పై ఫిర్యాదు చేయండి
+Report this reply	ఈ జవాబుపై ఫిర్యాదు చేయండి
+The Sahara team will look at it. The writer isn't told who reported.	సహారా టీమ్ దీన్ని చూస్తుంది. ఎవరు ఫిర్యాదు చేశారో రాసినవారికి చెప్పరు.
+Send report	ఫిర్యాదు పంపండి
+Text	రాత
+Pick a part to zoom in. Left and right mean the patient's sides. If the pain has gone, tap Pain has gone (0) on the note.	దగ్గరగా చూడటానికి ఒక భాగం ఎంచుకోండి. ఎడమ, కుడి అంటే పేషెంట్ వైపులు. నొప్పి పోయి ఉంటే, నోట్‌లో "నొప్పి తగ్గిపోయింది (0)" నొక్కండి.
+Plan v${active.version} active	ప్లాన్ v${active.version} అమలులో ఉంది
+Get a gentle reminder when a medicine is due?	మందు వేసుకునే సమయానికి ఒక చిన్న గుర్తు కావాలా?
+Reminders come at the times you choose, for medicines and visits.	మీరు ఎంచుకున్న సమయాలకు మందులు, విజిట్‌ల గుర్తులు వస్తాయి.
+Turn on reminders	గుర్తులు ఆన్ చేయండి
+Notifications are off	నోటిఫికేషన్లు ఆఫ్‌లో ఉన్నాయి
+Turn on notifications for Sahara in Settings to get reminders.	గుర్తులు రావడానికి సెట్టింగ్‌లలో సహారాకు నోటిఫికేషన్లు ఆన్ చేయండి.
+All symptoms	అన్ని లక్షణాలు
+Score 0–10	స్కోర్ 0–10
+Entries	నమోదులు
+Account and sharing	ఖాతా, పంచుకోవడం
+Share care with family	కుటుంబంతో సంరక్షణ పంచుకోండి
+Send a link on WhatsApp	WhatsApp లో లింక్ పంపండి
+Plan, wallet card, living will	ప్లాన్, వాలెట్ కార్డ్, లివింగ్ విల్
+Settings	సెట్టింగ్‌లు
+Notifications	నోటిఫికేషన్లు
+Privacy and data	గోప్యత, డేటా
+Help	సహాయం
+Help and feedback	సహాయం, అభిప్రాయం
+Unkind or hurtful	దయ లేకుండా లేదా బాధపెట్టేలా ఉంది
+Medical advice that could harm	హాని చేయగల వైద్య సలహా
+Selling or spam	అమ్మకం లేదా స్పామ్
+Shares someone's private details	ఎవరిదైనా వ్యక్తిగత వివరాలు పంచుకుంటోంది
+Something else	ఇంకేదైనా
+Please leave out phone numbers, email addresses and links. They keep everyone safe.	దయచేసి ఫోన్ నంబర్లు, ఈమెయిల్ చిరునామాలు, లింక్‌లు రాయకండి. అందరూ సురక్షితంగా ఉండటానికి ఇది ముఖ్యం.
+Write a few words first.	ముందు కొన్ని మాటలు రాయండి.
+Keep your post under $POST_MAX characters.	మీ పోస్ట్ $POST_MAX అక్షరాల లోపు ఉంచండి.
+Write your reply first.	ముందు మీ జవాబు రాయండి.
+Keep your reply under $REPLY_MAX characters.	మీ జవాబు $REPLY_MAX అక్షరాల లోపు ఉంచండి.
+Choose a name others will see, like \"Asha's daughter\".	ఇతరులకు కనిపించే ఒక పేరు ఎంచుకోండి, ఉదాహరణకు \"ఆశా కూతురు\".
+Keep your name under $NAME_MAX characters.	మీ పేరు $NAME_MAX అక్షరాల లోపు ఉంచండి.
+Don't use a phone number or email as your name.	ఫోన్ నంబర్ లేదా ఈమెయిల్‌ను మీ పేరుగా వాడకండి.
+Only the Sahara team can use the name Sahara.	Sahara అనే పేరును సహారా టీమ్ మాత్రమే వాడగలదు.
+You're offline. Connect to the internet and try again.	మీరు ఆఫ్‌లైన్‌లో ఉన్నారు. ఇంటర్నెట్‌కు కనెక్ట్ అయి మళ్ళీ ప్రయత్నించండి.
+The community isn't open yet. Please try again later.	సమాజం ఇంకా తెరవలేదు. దయచేసి తర్వాత మళ్ళీ ప్రయత్నించండి.
+You've shared $POSTS_PER_DAY posts today. You can post again tomorrow.	మీరు ఈరోజు $POSTS_PER_DAY పోస్ట్‌లు పంచుకున్నారు. రేపు మళ్ళీ పోస్ట్ చేయవచ్చు.
+You've sent $REPLIES_PER_DAY replies today. You can reply again tomorrow.	మీరు ఈరోజు $REPLIES_PER_DAY జవాబులు పంపారు. రేపు మళ్ళీ జవాబు ఇవ్వవచ్చు.
+You've sent many reports today. The Sahara team will look at them.	మీరు ఈరోజు చాలా ఫిర్యాదులు పంపారు. సహారా టీమ్ వాటిని చూస్తుంది.
+Choose the name others will see first.	ముందు ఇతరులకు కనిపించే పేరు ఎంచుకోండి.
+Choose a different name, without a phone number, email or the word Sahara.	వేరే పేరు ఎంచుకోండి — ఫోన్ నంబర్, ఈమెయిల్ లేదా Sahara అనే మాట లేకుండా.
+Keep your post between $POST_MIN and $POST_MAX characters.	మీ పోస్ట్ $POST_MIN నుండి $POST_MAX అక్షరాల మధ్య ఉంచండి.
+This post is no longer here.	ఈ పోస్ట్ ఇప్పుడు ఇక్కడ లేదు.
+This group is no longer here.	ఈ గ్రూప్ ఇప్పుడు ఇక్కడ లేదు.
+Only the Sahara team can hide posts.	సహారా టీమ్ మాత్రమే పోస్ట్‌లను దాచగలదు.
+Your Sahara account is closed. Write to workwithdevit@gmail.com for help.	మీ సహారా ఖాతా మూసివేయబడింది. సహాయం కోసం workwithdevit@gmail.com కి రాయండి.
+Sign in again to use the community.	సమాజాన్ని వాడటానికి మళ్ళీ సైన్ ఇన్ చేయండి.
+Please wait a moment and try again.	దయచేసి కొంచెం ఆగి మళ్ళీ ప్రయత్నించండి.
+Couldn't reach the community. Please try again.	సమాజాన్ని చేరుకోలేకపోయాం. దయచేసి మళ్ళీ ప్రయత్నించండి.
+$minutes min ago	$minutes నిమిషాల క్రితం
+$it h ago	$it గంటల క్రితం
+$it days ago	$it రోజుల క్రితం
+No patients yet. Add one with their invitation code.	ఇంకా పేషెంట్లు లేరు. వారి ఆహ్వాన కోడ్‌తో ఒకరిని జోడించండి.
+Later	తర్వాత
+Practice draft · not from your recording	ప్రాక్టీస్ డ్రాఫ్ట్ · మీ రికార్డింగ్ నుండి కాదు
+Visit today	ఈరోజు విజిట్
+Hard day	కష్టమైన రోజు
+Check-ins, 7 days	రోజువారీ పరిస్థితి, 7 రోజులు
+$hard hard	$hard కష్టమైనవి
+Nothing due today	ఈరోజు చేయాల్సింది ఏమీ లేదు
+No other check-ins this week	ఈ వారం ఇతర నమోదులు లేవు
+Missed · recorded	మిస్ అయింది · నమోదు చేశాం
+Past · completion not recorded	గడిచిపోయింది · పూర్తయిందో నమోదు కాలేదు
+Web link on	వెబ్ లింక్ ఆన్
+Out of date	పాతది
+Show centres near you?	మీ దగ్గర్లోని కేంద్రాలు చూపించాలా?
+Your location puts the closest centres first. It stays on this phone.	మీ లొకేషన్‌తో దగ్గర్లోని కేంద్రాలు ముందు కనిపిస్తాయి. అది ఈ ఫోన్‌లోనే ఉంటుంది.
+Location is off for Sahara	సహారాకు లొకేషన్ ఆఫ్‌లో ఉంది
+Turn on Location in Settings to see the closest centres first.	దగ్గర్లోని కేంద్రాలు ముందు చూడటానికి సెట్టింగ్‌లలో లొకేషన్ ఆన్ చేయండి.
+Use the camera?	కెమెరా వాడాలా?
+Use your location?	మీ లొకేషన్ వాడాలా?
+Allow reminders?	గుర్తులకు అనుమతి ఇవ్వాలా?
+Sahara records the conversation only while you press record.	మీరు రికార్డ్ నొక్కి ఉన్నప్పుడు మాత్రమే సహారా సంభాషణను రికార్డ్ చేస్తుంది.
+To photograph a prescription or report. Photos stay on this phone until you save them.	ప్రిస్క్రిప్షన్ లేదా రిపోర్ట్ ఫోటో తీయడానికి. మీరు సేవ్ చేసే వరకు ఫోటోలు ఈ ఫోన్‌లోనే ఉంటాయి.
+To show care centres near you. Your location is not saved.	మీ దగ్గర్లోని సంరక్షణ కేంద్రాలు చూపించడానికి. మీ లొకేషన్ సేవ్ చేయబడదు.
+To remind you about medicines and visits on time.	మందులు, విజిట్‌ల గురించి సమయానికి గుర్తు చేయడానికి.
+The microphone is turned off for Sahara. Turn it on in Settings, under Permissions.	సహారాకు మైక్రోఫోన్ ఆఫ్‌లో ఉంది. సెట్టింగ్‌లలో, అనుమతులు కింద దాన్ని ఆన్ చేయండి.
+The camera is turned off for Sahara. Turn it on in Settings, under Permissions.	సహారాకు కెమెరా ఆఫ్‌లో ఉంది. సెట్టింగ్‌లలో, అనుమతులు కింద దాన్ని ఆన్ చేయండి.
+Location is turned off for Sahara. Turn it on in Settings, under Permissions.	సహారాకు లొకేషన్ ఆఫ్‌లో ఉంది. సెట్టింగ్‌లలో, అనుమతులు కింద దాన్ని ఆన్ చేయండి.
+Notifications are turned off for Sahara. Turn them on in Settings.	సహారాకు నోటిఫికేషన్లు ఆఫ్‌లో ఉన్నాయి. సెట్టింగ్‌లలో వాటిని ఆన్ చేయండి.
+Reading	చదువుతున్నాం
+No internet	ఇంటర్నెట్ లేదు
+1 change kept on this phone	1 మార్పు ఈ ఫోన్‌లో దాచి ఉంది
+$kept changes kept on this phone	$kept మార్పులు ఈ ఫోన్‌లో దాచి ఉన్నాయి
+done	పూర్తి
+now	ఇప్పుడు
+next	తర్వాత

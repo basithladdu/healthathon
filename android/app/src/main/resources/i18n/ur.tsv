@@ -4920,3 +4920,138 @@ Leaving Practice…	مشق سے باہر جا رہے ہیں…
 Practice record removed.	مشق کا ریکارڈ ہٹا دیا گیا۔
 Not available in Practice	مشق میں دستیاب نہیں
 Leave Practice to sign in or use an account.	سائن ان یا اکاؤنٹ کے لیے مشق سے باہر جائیں۔
+Family and care team	گھر والے اور دیکھ بھال ٹیم
+${members.size} joined	${members.size} لوگ جڑ گئے
+Invite link made · expires in 3 days	دعوت کا لنک بن گیا · 3 دن میں ختم ہو جائے گا
+You're offline	آپ آف لائن ہیں
+Your words are saved on this phone. They will be sent when you're online and open Community.	آپ کی باتیں اس فون پر محفوظ ہیں۔ جب آپ آن لائن ہو کر کمیونٹی کھولیں گے تو یہ بھیج دی جائیں گی۔
+Delete your post?	اپنی پوسٹ مٹا دیں؟
+Delete your reply?	اپنا جواب مٹا دیں؟
+It hasn't been sent yet. It will be removed from this phone.	یہ ابھی بھیجا نہیں گیا۔ اسے اس فون سے ہٹا دیا جائے گا۔
+It will be removed for everyone. This can't be undone.	اسے سب کے لیے ہٹا دیا جائے گا۔ یہ واپس نہیں ہو سکتا۔
+Be kind. This isn't medical advice. For symptoms, talk to your care team.	نرمی سے بات کریں۔ یہ طبی مشورہ نہیں ہے۔ علامات کے بارے میں اپنی دیکھ بھال ٹیم سے بات کریں۔
+Talk with families and patients who understand	ان گھرانوں اور مریضوں سے بات کریں جو آپ کو سمجھتے ہیں
+Only signed-in members can read and write posts.	صرف سائن ان کیے ہوئے ممبر ہی پوسٹ پڑھ اور لکھ سکتے ہیں۔
+Sign in to join	جڑنے کے لیے سائن ان کریں
+1 post or reply is waiting to send.	1 پوسٹ یا جواب بھیجے جانے کا انتظار کر رہا ہے۔
+$waiting posts or replies are waiting to send.	$waiting پوسٹیں یا جواب بھیجے جانے کا انتظار کر رہے ہیں۔
+Groups	گروپ
+No groups are open right now.	ابھی کوئی گروپ کھلا نہیں ہے۔
+1 post	1 پوسٹ
+${group.posts} posts	${group.posts} پوسٹیں
+You	آپ
+No posts here yet	یہاں ابھی کوئی پوسٹ نہیں
+Say hello, or ask what helped others. Your words could help someone today.	سلام کہیں، یا پوچھیں کہ دوسروں کو کس چیز سے مدد ملی۔ آپ کی باتیں آج کسی کی مدد کر سکتی ہیں۔
+Write the first post	پہلی پوسٹ لکھیں
+Write a post first to choose the name others will see.	دوسروں کو نظر آنے والا نام چننے کے لیے پہلے ایک پوسٹ لکھیں۔
+Write a post	پوسٹ لکھیں
+Hidden	چھپی ہوئی
+Posted	بھیج دیا
+Sahara team	سہارا ٹیم
+$reports reports	$reports شکایتیں
+Reported	شکایت کی گئی
+Helpful ${post.helpful}	مددگار ${post.helpful}
+Helpful	مددگار
+Hugs ${post.hugs}	گلے ${post.hugs}
+Hugs	گلے
+Reply	جواب دیں
+Report	شکایت کریں
+Show again	دوبارہ دکھائیں
+Your reply	آپ کا جواب
+Send reply	جواب بھیجیں
+Your name in the community	کمیونٹی میں آپ کا نام
+Others see only this name, never your phone or email.	دوسروں کو صرف یہی نام نظر آتا ہے، آپ کا فون یا ای میل کبھی نہیں۔
+Your post	آپ کی پوسٹ
+Share how you are, or ask what helped others.	بتائیں کہ آپ کیسے ہیں، یا پوچھیں کہ دوسروں کو کس چیز سے مدد ملی۔
+Share post	پوسٹ بھیجیں
+Report this post	اس پوسٹ کی شکایت کریں
+Report this reply	اس جواب کی شکایت کریں
+The Sahara team will look at it. The writer isn't told who reported.	سہارا ٹیم اسے دیکھے گی۔ لکھنے والے کو نہیں بتایا جاتا کہ شکایت کس نے کی۔
+Send report	شکایت بھیجیں
+Text	لکھائی
+Pick a part to zoom in. Left and right mean the patient's sides. If the pain has gone, tap Pain has gone (0) on the note.	قریب سے دیکھنے کے لیے کوئی حصہ چنیں۔ بائیں اور دائیں کا مطلب مریض کی اپنی طرفیں ہیں۔ اگر درد چلا گیا ہو تو نوٹ پر "درد چلا گیا (0)" دبائیں۔
+Plan v${active.version} active	پلان v${active.version} چالو ہے
+Get a gentle reminder when a medicine is due?	دوا کا وقت ہونے پر ہلکی سی یاد دہانی چاہیے؟
+Reminders come at the times you choose, for medicines and visits.	یاد دہانیاں آپ کے چنے ہوئے وقت پر آتی ہیں، دواؤں اور ملاقاتوں کے لیے۔
+Turn on reminders	یاد دہانیاں چالو کریں
+Notifications are off	نوٹیفکیشن بند ہیں
+Turn on notifications for Sahara in Settings to get reminders.	یاد دہانیاں پانے کے لیے سیٹنگز میں سہارا کے نوٹیفکیشن چالو کریں۔
+All symptoms	سب علامات
+Score 0–10	اسکور 0–10
+Entries	اندراجات
+Account and sharing	اکاؤنٹ اور شیئرنگ
+Share care with family	گھر والوں کے ساتھ دیکھ بھال شیئر کریں
+Send a link on WhatsApp	WhatsApp پر لنک بھیجیں
+Plan, wallet card, living will	پلان، والٹ کارڈ، لیونگ ول
+Settings	سیٹنگز
+Notifications	نوٹیفکیشن
+Privacy and data	پرائیویسی اور ڈیٹا
+Help	مدد
+Help and feedback	مدد اور رائے
+Unkind or hurtful	سخت یا دل دکھانے والا
+Medical advice that could harm	نقصان پہنچا سکنے والا طبی مشورہ
+Selling or spam	بیچنا یا اسپیم
+Shares someone's private details	کسی کی نجی معلومات شیئر کرتا ہے
+Something else	کچھ اور
+Please leave out phone numbers, email addresses and links. They keep everyone safe.	براہ کرم فون نمبر، ای میل پتے اور لنک نہ لکھیں۔ اس سے سب محفوظ رہتے ہیں۔
+Write a few words first.	پہلے کچھ الفاظ لکھیں۔
+Keep your post under $POST_MAX characters.	اپنی پوسٹ $POST_MAX حروف سے کم رکھیں۔
+Write your reply first.	پہلے اپنا جواب لکھیں۔
+Keep your reply under $REPLY_MAX characters.	اپنا جواب $REPLY_MAX حروف سے کم رکھیں۔
+Choose a name others will see, like \"Asha's daughter\".	ایسا نام چنیں جو دوسروں کو نظر آئے، جیسے \"آشا کی بیٹی\"۔
+Keep your name under $NAME_MAX characters.	اپنا نام $NAME_MAX حروف سے کم رکھیں۔
+Don't use a phone number or email as your name.	فون نمبر یا ای میل کو اپنا نام نہ بنائیں۔
+Only the Sahara team can use the name Sahara.	Sahara نام صرف سہارا ٹیم استعمال کر سکتی ہے۔
+You're offline. Connect to the internet and try again.	آپ آف لائن ہیں۔ انٹرنیٹ سے جڑیں اور دوبارہ کوشش کریں۔
+The community isn't open yet. Please try again later.	کمیونٹی ابھی کھلی نہیں ہے۔ براہ کرم بعد میں دوبارہ کوشش کریں۔
+You've shared $POSTS_PER_DAY posts today. You can post again tomorrow.	آپ آج $POSTS_PER_DAY پوسٹیں شیئر کر چکے ہیں۔ کل دوبارہ پوسٹ کر سکتے ہیں۔
+You've sent $REPLIES_PER_DAY replies today. You can reply again tomorrow.	آپ آج $REPLIES_PER_DAY جواب بھیج چکے ہیں۔ کل دوبارہ جواب دے سکتے ہیں۔
+You've sent many reports today. The Sahara team will look at them.	آپ نے آج بہت سی شکایتیں بھیجی ہیں۔ سہارا ٹیم انہیں دیکھے گی۔
+Choose the name others will see first.	پہلے وہ نام چنیں جو دوسروں کو نظر آئے گا۔
+Choose a different name, without a phone number, email or the word Sahara.	کوئی اور نام چنیں، جس میں فون نمبر، ای میل یا لفظ Sahara نہ ہو۔
+Keep your post between $POST_MIN and $POST_MAX characters.	اپنی پوسٹ $POST_MIN سے $POST_MAX حروف کے بیچ رکھیں۔
+This post is no longer here.	یہ پوسٹ اب یہاں نہیں ہے۔
+This group is no longer here.	یہ گروپ اب یہاں نہیں ہے۔
+Only the Sahara team can hide posts.	صرف سہارا ٹیم پوسٹیں چھپا سکتی ہے۔
+Your Sahara account is closed. Write to workwithdevit@gmail.com for help.	آپ کا سہارا اکاؤنٹ بند ہو چکا ہے۔ مدد کے لیے workwithdevit@gmail.com پر لکھیں۔
+Sign in again to use the community.	کمیونٹی استعمال کرنے کے لیے دوبارہ سائن ان کریں۔
+Please wait a moment and try again.	براہ کرم تھوڑا رکیں اور دوبارہ کوشش کریں۔
+Couldn't reach the community. Please try again.	کمیونٹی تک نہیں پہنچ سکے۔ براہ کرم دوبارہ کوشش کریں۔
+$minutes min ago	$minutes منٹ پہلے
+$it h ago	$it گھنٹے پہلے
+$it days ago	$it دن پہلے
+No patients yet. Add one with their invitation code.	ابھی کوئی مریض نہیں۔ ان کے دعوت کوڈ سے کسی کو جوڑیں۔
+Later	بعد میں
+Practice draft · not from your recording	مشق کا مسودہ · آپ کی ریکارڈنگ سے نہیں
+Visit today	آج ملاقات
+Hard day	مشکل دن
+Check-ins, 7 days	روز کا حال، 7 دن
+$hard hard	$hard مشکل
+Nothing due today	آج کچھ باقی نہیں
+No other check-ins this week	اس ہفتے کوئی اور حال درج نہیں
+Missed · recorded	چھوٹ گئی · درج ہے
+Past · completion not recorded	گزر گیا · پورا ہونا درج نہیں
+Web link on	ویب لنک چالو
+Out of date	پرانا ہے
+Show centres near you?	آپ کے قریب کے مراکز دکھائیں؟
+Your location puts the closest centres first. It stays on this phone.	آپ کے مقام سے سب سے قریبی مراکز پہلے آتے ہیں۔ یہ اسی فون پر رہتا ہے۔
+Location is off for Sahara	سہارا کے لیے مقام بند ہے
+Turn on Location in Settings to see the closest centres first.	قریبی مراکز پہلے دیکھنے کے لیے سیٹنگز میں مقام چالو کریں۔
+Use the camera?	کیمرا استعمال کریں؟
+Use your location?	اپنا مقام استعمال کریں؟
+Allow reminders?	یاد دہانیوں کی اجازت دیں؟
+Sahara records the conversation only while you press record.	سہارا بات چیت صرف تب ریکارڈ کرتا ہے جب آپ ریکارڈ دباتے ہیں۔
+To photograph a prescription or report. Photos stay on this phone until you save them.	نسخے یا رپورٹ کی تصویر لینے کے لیے۔ جب تک آپ محفوظ نہ کریں، تصویریں اسی فون پر رہتی ہیں۔
+To show care centres near you. Your location is not saved.	آپ کے قریب دیکھ بھال کے مراکز دکھانے کے لیے۔ آپ کا مقام محفوظ نہیں کیا جاتا۔
+To remind you about medicines and visits on time.	دواؤں اور ملاقاتوں کی وقت پر یاد دلانے کے لیے۔
+The microphone is turned off for Sahara. Turn it on in Settings, under Permissions.	سہارا کے لیے مائیکروفون بند ہے۔ اسے سیٹنگز میں اجازتوں کے نیچے چالو کریں۔
+The camera is turned off for Sahara. Turn it on in Settings, under Permissions.	سہارا کے لیے کیمرا بند ہے۔ اسے سیٹنگز میں اجازتوں کے نیچے چالو کریں۔
+Location is turned off for Sahara. Turn it on in Settings, under Permissions.	سہارا کے لیے مقام بند ہے۔ اسے سیٹنگز میں اجازتوں کے نیچے چالو کریں۔
+Notifications are turned off for Sahara. Turn them on in Settings.	سہارا کے لیے نوٹیفکیشن بند ہیں۔ انہیں سیٹنگز میں چالو کریں۔
+Reading	پڑھ رہے ہیں
+No internet	انٹرنیٹ نہیں
+1 change kept on this phone	1 تبدیلی اس فون پر محفوظ ہے
+$kept changes kept on this phone	$kept تبدیلیاں اس فون پر محفوظ ہیں
+done	پورا
+now	اب
+next	آگے
