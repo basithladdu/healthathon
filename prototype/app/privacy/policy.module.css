@@ -128,7 +128,7 @@
 }
 
 /* Sahara band header (shared palette with the app) and a short entrance. */
-.header { margin-top: -24px; padding: 12px 0; border-bottom: 0; background: #5c2518; box-shadow: 0 0 0 100vmax #5c2518; clip-path: inset(0 -100vmax); color: #fff; }
+.header { margin-top: -24px; padding: 12px 0; border-bottom: 0; background: #4a1f14; box-shadow: 0 0 0 100vmax #4a1f14; clip-path: inset(0 -100vmax); color: #fff; }
 .header .brand, .page .header a { color: #fff; font-family: var(--font-anek), var(--font-noto), sans-serif; font-weight: 800; letter-spacing: 0; }
 .page .header a:focus-visible { outline-color: #f5c060; }
 .page h1, .page h2 { font-family: var(--font-anek), var(--font-noto), sans-serif; letter-spacing: 0; }

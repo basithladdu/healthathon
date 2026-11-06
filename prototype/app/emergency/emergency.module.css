@@ -23,9 +23,9 @@
 @media print { .header { position: static; background: #fff; } .page { background: #fff; } .section { box-shadow: none; break-inside: avoid; } }
 
 /* Sahara band header (shared palette with the app) and a short entrance. */
-.header { border-bottom: 0; background: #5c2518; backdrop-filter: none; color: #fff; }
+.header { border-bottom: 0; background: #4a1f14; backdrop-filter: none; color: #fff; }
 .header .brand { color: #fff; font-family: var(--font-anek), var(--font-noto), sans-serif; letter-spacing: 0; }
-.header .tag { color: #ffe3d6; }
+.header .tag { color: #f3d9cf; }
 .section { animation: emergency-rise 260ms cubic-bezier(.22, 1, .36, 1) both; }
 @keyframes emergency-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .section { animation: none; } }

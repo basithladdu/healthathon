@@ -5,12 +5,18 @@
    Every section keeps its own saturated accent; buttons are solid or strongly outlined. */
 
 :root {
-  /* Palette: the Sahara tokens shared with the Android app (HUMAN_APP_GUIDE section 3).
+  /* Palette: the same values as SaharaColors / SaharaTone in the Android app (SaharaPalette.kt).
      Flat fills only; colour comes from one accent per section, never from gradients. */
-  --sh-band: #5c2518;
+  --sh-band: #4a1f14;       /* SaharaColors.Band */
+  --sh-band-raised: #63291b;
+  --sh-on-band-sub: #f3d9cf;
+  --sh-line: #e6d8cc;
+  --sh-line-strong: #8d7b70; /* control edges, 3:1 on paper */
+  --sh-edge: #9c887b;
+  --sh-well: #efe7df;
   --sh-rust: #b9472c;       /* primary actions, links, selected state */
   --sh-rust-600: #9e3b23;   /* RustText: rust text on tints, hover */
-  --sh-rust-50: #ffd1b3;    /* Peach container */
+  --sh-rust-50: #ffe2d2;    /* PrimaryWash */
   --sh-ink: #382e29;
   --sh-ink-sub: #4a3e36;
   --sh-cream: #fff8ee;
@@ -68,7 +74,7 @@ body { background: var(--care-canvas); }
 :root .simple-care-app .simple-care-brand { color: #fff; font-family: var(--sh-display); letter-spacing: 0; }
 :root .simple-care-app .simple-care-brand-logo { padding: 3px; border-radius: 10px; background: #fff; box-shadow: 0 3px 10px rgba(0, 0, 0, .2); }
 :root .simple-care-app .simple-care-brand-name { font: 800 24px/1 var(--sh-display); letter-spacing: 0; color: #fff; }
-:root .simple-care-app .simple-care-brand-tagline { color: #ffe3d6; font: 600 12px/1.25 var(--font-ui); }
+:root .simple-care-app .simple-care-brand-tagline { color: var(--sh-on-band-sub); font: 600 12px/1.25 var(--font-ui); }
 :root .simple-care-app .simple-care-switches > button,
 :root .simple-care-app .simple-care-role-trigger,
 /* The header select sits on the dark band; :not(#sh-none) outranks the generic field rule in care-colors.css. */
@@ -77,7 +83,7 @@ body { background: var(--care-canvas); }
   min-height: 44px;
   border: 1px solid rgba(255, 255, 255, .34);
   border-radius: var(--sh-r-sm);
-  background: rgba(56, 30, 20, .38);
+  background: var(--sh-band-raised);
   color: #fff;
   font: 700 15px/1.2 var(--sh-display);
 }
@@ -87,7 +93,7 @@ body { background: var(--care-canvas); }
 :root .care-sign-in .care-sign-in-header .care-language-select > select option { color: var(--care-ink); background: #fff; }
 :root .simple-care-app .simple-care-switches > button:hover,
 :root .simple-care-app .simple-care-header .care-language-select > select:not(#sh-none):hover,
-:root .care-sign-in .care-sign-in-header .care-language-select > select:not(#sh-none):hover { background: rgba(56, 30, 20, .55); border-color: rgba(255, 255, 255, .6); }
+:root .care-sign-in .care-sign-in-header .care-language-select > select:not(#sh-none):hover { background: #7a3424; border-color: rgba(255, 255, 255, .6); }
 :root .simple-care-app .simple-care-header :is(a, button, select):focus-visible,
 :root .care-sign-in .care-sign-in-header :is(a, button, select):focus-visible { outline: 3px solid #f5c060; outline-offset: 2px; }
 
@@ -134,7 +140,6 @@ body { background: var(--care-canvas); }
 :root .simple-care-app .simple-care-content h1 { font-size: clamp(26px, 2.4vw, 32px); font-weight: 800; line-height: 1.2; }
 :root .simple-care-app .simple-care-content :where(h2) { font-size: 20px; font-weight: 750; line-height: 1.3; }
 :root .simple-care-app .simple-care-content :where(h3) { font-size: 17px; font-weight: 700; }
-:root .simple-care-app .simple-care-content :where(p, li, dd, label, small, span) { color: inherit; }
 
 /* ===================================================================== buttons */
 /* Primary: one solid rust command with a pressed edge. */
@@ -191,7 +196,7 @@ body { background: var(--care-canvas); }
 
 /* Inputs: 48px, strong border, royal-style focus halo in rust. */
 :root .simple-care-app .simple-care-content :is(input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']), select, textarea) {
-  border: 1.5px solid #9c7f68;
+  border: 1.5px solid var(--sh-line-strong);
   border-radius: var(--sh-r-md);
   background-color: #fff;
   transition: border-color var(--sh-fast) ease, box-shadow var(--sh-fast) ease;
@@ -241,7 +246,7 @@ body { background: var(--care-canvas); }
 :root .simple-care-app dialog[open],
 :root dialog.care-notice-dialog[open] { animation: sh-dialog-in var(--sh-enter) var(--sh-ease) both; }
 
-:root .care-notice-dialog { width: min(420px, calc(100vw - 32px)); padding: 20px; font-family: var(--font-ui); }
+:root .care-notice-dialog { width: min(420px, calc(100vw - 32px)); margin: auto; padding: 20px; font-family: var(--font-ui); }
 :root .care-notice-dialog form { display: grid; gap: 16px; margin: 0; }
 :root .care-notice-dialog p { display: flex; align-items: flex-start; gap: 12px; margin: 0; font: 650 17px/1.45 var(--sh-display); }
 :root .care-notice-dialog p > svg { flex: none; width: 36px; height: 36px; padding: 8px; border-radius: 12px; background: var(--sh-ok-50); color: var(--sh-ok); }
@@ -256,7 +261,7 @@ body { background: var(--care-canvas); }
 :root .care-sign-in .care-sign-in-brand,
 :root .care-sign-in .care-sign-in-brand strong { color: #fff; font-family: var(--sh-display); letter-spacing: 0; }
 :root .care-sign-in .care-sign-in-brand strong { font-weight: 800; }
-:root .care-sign-in .care-sign-in-brand small { color: #ffe3d6; }
+:root .care-sign-in .care-sign-in-brand small { color: var(--sh-on-band-sub); }
 :root .care-sign-in .care-sign-in-logo { padding: 3px; border-radius: 10px; background: #fff; }
 :root .care-sign-in .care-sign-in-card { border: 0; border-radius: var(--sh-r-hero); background: #fff; box-shadow: var(--sh-shadow-up); animation: sh-rise var(--sh-enter) var(--sh-ease) both; }
 :root .care-sign-in .care-sign-in-art { background: var(--sh-marigold-50); }
@@ -269,7 +274,7 @@ body { background: var(--care-canvas); }
 :root .care-sign-in .care-sign-in-role[aria-pressed='true'] { border-color: var(--a); background: var(--a); color: #fff; box-shadow: 0 2px 0 rgba(0, 0, 0, .25); }
 :root .care-sign-in .care-sign-in-role[aria-pressed='true'] svg { filter: drop-shadow(0 2px 0 rgba(255, 255, 255, .6)); }
 :root .care-sign-in .care-sign-in-role:active { transform: scale(.97); }
-:root .care-sign-in input { border: 1.5px solid #9c7f68; border-radius: var(--sh-r-md); background: #fff; color: var(--care-ink); }
+:root .care-sign-in input { border: 1.5px solid var(--sh-line-strong); border-radius: var(--sh-r-md); background: #fff; color: var(--care-ink); }
 :root .care-sign-in input:focus { border-color: var(--sh-rust); box-shadow: 0 0 0 4px rgba(185, 71, 44, .16); }
 :root .care-sign-in .care-sign-in-submit { min-height: 52px; font-size: 17px; }
 
@@ -482,6 +487,8 @@ body { background: var(--care-canvas); }
   /* Dock: white bar, each destination its own colour; the current one fills. */
   :root .simple-care-app .simple-care-nav { background: #fff; border-top: 1px solid var(--care-line); box-shadow: 0 -8px 24px rgba(56, 46, 41, .12); }
   :root .simple-care-app .simple-care-nav :is(a, button) { min-height: 60px; color: var(--care-ink); font: 700 12px/1.1 var(--sh-display); }
+  /* Devanagari vowel signs need room above the line; the short label clips without it. */
+  :root .simple-care-app .simple-care-nav-short-label { line-height: 1.45; }
   :root .simple-care-app .simple-care-nav :is(a, button) .simple-care-nav-icon { box-sizing: border-box; width: 34px; height: 30px; padding: 4px 6px; border-radius: 10px; color: var(--a); background: color-mix(in srgb, var(--a) 12%, #fff); transition: background-color var(--sh-fast) ease, color var(--sh-fast) ease; }
   :root .simple-care-app .simple-care-nav :is(a, button)[aria-current='page'] { background: transparent; box-shadow: none; color: var(--a); font-weight: 800; }
   :root .simple-care-app .simple-care-nav :is(a, button)[aria-current='page'] .simple-care-nav-icon { background: var(--a); color: #fff; }
@@ -513,7 +520,7 @@ body { background: var(--care-canvas); }
 :root .directory-review :is(h1, h2) { font-family: var(--sh-display); letter-spacing: 0; }
 :root .directory-review a { color: var(--sh-rust-600); }
 :root .directory-review button { border: 1.5px solid var(--sh-rust); background: #fff; color: var(--sh-rust-600); font-weight: 700; }
-:root .directory-review input, :root .directory-review select, :root .directory-review textarea { border: 1.5px solid #9c7f68; }
+:root .directory-review input, :root .directory-review select, :root .directory-review textarea { border: 1.5px solid var(--sh-line-strong); }
 :root .directory-review :focus-visible { outline-color: var(--care-focus); }
 :root .shared-care button:not(.secondary):not(.quiet) { border: 0; border-radius: var(--sh-r-md); background: var(--sh-rust); box-shadow: var(--sh-press); font-family: var(--sh-display); font-weight: 750; }
 :root .shared-care :is(h1, h2, h3) { font-family: var(--sh-display); letter-spacing: 0; }
@@ -522,3 +529,4 @@ body { background: var(--care-canvas); }
   :root .shared-care > :not(header), :root .directory-review > :not(header) { animation: none; }
 }
 :root .shared-care > header { margin-top: calc(-1 * clamp(16px, 3vw, 36px)); }
+:root .care-community-choices input:checked + span { border-color: var(--sh-rust); background: var(--sh-rust); color: #fff; }

@@ -155,7 +155,7 @@
 }
 
 /* Sahara band header (shared palette with the app) and a short entrance. */
-.header{max-width:none;background:#5c2518;border-bottom:0;color:#fff;padding-inline:max(16px,calc((100% - 1200px)/2))}
+.header{max-width:none;background:#4a1f14;border-bottom:0;color:#fff;padding-inline:max(16px,calc((100% - 1200px)/2))}
 .header .brand,.header a{color:#fff;font-family:var(--font-anek),var(--font-noto),sans-serif;letter-spacing:0}
 .header a:focus-visible{outline:3px solid #f5c060;outline-offset:2px}
 .main{animation:feedback-rise 260ms cubic-bezier(.22,1,.36,1) both}
