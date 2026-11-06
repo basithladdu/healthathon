@@ -169,12 +169,15 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
             else if (shared) EmbeddedSharedCare(vm, onAccount, { shared = false }, onNavigationBlockedChange = { navigationBlocked = it })
             else if (realPatientId != null) {
                 if (!doctorSharedPatientReady(selection, userId, realPeople.map { it.id }.toSet(), selectedRealId, realDraft.personId)) {
-                    Column(Modifier.fillMaxWidth().padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                        if (realRefreshing || (realPatient != null && realDraft.personId != realPatientId)) SaharaBrandMark(size = 56)
-                        Text(if (realPatient == null && !realRefreshing) t("Not available", "उपलब्ध नहीं") else t("Opening…", "खुल रहा है…"), style = MaterialTheme.typography.titleLarge)
-                        realRefreshError?.let { Text(it) }
-                        OutlinedButton(onClick = { vm.refresh() }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Retry", "फिर कोशिश करें")) }
-                        TextButton(onClick = { navigate { selection = null } }) { Text(t("Back to patients", "मरीज़ों पर वापस")) }
+                    // Opening: a skeleton of the hub. Not available: one error line with Try again, and the way back.
+                    Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        if (realPatient == null && !realRefreshing) {
+                            SaharaErrorState(t("Not available", "उपलब्ध नहीं"), detail = realRefreshError, actionLabel = t("Retry", "फिर कोशिश करें"), onAction = { vm.refresh() })
+                            SaharaSecondaryButton(t("Back to patients", "मरीज़ों पर वापस"), { navigate { selection = null } }, Modifier.fillMaxWidth(), navigates = true)
+                        } else {
+                            SaharaSkeleton(rows = 4)
+                            realRefreshError?.let { SaharaErrorState(it, actionLabel = t("Retry", "फिर कोशिश करें"), onAction = { vm.refresh() }) }
+                        }
                     }
                 } else DoctorPatientWorkspace(vm, realPatientId, section, { next -> navigate { section = next } },
                     hub = { pane, open -> DoctorSharedPatientHub(realPatient!!, onSection = { next -> navigate { section = next } }, items = vm.items, pane = pane, selected = open) },
@@ -231,7 +234,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                         item { Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) { Text(t("Patients", "मरीज़"), Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 24.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk); if (realPeople.isNotEmpty()) DoctorPill(if (patientQuery.isBlank()) "${realPeople.size}" else "${shown.size}/${realPeople.size}", DoctorTones.Rust) } }
                         if (realPeople.isNotEmpty()) item { DoctorPatientSearchField(patientQuery, { patientQuery = it }, hindi) }
                         if (realPeople.isEmpty()) item(key = "patients-empty-art") { SaharaIllustration(SaharaArtKind.NoPatients, Modifier.fillMaxWidth()) }
-                        if (realPeople.isEmpty()) item { Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) { Icon(Icons.Default.People, null, tint = DoctorAccent); Text(t("No patients yet. Add one with their invitation code.", "अभी कोई मरीज़ नहीं। उनके निमंत्रण कोड से जोड़ें।"), color = DoctorCardSub, fontSize = 16.sp) } }
+                        if (realPeople.isEmpty()) item { SaharaEmpty(t("No patients yet. Add one with their invitation code.", "अभी कोई मरीज़ नहीं। उनके निमंत्रण कोड से जोड़ें।"), icon = Icons.Default.People, tone = DoctorTones.Rust) }
                         else if (shown.isEmpty()) item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Text(t("No matching patient", "कोई मरीज़ नहीं मिला"), Modifier.weight(1f), color = DoctorCardSub, fontSize = 16.sp); TextButton(onClick = { patientQuery = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Clear search", "खोज साफ़ करें"), color = RustText) } } }
                         items(shown, key = { "shared:${it.id}" }) { person -> DoctorPatientListCard(person.name, DoctorConnectedHome.patientCode(person.id), { openReal(person.id) }, pill = doctorPatientStatus(person, allItems, now, hindi)) }
                         item { ConnectedCard(t("Add a patient", "मरीज़ जोड़ें")) {
@@ -308,7 +311,7 @@ private fun connectedTopicLabel(status: WorkflowTopicStatus, t: (String, String)
         item { DoctorPatientNavigationTiles(onSection, selected = selected) }
         if (entries != null && !pane) item { DoctorSymptomSummary(entries, person.id, limit = 3) }
         item { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(t("More for this patient", "इस मरीज़ के लिए और"), Modifier.padding(top = 8.dp).a11yHeading(), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub)
+            SaharaSectionHeader(t("More for this patient", "इस मरीज़ के लिए और"), Modifier.padding(top = 4.dp), tone = DoctorTones.Indigo, icon = Icons.Default.MoreHoriz)
             Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().saharaAppear()) {
                 Column {
                     DoctorPlainRoute(Icons.Default.Apps, t("Daily care", "रोज़ की देखभाल"), { onSection("Tools") }, "doctor-shared-tools")
