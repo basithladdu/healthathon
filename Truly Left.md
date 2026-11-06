@@ -1,5 +1,36 @@
 # Truly Left
 
+## 6 Nov 2026: what is left (plain words)
+
+**Not working yet**
+- Community: you can see posts, but they are built into the app. Real posts between phones do not work yet.
+- Website (sahara.wedevit.in): the new look is live. The brighter colours from the app are being added next.
+- New look on the phone: nobody has tried it on a real phone yet.
+- Hindi, Telugu, Urdu, Kannada words added this week: written by computer, not checked by a native speaker.
+
+**To do**
+- PPT: new screenshots of the new look. Update the slides.
+- Video: record the app walkthrough again with the new look.
+- Awaiz: switch on community on the server (one database update).
+- Doctors: say yes to the 4 community groups. Pick who can hide bad posts.
+- Doctors: check that "Confirm and continue" (one button now) is OK in Goals of care.
+- Test on a phone: sign in, Practice, Today check-in, take a dose (and Undo), Goals of care, Nearby, community.
+- Before real patients: show the built-in community posts only in Practice.
+
+**Known small problems**
+- One old test fails (emergency card field names). It also failed before this week.
+- 8 website tests about AI services time out on our test machine. They also failed before this week.
+- Dose Undo: if the phone closes the app in the 6 seconds after a tap, that tap is lost.
+
+### Details (for the team)
+
+- **Community.** The app shows 4 groups and about 20 posts with replies from inside the app (signed out, Practice, or when the server is not set up). What people write stays on their phone. Real shared community needs `android/supabase/migrations/20261106120000_community.sql` applied to Supabase (Awaiz), then `PGLITE_MODULE=… node android/scripts/test-community-sql.mjs` (36 checks). Moderators need the existing `clinical_verifier` or `admin` role. Group list is editable rows in `public.community_groups`; the 28 Oct meeting asked clinicians to confirm groups first.
+- **Website.** Vercel deploys `main` automatically (the `[skip ci]` tag does not stop it). The new look (Sahara colours on the AI-FIR layout, dialogs instead of toasts, no split words) is live at sahara.wedevit.in.
+- **Phone.** Build from `main` after `git pull`. Earlier APKs (`Sahara-team-test.apk`) do not have the new look.
+- **What changed in the UI this week** (rounds 1–3): bright section colours and solid buttons; bottom bar Today · Care · Help · More; Today = SOS, 1-tap check-in, today's doses, at a glance, All care tools; Goals of care opens as its own page (Record → Review → Sign), the 10-part plan is "Make the full care plan"; "ED Quick View" shows as "For the emergency room", "Wallet card" as "Pocket emergency card" (printed PDF and legal words unchanged); the thumb switch is gone (hold on the pad = thumb mark; legal heading "Signature / thumb impression" unchanged); doctor patient page = header + ordered list, no tab row inside a section; dialogs replace most toasts; permission screens explain before Android asks; illustrations, Lottie and idle animations (switch off with Remove animations / Battery Saver); Undo for a mistaken "Taken" dose (6 seconds, nothing saved).
+- **Tests on `main`.** Android: 909 of 910 unit tests pass; `CareEdCardTest.snapshotFieldNamesAreTheWebModels` fails on unchanged `main` too (Kotlin fields `values.doesNotWishToKnow` and `values.knowsPrognosis` are not in the web model). Web: 591 of 599 pass; the 8 in `tests/ai-providers.test.mjs` time out here (files unchanged this week).
+- **Accessibility not done.** The goals-of-care signature can only be drawn, so a TalkBack or switch user cannot sign. Not added, because it is not in the legal document.
+
 Updated 24 September 2026. Entry: **Cancer > Patient / Caregiver > Family & Caregiver Support**.
 
 ## Latest meeting: what changed
