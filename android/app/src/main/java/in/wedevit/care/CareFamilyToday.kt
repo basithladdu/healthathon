@@ -1,6 +1,7 @@
 package `in`.wedevit.care
 
 import android.content.Context
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -108,13 +109,15 @@ internal class CaregiverCheckStore(context: Context) {
                     }
                 }
             }
-            if (saved == null || picking) {
+            // Picking and the saved score crossfade in place; the chosen circle fills as it is tapped.
+            SaharaStateSwitch(saved == null || picking, Modifier.fillMaxWidth()) { choosing -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) { if (choosing) {
                 Text(t("Distress this past week, including today", "पिछले हफ़्ते, आज समेत, परेशानी"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
                 FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     CareFamilyRules.scores.forEach { score ->
                         val chosen = saved == score
                         val fill = CareFamilyRules.colour(score)
-                        Box(Modifier.size(44.dp).clip(CircleShape).background(if (chosen) fill else Paper).border(2.dp, fill, CircleShape)
+                        val shown by animateColorAsState(if (chosen) fill else Paper, SaharaMotion.tween(SaharaMotion.SELECT_MS))
+                        Box(Modifier.size(48.dp).clip(CircleShape).background(shown).border(2.dp, fill, CircleShape)
                             .clickable(role = Role.RadioButton) { store.save(key, today, score); saved = score; picking = false }
                             .semantics { contentDescription = "$score/10"; selected = chosen }.testTag("family-check-$score"), contentAlignment = Alignment.Center) {
                             Text("$score", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = if (chosen) Color.White else DoctorCardInk)
@@ -130,7 +133,7 @@ internal class CaregiverCheckStore(context: Context) {
                 LinearProgressIndicator(progress = { current / 10f }, color = CareFamilyRules.colour(current), trackColor = Paper, modifier = Modifier.fillMaxWidth().height(10.dp).clip(RoundedCornerShape(50)))
                 if (current >= CareFamilyRules.TALK_FROM) Text(t("Tell your care team how you are.", "देखभाल टीम को अपना हाल बताएँ।"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk)
                 TextButton(onClick = { picking = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("family-check-change")) { Text(t("Change", "बदलें"), color = RustText) }
-            }
+            } } }
         }
     }
 }
@@ -148,7 +151,7 @@ internal class CaregiverCheckStore(context: Context) {
                 Spacer(Modifier.width(12.dp))
                 Text(t("Tip of the day", "आज का सुझाव"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
             }
-            Text(t(tip.first, tip.second), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk)
+            SaharaStateSwitch(tip, Modifier.fillMaxWidth()) { shown -> Text(t(shown.first, shown.second), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk) }
             TextButton(onClick = { offset += 1 }, modifier = Modifier.heightIn(min = 48.dp).testTag("family-tip-next")) { Text(t("Next tip", "अगला सुझाव"), color = RustText) }
         }
     }

@@ -390,7 +390,8 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
 
 /**
  * Today, the landing page. It points to pages rather than holding everything (3 Nov meeting): greeting and date, SOS with
- * the QR card one tap away, the check-in, the summary, goals of care, Up next, today's medicines, then page shortcuts.
+ * the QR card one tap away, then the day's direct actions (the one-tap check-in, today's medicines), the summary, goals of
+ * care, Up next, then page shortcuts.
  * Patient and family differ (see [CareFamilyRules]): family sees "Caring for <name>", the patient's summary first, their
  * own caregiver check, the to-do list and caregiver tips; the patient's own check-in stays with the patient.
  */
@@ -425,14 +426,13 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     }
     val hour = java.time.LocalTime.now().hour
     val medicines = CareDailyFlow.medicinesForToday(items, today)
-    val takenToday = CareDailyFlow.takenToday(items, today)
     val visits = CareTodayRules.upcomingVisits(items, dayStart)
     val tasks = items.filter { it.kind == "task" && !CareEntryCodec.isStructured(it.detail) }.sortedBy { it.doneOn.isNotBlank() }
     LazyColumn(Modifier.fillMaxSize().testTag("today-list"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item(key = "today-header") { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Text(CareTodayRules.greetingLine(hour, hindi, personName, patient = !family && !clinician), Modifier.a11yHeading().testTag("today-greeting"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 30.sp, lineHeight = 36.sp, color = DoctorCardInk)
-                Text(today.format(careDateFormat("EEEE, d MMMM", hindi)), fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub, modifier = Modifier.padding(top = 2.dp).testTag("today-date"))
+                Text(CareTodayRules.greetingLine(hour, hindi, personName, patient = !family && !clinician), Modifier.a11yHeading().testTag("today-greeting"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 22.sp, lineHeight = 28.sp, color = DoctorCardInk)
+                Text(today.format(careDateFormat("EEEE, d MMMM", hindi)), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub, modifier = Modifier.padding(top = 2.dp).testTag("today-date"))
                 // Family only: who they are caring for, as a soft chip under the date.
                 if (family && personName.isNotBlank()) Surface(shape = RoundedCornerShape(50), color = SaharaApricot, modifier = Modifier.padding(top = 8.dp)) {
                     Row(Modifier.padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -441,31 +441,39 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                     }
                 }
             }
-            if (vm.cloud != null) IconButton(onClick = vm::refresh, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Refresh, t("Refresh records", "रिकॉर्ड फिर से लाएँ"), tint = DoctorCardSub) }
+            // A labelled button, not a bare arrow icon nobody can name.
+            if (vm.cloud != null) TextButton(onClick = vm::refresh, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Icon(Icons.Default.Refresh, null, Modifier.size(20.dp)); Spacer(Modifier.width(6.dp)); Text(t("Refresh", "रिफ़्रेश करें")) }
         } }
         if (!clinician) item(key = "today-sos") { CareSosBar(onSos = { sosOpen = true }, onQr = { qrOpen = true }) }
         if (family) {
-            // Family: how the patient is doing first, then their own check (not the patient's).
+            // Family: how the patient is doing first; their own check (not the patient's) comes after the day's tasks.
             if (showSummary) item(key = "patient-summary") { PatientSummaryCard(vm, onSymptoms = onSymptoms, onMedicines = { onCare("Medicines") }, onVisit = { if (it.due == 0L) onCalendar() else onCalendarAt(it.due) }, onRead = onRead, onCarePlan = onCarePlan) }
-            item(key = "family-check") { FamilyCaregiverCheckCard(vm, personName.ifBlank { t("the patient", "मरीज़") }) }
         } else {
-            if (!clinician && canEdit) item(key = "today-checkin") { TodayCheckInBar(vm, onOpen = onCheckInWords) }
-            if (showSummary) item(key = "patient-summary") { PatientSummaryCard(vm, onSymptoms = onSymptoms, onMedicines = { onCare("Medicines") }, onVisit = { if (it.due == 0L) onCalendar() else onCalendarAt(it.due) }, onRead = onRead, onCarePlan = onCarePlan) }
+            if (!clinician && canEdit) item(key = "today-checkin") { TodayCheckInBar(vm, onOpen = onCheckInWords, onSymptom = onSymptomNote) }
         }
+        // Today's doses come straight after the check-in (patient) or the caregiver's own check (family): the day's direct actions sit together at the top.
+        val medicineSection: androidx.compose.foundation.lazy.LazyListScope.() -> Unit = {
+            // Medicines: the doses card under the title carries the one "x of y taken" count; no second count here, no explanatory text.
+            item(key = "medicines-title") { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(t("Medicines", "दवाइयाँ"), fontSize = 20.sp, fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
+                Spacer(Modifier.weight(1f))
+                TextButton(onClick = { onCare("Medicines") }, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Text(t("See all", "सब देखें")); Icon(Icons.Default.ChevronRight, null, Modifier.size(18.dp)) }
+            } }
+            item(key = "today-doses") { TodayDosesCard(vm) }
+            if (medicines.isEmpty() && loaded && canEdit) item { OutlinedButton(onClick = { onAdd("medicine") }, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, Rust.copy(alpha = .6f)), colors = ButtonDefaults.outlinedButtonColors(containerColor = Paper, contentColor = RustText), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.Add, null); Spacer(Modifier.width(8.dp)); Text(t("Add a medicine", "दवा जोड़ें")) } }
+        }
+        if (!clinician) medicineSection()
+        if (!family && showSummary) item(key = "patient-summary") { PatientSummaryCard(vm, onSymptoms = onSymptoms, onMedicines = { onCare("Medicines") }, onVisit = { if (it.due == 0L) onCalendar() else onCalendarAt(it.due) }, onRead = onRead, onCarePlan = onCarePlan) }
         // Goals of care sits high on Today (3 Nov meeting: "maybe this can go up").
-        item(key = "goals-of-care") { ActionCard(Gold, Modifier.testTag("today-goals-of-care"), onClick = { if (!clinician && latest != null) onRead(latest) else onTalk() }) {
-            Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
-                    Surface(shape = RoundedCornerShape(50), color = Paper) { Text(t("Goals of care", "देखभाल के लक्ष्य"), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk) }
-                    Spacer(Modifier.height(8.dp)); Heading(when { clinician -> t("Let's talk", "बात करें"); family && personName.isNotBlank() -> t("$personName's care notes", "$personName के देखभाल नोट"); else -> t("Your care notes", "आपके देखभाल नोट") }, 27)
-                    Spacer(Modifier.height(12.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(if (clinician) t("Start talking", "बात शुरू करें") else t("Read notes", "नोट पढ़ें"), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = DoctorCardInk)
-                        Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(20.dp), tint = DoctorCardInk)
-                    }
-                }
+        // One name for one card, no illustration (goals of care is a serious conversation, not a decoration).
+        item(key = "goals-of-care") { ActionCard(SaharaTone.Marigold.wash, Modifier.testTag("today-goals-of-care"), onClick = { if (!clinician && latest != null) onRead(latest) else onTalk() }) {
+            Row(Modifier.fillMaxWidth().heightIn(min = 64.dp).padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                Surface(shape = RoundedCornerShape(12.dp), color = SaharaTone.Marigold.solid) { Icon(Icons.Default.Description, null, Modifier.padding(8.dp).size(22.dp), tint = SaharaTone.Marigold.onSolid) }
                 Spacer(Modifier.width(12.dp))
-                Image(saharaImage(R.drawable.care_notes_illustration, 96.dp), null, Modifier.size(88.dp), contentScale = ContentScale.Fit)
+                Column(Modifier.weight(1f)) {
+                    Heading(if (clinician) t("Let's talk", "बात करें") else t("Goals of care", "देखभाल के लक्ष्य"), 22)
+                }
+                Icon(Icons.AutoMirrored.Filled.ArrowForward, if (clinician) t("Start talking", "बात शुरू करें") else t("Read notes", "नोट पढ़ें"), Modifier.size(22.dp), tint = DoctorCardInk)
             }
         } }
         if (clinician && latest != null) item { ActionCard(Paper, onClick = { onRead(latest) }) {
@@ -476,7 +484,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         val checkin = CareTodayRules.todayCheckIn(items, dayStart)
         if (checkin != null && (clinician || !canEdit)) item { CareRow(checkin, vm) }
         DistressRules.today(items, selectedPerson, dayStart)?.takeIf { clinician || !canEdit }?.let { item { CareRow(it, vm) } }
-        item(key = "up-next-title") { SectionTitle(t("Up next", "आगे क्या है"), if (canEdit) t("Add visit", "मुलाक़ात जोड़ें") else null) { onAdd("visit") } }
+        item(key = "up-next-title") { SectionTitle(t("Up next", "आगे क्या है"), if (canEdit && visits.isNotEmpty()) t("Add visit", "मुलाक़ात जोड़ें") else null) { onAdd("visit") } }
         if (visits.isEmpty() && loaded) item(key = "up-next-empty") { ActionCard(SaharaSoftBlue, Modifier.fillMaxWidth(), onClick = { if (canEdit) onAdd("visit") else onCalendar() }) {
             Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                 Surface(shape = CircleShape, color = Paper) { Icon(Icons.Default.Event, null, Modifier.padding(10.dp).size(24.dp), tint = DoctorAccent) }
@@ -487,17 +495,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         itemsIndexed(visits.take(2), key = { _, v -> "up-next-${v.id}" }) { index, v ->
             CareUpNextCard(v, CareTodayRules.whenLabel(v.due, today, hindi), if (index == 0) SaharaSoftBlue else SaharaApricot) { if (v.due == 0L) onCalendar() else onCalendarAt(v.due) }
         }
-        // Medicines: "0 of 3" and no explanatory text; each dose is ticked on the doses card. No side-effect or history capsules here.
-        item(key = "medicines-title") { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text(t("Medicines", "दवाइयाँ"), fontSize = 20.sp, fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
-            if (medicines.isNotEmpty()) { Spacer(Modifier.width(8.dp)); Surface(shape = RoundedCornerShape(50), color = if (takenToday >= medicines.size) DoctorStatusGoodBg else SaharaSoftGold) {
-                Text(CareTodayRules.medicineCount(takenToday, medicines.size, hindi), Modifier.padding(horizontal = 12.dp, vertical = 4.dp).testTag("today-medicine-count"), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = if (takenToday >= medicines.size) DoctorStatusGood else DoctorCardInk)
-            } }
-            Spacer(Modifier.weight(1f))
-            TextButton(onClick = { onCare("Medicines") }, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Text(t("See all", "सब देखें")); Icon(Icons.Default.ChevronRight, null, Modifier.size(18.dp)) }
-        } }
-        item(key = "today-doses") { TodayDosesCard(vm) }
-        if (medicines.isEmpty() && loaded && canEdit) item { OutlinedButton(onClick = { onAdd("medicine") }, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, Rust.copy(alpha = .6f)), colors = ButtonDefaults.outlinedButtonColors(containerColor = Paper, contentColor = RustText), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.Add, null); Spacer(Modifier.width(8.dp)); Text(t("Add a medicine", "दवा जोड़ें")) } }
+        if (clinician) medicineSection()
         // The family's own to-dos stay on their Today; the patient reaches To do from the Care tab.
         if (family || clinician) {
             item(key = "todo-title") { SectionTitle(t("To do", "करने के काम"), if (canEdit) t("Add task", "काम जोड़ें") else null) { onAdd("task") } }
@@ -505,6 +503,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             items(tasks.take(4), key = { it.id }) { CareRow(it, vm) }
             if (tasks.size > 4) item { TextButton(onClick = { onCare("To do") }, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Text(t("See all", "सब देखें")) } }
         }
+        if (family) item(key = "family-check") { FamilyCaregiverCheckCard(vm, personName.ifBlank { t("the patient", "मरीज़") }) }
         if (clinician) {
             item { SectionTitle(t("Journal", "डायरी"), t("Write a note", "नोट लिखें")) { onAdd("journal") } }
             val notes = items.filter { it.kind == "journal" && !PatientProfileCodec.isStructured(it.detail) && !SideEffectCodec.isStructured(it.detail) }

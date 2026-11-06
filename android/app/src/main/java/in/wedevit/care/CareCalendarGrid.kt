@@ -30,15 +30,16 @@ import java.time.LocalDate
 object CalendarKinds {
     val order = listOf("Chemotherapy", "Radiotherapy", "Visit", "Test", "Follow-up", "Medicine", "Procedure", "Other")
     fun key(item: CareItem): String = calendarCategory(item).let { if (it in order) it else "Other" }
+    /** The same section colours as the rest of the app: chemo rose, radiotherapy plum, visits sky, tests teal. */
     fun color(key: String): Color = when (key) {
-        "Chemotherapy" -> Color(0xFFB9472C)
-        "Radiotherapy" -> Color(0xFF7B5EA7)
-        "Visit" -> Color(0xFF3F7CAC)
-        "Test" -> Color(0xFF2F8F83)
-        "Follow-up" -> Color(0xFFB98300)
-        "Medicine" -> Color(0xFF5E8C3A)
-        "Procedure" -> Color(0xFFC2647A)
-        else -> Color(0xFF7A7A7A)
+        "Chemotherapy" -> SaharaTone.Rose.solid
+        "Radiotherapy" -> SaharaTone.Plum.solid
+        "Visit" -> SaharaTone.Indigo.solid
+        "Test" -> SaharaTone.Teal.solid
+        "Follow-up" -> SaharaTone.Marigold.solid
+        "Medicine" -> SaharaTone.Leaf.solid
+        "Procedure" -> SaharaTone.Rust.solid
+        else -> SaharaTone.Neutral.solid
     }
     @Composable fun label(key: String): String {
         val t = careText(); val hindi = careHindi()
@@ -84,7 +85,8 @@ private fun weekStart(day: LocalDate): LocalDate = day.with(DayOfWeek.MONDAY)
                     val d = first.plusDays((r * 7 + c).toLong()); val kinds = kindsByDay[d].orEmpty(); val n = countByDay[d] ?: 0
                     val inMonth = week || d.month == day.month; val selected = d == day; val isToday = d == today
                     val desc = d.format(careDateFormat("EEE d MMM", hindi)) + if (n > 0) ", " + (if (n == 1) t("1 entry", "1 प्रविष्टि") else t("$n entries", "$n प्रविष्टियाँ")) else ""
-                    Box(Modifier.weight(1f).padding(1.dp).heightIn(min = 48.dp).background(if (selected) Rust else Color.Transparent, RoundedCornerShape(12.dp))
+                    val fill by androidx.compose.animation.animateColorAsState(if (selected) Rust else Color.Transparent, SaharaMotion.tween(SaharaMotion.SELECT_MS))
+                    Box(Modifier.weight(1f).padding(1.dp).heightIn(min = 48.dp).background(fill, RoundedCornerShape(12.dp))
                         .clickable(role = Role.Button) { onDay(d) }.semantics { contentDescription = desc }.testTag("calendar-day-$d")) {
                         Surface(Modifier.matchParentSize(), color = Color.Transparent, shape = RoundedCornerShape(12.dp), border = if (isToday) BorderStroke(2.dp, Rust) else null) {}
                         Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {

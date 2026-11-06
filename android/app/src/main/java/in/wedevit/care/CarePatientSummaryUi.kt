@@ -1,18 +1,8 @@
 package `in`.wedevit.care
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -20,7 +10,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -29,7 +18,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,91 +37,41 @@ import java.time.LocalDate
     val store = remember(vm.storageNamespace) { CarePlanStore(context.applicationContext, vm.storageNamespace) }
     val plans = remember(selected) { runCatching { store.load(selected).ectprs }.getOrDefault(emptyList()) }
     val summary = remember(items, versions, selected, plans, today) { CarePatientSummaryRules.build(items, versions, selected, plans, today) }
-    var open by rememberSaveable(selected) { mutableStateOf(false) }
-    var symOpen by rememberSaveable(selected) { mutableStateOf(false) }; var medOpen by rememberSaveable(selected) { mutableStateOf(false) }
-    var visitOpen by rememberSaveable(selected) { mutableStateOf(false) }; var noteOpen by rememberSaveable(selected) { mutableStateOf(false) }
-    var planOpen by rememberSaveable(selected) { mutableStateOf(false) }
-    val expandedWord = t("Expanded", "खुला"); val collapsedWord = t("Collapsed", "बंद")
-    val taken = summary.medicineTicked.coerceAtMost(summary.medicineTotal)
-    // Same card language as the rest of the app: 20dp corners, a hairline border, one soft wash from the palette.
-    Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("patient-summary")) {
-        Column(Modifier.background(Brush.linearGradient(listOf(SaharaSoftGold.copy(alpha = .55f), Paper, Mint.copy(alpha = .8f)))).padding(top = 16.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Surface(shape = CircleShape, color = SaharaApricot, modifier = Modifier.size(48.dp)) { Box(contentAlignment = Alignment.Center) { Text(name.take(1).uppercase(), fontFamily = SaharaTitleFont, fontSize = 22.sp, fontWeight = FontWeight.Medium, color = DoctorAccent) } }
+    // A plain register, always open: symptoms and the emergency plan. Medicines, visits and the latest note each have
+    // their own section on Today ([onMedicines], [onVisit], [onRead] stay for callers), so they are not repeated here.
+    Surface(shape = RoundedCornerShape(12.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().saharaAppear().testTag("patient-summary")) {
+        Column(Modifier.saharaContentSize().padding(top = 12.dp, start = 16.dp, end = 16.dp)) {
+            Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Surface(shape = CircleShape, color = SaharaTone.Teal.wash, modifier = Modifier.size(40.dp)) { Box(contentAlignment = Alignment.Center) { Text(name.take(1).uppercase(), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = SaharaTone.Teal.ink) } }
                 Spacer(Modifier.width(12.dp))
-                Column(Modifier.weight(1f).semantics(mergeDescendants = true) { heading() }) {
-                    Text(today.format(careDateFormat("EEEE, d MMM", hindi)), fontSize = 14.sp, color = DoctorCardSub)
-                    Text(t("$name at a glance", "$name एक नज़र में"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 2)
-                }
-                Spacer(Modifier.width(8.dp))
-                MedicineRing(taken, summary.medicineTotal)
+                Text(t("$name at a glance", "$name एक नज़र में"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 2, modifier = Modifier.weight(1f).semantics { heading() })
             }
-            if (!open) Text(CarePatientSummaryRules.collapsed(summary, hindi), Modifier.padding(top = 12.dp), fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardSub, maxLines = 3)
-            // The drop-down: the same five sections as before, one tap away.
-            Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button) { open = !open }.semantics(mergeDescendants = true) { stateDescription = if (open) expandedWord else collapsedWord },
-                horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                Text(if (open) t("Hide details", "ब्योरा छिपाएँ") else t("Show details", "ब्योरा दिखाएँ"), fontWeight = FontWeight.Bold, fontSize = 14.sp, color = RustText)
-                Icon(if (open) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, tint = Rust)
-            }
-            if (open) {
-                val topSymptom = summary.symptoms.firstOrNull()
-                GlanceSection(Icons.Default.Healing, t("Pain and symptoms", "दर्द और लक्षण"), topSymptom?.let { CarePatientSummaryRules.symptomLine(it, hindi) } ?: CarePatientSummaryRules.noSymptoms(hindi), symOpen, { symOpen = !symOpen }) {
-                    summary.symptoms.forEach { GlanceRow(CarePatientSummaryRules.symptomLine(it, hindi), onSymptoms) }
-                    GlanceRow(t("See symptom notes", "तबीयत के नोट देखें"), onSymptoms, action = true)
-                }
-                GlanceSection(Icons.Default.Medication, t("Medicines", "दवाइयाँ"), CarePatientSummaryRules.medicineStatus(summary.medicineTotal, summary.medicineTicked, hindi), medOpen, { medOpen = !medOpen }) {
-                    GlanceRow(CarePatientSummaryRules.medicineCount(summary.medicineTotal, hindi), onMedicines)
-                    GlanceRow(t("See medicines", "दवाइयाँ देखें"), onMedicines, action = true)
-                }
-                GlanceSection(Icons.Default.Event, t("Next visit", "अगली मुलाक़ात"), CarePatientSummaryRules.nextVisit(summary.nextVisit, hindi), visitOpen, { visitOpen = !visitOpen }) {
-                    summary.nextVisit?.let { v -> GlanceRow("${v.title.ifBlank { t("Visit", "मुलाक़ात") }} · ${CarePatientSummaryRules.visitDay(v, hindi)}", { onVisit(v) }) }
-                    GlanceRow(t("See calendar", "कैलेंडर देखें"), { onVisit(summary.nextVisit ?: CareItem(personId = selected, kind = "visit", title = "")) }, action = true)
-                }
-                GlanceSection(Icons.Default.Description, t("Latest note from the doctor", "डॉक्टर का सबसे नया नोट"), CarePatientSummaryRules.noteLine(summary.latestNote, summary.latestNote?.let { date(it.published) }.orEmpty(), hindi), noteOpen, { noteOpen = !noteOpen }) {
-                    summary.latestNote?.let { n -> GlanceRow(t("Read", "पढ़ें"), { onRead(n) }, action = true) } ?: GlanceRow(CarePatientSummaryRules.noteLine(null, "", hindi), {})
-                }
-                GlanceSection(Icons.Default.LocalHospital, t("Emergency care plan", "आपातकालीन देखभाल योजना"), CarePatientSummaryRules.planLine(summary.plan, hindi), planOpen, { planOpen = !planOpen }) {
-                    GlanceRow(t("See emergency plan", "आपातकालीन योजना देखें"), onCarePlan, action = true)
-                }
-            }
+            GlanceRow(Icons.Default.Healing, SaharaTone.Rose, t("Pain and symptoms", "दर्द और लक्षण"), summary.symptoms.firstOrNull()?.let { CarePatientSummaryRules.symptomLine(it, hindi) } ?: CarePatientSummaryRules.noSymptoms(hindi), "summary-symptoms", onSymptoms)
+            GlanceRow(Icons.Default.LocalHospital, SaharaTone.Marigold, t("Emergency care plan", "आपातकालीन देखभाल योजना"), CarePatientSummaryRules.planLine(summary.plan, hindi), "summary-plan", onCarePlan)
         }
     }
 }
 
-/** Today's medicines as a ring: how many are ticked out of how many are due. */
-@Composable private fun MedicineRing(taken: Int, total: Int) {
-    val t = careText(); val hindi = careHindi()
-    val progress by animateFloatAsState(if (total == 0) 0f else taken.toFloat() / total, label = "medicine ring")
-    val label = CarePatientSummaryRules.medicineStatus(total, taken, hindi)
-    val track = DoctorStatusGood.copy(alpha = .14f); val fill = DoctorStatusGood
-    Box(Modifier.size(80.dp).semantics(mergeDescendants = true) { contentDescription = label }, contentAlignment = Alignment.Center) {
-        Canvas(Modifier.fillMaxSize().padding(4.dp)) {
-            val stroke = Stroke(width = 8.dp.toPx(), cap = StrokeCap.Round)
-            drawArc(track, 0f, 360f, false, style = stroke)
-            if (progress > 0f) drawArc(fill, -90f, 360f * progress, false, style = stroke)
-        }
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(if (total == 0) "–" else "$taken/$total", fontSize = 19.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk)
-            Text(t("Medicines", "दवाइयाँ"), fontSize = 11.sp, color = DoctorCardSub, maxLines = 1)
-        }
-    }
-}
-
-/** Today's page shortcuts as tall rounded tiles with their own art. SOS has its own bar above; Care team left (3 Nov meeting). */
+/** Today's page shortcuts, two by two, with full-word labels (the same names as on the Care tab). SOS has its own bar above. */
 @Composable fun TodayQuickActions(onCalendar: () -> Unit, onSymptoms: () -> Unit, onLabs: () -> Unit, onCommunity: () -> Unit) {
     val t = careText()
+    val actions = listOf(
+        QuickAction(t("Calendar", "कैलेंडर"), Icons.Default.CalendarMonth, SaharaTone.Indigo, "shortcut-calendar", onCalendar),
+        QuickAction(t("Symptoms", "लक्षण"), Icons.Default.MonitorHeart, SaharaTone.Rose, "symptom-tracker-entry", onSymptoms),
+        QuickAction(t("Lab history", "जाँच रिपोर्टें"), Icons.Default.Science, SaharaTone.Marigold, "shortcut-labs", onLabs),
+        QuickAction(t("Community", "समुदाय"), Icons.Default.Groups, SaharaTone.Leaf, "shortcut-community", onCommunity),
+    )
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf(
-                QuickAction(t("Calendar", "कैलेंडर"), R.drawable.quick_calendar_art, SaharaApricot, "shortcut-calendar", onCalendar),
-                QuickAction(t("Symptoms", "लक्षण"), R.drawable.symptom_tracker_illustration, Peach.copy(alpha = .6f), "symptom-tracker-entry", onSymptoms),
-                QuickAction(t("Labs", "जाँच"), R.drawable.quick_labs_art, SaharaLavender, "shortcut-labs", onLabs),
-                QuickAction(t("Community", "समुदाय"), R.drawable.quick_family_art, Mint, "shortcut-community", onCommunity),
-            ).forEach { action ->
-                ActionCard(Paper, Modifier.weight(1f).heightIn(min = 124.dp).testTag(action.tag), action.onClick) {
-                    Column(Modifier.fillMaxSize().padding(vertical = 12.dp, horizontal = 2.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceBetween) {
-                        Surface(shape = CircleShape, color = action.tint, modifier = Modifier.size(60.dp)) { Box(contentAlignment = Alignment.Center) { Image(saharaImage(action.art, 46.dp), null, Modifier.size(46.dp), contentScale = ContentScale.Fit) } }
-                        Text(action.label, fontSize = cappedLabelSize(12f), fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, softWrap = false, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+        actions.chunked(2).forEach { row ->
+            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                row.forEach { action ->
+                    ActionCard(action.tone.wash, Modifier.weight(1f).fillMaxHeight().heightIn(min = 64.dp).testTag(action.tag), action.onClick) {
+                        Row(Modifier.fillMaxSize().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Surface(shape = RoundedCornerShape(12.dp), color = action.tone.solid) { Icon(action.icon, null, Modifier.padding(8.dp).size(22.dp), tint = action.tone.onSolid) }
+                            Spacer(Modifier.width(10.dp))
+                            Text(action.label, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.weight(1f),
+                                style = LocalTextStyle.current.copy(lineBreak = androidx.compose.ui.text.style.LineBreak.Heading, hyphens = androidx.compose.ui.text.style.Hyphens.None))
+                        }
                     }
                 }
             }
@@ -141,23 +79,14 @@ import java.time.LocalDate
     }
 }
 
-private class QuickAction(val label: String, val art: Int, val tint: Color, val tag: String, val onClick: () -> Unit)
+private class QuickAction(val label: String, val icon: ImageVector, val tone: SaharaTone, val tag: String, val onClick: () -> Unit)
 
-@Composable private fun GlanceSection(icon: ImageVector, title: String, subtitle: String, open: Boolean, toggle: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
-    val t = careText(); val expandedWord = t("Expanded", "खुला"); val collapsedWord = t("Collapsed", "बंद")
+/** One register row: a coloured icon tile, the title, today's line under it, and an arrow; the whole row opens its page. */
+@Composable private fun GlanceRow(icon: ImageVector, tone: SaharaTone, title: String, subtitle: String, tag: String, onClick: () -> Unit) {
     HorizontalDivider(color = DoctorHairline)
-    Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).clickable(role = Role.Button, onClick = toggle).padding(vertical = 6.dp).semantics(mergeDescendants = true) { stateDescription = if (open) expandedWord else collapsedWord },
-        verticalAlignment = Alignment.CenterVertically) {
-        Surface(shape = CircleShape, color = Paper) { Icon(icon, null, Modifier.padding(6.dp).size(20.dp), tint = Rust) }; Spacer(Modifier.width(12.dp))
+    Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).clickable(role = Role.Button, onClick = onClick).padding(vertical = 8.dp).semantics(mergeDescendants = true) {}.testTag(tag), verticalAlignment = Alignment.CenterVertically) {
+        Surface(shape = RoundedCornerShape(12.dp), color = tone.solid) { Icon(icon, null, Modifier.padding(6.dp).size(20.dp), tint = tone.onSolid) }; Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) { Text(title, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk); Text(subtitle, fontSize = 14.sp, color = DoctorCardSub, maxLines = 3) }
-        Icon(if (open) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, tint = DoctorCardSub)
-    }
-    if (open) Column(Modifier.padding(start = 44.dp, bottom = 4.dp), content = content)
-}
-
-@Composable private fun GlanceRow(text: String, onClick: () -> Unit, action: Boolean = false) {
-    Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button, onClick = onClick).padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(text, Modifier.weight(1f), fontSize = 15.sp, fontWeight = if (action) FontWeight.SemiBold else FontWeight.Normal, color = if (action) RustText else DoctorCardInk)
-        Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(18.dp), tint = Rust)
+        Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(18.dp), tint = RustText)
     }
 }
