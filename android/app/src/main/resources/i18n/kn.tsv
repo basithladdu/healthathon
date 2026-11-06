@@ -4904,3 +4904,19 @@ Not saved	ಉಳಿಸಲಾಗಿಲ್ಲ
 Read from the photo. Check it.	ಫೋಟೋದಿಂದ ಓದಲಾಗಿದೆ. ಪರಿಶೀಲಿಸಿ.
 Taken or missed	ತೆಗೆದುಕೊಂಡಿದೆ ಅಥವಾ ತಪ್ಪಿದೆ
 Tap a dose when taken. Hold it for Missed.	ಔಷಧಿ ತೆಗೆದುಕೊಂಡಾಗ ಅದನ್ನು ಮುಟ್ಟಿ. ತಪ್ಪಿದ್ದರೆ ಒತ್ತಿ ಹಿಡಿಯಿರಿ.
+# Onboarding lane, 6 Nov: role tiles and Practice naming.
+Practice user, currently ${user.name}, ${user.role}	ಅಭ್ಯಾಸ ಬಳಕೆದಾರ, ಈಗ ${user.name}, ${user.role}
+Leave Practice	ಅಭ್ಯಾಸದಿಂದ ಹೊರಬನ್ನಿ
+Who is using Sahara?	ಸಹಾರಾವನ್ನು ಯಾರು ಬಳಸುತ್ತಿದ್ದಾರೆ?
+Add the person you care for	ನೀವು ಆರೈಕೆ ಮಾಡುವ ವ್ಯಕ್ತಿಯನ್ನು ಸೇರಿಸಿ
+Start with your name	ನಿಮ್ಮ ಹೆಸರಿನಿಂದ ಪ್ರಾರಂಭಿಸಿ
+Look around with a ready-made record. No account needed.	ಸಿದ್ಧ ದಾಖಲೆಯೊಂದಿಗೆ ಆ್ಯಪ್ ನೋಡಿ. ಖಾತೆ ಬೇಕಿಲ್ಲ.
+Open Dr Meera's practice workspace. No account needed.	ಡಾ. ಮೀರಾ ಅವರ ಅಭ್ಯಾಸ ಕಾರ್ಯಸ್ಥಳ ತೆರೆಯಿರಿ. ಖಾತೆ ಬೇಕಿಲ್ಲ.
+Practice as	ಯಾರಾಗಿ ಅಭ್ಯಾಸ ಮಾಡಬೇಕು
+Patient · sees his own care record	ರೋಗಿ · ತಮ್ಮ ಆರೈಕೆ ದಾಖಲೆ ನೋಡುತ್ತಾರೆ
+Family · Rahul's brother	ಕುಟುಂಬ · ರಾಹುಲ್ ಅವರ ಸಹೋದರ
+Couldn't open Practice.	ಅಭ್ಯಾಸ ತೆರೆಯಲಾಗಲಿಲ್ಲ.
+Leaving Practice…	ಅಭ್ಯಾಸದಿಂದ ಹೊರಹೋಗುತ್ತಿದ್ದೇವೆ…
+Practice record removed.	ಅಭ್ಯಾಸ ದಾಖಲೆ ತೆಗೆದುಹಾಕಲಾಗಿದೆ.
+Not available in Practice	ಅಭ್ಯಾಸದಲ್ಲಿ ಲಭ್ಯವಿಲ್ಲ
+Leave Practice to sign in or use an account.	ಸೈನ್ ಇನ್ ಮಾಡಲು ಅಥವಾ ಖಾತೆ ಬಳಸಲು ಅಭ್ಯಾಸದಿಂದ ಹೊರಬನ್ನಿ.

@@ -4904,3 +4904,19 @@ Not saved	محفوظ نہیں ہوا
 Read from the photo. Check it.	تصویر سے پڑھا گیا۔ جانچ لیں۔
 Taken or missed	لی گئی یا چھوٹ گئی
 Tap a dose when taken. Hold it for Missed.	دوا لینے پر اسے چھوئیں۔ چھوٹ گئی ہو تو دبا کر رکھیں۔
+# Onboarding lane, 6 Nov: role tiles and Practice naming.
+Practice user, currently ${user.name}, ${user.role}	مشق یوزر، ابھی ${user.name}، ${user.role}
+Leave Practice	مشق سے باہر جائیں
+Who is using Sahara?	سہارا کون استعمال کر رہا ہے؟
+Add the person you care for	جن کی آپ دیکھ بھال کرتے ہیں، انہیں شامل کریں
+Start with your name	اپنے نام سے شروع کریں
+Look around with a ready-made record. No account needed.	تیار ریکارڈ کے ساتھ ایپ دیکھیں۔ اکاؤنٹ کی ضرورت نہیں۔
+Open Dr Meera's practice workspace. No account needed.	ڈاکٹر میرا کا مشق ورک اسپیس کھولیں۔ اکاؤنٹ کی ضرورت نہیں۔
+Practice as	کس کے طور پر مشق کریں
+Patient · sees his own care record	مریض · اپنا دیکھ بھال کا ریکارڈ دیکھتے ہیں
+Family · Rahul's brother	خاندان · راہل کے بھائی
+Couldn't open Practice.	مشق نہیں کھل سکی۔
+Leaving Practice…	مشق سے باہر جا رہے ہیں…
+Practice record removed.	مشق کا ریکارڈ ہٹا دیا گیا۔
+Not available in Practice	مشق میں دستیاب نہیں
+Leave Practice to sign in or use an account.	سائن ان یا اکاؤنٹ کے لیے مشق سے باہر جائیں۔
