@@ -117,7 +117,7 @@ class CareReminderScheduler(private val context: Context, private val account: S
         if (deliver && doses.none { group -> group.medicines.any { it.itemId == expected?.itemId } }) {
             // Tap: select the person whose activity is due (CareTodayRules), then open Reminders (CareReminderLaunch).
             val launch = PendingIntent.getActivity(context, notificationId(account, key), Intent(context, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP; putExtra(CareReminderLaunch.EXTRA, true); putExtra(CareTodayRules.OPEN_PERSON_EXTRA, CareTodayRules.personForItem(prefs.getString("items", null), expected?.itemId.orEmpty())) }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-            val notification = NotificationCompat.Builder(context, CHANNEL).setSmallIcon(android.R.drawable.ic_popup_reminder)
+            val notification = NotificationCompat.Builder(context, CHANNEL).setSmallIcon(R.drawable.ic_stat_sahara).setColor(SAHARA_RUST)
                 .setContentTitle(reminderText("Sahara reminder")).setContentText(reminderText("A saved care activity is due. Open Sahara to check the record."))
                 .setVisibility(NotificationCompat.VISIBILITY_PRIVATE).setContentIntent(launch).setAutoCancel(true).setCategory(NotificationCompat.CATEGORY_REMINDER).build()
             try {
@@ -138,8 +138,8 @@ class CareReminderScheduler(private val context: Context, private val account: S
         val content = careWithDeviceLanguage(context) { MedicineDoseRules.reminder(group, careDeviceHindi(context)) }
         val photos = runCatching { MedicineStripPhotos(context, account).collage(group.personId, content.itemIds) }.getOrNull()
         val launch = PendingIntent.getActivity(context, notificationId(account, groupKey), Intent(context, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP; putExtra(CareReminderLaunch.EXTRA, true); putExtra(CareTodayRules.OPEN_PERSON_EXTRA, group.personId) }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        val hidden = NotificationCompat.Builder(context, CHANNEL).setSmallIcon(android.R.drawable.ic_popup_reminder).setContentTitle(content.publicTitle).setContentText(content.publicText).build()
-        val builder = NotificationCompat.Builder(context, CHANNEL).setSmallIcon(android.R.drawable.ic_popup_reminder)
+        val hidden = NotificationCompat.Builder(context, CHANNEL).setSmallIcon(R.drawable.ic_stat_medicine).setColor(SAHARA_RUST).setContentTitle(content.publicTitle).setContentText(content.publicText).build()
+        val builder = NotificationCompat.Builder(context, CHANNEL).setSmallIcon(R.drawable.ic_stat_medicine).setColor(SAHARA_RUST)
             .setContentTitle(content.title).setContentText(content.text.lineSequence().first())
             .setVisibility(NotificationCompat.VISIBILITY_PRIVATE).setPublicVersion(hidden).setContentIntent(launch).setAutoCancel(true).setCategory(NotificationCompat.CATEGORY_REMINDER)
         if (photos != null) builder.setLargeIcon(photos).setStyle(NotificationCompat.BigPictureStyle().bigPicture(photos).setSummaryText(content.text.replace('\n', ' ')))
@@ -158,6 +158,8 @@ class CareReminderScheduler(private val context: Context, private val account: S
     private fun createChannel() { context.getSystemService(NotificationManager::class.java).createNotificationChannel(NotificationChannel(CHANNEL, reminderText("Care reminders"), NotificationManager.IMPORTANCE_DEFAULT).apply { description = reminderText("Reminders for your chosen medicine times and dated care activities. Android may delay alerts."); lockscreenVisibility = android.app.Notification.VISIBILITY_PRIVATE }) }
     companion object {
         const val CHANNEL = "sahara-care-reminders"
+        /** Sahara Rust (#B9472C), the accent Android uses for the small icon and app name in the shade. */
+        private const val SAHARA_RUST = 0xFFB9472C.toInt()
         fun active(context: Context): String? = context.getSharedPreferences("care-reminder-active", 0).getString("account", null)
         private fun notificationId(account: String, key: String) = ("$account:$key".hashCode() and Int.MAX_VALUE)
     }

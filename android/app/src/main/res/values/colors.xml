@@ -1,3 +1,5 @@
 <resources>
     <color name="launcher_background">#FFF8EE</color>
+    <!-- Sahara Rust, behind the launcher logo and the Android 12+ splash logo. -->
+    <color name="ic_launcher_background">#B9472C</color>
 </resources>
