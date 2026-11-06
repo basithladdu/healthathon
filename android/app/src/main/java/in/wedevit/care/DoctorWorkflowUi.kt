@@ -42,7 +42,7 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
 @Composable private fun WorkflowChip(text: String, fg: androidx.compose.ui.graphics.Color = DoctorStatusRest, bg: androidx.compose.ui.graphics.Color = DoctorStatusRestBg) { Surface(color = bg, shape = RoundedCornerShape(50)) { Text(text, Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = fg) } }
 @Composable private fun WorkflowStatus(text: String) { Surface(color = Peach.copy(alpha = .45f), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth()) { Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) { Icon(Icons.Default.Info, null, Modifier.size(20.dp), tint = RustText); Text(text, Modifier.weight(1f).testTag("workflow-status"), fontSize = 15.sp, color = DoctorCardInk) } } }
 @Composable private fun WorkflowCard(content: @Composable ColumnScope.() -> Unit) {
-    Surface(color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().a11yCard()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp), content = content) }
+    Surface(color = Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().a11yCard()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp), content = content) }
 }
 
 @Composable fun DoctorRequestQueue(store: DoctorWorkflowStore, patients: List<DoctorDemoPatient>, onBack: () -> Unit, onOpen: (String) -> Unit, onSchedule: (WorkflowRequest) -> Unit, refreshToken: Int = 0) { val t = careText();

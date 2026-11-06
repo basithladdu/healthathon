@@ -28,7 +28,7 @@ import java.util.Locale
 @Composable fun DoctorProgressTimeline(reports: List<DoctorProgressReport>, onOpenReport: (String) -> Unit, modifier: Modifier = Modifier) { val t = careText();
     Column(modifier.fillMaxWidth().testTag("doctor-progress-timeline"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(t("Reported updates", "बताए अपडेट"), Modifier.a11yHeading(), fontSize = 22.sp, fontWeight = FontWeight.Medium, color = Ink, fontFamily = SaharaTitleFont)
-        if (reports.isEmpty()) Surface(color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) { Icon(Icons.Outlined.Notes, null, tint = Rust, modifier = Modifier.size(24.dp)); Text(t("No updates yet.", "अभी कोई अपडेट नहीं।"), fontSize = 16.sp, color = DoctorCardInk) } }
+        if (reports.isEmpty()) Surface(color = Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) { Icon(Icons.Outlined.Notes, null, tint = Rust, modifier = Modifier.size(24.dp)); Text(t("No updates yet.", "अभी कोई अपडेट नहीं।"), fontSize = 16.sp, color = DoctorCardInk) } }
         reports.forEachIndexed { index, report ->
             Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Column(Modifier.width(48.dp).fillMaxHeight(), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -36,7 +36,7 @@ import java.util.Locale
                     Text(report.date.format(DateTimeFormatter.ofPattern("MMM", Locale.ENGLISH)), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.padding(top = 5.dp))
                     if (index != reports.lastIndex) Box(Modifier.padding(top = 8.dp).width(2.dp).weight(1f).background(Rust.copy(alpha = .18f)))
                 }
-                Surface(onClick = { onOpenReport(report.id) }, shape = RoundedCornerShape(20.dp), color = if (report.isLatest) SaharaSoftGold else if (report.source == SampleReportSource.FAMILY) SaharaLavender else SaharaSoftBlue, contentColor = Ink, modifier = Modifier.weight(1f).testTag("progress-report-${report.id}")) {
+                Surface(onClick = { onOpenReport(report.id) }, shape = RoundedCornerShape(16.dp), color = if (report.isLatest) SaharaSoftGold else if (report.source == SampleReportSource.FAMILY) SaharaLavender else SaharaSoftBlue, contentColor = Ink, modifier = Modifier.weight(1f).testTag("progress-report-${report.id}")) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) { Icon(if (report.source == SampleReportSource.PATIENT) Icons.Outlined.PersonOutline else Icons.Outlined.PeopleOutline, null, tint = Rust, modifier = Modifier.size(18.dp)); Text(if (report.source == SampleReportSource.PATIENT) t("Patient reported", "मरीज़ ने बताया") else t("Family reported", "परिवार ने बताया"), fontSize = 14.sp, fontWeight = FontWeight.Medium) }
                         Text(if (report.isLatest) t("Latest update", "नया अपडेट") else t("Earlier update", "पुराना अपडेट"), fontSize = 18.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
@@ -78,7 +78,7 @@ import java.util.Locale
 }
 
 @Composable private fun ProgressDetailCard(title: String, icon: ImageVector, color: Color, content: @Composable ColumnScope.() -> Unit) {
-    Surface(color = color, contentColor = Ink, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
+    Surface(color = color, contentColor = Ink, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Row(verticalAlignment = Alignment.CenterVertically) { Icon(icon, null, tint = Rust, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(12.dp)); Text(title, fontSize = 18.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, modifier = Modifier.a11yHeading()) }; content() }
     }
 }

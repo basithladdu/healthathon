@@ -28,7 +28,7 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
     val discussion=overview.lastDiscussion
     val earlierDiscussions=overview.history.filter {it.id!=discussion?.id}
     Column(Modifier.fillMaxWidth().testTag("overview-content"),verticalArrangement=Arrangement.spacedBy(16.dp)) {
-        Surface(color=SaharaSoftBlue,shape=RoundedCornerShape(20.dp)) {
+        Surface(color=SaharaSoftBlue,shape=RoundedCornerShape(16.dp)) {
             Column(Modifier.fillMaxWidth().padding(16.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
                 Text(t("Handover at a glance", "एक नज़र में हैंडओवर"),fontSize=19.sp,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont)
                 Column(Modifier.testTag("overview-previous-professional"),verticalArrangement=Arrangement.spacedBy(4.dp)) {
@@ -73,7 +73,7 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
         if(earlierDiscussions.isNotEmpty()) {
             Text(t("Earlier discussions (${earlierDiscussions.size})", "पुरानी चर्चाएँ (${earlierDiscussions.size})"),fontWeight=FontWeight.Medium,modifier=Modifier.testTag("overview-history-toggle"), fontFamily = SaharaTitleFont)
             earlierDiscussions.forEach {earlier ->
-                Surface(color=Paper,shape=RoundedCornerShape(20.dp),border=BorderStroke(1.dp,DoctorHairline)) {
+                Surface(color=Paper,shape=RoundedCornerShape(16.dp),border=BorderStroke(1.dp,DoctorHairline)) {
                     Column(Modifier.fillMaxWidth().padding(16.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
                         Text(overviewDate(earlier.publishedAt),style=MaterialTheme.typography.labelLarge,color=Rust)
                         OverviewDiscussionMeta(earlier)
@@ -106,7 +106,7 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
         val x=5.dp.toPx();drawLine(DoctorHairline,Offset(x,12.dp.toPx()),Offset(x,size.height),strokeWidth=1.dp.toPx());drawCircle(Rust,radius=4.dp.toPx(),center=Offset(x,12.dp.toPx()))
     }.padding(start=24.dp,bottom=18.dp),verticalArrangement=Arrangement.spacedBy(9.dp)) {
         Surface(color=tint,shape=RoundedCornerShape(50)) {Text(date,Modifier.padding(horizontal=10.dp,vertical=4.dp),style=MaterialTheme.typography.labelMedium,color=Ink)}
-        Surface(color=Paper,shape=RoundedCornerShape(20.dp),border=BorderStroke(1.dp,DoctorHairline)) {
+        Surface(color=Paper,shape=RoundedCornerShape(16.dp),border=BorderStroke(1.dp,DoctorHairline)) {
             Column(Modifier.fillMaxWidth().padding(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {Text(title,fontWeight=FontWeight.Medium,fontSize=18.sp, fontFamily = SaharaTitleFont);content()}
         }
     }

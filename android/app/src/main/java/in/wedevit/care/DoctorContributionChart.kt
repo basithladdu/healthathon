@@ -62,7 +62,7 @@ internal fun DoctorContributionChart(checks: List<CareItem>, zone: ZoneId, now: 
     val scale = LocalDensity.current.fontScale.coerceAtLeast(1f)
     val rowHeight = (26 * scale).dp
     val labelWidth = (40 * scale).dp
-    Surface(color = Peach.copy(alpha = .4f), shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth()) {
+    Surface(color = Peach.copy(alpha = .4f), shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()) {
     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(monthLabel, fontFamily=SaharaTitleFont,fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
         Row(Modifier.fillMaxWidth()) {

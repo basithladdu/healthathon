@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable fun DoctorCareTeamSummary(vm: CareModel, personId: String, onOpen: () -> Unit) { val t = careText();
-    Card(onClick = onOpen, colors = CardDefaults.cardColors(containerColor = DoctorCardReport), border = BorderStroke(1.dp, DoctorHairline), shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 72.dp).testTag("doctor-care-team-summary").semantics(mergeDescendants = true) { contentDescription = t("View care team", "देखभाल टीम देखें") }) {
+    Card(onClick = onOpen, colors = CardDefaults.cardColors(containerColor = DoctorCardReport), border = BorderStroke(1.dp, DoctorHairline), shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 72.dp).testTag("doctor-care-team-summary").semantics(mergeDescendants = true) { contentDescription = t("View care team", "देखभाल टीम देखें") }) {
         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Box(Modifier.size(40.dp).background(DoctorCardConversation, CircleShape), contentAlignment = Alignment.Center) { Icon(Icons.Default.Groups, null, tint = DoctorAccent, modifier = Modifier.size(22.dp)) }
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -59,7 +59,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
         error?.let { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Text(it, Modifier.weight(1f).announce(), color = MaterialTheme.colorScheme.error); TextButton(onClick = onRefresh, enabled = !loading, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Refresh contacts", "संपर्क ताज़ा करें"), color = RustText) } } }
         if (!readable && !loading) CareTeamEmpty(Icons.Default.Lock, t("Contacts not shared", "संपर्क साझा नहीं"))
         if (readable && contacts.isEmpty() && !loading) CareTeamEmpty(Icons.Default.Groups, t("No contacts yet", "अभी कोई संपर्क नहीं"))
-        if (readable && contacts.isNotEmpty()) Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), color = DoctorCardReport, border = BorderStroke(1.dp, DoctorHairline)) { Column {
+        if (readable && contacts.isNotEmpty()) Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), color = DoctorCardReport, border = BorderStroke(1.dp, DoctorHairline)) { Column {
             contacts.forEachIndexed { index, contact ->
                 if (index > 0) HorizontalDivider(Modifier.padding(horizontal = 16.dp), color = DoctorHairline)
                 Row(Modifier.fillMaxWidth().heightIn(min = 64.dp).padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -78,7 +78,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 }
 
 @Composable private fun CareTeamEmpty(icon: ImageVector, text: String) {
-    Surface(color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
+    Surface(color = Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Icon(icon, null, tint = DoctorAccent, modifier = Modifier.size(22.dp))
             Text(text, fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardSub)

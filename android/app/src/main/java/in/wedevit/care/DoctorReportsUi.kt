@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.sp
                 DoctorReportCategory.entries.forEach { item -> ReportFolder(item.label, counts.getValue(item), category == item, item.name, onClick = { onCategoryChange(item) }) }
             }
         }
-        if (visible.isEmpty()) Surface(color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("reports-empty")) {
+        if (visible.isEmpty()) Surface(color = Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("reports-empty")) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Icon(Icons.Outlined.FindInPage, null, tint = Rust, modifier = Modifier.size(30.dp))
                 Text(if (query.isNotBlank()) t("No matching summaries", "कोई सार नहीं मिला") else t("No summaries in this category", "इस श्रेणी में कोई सार नहीं"), fontSize = 18.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
@@ -51,7 +51,7 @@ import androidx.compose.ui.unit.sp
             }
         }
         visible.forEach { report ->
-            Surface(onClick = { onOpenReport(report.id) }, color = Paper, contentColor = Ink, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("report-open-${report.id}")) {
+            Surface(onClick = { onOpenReport(report.id) }, color = Paper, contentColor = Ink, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("report-open-${report.id}")) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Surface(color = SaharaSoftGold, shape = RoundedCornerShape(14.dp)) { Icon(Icons.Outlined.Description, null, tint = Rust, modifier = Modifier.padding(10.dp).size(24.dp)) }
@@ -67,7 +67,7 @@ import androidx.compose.ui.unit.sp
 
 @Composable private fun ReportFolder(label: String, count: Int, selected: Boolean, tag: String, onClick: () -> Unit) {
     val categorySelected = selected
-    Surface(onClick = onClick, color = if (selected) Rust else SaharaSoftGold, contentColor = if (selected) Color.White else Ink, shape = RoundedCornerShape(20.dp), border = if (selected) null else BorderStroke(1.dp, DoctorHairline), modifier = Modifier.widthIn(min = 126.dp).heightIn(min = 88.dp).testTag("reports-category-$tag").semantics { this.selected = categorySelected }) {
+    Surface(onClick = onClick, color = if (selected) Rust else SaharaSoftGold, contentColor = if (selected) Color.White else Ink, shape = RoundedCornerShape(16.dp), border = if (selected) null else BorderStroke(1.dp, DoctorHairline), modifier = Modifier.widthIn(min = 126.dp).heightIn(min = 88.dp).testTag("reports-category-$tag").semantics { this.selected = categorySelected }) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Outlined.Folder, null, Modifier.size(24.dp)); Spacer(Modifier.width(8.dp)); Text(count.toString(), fontSize = 18.sp, fontWeight = FontWeight.SemiBold) }
             Text(label, fontSize = 15.sp, fontWeight = FontWeight.Medium, lineHeight = 20.sp)
@@ -79,7 +79,7 @@ import androidx.compose.ui.unit.sp
     Column(modifier.fillMaxWidth().testTag("report-detail-${report.id}"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(report.title, Modifier.a11yHeading(), fontSize = 24.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
         Text("${report.patientName} · ${report.category.label}", fontSize = 14.sp, color = DoctorCardSub)
-        Surface(color = Paper, shape = RoundedCornerShape(20.dp), contentColor = Ink, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
+        Surface(color = Paper, shape = RoundedCornerShape(16.dp), contentColor = Ink, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(report.summary, fontSize = 16.sp, lineHeight = 25.sp, modifier = Modifier.testTag("report-exact-summary"))
                 HorizontalDivider(color = DoctorHairline)

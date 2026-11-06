@@ -64,4 +64,21 @@ class DoctorConnectedHomeTest {
             assertNotEquals(DoctorConnectedHome.verificationBody(state, false), DoctorConnectedHome.verificationBody(state, true))
         }
     }
+
+    @Test fun tilesPairOnlyWhenEveryLabelStillFitsWholeWords() {
+        assertTrue(doctorTilesPaired(360f, 1f))
+        assertFalse(doctorTilesPaired(360f, 1.3f))
+        assertFalse(doctorTilesPaired(300f, 1f))
+        assertTrue(doctorTilesPaired(840f, 2f))
+    }
+
+    @Test fun registerPillShowsVisitTodayThenHardDayThenCheckIn() {
+        val visit = CareEntryCodec.encode(CareEntry("schedule", category = "Visit", timed = true))
+        val today = listOf(item("v", asha, "visit", "Review", due = now + 3_600_000, detail = visit))
+        assertEquals("Visit today", doctorPatientStatus(asha, today, now, false, zone)?.first)
+        assertEquals("आज विज़िट", doctorPatientStatus(asha, today, now, true, zone)?.first)
+        assertEquals("Hard day", doctorPatientStatus(asha, listOf(item("h", asha, "checkin", "A hard day", created = now - 86_400_000)), now, false, zone)?.first)
+        assertEquals("Check-in", doctorPatientStatus(asha, listOf(item("g", asha, "checkin", created = now - 86_400_000)), now, false, zone)?.first)
+        assertNull(doctorPatientStatus(asha, listOf(item("old", asha, "checkin", created = now - 9 * 86_400_000)), now, false, zone))
+    }
 }

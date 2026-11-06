@@ -701,25 +701,26 @@ private suspend fun loadHomeVisits(context: android.content.Context): List<HomeV
     val newRequests = state.requests.filter { it.status == WorkflowRequestStatus.NEW && it.patientId in byId }.sortedByDescending { it.createdAt }
     LazyColumn(Modifier.fillMaxSize().testTag("demo-home-list"), contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item {
-            val now = java.time.LocalDateTime.now(); val greet = when { now.hour < 12 -> t("Good morning", "सुप्रभात"); now.hour < 17 -> t("Good afternoon", "नमस्ते"); else -> t("Good evening", "शुभ संध्या") }
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(now.format(DateTimeFormatter.ofPattern("EEEE, d MMMM")), fontSize = 14.sp, color = DoctorCardSub)
-                DoctorTitle("$greet, ${DoctorDemoData.doctorName}", 26)
-            }
+            // The date is the heading; the doctor already knows who they are (no "Good evening, Dr …" line).
+            Text(java.time.LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, d MMMM", careLocale(careHindi()))), Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
         }
         item {
             val drafts = pending.filter { it.section == "Conversations" }
-            val tiles = listOf<Triple<String, String, Color>>(
-                Triple(t("Patients", "मरीज़"), careCount.toString(), DoctorCardOverview),
-                Triple(t("Visits this week", "इस हफ़्ते की विज़िट"), if (loaded) visits.size.toString() else "—", DoctorCardProgress),
-                Triple(t("Drafts", "ड्राफ़्ट"), if (loaded) drafts.size.toString() else "—", DoctorCardConversation),
-                Triple(t("Requests", "अनुरोध"), newRequests.size.toString(), DoctorCardMedicine))
+            val tiles = listOf(
+                Triple(t("Patients", "मरीज़"), careCount, Icons.Default.People to DoctorTones.Rust),
+                Triple(t("Visits this week", "इस हफ़्ते की विज़िट"), visits.size.takeIf { loaded }, Icons.Default.CalendarMonth to DoctorTones.Teal),
+                Triple(t("Drafts", "ड्राफ़्ट"), drafts.size.takeIf { loaded }, Icons.Default.Forum to DoctorTones.Plum),
+                Triple(t("Requests", "अनुरोध"), newRequests.size, Icons.Default.Inbox to DoctorTones.Marigold))
             val clicks = listOf<() -> Unit>(onPatients, onSchedule, { drafts.firstOrNull()?.let(onPending) ?: onPatients() }, onRequests)
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                for (r in 0..1) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) { for (c in 0..1) { val i = r * 2 + c; val tile = tiles[i]
-                    Surface(onClick = clicks[i], color = tile.third, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.weight(1f).heightIn(min = 88.dp).semantics(mergeDescendants = true) { contentDescription = if (tile.second == "—") t("${tile.first}, loading. Opens it.", "${tile.first}, लोड हो रहा है। इसे खोलता है।") else t("${tile.second} ${tile.first}. Opens it.", "${tile.second} ${tile.first}. इसे खोलता है।") }) {
-                        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) { Crossfade(tile.second, animationSpec = tween(SaharaMotion.ENTER_MS), label = "home-tile-count") { value -> Text(value, fontFamily = SaharaTitleFont, fontSize = 30.sp, fontWeight = FontWeight.Medium, color = if (value == "—") DoctorCardSub else DoctorCardInk) }; Text(tile.first, fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub) }
-                    } } }
+            BoxWithConstraints {
+                val paired = doctorTilesPaired(maxWidth.value, LocalDensity.current.fontScale)
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    (if (paired) tiles.indices.chunked(2) else tiles.indices.map { listOf(it) }).forEach { row ->
+                        Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) { row.forEach { i -> val tile = tiles[i]
+                            DoctorStatTile(tile.third.first, tile.second, tile.first, tile.third.second, clicks[i], "demo-home-tile-$i", Modifier.weight(1f).fillMaxHeight())
+                        } }
+                    }
+                }
             }
         }
         // Visits and drafts are read from the device just after the first frame; they fade in and the rows below glide down instead of jumping.
@@ -728,7 +729,7 @@ private suspend fun loadHomeVisits(context: android.content.Context): List<HomeV
             items(visits.take(4), key = { "home-visit-${it.key}" }) { v ->
                 Surface(onClick = onSchedule, color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.animateItem().fillMaxWidth().heightIn(min = 72.dp).semantics(mergeDescendants = true) { contentDescription = t("${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} at ${demoTime(v.due)}. Opens the schedule.", "${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} को ${demoTime(v.due)}. समय-सूची खोलता है।") }) {
                     Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                        Column(Modifier.width(76.dp)) { Text(demoTime(v.due), fontSize = 15.sp, fontWeight = FontWeight.Medium, color = DoctorAccent); Text(demoDate(v.due).format(DateTimeFormatter.ofPattern("EEE d MMM")), fontSize = 14.sp, color = DoctorCardSub) }
+                        Column(Modifier.widthIn(min = 76.dp)) { Text(demoTime(v.due), fontSize = 15.sp, fontWeight = FontWeight.Medium, color = DoctorAccent, softWrap = false); Text(demoDate(v.due).format(DateTimeFormatter.ofPattern("EEE d MMM")), fontSize = 14.sp, color = DoctorCardSub, softWrap = false) }
                         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) { Text(v.profile.name, fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk); Text(v.kind, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis) }
                         Icon(Icons.Default.ChevronRight, null, tint = DoctorAccent)
                     }
