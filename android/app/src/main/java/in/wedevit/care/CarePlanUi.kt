@@ -681,7 +681,7 @@ private fun LazyListScope.withdrawalStep(d: EctprRecord, today: LocalDate, updat
             // Decided now, by the signed-in doctor, with those present on step 1: filled once, all still editable.
             val doctor = LocalSignedInDoctor.current
             LaunchedEffect(c.dnacprDecidedBy == null) { if (c.dnacprDecidedBy == null) choices { it.copy(
-                dnacprDecidedBy = DnacprDecidedBy(doctor?.name.orEmpty(), doctor?.registration.orEmpty(), java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))),
+                dnacprDecidedBy = DnacprDecidedBy(doctor?.name.orEmpty(), doctor?.registration.orEmpty(), java.time.LocalDateTime.now().format(DNACPR_TIME_FORMAT)),
                 dnacprDiscussedWith = it.dnacprDiscussedWith.ifBlank { d.decisionMakers.presentAtDiscussion.filter(String::isNotBlank).joinToString(", ") }) } }
             LaunchedEffect(doctor) { if (doctor != null && by.name.isBlank() && by.registrationNo.isBlank()) choices { it.copy(dnacprDecidedBy = (it.dnacprDecidedBy ?: DnacprDecidedBy()).copy(name = doctor.name, registrationNo = doctor.registration)) } }
             PrefilledField(by.name, doctor?.name.orEmpty(), t("Decided by (doctor's name)", "किसने तय किया (डॉक्टर का नाम)"), "dnacpr-by-name") { CareField(by.name, { v -> choices { it.copy(dnacprDecidedBy = by.copy(name = v)) } }, t("Decided by (doctor's name)", "किसने तय किया (डॉक्टर का नाम)"), singleLine = true) }
@@ -986,3 +986,6 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
     }
 }
 
+
+/** Date and time stamp used when the doctor records the DNACPR decision. */
+private val DNACPR_TIME_FORMAT: java.time.format.DateTimeFormatter = java.time.format.DateTimeFormatter.ofPattern("yyyy" + "-MM-dd HH:mm")
