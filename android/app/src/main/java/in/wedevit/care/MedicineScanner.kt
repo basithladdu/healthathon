@@ -69,6 +69,8 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
     var pendingKind by rememberSaveable { mutableStateOf("") }
     var pendingUri by rememberSaveable { mutableStateOf("") }
     var pendingPath by rememberSaveable { mutableStateOf("") }
+    // Photo limits and a missing camera app are said beside the photo cards, not in a toast.
+    var pickNote by remember { mutableStateOf("") }
 
     fun releaseReadAccess(value: String) {
         runCatching {
@@ -88,7 +90,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
             runCatching { context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
         }
         val merged = (current + selected.map(Uri::toString)).distinct()
-        if (merged.size > maximum) vm.message.value = t("Use up to $maximum $label.", "ज़्यादा से ज़्यादा $maximum $label जोड़ें।")
+        pickNote = if (merged.size > maximum) t("Use up to $maximum $label.", "ज़्यादा से ज़्यादा $maximum $label जोड़ें।") else ""
         return merged.take(maximum)
     }
 
@@ -109,7 +111,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
     fun photograph(kind: String) {
         val maximumReached = if (kind == "prescription") prescriptionUris.size >= 5 else medicineUris.size >= 10
         if (maximumReached) {
-            vm.message.value = if (kind == "prescription") t("Use up to 5 prescription pages.", "पर्चे के ज़्यादा से ज़्यादा 5 पेज जोड़ें।") else t("Use up to 10 medicine photos.", "दवा की ज़्यादा से ज़्यादा 10 फ़ोटो जोड़ें।")
+            pickNote = if (kind == "prescription") t("Use up to 5 prescription pages.", "पर्चे के ज़्यादा से ज़्यादा 5 पेज जोड़ें।") else t("Use up to 10 medicine photos.", "दवा की ज़्यादा से ज़्यादा 10 फ़ोटो जोड़ें।")
             return
         }
         val directory = File(context.cacheDir, "medicine-scan").apply { mkdirs() }
@@ -121,7 +123,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
             camera.launch(uri)
         }.onFailure {
             file.delete(); pendingKind = ""; pendingUri = ""; pendingPath = ""
-            vm.message.value = t("No camera app is available. Choose a photo instead.", "कैमरा ऐप नहीं मिला। फ़ोटो चुनें।")
+            pickNote = t("No camera app is available. Choose a photo instead.", "कैमरा ऐप नहीं मिला। फ़ोटो चुनें।")
         }
     }
 
@@ -141,7 +143,8 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
         if (phase == MedicineScannerPhase.Select) cleanAndClose() else returnToImages()
     }
 
-    when (phase) {
+    // Photos → reading → review slide forward and back like the rest of the app.
+    SaharaScreenHost(phase, Modifier.fillMaxSize(), label = "medicine-scanner", direction = { from, to -> if (to.ordinal > from.ordinal) SaharaMotion.Direction.Forward else SaharaMotion.Direction.Back }) { shown -> when (shown) {
         MedicineScannerPhase.Select -> LazyColumn(
             Modifier.fillMaxSize().imePadding().testTag("medicine-scanner-select"),
             contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 28.dp),
@@ -184,10 +187,12 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                     onMove = null,
                 )
             }
-            scanError?.let { error -> item { Text(error, color = RustText, fontSize = 15.sp, modifier = Modifier.announce()) } }
+            if (pickNote.isNotBlank()) item { Text(pickNote, color = RustText, fontSize = 15.sp, modifier = Modifier.animateItem().announce()) }
             item {
                 Spacer(Modifier.height(8.dp))
-                Button(
+                SaharaPrimaryButton(
+                    t("Read prescription", "पर्चा पढ़ें"),
+                    icon = Icons.Default.DocumentScanner,
                     onClick = {
                         scanError = null; phase = MedicineScannerPhase.Scanning
                         scanJob = scope.launch {
@@ -209,14 +214,12 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                         }
                     },
                     enabled = prescriptionUris.isNotEmpty(),
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp),
-                    shape = RoundedCornerShape(14.dp),
-                ) { Icon(Icons.Default.DocumentScanner, null); Spacer(Modifier.width(8.dp)); Text(t("Read prescription", "पर्चा पढ़ें"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold) }
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
+                )
                 Spacer(Modifier.height(8.dp))
-                OutlinedButton(onClick = {
+                SaharaSecondaryButton(t("Add one manually", "एक दवा ख़ुद लिखें"), icon = Icons.Default.Edit, onClick = {
                     drafts = listOf(MedicineDraft(newId(), manualMedicine(), false)); warnings = emptyList(); unmatched = emptyList(); unmatchedReviewed = true; phase = MedicineScannerPhase.Review
-                }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Edit, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Add one manually", "एक दवा ख़ुद लिखें"), fontSize = 15.sp) }
-                TextButton(onClick = { cleanAndClose() }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें"), fontSize = 15.sp) }
+                }, modifier = Modifier.fillMaxWidth())
             }
         }
 
@@ -247,7 +250,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                 }.onFailure { scanError = t("No image viewer available.", "फ़ोटो देखने वाला ऐप नहीं मिला।") } }, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Image, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("View prescription page ${index + 1}", "पर्चे का पेज ${index + 1} देखें"), fontSize = 15.sp) } }
             } }
             warnings.forEach { warning -> item(warning) { SurfaceCard(Peach) { Row(verticalAlignment = Alignment.Top) { Icon(Icons.Default.WarningAmber, null, Modifier.size(20.dp), tint = RustText); Spacer(Modifier.width(12.dp)); Text(warning, fontSize = 15.sp, color = DoctorCardInk) } } } }
-            items(drafts.size, key = { drafts[it].id }) { index ->
+            items(drafts.size, key = { drafts[it].id }) { index -> Box(Modifier.animateItem()) {
                 MedicineReviewCard(
                     draft = drafts[index],
                     storage = vm.storageNamespace,
@@ -255,7 +258,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                     onChange = { changed -> drafts = drafts.toMutableList().also { it[index] = changed } },
                     onRemove = { drafts = drafts.toMutableList().also { it.removeAt(index) } },
                 )
-            }
+            } }
             if (unmatched.isNotEmpty()) item {
                 SurfaceCard(Peach) {
                     Text(run { val n = unmatched.size; if (n == 1) t("1 medicine photo was not matched", "दवा की 1 फ़ोटो नहीं मिली") else t("$n medicine photos were not matched", "दवा की $n फ़ोटो नहीं मिलीं") }, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
@@ -270,13 +273,12 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                     Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Add another manually", "एक और दवा ख़ुद लिखें"), fontSize = 15.sp)
                 }
             }
-            scanError?.let { error -> item { Text(error, color = RustText, fontSize = 15.sp, modifier = Modifier.announce()) } }
             item {
                 val names = drafts.map { it.medicine.medicineName.trim().lowercase() }.filter(String::isNotEmpty)
                 val valid = drafts.isNotEmpty() && unmatchedReviewed && names.size == names.distinct().size && drafts.all {
                     it.confirmed && it.medicine.medicineName.isNotBlank() && (it.medicine.strength.isNotBlank() || it.medicine.quantity.isNotBlank() || it.medicine.form.isNotBlank())
                 }
-                Button(onClick = {
+                SaharaPrimaryButton(if (busy || savingSources) t("Saving…", "सहेज रहे हैं…") else if(onReviewedMedicines != null) t("Use ${drafts.size} reviewed medicines", "जाँची गई ${drafts.size} दवाएँ लें") else run { val n = drafts.size; if (n == 1) t("Save 1 medicine", "1 दवा सहेजें") else t("Save $n medicines", "$n दवा सहेजें") }, onClick = {
                     scanError = null
                     savingSources = true
                     scope.launch {
@@ -299,14 +301,13 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                         } catch (failure: Exception) { if (failure is CancellationException) throw failure; scanError = failure.message ?: t("Could not keep the original pages.", "असली पेज सँभाले नहीं जा सके।") }
                         finally { savingSources = false }
                     }
-                }, enabled = valid && !busy && !savingSources, modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp), shape = RoundedCornerShape(14.dp)) {
-                    Text(fontSize = 16.sp, fontWeight = FontWeight.SemiBold, text = if (busy || savingSources) t("Saving…", "सहेज रहे हैं…") else if(onReviewedMedicines != null) t("Use ${drafts.size} reviewed medicines", "जाँची गई ${drafts.size} दवाएँ लें") else run { val n = drafts.size; if (n == 1) t("Save 1 medicine", "1 दवा सहेजें") else t("Save $n medicines", "$n दवा सहेजें") })
-                }
+                }, enabled = valid, busy = busy || savingSources, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp))
                 Spacer(Modifier.height(8.dp))
                 TextButton(onClick = { cleanAndClose() }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें"), fontSize = 15.sp) }
             }
         }
-    }
+    } }
+    scanError?.let { error -> SaharaDialog(t("Not done", "पूरा नहीं हुआ"), onDismiss = { scanError = null }, text = error, tone = SaharaTone.Error) }
 }
 
 @Composable
@@ -406,6 +407,11 @@ private fun MedicineReviewCard(draft: MedicineDraft, storage: String, personId: 
             IconButton(onClick = onRemove, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.DeleteOutline, t("Remove medicine", "दवा हटाएँ"), tint = RustText) }
         }
         medicine.uncertainties.forEach { Text("• $it", color = RustText, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp)) }
+        // The prescription's own words sit above the fields they fill, not between a label and its choices.
+        if (medicine.sourceQuote.isNotBlank()) {
+            Text(run { val pages = medicine.prescriptionPageIndexes.joinToString { val k = it + 1; t("page $k", "पेज $k") }; t("Original reading · $pages", "असली पढ़ाई · $pages") }, Modifier.padding(top = 8.dp), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub)
+            Text(medicine.sourceQuote, fontSize = 14.sp, color = DoctorCardInk)
+        }
         Spacer(Modifier.height(12.dp))
         CareField(medicine.medicineName, { change(medicine.copy(medicineName = it.take(120))) }, t("Medicine name", "दवा का नाम"), singleLine = true)
         MedicineNameSuggestions(medicine.medicineName) { change(medicine.copy(medicineName = it.take(120))) }
@@ -415,10 +421,6 @@ private fun MedicineReviewCard(draft: MedicineDraft, storage: String, personId: 
         CareField(medicine.frequency, { change(medicine.copy(frequency = it.take(120))) }, t("How often", "कितनी बार"), singleLine = true, placeholder = t("e.g. twice a day, only when needed", "जैसे दिन में दो बार, ज़रूरत होने पर ही"))
         CareField(medicine.instructions, { change(medicine.copy(instructions = it.take(500))) }, t("Directions", "तरीक़ा"), minLines = 2, placeholder = t("e.g. as written: dissolve in water", "जैसे पर्चे में लिखा: पानी में घोलकर"))
         Text(t("Food timing", "खाने के हिसाब से समय"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.padding(top = 8.dp))
-        if (medicine.sourceQuote.isNotBlank()) {
-            Text(run { val pages = medicine.prescriptionPageIndexes.joinToString { val k = it + 1; t("page $k", "पेज $k") }; t("Original reading · $pages", "असली पढ़ाई · $pages") }, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub)
-            Text(medicine.sourceQuote, fontSize = 14.sp, color = DoctorCardInk)
-        }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
             MedicineMealTiming.entries.forEach { timing ->
                 FilterChip(selected = medicine.mealTiming == timing, onClick = { change(medicine.copy(mealTiming = timing)) }, label = { Text(mealTimingLabel(timing, hindi), fontSize = 14.sp) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp))

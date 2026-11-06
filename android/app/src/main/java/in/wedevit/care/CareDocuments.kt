@@ -1,4 +1,4 @@
-@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 package `in`.wedevit.care
 
 import android.content.Intent
@@ -17,7 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.DriveFileMove
-import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -27,6 +27,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
@@ -78,6 +81,8 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
     var timeline by rememberSaveable { mutableStateOf(false) }
     var reviewPage by rememberSaveable { mutableIntStateOf(1) }
     var sorting by remember { mutableStateOf(false) }
+    // A file that will not open, or no camera app, is said in a small dialog rather than a passing toast.
+    var docProblem by remember { mutableStateOf("") }
     fun folderOf(report: CareReport) = folders[report.id]?.folder ?: DocumentFolderRules.OTHER
     val listState = rememberLazyListState()
     val focus = LocalFocusManager.current; val t = careText()
@@ -121,7 +126,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         val directory = File(context.cacheDir, "report-scan").apply { deleteRecursively(); mkdirs() }
         val file = File(directory, "Scan ${java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH-mm"))}.jpg")
         runCatching { check(file.createNewFile()); importingFor = person; scanPath = file.absolutePath; camera.launch(FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)) }
-            .onFailure { file.delete(); importingFor = ""; scanPath = ""; vm.message.value = t("No camera app found.", "कैमरा ऐप नहीं मिला।") }
+            .onFailure { file.delete(); importingFor = ""; scanPath = ""; docProblem = t("No camera app found.", "कैमरा ऐप नहीं मिला।") }
         Unit
     }
     val bothLanguages: (String, String) -> String = { en, hi -> "$en $hi" }
@@ -132,7 +137,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         try {
             val intent = vm.reportFiles.intent(report, share)
             open(context, if (share) Intent.createChooser(intent, t("Share report", "रिपोर्ट भेजें")) else intent)
-        } catch (_: Exception) { vm.message.value = t("Couldn't open this report.", "यह रिपोर्ट नहीं खुल सकी।") }
+        } catch (_: Exception) { docProblem = t("Couldn't open this report.", "यह रिपोर्ट नहीं खुल सकी।") }
     }
 
     var addSheet by rememberSaveable { mutableStateOf(false) }
@@ -149,9 +154,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
             Column(Modifier.weight(1f).padding(end = 8.dp)) {
                 Heading(t("Documents", "कागज़ात"), 30)
             }
-            if (canEdit) Button(onClick = { addSheet = true }, enabled = !busy, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), contentPadding = PaddingValues(horizontal = 16.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("document-add")) {
-                Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Add document", "कागज़ जोड़ें"), fontWeight = FontWeight.SemiBold)
-            }
+            if (canEdit) SaharaPrimaryButton(t("Add document", "कागज़ जोड़ें"), onClick = { addSheet = true }, icon = Icons.Default.Add, enabled = !busy, modifier = Modifier.testTag("document-add"))
         } }
         item { Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             DocsTile(t("Care timeline", "देखभाल की समय-रेखा"), Icons.Default.Timeline, Peach, Modifier.weight(1f).fillMaxHeight().testTag("care-timeline-open")) { timeline = true }
@@ -164,14 +167,15 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf("All", "Care notes", "Reports", "Cancer").forEach { label -> FilterChip(selected = filter == label, onClick = { filter = label }, label = { Text(when (label) { "Care notes" -> t("Care notes", "देखभाल नोट"); "Reports" -> t("Reports", "रिपोर्टें"); "Cancer" -> t("Cancer documents", "कैंसर के कागज़"); else -> t("All", "सभी") }) }, shape = RoundedCornerShape(50), modifier = Modifier.testTag("document-filter-$label")) }
         } }
-        if (reports.isNotEmpty()) item { Column {
-            val counts = DocumentFolderRules.counts(reports.map(::folderOf))
-            Text(t("Folders", "फ़ोल्डर"), style = MaterialTheme.typography.labelLarge, color = DoctorCardSub)
-            Row(Modifier.horizontalScroll(rememberScrollState()).padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                DocumentFolderRules.folders.forEach { folder -> FilterChip(selected = folderFilter == folder, onClick = { folderFilter = if (folderFilter == folder) "" else folder },
-                    label = { Text("${DocumentFolderRules.label(folder, t)} · ${counts[folder] ?: 0}") }, shape = RoundedCornerShape(50), modifier = Modifier.testTag("document-folder-$folder")) }
+        // Auto-sorted folders as coloured tiles with their counts; tap one to open it, tap again to see everything.
+        if (reports.isNotEmpty()) item { val counts = DocumentFolderRules.counts(reports.map(::folderOf))
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                DocumentFolderRules.folders.chunked(2).forEach { pair -> Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    pair.forEach { folder -> FolderTile(DocumentFolderRules.label(folder, t), folder, counts[folder] ?: 0, folderFilter == folder, Modifier.weight(1f).fillMaxHeight().testTag("document-folder-$folder")) { folderFilter = if (folderFilter == folder) "" else folder } }
+                    if (pair.size == 1) Spacer(Modifier.weight(1f))
+                } }
             }
-        } }
+        }
         // Searching inside checked report text only makes sense once something is typed.
         if (search.isNotBlank()) item { OutlinedButton(onClick = {
             val query = search.trim(); val capturedPerson = person
@@ -225,19 +229,25 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
                 }
             }
         }
-        if (visibleReports.isNotEmpty()) item { SectionTitle(t("Reports", "रिपोर्टें")) }
+        if (visibleReports.isNotEmpty()) item(key = "reports-title") { SaharaStateSwitch(folderFilter, Modifier.animateItem(), label = "open-folder") { open ->
+            if (open.isEmpty()) SectionTitle(t("Reports", "रिपोर्टें")) else SectionTitle(DocumentFolderRules.label(open, t), t("Show all", "सभी दिखाएँ")) { folderFilter = "" }
+        } }
         items(visibleReports, key = { it.id }) { report ->
             Surface(Modifier.animateItem().fillMaxWidth(), shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline)) {
                 Column {
                     var menuOpen by remember { mutableStateOf(false) }
                     val editable = canEdit && prescriptionOriginals.none { it.id == report.id }
                     Row(Modifier.fillMaxWidth().clickable { openReport(report, false) }.padding(start = 16.dp, top = 12.dp, end = 4.dp), verticalAlignment = Alignment.Top) {
-                        Surface(shape = RoundedCornerShape(14.dp), color = if (report.mime == "application/pdf") SaharaApricot else Mint) { Icon(if (report.mime == "application/pdf") Icons.Default.PictureAsPdf else Icons.Default.Image, null, Modifier.padding(10.dp).size(22.dp), tint = DoctorAccent) }
+                        val tone = documentFolderTone(folderOf(report))
+                        Surface(shape = RoundedCornerShape(12.dp), color = tone.soft) { Icon(if (report.mime == "application/pdf") Icons.Default.PictureAsPdf else Icons.Default.Image, null, Modifier.padding(10.dp).size(22.dp), tint = tone.accent) }
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f).padding(top = 2.dp)) {
                             Text(report.name, fontWeight = FontWeight.Medium, fontSize = 17.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, fontFamily = SaharaTitleFont, color = DoctorCardInk)
-                            Text(Formatter.formatShortFileSize(context, report.bytes) + " · " + date(report.created) + " · " + DocumentFolderRules.label(folderOf(report), t), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.padding(top = 2.dp).testTag("report-folder-${report.id}"))
-                            cancerType(report)?.let { type -> DocsChip(CancerDocumentRules.label(type, t), DoctorStatusRestBg, Modifier.padding(top = 6.dp).testTag("report-cancer-${report.id}"), color = DoctorStatusRest) }
+                            Text(Formatter.formatShortFileSize(context, report.bytes) + " · " + date(report.created), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.padding(top = 2.dp))
+                            FlowRow(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                DocsChip(DocumentFolderRules.label(folderOf(report), t), tone.soft, Modifier.testTag("report-folder-${report.id}"), color = tone.accent)
+                                cancerType(report)?.let { type -> DocsChip(CancerDocumentRules.label(type, t), CancerTone.soft, Modifier.testTag("report-cancer-${report.id}"), color = CancerTone.accent) }
+                            }
                         }
                         if (canEdit) Box {
                             IconButton(onClick = { menuOpen = true }, modifier = Modifier.size(48.dp).testTag("report-menu-${report.id}")) { Icon(Icons.Default.MoreVert, t("More actions", "और विकल्प"), tint = DoctorCardInk) }
@@ -249,16 +259,15 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
                             }
                         } else Spacer(Modifier.width(10.dp))
                     }
-                    // Main actions as small capsules; the rest live in the menu above.
+                    // Tapping the row opens the file; Review and Share sit here as outlined capsules, the rest in the menu above.
                     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         @Composable fun Capsule(label: String, icon: androidx.compose.ui.graphics.vector.ImageVector, tag: String, onClick: () -> Unit) {
                             // Slim capsule so the three actions fit on one line; the touch area still meets 48dp.
-                            Surface(onClick = onClick, shape = RoundedCornerShape(50), color = SaharaSoftGold, contentColor = DoctorCardInk, modifier = Modifier.minimumInteractiveComponentSize().testTag(tag)) {
+                            Surface(onClick = onClick, shape = RoundedCornerShape(50), color = Paper, contentColor = DoctorCardInk, border = BorderStroke(1.5.dp, DoctorAccent), modifier = Modifier.minimumInteractiveComponentSize().testTag(tag)) {
                                 Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) { Icon(icon, null, Modifier.size(16.dp), tint = DoctorAccent); Spacer(Modifier.width(6.dp)); Text(label, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1) }
                             }
                         }
-                        Capsule(t("Open", "खोलें"), Icons.AutoMirrored.Filled.OpenInNew, "report-open-${report.id}") { openReport(report, false) }
-                        Capsule(t("Read", "पढ़ें"), Icons.Default.DocumentScanner, "report-review-${report.id}") { reviewId = report.id }
+                        Capsule(t("Review", "जाँचें"), Icons.Default.DocumentScanner, "report-review-${report.id}") { reviewId = report.id }
                         Capsule(t("Share", "भेजें"), Icons.Default.Share, "report-share-${report.id}") { openReport(report, true) }
                     }
                 }
@@ -266,6 +275,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         }
         if (search.isBlank() && filter != "Reports") item { TextButton(onClick = onTalk, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Forum, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(if (clinician) t("Start a conversation", "बातचीत शुरू करें") else t("Talk with your doctor", "अपने डॉक्टर से बात करें")) } }
     }
+    if (docProblem.isNotBlank()) SaharaDialog(docProblem, onDismiss = { docProblem = "" }, tone = SaharaTone.Error)
     remove?.let { report -> AlertDialog(onDismissRequest = { if (!busy) remove = null }, title = { Text(t("Remove this report?", "यह रिपोर्ट हटाएँ?")) }, text = { Text(report.name) },
         confirmButton = { TextButton(onClick = { vm.removeReport(report) { remove = null; cancerStore.remove(report.id); cancerChoices = cancerStore.all(); folderStore.remove(report.id); folders = folderStore.all() } }, enabled = !busy, colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Text(t("Remove", "हटाएँ"), fontWeight = FontWeight.SemiBold) } },
         dismissButton = { TextButton(onClick = { remove = null }, enabled = !busy) { Text(t("Keep", "रखें")) } }) }
@@ -321,6 +331,35 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
             Spacer(Modifier.width(14.dp))
             Text(title, Modifier.weight(1f), fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = DoctorCardInk)
             Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(20.dp), tint = DoctorAccent)
+        }
+    }
+}
+
+/** Each auto-sorted folder keeps one colour everywhere: its tile, its file icons, its pills and the Ask badge. */
+internal data class FolderTone(val accent: androidx.compose.ui.graphics.Color, val soft: androidx.compose.ui.graphics.Color, val icon: androidx.compose.ui.graphics.vector.ImageVector)
+internal fun documentFolderTone(folder: String?): FolderTone = when (folder) {
+    // The design lane's section tones (SaharaTone): solid for the icon and an open tile, wash for chips, ink for text on the wash.
+    DocumentFolderRules.BILLS -> FolderTone(SaharaTone.Marigold.ink, SaharaTone.Marigold.wash, Icons.AutoMirrored.Filled.ReceiptLong)
+    DocumentFolderRules.LAB -> FolderTone(SaharaTone.Teal.ink, SaharaTone.Teal.wash, Icons.Default.Science)
+    DocumentFolderRules.PRESCRIPTIONS -> FolderTone(SaharaTone.Plum.ink, SaharaTone.Plum.wash, Icons.Default.Medication)
+    DocumentFolderRules.DISCHARGE -> FolderTone(SaharaTone.Indigo.ink, SaharaTone.Indigo.wash, Icons.Default.LocalHospital)
+    else -> FolderTone(SaharaColors.InkSub, SaharaColors.Well, Icons.Default.Folder)
+}
+internal val CancerTone = FolderTone(SaharaTone.Rose.ink, SaharaTone.Rose.wash, Icons.Default.LocalHospital)
+
+/** One folder tile: coloured icon chip, name and count. The open folder fills with its colour. */
+@Composable private fun FolderTile(title: String, folder: String, count: Int, open: Boolean, modifier: Modifier, onClick: () -> Unit) {
+    val tone = documentFolderTone(folder)
+    val fill by androidx.compose.animation.animateColorAsState(if (open) tone.accent else Paper, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "folder-tile")
+    val ink by androidx.compose.animation.animateColorAsState(if (open) Paper else DoctorCardInk, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "folder-ink")
+    val interaction = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+    Surface(onClick = onClick, shape = RoundedCornerShape(12.dp), color = fill, border = BorderStroke(1.5.dp, tone.accent), interactionSource = interaction,
+        modifier = modifier.saharaPress(interaction).heightIn(min = 56.dp).semantics { selected = open; contentDescription = "$title, $count" }) {
+        Row(Modifier.padding(horizontal = 10.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Surface(shape = RoundedCornerShape(10.dp), color = if (open) Paper else tone.soft) { Icon(if (open) Icons.Default.FolderOpen else tone.icon, null, Modifier.padding(7.dp).size(20.dp), tint = tone.accent) }
+            Spacer(Modifier.width(8.dp))
+            Text(title, Modifier.weight(1f), color = ink, fontSize = 15.sp, lineHeight = 19.sp, fontWeight = FontWeight.SemiBold, style = LocalTextStyle.current.copy(hyphens = androidx.compose.ui.text.style.Hyphens.None, lineBreak = androidx.compose.ui.text.style.LineBreak.Heading))
+            SaharaAnimatedText("$count") { Text(it, color = if (open) Paper else tone.accent, fontSize = 16.sp, fontWeight = FontWeight.Bold) }
         }
     }
 }

@@ -4,9 +4,16 @@ package `in`.wedevit.care
 import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.togetherWith
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -57,7 +64,6 @@ import java.time.format.DateTimeFormatter
     var editing by rememberSaveable(item.id) { mutableStateOf(false) }
     var delete by rememberSaveable(item.id) { mutableStateOf(false) }
     var sideEffect by rememberSaveable(item.id) { mutableStateOf(false) }
-    var open by rememberSaveable(item.id) { mutableStateOf(false) }
     val capturedAccount = remember(item.id) { vm.accountNamespace }
     val store = remember(vm.storageNamespace) { MedicineStripPhotos(context.applicationContext, vm.storageNamespace) }
     val photoRevision by MedicineStripPhotos.revision.collectAsStateWithLifecycle()
@@ -77,12 +83,12 @@ import java.time.format.DateTimeFormatter
             // The pillbox: the strip photo once one is taken; tap an empty one to add it.
             Box(Modifier.clickable(enabled = canEdit && !busy, onClickLabel = t("Edit", "बदलें")) { editing = true }.testTag("medicine-photo-${item.id}")) { StripThumb(photo, 56) }
             Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f).clickable(enabled = !compact && rest.isNotBlank(), onClickLabel = if (open) t("Show less", "कम दिखाएँ") else t("Show more", "और दिखाएँ")) { open = !open }, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            // Everything about the medicine is shown at once: no tap-to-expand (20 Oct rule: no collapsible sections).
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(item.title, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, lineHeight = 22.sp, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                if (!compact && summary.isNotBlank()) Text(summary, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, maxLines = if (open) Int.MAX_VALUE else 1, overflow = TextOverflow.Ellipsis)
-                if (!compact && purpose.isNotBlank()) Text(purpose, fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardInk, maxLines = if (open) Int.MAX_VALUE else 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.testTag("medicine-purpose-${item.id}"))
-                if (!compact && open && rest.isNotBlank()) Text(rest, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
-                if (!compact && !open && rest.isNotBlank()) Text(t("More", "और"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = RustText)
+                if (!compact && summary.isNotBlank()) Text(summary, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
+                if (!compact && purpose.isNotBlank()) Text(purpose, fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardInk, modifier = Modifier.testTag("medicine-purpose-${item.id}"))
+                if (!compact && rest.isNotBlank()) Text(rest, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
             }
             if (canEdit) Box {
                 IconButton(onClick = { menu = true }, modifier = Modifier.size(48.dp).testTag("care-menu-${item.id}")) { Icon(Icons.Default.MoreVert, t("More actions", "और विकल्प"), tint = DoctorCardInk) }
@@ -141,7 +147,8 @@ internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: C
     val states = MedicineDoses.states(item, doses, events, today, zone)
     val editable = canEdit && current.any { it.id == item.id }
     val failed = t("Couldn't save. Please try again.", "सहेजा नहीं जा सका। कृपया फिर कोशिश करें।")
-    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+    // Dose chips wrap, so every dose of the day is visible without sideways scrolling.
+    FlowRow(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         doses.forEach { dose ->
             MedicineDoseChip(item, dose, states[dose.key] ?: MedicineDoseState.PENDING, enabled = editable && !busy && !working) { taken ->
                 if (canEditCareContext(vm, item.personId, capturedAccount)) { working = true; problem = ""; scope.launch {
@@ -153,7 +160,7 @@ internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: C
         }
         if (showHistory) DoseChip(Icons.Default.History, t("History", "इतिहास"), "care-medicine-history-${item.id}", true) { history = true }
     }
-    if (problem.isNotBlank()) Text(problem, fontSize = 14.sp, color = RustText, modifier = Modifier.padding(top = 4.dp).announce())
+    if (problem.isNotBlank()) SaharaDialog(t("Not saved", "सहेजा नहीं गया"), onDismiss = { problem = "" }, text = problem, tone = SaharaTone.Error)
     if (history) MedicineHistorySheet(item, vm) { history = false }
 }
 
@@ -162,31 +169,50 @@ internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: C
     return when { dose.timed -> dose.time; dose.count == 1 -> t("Today", "आज"); else -> t("Dose ${dose.index}", "खुराक ${dose.index}") }
 }
 
-/** One dose: tap to choose Taken or Missed. Green when taken, red-brown when missed, amber once its time has passed unmarked. */
+/**
+ * One dose. A dose not marked yet is ticked Taken with one tap; a marked dose (or a long press) opens Taken / Missed,
+ * so a mistake can be corrected. Green when taken, red-brown when missed, amber once its time has passed unmarked.
+ */
 @Composable internal fun MedicineDoseChip(item: CareItem, dose: MedicineDose, state: MedicineDoseState, enabled: Boolean, onMark: (Boolean) -> Unit) {
     val t = careText(); var menu by remember { mutableStateOf(false) }
     val late = state == MedicineDoseState.PENDING && dose.timed && LocalTime.now() > LocalTime.parse(dose.time)
-    val (icon, fg, bg) = when {
-        state == MedicineDoseState.TAKEN -> Triple(Icons.Default.Check, DoctorStatusGood, DoctorStatusGoodBg)
-        state == MedicineDoseState.MISSED -> Triple(Icons.Default.Close, DoctorStatusRest, DoctorStatusRestBg)
-        late -> Triple(Icons.Default.RadioButtonUnchecked, DoctorStatusWarn, DoctorStatusWarnBg)
-        else -> Triple(Icons.Default.RadioButtonUnchecked, DoctorCardSub, Paper)
+    val (fg, bgTarget) = when {
+        state == MedicineDoseState.TAKEN -> DoctorStatusGood to DoctorStatusGoodBg
+        state == MedicineDoseState.MISSED -> DoctorStatusRest to DoctorStatusRestBg
+        late -> DoctorStatusWarn to DoctorStatusWarnBg
+        else -> DoctorCardSub to Paper
     }
+    val bg by animateColorAsState(bgTarget, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "dose-chip")
     val label = medicineDoseLabel(dose)
     val stateWord = when (state) { MedicineDoseState.TAKEN -> t("Taken", "ली"); MedicineDoseState.MISSED -> t("Missed", "छूटी"); else -> t("Not yet", "अभी नहीं") }
+    val pending = state == MedicineDoseState.PENDING
+    val tapLabel = if (pending) t("Mark taken", "ली हुई दर्ज करें") else t("Change", "बदलें")
+    val holdLabel = t("Taken or missed", "ली या छूटी")
     Box {
-        Surface(onClick = { menu = true }, enabled = enabled, shape = RoundedCornerShape(50), color = bg, border = if (state == MedicineDoseState.PENDING && !late) BorderStroke(1.dp, DoctorCardFaint.copy(alpha = .4f)) else null,
-            modifier = Modifier.minimumInteractiveComponentSize().semantics { contentDescription = "${item.title}, $label: $stateWord" }.testTag("medicine-dose-${item.id}-${dose.key}")) {
+        Surface(shape = RoundedCornerShape(50), color = bg, border = if (pending && !late) BorderStroke(1.dp, DoctorCardFaint.copy(alpha = .4f)) else null,
+            modifier = Modifier.minimumInteractiveComponentSize().clip(RoundedCornerShape(50))
+                .combinedClickable(enabled = enabled, role = Role.Button, onClickLabel = tapLabel, onLongClickLabel = holdLabel, onLongClick = { menu = true }) { if (pending) onMark(true) else menu = true }
+                .semantics { contentDescription = "${item.title}, $label: $stateWord" }.testTag("medicine-dose-${item.id}-${dose.key}")) {
             // A clear time chip: the dose time in bold; the state shows as icon and colour (the word is in the description).
             Row(Modifier.heightIn(min = 40.dp).padding(start = 10.dp, end = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-                Icon(icon, null, Modifier.size(18.dp), tint = fg); Spacer(Modifier.width(6.dp))
-                Text(label, color = if (state == MedicineDoseState.PENDING && !late) DoctorCardInk else fg, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
+                DoseStateIcon(state, fg, 18)
+                Spacer(Modifier.width(6.dp))
+                Text(label, color = if (pending && !late) DoctorCardInk else fg, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
             }
         }
         DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
             DropdownMenuItem(text = { Text(t("Taken", "ली"), color = DoctorCardInk) }, leadingIcon = { Icon(Icons.Default.Check, null, tint = DoctorStatusGood) }, onClick = { menu = false; onMark(true) }, modifier = Modifier.heightIn(min = 48.dp).testTag("medicine-dose-taken-${item.id}-${dose.key}"))
             DropdownMenuItem(text = { Text(t("Missed", "छूटी"), color = DoctorCardInk) }, leadingIcon = { Icon(Icons.Default.Close, null, tint = DoctorStatusRest) }, onClick = { menu = false; onMark(false) }, modifier = Modifier.heightIn(min = 48.dp).testTag("medicine-dose-missed-${item.id}-${dose.key}"))
         }
+    }
+}
+
+/** The dose's state as an icon that pops in when it changes: a tick once taken, a cross once missed, an empty ring before. */
+@Composable internal fun DoseStateIcon(state: MedicineDoseState, tint: androidx.compose.ui.graphics.Color, size: Int) {
+    AnimatedContent(state, transitionSpec = {
+        (fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)) + scaleIn(SaharaMotion.tween(SaharaMotion.SAVED_MS, easing = SaharaMotion.Emphasized), initialScale = 0.4f)) togetherWith fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS))
+    }, label = "dose-state") { shown ->
+        Icon(when (shown) { MedicineDoseState.TAKEN -> Icons.Default.Check; MedicineDoseState.MISSED -> Icons.Default.Close; else -> Icons.Default.RadioButtonUnchecked }, null, Modifier.size(size.dp), tint = tint)
     }
 }
 

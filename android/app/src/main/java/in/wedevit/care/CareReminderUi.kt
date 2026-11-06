@@ -80,7 +80,7 @@ import java.time.ZoneId
                 Icon(if (enabled && allowed) Icons.Default.NotificationsActive else Icons.Default.NotificationsOff, null, Modifier.size(24.dp), tint = DoctorCardInk); Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) { Text(t("Care reminders", "देखभाल रिमाइंडर"), fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = DoctorCardInk)
                     // Status as a chip, not a sentence.
-                    Surface(shape = RoundedCornerShape(50), color = if (enabled && allowed) Paper else Cream) { Text(if (enabled && allowed) t("On", "चालू") else t("Off", "बंद"), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = if (enabled && allowed) DoctorStatusGood else DoctorCardSub) } }
+                    SaharaStateSwitch(enabled && allowed, label = "reminders-status") { on -> Surface(shape = RoundedCornerShape(50), color = if (on) Paper else Cream) { Text(if (on) t("On", "चालू") else t("Off", "बंद"), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = if (on) DoctorStatusGood else DoctorCardSub) } } }
                 Switch(checked = enabled && allowed, onCheckedChange = { turnOn ->
                 error = ""
                 if (!turnOn) scheduler.enable(false)
@@ -99,13 +99,14 @@ import java.time.ZoneId
         val eligible = items.filter { it.personId == selected && CareReminderRules.listed(it, today) }
         if (eligible.isEmpty()) item { SurfaceCard { Column(Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Icon(Icons.Default.NotificationsOff, null, Modifier.size(32.dp), tint = DoctorCardSub)
-            Text(t("No reminders yet", "अभी कोई रिमाइंडर नहीं"), fontSize = 16.sp, color = DoctorCardInk, textAlign = TextAlign.Center)
-            TextButton(onClick = onClose, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Back", "वापस"), fontSize = 15.sp) }
+            Text(t("No reminders yet", "अभी कोई रिमाइंडर नहीं"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, textAlign = TextAlign.Center)
+            // Says where reminders come from, instead of a second Back button under the one in the header.
+            Text(t("Medicines, visits and tasks with a time show here.", "समय वाली दवाएँ, मुलाक़ातें और काम यहाँ दिखेंगे।"), fontSize = 15.sp, color = DoctorCardSub, textAlign = TextAlign.Center)
         } } }
-        items(eligible, key = { it.id }) { item -> ReminderItemSettings(item, scheduler, revision, share = if (canEdit && item.kind == "medicine") { times ->
+        items(eligible, key = { it.id }) { item -> Box(Modifier.animateItem()) { ReminderItemSettings(item, scheduler, revision, share = if (canEdit && item.kind == "medicine") { times ->
             val detail = runCatching { MedicineEntryText.withTimes(item.detail, times) }.getOrDefault(item.detail)
             if (detail != item.detail && detail.length <= 4000) vm.updateItem(item.copy(detail = detail)) {}
-        } else null) { revision++ } }
+        } else null) { revision++ } } }
     }
 }
 
@@ -125,7 +126,7 @@ import java.time.ZoneId
         if (item.kind == "medicine") {
             val doseTimes = CareReminderRules.printedTimes(item.detail)
             var dates by rememberSaveable(item.id) { mutableStateOf(starts.isNotBlank() || ends.isNotBlank()) }
-            Column(Modifier.padding(top = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(Modifier.saharaContentSize().padding(top = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (doseTimes.isNotEmpty()) {
                     // Each dose time is its own optional reminder; turning a bell off never changes the dose times.
                     val ringing = option?.times ?: doseTimes
