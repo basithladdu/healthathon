@@ -67,7 +67,7 @@ function speechErrorText(t: T, error: unknown): string {
     case 'unsupported': return t('This browser cannot run the speech model. Type or paste the conversation.', 'यह ब्राउज़र स्पीच मॉडल नहीं चला सकता। बातचीत टाइप या पेस्ट करें।');
     case 'too-long': return t('This recording is longer than one hour. Split it, or type or paste the conversation.', 'यह रिकॉर्डिंग एक घंटे से लंबी है। इसे बाँटें, या बातचीत टाइप या पेस्ट करें।');
     case 'decode': return t('This audio file could not be read. Try another file, or type or paste the conversation.', 'यह ऑडियो फ़ाइल पढ़ी नहीं जा सकी। दूसरी फ़ाइल आज़माएँ, या बातचीत टाइप या पेस्ट करें।');
-    case 'integrity': return t('The speech engine did not match its checksum, so it was not run. Type or paste the conversation.', 'स्पीच इंजन का चेकसम मेल नहीं खाया, इसलिए उसे नहीं चलाया गया। बातचीत टाइप या पेस्ट करें।');
+    case 'integrity': return t('The speech tool did not match its checksum, so it was not run. Type or paste the conversation.', 'स्पीच इंजन का चेकसम मेल नहीं खाया, इसलिए उसे नहीं चलाया गया। बातचीत टाइप या पेस्ट करें।');
     default: return t('The speech model stopped. Any lines already made are kept. You can type or paste the rest.', 'स्पीच मॉडल रुक गया। जो पंक्तियाँ बन चुकीं वे रखी हैं। बाक़ी आप टाइप या पेस्ट कर सकते हैं।');
   }
 }

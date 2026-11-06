@@ -7,6 +7,7 @@ import { loadMedicineRegimens, patientMedicineRegimens, type MedicineRegimen } f
 import { formatMedicineTime, nextMedicineTimeGroup } from './care-medicine-schedule';
 import { medicinePrescription } from './care-medicines-state';
 import { CareRouteLink } from './care-route-link';
+import { SaharaLottie } from './sahara-lottie';
 import { IconArrowRight } from './icons';
 import './care-today.css';
 import { careLocale, careText, type CareLang } from './care-i18n';
@@ -106,7 +107,7 @@ export function CareTodayGreeting({ name = '', role, today, lang = 'en' }: CareT
   const line = role === 'patient' && first ? `${greeting}, ${first}` : greeting;
   const date = new Date(`${today}T12:00:00Z`).toLocaleDateString(careLocale(lang, 'en-IN'), { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
   return <div className="care-today-greeting">
-    <div className="care-today-greeting-copy"><p className="care-today-hello">{line}</p><p className="care-today-date">{date}</p>{role === 'family' && first && <p className="care-today-caring">{t(`Caring for ${first}`, `${first} की देखभाल`)}</p>}</div>
+    <div className="care-today-greeting-copy"><p className="care-today-hello">{line} <SaharaLottie name="wave" className="sh-lottie-inline" /></p><p className="care-today-date">{date}</p>{role === 'family' && first && <p className="care-today-caring">{t(`Caring for ${first}`, `${first} की देखभाल`)}</p>}</div>
     <div className="care-today-sos-bar">
       <CareRouteLink view="emergency-card" className="care-today-sos">{t('SOS', 'SOS')}</CareRouteLink>
       <CareRouteLink view="emergency-card" className="care-today-qr"><QrIcon />{t('QR card', 'QR कार्ड')}</CareRouteLink>

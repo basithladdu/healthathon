@@ -9,6 +9,8 @@ import type { CareDocumentText } from './care-document-search';
 import type { CareSaveStatus } from './care-local-store';
 import { VisitInstructions } from './visit-instructions';
 import { CareRouteLink } from './care-route-link';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
+import { SaharaLottie } from './sahara-lottie';
 import { careLocale, careText, type CareLang } from './care-i18n';
 
 type Props = {
@@ -33,6 +35,7 @@ export function CareCalendar(props: Props) {
 }
 
 function CareCalendarContent({ patientId, author, today, lang, appointments, tasks, events, checks, reports, reportSave, focusReports = false, documentText = [], onReadReport, onTestResults, onAppointmentInstructions, onAdd, onUpdate, onMedicines, onCheck, onTaskCheck, onRemove: removeEvent, onRestore, onReports, onRemoveReport: removeReport, onCareTeam }: Props) {
+  const [agendaMotion] = useAutoAnimate<HTMLUListElement>();
   const id = useId();
   const eventForm = useRef<HTMLFormElement>(null);
   const t = (en: string, hi: string) => careText(lang, en, hi);
@@ -128,7 +131,7 @@ function CareCalendarContent({ patientId, author, today, lang, appointments, tas
     const dateContext = agendaMode === 'week' ? `, ${displayDate(date, { day: 'numeric', month: 'short' })}` : '';
     return <section key={date} className={agendaMode === 'week' ? 'care-week-agenda-day' : undefined} aria-label={displayDate(date, { weekday: 'long', day: 'numeric', month: 'long' })}>
       {agendaMode === 'week' && <h3><time dateTime={date}>{displayDate(date, { weekday: 'short', day: 'numeric', month: 'short' })}</time>{date === today && <span>{t('Today', 'आज')}</span>}</h3>}
-      <ul className="care-agenda-list">
+      <ul className="care-agenda-list" ref={agendaMotion}>
         {[...dueVisits.map((visit) => ({ time: visit.time, node: <li className="care-agenda-visit" key={visit.id}><time>{visit.time}</time><div><span className="care-agenda-kind">{t('Appointment', 'मुलाकात')} · {visit.status}</span><strong>{visit.type}</strong><span>{visit.clinician} · {visit.mode}</span></div><button type="button" className="care-text-button" onClick={onCareTeam}>{t('Care team', 'देखभाल टीम')} →</button><VisitInstructions key={visit.id} value={visit.preparationInstructions} author={author} clinician={visit.clinician} lang={lang} onChange={(value) => onAppointmentInstructions(patientId, visit.id, value)} /></li> })),
         ...dueEvents.map((item) => {
           const checked = checks.find((check) => check.patientId === patientId && check.eventId === item.id && check.date === date);
@@ -136,7 +139,7 @@ function CareCalendarContent({ patientId, author, today, lang, appointments, tas
         })].sort((a, b) => a.time.localeCompare(b.time)).map((row) => row.node)}
         {dueTasks.map((task) => <li key={task.id} className={`care-agenda-task${task.completedBy ? ' is-done' : ''}`}><span className="care-any-time">{t('Any time', 'कभी भी')}</span><div><span className="care-agenda-kind">{t('Task', 'काम')}</span><strong>{task.title}</strong><span>{task.completedBy || task.owner}</span></div>{task.assignedToId && (task.owner.trim().toLocaleLowerCase() !== author.trim().toLocaleLowerCase() || (!task.completedBy && task.createdById !== task.assignedToId && !task.acceptedBy)) ? <CareRouteLink view="family-tasks" className="care-check-button">{t('View task', 'काम देखें')}</CareRouteLink> : <button type="button" className="care-check-button" aria-pressed={Boolean(task.completedBy)} aria-label={`${task.completedBy ? t('Undo', 'वापस करें') : t('Mark done', 'हो गया')}: ${task.title}${dateContext}`} onClick={() => onTaskCheck(task.id, !task.completedBy)}>{task.completedBy ? '✓' : t('Done', 'हो गया')}</button>}</li>)}
       </ul>
-      {!dueEvents.length && !dueVisits.length && !dueTasks.length && <p className={agendaMode === 'week' ? 'care-week-empty' : 'care-calendar-empty'}>{t('Nothing planned for this day.', 'इस दिन के लिए कुछ नहीं जोड़ा है।')}</p>}
+      {!dueEvents.length && !dueVisits.length && !dueTasks.length && <p className={agendaMode === 'week' ? 'care-week-empty' : 'care-calendar-empty'}><SaharaLottie name="calendar" className="sh-lottie-inline" />{t('Nothing planned for this day.', 'इस दिन के लिए कुछ नहीं जोड़ा है।')}</p>}
       {date > today && dueEvents.length > 0 && <p className="care-calendar-note">{t('You can mark these done on the day.', 'इन्हें उसी दिन पूरा हुआ दर्ज कर सकते हैं।')}</p>}
     </section>;
   }
