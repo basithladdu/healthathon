@@ -1,10 +1,6 @@
 @file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 package `in`.wedevit.care
 
-import android.Manifest
-import android.content.pm.PackageManager
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -20,7 +16,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -41,7 +36,6 @@ import java.time.format.DateTimeFormatter
 
 @Composable fun DoctorAudioCapture(controller:DoctorAudioController,signedIn:Boolean,busy:Boolean,sourceIsBlank:Boolean,onSignIn:()->Unit,onTranscribe:(DoctorAudioClip)->Unit) {
     val state by controller.state.collectAsState()
-    val context=LocalContext.current
     var consentOpen by rememberSaveable { mutableStateOf(false) }
     var participants by rememberSaveable { mutableStateOf("") }
     val agreements=remember { mutableStateMapOf<String,Boolean>() }
@@ -51,10 +45,7 @@ import java.time.format.DateTimeFormatter
     val owner=LocalLifecycleOwner.current
     var approved by remember { mutableStateOf<ApprovedDoctorRecording?>(null) }
     DisposableEffect(controller) { onDispose { approved=null } }
-    val permission=rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        val request=approved;approved=null
-        if(granted && signedIn && request!=null && request.controller===controller && !controller.isClosed() && owner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) request.start()
-    }
+    val mic=rememberSaharaMicGate()
     Surface(color=Peach.copy(alpha=.45f),shape=RoundedCornerShape(20.dp),modifier=Modifier.fillMaxWidth().testTag("doctor-live-capture")) {
         Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment=Alignment.CenterVertically) { Icon(Icons.Default.Mic,null,tint=Rust);Spacer(Modifier.width(10.dp));Text(if(state.recording) "Recording ${state.seconds/60}:${(state.seconds%60).toString().padStart(2,'0')}" else "Record",fontWeight=FontWeight.SemiBold) }
@@ -92,8 +83,8 @@ import java.time.format.DateTimeFormatter
         consentOpen=false
         val request=ApprovedDoctorRecording(controller,participants,agreements.filterValues {it}.keys.toSet(),purpose,storage,access,cloud)
         if(signedIn && !controller.isClosed() && owner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-            if(ContextCompat.checkSelfPermission(context,Manifest.permission.RECORD_AUDIO)==PackageManager.PERMISSION_GRANTED) request.start()
-            else {approved=request;permission.launch(Manifest.permission.RECORD_AUDIO)}
+            approved=request
+            mic.request { val r=approved;approved=null; if(signedIn && r!=null && r.controller===controller && !controller.isClosed() && owner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) r.start() }
         }
     },enabled=signedIn && names.isNotEmpty() && names.all { agreements[it]==true } && purpose && storage && access,modifier=Modifier.testTag("doctor-start-recording")) { Text("Start recording") }},dismissButton={TextButton(onClick={consentOpen=false}) {Text("Cancel")}})
     deleting?.let { clip -> AlertDialog(containerColor=Paper,onDismissRequest={deleting=null},title={Text("Delete this recording?")},text={Text("Written transcripts and published versions are kept.")},confirmButton={TextButton(onClick={controller.remove(clip);deleting=null}){Text("Delete",color=MaterialTheme.colorScheme.error)}},dismissButton={TextButton(onClick={deleting=null}){Text("Keep")}}) }

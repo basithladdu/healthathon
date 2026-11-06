@@ -4891,3 +4891,11 @@ Record this talk?	یہ بات چیت ریکارڈ کریں؟
 The audio stays on this phone.	آڈیو اسی فون پر رہتا ہے۔
 Use Google Gemini to write it down	Google Gemini سے لکھوائیں
 Questions to ask today (optional)	آج پوچھنے کے سوال (اختیاری)
+Allow	اجازت دیں
+Confirm ${suggestions.size} and continue	${suggestions.size} پکے کریں، آگے بڑھیں
+Microphone is off	مائیک بند ہے
+Open Settings	سیٹنگز کھولیں
+Sahara needs it to record this talk.	اس گفتگو کو ریکارڈ کرنے کے لیے سہارا کو اس کی ضرورت ہے۔
+Step ${step + 1} of 5	مرحلہ ${step + 1} / 5
+Turn it on in Settings to record.	ریکارڈ کرنے کے لیے سیٹنگز میں آن کریں۔
+Use the microphone?	مائیک استعمال کریں؟

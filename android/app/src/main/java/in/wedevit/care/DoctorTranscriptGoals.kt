@@ -102,14 +102,11 @@ internal fun doctorTranscriptIsSample(walkthrough: Boolean, source: String, samp
 
 /** Collapsible goals-of-care cards for the transcript page. [onSave] receives (question id, answer); [onShowLine] jumps to a transcript line. */
 @Composable internal fun DoctorTranscriptGoals(rows: List<DoctorPreparationQuestion>, matches: QuestionMatchResult?, editable: Boolean, onSave: (String, String) -> Unit, onBackToWho: () -> Unit = {}, source: String = "", onShowLine: (CareSourceLine) -> Unit = {}) { val t = careText();
+    // Questions are optional: with none added there is nothing to check here, so nothing is shown.
+    if (rows.isEmpty()) return
     Column(Modifier.fillMaxWidth().testTag("transcript-goals"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(t("Goals of care", "देखभाल के लक्ष्य"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
-        if (rows.isEmpty()) {
-            Text(t("No questions yet", "अभी कोई सवाल नहीं"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardSub)
-            TextButton(onClick = onBackToWho, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-goals-back")) { Text(t("Who's here", "कौन मौजूद है"), color = DoctorAccent) }
-        } else {
-            rows.forEach { row -> key(row.id) { GoalCard(row, matches, editable, onSave, source, onShowLine) } }
-        }
+        rows.forEach { row -> key(row.id) { GoalCard(row, matches, editable, onSave, source, onShowLine) } }
     }
 }
 

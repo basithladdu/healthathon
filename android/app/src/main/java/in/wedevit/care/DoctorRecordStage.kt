@@ -50,7 +50,8 @@ internal fun doctorCaptureModeLabel(mode: String, hindi: Boolean): String = care
 /** Horizontal waveform of white rounded bars with a dot at each end. Moves with the microphone [level] while [active]; low and still otherwise. */
 @Composable fun DoctorWaveform(level: Float, active: Boolean, modifier: Modifier = Modifier) {
     val meter by animateFloatAsState(level.coerceIn(0f, 1f), tween(120), label = "wave level")
-    val phase by rememberInfiniteTransition(label = "wave").animateFloat(0f, (2 * PI).toFloat(), infiniteRepeatable(tween(1400, easing = LinearEasing)), label = "wave phase")
+    // The ripple runs only while recording with animations on; idle bars stay still (no background loop).
+    val phase = if (active && SaharaMotion.enabled) rememberInfiniteTransition(label = "wave").animateFloat(0f, (2 * PI).toFloat(), infiniteRepeatable(tween(1400, easing = LinearEasing)), label = "wave phase").value else 0f
     Canvas(modifier.fillMaxWidth().height(96.dp).testTag("record-stage-waveform")) {
         val n = 33; val dot = 3.dp.toPx(); val left = dot * 5; val step = (size.width - left * 2) / (n - 1); val bw = (step * 0.5f).coerceAtMost(5.dp.toPx()); val cy = size.height / 2
         drawCircle(Color.White, dot, Offset(dot, cy)); drawCircle(Color.White, dot, Offset(size.width - dot, cy))
@@ -97,8 +98,13 @@ internal fun doctorCaptureModeLabel(mode: String, hindi: Boolean): String = care
             // The goals-of-care checklist sits between the title and the waveform and scrolls if it is long.
             Column(Modifier.weight(1f).fillMaxWidth().padding(top = 12.dp, end = 12.dp).verticalScroll(rememberScrollState())) { checklist() }
             DoctorWaveform(level, recording, Modifier.padding(end = 12.dp))
-            Spacer(Modifier.height(28.dp))
-            Surface(onClick = { if (recording) onStop() else onRecord() }, enabled = recordEnabled, shape = CircleShape, color = DoctorStageCream, contentColor = DoctorStageDeep, modifier = Modifier.size(88.dp).testTag("record-stage-button")) { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Icon(if (recording) Icons.Default.Stop else Icons.Default.Mic, if (recording) t("Stop and save", "रोकें और सहेजें") else t("Record conversation", "बातचीत रिकॉर्ड करें"), Modifier.size(40.dp), tint = DoctorStageDeep.copy(alpha = if (recordEnabled) 1f else .4f)) } }
+            Spacer(Modifier.height(12.dp))
+            // A slow breathing ring while recording (gated by the motion setting), so the doctor sees at a glance that it is listening.
+            val breath = if (recording && SaharaMotion.enabled) rememberInfiniteTransition(label = "record pulse").animateFloat(0f, 1f, infiniteRepeatable(tween(1200, easing = androidx.compose.animation.core.FastOutSlowInEasing), androidx.compose.animation.core.RepeatMode.Reverse), label = "breath").value else 0f
+            Box(Modifier.size(120.dp), contentAlignment = Alignment.Center) {
+            if (recording) Box(Modifier.size(96.dp + 22.dp * breath).background(white.copy(alpha = .18f + .12f * breath), CircleShape))
+            Surface(onClick = { if (recording) onStop() else onRecord() }, enabled = recordEnabled, shape = CircleShape, color = DoctorStageCream, contentColor = DoctorStageDeep, shadowElevation = 4.dp, modifier = Modifier.size(88.dp).testTag("record-stage-button")) { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Icon(if (recording) Icons.Default.Stop else Icons.Default.Mic, if (recording) t("Stop and save", "रोकें और सहेजें") else t("Record conversation", "बातचीत रिकॉर्ड करें"), Modifier.size(40.dp), tint = DoctorStageDeep.copy(alpha = if (recordEnabled) 1f else .4f)) } }
+            }
             if (saveError && !saving) Column(Modifier.padding(top = 12.dp, end = 12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(if (saving) t("Saving…", "सहेज रहे हैं…") else t("Couldn't save. Try again.", "सहेजा नहीं गया। फिर कोशिश करें।"), fontSize = 15.sp, lineHeight = 21.sp, color = white, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                 if (saveError) OutlinedButton(onClick = onRetry, enabled = !saving, shape = RoundedCornerShape(14.dp), border = androidx.compose.foundation.BorderStroke(1.dp, white), colors = ButtonDefaults.outlinedButtonColors(contentColor = white), modifier = Modifier.heightIn(min = 48.dp).testTag("retry-saving-audio")) { Text(t("Retry", "फिर कोशिश करें")) }
