@@ -326,7 +326,7 @@ private const val HOME = "home"
             CommunityNotice(if (waiting == 1) CommunityCopy("1 post or reply is waiting to send.", "1 पोस्ट या जवाब भेजा जाना बाकी है।")
                 else CommunityCopy("$waiting posts or replies are waiting to send.", "$waiting पोस्ट या जवाब भेजे जाने बाकी हैं।"), onRetry)
         }
-        if (home == null && error != null) item(key = "community-offline-art") { SaharaIllustration(SaharaArtKind.Offline, Modifier.fillMaxWidth()) }
+        if (home == null && error != null) item(key = "community-offline-art") { SaharaLottie(SaharaLottieKind.Offline, Modifier.fillMaxWidth()) }
         if (error != null) item { CommunityNotice(error, onRetry) }
         if (home == null && error == null && loading) item { SaharaInlineLoading(t("Loading…", "खुल रहा है…")) }
         home?.groups?.let { groups ->
@@ -398,7 +398,7 @@ private const val HOME = "home"
             item { CommunityGuideline() }
             if (error != null) item { CommunityNotice(error, onRetry) }
             if (feed == null && error == null && loading) item { SaharaInlineLoading(t("Loading…", "खुल रहा है…")) }
-            if (feed != null && posts.isEmpty()) item(key = "community-empty-art") { SaharaIllustration(SaharaArtKind.CommunityEmpty, Modifier.fillMaxWidth()) }
+            if (feed != null && posts.isEmpty()) item(key = "community-empty-art") { SaharaLottie(SaharaLottieKind.Hug, Modifier.fillMaxWidth()) }
             if (feed != null && posts.isEmpty()) item {
                 SaharaEmpty(t("No posts here yet", "यहाँ अभी कोई पोस्ट नहीं है"), t("Say hello, or ask what helped others. Your words could help someone today.", "नमस्ते कहें, या पूछें कि दूसरों को किस बात से मदद मिली। आपकी बात आज किसी के काम आ सकती है।"),
                     actionLabel = t("Write the first post", "पहली पोस्ट लिखें"), onAction = onWrite, modifier = Modifier.saharaAppear())
@@ -435,7 +435,7 @@ private const val HOME = "home"
             // The sent tick: pops in once, then the pill stays for a moment.
             val shown = remember { MutableTransitionState(false).apply { targetState = true } }
             AnimatedVisibility(shown, enter = fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)) + scaleIn(SaharaMotion.tween(SaharaMotion.SAVED_MS), initialScale = .6f)) {
-                SaharaStatusPill(t("Posted", "भेज दिया"), SaharaTone.Success, Modifier.testTag("community-sent-tick"), icon = Icons.Default.CheckCircle)
+                Row(verticalAlignment = Alignment.CenterVertically) { SaharaLottie(SaharaLottieKind.Success, Modifier.size(28.dp)); SaharaStatusPill(t("Posted", "भेज दिया"), SaharaTone.Success, Modifier.testTag("community-sent-tick"), icon = Icons.Default.CheckCircle) }
             }
         }
         byTeam -> SaharaStatusPill(t("Sahara team", "Sahara टीम"), SaharaTone.Indigo)

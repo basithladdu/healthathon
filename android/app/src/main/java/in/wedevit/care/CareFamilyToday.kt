@@ -98,7 +98,7 @@ internal class CaregiverCheckStore(context: Context) {
     Surface(shape = RoundedCornerShape(20.dp), color = SaharaLavender, modifier = Modifier.fillMaxWidth().saharaAppear().testTag("family-caregiver-check")) {
         Column(Modifier.saharaContentSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(shape = CircleShape, color = Paper) { Icon(Icons.Default.Favorite, null, Modifier.padding(10.dp).size(22.dp), tint = RustText) }
+                Surface(shape = CircleShape, color = Paper) { SaharaLottie(SaharaLottieKind.Heart, Modifier.padding(4.dp).size(34.dp)) }
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
                     Text(t("How are you holding up?", "आप ख़ुद कैसे हैं?"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
