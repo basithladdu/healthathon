@@ -25,6 +25,7 @@ class CareHindiCoverageTest {
         "CareReminderUi.kt" to listOf("CareReminderSettings", "ReminderItemSettings"),
         "FeedbackUi.kt" to listOf("FeedbackExperienceScreen"),
         "CareComponents.kt" to listOf("CareNavigation", "CarePersonSelector", "WalkthroughUserMenu"),
+        "SaharaDialogs.kt" to listOf("SaharaDialog", "rememberSaharaPermission", "SaharaPermissionDialog"),
         "CareDailyUi.kt" to listOf("CareAddMenuButton", "CareModuleCard", "CareModuleList", "ConversationRow", "MedicineScanAction", "QuickCheckInCard"),
         "CareSchedule.kt" to listOf("DailyCareShortcuts", "CareDateButton", "CareCalendar", "CalendarEntryCard", "CareScheduleEditor"),
         "CareWorkflow.kt" to listOf("WorkflowSummary", "CareWorkflows", "WorkflowCard", "CareWorkflowEditor"),
