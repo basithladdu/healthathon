@@ -37,7 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
     var problem by remember(medicine.id) { mutableStateOf<String?>(null) }
     val capturedAccount = remember(medicine.id) { vm.accountNamespace }
     ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Cream) {
-        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 16.dp, end = 16.dp, bottom = 32.dp).testTag("side-effect-sheet"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 16.dp, end = 16.dp, bottom = 32.dp).saharaContentSize().testTag("side-effect-sheet"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Heading(t("Side effect?", "कोई दुष्प्रभाव?"), 24)
             // Which medicine, as one pill under the title.
             Surface(shape = RoundedCornerShape(50), color = SaharaSoftBlue) {
@@ -48,18 +48,18 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
             }
             SideEffectStep(1, t("What happened?", "क्या हुआ?")) {
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    SideEffectRules.effects.keys.forEach { key -> PickChip(key in picked, SideEffectRules.effectLabel(key, hindi), Mint, Modifier.testTag("side-effect-chip-$key")) { pickedKeys = (if (key in picked) picked - key else picked + key).joinToString(",") } }
+                    SideEffectRules.effects.keys.forEach { key -> PickChip(key in picked, SideEffectRules.effectLabel(key, hindi), DoctorAccent, Modifier.testTag("side-effect-chip-$key")) { pickedKeys = (if (key in picked) picked - key else picked + key).joinToString(",") } }
                 }
                 CareField(other, { other = it.take(SideEffectRules.MAX_OTHER) }, t("Details (optional)", "विवरण (चाहें तो)"), minLines = 2)
             }
             SideEffectStep(2, t("How bad was it?", "कितना ज़्यादा था?")) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SideEffectRules.severities.keys.forEachIndexed { i, key -> PickChip(severity == key, SideEffectRules.severityLabel(key, hindi), SeverityTints.getOrElse(i) { Mint }, Modifier.weight(1f).testTag("side-effect-severity-$key")) { severity = key } }
+                    SideEffectRules.severities.keys.forEachIndexed { i, key -> PickChip(severity == key, SideEffectRules.severityLabel(key, hindi), SeverityTints.getOrElse(i) { DoctorAccent }, Modifier.weight(1f).testTag("side-effect-severity-$key")) { severity = key } }
                 }
             }
             SideEffectStep(3, t("When?", "कब?")) {
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    SideEffectRules.whenOptions.forEach { (key, label) -> PickChip(whenKey == key, careTr(hindi, label.first, label.second), SaharaSoftBlue, Modifier.testTag("side-effect-when-$key")) { whenKey = key } }
+                    SideEffectRules.whenOptions.forEach { (key, label) -> PickChip(whenKey == key, careTr(hindi, label.first, label.second), DoctorAccent, Modifier.testTag("side-effect-when-$key")) { whenKey = key } }
                 }
             }
             Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
@@ -75,13 +75,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                 val err = SideEffectRules.error(note, now)
                 if (err != null) problem = err
                 else if (canEditCareContext(vm, medicine.personId, capturedAccount)) { problem = null; vm.saveItem("journal", SideEffectRules.title(note), SideEffectCodec.encode(note), done = onDismiss) }
-            }, enabled = !busy && canEdit, colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = androidx.compose.ui.graphics.Color.White), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().padding(top = 8.dp).heightIn(min = 54.dp).testTag("side-effect-save")) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Save", "सहेजें"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold) }
+            }, enabled = !busy && canEdit, colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = androidx.compose.ui.graphics.Color.White), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().padding(top = 8.dp).heightIn(min = 54.dp).testTag("side-effect-save")) {
+                if (busy) { CircularProgressIndicator(Modifier.size(18.dp), color = androidx.compose.ui.graphics.Color.White, strokeWidth = 2.dp); Spacer(Modifier.width(8.dp)) }
+                Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Save", "सहेजें"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+            }
         }
     }
 }
 
-/** Calm green, amber and red for Mild, Moderate and Severe, in SideEffectRules.severities order. */
-private val SeverityTints = listOf(DoctorStatusGoodBg, DoctorStatusWarnBg, DoctorStatusRestBg)
+/** Solid green, amber and red for Mild, Moderate and Severe (the chart band colours), in SideEffectRules.severities order. */
+private val SeverityTints = listOf(ChartBands.Mild, ChartBands.Moderate, ChartBands.Severe)
 
 /** One numbered step of the side-effect form on its own card. */
 @Composable private fun SideEffectStep(number: Int, title: String, content: @Composable ColumnScope.() -> Unit) {
@@ -97,11 +100,13 @@ private val SeverityTints = listOf(DoctorStatusGoodBg, DoctorStatusWarnBg, Docto
     }
 }
 
-/** A choice chip that shows a tick and a filled colour when picked, so the choice is clear at a glance. */
+/** A choice chip: strong outline when free, a solid fill with white text and a tick when picked, so it reads as a button. */
 @Composable private fun PickChip(selected: Boolean, label: String, tint: androidx.compose.ui.graphics.Color, modifier: Modifier, onClick: () -> Unit) {
-    FilterChip(selected = selected, onClick = onClick, label = { Text(label, fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal, maxLines = 1) },
+    val ink = readableOn(tint)
+    FilterChip(selected = selected, onClick = onClick, label = { Text(label, fontWeight = FontWeight.SemiBold, maxLines = 2, style = SymptomWords) },
         leadingIcon = if (selected) { { Icon(Icons.Default.Check, null, Modifier.size(16.dp)) } } else null, shape = RoundedCornerShape(50),
-        colors = FilterChipDefaults.filterChipColors(containerColor = Cream, labelColor = DoctorCardInk, selectedContainerColor = tint, selectedLabelColor = DoctorCardInk, selectedLeadingIconColor = DoctorAccent),
+        border = FilterChipDefaults.filterChipBorder(enabled = true, selected = selected, borderColor = DoctorCardSub.copy(alpha = .5f), selectedBorderColor = tint, borderWidth = 1.5.dp, selectedBorderWidth = 1.5.dp),
+        colors = FilterChipDefaults.filterChipColors(containerColor = Paper, labelColor = DoctorCardInk, selectedContainerColor = tint, selectedLabelColor = ink, selectedLeadingIconColor = ink),
         modifier = modifier.heightIn(min = 48.dp))
 }
 

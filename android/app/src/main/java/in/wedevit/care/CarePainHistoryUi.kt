@@ -1,7 +1,12 @@
 @file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 package `in`.wedevit.care
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -57,16 +62,26 @@ object PainHistoryRules {
             val note = history[index].second
             LazyRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(history, key = { it.first.id }) { (item, value) ->
-                    FilterChip(selected == item.id, { preferred = item.id }, label = { Text("${friendlyWhen(value.observedDate, value.observedTime, hindi)} · ${SymptomDiaryRules.ratingLabel(value.rating, hindi)}", fontSize = 14.sp) }, shape = CircleShape,
-                        colors = FilterChipDefaults.filterChipColors(containerColor = Paper, labelColor = DoctorCardInk, selectedContainerColor = Mint, selectedLabelColor = DoctorCardInk), modifier = Modifier.heightIn(min = 48.dp).testTag("pain-history-entry-${item.id}"))
+                    FilterChip(selected == item.id, { preferred = item.id }, label = { Text("${friendlyWhen(value.observedDate, value.observedTime, hindi)} · ${SymptomDiaryRules.ratingLabel(value.rating, hindi)}", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false) }, shape = CircleShape,
+                        leadingIcon = if (value.rating != null) { { Box(Modifier.size(12.dp).background(ChartBands.color(value.rating), CircleShape)) } } else null,
+                        border = FilterChipDefaults.filterChipBorder(enabled = true, selected = selected == item.id, borderColor = DoctorCardSub.copy(alpha = .45f), selectedBorderColor = DoctorAccent, borderWidth = 1.5.dp, selectedBorderWidth = 2.dp),
+                        colors = FilterChipDefaults.filterChipColors(containerColor = Paper, labelColor = DoctorCardInk, selectedContainerColor = lerp(Paper, DoctorAccent, .14f), selectedLabelColor = DoctorCardInk), modifier = Modifier.heightIn(min = 48.dp).testTag("pain-history-entry-${item.id}"))
                 }
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = { preferred = history[index + 1].first.id }, enabled = index < history.lastIndex, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("pain-history-older")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Older", "पुराना")) }
-                OutlinedButton(onClick = { preferred = history[index - 1].first.id }, enabled = index > 0, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("pain-history-newer")) { Text(t("Newer", "नया")); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(18.dp)) }
+                OutlinedButton(onClick = { preferred = history[index + 1].first.id }, enabled = index < history.lastIndex, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, DoctorCardSub.copy(alpha = .5f)), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("pain-history-older")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Older", "पुराना")) }
+                OutlinedButton(onClick = { preferred = history[index - 1].first.id }, enabled = index > 0, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, DoctorCardSub.copy(alpha = .5f)), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("pain-history-newer")) { Text(t("Newer", "नया")); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(18.dp)) }
             }
-            Text("${friendlyWhen(note.observedDate, note.observedTime, hindi)} · ${SymptomDiaryRules.ratingLabel(note.rating, hindi)}${note.rating?.let { " · ${ChartBands.word(it, hindi)}" }.orEmpty()}", fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.testTag("pain-history-observation"))
-            Text("${SymptomDiaryRules.label(SymptomDiaryRules.recalls, note.recall, hindi)} · ${SymptomDiaryRules.label(SymptomDiaryRules.respondents, note.respondent, hindi)} · ${note.author}", fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.testTag("pain-history-context"))
+            // The chosen observation slides in when another date is picked; its number sits on a band-coloured pill.
+            AnimatedContent(history[index], transitionSpec = { SaharaMotion.crossfade() }, contentKey = { it.first.id }, label = "pain observation") { (_, shown) ->
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Text("${friendlyWhen(shown.observedDate, shown.observedTime, hindi)} · ${SymptomDiaryRules.ratingLabel(shown.rating, hindi)}${shown.rating?.let { " · ${ChartBands.word(it, hindi)}" }.orEmpty()}", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk, modifier = Modifier.weight(1f).testTag("pain-history-observation"))
+                        shown.rating?.let { r -> Box(Modifier.size(16.dp).background(ChartBands.color(r), CircleShape)) }
+                    }
+                    Text("${SymptomDiaryRules.label(SymptomDiaryRules.recalls, shown.recall, hindi)} · ${SymptomDiaryRules.label(SymptomDiaryRules.respondents, shown.respondent, hindi)} · ${shown.author}", fontSize = 15.sp, color = DoctorCardSub, modifier = Modifier.testTag("pain-history-context"))
+                }
+            }
             when (PainHistoryRules.locationKind(note)) {
                 "points", "regions", "text" -> {}
                 "unsupported-model" -> Text(t("Can't show this picture", "यह तस्वीर यहाँ नहीं दिख सकती"), fontSize = 14.sp, color = DoctorCardSub)

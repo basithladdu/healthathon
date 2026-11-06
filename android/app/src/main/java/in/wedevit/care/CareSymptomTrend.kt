@@ -18,6 +18,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -29,9 +30,10 @@ import java.time.LocalDate
 
 /** The same three colour bands on every chart: green 0–3, amber 4–6, red 7–10. */
 object ChartBands {
-    val Mild = Color(0xFF2E7D4F)
-    val Moderate = Color(0xFFD08A1A)
-    val Severe = Color(0xFFC0392B)
+    // Sahara status tones (Good / Needs attention / Error): clearly different, each passes 4.5:1 with white text. Words always sit beside them.
+    val Mild = Color(0xFF2F6B46)
+    val Moderate = Color(0xFF8A5A1B)
+    val Severe = Color(0xFFB3261E)
     fun color(value: Int): Color = when { value <= 3 -> Mild; value <= 6 -> Moderate; else -> Severe }
     fun word(value: Int, hindi: Boolean): String = when {
         value <= 3 -> careTr(hindi, "Mild", "हल्का")
@@ -94,9 +96,10 @@ object TrendChartRules {
     // Three soft pills, one per band, so the legend reads like the chips elsewhere in the app.
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.testTag("chart-legend")) {
         listOf(2, 5, 8).zip(listOf("0–3", "4–6", "7–10")).forEach { (sample, range) ->
-            Row(Modifier.background(Paper, CircleShape).border(1.dp, DoctorHairline, CircleShape).padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Box(Modifier.size(12.dp).background(ChartBands.color(sample), CircleShape))
-                Text("${ChartBands.word(sample, hindi)} $range", fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+            val band = ChartBands.color(sample)
+            Row(Modifier.background(lerp(Paper, band, .12f), CircleShape).border(1.5.dp, band, CircleShape).padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Box(Modifier.size(12.dp).background(band, CircleShape))
+                Text("${ChartBands.word(sample, hindi)} $range", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, softWrap = false)
             }
         }
     }

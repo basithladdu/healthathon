@@ -117,6 +117,9 @@ object ChartRangeRules {
     now: Long = System.currentTimeMillis(),
     /** Above this many points the per-point value labels are left out so the line stays readable (the latest keeps its label). */
     pointTextLimit: Int = 14,
+    /** Optional axis names: [yTitle] above the value labels, [xTitle] centred under the dates. */
+    yTitle: String? = null,
+    xTitle: String? = null,
 ) {
     val measurer = rememberTextMeasurer()
     val shownPoints = remember(points, range, now / 3_600_000L) { ChartRangeRules.filter(points, range, now) }
@@ -131,10 +134,11 @@ object ChartRangeRules {
     val shownMarkers = markers.filter { it.x >= minOf(lo, hi) && it.x <= maxOf(lo, hi) }
     val shownLabels = xLabels.filter { it.x >= minOf(lo, hi) && it.x <= maxOf(lo, hi) }
     val labelEach = shownPoints.count { it.y != null } <= pointTextLimit
+    val titleStyle = axisStyle.copy(color = DoctorCardInk, fontWeight = FontWeight.SemiBold)
     Canvas(modifier.fillMaxWidth().height(height).clearAndSetSemantics { contentDescription = description }.testTag("$tag-chart")) {
         // Room above the plot for treatment-day labels, so they never sit on the top gridline.
-        val topPad = (if (shownMarkers.any { it.label.isNotBlank() }) 22 else 14).dp.toPx()
-        val bottomPad = (10 + 15 * xLabelLines).dp.toPx()
+        val topPad = ((if (shownMarkers.any { it.label.isNotBlank() }) 22 else 14) + (if (yTitle != null) 16 else 0)).dp.toPx()
+        val bottomPad = (10 + 15 * xLabelLines + (if (xTitle != null) 16 else 0)).dp.toPx()
         val rightPad = 16.dp.toPx()
         val yWidth = (yTicks.maxOfOrNull { measurer.measure(yText(it), axisStyle).size.width } ?: 0) + 8.dp.toPx()
         val left = yWidth
@@ -143,6 +147,9 @@ object ChartRangeRules {
         val ySpan = (yMax - yMin).takeIf { it > 0 } ?: 1.0
         fun py(v: Double) = topPad + ((yMax - v) / ySpan * plotH).toFloat().coerceIn(0f, plotH)
         fun px(v: Double) = if (hi > lo) left + ((v - lo) / (hi - lo) * plotW).toFloat() else left + plotW / 2
+        // axis names, written once in ink: the value scale top-left, the time axis centred at the bottom
+        yTitle?.let { val layout = measurer.measure(it, titleStyle); drawText(layout, topLeft = Offset(0f, 0f)) }
+        xTitle?.let { val layout = measurer.measure(it, titleStyle); drawText(layout, topLeft = Offset(left + (plotW - layout.size.width) / 2f, size.height - layout.size.height)) }
         // soft bands, then gridlines with y labels
         bands.forEach { b ->
             val top = py(b.to.coerceAtMost(yMax)); val bottom = py(b.from.coerceAtLeast(yMin))
@@ -198,7 +205,7 @@ object ChartRangeRules {
                 }
             }
             drawPath(path, lineColor, style = Stroke(2.5.dp.toPx(), cap = androidx.compose.ui.graphics.StrokeCap.Round, join = androidx.compose.ui.graphics.StrokeJoin.Round))
-            shownPoints.forEach { p -> p.y?.let { drawCircle(p.color ?: lineColor, 4.5.dp.toPx(), Offset(px(p.x), py(it))) } }
+            shownPoints.forEach { p -> p.y?.let { drawCircle(Color.White, 6.dp.toPx(), Offset(px(p.x), py(it))); drawCircle(p.color ?: lineColor, 4.5.dp.toPx(), Offset(px(p.x), py(it))) } }
         }
         val latest = shownPoints.lastOrNull { it.y != null }
         // every other point's value, small and above its dot
@@ -230,7 +237,7 @@ object ChartRangeRules {
     Row(modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).testTag("$tag-range"), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         choices.forEach { r ->
             FilterChip(selected = r == selected, onClick = { onSelect(r) }, label = { Text(r.label(hindi), fontSize = 14.sp, fontWeight = if (r == selected) FontWeight.SemiBold else FontWeight.Medium) },
-                shape = CircleShape, border = FilterChipDefaults.filterChipBorder(enabled = true, selected = r == selected, borderColor = DoctorHairline, selectedBorderColor = Rust),
+                shape = CircleShape, border = FilterChipDefaults.filterChipBorder(enabled = true, selected = r == selected, borderColor = DoctorCardSub.copy(alpha = .45f), selectedBorderColor = Rust, borderWidth = 1.5.dp, selectedBorderWidth = 1.5.dp),
                 colors = FilterChipDefaults.filterChipColors(containerColor = Paper, labelColor = DoctorCardInk, selectedContainerColor = Rust, selectedLabelColor = Color.White),
                 modifier = Modifier.heightIn(min = 48.dp).testTag("$tag-range-${r.name.lowercase()}"))
         }
@@ -261,6 +268,8 @@ object ChartRangeRules {
     range: ChartRange? = null,
     onRangeChange: (ChartRange) -> Unit = {},
     now: Long = System.currentTimeMillis(),
+    yTitle: String? = null,
+    xTitle: String? = null,
 ) {
     val hindi = careHindi()
     var own by rememberSaveable(tag) { mutableStateOf(ChartRange.ALL.name) }
@@ -280,7 +289,7 @@ object ChartRangeRules {
             points = points, yMin = yMin, yMax = yMax, yTicks = yTicks, yText = yText, xLabels = labels,
             description = if (current == ChartRange.ALL) description else "${current.label(hindi)}. $description",
             latestText = shown.lastOrNull { it.y != null }?.y?.let(latestText).orEmpty(), tag = tag, height = height, lineColor = lineColor,
-            bands = bands, markers = markers, pointText = pointText, range = current, now = now,
+            bands = bands, markers = markers, pointText = pointText, range = current, now = now, yTitle = yTitle, xTitle = xTitle,
             xMin = if (single) shown.first { it.y != null }.x - 43_200_000.0 else null, xMax = if (single) shown.first { it.y != null }.x + 43_200_000.0 else null,
         )
     }
