@@ -34,7 +34,9 @@ import androidx.compose.ui.unit.sp
 
 @Composable fun ActionCard(color: Color, modifier: Modifier = Modifier, onClick: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
     val interaction = remember { MutableInteractionSource() }
-    Card(onClick = onClick, interactionSource = interaction, modifier = modifier.saharaAppear().saharaPress(interaction), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = color), content = content)
+    // A tappable card carries a 3:1 edge so it reads as one control on the cream ground.
+    Card(onClick = onClick, interactionSource = interaction, modifier = modifier.saharaAppear().saharaPress(interaction), shape = RoundedCornerShape(SaharaRadius.Lg),
+        colors = CardDefaults.cardColors(containerColor = color), border = BorderStroke(1.dp, SaharaColors.Edge), content = content)
 }
 
 @Composable fun CareNavigation(selected: Int, clinician: Boolean, onSelect: (Int) -> Unit) {
@@ -58,8 +60,8 @@ import androidx.compose.ui.unit.sp
                         Icon(icons[index], null, Modifier.size(24.dp), tint = iconTint)
                     }
                     Spacer(Modifier.height(4.dp))
-                    SaharaFitText(label, style = MaterialTheme.typography.labelMedium.copy(fontSize = cappedLabelSize(13f)), fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
-                        color = if (active) RustText else SaharaColors.InkSub, min = 10f)
+                    SaharaFitText(label, style = MaterialTheme.typography.labelMedium.copy(fontSize = cappedLabelSize(14f)), fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
+                        color = if (active) RustText else SaharaColors.InkSub, maxLines = 2, min = 11f)
                 }
             }
         }
@@ -128,7 +130,7 @@ import androidx.compose.ui.unit.sp
             }
         }
         if (canInvite) OutlinedButton(onClick = onInvite, enabled = enabled, modifier = Modifier.heightIn(min = 44.dp).testTag("invite-family-top"),
-            shape = RoundedCornerShape(50), border = BorderStroke(1.dp, if (enabled) Rust.copy(alpha = .6f) else MaterialTheme.colorScheme.outline.copy(alpha = .3f)),
+            shape = RoundedCornerShape(50), border = BorderStroke(1.5.dp, if (enabled) Rust else SaharaColors.Edge),
             contentPadding = PaddingValues(horizontal = 14.dp)) {
             Icon(Icons.Default.PersonAdd, null, Modifier.size(18.dp), tint = if (enabled) Rust else MaterialTheme.colorScheme.onSurface.copy(alpha = .38f))
             Spacer(Modifier.width(6.dp)); Text(inviteLabel, color = if (enabled) RustText else MaterialTheme.colorScheme.onSurface.copy(alpha = .38f), fontWeight = FontWeight.SemiBold, fontSize = 14.sp, maxLines = 1)
@@ -191,7 +193,7 @@ import androidx.compose.ui.unit.sp
 }
 
 @Composable fun DetailPanel(title: String, icon: ImageVector, content: @Composable ColumnScope.() -> Unit) {
-    Surface(color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.saharaAppear()) {
+    Surface(color = Paper, shape = RoundedCornerShape(SaharaRadius.Lg), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.saharaAppear()) {
         Column(Modifier.fillMaxWidth().saharaContentSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.size(36.dp).clip(CircleShape).background(SaharaApricot), contentAlignment = Alignment.Center) { Icon(icon, null, Modifier.size(20.dp), tint = RustText) }
