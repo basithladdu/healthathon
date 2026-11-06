@@ -176,7 +176,7 @@ internal val DoctorBand get() = SaharaColors.Band
 @Composable internal fun doctorCountUp(value: Int): Int {
     var target by remember { mutableIntStateOf(0) }
     LaunchedEffect(value) { target = value }
-    val shown by animateIntAsState(target, SaharaMotion.tween(SaharaMotion.ENTER_MS * 2, easing = SaharaMotion.Emphasized), label = "tile count")
+    val shown by animateIntAsState(target, SaharaMotion.tween(SaharaMotion.ENTER_MS * 2, easing = SaharaMotion.Emphasized), label = "tilecount")
     return shown
 }
 
@@ -185,19 +185,9 @@ internal fun doctorTilesPaired(widthDp: Float, fontScale: Float): Boolean = widt
 
 /** Bento launch tile: icon chip, big real count, label, optional status pill. The whole tile is the action. */
 @Composable internal fun DoctorStatTile(icon: ImageVector, count: Int?, label: String, tone: DoctorTone, onClick: () -> Unit, tag: String, modifier: Modifier = Modifier, pill: Pair<String, DoctorTone>? = null) {
-    val press = remember { MutableInteractionSource() }
-    Surface(onClick = onClick, interactionSource = press, color = Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), shadowElevation = 1.dp,
-        modifier = modifier.saharaAppear().saharaPress(press).heightIn(min = 76.dp).testTag(tag).semantics(mergeDescendants = true) { contentDescription = "${count ?: "—"} $label" + (pill?.let { ", ${it.first}" } ?: "") }) {
-        Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            DoctorIconChip(icon, tone)
-            Column(Modifier.weight(1f)) {
-                Text(count?.let { "${doctorCountUp(it)}" } ?: "—", fontFamily = SaharaTitleFont, fontSize = 24.sp, lineHeight = 28.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk,
-                    style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"), modifier = Modifier.testTag("$tag-count"))
-                Text(label, fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub, style = DoctorWholeWords)
-                pill?.let { DoctorPill(it.first, it.second, Modifier.padding(top = 4.dp)) }
-            }
-        }
-    }
+    // The design lane's solid bento tile: bright section colour, white icon, big count, white bold label.
+    SaharaBentoTile(label, icon, tone, onClick, modifier.testTag(tag).semantics(mergeDescendants = true) { contentDescription = "${count ?: "—"} $label" + (pill?.let { ", ${it.first}" } ?: "") },
+        value = count?.let { "${doctorCountUp(it)}" } ?: "—", caption = pill?.first)
 }
 
 /** Text that wraps only between words. */
@@ -231,11 +221,11 @@ internal fun doctorPatientStatus(person: Person, items: List<CareItem>, now: Lon
 }
 
 /**
- * Doctor Home as a launchpad: four real counts as tiles, then the Today queue, then what is coming up and the week's check-ins.
+ * Doctor Home: three real counts as tiles (each jumps to its list below), then the Today queue, what is coming up and the week's check-ins.
  * [firstIndex] is how many list items the caller drew above, so the Check-ins tile can scroll to its section.
  */
 internal fun LazyListScope.doctorConnectedHomeItems(people: List<Person>, items: List<CareItem>, now: Long, hindi: Boolean, onVisit: (String) -> Unit, onProgress: (String) -> Unit, onPatients: () -> Unit,
-    onSchedule: () -> Unit = onPatients, onScrollTo: (Int) -> Unit = {}, firstIndex: Int = 0, zone: ZoneId = ZoneId.systemDefault()) {
+    onScrollTo: (Int) -> Unit = {}, firstIndex: Int = 0, zone: ZoneId = ZoneId.systemDefault()) {
     val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     val today = Instant.ofEpochMilli(now).atZone(zone).toLocalDate()
     val visits = DoctorConnectedHome.upcomingVisits(people, items, now, zone)
@@ -247,14 +237,16 @@ internal fun LazyListScope.doctorConnectedHomeItems(people: List<Person>, items:
     val todayRows = (todayVisits.size + todayChecks.size).coerceAtLeast(1)
     val laterRows = if (laterVisits.isEmpty()) 0 else 1 + laterVisits.take(5).size
     val checksIndex = firstIndex + 2 + todayRows + laterRows
+    val todayIndex = firstIndex + 1
+    val laterIndex = if (laterVisits.isEmpty()) checksIndex else firstIndex + 2 + todayRows
+    // Each tile is a count that jumps to its own list on this page. Patients is not repeated here: the bottom bar opens it.
     item(key = "home-tiles") {
         BoxWithConstraints {
             val paired = doctorTilesPaired(maxWidth.value, LocalDensity.current.fontScale)
             val tiles: List<@Composable (Modifier) -> Unit> = listOf(
-                { m -> DoctorStatTile(Icons.Default.People, people.size, t("Patients", "मरीज़"), DoctorTones.Rust, onPatients, "doctor-home-tile-patients", m) },
-                { m -> DoctorStatTile(Icons.Default.Today, todayVisits.size, t("Visits today", "आज की विज़िट"), DoctorTones.Indigo, onSchedule, "doctor-home-tile-today", m) },
-                { m -> DoctorStatTile(Icons.Default.EventAvailable, laterVisits.size, t("Coming up", "आगे की विज़िट"), DoctorTones.Plum, onSchedule, "doctor-home-tile-upcoming", m) },
-                { m -> DoctorStatTile(Icons.Default.Favorite, checks.size, t("Check-ins, 7 days", "हालचाल, 7 दिन"), DoctorTones.Teal, { onScrollTo(checksIndex) }, "doctor-home-tile-checkins", m,
+                { m -> DoctorStatTile(Icons.Default.Today, todayVisits.size, t("Visits today", "आज की विज़िट"), DoctorTones.Indigo, { if (people.isEmpty()) onPatients() else onScrollTo(todayIndex) }, "doctor-home-tile-today", m) },
+                { m -> DoctorStatTile(Icons.Default.EventAvailable, laterVisits.size, t("Coming up", "आगे की विज़िट"), DoctorTones.Plum, { if (people.isEmpty()) onPatients() else onScrollTo(laterIndex) }, "doctor-home-tile-upcoming", m) },
+                { m -> DoctorStatTile(Icons.Default.Favorite, checks.size, t("Check-ins, 7 days", "हालचाल, 7 दिन"), DoctorTones.Teal, { if (people.isEmpty()) onPatients() else onScrollTo(checksIndex) }, "doctor-home-tile-checkins", m,
                     pill = if (hard > 0) t("$hard hard", "$hard मुश्किल") to DoctorTones.Attention else null) },
             )
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -264,7 +256,7 @@ internal fun LazyListScope.doctorConnectedHomeItems(people: List<Person>, items:
         }
     }
     if (people.isEmpty()) return
-    item(key = "home-today-title") { DoctorHomeSection(t("Today", "आज"), todayVisits.size + todayChecks.size, DoctorTones.Indigo) }
+    item(key = "home-today-title") { DoctorHomeSection(t("Today", "आज"), todayVisits.size + todayChecks.size, DoctorTones.Indigo, Icons.Default.Today) }
     if (todayVisits.isEmpty() && todayChecks.isEmpty()) item(key = "home-today-empty") { DoctorHomeEmpty(Icons.Default.EventAvailable, t("Nothing due today", "आज कुछ तय नहीं")) }
     items(todayVisits, key = { "home-today-${it.item.id}" }) { visit ->
         DoctorRegisterRow(visit.person.name, visit.item.title, { onVisit(visit.person.id) }, lead = doctorTimeOrDay(visit.item, hindi, zone))
@@ -274,12 +266,12 @@ internal fun LazyListScope.doctorConnectedHomeItems(people: List<Person>, items:
             pill = if (check.title == DoctorReportedMood.HARD.title) t("Hard day", "मुश्किल दिन") to DoctorTones.Attention else null)
     }
     if (laterVisits.isNotEmpty()) {
-        item(key = "home-visits-title") { DoctorHomeSection(t("Coming up", "आगे की विज़िट"), laterVisits.size, DoctorTones.Plum) }
+        item(key = "home-visits-title") { DoctorHomeSection(t("Coming up", "आगे की विज़िट"), laterVisits.size, DoctorTones.Plum, Icons.Default.EventAvailable) }
         items(laterVisits.take(5), key = { "home-visit-${it.item.id}" }) { visit ->
             DoctorRegisterRow(visit.person.name, "${doctorWhen(visit.item, hindi, zone)} · ${visit.item.title}", { onVisit(visit.person.id) })
         }
     }
-    item(key = "home-checks-title") { DoctorHomeSection(t("Check-ins", "हालचाल"), weekChecks.size, DoctorTones.Teal) }
+    item(key = "home-checks-title") { DoctorHomeSection(t("Check-ins", "हालचाल"), weekChecks.size, DoctorTones.Teal, Icons.Default.Favorite) }
     if (weekChecks.isEmpty()) item(key = "home-checks-empty") { DoctorHomeEmpty(Icons.Default.Favorite, t("No other check-ins this week", "इस हफ़्ते और कोई हालचाल नहीं")) }
     items(weekChecks, key = { "home-check-${it.second.id}" }) { (person, check) ->
         DoctorRegisterRow(person.name, "${checkInMoodLabel(check.title, hindi)} · ${DateTimeFormatter.ofPattern("d MMM, h:mm a", careLocale(hindi)).withZone(zone).format(Instant.ofEpochMilli(check.created))}", { onProgress(person.id) },
@@ -292,12 +284,8 @@ private fun doctorTimeOrDay(item: CareItem, hindi: Boolean, zone: ZoneId): Strin
     if (CareEntryCodec.decode(item.detail)?.timed == true) DateTimeFormatter.ofPattern("h:mm a", careLocale(hindi)).withZone(zone).format(Instant.ofEpochMilli(item.due)) else careTr(hindi, "Today", "आज")
 
 /** Section title with a tone bar and count: scannable at a glance. */
-@Composable private fun DoctorHomeSection(title: String, count: Int, tone: DoctorTone) {
-    Row(Modifier.fillMaxWidth().padding(top = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Box(Modifier.size(width = 4.dp, height = 18.dp).background(tone.solid, RoundedCornerShape(2.dp)))
-        Text(title, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
-        if (count > 0) Text("$count", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = tone.ink)
-    }
+@Composable private fun DoctorHomeSection(title: String, count: Int, tone: DoctorTone, icon: ImageVector) {
+    SaharaSectionHeader(if (count > 0) "$title · $count" else title, Modifier.padding(top = 8.dp), tone = tone, icon = icon)
 }
 
 /** One line with an icon for an empty list. */
