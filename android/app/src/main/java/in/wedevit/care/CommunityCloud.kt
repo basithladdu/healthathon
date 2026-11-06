@@ -53,5 +53,8 @@ internal class CommunityStore(context: Context) {
     suspend fun flush(accountId: String, send: suspend (CommunityPending) -> Unit): Throwable? = sending.withLock {
         CommunityOutbox.flush(all(), accountId, send) { remaining -> synchronized(this) { preferences.edit().putString("pending", CommunityOutbox.encode(remaining)).commit() } }
     }
+    /** The built-in community and what this phone added to it (used while the server can't be). Unreadable data starts fresh. */
+    @Synchronized fun local(): CommunityLocalState = runCatching { CommunityLocal.decode(preferences.getString("local", null)) }.getOrDefault(CommunityLocalState())
+    @Synchronized fun saveLocal(state: CommunityLocalState): Boolean = preferences.edit().putString("local", CommunityLocal.encode(state)).commit()
     private companion object { val sending = Mutex() }
 }
