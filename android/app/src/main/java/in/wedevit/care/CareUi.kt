@@ -474,7 +474,7 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
     val medicines = CareDailyFlow.medicinesForToday(items, today)
     val visits = CareTodayRules.upcomingVisits(items, dayStart)
     val tasks = items.filter { it.kind == "task" && !CareEntryCodec.isStructured(it.detail) }.sortedBy { it.doneOn.isNotBlank() }
-    LazyColumn(Modifier.fillMaxSize().testTag("today-list"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    LazyColumn(Modifier.fillMaxSize().saharaScreenEnter().testTag("today-list"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item(key = "today-header") { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text(CareTodayRules.greetingLine(hour, hindi, personName, patient = !family && !clinician), Modifier.a11yHeading().testTag("today-greeting"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 22.sp, lineHeight = 28.sp, color = DoctorCardInk)
@@ -501,7 +501,7 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
         if (family) summary() else if (!clinician && canEdit) item(key = "today-checkin") { TodayCheckInBar(vm, onOpen = onCheckInWords, onSymptom = onSymptomNote) }
         val medicineSection: androidx.compose.foundation.lazy.LazyListScope.() -> Unit = {
             // The doses card under the title carries the one "x of y taken" count.
-            item(key = "medicines-title") { TodaySectionHeader(t("Medicines today", "आज की दवाइयाँ"), t("Open medicines", "दवाइयाँ खोलें"), "today-open-medicines") { onCare("Medicines") } }
+            item(key = "medicines-title") { SaharaSectionHeader(t("Medicines today", "आज की दवाइयाँ"), Modifier.testTag("today-medicines-title"), tone = SaharaTone.Plum, actionLabel = t("Open medicines", "दवाइयाँ खोलें"), onAction = { onCare("Medicines") }, icon = careIcon("medicine")) }
             item(key = "today-doses") { TodayDosesCard(vm) }
             if (medicines.isEmpty() && loaded && canEdit) item { SaharaSecondaryButton(t("Add a medicine", "दवा जोड़ें"), { onAdd("medicine") }, Modifier.fillMaxWidth(), icon = Icons.Default.Add, tone = SaharaTone.Plum) }
         }
@@ -514,7 +514,7 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
                 DistressRules.today(items, selectedPerson, dayStart)?.let { item(key = "today-distress-seen") { CareRow(it, vm) } }
             }
             if (family) {
-                item(key = "todo-title") { TodaySectionHeader(t("To do", "करने के काम"), t("Open to do", "काम खोलें"), "today-open-todo") { onCare("To do") } }
+                item(key = "todo-title") { SaharaSectionHeader(t("To do", "करने के काम"), Modifier.testTag("today-todo-title"), tone = SaharaTone.Leaf, actionLabel = t("Open to do", "काम खोलें"), onAction = { onCare("To do") }, icon = careIcon("task")) }
                 if (tasks.isEmpty() && loaded) item { SurfaceCard { Text(CareTodayRules.emptyText("tasks", canEdit, hindi), color = DoctorCardSub) } }
                 items(tasks.take(3), key = { it.id }) { CareRow(it, vm) }
                 if (canEdit) item(key = "todo-add") { SaharaSecondaryButton(t("Add task", "काम जोड़ें"), { onAdd("task") }, Modifier.fillMaxWidth(), icon = Icons.Default.Add, tone = SaharaTone.Leaf) }
@@ -1072,7 +1072,7 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
             page(t("Tubes and lines", "नलियाँ और लाइनें"), Icons.Default.Healing, SaharaTone.Plum, "shortcut-devices", onDevices), page(t("Community", "समुदाय"), Icons.Default.Groups, SaharaTone.Leaf, "shortcut-community", onCommunity)),
     ).filter { it.second.isNotEmpty() }
     if (opened != null) CareModuleScreen(opened) { closeModule() } else
-    LazyColumn(Modifier.fillMaxSize().testTag("care-list"), state = listState, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    LazyColumn(Modifier.fillMaxSize().saharaScreenEnter().testTag("care-list"), state = listState, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         // One title and the one main action (Add) on top; then the list.
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.weight(1f)) { Heading(title ?: t("Daily care", "रोज़ की देखभाल"), 26) }
@@ -1160,7 +1160,7 @@ private class CareToolRow(val label: String, val icon: ImageVector, val tone: Sa
     val email = vm.cloud?.session?.collectAsStateWithLifecycle()?.value?.email.orEmpty()
     var about by rememberSaveable { mutableStateOf(false) }
     // An Android settings page: the person's profile at the top, then one plain grouped list. Every row is a title, one short line and a chevron.
-    LazyColumn(Modifier.fillMaxSize().testTag("more-list"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    LazyColumn(Modifier.fillMaxSize().saharaScreenEnter().testTag("more-list"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         if (doctorEmbedded || clinicianView) item { Heading(if (doctorEmbedded) t("Daily care & tools", "रोज़ की देखभाल और साधन") else t("More", "और"), 26) }
         else item { PatientProfileCard(vm, person) }
         if (!doctorEmbedded && !walkthrough) item { MoreGroup(t("Account", "खाता")) {

@@ -28,6 +28,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.DocumentScanner
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -78,6 +79,8 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
     Surface(shape = RoundedCornerShape(TodayHero.radius), color = band, contentColor = Color.White, modifier = Modifier.fillMaxWidth().saharaAppear().testTag("today-checkin")) {
         Column(Modifier.saharaContentSize().padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 6.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
+                // The one main card on Today: its icon swells slowly a few times, then rests (off when animations are off).
+                SaharaIconChip(Icons.Default.WbSunny, SaharaTone.Gold, size = 36, breathe = true); Spacer(Modifier.width(10.dp))
                 Text(t("How was today?", "आज का दिन कैसा रहा?"), fontFamily = SaharaTitleFont, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Medium, color = Color.White, modifier = Modifier.weight(1f).a11yHeading())
                 // The saved tick pops in once the check-in is stored (it follows the saved record, not a timer).
                 AnimatedVisibility(done, enter = scaleIn(spring(dampingRatio = Spring.DampingRatioMediumBouncy), initialScale = .6f) + fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)), exit = fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS))) {
@@ -263,7 +266,7 @@ internal fun careModuleIcon(name: String): ImageVector = when (name) {
 @Composable internal fun CareModuleScreen(tile: CareModuleTile, onBack: () -> Unit) {
     val t = careText()
     BackHandler(onBack = onBack)
-    LazyColumn(Modifier.fillMaxSize().testTag("care-list"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    LazyColumn(Modifier.fillMaxSize().saharaScreenEnter().testTag("care-list"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack, modifier = Modifier.size(48.dp).testTag("care-module-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) }
             Text(tile.title, fontFamily = SaharaTitleFont, fontSize = 28.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())

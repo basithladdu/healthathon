@@ -54,16 +54,6 @@ import java.time.LocalDate
     }
 }
 
-/** A Today section title with the one page it opens on the right ("Open medicines" and a chevron). */
-@Composable fun TodaySectionHeader(title: String, action: String, tag: String, onAction: () -> Unit) {
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text(title, fontSize = 20.sp, fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
-        TextButton(onClick = onAction, modifier = Modifier.heightIn(min = 48.dp).testTag(tag), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) {
-            Text(action, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false); Icon(Icons.Default.ChevronRight, null, Modifier.size(20.dp))
-        }
-    }
-}
-
 /** The last row on Today: the one way into every other care page (the Care tab). */
 @Composable fun TodayAllCareTools(onOpen: () -> Unit) {
     val t = careText()

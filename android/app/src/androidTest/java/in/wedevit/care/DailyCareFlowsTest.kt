@@ -45,9 +45,10 @@ class DailyCareFlowsTest {
         ui.runOnIdle { vm = ui.activity.careModel; vm.select(originalPerson); vm.role(originalRole) }
     }
 
+    /** Calendar, Lab history and the other pages are rows in All care tools (the Care tab). */
     private fun openShortcut(tag: String) {
-        ui.onNodeWithTag("nav-Today").performClick()
-        ui.onNodeWithTag("today-list").performScrollToNode(hasTestTag(tag))
+        ui.onNodeWithTag("nav-Care").performClick()
+        ui.onNodeWithTag("care-list").performScrollToNode(hasTestTag(tag))
         ui.onNodeWithTag(tag).performClick()
     }
     /** The Care team page left the patient's Today (2 Nov redesign). A family member reaches it from the Goals of care card: Talk, then "Ask for a conversation". */
