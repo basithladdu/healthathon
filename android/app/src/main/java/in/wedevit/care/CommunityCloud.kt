@@ -27,6 +27,15 @@ internal suspend fun CareCloud.communityReact(postId: String, kind: String, on: 
     request("POST", "/rest/v1/rpc/sahara_community_react", JSONObject().put("p_post", postId).put("p_kind", kind).put("p_on", on))
 }
 
+/** Joins or leaves a group for the signed-in member; returns whether they are in it now. */
+internal suspend fun CareCloud.communityJoin(groupId: String, on: Boolean): Boolean =
+    JSONObject(request("POST", "/rest/v1/rpc/sahara_community_join", JSONObject().put("p_group", groupId).put("p_on", on))).getBoolean("joined")
+
+/** Saves a post to read again (or takes it out of Saved); only this member sees it. */
+internal suspend fun CareCloud.communitySave(postId: String, on: Boolean) {
+    request("POST", "/rest/v1/rpc/sahara_community_save", JSONObject().put("p_post", postId).put("p_on", on))
+}
+
 internal suspend fun CareCloud.communityReport(postId: String?, replyId: String?, reason: String) {
     request("POST", "/rest/v1/rpc/sahara_community_report", JSONObject().put("p_post", postId ?: JSONObject.NULL).put("p_reply", replyId ?: JSONObject.NULL).put("p_reason", reason).put("p_note", ""))
 }
@@ -53,8 +62,8 @@ internal class CommunityStore(context: Context) {
     suspend fun flush(accountId: String, send: suspend (CommunityPending) -> Unit): Throwable? = sending.withLock {
         CommunityOutbox.flush(all(), accountId, send) { remaining -> synchronized(this) { preferences.edit().putString("pending", CommunityOutbox.encode(remaining)).commit() } }
     }
-    /** The built-in community and what this phone added to it (used while the server can't be). Unreadable data starts fresh. */
-    @Synchronized fun local(): CommunityLocalState = runCatching { CommunityLocal.decode(preferences.getString("local", null)) }.getOrDefault(CommunityLocalState())
-    @Synchronized fun saveLocal(state: CommunityLocalState): Boolean = preferences.edit().putString("local", CommunityLocal.encode(state)).commit()
+    /** What [accountId] added to the built-in community (used while the server can't be): kept per account, so each login sees its own. Unreadable data starts fresh. */
+    @Synchronized fun local(accountId: String): CommunityLocalState = runCatching { CommunityLocal.decode(preferences.getString("local:$accountId", null)) }.getOrDefault(CommunityLocalState())
+    @Synchronized fun saveLocal(accountId: String, state: CommunityLocalState): Boolean = preferences.edit().putString("local:$accountId", CommunityLocal.encode(state)).commit()
     private companion object { val sending = Mutex() }
 }

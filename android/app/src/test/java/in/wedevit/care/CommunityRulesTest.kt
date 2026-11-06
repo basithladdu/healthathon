@@ -163,9 +163,9 @@ class CommunityRulesTest {
     @Test fun whatThisPhoneAddsShowsAtOnceAndSurvivesARestart() {
         val anchor = 5_000_000_000L
         var state = CommunityLocalState(name = "Asha's daughter")
-        state = CommunityLocal.add(state, CommunityPending("mine-1", CommunityLocal.ACCOUNT, CommunityPending.POST, "family-carers", "Hello all", anchor + 1000))
-        state = CommunityLocal.add(state, CommunityPending("mine-r", CommunityLocal.ACCOUNT, CommunityPending.REPLY, "local-fc-2", "Same here", anchor + 2000))
-        state = CommunityLocal.add(state, CommunityPending("mine-r2", CommunityLocal.ACCOUNT, CommunityPending.REPLY, "mine-1", "Thank you", anchor + 3000))
+        state = CommunityLocal.add(state, CommunityPending("mine-1", "acct-a", CommunityPending.POST, "family-carers", "Hello all", anchor + 1000))
+        state = CommunityLocal.add(state, CommunityPending("mine-r", "acct-a", CommunityPending.REPLY, "local-fc-2", "Same here", anchor + 2000))
+        state = CommunityLocal.add(state, CommunityPending("mine-r2", "acct-a", CommunityPending.REPLY, "mine-1", "Thank you", anchor + 3000))
         state = CommunityLocal.react(state, "local-fc-2", "hugs")
         state = CommunityLocal.report(state, "local-fc-3")
         val base = CommunityLocal.home(CommunityLocalState()).groups.first { it.id == "family-carers" }.posts
@@ -177,6 +177,12 @@ class CommunityRulesTest {
         assertTrue(nights.myHugs); assertEquals(CommunityLocal.posts.first { it.id == "local-fc-2" }.hugs + 1, nights.hugs)
         assertTrue(nights.replies.last().mine); assertTrue(hindi.containsMatchIn(nights.body))
         assertTrue(feed.posts.first { it.id == "local-fc-3" }.reported)
+        // Posting joins the group; saving lists the post under Saved; both survive a restart.
+        assertTrue(CommunityLocal.home(state).groups.first { it.id == "family-carers" }.joined)
+        state = CommunityLocal.save(CommunityLocal.join(state, "grief-loss", true), "local-gl-1", true)
+        assertEquals(listOf("local-gl-1"), CommunityLocal.feed(CommunityRules.SAVED, state, anchor) { it.en }.posts.map { it.id })
+        assertEquals(setOf("family-carers", "grief-loss"), CommunityLocal.home(state).groups.filter { it.joined }.map { it.id }.toSet())
+        assertEquals("Asha", CommunityRules.suggestName("asha.verma42@example.com")); assertNull(CommunityRules.suggestName("98765@example.com"))
         assertEquals(state, CommunityLocal.decode(CommunityLocal.encode(state)))
         assertEquals(CommunityLocalState(), CommunityLocal.decode(null))
         // A second tap takes the hug back; deleting a post takes its replies with it; built-in posts stay.
