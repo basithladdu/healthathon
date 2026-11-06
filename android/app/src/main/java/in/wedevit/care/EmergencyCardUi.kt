@@ -312,19 +312,21 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
     done?.let { message -> SaharaDialog(message, onDismiss = { done = null }, tone = SaharaTone.Success, modifier = Modifier.testTag("emergency-card-done")) }
     if (selected.isBlank()) return
     if (card == null || qr == null) {
-        ActionCard(Peach, modifier = Modifier.fillMaxWidth().testTag("emergency-card-entry"), onClick = { if (ready && !busy) remake(EmergencySection.entries.toSet(), null) }) {
+        // Emergency red: the red wash with a solid red QR chip.
+        ActionCard(SaharaSection.Emergency.wash, modifier = Modifier.fillMaxWidth().testTag("emergency-card-entry"), onClick = { if (ready && !busy) remake(EmergencySection.entries.toSet(), null) }) {
             Row(Modifier.fillMaxWidth().heightIn(min = 64.dp).padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.QrCode, null, Modifier.size(36.dp), tint = Rust); Spacer(Modifier.width(12.dp))
+                SaharaIconChip(Icons.Default.QrCode, SaharaSection.Emergency, size = 44); Spacer(Modifier.width(12.dp))
                 Text(t("Emergency card", "आपातकालीन कार्ड"), fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Ink, modifier = Modifier.weight(1f))
-                if (!ready || busy) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp, color = Rust)
-                else Icon(Icons.Default.Refresh, null, Modifier.size(19.dp))
+                if (!ready || busy) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp, color = SaharaSection.Emergency.solid)
+                else Icon(Icons.Default.Refresh, null, Modifier.size(19.dp), tint = SaharaSection.Emergency.ink)
             }
         }
     } else {
         val stale = ready && runCatching { card.outOfDate(source) }.getOrDefault(false)
         val shownQr = linkQr ?: qr
         val link = card.link
-        Surface(shape = RoundedCornerShape(12.dp), color = Paper, border = androidx.compose.foundation.BorderStroke(1.5.dp, FamilyAccent.Marigold.copy(alpha = .5f)), modifier = Modifier.fillMaxWidth().testTag("emergency-card")) {
+        // The QR stays on white for scanners; the card's solid red edge says Emergency.
+        Surface(shape = RoundedCornerShape(12.dp), color = Paper, border = androidx.compose.foundation.BorderStroke(2.dp, SaharaSection.Emergency.solid), modifier = Modifier.fillMaxWidth().testTag("emergency-card")) {
             Column(Modifier.saharaContentSize().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 QrImage(shownQr, if (link != null) t("Emergency web link QR code", "आपातकालीन वेब लिंक QR कोड") else t("Emergency card offline QR code", "आपातकालीन कार्ड ऑफ़लाइन QR कोड"), Modifier.fillMaxWidth().widthIn(max = 240.dp).clickable(onClickLabel = t("Show full screen", "पूरी स्क्रीन पर दिखाएँ")) { fullScreen = true }.testTag("emergency-card-qr"))
                 if (name.isNotBlank()) Text(name, fontWeight = FontWeight.Bold, fontSize = 22.sp, color = Ink, textAlign = TextAlign.Center, modifier = Modifier.testTag("emergency-card-name"))
@@ -439,7 +441,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
     val preview = remember(source, sections, previous) { if (sections.isEmpty()) null else runCatching { EmergencyCardRules.build(source, sections, (previous?.number ?: 0) + 1, "NEW", System.currentTimeMillis()) }.getOrNull() }
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         LazyColumn(Modifier.fillMaxWidth().testTag("emergency-card-setup"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            item { Heading(if (previous == null) t("Emergency card", "आपातकालीन कार्ड") else t("Edit card", "कार्ड बदलें"), 26) }
+            item { SaharaSectionBand(if (previous == null) t("Emergency card", "आपातकालीन कार्ड") else t("Edit card", "कार्ड बदलें"), SaharaSection.Emergency) }
             item {
                 val goals = source.goals
                 EmergencySection.entries.forEach { section ->

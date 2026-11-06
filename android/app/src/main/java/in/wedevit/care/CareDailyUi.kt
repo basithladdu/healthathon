@@ -13,10 +13,7 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
@@ -226,20 +223,20 @@ internal object CareModules {
 
 @Composable fun MedicineScanAction(onScan: () -> Unit, onManual: () -> Unit) {
     val t = careText()
-    Surface(shape = RoundedCornerShape(20.dp), color = SaharaSoftBlue, modifier = Modifier.fillMaxWidth().testTag("medicine-scan-card")) {
+    Surface(shape = RoundedCornerShape(20.dp), color = SaharaSection.Medicines.wash, border = BorderStroke(1.5.dp, SaharaSection.Medicines.solid), modifier = Modifier.fillMaxWidth().testTag("medicine-scan-card")) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(shape = androidx.compose.foundation.shape.CircleShape, color = Paper) { Icon(Icons.Default.DocumentScanner, null, tint = DoctorAccent, modifier = Modifier.padding(10.dp).size(24.dp)) }
+                SaharaIconChip(Icons.Default.DocumentScanner, SaharaSection.Medicines, size = 44)
                 Spacer(Modifier.width(12.dp))
                 Text(t("Scan a prescription", "पर्चा स्कैन करें"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.weight(1f))
             }
             // Wraps instead of squeezing when the screen is narrow or the text is large.
             FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = onScan, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.heightIn(min = 48.dp).testTag("care-module-medicines-scan")) {
+                Button(onClick = onScan, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = SaharaSection.Medicines.solid, contentColor = SaharaSection.Medicines.onSolid), modifier = Modifier.heightIn(min = 48.dp).testTag("care-module-medicines-scan")) {
                     Icon(Icons.Default.DocumentScanner, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Scan", "स्कैन करें"))
                 }
-                OutlinedButton(onClick = onManual, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, DoctorAccent.copy(alpha = 0.5f)), modifier = Modifier.heightIn(min = 48.dp)) {
-                    Icon(Icons.Default.Add, null, Modifier.size(18.dp), tint = DoctorAccent); Spacer(Modifier.width(6.dp)); Text(t("Add manually", "ख़ुद लिखें"), color = DoctorAccent)
+                OutlinedButton(onClick = onManual, shape = RoundedCornerShape(14.dp), border = BorderStroke(2.dp, SaharaSection.Medicines.solid), colors = ButtonDefaults.outlinedButtonColors(containerColor = Paper), modifier = Modifier.heightIn(min = 48.dp)) {
+                    Icon(Icons.Default.Add, null, Modifier.size(18.dp), tint = SaharaSection.Medicines.ink); Spacer(Modifier.width(6.dp)); Text(t("Add manually", "ख़ुद लिखें"), color = SaharaSection.Medicines.ink)
                 }
             }
         }
@@ -265,14 +262,10 @@ internal fun careModuleIcon(name: String): ImageVector = when (name) {
 
 /** A module on its own screen, with a back arrow to where it was opened from (All care tools, or Today). */
 @Composable internal fun CareModuleScreen(tile: CareModuleTile, onBack: () -> Unit) {
-    val t = careText()
     BackHandler(onBack = onBack)
     LazyColumn(Modifier.fillMaxSize().saharaScreenEnter().testTag("care-list"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack, modifier = Modifier.size(48.dp).testTag("care-module-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) }
-            Text(tile.title, fontFamily = SaharaTitleFont, fontSize = 28.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
-            Image(saharaImage(tile.art, 56.dp), null, Modifier.size(56.dp), contentScale = ContentScale.Fit)
-        } }
+        // The module's header band in its section colour (medicines plum, visits indigo, check-ins teal), white title and back.
+        item { SaharaSectionBand(tile.title, careModuleTone(tile.name), onBack = onBack, backTag = "care-module-back") { SaharaBandArt(tile.art) } }
         item { Column(Modifier.testTag("care-module-${tile.key}"), verticalArrangement = Arrangement.spacedBy(12.dp), content = tile.content) }
     }
 }

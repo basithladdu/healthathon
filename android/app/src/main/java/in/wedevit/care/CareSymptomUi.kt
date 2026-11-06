@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.DeleteOutline
@@ -77,19 +76,12 @@ import java.time.format.DateTimeFormatter
     BackHandler(onBack = onBack)
     LazyColumn(Modifier.fillMaxSize().testTag("symptom-diary"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item {
-            // One title, the person's name as its single subtitle line.
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस"), tint = Ink) }
-                Spacer(Modifier.width(4.dp))
-                Column(Modifier.weight(1f)) {
-                    Heading(t("Symptoms", "लक्षण"), 27)
-                    if (!person?.name.isNullOrBlank()) Text(person?.name.orEmpty(), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub)
-                }
-            }
+            // One title on the rose Symptoms band, the person's name as its single subtitle line.
+            SaharaSectionBand(t("Symptoms", "लक्षण"), SaharaSection.Symptoms, onBack = onBack, subtitle = person?.name)
         }
         if (canEdit && person != null) item(key = "quick-grid") {
             Column(Modifier.saharaAppear(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(t("Log a symptom", "लक्षण दर्ज करें"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.a11yHeading())
+                Text(t("Log a symptom", "लक्षण दर्ज करें"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = SaharaSection.Symptoms.ink, modifier = Modifier.a11yHeading())
                 val tiles = quickKeys.map { it to SymptomDiaryRules.symptomLabel(it, hindi) } + ("Other" to t("All symptoms", "सभी लक्षण"))
                 tiles.chunked(if (largeText) 1 else 2).forEach { row ->
                     Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -105,13 +97,13 @@ import java.time.format.DateTimeFormatter
         }
         if (person != null && hasPainHistory) item {
             // Opens past pain notes on the body model (read only); new pain is added with "How are you feeling?".
-            OutlinedButton(onClick = { showingPainHistory = true }, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, DoctorAccent), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).saharaAppear().testTag("symptom-pain-history")) {
-                Icon(Icons.Default.AccessibilityNew, null, Modifier.size(20.dp), tint = DoctorAccent); Spacer(Modifier.width(8.dp)); Text(t("Pain map", "दर्द का नक्शा"), color = RustText, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+            OutlinedButton(onClick = { showingPainHistory = true }, shape = RoundedCornerShape(14.dp), border = BorderStroke(2.dp, SaharaSection.Symptoms.solid), colors = ButtonDefaults.outlinedButtonColors(containerColor = Paper), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).saharaAppear().testTag("symptom-pain-history")) {
+                Icon(Icons.Default.AccessibilityNew, null, Modifier.size(20.dp), tint = SaharaSection.Symptoms.ink); Spacer(Modifier.width(8.dp)); Text(t("Pain map", "दर्द का नक्शा"), color = SaharaSection.Symptoms.ink, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
             }
         }
         // Friendly empty state: a calm picture and one line; the "How are you feeling?" button above is its action.
         if (notes.isEmpty()) item {
-            Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
+            Surface(shape = RoundedCornerShape(20.dp), color = SaharaSection.Symptoms.wash, border = BorderStroke(1.5.dp, SaharaSection.Symptoms.solid), modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 24.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     SaharaIllustration(SaharaArtKind.NoSymptoms)
                     Text(t("No symptom notes yet", "अभी तबीयत का कोई नोट नहीं है"), fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
@@ -121,12 +113,12 @@ import java.time.format.DateTimeFormatter
         if (notes.isNotEmpty()) item(key = "notes-head") {
             // One row: the list's name and count, with Share beside it (it shares this list).
             Row(Modifier.fillMaxWidth().padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text("${t("Notes", "नोट")} · ${notes.size}", fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
+                Text("${t("Notes", "नोट")} · ${notes.size}", fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = SaharaSection.Symptoms.ink, modifier = Modifier.weight(1f).a11yHeading())
                 TextButton(onClick = {
                 val text = listOf("Sahara — ${t("Personal symptom notes", "तबीयत के निजी नोट")}", person?.name.orEmpty(),
                     *notes.map { "${SymptomNoteCodec.decode(it.detail)?.let { n -> SymptomDiaryRules.symptomLabel(n.symptom, hindi) }.orEmpty()}\n${SymptomNoteCodec.readable(it.detail, hindi)}" }.toTypedArray()).joinToString("\n\n")
                 open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), t("Share symptom notes", "तबीयत के नोट साझा करें")))
-            }, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Share, null, Modifier.size(20.dp), tint = DoctorAccent); Spacer(Modifier.width(6.dp)); Text(t("Share notes", "नोट साझा करें"), color = RustText, fontSize = 16.sp, fontWeight = FontWeight.SemiBold) }
+            }, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Share, null, Modifier.size(20.dp), tint = SaharaSection.Symptoms.ink); Spacer(Modifier.width(6.dp)); Text(t("Share notes", "नोट साझा करें"), color = SaharaSection.Symptoms.ink, fontSize = 16.sp, fontWeight = FontWeight.SemiBold) }
             }
         }
         if (notes.size > 1) item {
@@ -193,7 +185,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
     val isMood = note?.symptom == SymptomDiaryRules.MOOD
     val largeText = LocalDensity.current.fontScale > 1.15f
     val accent = symptomColor(note?.symptom ?: item.title)
-    Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().saharaContentSize()) { Row(Modifier.height(IntrinsicSize.Min)) {
+    Surface(shape = RoundedCornerShape(16.dp), color = SaharaSection.Symptoms.wash, border = BorderStroke(1.5.dp, SaharaSection.Symptoms.solid), modifier = Modifier.fillMaxWidth().saharaContentSize()) { Row(Modifier.height(IntrinsicSize.Min)) {
       // The symptom's own colour down the left edge, so a long list scans by colour as well as by name.
       Box(Modifier.width(5.dp).fillMaxHeight().background(accent))
       Column(Modifier.weight(1f).padding(start = 12.dp, top = 12.dp, end = 8.dp, bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {

@@ -317,31 +317,33 @@ class MedicineStripPhotos(context: Context, storage: String) {
             finally { working = false }
         } }
     }
-    Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("today-doses")) {
+    // Medicines plum: the card sits on the plum wash with a solid plum edge; the white pillboxes stand out on it.
+    Surface(shape = RoundedCornerShape(20.dp), color = SaharaSection.Medicines.wash, border = BorderStroke(1.5.dp, SaharaSection.Medicines.solid), modifier = Modifier.fillMaxWidth().testTag("today-doses")) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 // Medicines keep the plum section colour on their icon tile.
-                SaharaIconChip(Icons.Default.Medication, SaharaTone.Plum, size = 36)
+                SaharaIconChip(Icons.Default.Medication, SaharaSection.Medicines, size = 40)
                 Spacer(Modifier.width(12.dp))
                 Text(t("Today's doses", "आज की दवाएँ"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
                 // The count as a status pill, green once every dose is ticked; the number rises in when it changes.
                 val allDone = taken == total
-                val pillBg by animateColorAsState(if (allDone) DoctorStatusGoodBg else Cream, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "doses-pill")
+                // Solid pill: plum while doses are due, green once all are taken; bold white count on it.
+                val pillBg by animateColorAsState(if (allDone) SaharaTone.Success.solid else SaharaSection.Medicines.solid, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "doses-pill")
                 Surface(shape = RoundedCornerShape(50), color = pillBg) {
                     SaharaAnimatedText(t("$taken of $total taken", "$total में से $taken ली"), Modifier.padding(horizontal = 12.dp, vertical = 6.dp)) { text ->
-                        Text(text, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = if (allDone) DoctorStatusGood else DoctorCardSub, maxLines = 1, softWrap = false, modifier = Modifier.testTag("today-doses-count"))
+                        Text(text, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = SaharaSection.Medicines.onSolid, maxLines = 1, softWrap = false, modifier = Modifier.testTag("today-doses-count"))
                     }
                 }
             }
             val share by animateFloatAsState(if (total == 0) 0f else taken.toFloat() / total, SaharaMotion.tween(SaharaMotion.ENTER_MS, easing = SaharaMotion.Emphasized), label = "doses-progress")
-            LinearProgressIndicator(progress = { share }, modifier = Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(50)), color = DoctorStatusGood, trackColor = DoctorHairline, drawStopIndicator = {}, gapSize = 0.dp)
+            LinearProgressIndicator(progress = { share }, modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(50)), color = SaharaTone.Success.solid, trackColor = SaharaColors.Surface, drawStopIndicator = {}, gapSize = 0.dp)
             if (canEdit && taken < total && held?.personId != person) Text(t("Tap a dose when taken. Hold it for Missed.", "दवा लेने पर उसे छुएँ। छूटी हो तो दबाकर रखें।"), fontSize = 14.sp, color = DoctorCardSub)
             // "Marked taken · Undo" sits right under the count, in the first screenful, while a one-tap tick waits.
             DoseUndoRow(person)
             groups.forEach { group ->
                 Column(Modifier.testTag("today-doses-${group.time}"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    HorizontalDivider(color = DoctorHairline)
-                    Text(MedicineDoseRules.title(group, hindi), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = RustText, modifier = Modifier.padding(top = 4.dp))
+                    HorizontalDivider(color = SaharaSection.Medicines.solid.copy(alpha = .35f))
+                    Text(MedicineDoseRules.title(group, hindi), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = SaharaSection.Medicines.ink, modifier = Modifier.padding(top = 4.dp))
                     // Wraps onto new lines instead of hiding doses off the side of the screen.
                     FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         group.medicines.forEach { medicine ->
@@ -354,8 +356,8 @@ class MedicineStripPhotos(context: Context, storage: String) {
                 }
             }
             if (untimed.isNotEmpty()) Column(Modifier.testTag("today-doses-any-time"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                HorizontalDivider(color = DoctorHairline)
-                Text(t("Any time", "कभी भी"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = RustText, modifier = Modifier.padding(top = 4.dp))
+                HorizontalDivider(color = SaharaSection.Medicines.solid.copy(alpha = .35f))
+                Text(t("Any time", "कभी भी"), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = SaharaSection.Medicines.ink, modifier = Modifier.padding(top = 4.dp))
                 FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     untimed.forEach { (item, dose) -> key(item.id, dose.key) {
                         val doseLabel = medicineDoseLabel(dose)

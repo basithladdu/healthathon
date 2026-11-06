@@ -23,7 +23,6 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.CheckCircle
@@ -88,7 +87,6 @@ private fun communityIcon(groupId: String): ImageVector = when (groupId) {
 
 /** Body text that never splits a word across lines (owner, 6 Nov). */
 @Composable private fun communityBody(): TextStyle = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp, lineHeight = 24.sp, lineBreak = LineBreak.Paragraph, hyphens = Hyphens.None)
-@Composable private fun communityTitle(): TextStyle = MaterialTheme.typography.titleLarge.copy(fontSize = 22.sp, lineHeight = 28.sp, lineBreak = LineBreak.Heading, hyphens = Hyphens.None)
 
 private const val HOME = "home"
 
@@ -280,15 +278,9 @@ private const val HOME = "home"
     }
 }
 
-/** Back arrow and the screen title, like a top app bar. */
+/** Back arrow and the screen title on a band: the group's own colour, or Community rose on the groups list. */
 @Composable private fun CommunityTitleRow(title: String, onBack: () -> Unit, tone: SaharaTone? = null) {
-    val t = careText()
-    Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
-        IconButton(onClick = onBack, modifier = Modifier.size(48.dp).testTag("community-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस"), tint = SaharaColors.Ink) }
-        Spacer(Modifier.width(4.dp))
-        if (tone != null) { Box(Modifier.size(width = 4.dp, height = 24.dp).clip(CircleShape).background(tone.solid)); Spacer(Modifier.width(8.dp)) }
-        Text(title, Modifier.weight(1f).a11yHeading(), style = communityTitle(), color = SaharaColors.Ink, maxLines = 2, overflow = TextOverflow.Ellipsis)
-    }
+    SaharaSectionBand(title, tone ?: SaharaSection.Community, Modifier.padding(top = 8.dp), onBack = onBack, backTag = "community-back")
 }
 
 /** The pinned house rule: short and gentle, at the top of every group. */

@@ -40,10 +40,10 @@ internal fun doctorHubSingleColumn(widthDp: Float, fontScale: Float): Boolean = 
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         tabs.firstOrNull()?.let { PatientHubPrimaryRow(it, onSection, tagPrefix, meta[it.section], selected == it.section) }
         val rest = tabs.drop(1)
-        if (rest.isNotEmpty()) Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().saharaAppear()) {
+        if (rest.isNotEmpty()) Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, SaharaColors.Edge), modifier = Modifier.fillMaxWidth().saharaAppear()) {
             Column {
                 rest.forEachIndexed { index, tab ->
-                    if (index > 0) HorizontalDivider(Modifier.padding(start = 64.dp), color = DoctorHairline)
+                    if (index > 0) HorizontalDivider(color = SaharaColors.Surface, thickness = 2.dp)
                     DoctorSectionRow(tab, onSection, tagPrefix, meta[tab.section], selected == tab.section)
                 }
             }
@@ -51,15 +51,17 @@ internal fun doctorHubSingleColumn(widthDp: Float, fontScale: Float): Boolean = 
     }
 }
 
-/** Each patient section keeps its own colour on the hub row, the section bar and the Sections sheet. */
+/** Each patient section keeps its own colour (the same as the patient app's) on the hub row, the section bar and the Sections sheet. */
 internal fun doctorTabTone(section: String): DoctorTone = when (section) {
-    "GoalsOfCare", "Conversations" -> DoctorTones.Rust
-    "CarePlan", "Reports" -> DoctorTones.Marigold
-    "Progress", "Summary" -> DoctorTones.Teal
-    "Labs" -> DoctorTones.Leaf
-    "Visits" -> DoctorTones.Indigo
-    "Medicines" -> DoctorTones.Plum
-    else -> DoctorTones.Indigo
+    "GoalsOfCare" -> SaharaSection.GoalsOfCare
+    "Conversations" -> SaharaSection.Conversations
+    "CarePlan" -> SaharaSection.Emergency
+    "Reports" -> SaharaSection.Documents
+    "Progress", "Summary" -> SaharaSection.Symptoms
+    "Labs" -> SaharaSection.Labs
+    "Visits" -> SaharaSection.Visits
+    "Medicines" -> SaharaSection.Medicines
+    else -> DoctorTones.Teal
 }
 
 /** The first thing a doctor does here: a solid button-like row in the section colour with white text. */
@@ -85,15 +87,16 @@ internal fun doctorTabTone(section: String): DoctorTone = when (section) {
 @Composable internal fun DoctorSectionRow(tab: DoctorPatientTab, onSection: (String) -> Unit, tagPrefix: String, meta: String? = null, selected: Boolean = false) { val t = careText()
     val tone = doctorTabTone(tab.section)
     val press = remember { MutableInteractionSource() }
-    Surface(onClick = { onSection(tab.section) }, interactionSource = press, color = if (selected) tone.wash else Paper, contentColor = DoctorCardInk,
+    // Every row sits on its section's wash with a solid edge bar in its colour; the open one's bar is twice as wide.
+    Surface(onClick = { onSection(tab.section) }, interactionSource = press, color = tone.wash, contentColor = DoctorCardInk,
         modifier = Modifier.fillMaxWidth().saharaPress(press).heightIn(min = 56.dp).testTag("$tagPrefix-${tab.section}").semantics { role = Role.Button; semanticsSelected = selected }) {
         Row(Modifier.height(IntrinsicSize.Min), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.width(4.dp).fillMaxHeight().background(if (selected) tone.solid else Paper))
+            Box(Modifier.width(if (selected) 10.dp else 5.dp).fillMaxHeight().background(tone.solid))
             Row(Modifier.weight(1f).padding(start = 8.dp, end = 12.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 DoctorIconChip(tab.icon, tone, 40.dp)
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text(t(tab.en, tab.hi), fontSize = 17.sp, lineHeight = 22.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, style = DoctorWholeWords)
+                    Text(t(tab.en, tab.hi), fontSize = 17.sp, lineHeight = 22.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk, style = DoctorWholeWords)
                     if (!meta.isNullOrBlank()) Text(meta, fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium, color = tone.ink, style = DoctorWholeWords, modifier = Modifier.testTag("$tagPrefix-${tab.section}-meta"))
                 }
                 Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = tone.ink, modifier = Modifier.size(20.dp))

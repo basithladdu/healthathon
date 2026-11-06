@@ -4,7 +4,6 @@ package `in`.wedevit.care
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -114,7 +113,7 @@ private fun visitTone(s: CareVisitSpeciality?): SaharaTone = when (s) {
     CareVisitSpeciality.SURGERY -> SaharaTone.Indigo
     CareVisitSpeciality.HOME_CARE -> SaharaTone.Marigold
     CareVisitSpeciality.GENERAL -> SaharaTone.Leaf
-    null -> SaharaTone.Neutral
+    null -> SaharaSection.Visits
 }
 
 @Composable private fun visitSpecialityLabel(s: CareVisitSpeciality): String { val t = careText(); return when (s) {
@@ -123,19 +122,22 @@ private fun visitTone(s: CareVisitSpeciality?): SaharaTone = when (s) {
     CareVisitSpeciality.HOME_CARE -> t("Home care", "घर पर देखभाल"); CareVisitSpeciality.GENERAL -> t("General medicine", "सामान्य चिकित्सा")
 } }
 
+/** Solid status colour for a visit chip: green completed, red cancelled or missed. */
+private fun visitStatusTone(status: String): SaharaTone = if (status == "completed") SaharaTone.Success else SaharaTone.Error
+
 @Composable private fun visitStatusLabel(status: String): String { val t = careText(); return when (status) {
     "completed" -> t("Completed", "पूरा हुआ"); "cancelled" -> t("Cancelled", "रद्द"); "missed" -> t("Missed", "छूट गई"); else -> ""
 } }
 
-/** A coloured date block: big day number over the short month; a dash when the date is not recorded. */
-@Composable private fun VisitDateBlock(at: Long, color: Color) {
+/** A solid date block in the [tone]'s colour: big white day number over the short month; a dash when the date is not recorded. */
+@Composable private fun VisitDateBlock(at: Long, tone: SaharaTone) {
     val hindi = careHindi()
     val day = at.takeIf { it > 0 }?.let(::careDay)
-    Surface(shape = RoundedCornerShape(14.dp), color = color, modifier = Modifier.size(width = 48.dp, height = 52.dp)) {
+    Surface(shape = RoundedCornerShape(14.dp), color = tone.band, modifier = Modifier.size(width = 48.dp, height = 52.dp)) {
         Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-            Text(day?.dayOfMonth?.toString() ?: "—", fontFamily = SaharaTitleFont, fontSize = 20.sp, lineHeight = 22.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk, maxLines = 1)
-            if (day != null) Text(day.format(careDateFormat("MMM", hindi)).uppercase(), fontSize = 12.sp, lineHeight = 14.sp, fontWeight = FontWeight.SemiBold, color = RustText, maxLines = 1)
-            if (day != null && day.year != LocalDate.now().year) Text("${day.year}", fontSize = 11.sp, lineHeight = 12.sp, color = DoctorCardSub, maxLines = 1)
+            Text(day?.dayOfMonth?.toString() ?: "—", fontFamily = SaharaTitleFont, fontSize = 20.sp, lineHeight = 22.sp, fontWeight = FontWeight.Bold, color = tone.onSolid, maxLines = 1)
+            if (day != null) Text(day.format(careDateFormat("MMM", hindi)).uppercase(), fontSize = 12.sp, lineHeight = 14.sp, fontWeight = FontWeight.Bold, color = tone.onSolid, maxLines = 1)
+            if (day != null && day.year != LocalDate.now().year) Text("${day.year}", fontSize = 11.sp, lineHeight = 12.sp, fontWeight = FontWeight.Bold, color = tone.onSolid, maxLines = 1)
         }
     }
 }
@@ -153,20 +155,20 @@ private fun visitTone(s: CareVisitSpeciality?): SaharaTone = when (s) {
     val speciality = info.speciality?.let { visitSpecialityLabel(it) }
     val status = visitStatusLabel(info.status)
     val dateText = if (item.due > 0) date(item.due) else t("Date not recorded", "तारीख़ दर्ज नहीं")
-    Surface(onClick = onOpen, shape = RoundedCornerShape(20.dp), color = tone.wash, border = BorderStroke(1.dp, DoctorHairline),
+    Surface(onClick = onOpen, shape = RoundedCornerShape(20.dp), color = tone.wash, border = BorderStroke(1.5.dp, tone.solid),
         modifier = Modifier.fillMaxWidth().saharaAppear().heightIn(min = 64.dp).semantics(mergeDescendants = true) { contentDescription = listOfNotNull(dateText, info.doctor, speciality, status.ifBlank { null }).joinToString(", ") }.testTag("care-visit-${item.id}")) {
         Row(Modifier.padding(horizontal = 8.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-            VisitDateBlock(item.due, Paper)
+            VisitDateBlock(item.due, tone)
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(info.doctor.ifBlank { t("Visit", "मुलाक़ात") }, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis,
                     textDecoration = if (info.status == "cancelled") TextDecoration.LineThrough else null)
                 if (speciality != null || status.isNotBlank()) Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
                     if (speciality != null) VisitChip(speciality, tone.solid, tone.onSolid)
-                    if (status.isNotBlank()) VisitChip(status, Paper, if (info.status == "completed") DoctorAccent else RustText)
+                    if (status.isNotBlank()) visitStatusTone(info.status).let { VisitChip(status, it.solid, it.onSolid) }
                 }
             }
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, Modifier.size(22.dp), tint = Rust)
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, Modifier.size(22.dp), tint = tone.ink)
         }
     }
 }
@@ -185,10 +187,10 @@ private fun visitTone(s: CareVisitSpeciality?): SaharaTone = when (s) {
     (upcoming + past).firstOrNull { it.id == openId }?.let { visit -> CareVisitDaySheet(vm, visit, onCalendarAt) { openId = null } }
 }
 
-/** A friendly empty module: a soft icon and one line. */
-@Composable private fun ModuleEmpty(icon: ImageVector, text: String) {
+/** A friendly empty module: the section's solid icon chip and one line. */
+@Composable private fun ModuleEmpty(icon: ImageVector, text: String, tone: SaharaTone = SaharaSection.Visits) {
     Row(Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-        Surface(shape = CircleShape, color = SaharaApricot) { Icon(icon, null, Modifier.padding(8.dp).size(20.dp), tint = DoctorAccent) }
+        SaharaIconChip(icon, tone, size = 36)
         Spacer(Modifier.width(12.dp)); Text(text, fontSize = 15.sp, color = DoctorCardSub)
     }
 }
@@ -214,34 +216,34 @@ private fun visitTone(s: CareVisitSpeciality?): SaharaTone = when (s) {
         .format(if (info.timed) careDateFormat("EEE, d MMM yyyy · h:mm a", hindi) else careDateFormat("EEE, d MMM yyyy", hindi))
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 20.dp, end = 20.dp, bottom = 28.dp).testTag("care-visit-day"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Surface(shape = RoundedCornerShape(20.dp), color = tone.wash, modifier = Modifier.fillMaxWidth()) {
+            Surface(shape = RoundedCornerShape(20.dp), color = tone.wash, border = BorderStroke(1.5.dp, tone.solid), modifier = Modifier.fillMaxWidth()) {
                 Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    VisitDateBlock(visit.due, Paper); Spacer(Modifier.width(12.dp))
+                    VisitDateBlock(visit.due, tone); Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(info.doctor.ifBlank { t("Visit", "मुलाक़ात") }, fontFamily = SaharaTitleFont, fontSize = 22.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
                         Text(whenText, fontSize = 14.sp, color = DoctorCardSub)
                         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             info.speciality?.let { VisitChip(visitSpecialityLabel(it), tone.solid, tone.onSolid) }
-                            visitStatusLabel(info.status).takeIf(String::isNotBlank)?.let { VisitChip(it, Paper, if (info.status == "completed") DoctorAccent else RustText) }
+                            visitStatusLabel(info.status).takeIf(String::isNotBlank)?.let { label -> visitStatusTone(info.status).let { VisitChip(label, it.solid, it.onSolid) } }
                         }
                     }
                 }
             }
             if (info.place.isNotBlank()) VisitDetailLine(Icons.Default.Place, info.place)
             if (info.note.isNotBlank()) VisitDetailLine(Icons.Default.EditNote, info.note)
-            Text(t("Prescription", "पर्चा"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
+            Text(t("Prescription", "पर्चा"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Bold, color = SaharaSection.Medicines.ink, modifier = Modifier.a11yHeading())
             if (prescription.isEmpty) Row(Modifier.fillMaxWidth().testTag("care-visit-no-prescription"), verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.Description, null, Modifier.size(20.dp), tint = DoctorCardSub); Spacer(Modifier.width(12.dp))
                 Text(t("No prescription", "कोई पर्चा नहीं"), fontSize = 14.sp, color = DoctorCardSub)
             }
-            else Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("care-visit-prescription")) {
+            else Surface(shape = RoundedCornerShape(20.dp), color = SaharaSection.Medicines.wash, border = BorderStroke(1.5.dp, SaharaSection.Medicines.solid), modifier = Modifier.fillMaxWidth().testTag("care-visit-prescription")) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     prescription.documents.forEach { doc -> Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Description, null, Modifier.size(20.dp), tint = DoctorAccent); Spacer(Modifier.width(10.dp))
+                        Icon(Icons.Default.Description, null, Modifier.size(20.dp), tint = SaharaSection.Medicines.ink); Spacer(Modifier.width(10.dp))
                         Text(doc.name, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     } }
                     prescription.medicines.forEach { m -> Row(verticalAlignment = Alignment.Top) {
-                        Surface(shape = CircleShape, color = SaharaSoftBlue) { Icon(Icons.Default.Medication, null, Modifier.padding(5.dp).size(16.dp), tint = DoctorAccent) }
+                        SaharaIconChip(Icons.Default.Medication, SaharaSection.Medicines, size = 28)
                         Spacer(Modifier.width(10.dp))
                         Column(Modifier.weight(1f)) {
                             Text(m.title, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -270,7 +272,7 @@ private fun visitTone(s: CareVisitSpeciality?): SaharaTone = when (s) {
 @Composable private fun VisitDetailLine(icon: ImageVector, text: String) {
     Surface(shape = RoundedCornerShape(14.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
         Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.Top) {
-            Icon(icon, null, Modifier.size(20.dp), tint = Rust); Spacer(Modifier.width(12.dp))
+            Icon(icon, null, Modifier.size(20.dp), tint = SaharaSection.Visits.ink); Spacer(Modifier.width(12.dp))
             Text(text, fontSize = 15.sp, color = DoctorCardInk)
         }
     }
@@ -280,7 +282,7 @@ private fun visitTone(s: CareVisitSpeciality?): SaharaTone = when (s) {
 @Composable fun CareTodoModule(vm: CareModel, tasks: List<CareItem>) {
     val t = careText()
     val (open, done) = remember(tasks) { CareTodoRules.split(tasks) }
-    if (tasks.isEmpty()) ModuleEmpty(Icons.Default.Checklist, t("No tasks yet.", "अभी कोई काम नहीं।")) else {
+    if (tasks.isEmpty()) ModuleEmpty(Icons.Default.Checklist, t("No tasks yet.", "अभी कोई काम नहीं।"), SaharaSection.ToDo) else {
         CareModuleList("to-do", open, t("Nothing left to do.", "कोई काम बाक़ी नहीं।"), keyOf = { it.id }) { CareTaskRow(it, vm) }
         if (done.isNotEmpty()) CareModuleList("to-do-done", done, "", t("Done", "हो गया"), { it.id }) { CareTaskRow(it, vm) }
     }
@@ -296,7 +298,7 @@ private fun visitTone(s: CareVisitSpeciality?): SaharaTone = when (s) {
     val done = item.doneOn.isNotBlank()
     val overdue = CareTodoRules.overdue(item, LocalDate.now())
     val detail = item.detail.takeIf { !CareEntryCodec.isStructured(it) }?.trim().orEmpty()
-    Surface(onClick = { if (detail.isNotBlank()) expanded = !expanded }, shape = RoundedCornerShape(16.dp), color = if (done) Sage.copy(alpha = .45f) else Paper, border = BorderStroke(1.dp, DoctorHairline),
+    Surface(onClick = { if (detail.isNotBlank()) expanded = !expanded }, shape = RoundedCornerShape(16.dp), color = if (done) SaharaSection.ToDo.wash else Paper, border = BorderStroke(1.5.dp, SaharaSection.ToDo.solid),
         modifier = Modifier.fillMaxWidth().saharaAppear().heightIn(min = 56.dp).testTag("care-task-${item.id}")) {
         Column(Modifier.padding(end = 4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -304,7 +306,7 @@ private fun visitTone(s: CareVisitSpeciality?): SaharaTone = when (s) {
                     modifier = Modifier.semantics { contentDescription = "${t("Done", "हो गया")}: ${item.title}" })
                 Text(item.title, Modifier.weight(1f), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = if (done) DoctorCardSub else DoctorCardInk, maxLines = if (expanded) 3 else 1, overflow = TextOverflow.Ellipsis,
                     textDecoration = if (done) TextDecoration.LineThrough else null)
-                if (item.due > 0) VisitChip(careDay(item.due).format(DateTimeFormatter.ofPattern("d MMM", careLocale(careHindi()))), if (overdue) SaharaTone.Error.wash else SaharaTone.Gold.wash, if (overdue) SaharaTone.Error.ink else DoctorCardInk)
+                if (item.due > 0) VisitChip(careDay(item.due).format(DateTimeFormatter.ofPattern("d MMM", careLocale(careHindi()))), if (overdue) SaharaTone.Error.solid else SaharaSection.ToDo.solid, if (overdue) SaharaTone.Error.onSolid else SaharaSection.ToDo.onSolid)
                 if (canEdit) Box {
                     IconButton(onClick = { menu = true }, modifier = Modifier.size(48.dp).testTag("care-menu-${item.id}")) { Icon(Icons.Default.MoreVert, t("More actions", "और विकल्प"), tint = DoctorCardInk) }
                     DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
@@ -325,10 +327,10 @@ private fun visitTone(s: CareVisitSpeciality?): SaharaTone = when (s) {
 /** One saved conversation: a coloured date block, who it was with, and its version and review state on one line. */
 @Composable fun CareConversationRow(note: CareVersion, onRead: (CareVersion) -> Unit) {
     val t = careText()
-    Surface(onClick = { onRead(note) }, shape = RoundedCornerShape(20.dp), color = SaharaLavender, border = BorderStroke(1.dp, DoctorHairline),
+    Surface(onClick = { onRead(note) }, shape = RoundedCornerShape(20.dp), color = SaharaSection.Conversations.wash, border = BorderStroke(1.5.dp, SaharaSection.Conversations.solid),
         modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp).testTag("care-note-${note.id}")) {
         Row(Modifier.padding(horizontal = 8.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-            VisitDateBlock(note.published, Paper)
+            VisitDateBlock(note.published, SaharaSection.Conversations)
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(note.doctor.trim().ifBlank { t("Goals of care", "देखभाल के लक्ष्य") }, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -337,7 +339,7 @@ private fun visitTone(s: CareVisitSpeciality?): SaharaTone = when (s) {
                     Text(ReviewWorkflow.label(note), fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, Modifier.size(22.dp), tint = Rust)
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, Modifier.size(22.dp), tint = SaharaSection.Conversations.ink)
         }
     }
 }

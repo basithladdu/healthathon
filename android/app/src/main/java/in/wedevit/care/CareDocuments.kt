@@ -150,11 +150,9 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         }
     }
     LazyColumn(Modifier.fillMaxSize().testTag("documents-list"), state = listState, contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f).padding(end = 8.dp)) {
-                Heading(t("Documents", "कागज़ात"), 30)
-            }
-            if (canEdit) SaharaPrimaryButton(t("Add document", "कागज़ जोड़ें"), onClick = { addSheet = true }, icon = Icons.Default.Add, enabled = !busy, modifier = Modifier.testTag("document-add"))
+        // The marigold Documents band, with Add as a white button on it.
+        item { SaharaSectionBand(t("Documents", "कागज़ात"), SaharaSection.Documents) {
+            if (canEdit) SaharaBandButton(t("Add document", "कागज़ जोड़ें"), onClick = { addSheet = true }, tone = SaharaSection.Documents, icon = Icons.Default.Add, enabled = !busy, modifier = Modifier.testTag("document-add"))
         } }
         // Timeline and Ask as two slim buttons (they open their own screens), so the list starts in the first screenful.
         item { Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -217,17 +215,18 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         if (visibleNotes.isNotEmpty()) item { SectionTitle(t("Care notes", "देखभाल नोट")) }
         items(visibleNotes, key = { it.id }) { note ->
             val latest = note.id == notes.firstOrNull()?.id
-            Card(onClick = { onRead(note) }, modifier = Modifier.animateItem().fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = Paper), border = BorderStroke(1.dp, DoctorHairline)) {
+            // Goals-of-care notes keep their indigo: washed card, solid edge and a solid icon chip.
+            Card(onClick = { onRead(note) }, modifier = Modifier.animateItem().fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = SaharaSection.GoalsOfCare.wash), border = BorderStroke(1.5.dp, SaharaSection.GoalsOfCare.solid)) {
                 Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Surface(shape = RoundedCornerShape(14.dp), color = if (latest) SaharaSoftGold else SaharaLavender) { Icon(Icons.Default.Description, null, Modifier.padding(10.dp).size(22.dp), tint = DoctorAccent) }
+                    SaharaIconChip(Icons.Default.Description, SaharaSection.GoalsOfCare, size = 42)
                     Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f)) {
                         Text(t("Goals of care", "देखभाल के लक्ष्य"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, fontSize = 17.sp, color = DoctorCardInk)
                         Text(t("Version ${note.version}", "संस्करण ${note.version}") + " · ${date(note.published)} · ${note.doctor}", fontSize = 14.sp, color = DoctorCardSub, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     }
-                    if (latest) { Spacer(Modifier.width(8.dp)); DocsChip(t("Latest", "नया"), SaharaSoftGold) }
+                    if (latest) { Spacer(Modifier.width(8.dp)); SaharaStatusPill(t("Latest", "नया"), SaharaSection.GoalsOfCare) }
                     Spacer(Modifier.width(4.dp))
-                    Icon(Icons.AutoMirrored.Filled.ArrowForward, t("Read version ${note.version}", "संस्करण ${note.version} पढ़ें"), Modifier.size(20.dp), tint = DoctorAccent)
+                    Icon(Icons.AutoMirrored.Filled.ArrowForward, t("Read version ${note.version}", "संस्करण ${note.version} पढ़ें"), Modifier.size(20.dp), tint = SaharaSection.GoalsOfCare.ink)
                 }
             }
         }
@@ -235,13 +234,14 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
             if (open.isEmpty()) SectionTitle(t("Reports", "रिपोर्टें")) else SectionTitle(DocumentFolderRules.label(open, t), t("Show all", "सभी दिखाएँ")) { folderFilter = "" }
         } }
         items(visibleReports, key = { it.id }) { report ->
-            Surface(Modifier.animateItem().fillMaxWidth(), shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline)) {
-                Column {
+            // Reports: white card with a marigold edge and accent bar (Documents), the folder's colour on a solid icon chip.
+            Surface(Modifier.animateItem().fillMaxWidth(), shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.5.dp, SaharaSection.Documents.solid)) {
+                Column(Modifier.saharaAccentBar(SaharaSection.Documents)) {
                     var menuOpen by remember { mutableStateOf(false) }
                     val editable = canEdit && prescriptionOriginals.none { it.id == report.id }
                     Row(Modifier.fillMaxWidth().clickable { openReport(report, false) }.padding(start = 16.dp, top = 12.dp, end = 4.dp), verticalAlignment = Alignment.Top) {
                         val tone = documentFolderTone(folderOf(report))
-                        Surface(shape = RoundedCornerShape(12.dp), color = tone.soft) { Icon(if (report.mime == "application/pdf") Icons.Default.PictureAsPdf else Icons.Default.Image, null, Modifier.padding(10.dp).size(22.dp), tint = tone.accent) }
+                        Surface(shape = RoundedCornerShape(12.dp), color = tone.accent) { Icon(if (report.mime == "application/pdf") Icons.Default.PictureAsPdf else Icons.Default.Image, null, Modifier.padding(10.dp).size(22.dp), tint = Paper) }
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f).padding(top = 2.dp)) {
                             Text(report.name, fontWeight = FontWeight.Medium, fontSize = 17.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, fontFamily = SaharaTitleFont, color = DoctorCardInk)
@@ -265,8 +265,8 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
                     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         @Composable fun Capsule(label: String, icon: androidx.compose.ui.graphics.vector.ImageVector, tag: String, onClick: () -> Unit) {
                             // Slim capsule so the three actions fit on one line; the touch area still meets 48dp.
-                            Surface(onClick = onClick, shape = RoundedCornerShape(50), color = Paper, contentColor = DoctorCardInk, border = BorderStroke(1.5.dp, DoctorAccent), modifier = Modifier.minimumInteractiveComponentSize().testTag(tag)) {
-                                Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) { Icon(icon, null, Modifier.size(16.dp), tint = DoctorAccent); Spacer(Modifier.width(6.dp)); Text(label, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1) }
+                            Surface(onClick = onClick, shape = RoundedCornerShape(50), color = Paper, contentColor = SaharaSection.Documents.ink, border = BorderStroke(1.5.dp, SaharaSection.Documents.solid), modifier = Modifier.minimumInteractiveComponentSize().testTag(tag)) {
+                                Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) { Icon(icon, null, Modifier.size(16.dp), tint = SaharaSection.Documents.ink); Spacer(Modifier.width(6.dp)); Text(label, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1) }
                             }
                         }
                         Capsule(t("Review", "जाँचें"), Icons.Default.DocumentScanner, "report-review-${report.id}") { reviewId = report.id }
@@ -329,7 +329,7 @@ internal data class FolderTone(val accent: androidx.compose.ui.graphics.Color, v
 internal fun documentFolderTone(folder: String?): FolderTone = when (folder) {
     // The design lane's section tones (SaharaTone): solid for the icon and an open tile, wash for chips, ink for text on the wash.
     DocumentFolderRules.BILLS -> FolderTone(SaharaTone.Marigold.ink, SaharaTone.Marigold.wash, Icons.AutoMirrored.Filled.ReceiptLong)
-    DocumentFolderRules.LAB -> FolderTone(SaharaTone.Teal.ink, SaharaTone.Teal.wash, Icons.Default.Science)
+    DocumentFolderRules.LAB -> FolderTone(SaharaSection.Labs.ink, SaharaSection.Labs.wash, Icons.Default.Science)
     DocumentFolderRules.PRESCRIPTIONS -> FolderTone(SaharaTone.Plum.ink, SaharaTone.Plum.wash, Icons.Default.Medication)
     DocumentFolderRules.DISCHARGE -> FolderTone(SaharaTone.Indigo.ink, SaharaTone.Indigo.wash, Icons.Default.LocalHospital)
     else -> FolderTone(SaharaColors.InkSub, SaharaColors.Well, Icons.Default.Folder)

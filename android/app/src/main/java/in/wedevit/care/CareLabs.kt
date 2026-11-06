@@ -53,16 +53,17 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
     val treatmentDays = TreatmentDayRules.days(entries, selected)
     val groups = labGroups(entries.filter { it.personId == selected && it.title.contains(query.trim(), ignoreCase = true) })
     LazyColumn(Modifier.fillMaxSize().testTag("lab-history"), contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Heading(t("Lab history", "जाँच रिपोर्टें")); Spacer(Modifier.weight(1f)); if (canEdit) FilledTonalIconButton(onClick = { adding = true }, modifier = Modifier.size(48.dp), colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = DoctorAccent, contentColor = Paper)) { Icon(Icons.Default.Add, t("Add a lab result", "जाँच का नतीजा जोड़ें")) } } }
+        // The info-blue Labs band; Add sits on it as a white round button.
+        item { SaharaSectionBand(t("Lab history", "जाँच रिपोर्टें"), SaharaSection.Labs) { if (canEdit) FilledTonalIconButton(onClick = { adding = true }, modifier = Modifier.size(48.dp), colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = Paper, contentColor = SaharaSection.Labs.ink)) { Icon(Icons.Default.Add, t("Add a lab result", "जाँच का नतीजा जोड़ें")) } } }
         item { OutlinedTextField(query, { query = it }, placeholder = { Text(t("Find a test", "जाँच खोजें")) }, leadingIcon = { Icon(Icons.Default.Search, null) }, trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { query = "" }) { Icon(Icons.Default.Close, t("Clear search", "खोज मिटाएँ")) } }, singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) }
-        if (groups.isEmpty()) item { SurfaceCard { Surface(shape = androidx.compose.foundation.shape.CircleShape, color = Mint) { Icon(Icons.Default.Science, null, Modifier.padding(12.dp).size(28.dp), tint = DoctorAccent) }; Spacer(Modifier.height(12.dp)); Text(if (query.isBlank()) t("No results yet", "अभी कोई नतीजा नहीं") else t("No matching results", "कोई नतीजा नहीं मिला"), fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk); if (query.isBlank()) { if (canEdit) TextButton(onClick = { adding = true }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Add a result", "नतीजा जोड़ें")) } } else TextButton(onClick = { query = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Clear search", "खोज मिटाएँ")) } } }
+        if (groups.isEmpty()) item { SurfaceCard(SaharaSection.Labs.wash) { SaharaIconChip(Icons.Default.Science, SaharaSection.Labs, size = 52); Spacer(Modifier.height(12.dp)); Text(if (query.isBlank()) t("No results yet", "अभी कोई नतीजा नहीं") else t("No matching results", "कोई नतीजा नहीं मिला"), fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk); if (query.isBlank()) { if (canEdit) TextButton(onClick = { adding = true }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Add a result", "नतीजा जोड़ें")) } } else TextButton(onClick = { query = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Clear search", "खोज मिटाएँ")) } } }
         items(groups, key = { values -> "${values.first().first.title.lowercase()}:${values.first().second.unit}" }) { values -> Box(Modifier.animateItem()) { LabHistoryCard(vm, values, treatmentDays, onEdit = { editing = it }) } }
         // Results first; treatment days, which only mark the charts, come after them.
         item(key = "treatment-days") { SurfaceCard {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(shape = androidx.compose.foundation.shape.CircleShape, color = SaharaApricot) { Icon(Icons.Default.Event, null, Modifier.padding(8.dp).size(18.dp), tint = DoctorAccent) }
+                SaharaIconChip(Icons.Default.Event, SaharaSection.Visits, size = 36)
                 Spacer(Modifier.width(12.dp))
-                Text(t("Treatment days", "इलाज के दिन"), Modifier.weight(1f).a11yHeading(), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, fontSize = 18.sp, color = DoctorCardInk)
+                Text(t("Treatment days", "इलाज के दिन"), Modifier.weight(1f).a11yHeading(), fontWeight = FontWeight.Bold, fontFamily = SaharaTitleFont, fontSize = 18.sp, color = DoctorCardInk)
             }
             treatmentDays.take(6).forEach { day -> Row(Modifier.fillMaxWidth().then(if (canEdit) Modifier.clickable { editingDay = day } else Modifier).heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text("${date(day.item.due)} · ${TreatmentDayRules.label(day.category)}", Modifier.weight(1f), color = if (day.category == "Chemotherapy") DoctorStatusWarn else DoctorCardInk)
@@ -79,15 +80,16 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
 
 @Composable private fun LabHistoryCard(vm: CareModel, values: List<Pair<CareItem, CareEntry>>, treatmentDays: List<TreatmentDay>, onEdit: (CareItem) -> Unit) { val t = careText();
     val latest = values.first()
-    SurfaceCard {
+    // Each test on the info-blue Labs wash, its latest value in the Labs ink.
+    SurfaceCard(SaharaSection.Labs.wash) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
             Column(Modifier.weight(1f)) {
                 Text(latest.first.title, Modifier.a11yHeading(), fontWeight = FontWeight.Medium, fontSize = 18.sp, fontFamily = SaharaTitleFont, color = DoctorCardInk)
-                Text("${latest.second.value} ${latest.second.unit}", color = Rust, fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
+                Text("${latest.second.value} ${latest.second.unit}", color = SaharaSection.Labs.ink, fontSize = 24.sp, fontWeight = FontWeight.Bold)
                 Text(labDateText(latest.first, t), fontSize = 14.sp, color = DoctorCardSub)
             }
             Spacer(Modifier.width(8.dp))
-            LabPill(if (values.size == 1) t("1 result", "1 नतीजा") else t("${values.size} results", "${values.size} नतीजे"), SaharaSoftBlue, DoctorCardInk)
+            LabPill(if (values.size == 1) t("1 result", "1 नतीजा") else t("${values.size} results", "${values.size} नतीजे"), SaharaSection.Labs.solid, SaharaSection.Labs.onSolid)
         }
         if (values.size > 1) LabHistoryPlot(values, treatmentDays)
         values.forEach { (item, data) -> LabResultRow(vm, item, data, showDate = true, onEdit = { onEdit(item) }) }

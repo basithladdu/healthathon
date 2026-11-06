@@ -158,10 +158,10 @@ internal object DoctorTones {
 /** The dark header band. */
 internal val DoctorBand get() = SaharaColors.Band
 
-/** Status pill: tone wash, tone ink, never colour alone (it always carries a word). */
+/** Status pill: the tone's solid (its band step, so small white text keeps 4.5:1) with bold white text; never colour alone (it always carries a word). */
 @Composable internal fun DoctorPill(text: String, tone: DoctorTone, modifier: Modifier = Modifier) {
-    Surface(color = tone.wash, shape = RoundedCornerShape(50), modifier = modifier) {
-        Text(text, Modifier.padding(horizontal = 10.dp, vertical = 3.dp), fontSize = 13.sp, lineHeight = 18.sp, fontWeight = FontWeight.SemiBold, color = tone.ink, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis)
+    Surface(color = tone.band, shape = RoundedCornerShape(50), modifier = modifier) {
+        Text(text, Modifier.padding(horizontal = 10.dp, vertical = 3.dp), fontSize = 13.sp, lineHeight = 18.sp, fontWeight = FontWeight.Bold, color = tone.onSolid, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -193,21 +193,21 @@ internal fun doctorTilesPaired(widthDp: Float, fontScale: Float): Boolean = widt
 /** Text that wraps only between words. */
 internal val DoctorWholeWords = TextStyle(lineBreak = LineBreak.Heading, hyphens = Hyphens.None)
 
-/** Compact register row: coloured initial, name, one line of detail, status pill. 64dp tall at most text sizes. */
-@Composable internal fun DoctorRegisterRow(name: String, detail: String, onClick: () -> Unit, modifier: Modifier = Modifier, pill: Pair<String, DoctorTone>? = null, lead: String? = null) {
+/** Compact register row: coloured initial, name, one line of detail, status pill. 64dp tall at most text sizes. [section]: the list's colour, as the row's wash and edge. */
+@Composable internal fun DoctorRegisterRow(name: String, detail: String, onClick: () -> Unit, modifier: Modifier = Modifier, pill: Pair<String, DoctorTone>? = null, lead: String? = null, section: DoctorTone? = null) {
     val press = remember { MutableInteractionSource() }
     val tone = DoctorTones.forName(name)
-    Surface(onClick = onClick, interactionSource = press, color = Paper, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, DoctorHairline),
+    Surface(onClick = onClick, interactionSource = press, color = section?.wash ?: Paper, shape = RoundedCornerShape(14.dp), border = BorderStroke(if (section != null) 1.5.dp else 1.dp, section?.solid ?: DoctorHairline),
         modifier = modifier.fillMaxWidth().saharaAppear().saharaPress(press).heightIn(min = 64.dp)) {
         Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            if (lead != null) Text(lead, Modifier.widthIn(min = 64.dp), fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Bold, color = DoctorTones.Indigo.ink, style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"))
-            else Box(Modifier.size(40.dp).background(tone.wash, CircleShape), contentAlignment = Alignment.Center) { Text(name.trim().take(1).uppercase(), color = tone.ink, fontWeight = FontWeight.Bold, fontSize = 17.sp) }
+            if (lead != null) Text(lead, Modifier.widthIn(min = 64.dp), fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Bold, color = (section ?: DoctorTones.Indigo).ink, style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"))
+            else Box(Modifier.size(40.dp).background(tone.band, CircleShape), contentAlignment = Alignment.Center) { Text(name.trim().take(1).uppercase(), color = tone.onSolid, fontWeight = FontWeight.Bold, fontSize = 17.sp) }
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(1.dp)) {
                 Text(name, fontSize = 17.sp, lineHeight = 22.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 if (detail.isNotBlank()) Text(detail, fontSize = 14.sp, lineHeight = 19.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             pill?.let { DoctorPill(it.first, it.second) }
-            Icon(Icons.Default.ChevronRight, null, tint = DoctorCardSub, modifier = Modifier.size(20.dp))
+            Icon(Icons.Default.ChevronRight, null, tint = section?.ink ?: DoctorCardSub, modifier = Modifier.size(20.dp))
         }
     }
 }
@@ -259,23 +259,23 @@ internal fun LazyListScope.doctorConnectedHomeItems(people: List<Person>, items:
     item(key = "home-today-title") { DoctorHomeSection(t("Today", "आज"), todayVisits.size + todayChecks.size, DoctorTones.Indigo, Icons.Default.Today) }
     if (todayVisits.isEmpty() && todayChecks.isEmpty()) item(key = "home-today-empty") { DoctorHomeEmpty(Icons.Default.EventAvailable, t("Nothing due today", "आज कुछ तय नहीं")) }
     items(todayVisits, key = { "home-today-${it.item.id}" }) { visit ->
-        DoctorRegisterRow(visit.person.name, visit.item.title, { onVisit(visit.person.id) }, lead = doctorTimeOrDay(visit.item, hindi, zone))
+        DoctorRegisterRow(visit.person.name, visit.item.title, { onVisit(visit.person.id) }, lead = doctorTimeOrDay(visit.item, hindi, zone), section = DoctorTones.Indigo)
     }
     items(todayChecks, key = { "home-today-check-${it.second.id}" }) { (person, check) ->
         DoctorRegisterRow(person.name, checkInMoodLabel(check.title, hindi), { onProgress(person.id) }, lead = DateTimeFormatter.ofPattern("h:mm a", careLocale(hindi)).withZone(zone).format(Instant.ofEpochMilli(check.created)),
-            pill = if (check.title == DoctorReportedMood.HARD.title) t("Hard day", "मुश्किल दिन") to DoctorTones.Attention else null)
+            pill = if (check.title == DoctorReportedMood.HARD.title) t("Hard day", "मुश्किल दिन") to DoctorTones.Attention else null, section = DoctorTones.Indigo)
     }
     if (laterVisits.isNotEmpty()) {
         item(key = "home-visits-title") { DoctorHomeSection(t("Coming up", "आगे की विज़िट"), laterVisits.size, DoctorTones.Plum, Icons.Default.EventAvailable) }
         items(laterVisits.take(5), key = { "home-visit-${it.item.id}" }) { visit ->
-            DoctorRegisterRow(visit.person.name, "${doctorWhen(visit.item, hindi, zone)} · ${visit.item.title}", { onVisit(visit.person.id) })
+            DoctorRegisterRow(visit.person.name, "${doctorWhen(visit.item, hindi, zone)} · ${visit.item.title}", { onVisit(visit.person.id) }, section = DoctorTones.Plum)
         }
     }
     item(key = "home-checks-title") { DoctorHomeSection(t("Check-ins", "हालचाल"), weekChecks.size, DoctorTones.Teal, Icons.Default.Favorite) }
     if (weekChecks.isEmpty()) item(key = "home-checks-empty") { DoctorHomeEmpty(Icons.Default.Favorite, t("No other check-ins this week", "इस हफ़्ते और कोई हालचाल नहीं")) }
     items(weekChecks, key = { "home-check-${it.second.id}" }) { (person, check) ->
         DoctorRegisterRow(person.name, "${checkInMoodLabel(check.title, hindi)} · ${DateTimeFormatter.ofPattern("d MMM, h:mm a", careLocale(hindi)).withZone(zone).format(Instant.ofEpochMilli(check.created))}", { onProgress(person.id) },
-            pill = if (check.title == DoctorReportedMood.HARD.title) t("Hard day", "मुश्किल दिन") to DoctorTones.Attention else null)
+            pill = if (check.title == DoctorReportedMood.HARD.title) t("Hard day", "मुश्किल दिन") to DoctorTones.Attention else null, section = DoctorTones.Teal)
     }
 }
 
@@ -291,7 +291,7 @@ private fun doctorTimeOrDay(item: CareItem, hindi: Boolean, zone: ZoneId): Strin
 /** One line with an icon for an empty list. */
 @Composable private fun DoctorHomeEmpty(icon: ImageVector, text: String) {
     Row(Modifier.fillMaxWidth().background(Paper, RoundedCornerShape(14.dp)).border(1.dp, DoctorHairline, RoundedCornerShape(14.dp)).padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        Icon(icon, null, tint = DoctorCardSub, modifier = Modifier.size(20.dp))
+        Icon(icon, null, tint = DoctorTones.Teal.ink, modifier = Modifier.size(20.dp))
         Text(text, fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardSub)
     }
 }

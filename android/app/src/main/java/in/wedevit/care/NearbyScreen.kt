@@ -84,21 +84,17 @@ internal const val NEARBY_PAGE = 10
     val filterCount = listOf(service != NearbyHelp.ALL_SERVICES, state != NearbyHelp.ALL_INDIA, district.isNotBlank(), layerKey != allLayers).count { it }
     // First screen at 360 x 800: title, Call 112, search with one Filters button, a short map, and the first centre. Filters live in one sheet.
     LazyColumn(Modifier.fillMaxSize().saharaScreenEnter().testTag("nearby-list"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
-                Heading(t("Find care", "देखभाल केंद्र खोजें"), 26)
+        // The teal Help band: title and place on the colour, the count badge and the info button beside it.
+        item { SaharaSectionBand(t("Find care", "देखभाल केंद्र खोजें"), SaharaSection.Help, subtitle = listOf(optionLabel(state), district).filter(String::isNotBlank).joinToString(" · ")) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(listOf(optionLabel(state), district).filter(String::isNotBlank).joinToString(" · "), color = RustText, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
-                    Spacer(Modifier.width(8.dp))
                     // The count is a badge, not part of the sentence.
                     FamilyPill(t("${visible.size} ${if (visible.size == 1) "centre" else "centres"}", "${visible.size} केंद्र"), if (visible.isEmpty()) FamilyTone.NEUTRAL else FamilyTone.INFO, Modifier.testTag("nearby-count"))
-                    NearbyInfoButton(t("About this list", "इस सूची के बारे में"), Modifier.testTag("nearby-about")) {
+                    NearbyInfoButton(t("About this list", "इस सूची के बारे में"), Modifier.testTag("nearby-about"), tint = SaharaSection.Help.onSolid) {
                         Text(t("Directory listings. Call to confirm services, availability and cost.", "यह सूची से ली गई जानकारी है। सेवा, उपलब्धता और ख़र्च फ़ोन करके पक्का करें।"))
                         val coverage = CentreLocation.coverage(listed)
                         if (coverage.approximate > 0) Text(t("Approximate locations © GeoNames (CC BY 4.0)", "अनुमानित जगहें © GeoNames (CC BY 4.0)"), style = MaterialTheme.typography.labelSmall)
                     }
                 }
-            }
         } }
         item(key = "nearby-call") { NearbyCallBar() }
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -217,9 +213,9 @@ internal const val NEARBY_PAGE = 10
 }
 
 /** A small info icon that opens [content] in a dialog: for fine print that matters but should not sit on the screen. */
-@Composable fun NearbyInfoButton(title: String, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+@Composable fun NearbyInfoButton(title: String, modifier: Modifier = Modifier, tint: Color = DoctorAccent, content: @Composable ColumnScope.() -> Unit) {
     val t = careText(); var open by rememberSaveable(title) { mutableStateOf(false) }
-    IconButton(onClick = { open = true }, modifier = modifier.size(48.dp)) { Icon(Icons.Outlined.Info, title, tint = DoctorAccent, modifier = Modifier.size(22.dp)) }
+    IconButton(onClick = { open = true }, modifier = modifier.size(48.dp)) { Icon(Icons.Outlined.Info, title, tint = tint, modifier = Modifier.size(22.dp)) }
     if (open) AlertDialog(onDismissRequest = { open = false }, containerColor = Paper, title = { Text(title, fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium) },
         text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp), content = content) },
         confirmButton = { TextButton(onClick = { open = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Close", "बंद करें"), color = RustText) } })
