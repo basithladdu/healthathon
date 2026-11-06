@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Offline: a phone with a crossed-out cloud, and a cup of chai. Original Sahara art (CC0), see android/licenses/art/README.md. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="240dp" android:height="180dp" android:viewportWidth="240" android:viewportHeight="180">
+    <path android:fillColor="#FFF0CC" android:pathData="M20,96C20,36.6 85,26.7 130,30C190,33.3 222,63 220,99.3C218,142.2 170,162 115,162C60,162 20,135.6 20,96z"/>
+    <path android:fillColor="#382E29" android:pathData="M105,36h38a11,11 0 0 1 11,11v90a11,11 0 0 1 -11,11h-38a11,11 0 0 1 -11,-11v-90a11,11 0 0 1 11,-11z"/>
+    <path android:fillColor="#FFFDF9" android:pathData="M104,46h40a5,5 0 0 1 5,5v80a5,5 0 0 1 -5,5h-40a5,5 0 0 1 -5,-5v-80a5,5 0 0 1 5,-5z"/>
+    <path android:fillColor="#5E5249" android:pathData="M117.5,40h13a1.5,1.5 0 0 1 1.5,1.5v0a1.5,1.5 0 0 1 -1.5,1.5h-13a1.5,1.5 0 0 1 -1.5,-1.5v-0a1.5,1.5 0 0 1 1.5,-1.5z"/>
+    <path android:fillColor="#E0E4F7" android:pathData="M106,100a10,10 0 0 1 2,-19.8a13,13 0 0 1 25,-2a11.5,11.5 0 0 1 5,21.8z"/>
+    <path android:strokeColor="#3F51A3" android:strokeWidth="2.2" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M106,100a10,10 0 0 1 2,-19.8a13,13 0 0 1 25,-2a11.5,11.5 0 0 1 5,21.8z"/>
+    <path android:strokeColor="#B9472C" android:strokeWidth="3.2" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M108,70L142,108"/>
+    <path android:strokeColor="#E6D8CC" android:strokeWidth="3" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M110,120H138"/>
+    <path android:strokeColor="#9C887B" android:strokeWidth="3" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M172,62a22,22 0 0 1 0,32M180,54a32,32 0 0 1 0,48"/>
+    <path android:fillColor="#E6D8CC" android:pathData="M32,148a26,6 0 1,0 52,0a26,6 0 1,0 -52,0z"/>
+    <path android:fillColor="#B9472C" android:pathData="M38,116H78V132a14,14 0 0 1 -14,14H52a14,14 0 0 1 -14,-14z"/>
+    <path android:strokeColor="#B9472C" android:strokeWidth="3.4" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M78,122a7,7 0 0 1 0,14"/>
+    <path android:fillColor="#F2B33D" android:pathData="M40,116h36a2,2 0 0 1 2,2v1a2,2 0 0 1 -2,2h-36a2,2 0 0 1 -2,-2v-1a2,2 0 0 1 2,-2z"/>
+    <path android:strokeColor="#9C887B" android:strokeWidth="2.4" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M50,108q-4,-6 0,-12M60,106q-4,-6 0,-12"/>
+    <path android:fillColor="#386D29" android:pathData="M200,150Q209.8,136 200,122Q190.2,136 200,150z"/>
+    <path android:fillColor="#386D29" android:pathData="M200,150Q213.3,145.9 214,132Q200.7,136.1 200,150z"/>
+</vector>
