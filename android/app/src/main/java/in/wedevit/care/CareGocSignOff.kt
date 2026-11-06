@@ -459,7 +459,7 @@ private fun gocRoleText(t: (String, String) -> String, role: String): String = w
                 GocStepHeading(t("1. Doctor", "1. डॉक्टर"))
                 GocSignField(doctorName, { doctorName = it.take(GocSignOffRules.NAME_MAX) }, t("Name", "नाम"), "goc-doctor-name")
                 GocSignField(registrationNo, { registrationNo = it.take(60) }, t("Registration no.", "रजिस्ट्रेशन नंबर"), "goc-doctor-reg")
-                GocSignaturePad(allowThumb = false, onDone = { p -> sign(GocSignatureInput(GocSignOffRules.DOCTOR, doctorName, registrationNo = registrationNo, consent = true, method = p.method, png = p.png, strokeCount = p.strokeCount)) })
+                GocSignaturePad(onDone = { p -> sign(GocSignatureInput(GocSignOffRules.DOCTOR, doctorName, registrationNo = registrationNo, consent = true, method = GocSignOffRules.DRAWN, png = p.png, strokeCount = p.strokeCount)) })
             }
             GocSignOffRules.PATIENT_OR_FAMILY -> {
                 GocStepHeading(t("2. Patient or family member", "2. मरीज़ या परिवार के सदस्य"))
@@ -484,7 +484,7 @@ private fun gocRoleText(t: (String, String) -> String, role: String): String = w
                 GocSignField(witnessName, { witnessName = it.take(GocSignOffRules.NAME_MAX) }, t("Name", "नाम"), "goc-witness-name")
                 GocSignField(witnessRole, { witnessRole = it.take(GocSignOffRules.NAME_MAX) }, t("Role (optional)", "भूमिका (वैकल्पिक)"))
                 GocTick(t("I saw the note read out and the person sign or give their thumb impression", "मैंने नोट पढ़कर सुनाते और व्यक्ति को साइन करते या अंगूठा लगाते देखा"), witnessConsent, { witnessConsent = it }, "goc-witness-consent")
-                GocSignaturePad(allowThumb = false, onDone = { p -> sign(GocSignatureInput(GocSignOffRules.WITNESS, witnessName, relation = witnessRole, consent = witnessConsent, method = p.method, png = p.png, strokeCount = p.strokeCount)) })
+                GocSignaturePad(onDone = { p -> sign(GocSignatureInput(GocSignOffRules.WITNESS, witnessName, relation = witnessRole, consent = witnessConsent, method = GocSignOffRules.DRAWN, png = p.png, strokeCount = p.strokeCount)) })
             }
             GocSignOffRules.LOCK -> Button(onClick = {
                 try {

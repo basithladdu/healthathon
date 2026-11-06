@@ -173,8 +173,20 @@ class CareGocSignOffTest {
         assertEquals(9, rows.size)
         assertEquals(0, rows[0].toInt())
         assertEquals(0b01101101, rows[1].toInt() and 0xFF)
-        assertTrue(GocSignatureInk.ready(listOf(listOf(0.5f to 0.5f)), thumb = true))
-        assertFalse(GocSignatureInk.ready(listOf(listOf(0.5f to 0.5f)), thumb = false))
-        assertTrue(GocSignatureInk.ready(listOf(listOf(0f to 0.5f, 0.5f to 0.5f)), thumb = false))
+        // No thumb switch: a held press counts, a stray tap does not, and a drawn line counts whether held or not.
+        assertTrue(GocSignatureInk.ready(listOf(listOf(0.5f to 0.5f)), held = true))
+        assertFalse(GocSignatureInk.ready(listOf(listOf(0.5f to 0.5f)), held = false))
+        assertTrue(GocSignatureInk.ready(listOf(listOf(0f to 0.5f, 0.5f to 0.5f)), held = false))
+        assertFalse(GocSignatureInk.ready(emptyList(), held = true))
+    }
+
+    @Test fun aHeldPressIsAThumbImpressionAndADrawnLineIsNot() {
+        val press = listOf(listOf(0.5f to 0.5f, 0.51f to 0.5f))
+        val drawn = listOf(listOf(0f to 0.5f, 0.5f to 0.5f))
+        assertTrue(GocSignatureInk.thumbPress(press, held = true))
+        assertFalse(GocSignatureInk.thumbPress(press, held = false))
+        assertFalse(GocSignatureInk.thumbPress(drawn, held = true))
+        assertFalse(GocSignatureInk.thumbPress(emptyList(), held = true))
+        assertTrue(GocSignatureInk.HOLD_MS in 300L..1000L)
     }
 }

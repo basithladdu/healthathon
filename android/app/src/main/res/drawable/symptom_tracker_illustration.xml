@@ -5,23 +5,23 @@
     android:viewportHeight="128">
     <!-- Warm layered clipboard; the canvas remains transparent. -->
     <path android:fillColor="#893D2B" android:pathData="M30,18 L91,18 Q103,18 103,30 L103,108 Q103,120 91,120 L30,120 Q18,120 18,108 L18,30 Q18,18 30,18 Z" />
-    <path android:fillColor="#B9472C" android:pathData="M30,14 L91,14 Q103,14 103,26 L103,104 Q103,116 91,116 L30,116 Q18,116 18,104 L18,26 Q18,14 30,14 Z" />
+    <path android:fillColor="#D2390B" android:pathData="M30,14 L91,14 Q103,14 103,26 L103,104 Q103,116 91,116 L30,116 Q18,116 18,104 L18,26 Q18,14 30,14 Z" />
     <path android:fillColor="#E6B899" android:pathData="M32,23 L89,23 Q95,23 95,29 L95,102 Q95,108 89,108 L32,108 Q26,108 26,102 L26,29 Q26,23 32,23 Z" />
     <path android:fillColor="#FFF8EE" android:pathData="M32,21 L89,21 Q95,21 95,27 L95,99 Q95,105 89,105 L32,105 Q26,105 26,99 L26,27 Q26,21 32,21 Z" />
     <path android:fillColor="#FFD1B3" android:pathData="M48,10 L52,10 Q53,4 60,4 Q67,4 68,10 L73,10 Q78,10 78,15 L78,21 Q78,26 73,26 L48,26 Q43,26 43,21 L43,15 Q43,10 48,10 Z" />
-    <path android:fillColor="#B9472C" android:pathData="M57,11 A3,3 0,1 0,63 11 A3,3 0,1 0,57 11" />
+    <path android:fillColor="#D2390B" android:pathData="M57,11 A3,3 0,1 0,63 11 A3,3 0,1 0,57 11" />
     <!-- Simple human silhouette outlined with soft, rounded strokes. -->
     <path android:fillColor="#FFD1B3" android:strokeColor="#795342" android:strokeWidth="2.4" android:pathData="M43,43 A7,7 0,1 0,57 43 A7,7 0,1 0,43 43" />
     <path android:fillColor="#FFE6D0" android:strokeColor="#795342" android:strokeWidth="2.4" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M44,54 Q40,54 38,59 L33,72 Q32,76 35,77 Q38,78 40,74 L43,67 L42,80 L41,94 Q41,98 45,98 Q48,98 48,94 L50,82 L52,94 Q52,98 55,98 Q59,98 59,94 L58,80 L57,67 L60,74 Q62,78 65,77 Q68,76 67,72 L62,59 Q60,54 56,54 Z" />
     <!-- Low-key symptom dots, without sharp rays or emergency symbolism. -->
     <path android:fillColor="#F1A77D" android:pathData="M52,62 A6,6 0,1 0,64 62 A6,6 0,1 0,52 62 M42,80 A6,6 0,1 0,54 80 A6,6 0,1 0,42 80" />
-    <path android:fillColor="#B9472C" android:pathData="M55.5,62 A2.5,2.5 0,1 0,60.5 62 A2.5,2.5 0,1 0,55.5 62 M45.5,80 A2.5,2.5 0,1 0,50.5 80 A2.5,2.5 0,1 0,45.5 80" />
+    <path android:fillColor="#D2390B" android:pathData="M55.5,62 A2.5,2.5 0,1 0,60.5 62 A2.5,2.5 0,1 0,55.5 62 M45.5,80 A2.5,2.5 0,1 0,50.5 80 A2.5,2.5 0,1 0,45.5 80" />
     <!-- Checklist sits beside the body map. -->
     <path android:fillColor="#FFD1B3" android:pathData="M75,40 L83,40 Q86,40 86,43 L86,51 Q86,54 83,54 L75,54 Q72,54 72,51 L72,43 Q72,40 75,40 Z M75,63 L83,63 Q86,63 86,66 L86,74 Q86,77 83,77 L75,77 Q72,77 72,74 L72,66 Q72,63 75,63 Z" />
-    <path android:fillColor="#00000000" android:strokeColor="#B9472C" android:strokeWidth="2.5" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M75,47 L78,50 L83,44 M75,70 L78,73 L83,67" />
+    <path android:fillColor="#00000000" android:strokeColor="#D2390B" android:strokeWidth="2.5" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M75,47 L78,50 L83,44 M75,70 L78,73 L83,67" />
     <path android:fillColor="#DABBA5" android:pathData="M74,85 L84,85 Q86,85 86,87 Q86,89 84,89 L74,89 Q72,89 72,87 Q72,85 74,85 Z M74,94 L80,94 Q82,94 82,96 Q82,98 80,98 L74,98 Q72,98 72,96 Q72,94 74,94 Z" />
     <!-- Small peach tab adds the same friendly layered depth as other tile art. -->
     <path android:fillColor="#893D2B" android:pathData="M102,82 Q111,82 111,91 L111,104 Q111,113 102,113 Q93,113 93,104 L93,91 Q93,82 102,82 Z" />
     <path android:fillColor="#FFD1B3" android:pathData="M102,79 Q111,79 111,88 L111,101 Q111,110 102,110 Q93,110 93,101 L93,88 Q93,79 102,79 Z" />
-    <path android:fillColor="#00000000" android:strokeColor="#B9472C" android:strokeWidth="2.8" android:strokeLineCap="round" android:pathData="M98,94 L101,97 L106,91" />
+    <path android:fillColor="#00000000" android:strokeColor="#D2390B" android:strokeWidth="2.8" android:strokeLineCap="round" android:pathData="M98,94 L101,97 L106,91" />
 </vector>

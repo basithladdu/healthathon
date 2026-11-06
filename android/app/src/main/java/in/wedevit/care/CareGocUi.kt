@@ -108,8 +108,6 @@ import java.time.LocalDate
 
 /** This person's plan folder, given by CarePlanScreen, so recordings go when the person's records go. Null means no recording: typing and pasting still work. */
 internal val LocalGocFolder = staticCompositionLocalOf<File?> { null }
-/** True when the doctor came from the Goals of care tab: the talk opens straight away, with no card tap first. */
-internal val LocalGocOpenNow = staticCompositionLocalOf { false }
 
 private const val GOC_NONE = "__none__"
 private enum class GocStage { CAPTURE, REVIEW, NOTE }
@@ -134,10 +132,6 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
     LaunchedEffect(Unit) { gemini = gocOnlineEngines().gemini }
     val own = d.gocTranscript?.takeIf { it.planVersion == d.version }
     val canRecord = own == null && LocalGocFolder.current != null
-    // From the Goals of care tab the talk (or the locked note) opens at once, once per visit.
-    val openNow = LocalGocOpenNow.current
-    var openedOnce by rememberSaveable(d.id) { mutableStateOf(false) }
-    LaunchedEffect(openNow) { if (openNow && !openedOnce) { openedOnce = true; open = true } }
     PlanCard {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(44.dp).background(if (own?.signOff != null) DoctorStatusGood else Rust, RoundedCornerShape(14.dp)), contentAlignment = Alignment.Center) { Icon(if (own?.signOff != null) Icons.Default.Lock else Icons.Default.GraphicEq, null, tint = Color.White, modifier = Modifier.size(24.dp)) }
@@ -161,6 +155,33 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
     }
     if (open) Dialog(onDismissRequest = { open = false }, properties = DialogProperties(usePlatformDefaultWidth = false, dismissOnClickOutside = false)) {
         Surface(color = Cream, modifier = Modifier.fillMaxSize().imePadding()) { GocConversationPage(d, update, LocalGocFolder.current, mic::request, agreedAt = agreedAt, startRecording = startNow, onClose = { open = false; startNow = false }) }
+    }
+}
+
+/**
+ * The doctor's Goals of care tab: the talk as its own page (Record, Review, Sign), titled with the patient's name,
+ * not as step 6 of the plan. Leaving saves the draft as the plan wizard does; [onFullPlan] opens the 10-step plan.
+ */
+@Composable internal fun GocTabFlow(record: EctprRecord, canEdit: Boolean, onSave: (EctprRecord) -> Boolean, onClose: () -> Unit, onFullPlan: () -> Unit) {
+    val t = careText(); val hindi = careHindi()
+    val mic = rememberSaharaPermission(SaharaPermission.Microphone)
+    var d by remember(record.id) { mutableStateOf(record) }
+    var leaving by remember { mutableStateOf<(() -> Unit)?>(null) }
+    val blockers = EctprRules.saveBlockers(d, LocalDate.now())
+    fun leave(then: () -> Unit) { if (samePlan(d, record)) then() else if (blockers.isEmpty()) { if (onSave(d)) then() } else leaving = then }
+    androidx.activity.compose.BackHandler { leave(onClose) }
+    GocConversationPage(d, { change -> d = change(d) }, LocalGocFolder.current, mic::request, onClose = { leave(onClose) }, onFullPlan = if (canEdit) { { leave(onFullPlan) } } else null)
+    leaving?.let { then -> androidx.compose.material3.AlertDialog(onDismissRequest = { leaving = null }, title = { Text(t("Can't save yet", "अभी सहेजा नहीं जा सकता")) },
+        text = { Column { blockers.forEach { Text("• " + it.text(hindi), style = MaterialTheme.typography.bodySmall) } } },
+        confirmButton = { TextButton(onClick = { leaving = null }) { Text(t("Fix them", "ठीक करें")) } },
+        dismissButton = { TextButton(onClick = { leaving = null; then() }) { Text(t("Discard changes", "बदलाव छोड़ें"), color = RustText) } }) }
+}
+
+/** The way from the talk into the 10-step plan, named for what it is. */
+@Composable private fun GocFullPlanButton(onClick: () -> Unit) { val t = careText()
+    SaharaRegister(Modifier.testTag("goc-full-plan")) {
+        SaharaListRow(t("Make the full care plan", "पूरी देखभाल योजना बनाएँ"), detail = t("All 10 parts of the emergency care plan, from patient details to signatures", "आपातकालीन देखभाल योजना के सभी 10 हिस्से, मरीज़ की जानकारी से हस्ताक्षर तक"),
+            icon = Icons.Default.Checklist, tone = SaharaTone.Marigold, onClick = onClick)
     }
 }
 
@@ -284,7 +305,7 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
     }
 }
 
-@Composable private fun GocConversationPage(d: EctprRecord, update: ((EctprRecord) -> EctprRecord) -> Unit, folder: File?, withMic: (() -> Unit) -> Unit, agreedAt: Long = 0L, startRecording: Boolean = false, onClose: () -> Unit) {
+@Composable private fun GocConversationPage(d: EctprRecord, update: ((EctprRecord) -> EctprRecord) -> Unit, folder: File?, withMic: (() -> Unit) -> Unit, agreedAt: Long = 0L, startRecording: Boolean = false, onClose: () -> Unit, onFullPlan: (() -> Unit)? = null) {
     val t = careText(); val hindi = careHindi(); val context = LocalContext.current; val scope = rememberCoroutineScope(); val owner = LocalLifecycleOwner.current; val view = LocalView.current
     val recorder = remember(folder, d.patientId) { folder?.let { GocRecorder(context, it, d.patientId, scope) } }
     val engine = remember { GocSpeechEngine(context) }
@@ -436,10 +457,10 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
         if (close) onClose()
     }
 
-    // Record → Text → Form → Sign → Locked: where the talk is now, always on screen in the band.
-    val step = when (stage) { GocStage.CAPTURE -> if (busy) 1 else 0; GocStage.REVIEW -> 2; GocStage.NOTE -> if (signOff != null) 4 else 3 }
+    // Record → Review → Sign: where the talk is now, always on screen in the band, with the patient's name.
+    val step = when (stage) { GocStage.CAPTURE -> 0; GocStage.REVIEW -> 1; GocStage.NOTE -> 2 }
     Column(Modifier.fillMaxSize().testTag("goc-page")) {
-    GocBand(t("Goals of care", "देखभाल के लक्ष्य"), step, signOff != null, onClose)
+    GocBand(t("Goals of care", "देखभाल के लक्ष्य"), d.patient.name, step, signOff != null, onClose)
     SaharaStateSwitch(stage, Modifier.weight(1f), label = "goc stage") { shown ->
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
 
@@ -627,30 +648,41 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
                 }
             }
         }
+        if (onFullPlan != null && !recorderState.recording && !busy) item(key = "full-plan") { GocFullPlanButton(onFullPlan) }
     }
     }
     }
 }
 
-/** The page's dark band: back, title, and the five steps (Record, Text, Form, Sign, Locked) as a segmented bar with the current one named. */
-@Composable private fun GocBand(title: String, step: Int, locked: Boolean, onBack: () -> Unit) { val t = careText()
-    val labels = listOf(t("Record", "रिकॉर्ड"), t("Text", "लिखाई"), t("Form", "फ़ॉर्म"), t("Sign", "हस्ताक्षर"), t("Locked", "लॉक"))
+/** The page's dark band: back, title with the patient's name, and the three steps (Record, Review, Sign), each named under its bar. */
+@Composable private fun GocBand(title: String, name: String, step: Int, locked: Boolean, onBack: () -> Unit) { val t = careText()
+    val labels = listOf(t("Record", "रिकॉर्ड"), t("Review", "समीक्षा"), t("Sign", "हस्ताक्षर"))
     Surface(color = GocBandColor, contentColor = Color.White, modifier = Modifier.fillMaxWidth().testTag("goc-header")) {
         Column(Modifier.padding(start = 4.dp, end = 16.dp, top = 4.dp, bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onBack, modifier = Modifier.testTag("goc-header-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस"), tint = Color.White) }
-                Text(title, Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.SemiBold, fontSize = 22.sp, lineHeight = 28.sp, color = Color.White)
-            }
-            Column(Modifier.padding(start = 12.dp).testTag("goc-steps").semantics(mergeDescendants = true) {}, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    labels.indices.forEach { i ->
-                        val done = i < step || locked
-                        val fill by androidx.compose.animation.animateColorAsState(if (done) GocBandDone else if (i == step) Color.White else Color.White.copy(alpha = .28f), SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "goc step")
-                        Box(Modifier.weight(1f).height(6.dp).clip(CircleShape).background(fill))
+                Column(Modifier.weight(1f)) {
+                    Text(title, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.SemiBold, fontSize = 22.sp, lineHeight = 28.sp, color = Color.White)
+                    if (name.isNotBlank()) Text(name, fontSize = 15.sp, lineHeight = 20.sp, color = SaharaColors.OnBandSub, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.testTag("goc-header-name"))
+                }
+                if (locked) Surface(color = GocBandDone, contentColor = SaharaColors.Ink, shape = CircleShape) {
+                    Row(Modifier.padding(horizontal = 10.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Lock, null, Modifier.size(16.dp)); Spacer(Modifier.width(4.dp)); Text(t("Locked", "लॉक"), fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
                     }
                 }
-                SaharaAnimatedText(if (locked) labels.last() else labels[step.coerceIn(0, labels.lastIndex)]) { now ->
-                    Text(t("Step ${step + 1} of 5", "चरण ${step + 1} / 5") + " · " + now, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Color.White, modifier = Modifier.testTag("goc-step-now"))
+            }
+            Row(Modifier.fillMaxWidth().padding(start = 12.dp).testTag("goc-steps"), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                labels.forEachIndexed { i, label ->
+                    val done = i < step || locked; val now = i == step && !locked
+                    val fill by androidx.compose.animation.animateColorAsState(if (done) GocBandDone else if (now) Color.White else Color.White.copy(alpha = .28f), SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "goc-step")
+                    Column(Modifier.weight(1f).semantics(mergeDescendants = true) {}, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Box(Modifier.fillMaxWidth().height(6.dp).clip(CircleShape).background(fill))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (done) { Icon(Icons.Default.Check, null, Modifier.size(16.dp), tint = GocBandDone); Spacer(Modifier.width(4.dp)) }
+                            Text(label, fontSize = 15.sp, fontWeight = if (now) FontWeight.Bold else FontWeight.Medium, color = if (now || done) Color.White else SaharaColors.OnBandSub, maxLines = 1, softWrap = false,
+                                modifier = if (now) Modifier.testTag("goc-step-now") else Modifier)
+                        }
+                    }
                 }
             }
         }
@@ -703,8 +735,7 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
                 Spacer(Modifier.width(12.dp))
                 Text(if (progress.second > 0) "$operation · $percent%" else "$operation…", fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.weight(1f).announce())
             }
-            if (progress.second > 0) LinearProgressIndicator(progress = { (progress.first.toFloat() / progress.second).coerceIn(0f, 1f) }, modifier = Modifier.fillMaxWidth().height(6.dp).clip(CircleShape), color = Rust, trackColor = Paper)
-            else LinearProgressIndicator(Modifier.fillMaxWidth().height(6.dp).clip(CircleShape), color = Rust, trackColor = Paper)
+            SaharaProgressBar(if (progress.second > 0) (progress.first.toFloat() / progress.second).coerceIn(0f, 1f) else null)
             OutlinedButton(onClick = onStop, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, RustText), modifier = Modifier.heightIn(min = 48.dp).testTag("goc-cancel")) {
                 Icon(Icons.Default.Stop, null, tint = RustText); Spacer(Modifier.width(6.dp)); Text(t("Stop", "रोकें"), color = RustText)
             }

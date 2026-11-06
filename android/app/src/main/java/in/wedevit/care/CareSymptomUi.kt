@@ -111,7 +111,7 @@ import java.time.format.DateTimeFormatter
         if (notes.isEmpty()) item {
             Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 24.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    SymptomIconBadge(SymptomDiaryRules.WELLBEING_SYMPTOM, size = 64.dp)
+                    SaharaIllustration(SaharaArtKind.NoSymptoms)
                     Text(t("No symptom notes yet", "अभी तबीयत का कोई नोट नहीं है"), fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                 }
             }

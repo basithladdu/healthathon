@@ -74,7 +74,7 @@ val Gold = SaharaTone.Gold.solid
 val Sage = SaharaTone.Leaf.wash
 val Mint = SaharaTone.Teal.wash
 val Peach = SaharaColors.PrimaryWash
-/** The welcome panel is the header band: deep maroon-brown with white text. */
+/** The welcome panel is the header band: deep oxblood with white text. */
 internal val WelcomePanelOrange = SaharaColors.Band
 internal val WelcomePanelInk = SaharaColors.OnBand
 internal fun welcomePanelGapDp(screenHeightDp: Int, fontScale: Float): Int =
@@ -96,10 +96,10 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
  */
 internal val saharaColorScheme = lightColorScheme(primary = SaharaColors.Primary, onPrimary = SaharaColors.OnPrimary,
     primaryContainer = SaharaColors.PrimaryWash, onPrimaryContainer = SaharaColors.PrimaryPressed,
-    // secondaryContainer is Material's selected state (chips, tonal buttons, nav indicator): solid rust so it shows at 3:1+.
-    secondary = SaharaTone.Teal.solid, onSecondary = Color.White, secondaryContainer = SaharaColors.PrimaryPressed, onSecondaryContainer = Color.White,
+    // secondaryContainer is Material's selected state (chips, tonal buttons, nav indicator): the bright solid rust, white on it at 4.85:1.
+    secondary = SaharaTone.Teal.solid, onSecondary = Color.White, secondaryContainer = SaharaColors.Primary, onSecondaryContainer = Color.White,
     tertiary = SaharaTone.Plum.solid, onTertiary = Color.White, tertiaryContainer = SaharaTone.Plum.wash, onTertiaryContainer = SaharaTone.Plum.ink,
-    error = SaharaColors.Error, onError = Color.White, errorContainer = SaharaColors.ErrorWash, onErrorContainer = SaharaColors.Error,
+    error = SaharaColors.Error, onError = Color.White, errorContainer = SaharaColors.ErrorWash, onErrorContainer = SaharaTone.Error.ink,
     background = SaharaColors.Ground, onBackground = SaharaColors.Ink, surface = SaharaColors.Surface, onSurface = SaharaColors.Ink,
     surfaceVariant = SaharaColors.Well, onSurfaceVariant = SaharaColors.InkSub,
     surfaceTint = SaharaColors.Surface, surfaceBright = SaharaColors.Surface, surfaceDim = SaharaColors.Well,
@@ -380,6 +380,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                         Surface(color = Paper, contentColor = Ink, shape = RoundedCornerShape(topStart = SaharaRadius.Hero, topEnd = SaharaRadius.Hero), modifier = Modifier.fillMaxWidth().weight(1f)) {
                             Box(Modifier.fillMaxSize().padding(top = 16.dp)) { when(shown) {
                                 "family" -> Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 16.dp).saharaScreenEnter(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                                    SaharaIllustration(SaharaArtKind.Welcome, Modifier.fillMaxWidth())
                                     SaharaPrimaryButton(if (role == "family") t("Add the person you care for", "जिनकी देखभाल करते हैं, उन्हें जोड़ें") else t("Start with your name", "अपने नाम से शुरू करें"),
                                         onClick = { if (addPersonContent == null) onStart() else select("person") }, enabled = !entryBusy, icon = Icons.Default.PersonAdd, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("welcome-add-person"))
                                     SaharaSecondaryButton(t("Sign in", "साइन इन"), onClick = { if (accountContent == null) onAccount() else select("account") }, enabled = !entryBusy, icon = Icons.Default.AccountCircle,
@@ -1038,7 +1039,7 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
         CareModuleTile("Medicines", t("Medicines", "दवाइयाँ"), "", SaharaSoftBlue, R.drawable.care_medicines_art, currentMeds.size + pastMeds.size) {
                 SideEffectsToRaiseCard(vm)
                 MedicineScanAction(onScanPrescription) { onAdd("medicine") }
-                if (currentMeds.isEmpty() && pastMeds.isEmpty()) QuietLine(t("No medicines yet.", "अभी कोई दवा नहीं।")) else {
+                if (currentMeds.isEmpty() && pastMeds.isEmpty()) { SaharaIllustration(SaharaArtKind.NoMedicines, Modifier.fillMaxWidth()); QuietLine(t("No medicines yet.", "अभी कोई दवा नहीं।")) } else {
                     CareModuleList("medicines-current", currentMeds, t("No current medicines.", "अभी कोई दवा नहीं चल रही।"), t("Current", "अभी चल रही"), { it.id }) { CareRow(it, vm) }
                     CareModuleList("medicines-past", pastMeds, t("No past medicines yet.", "पहले की कोई दवा नहीं।"), t("Past", "पहले की"), { it.id }) { CareRow(it, vm) }
                 }
@@ -1158,7 +1159,7 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
         val shortcutsElsewhere = !doctorEmbedded && !clinicianView
         item { MoreGroup(t("Care", "देखभाल")) {
             if (!shortcutsElsewhere) MoreRow(Icons.Default.FolderOpen, FamilyAccent.Teal, t("Documents", "दस्तावेज़"), "", Modifier.testTag("more-documents-entry"), onDocuments)
-            if (onCarePlan != null) MoreRow(Icons.Default.LocalHospital, FamilyAccent.Marigold, t("Emergency plan", "आपातकालीन योजना"), t("Plan, wallet card, living will", "योजना, वॉलेट कार्ड, लिविंग विल"), Modifier.testTag("more-care-plan-entry"), onCarePlan)
+            if (onCarePlan != null) MoreRow(Icons.Default.LocalHospital, FamilyAccent.Marigold, t("Emergency plan", "आपातकालीन योजना"), t("Plan, pocket emergency card, living will", "योजना, जेब वाला आपातकालीन कार्ड, लिविंग विल"), Modifier.testTag("more-care-plan-entry"), onCarePlan)
             if (onDevices != null && !clinicianView) MoreRow(Icons.Default.Healing, FamilyAccent.Plum, t("Tubes and lines", "नलियाँ और लाइनें"), "", Modifier.testTag("more-devices"), onDevices)
             if (!shortcutsElsewhere) MoreRow(Icons.Default.CalendarMonth, FamilyAccent.Leaf, t("Calendar", "कैलेंडर"), "", Modifier.testTag("more-calendar"), onCalendar)
             if (!shortcutsElsewhere) MoreRow(Icons.Default.Science, FamilyAccent.Marigold, t("Lab history", "जाँच का इतिहास"), "", Modifier.testTag("more-labs"), onLabs)

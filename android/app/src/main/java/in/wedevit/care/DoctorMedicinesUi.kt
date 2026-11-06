@@ -87,7 +87,7 @@ private fun medicineTime(at: Long?) = at?.let { DateTimeFormatter.ofPattern("d M
     LazyColumn(Modifier.fillMaxSize().testTag("doctor-medicines"),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
         item {FlowRow(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalArrangement=Arrangement.spacedBy(8.dp)) {Heading(t("Prescription", "पर्चा"),28);Button(onClick={openPrescription(true)},enabled=editable&&loaded&&prescriptions!=null&&!busy,shape=RoundedCornerShape(14.dp),modifier=Modifier.heightIn(min=48.dp).testTag("doctor-add-prescription")){Icon(Icons.Default.Add,null,Modifier.size(18.dp));Spacer(Modifier.width(8.dp));Text(t("Add prescription", "पर्चा जोड़ें"))}}}
 
-        if(busy)item {LinearProgressIndicator(Modifier.fillMaxWidth())}
+        if(busy)item {SaharaProgressBar(null)}
         error?.let {message->item {SurfaceCard(Peach){Row(verticalAlignment=Alignment.CenterVertically){Icon(Icons.Default.ErrorOutline,null,tint=RustText,modifier=Modifier.size(20.dp));Spacer(Modifier.width(8.dp));Text(message, Modifier.weight(1f).announce(),fontSize=15.sp,color=DoctorCardInk);TextButton(onClick=::refresh,enabled=!busy,modifier=Modifier.heightIn(min=48.dp)){Text(t("Retry", "फिर कोशिश करें"), color = RustText)}}}}}
         item {DoctorSideEffectsSection(vm,personId)}
         item {MedicineHistoryTabs(tab,busy){tab=it}}

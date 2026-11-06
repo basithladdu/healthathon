@@ -326,6 +326,7 @@ private const val HOME = "home"
             CommunityNotice(if (waiting == 1) CommunityCopy("1 post or reply is waiting to send.", "1 पोस्ट या जवाब भेजा जाना बाकी है।")
                 else CommunityCopy("$waiting posts or replies are waiting to send.", "$waiting पोस्ट या जवाब भेजे जाने बाकी हैं।"), onRetry)
         }
+        if (home == null && error != null) item(key = "community-offline-art") { SaharaIllustration(SaharaArtKind.Offline, Modifier.fillMaxWidth()) }
         if (error != null) item { CommunityNotice(error, onRetry) }
         if (home == null && error == null && loading) item { SaharaInlineLoading(t("Loading…", "खुल रहा है…")) }
         home?.groups?.let { groups ->
@@ -397,9 +398,10 @@ private const val HOME = "home"
             item { CommunityGuideline() }
             if (error != null) item { CommunityNotice(error, onRetry) }
             if (feed == null && error == null && loading) item { SaharaInlineLoading(t("Loading…", "खुल रहा है…")) }
+            if (feed != null && posts.isEmpty()) item(key = "community-empty-art") { SaharaIllustration(SaharaArtKind.CommunityEmpty, Modifier.fillMaxWidth()) }
             if (feed != null && posts.isEmpty()) item {
                 SaharaEmpty(t("No posts here yet", "यहाँ अभी कोई पोस्ट नहीं है"), t("Say hello, or ask what helped others. Your words could help someone today.", "नमस्ते कहें, या पूछें कि दूसरों को किस बात से मदद मिली। आपकी बात आज किसी के काम आ सकती है।"),
-                    icon = Icons.Default.Forum, actionLabel = t("Write the first post", "पहली पोस्ट लिखें"), onAction = onWrite, modifier = Modifier.saharaAppear())
+                    actionLabel = t("Write the first post", "पहली पोस्ट लिखें"), onAction = onWrite, modifier = Modifier.saharaAppear())
             }
             items(posts, key = { it.id }) { post ->
                 CommunityPostCard(post, now = now, tone = tone, queued = post.id in queuedIds, queuedIds = queuedIds, justSent = justSent, canModerate = canModerate,
