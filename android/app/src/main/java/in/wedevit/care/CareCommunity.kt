@@ -417,11 +417,11 @@ private const val HOME = "home"
                     onReport = onReport, onRemove = onRemove, onModerate = onModerate,
                     // A new post fades in and the others slide down to make room.
                     modifier = Modifier.animateItem(fadeInSpec = SaharaMotion.tween(SaharaMotion.LIST_ITEM_MS), placementSpec = SaharaMotion.tween<IntOffset>(SaharaMotion.EXPAND_MS, easing = SaharaMotion.Emphasized),
-                        fadeOutSpec = SaharaMotion.tween(SaharaMotion.EXIT_MS)))
+                        fadeOutSpec = SaharaMotion.tween(SaharaMotion.EXIT_MS)).saharaStagger(posts.indexOf(post)))
             }
         }
         if (feed != null) ExtendedFloatingActionButton(text = { Text(t("Write a post", "पोस्ट लिखें"), fontSize = 16.sp) }, icon = { Icon(Icons.Default.Edit, null) }, onClick = onWrite,
-            containerColor = SaharaColors.Primary, contentColor = SaharaColors.OnPrimary, modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp).heightIn(min = 56.dp).testTag("community-write"))
+            containerColor = SaharaColors.Primary, contentColor = SaharaColors.OnPrimary, modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp).saharaPulseGlow(corner = 16.dp, active = posts.isEmpty()).heightIn(min = 56.dp).testTag("community-write"))
     }
 }
 
@@ -469,7 +469,7 @@ private fun authorTone(name: String, byTeam: Boolean): SaharaTone = if (byTeam) 
         border = BorderStroke(1.5.dp, if (selected) tone.solid else SaharaColors.Edge),
         colors = ButtonDefaults.outlinedButtonColors(containerColor = fill, contentColor = if (selected) tone.ink else SaharaColors.Ink),
         modifier = Modifier.heightIn(min = 48.dp).then(if (tag.isNotEmpty()) Modifier.testTag(tag) else Modifier)) {
-        Icon(icon, null, Modifier.size(18.dp).graphicsLayer { scaleX = iconScale; scaleY = iconScale }, tint = if (selected) tone.solid else SaharaColors.Ink); Spacer(Modifier.width(6.dp))
+        Icon(icon, null, Modifier.size(18.dp).saharaPop(selected).graphicsLayer { scaleX = iconScale; scaleY = iconScale }, tint = if (selected) tone.solid else SaharaColors.Ink); Spacer(Modifier.width(6.dp))
         SaharaAnimatedText(text) { Text(it, style = MaterialTheme.typography.labelLarge, maxLines = 1, softWrap = false) }
     }
 }

@@ -250,8 +250,8 @@ internal fun LazyListScope.doctorConnectedHomeItems(people: List<Person>, items:
                     pill = if (hard > 0) t("$hard hard", "$hard मुश्किल") to DoctorTones.Attention else null) },
             )
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                if (paired) tiles.chunked(2).forEach { pair -> Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) { pair.forEach { it(Modifier.weight(1f).fillMaxHeight()) } } }
-                else tiles.forEach { it(Modifier.fillMaxWidth()) }
+                if (paired) tiles.chunked(2).forEach { pair -> Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) { pair.forEach { it(Modifier.weight(1f).fillMaxHeight().saharaStagger(tiles.indexOf(it))) } } }
+                else tiles.forEachIndexed { i, tile -> tile(Modifier.fillMaxWidth().saharaStagger(i)) }
             }
         }
     }
@@ -259,16 +259,16 @@ internal fun LazyListScope.doctorConnectedHomeItems(people: List<Person>, items:
     item(key = "home-today-title") { DoctorHomeSection(t("Today", "आज"), todayVisits.size + todayChecks.size, DoctorTones.Indigo, Icons.Default.Today) }
     if (todayVisits.isEmpty() && todayChecks.isEmpty()) item(key = "home-today-empty") { DoctorHomeEmpty(Icons.Default.EventAvailable, t("Nothing due today", "आज कुछ तय नहीं")) }
     items(todayVisits, key = { "home-today-${it.item.id}" }) { visit ->
-        DoctorRegisterRow(visit.person.name, visit.item.title, { onVisit(visit.person.id) }, lead = doctorTimeOrDay(visit.item, hindi, zone))
+        DoctorRegisterRow(visit.person.name, visit.item.title, { onVisit(visit.person.id) }, Modifier.saharaStagger(3 + todayVisits.indexOf(visit)), lead = doctorTimeOrDay(visit.item, hindi, zone))
     }
     items(todayChecks, key = { "home-today-check-${it.second.id}" }) { (person, check) ->
-        DoctorRegisterRow(person.name, checkInMoodLabel(check.title, hindi), { onProgress(person.id) }, lead = DateTimeFormatter.ofPattern("h:mm a", careLocale(hindi)).withZone(zone).format(Instant.ofEpochMilli(check.created)),
+        DoctorRegisterRow(person.name, checkInMoodLabel(check.title, hindi), { onProgress(person.id) }, Modifier.saharaStagger(3 + todayVisits.size + todayChecks.indexOfFirst { it.second.id == check.id }), lead = DateTimeFormatter.ofPattern("h:mm a", careLocale(hindi)).withZone(zone).format(Instant.ofEpochMilli(check.created)),
             pill = if (check.title == DoctorReportedMood.HARD.title) t("Hard day", "मुश्किल दिन") to DoctorTones.Attention else null)
     }
     if (laterVisits.isNotEmpty()) {
         item(key = "home-visits-title") { DoctorHomeSection(t("Coming up", "आगे की विज़िट"), laterVisits.size, DoctorTones.Plum, Icons.Default.EventAvailable) }
         items(laterVisits.take(5), key = { "home-visit-${it.item.id}" }) { visit ->
-            DoctorRegisterRow(visit.person.name, "${doctorWhen(visit.item, hindi, zone)} · ${visit.item.title}", { onVisit(visit.person.id) })
+            DoctorRegisterRow(visit.person.name, "${doctorWhen(visit.item, hindi, zone)} · ${visit.item.title}", { onVisit(visit.person.id) }, Modifier.saharaStagger(4 + todayRows + laterVisits.indexOf(visit)))
         }
     }
     item(key = "home-checks-title") { DoctorHomeSection(t("Check-ins", "हालचाल"), weekChecks.size, DoctorTones.Teal, Icons.Default.Favorite) }
@@ -291,7 +291,7 @@ private fun doctorTimeOrDay(item: CareItem, hindi: Boolean, zone: ZoneId): Strin
 /** One line with an icon for an empty list. */
 @Composable private fun DoctorHomeEmpty(icon: ImageVector, text: String) {
     Row(Modifier.fillMaxWidth().background(Paper, RoundedCornerShape(14.dp)).border(1.dp, DoctorHairline, RoundedCornerShape(14.dp)).padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        Icon(icon, null, tint = DoctorCardSub, modifier = Modifier.size(20.dp))
+        Icon(icon, null, tint = DoctorCardSub, modifier = Modifier.saharaFloat().size(20.dp))
         Text(text, fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardSub)
     }
 }
