@@ -4,8 +4,6 @@ package `in`.wedevit.care
 import android.app.Application
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,7 +17,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -42,8 +39,8 @@ import java.time.ZoneId
 
 internal data class DoctorSchedulePatient(val id: String, val name: String)
 
-// Meeting-card tints, cycled per card so neighbouring visits are easy to tell apart.
-private val ScheduleTints get() = listOf(Peach to Cream, SaharaSoftBlue to Paper, Mint to Paper, SaharaLavender to Paper)
+// Visit-card colour bars, cycled per card so neighbouring visits are easy to tell apart.
+private val ScheduleTones get() = listOf(DoctorTones.Rust, DoctorTones.Teal, DoctorTones.Plum, DoctorTones.Indigo)
 
 private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone(zone).toLocalDate()
 
@@ -56,7 +53,6 @@ private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone
     val selected = LocalDate.parse(selectedText)
     var picking by rememberSaveable { mutableStateOf(false) }
     var planFor by rememberSaveable { mutableStateOf<String?>(null) }
-    var expandedId by rememberSaveable { mutableStateOf<String?>(null) }
     val zone = ZoneId.systemDefault(); val today = LocalDate.now()
     val visits = remember(patients, items) {
         patients.flatMap { p -> doctorVisitsFor(items, p.id).filter { it.due > 0 && CareEntryCodec.decode(it.detail)?.status != "cancelled" }.map { p to it } }
@@ -64,15 +60,15 @@ private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone
     val byDay = remember(visits) { visits.groupBy { visitDay(it.second.due, zone) } }
     val dayVisits = byDay[selected].orEmpty().sortedBy { it.second.due }
     val weekStart = selected.minusDays((selected.dayOfWeek.value - 1).toLong())
-    fun pick(day: LocalDate) { selectedText = day.toString(); expandedId = null }
+    fun pick(day: LocalDate) { selectedText = day.toString() }
 
     LazyColumn(modifier.fillMaxSize().testTag("doctor-schedule"), contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item {
             Column {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     Icon(Icons.Default.CalendarMonth, null, tint = DoctorAccent, modifier = Modifier.size(28.dp))
-                    Text(t("Schedule", "समय-सूची"), Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 28.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-                    Button(onClick = { picking = true }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = Color.White), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-schedule-add")) {
+                    Text(t("Schedule", "शेड्यूल"), Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 28.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+                    Button(onClick = { picking = true }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorTones.Rust.solid, contentColor = Color.White), elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-schedule-add")) {
                         Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Add", "जोड़ें"))
                     }
                 }
@@ -95,7 +91,7 @@ private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone
                 (0L..6L).forEach { offset ->
                     val day = weekStart.plusDays(offset); val isSelected = day == selected; val has = byDay.containsKey(day)
                     val label = careDateFormat("EEEE, d MMMM", hindi).format(day)
-                    Surface(onClick = { pick(day) }, shape = RoundedCornerShape(14.dp), color = if (isSelected) DoctorAccent else Color.Transparent,
+                    Surface(onClick = { pick(day) }, shape = RoundedCornerShape(14.dp), color = if (isSelected) DoctorTones.Rust.solid else Color.Transparent,
                         border = if (!isSelected && day == today) BorderStroke(1.5.dp, DoctorAccent) else null,
                         modifier = Modifier.weight(1f).heightIn(min = 64.dp).semantics { contentDescription = label }.testTag("doctor-schedule-day-$day")) {
                       Box(contentAlignment = Alignment.Center) {
@@ -113,7 +109,7 @@ private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone
         }
         if (dayVisits.isEmpty()) item(key = "schedule-empty") {
             val label = careDateFormat("EEE d MMM", hindi).format(selected)
-            Surface(color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
+            Surface(color = Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Box(Modifier.size(48.dp).clip(CircleShape).background(Peach), contentAlignment = Alignment.Center) { Icon(Icons.Default.EventAvailable, null, tint = DoctorAccent, modifier = Modifier.size(24.dp)) }
                     Text(t("No visits on $label", "$label को कोई विज़िट नहीं"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, textAlign = TextAlign.Center)
@@ -123,7 +119,7 @@ private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone
         }
         items(dayVisits.size, key = { "visit-${dayVisits[it].second.id}" }) { index ->
             val (patient, item) = dayVisits[index]
-            ScheduleVisitCard(patient, item, ScheduleTints[index % ScheduleTints.size], expandedId == item.id, { expandedId = if (expandedId == item.id) null else item.id }, { onOpenPatient(patient.id) })
+            ScheduleVisitCard(patient, item, ScheduleTones[index % ScheduleTones.size]) { onOpenPatient(patient.id) }
         }
         if (footer != null) item { footer() }
     }
@@ -132,36 +128,32 @@ private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone
     planFor?.let { id -> planner(id) { planFor = null } }
 }
 
-@Composable private fun ScheduleVisitCard(patient: DoctorSchedulePatient, item: CareItem, tint: Pair<Color, Color>, expanded: Boolean, onToggle: () -> Unit, onOpen: () -> Unit) { val t = careText(); val hindi = careHindi()
+/** One visit, one tap: the whole row opens the patient. Time, place, doctor and note are on the row, so nothing needs expanding. */
+@Composable private fun ScheduleVisitCard(patient: DoctorSchedulePatient, item: CareItem, tone: DoctorTone, onOpen: () -> Unit) { val t = careText(); val hindi = careHindi()
     val entry = CareEntryCodec.decode(item.detail)
     val time = if (entry?.timed == true) careDateFormat("h:mm a", hindi).format(Instant.ofEpochMilli(item.due).atZone(ZoneId.systemDefault())) else t("Time not set", "समय तय नहीं")
     val place = entry?.location?.trim().orEmpty().ifBlank { t("Visit", "विज़िट") }
-    val doctor = doctorVisitDoctor(item).ifBlank { t("Doctor not recorded", "डॉक्टर दर्ज नहीं") }
+    val doctor = doctorVisitDoctor(item)
     val note = DoctorVisitDetails.decode(entry?.detail ?: item.detail).note.trim()
-    Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(Brush.linearGradient(listOf(tint.first, tint.second))).border(1.dp, DoctorHairline, RoundedCornerShape(20.dp)).clickable(onClick = onToggle).testTag("doctor-schedule-card-${item.id}")) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(time, Modifier.width(76.dp), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = RustText, maxLines = 2)
-                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text(t("Visit with ${patient.name}", "${patient.name} के साथ विज़िट"), fontFamily = SaharaTitleFont, fontSize = 18.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+    val done = doctorVisitCompleted(item)
+    val press = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+    Surface(onClick = onOpen, interactionSource = press, color = Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), shadowElevation = 1.dp,
+        modifier = Modifier.fillMaxWidth().saharaAppear().saharaPress(press).testTag("doctor-schedule-card-${item.id}")) {
+        Row(Modifier.height(IntrinsicSize.Min)) {
+            Box(Modifier.width(5.dp).fillMaxHeight().background(tone.solid))
+            Column(Modifier.weight(1f).padding(horizontal = 14.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(time, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = tone.ink, softWrap = false)
+                    if (done) DoctorPill(t("Completed", "पूरी हुई"), DoctorTones.Good)
                 }
-                Surface(onClick = onToggle, shape = CircleShape, color = Color.White.copy(alpha = .75f), modifier = Modifier.size(48.dp)) {
-                    Box(contentAlignment = Alignment.Center) { Icon(if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore, if (expanded) t("Hide details", "विवरण छिपाएँ") else t("Show details", "विवरण दिखाएँ"), tint = DoctorCardInk) }
+                Text(patient.name, fontFamily = SaharaTitleFont, fontSize = 18.sp, lineHeight = 23.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Icon(Icons.Default.Place, null, Modifier.size(16.dp), tint = DoctorCardSub)
+                    Text(listOf(place, doctor).filter { it.isNotBlank() }.joinToString(" · "), Modifier.weight(1f), fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
+                if (note.isNotBlank()) Text(note, fontSize = 14.sp, lineHeight = 19.sp, color = DoctorCardSub, maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Icon(Icons.Default.Place, null, Modifier.size(18.dp), tint = DoctorCardSub)
-                Text(place, Modifier.weight(1f), fontSize = 14.sp, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                val done = doctorVisitCompleted(item)
-                Surface(color = if (done) DoctorStatusGoodBg else DoctorStatusWarnBg, shape = RoundedCornerShape(50)) {
-                    Text(if (done) t("Completed", "पूरी हुई") else t("Planned", "तय"), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 13.sp, fontWeight = FontWeight.Medium, color = if (done) DoctorStatusGood else DoctorStatusWarn)
-                }
-            }
-            if (expanded) {
-                Text(t("Doctor: $doctor", "डॉक्टर: $doctor"), fontSize = 14.sp, color = DoctorCardInk)
-                if (note.isNotBlank()) Text(note, fontSize = 14.sp, color = DoctorCardSub)
-                OutlinedButton(onClick = onOpen, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-schedule-open-${item.id}")) { Text(t("Open", "खोलें"), color = RustText); Spacer(Modifier.width(4.dp)); Icon(Icons.Default.ChevronRight, null, Modifier.size(18.dp), tint = RustText) }
-            }
+            Icon(Icons.Default.ChevronRight, t("Open", "खोलें"), Modifier.align(Alignment.CenterVertically).padding(end = 8.dp).testTag("doctor-schedule-open-${item.id}"), tint = DoctorCardSub)
         }
     }
 }
@@ -183,7 +175,7 @@ private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone
             }
             LazyColumn(Modifier.heightIn(max = 380.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 items(shown, key = { it.id }) { p ->
-                    Surface(onClick = { onPick(p.id) }, color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp)) {
+                    Surface(onClick = { onPick(p.id) }, color = Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp)) {
                         Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                             Box(Modifier.size(40.dp).clip(CircleShape).background(Peach), contentAlignment = Alignment.Center) { Text(p.name.take(1).uppercase(), fontWeight = FontWeight.Bold, fontSize = 17.sp, color = RustText) }
                             Text(p.name, Modifier.weight(1f), fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)

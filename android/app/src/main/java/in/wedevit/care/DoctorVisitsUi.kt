@@ -92,11 +92,11 @@ internal fun doctorVisitSources(item: CareItem, entries: List<CareItem>, notes: 
 }
 
 @Composable internal fun DoctorVisitsContent(visits: List<CareItem>, canEdit: Boolean, now: Long, onOpen: (CareItem) -> Unit, onCalendar: () -> Unit, onAdd: () -> Unit, conditionSources: List<CareItem> = emptyList(), discussionSources: List<CareVersion> = emptyList()) { val t = careText();
-    LazyColumn(Modifier.fillMaxSize().testTag("doctor-visits"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    CompositionLocalProvider(LocalSaharaStagger provides remember { SaharaStagger() }) { LazyColumn(Modifier.fillMaxSize().testTag("doctor-visits"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { FlowRow(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalArrangement=Arrangement.spacedBy(8.dp)) { Heading(t("Visits", "विज़िट"),28);Button(onClick=onAdd,enabled=canEdit,shape=RoundedCornerShape(14.dp),modifier=Modifier.heightIn(min=48.dp)){Icon(Icons.Default.Add,null,Modifier.size(18.dp));Spacer(Modifier.width(8.dp));Text(t("Plan visit", "विज़िट तय करें"))} } }
         if (visits.isEmpty()) item { SurfaceCard { Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) { Icon(Icons.Default.Event, null, tint = DoctorAccent, modifier = Modifier.size(24.dp)); Text(t("No visits recorded yet", "अभी कोई विज़िट दर्ज नहीं"), fontSize = 16.sp, color = DoctorCardInk) } } }
         items(visits, key = { "all:${it.id}" }) { VisitListCard(it, now, onOpen, conditionSources, discussionSources, highlighted = it.id == visits.firstOrNull()?.id) }
-    }
+    } }
 }
 internal val DoctorVisitHighlight = Color(0xFFD97757)
 internal val DoctorVisitHighlightInk = Color(0xFF201711)
@@ -113,7 +113,7 @@ internal val DoctorVisitHighlightInk = Color(0xFF201711)
         drawCircle(DoctorVisitHighlight, 4.dp.toPx(), Offset(x, 29.dp.toPx()))
     }, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         Spacer(Modifier.width(16.dp))
-        Card(onClick = { onOpen(item) }, shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = background), border = if (highlighted) null else androidx.compose.foundation.BorderStroke(1.dp, DoctorHairline), modifier = Modifier.weight(1f).heightIn(min = 104.dp).testTag("doctor-visit-card-${item.id}")) {
+        Card(onClick = { onOpen(item) }, shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = background), border = if (highlighted) null else androidx.compose.foundation.BorderStroke(1.dp, DoctorHairline), modifier = Modifier.weight(1f).saharaAppear().heightIn(min = 96.dp).testTag("doctor-visit-card-${item.id}")) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (largeText) {
                     Text(doctorVisitDoctor(item).ifBlank { t("Doctor not recorded", "डॉक्टर दर्ज नहीं") }, color=ink, fontSize=18.sp, fontFamily=SaharaTitleFont, fontWeight=FontWeight.Medium)
@@ -140,8 +140,7 @@ internal val DoctorVisitHighlightInk = Color(0xFF201711)
             Text(t("Planned: ${visitDate(item)}", "तय: ${visitDate(item)}"), fontSize = 16.sp, color = DoctorCardSub)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 val state = doctorVisitState(item, System.currentTimeMillis())
-                val (fg, bg) = when { state == "Completed" -> DoctorStatusGood to DoctorStatusGoodBg; state == "Upcoming" -> DoctorStatusWarn to DoctorStatusWarnBg; else -> DoctorStatusRest to DoctorStatusRestBg }
-                Surface(color = bg, shape = RoundedCornerShape(50)) { Text(state, Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = fg) }
+                DoctorPill(when (state) { "Cancelled" -> t("Cancelled", "रद्द"); "Missed · recorded" -> t("Missed · recorded", "छूटी · दर्ज"); "Completed" -> t("Completed", "पूरी हुई"); "Date not recorded" -> t("Date not recorded", "तारीख़ दर्ज नहीं"); "Past · completion not recorded" -> t("Past · completion not recorded", "बीत गई · पूरी होना दर्ज नहीं"); else -> t("Upcoming", "आने वाली") }, when (state) { "Completed" -> DoctorTones.Leaf; "Upcoming" -> DoctorTones.Marigold; else -> DoctorTones.Red })
                             }
         } }
         item { VisitSection(t("Place / visit type", "जगह / विज़िट का प्रकार"), entry?.location?.ifBlank { t("Not recorded", "दर्ज नहीं") } ?: t("Not recorded", "दर्ज नहीं")) }
@@ -166,7 +165,7 @@ internal val DoctorVisitHighlightInk = Color(0xFF201711)
 }
 
 @Composable private fun VisitSection(label: String, value: String) {
-    Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = androidx.compose.foundation.BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
+    Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = androidx.compose.foundation.BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text(label, Modifier.a11yHeading(), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub)
             Text(value, fontSize = 16.sp, lineHeight = 23.sp, color = DoctorCardInk)

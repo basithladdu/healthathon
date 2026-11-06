@@ -68,7 +68,7 @@ object DoctorSymptomSummaryRules {
     var showingBody by rememberSaveable(personId) { mutableStateOf(false) }
     val numberCol = 56.dp
     val changeCol = 72.dp
-    Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("doctor-symptom-summary")) {
+    Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("doctor-symptom-summary")) {
         Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(t("Symptoms and pain", "लक्षण और दर्द"), fontFamily = SaharaTitleFont, fontSize = 20.sp, color = DoctorCardInk, modifier = Modifier.a11yHeading())
             if (rows.isEmpty()) Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) { Icon(Icons.Default.Healing, null, tint = DoctorAccent, modifier = Modifier.size(24.dp)); Text(t("No symptom notes yet.", "अभी लक्षण का कोई नोट नहीं।"), fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.testTag("doctor-symptom-summary-empty")) }

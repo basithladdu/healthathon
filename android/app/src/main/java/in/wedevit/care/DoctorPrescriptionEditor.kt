@@ -56,7 +56,7 @@ import java.util.UUID
     },confirmButton={Button(enabled=!busy&&reviewed&&(!replacing||!currentExists||confirmed),onClick={
         if(title.isBlank()||rows.any {it.name.isBlank()})error=t("Add a name for each medicine", "हर दवा का नाम लिखें")
         else onSave(title,date,rows,!replacing||!currentExists||confirmed)
-    },shape=RoundedCornerShape(14.dp),modifier=Modifier.heightIn(min=48.dp)){Text(if(busy)t("Saving…", "सहेज रहे हैं…") else t("Save", "सहेजें"))}},dismissButton={TextButton(onClick=onDismiss,enabled=!busy,modifier=Modifier.heightIn(min=48.dp)){Text(t("Cancel", "रद्द करें"))}},containerColor=Cream,shape=RoundedCornerShape(20.dp))
+    },shape=RoundedCornerShape(14.dp),modifier=Modifier.heightIn(min=48.dp)){Text(if(busy)t("Saving…", "सहेज रहे हैं…") else t("Save", "सहेजें"))}},dismissButton={TextButton(onClick=onDismiss,enabled=!busy,modifier=Modifier.heightIn(min=48.dp)){Text(t("Cancel", "रद्द करें"))}},containerColor=Cream,shape=RoundedCornerShape(16.dp))
 }
 
 @Composable private fun PrescriptionCheck(checked:Boolean,enabled:Boolean,text:String,onChange:(Boolean)->Unit) {

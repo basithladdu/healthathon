@@ -44,13 +44,13 @@ fun doctorMedicinePresentation(dose:SampleMedicineDose,asOf:Long,zone:ZoneId):Do
     Column(Modifier.fillMaxWidth().testTag("doctor-medicine-content"),verticalArrangement=Arrangement.spacedBy(12.dp)) {
         Text(t("Medicine reports", "दवा की सूचनाएँ"),Modifier.a11yHeading(),fontSize=22.sp,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont,color=DoctorCardInk)
         Text("As of ${DateTimeFormatter.ofPattern("dd MMM yyyy · h:mm a",Locale.ENGLISH).withZone(zone).format(Instant.ofEpochMilli(asOf))} · ${zone.id}",fontSize=14.sp,lineHeight=20.sp,color=DoctorCardSub)
-        if(doses.isEmpty()) Surface(color=Paper,shape=RoundedCornerShape(20.dp),border=BorderStroke(1.dp,DoctorHairline),modifier=Modifier.fillMaxWidth()) {
+        if(doses.isEmpty()) Surface(color=Paper,shape=RoundedCornerShape(16.dp),border=BorderStroke(1.dp,DoctorHairline),modifier=Modifier.fillMaxWidth()) {
             Row(Modifier.padding(16.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(12.dp)) {Icon(Icons.Outlined.Schedule,null,tint=Rust,modifier=Modifier.size(24.dp));Text(t("No medicine reports recorded.", "दवा की कोई सूचना दर्ज नहीं।"),fontSize=16.sp,color=DoctorCardInk)}
         }
         doses.forEach {dose ->
             val view=doctorMedicinePresentation(dose,asOf,zone)
             val good=view.status=="Taken reported"
-            Surface(color=Paper,shape=RoundedCornerShape(20.dp),border=BorderStroke(1.dp,DoctorHairline),modifier=Modifier.fillMaxWidth().testTag("doctor-medicine-${dose.id}")) {
+            Surface(color=Paper,shape=RoundedCornerShape(16.dp),border=BorderStroke(1.dp,DoctorHairline),modifier=Modifier.fillMaxWidth().testTag("doctor-medicine-${dose.id}")) {
                 Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
                     Text(dose.medicineLabel,fontSize=18.sp,fontWeight=FontWeight.SemiBold,lineHeight=25.sp,color=DoctorCardInk)
                     Surface(color=if(good) DoctorStatusGoodBg else DoctorStatusWarnBg,shape=RoundedCornerShape(50)) {

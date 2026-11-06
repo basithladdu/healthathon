@@ -1,7 +1,14 @@
 package `in`.wedevit.care
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.Animatable
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -195,16 +202,26 @@ internal fun doctorLabRange(data: CareEntry): Pair<Double?, Double?> {
     return if (nums.size == 2 && nums[0] <= nums[1]) nums[0] to nums[1] else null to null
 }
 
-/** Phone: scrollable tab chips above the section. */
+/** Phone: one row of tabs on a white track (u-FIR tab grammar). The open tab is a solid fill in its own colour; the row scrolls to keep it in view. */
 @Composable internal fun DoctorPatientTabRow(selected: String, onSection: (String) -> Unit, modifier: Modifier = Modifier) {
     val t = careText()
-    Row(modifier.fillMaxWidth().background(Cream).horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 8.dp).testTag("doctor-patient-tabs"), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        doctorPatientTabs.forEach { tab ->
-            FilterChip(selected = tab.section == selected, onClick = { if (tab.section != selected) onSection(tab.section) }, label = { Text(t(tab.en, tab.hi), fontSize = 14.sp) },
-                leadingIcon = { Icon(tab.icon, null, Modifier.size(18.dp)) }, shape = RoundedCornerShape(50),
-                modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-tab-${tab.section}"),
-                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = tab.color, selectedLabelColor = DoctorCardInk, selectedLeadingIconColor = DoctorAccent, containerColor = Paper, labelColor = DoctorCardSub),
-                border = FilterChipDefaults.filterChipBorder(enabled = true, selected = tab.section == selected, borderColor = DoctorHairline, selectedBorderColor = DoctorAccent))
+    val scroll = rememberScrollState()
+    val positions = remember { mutableStateMapOf<String, Int>() }
+    LaunchedEffect(selected, positions[selected]) { positions[selected]?.let { scroll.animateScrollTo((it - 48).coerceAtLeast(0), SaharaMotion.tween(SaharaMotion.SELECT_MS * 2)) } }
+    Box(modifier.fillMaxWidth().background(Cream).padding(horizontal = 12.dp, vertical = 8.dp)) {
+        Row(Modifier.fillMaxWidth().background(Paper, RoundedCornerShape(14.dp)).border(1.dp, DoctorHairline, RoundedCornerShape(14.dp)).horizontalScroll(scroll).padding(4.dp).testTag("doctor-patient-tabs"), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            doctorPatientTabs.forEach { tab ->
+                val on = tab.section == selected
+                val tone = doctorTabTone(tab.section)
+                val fill by animateColorAsState(if (on) tone.solid else Color.Transparent, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "tab fill")
+                val ink by animateColorAsState(if (on) tone.onSolid else DoctorCardSub, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "tab ink")
+                Row(Modifier.onGloballyPositioned { positions[tab.section] = it.positionInParent().x.toInt() }.heightIn(min = 48.dp).background(fill, RoundedCornerShape(10.dp))
+                    .selectable(selected = on, role = Role.Tab) { if (!on) onSection(tab.section) }.padding(horizontal = 12.dp).testTag("doctor-tab-${tab.section}"),
+                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Icon(tab.icon, null, Modifier.size(18.dp), tint = if (on) tone.onSolid else tone.ink)
+                    Text(t(tab.en, tab.hi), fontSize = 14.sp, fontWeight = if (on) FontWeight.Bold else FontWeight.SemiBold, color = ink, maxLines = 1, softWrap = false)
+                }
+            }
         }
     }
 }
@@ -226,7 +243,13 @@ internal fun doctorLabRange(data: CareEntry): Pair<Double?, Double?> {
         else Column(Modifier.fillMaxSize()) {
             DoctorPatientTabRow(shown, onSection)
             HorizontalDivider(color = DoctorHairline)
-            Box(Modifier.weight(1f).fillMaxWidth()) { DoctorPatientSectionContent(vm, personId, shown, care) }
+            // Tab change: the new tab fades in and drifts from the side it sits on in the row. One instance only, so its saved state stays single.
+            val order = doctorPatientTabs.indexOfFirst { it.section == shown }
+            var last by remember { mutableIntStateOf(order) }
+            val drift = remember { Animatable(1f) }
+            var sign by remember { mutableFloatStateOf(1f) }
+            LaunchedEffect(order) { if (order != last && SaharaMotion.enabled) { sign = if (order > last) 1f else -1f; drift.snapTo(0f); last = order; drift.animateTo(1f, SaharaMotion.tween(SaharaMotion.ENTER_MS, easing = SaharaMotion.Emphasized)) } else last = order }
+            Box(Modifier.weight(1f).fillMaxWidth().graphicsLayer { val p = if (order != last && SaharaMotion.enabled) 0f else drift.value; alpha = p; translationX = (1f - p) * sign * 24.dp.toPx() }) { DoctorPatientSectionContent(vm, personId, shown, care) }
         }
     }
 }
@@ -263,7 +286,7 @@ internal fun doctorLabRange(data: CareEntry): Pair<Double?, Double?> {
         }
         item { DoctorRangeSelector(range, { rangeKey = it.name }) }
         if (groups.isEmpty()) item {
-            Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
+            Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.fillMaxWidth().padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Icon(Icons.Outlined.Science, null, Modifier.size(28.dp), tint = DoctorAccent)
                     Text(t("No lab results yet", "अभी कोई जाँच नतीजा नहीं"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.testTag("doctor-labs-empty"))
@@ -279,7 +302,7 @@ internal fun doctorLabRange(data: CareEntry): Pair<Double?, Double?> {
             val previous = values.getOrNull(1)?.second?.value?.toDoubleOrNull()
             val outside = latestValue != null && ((printed.first != null && latestValue < printed.first!!) || (printed.second != null && latestValue > printed.second!!))
             val arrow = if (latestValue == null || previous == null) "" else when { latestValue > previous -> "↑"; latestValue < previous -> "↓"; else -> "→" }
-            Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, if (outside) ChartBands.Severe.copy(alpha = .5f) else DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("doctor-lab-$key")) {
+            Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, if (outside) ChartBands.Severe.copy(alpha = .5f) else DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("doctor-lab-$key")) {
                 Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                     Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).clickable(role = Role.Button) { open = if (open == key) "" else key }, verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
