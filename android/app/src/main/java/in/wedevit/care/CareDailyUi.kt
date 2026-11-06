@@ -126,8 +126,9 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
         Column(Modifier.padding(horizontal = 4.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
             CareMoodFace(face, Modifier.size(32.dp).clearAndSetSemantics { })
             Spacer(Modifier.height(4.dp))
-            Text(label, fontSize = 15.sp, lineHeight = 18.sp, fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold, color = text, textAlign = TextAlign.Center,
-                style = LocalTextStyle.current.copy(lineBreak = androidx.compose.ui.text.style.LineBreak.Heading, hyphens = androidx.compose.ui.text.style.Hyphens.None))
+            // Shrinks the label instead of splitting a word ("ठीक-ठा / क") at large font sizes.
+            SaharaFitText(label, style = LocalTextStyle.current.copy(fontSize = 15.sp, lineHeight = 18.sp), color = text, maxLines = 2, min = 10f,
+                fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold, textAlign = TextAlign.Center)
         }
     }
 }

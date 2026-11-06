@@ -235,6 +235,8 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
             Image(saharaImage(R.drawable.sahara_professional_logo, 44.dp), null, Modifier.size(44.dp).then(if (person != null) Modifier.clip(CircleShape).background(SaharaColors.Surface).padding(3.dp) else Modifier), contentScale = ContentScale.Fit)
             Spacer(Modifier.width(4.dp))
             Column(Modifier.weight(1f).padding(vertical = 8.dp, horizontal = 2.dp)) {
+                    // At large text with a person chip, the logo alone names the app instead of a cut "Sa…".
+                    if (person == null || androidx.compose.ui.platform.LocalDensity.current.fontScale < 1.3f)
                     Text(androidx.compose.ui.res.stringResource(R.string.app_name), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 22.sp, lineHeight = 28.sp, color = LocalContentColor.current, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis)
             }
             // The one language choice, on the header of every family-side screen (welcome and sign-in included).
@@ -501,8 +503,8 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
         if (family) summary() else if (!clinician && canEdit) item(key = "today-checkin") { TodayCheckInBar(vm, onOpen = onCheckInWords, onSymptom = onSymptomNote) }
         val medicineSection: androidx.compose.foundation.lazy.LazyListScope.() -> Unit = {
             // The doses card under the title carries the one "x of y taken" count.
-            item(key = "medicines-title") { SaharaSectionHeader(t("Medicines today", "आज की दवाइयाँ"), Modifier.testTag("today-medicines-title"), tone = SaharaTone.Plum, actionLabel = t("Open medicines", "दवाइयाँ खोलें"), onAction = { onCare("Medicines") }, icon = careIcon("medicine")) }
             item(key = "today-doses") { TodayDosesCard(vm) }
+            item(key = "medicines-open") { SaharaSecondaryButton(t("Open medicines", "दवाइयाँ खोलें"), { onCare("Medicines") }, Modifier.fillMaxWidth().testTag("today-medicines-title"), icon = careIcon("medicine"), tone = SaharaTone.Plum, navigates = true) }
             if (medicines.isEmpty() && loaded && canEdit) item { SaharaSecondaryButton(t("Add a medicine", "दवा जोड़ें"), { onAdd("medicine") }, Modifier.fillMaxWidth(), icon = Icons.Default.Add, tone = SaharaTone.Plum) }
         }
         if (!clinician) medicineSection()
@@ -1039,12 +1041,12 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
             CareModuleList("conversations", versions, t("No saved conversations yet.", "अभी कोई सहेजी हुई बातचीत नहीं।"), keyOf = { it.id }) { CareConversationRow(it, onReadNote) }
         },
         CareModuleTile("Medicines", t("Medicines", "दवाइयाँ"), "", SaharaSoftBlue, R.drawable.care_medicines_art, currentMeds.size + pastMeds.size) {
-                SideEffectsToRaiseCard(vm)
-                MedicineScanAction(onScanPrescription) { onAdd("medicine") }
                 if (currentMeds.isEmpty() && pastMeds.isEmpty()) { SaharaIllustration(SaharaArtKind.NoMedicines, Modifier.fillMaxWidth()); QuietLine(t("No medicines yet.", "अभी कोई दवा नहीं।")) } else {
                     CareModuleList("medicines-current", currentMeds, t("No current medicines.", "अभी कोई दवा नहीं चल रही।"), t("Current", "अभी चल रही"), { it.id }) { CareRow(it, vm) }
                     CareModuleList("medicines-past", pastMeds, t("No past medicines yet.", "पहले की कोई दवा नहीं।"), t("Past", "पहले की"), { it.id }) { CareRow(it, vm) }
                 }
+                MedicineScanAction(onScanPrescription) { onAdd("medicine") }
+                SideEffectsToRaiseCard(vm)
         },
         CareModuleTile("Visits", t("Visits", "मुलाक़ातें"), "", SaharaApricot, R.drawable.conversation_history_art, upcoming.size + pastVisits.size) {
                 CareVisitsModule(vm, upcoming, pastVisits, onCalendarAt)
