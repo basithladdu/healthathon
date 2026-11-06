@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { eventFallsOn, type CareCheck, type CareEvent, type CareReport } from './care-calendar-state';
 import type { CareDocumentText } from './care-document-state';
 import { CareMedicineImport } from './care-medicine-import';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
+import { SaharaLottie } from './sahara-lottie';
 import {
   deleteMedicineImageImport,
   saveStandaloneMedicineImage,
@@ -74,6 +76,7 @@ export function CareMedicines(props: CareMedicinesProps) {
 }
 
 function MedicinesForPatient({ patientId, author, today, lang, events, checks, reports, documents, onAdd, onUpdate, onCheck, onRemove }: CareMedicinesProps) {
+  const [listMotion] = useAutoAnimate<HTMLDivElement>();
   const id = useId();
   const t = (en: string, hi: string) => careText(lang, en, hi);
   const [date, setDate] = useState(today);
@@ -331,7 +334,7 @@ function MedicinesForPatient({ patientId, author, today, lang, events, checks, r
       {item.uncertainties.length > 0 && <details className="medicine-saved-source"><summary>{t('Review notes', 'जाँच की टिप्पणियाँ')}</summary><ul>{item.uncertainties.map((uncertainty) => <li key={uncertainty}>{uncertainty}</li>)}</ul></details>}
       <div className="medicine-card-actions">{confirmRemove === item.id ? <div className="medicine-remove-confirm"><span>{t('Remove this medicine and all reminders?', 'यह दवा और सभी रिमाइंडर हटाएँ?')}</span><button type="button" onClick={() => removeRegimen(item)}>{t('Remove', 'हटाएँ')}</button><button type="button" onClick={() => setConfirmRemove(null)}>{t('Keep', 'रहने दें')}</button></div> : <button type="button" className="medicine-text-button" onClick={() => setConfirmRemove(item.id)}>{t('Remove medicine', 'दवा हटाएँ')}</button>}</div>
     </article>)}</div>}
-    <div className="medicine-list">{visible.map((item, index) => {
+    <div className="medicine-list" ref={listMotion}>{visible.map((item, index) => {
       const check = eventFallsOn(item, date) ? checked(item) : undefined;
       const prescription = medicinePrescription(item);
       const report = available.find((entry) => entry.id === prescription?.reportId);
@@ -342,6 +345,6 @@ function MedicinesForPatient({ patientId, author, today, lang, events, checks, r
         <div className="medicine-card-actions">{view === 'day' && <button type="button" className="medicine-taken" aria-pressed={Boolean(check)} aria-label={`${t('Taken', 'ले ली')}: ${item.title}, ${item.time}`} disabled={date > today} onClick={() => { onCheck(item.id, date, !check); setMessage(check ? t('Taken mark removed.', 'लेने का निशान हटा दिया।') : t('Marked taken.', 'लेना दर्ज हो गया।')); }}><span className="medicine-tick" aria-hidden="true"><MedicineIcon kind="check" /></span><span>{check ? t('Taken', 'ले ली') : t('Mark taken', 'लेना दर्ज करें')}</span></button>}{check && <span className="medicine-taken-by">{t('By', 'द्वारा')} {check.actor}</span>}<button type="button" className="medicine-text-button" onClick={() => openEditor(item)}>{prescription ? t('Edit', 'बदलें') : t('Add prescription', 'पर्चा जोड़ें')}</button>{confirmRemove === item.id ? <div className="medicine-remove-confirm"><span>{t('Remove this schedule?', 'यह समय हटाएँ?')}</span><button type="button" onClick={() => { onRemove(item.id); setConfirmRemove(null); setMessage(t('Schedule removed.', 'समय हटा दिया।')); }}>{t('Remove', 'हटाएँ')}</button><button type="button" onClick={() => setConfirmRemove(null)}>{t('Keep', 'रहने दें')}</button></div> : <button type="button" className="medicine-text-button" onClick={() => setConfirmRemove(item.id)} aria-label={`${t('Remove schedule', 'समय हटाएँ')}: ${item.title}`}>{t('Remove', 'हटाएँ')}</button>}</div>
       </article>;
     })}</div>
-    {!visible.length && (view === 'day' || regimens.length === 0) && <div className="medicine-empty"><span><MedicineIcon /></span><h2>{selectedTime !== 'all' ? t('No medicines at this time', 'इस समय कोई दवा नहीं है') : medicines.length || regimens.length ? t('Nothing scheduled for this day', 'इस दिन कोई दवा दर्ज नहीं है') : t('Keep your medicines together', 'अपनी दवाएँ एक जगह रखें')}</h2><button type="button" className={medicines.length || regimens.length ? undefined : 'medicine-primary'} onClick={() => selectedTime !== 'all' ? setSelectedTime('all') : medicines.length || regimens.length ? setView('all') : setImporting(true)}>{selectedTime !== 'all' ? t('Show all times', 'सभी समय दिखाएँ') : medicines.length || regimens.length ? t('See all medicines', 'सभी दवाएँ देखें') : t('Scan a prescription', 'पर्चा स्कैन करें')}</button></div>}
+    {!visible.length && (view === 'day' || regimens.length === 0) && <div className="medicine-empty"><span><SaharaLottie name="pill" /></span><h2>{selectedTime !== 'all' ? t('No medicines at this time', 'इस समय कोई दवा नहीं है') : medicines.length || regimens.length ? t('Nothing scheduled for this day', 'इस दिन कोई दवा दर्ज नहीं है') : t('Keep your medicines together', 'अपनी दवाएँ एक जगह रखें')}</h2><button type="button" className={medicines.length || regimens.length ? undefined : 'medicine-primary'} onClick={() => selectedTime !== 'all' ? setSelectedTime('all') : medicines.length || regimens.length ? setView('all') : setImporting(true)}>{selectedTime !== 'all' ? t('Show all times', 'सभी समय दिखाएँ') : medicines.length || regimens.length ? t('See all medicines', 'सभी दवाएँ देखें') : t('Scan a prescription', 'पर्चा स्कैन करें')}</button></div>}
   </section>;
 }
