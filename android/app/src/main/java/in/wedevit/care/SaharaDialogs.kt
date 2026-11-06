@@ -51,7 +51,7 @@ import androidx.core.content.ContextCompat
 enum class SaharaPermission(val permission: String?, val icon: ImageVector, val tone: SaharaTone) {
     Microphone(Manifest.permission.RECORD_AUDIO, Icons.Default.Mic, SaharaTone.Rose),
     Camera(Manifest.permission.CAMERA, Icons.Default.PhotoCamera, SaharaTone.Teal),
-    Location(Manifest.permission.ACCESS_COARSE_LOCATION, Icons.Default.Place, SaharaTone.Sky),
+    Location(Manifest.permission.ACCESS_COARSE_LOCATION, Icons.Default.Place, SaharaTone.Indigo),
     Notifications(if (Build.VERSION.SDK_INT >= 33) Manifest.permission.POST_NOTIFICATIONS else null, Icons.Default.NotificationsActive, SaharaTone.Marigold);
 
     fun title(t: (String, String) -> String) = when (this) {
