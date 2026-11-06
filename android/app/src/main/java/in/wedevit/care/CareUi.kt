@@ -1158,7 +1158,7 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
         val shortcutsElsewhere = !doctorEmbedded && !clinicianView
         item { MoreGroup(t("Care", "देखभाल")) {
             if (!shortcutsElsewhere) MoreRow(Icons.Default.FolderOpen, FamilyAccent.Teal, t("Documents", "दस्तावेज़"), "", Modifier.testTag("more-documents-entry"), onDocuments)
-            if (onCarePlan != null) MoreRow(Icons.Default.LocalHospital, FamilyAccent.Marigold, t("Emergency plan", "आपातकालीन योजना"), t("Plan, wallet card, living will", "योजना, वॉलेट कार्ड, लिविंग विल"), Modifier.testTag("more-care-plan-entry"), onCarePlan)
+            if (onCarePlan != null) MoreRow(Icons.Default.LocalHospital, FamilyAccent.Marigold, t("Emergency plan", "आपातकालीन योजना"), t("Plan, pocket emergency card, living will", "योजना, जेब वाला आपातकालीन कार्ड, लिविंग विल"), Modifier.testTag("more-care-plan-entry"), onCarePlan)
             if (onDevices != null && !clinicianView) MoreRow(Icons.Default.Healing, FamilyAccent.Plum, t("Tubes and lines", "नलियाँ और लाइनें"), "", Modifier.testTag("more-devices"), onDevices)
             if (!shortcutsElsewhere) MoreRow(Icons.Default.CalendarMonth, FamilyAccent.Leaf, t("Calendar", "कैलेंडर"), "", Modifier.testTag("more-calendar"), onCalendar)
             if (!shortcutsElsewhere) MoreRow(Icons.Default.Science, FamilyAccent.Marigold, t("Lab history", "जाँच का इतिहास"), "", Modifier.testTag("more-labs"), onLabs)
