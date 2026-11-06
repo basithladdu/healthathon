@@ -182,7 +182,7 @@ internal enum class FeedbackSendState { NONE, LOCAL, SENDING, SENT, QUEUED }
             icon = if (saved && (checkIn || sendState == FeedbackSendState.SENT || sendState == FeedbackSendState.LOCAL)) Icons.Outlined.CheckCircle else null, modifier = Modifier.fillMaxWidth().testTag("feedback-save"))
         if (savedCheckIn) Text(t("Check-in saved", "आज का हाल सहेज लिया"), Modifier.padding(top = 8.dp).announce(), color = DoctorStatusGood, fontWeight = FontWeight.SemiBold)
         Spacer(Modifier.height(12.dp))
-        if (checkIn && saved) SaharaIllustration(SaharaArtKind.CheckInSaved)
+        if (checkIn && saved) SaharaLottie(SaharaLottieKind.Success, Modifier.size(96.dp))
         if (account != null && sendState == FeedbackSendState.QUEUED) TextButton(onClick = { send(account) }, modifier = Modifier.heightIn(min = 48.dp).testTag("feedback-retry")) { Text(t("Try again", "फिर कोशिश करें"), color = RustText) }
         // The check-in also asks about distress and links to a symptom note: secondary, so below the main action, without a card around them.
         if (checkIn && careModel != null) Column(Modifier.fillMaxWidth().testTag("checkin-extras"), verticalArrangement = Arrangement.spacedBy(8.dp)) {

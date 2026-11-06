@@ -150,7 +150,7 @@ class SaharaSaid internal constructor() {
         onClose()
     }
     AlertDialog(onDismissRequest = onClose, modifier = Modifier.testTag("sahara-success-dialog"), containerColor = SaharaColors.Surface, shape = RoundedCornerShape(SaharaRadius.Hero),
-        icon = { SaharaSuccessTick(size = 56, description = t("Done", "हो गया")) },
+        icon = { SaharaLottie(SaharaLottieKind.Success, Modifier.size(64.dp)) },
         title = { Text(title, Modifier.announce(), style = MaterialTheme.typography.titleLarge, color = SaharaColors.Ink, textAlign = TextAlign.Center) },
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {

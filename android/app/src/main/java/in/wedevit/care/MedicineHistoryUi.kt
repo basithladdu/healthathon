@@ -182,7 +182,7 @@ internal suspend fun markMedicineDose(context: Context, vm: CareModel, item: Car
         Surface(shape = RoundedCornerShape(SaharaRadius.Md), color = SaharaTone.Success.wash, border = BorderStroke(1.5.dp, SaharaTone.Success.solid), modifier = Modifier.fillMaxWidth().padding(top = 8.dp).testTag("dose-undo-${p.itemId}-${p.doseKey}")) {
             Column {
                 Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(start = 12.dp, end = 4.dp).announce(), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Check, null, Modifier.size(22.dp), tint = SaharaTone.Success.ink)
+                    SaharaLottie(SaharaLottieKind.Success, Modifier.size(28.dp))
                     Spacer(Modifier.width(10.dp))
                     Text("${t("Marked taken", "ली हुई दर्ज की")} · ${p.title} ${p.doseLabel}", Modifier.weight(1f), fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.SemiBold, color = SaharaColors.Ink, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     TextButton(onClick = { window.undo() }, modifier = Modifier.heightIn(min = 48.dp).testTag("dose-undo-button"), colors = ButtonDefaults.textButtonColors(contentColor = SaharaTone.Success.ink)) {

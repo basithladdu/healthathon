@@ -223,8 +223,8 @@ fun Modifier.saharaAccentBar(tone: SaharaTone): Modifier = drawWithContent {
 }
 
 /** Section art on a band: the illustration sits on a white disc so it never melts into the colour. Decorative. */
-@Composable fun SaharaBandArt(art: Int, size: Int = 52) {
-    Box(Modifier.size(size.dp).clip(CircleShape).background(SaharaColors.Surface), contentAlignment = Alignment.Center) {
+@Composable fun SaharaBandArt(art: Int, size: Int = 52, modifier: Modifier = Modifier) {
+    Box(modifier.size(size.dp).clip(CircleShape).background(SaharaColors.Surface), contentAlignment = Alignment.Center) {
         androidx.compose.foundation.Image(saharaImage(art, (size - 8).dp), null, Modifier.size((size - 8).dp), contentScale = androidx.compose.ui.layout.ContentScale.Fit)
     }
 }

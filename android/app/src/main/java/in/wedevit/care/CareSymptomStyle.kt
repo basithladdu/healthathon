@@ -124,7 +124,7 @@ internal val SymptomWords = TextStyle(lineBreak = LineBreak.Paragraph, hyphens =
     val interaction = remember { MutableInteractionSource() }
     val ring by animateColorAsState(if (selected) c else DoctorHairline, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "tile ring")
     val fill by animateColorAsState(if (selected) lerp(Paper, c, .12f) else Paper, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "tile fill")
-    Column(modifier.heightIn(min = 64.dp).saharaPress(interaction).testTag(tag).clip(shape).background(fill, shape).border(if (selected) 2.dp else 1.dp, ring, shape)
+    Column(modifier.heightIn(min = 64.dp).saharaPressBounce().testTag(tag).clip(shape).background(fill, shape).border(if (selected) 2.dp else 1.dp, ring, shape)
         .then(if (role == Role.RadioButton) Modifier.selectable(selected, interaction, ripple(), role = role, onClick = onClick) else Modifier.clickable(interaction, ripple(), role = role, onClick = onClick))) {
         Row(Modifier.weight(1f).fillMaxWidth().padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             SymptomIconChip(key)

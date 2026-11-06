@@ -180,7 +180,7 @@ private fun visitStatusTone(status: String): SaharaTone = if (status == "complet
 @Composable fun CareVisitsModule(vm: CareModel, upcoming: List<CareItem>, past: List<CareItem>, onCalendarAt: (Long) -> Unit) {
     val t = careText()
     var openId by rememberSaveable { mutableStateOf<String?>(null) }
-    if (upcoming.isEmpty() && past.isEmpty()) { SaharaIllustration(SaharaArtKind.NoVisits, Modifier.fillMaxWidth()); ModuleEmpty(Icons.Default.EventAvailable, t("No visits yet.", "अभी कोई मुलाक़ात नहीं।")) } else {
+    if (upcoming.isEmpty() && past.isEmpty()) { SaharaLottie(SaharaLottieKind.Calendar, Modifier.fillMaxWidth()); ModuleEmpty(Icons.Default.EventAvailable, t("No visits yet.", "अभी कोई मुलाक़ात नहीं।")) } else {
         CareModuleList("visits-upcoming", upcoming, t("No upcoming visits.", "आगे कोई मुलाक़ात नहीं।"), t("Upcoming", "आगे की"), { it.id }) { CareVisitRow(it) { openId = it.id } }
         CareModuleList("visits-past", past, t("No past visits yet.", "पहले की कोई मुलाक़ात नहीं।"), t("Past", "पहले की"), { it.id }) { CareVisitRow(it) { openId = it.id } }
     }

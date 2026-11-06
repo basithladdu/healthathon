@@ -149,10 +149,10 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
             AddDocOption(t("Upload a file", "फ़ाइल अपलोड करें"), Icons.Default.UploadFile, SaharaSoftBlue, Modifier.testTag("document-upload")) { addSheet = false; addReport() }
         }
     }
-    LazyColumn(Modifier.fillMaxSize().testTag("documents-list"), state = listState, contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        // The marigold Documents band, with Add as a white button on it.
+    LazyColumn(Modifier.fillMaxSize().saharaScreenEnter().testTag("documents-list"), state = listState, contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        // The marigold Documents band, with Add as a white button on it (it glows while there is nothing yet).
         item { SaharaSectionBand(t("Documents", "कागज़ात"), SaharaSection.Documents) {
-            if (canEdit) SaharaBandButton(t("Add document", "कागज़ जोड़ें"), onClick = { addSheet = true }, tone = SaharaSection.Documents, icon = Icons.Default.Add, enabled = !busy, modifier = Modifier.testTag("document-add"))
+            if (canEdit) SaharaBandButton(t("Add document", "कागज़ जोड़ें"), onClick = { addSheet = true }, tone = SaharaSection.Documents, icon = Icons.Default.Add, enabled = !busy, modifier = Modifier.saharaPulseGlow(color = SaharaColors.Surface, corner = SaharaRadius.Md, active = reports.isEmpty()).testTag("document-add"))
         } }
         // Timeline and Ask as two slim buttons (they open their own screens), so the list starts in the first screenful.
         item { Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -171,7 +171,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         if (reports.isNotEmpty()) item { val counts = DocumentFolderRules.counts(reports.map(::folderOf))
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 DocumentFolderRules.folders.filter { (counts[it] ?: 0) > 0 || it == folderFilter }.chunked(2).forEach { pair -> Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    pair.forEach { folder -> FolderTile(DocumentFolderRules.label(folder, t), folder, counts[folder] ?: 0, folderFilter == folder, Modifier.weight(1f).fillMaxHeight().testTag("document-folder-$folder")) { folderFilter = if (folderFilter == folder) "" else folder } }
+                    pair.forEach { folder -> FolderTile(DocumentFolderRules.label(folder, t), folder, counts[folder] ?: 0, folderFilter == folder, Modifier.weight(1f).fillMaxHeight().saharaStagger(DocumentFolderRules.folders.indexOf(folder)).testTag("document-folder-$folder")) { folderFilter = if (folderFilter == folder) "" else folder } }
                     if (pair.size == 1) Spacer(Modifier.weight(1f))
                 } }
             }
@@ -206,7 +206,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
             }
         }
         if (visibleNotes.isEmpty() && visibleReports.isEmpty()) item { SurfaceCard {
-            SaharaIllustration(SaharaArtKind.NoDocuments)
+            SaharaLottie(SaharaLottieKind.Document, Modifier.fillMaxWidth())
             Spacer(Modifier.height(12.dp)); Text(if (search.isNotBlank()) t("No documents found", "कोई कागज़ नहीं मिला") else when (filter) { "Reports" -> t("No reports yet", "अभी कोई रिपोर्ट नहीं"); "Care notes" -> t("No care notes yet", "अभी कोई देखभाल नोट नहीं"); "Cancer" -> t("No cancer documents yet", "अभी कैंसर का कोई कागज़ नहीं"); else -> t("No documents yet", "अभी कोई कागज़ नहीं") }, fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk)
             Spacer(Modifier.height(4.dp))
             if (search.isNotBlank()) TextButton(onClick = { search = ""; filter = "All" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Clear search", "खोज मिटाएँ")) }
@@ -216,7 +216,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         items(visibleNotes, key = { it.id }) { note ->
             val latest = note.id == notes.firstOrNull()?.id
             // Goals-of-care notes keep their indigo: washed card, solid edge and a solid icon chip.
-            Card(onClick = { onRead(note) }, modifier = Modifier.animateItem().fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = SaharaSection.GoalsOfCare.wash), border = BorderStroke(1.5.dp, SaharaSection.GoalsOfCare.solid)) {
+            Card(onClick = { onRead(note) }, modifier = Modifier.animateItem().saharaStagger(visibleNotes.indexOf(note)).fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = SaharaSection.GoalsOfCare.wash), border = BorderStroke(1.5.dp, SaharaSection.GoalsOfCare.solid)) {
                 Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                     SaharaIconChip(Icons.Default.Description, SaharaSection.GoalsOfCare, size = 42)
                     Spacer(Modifier.width(12.dp))
@@ -235,7 +235,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         } }
         items(visibleReports, key = { it.id }) { report ->
             // Reports: white card with a marigold edge and accent bar (Documents), the folder's colour on a solid icon chip.
-            Surface(Modifier.animateItem().fillMaxWidth(), shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.5.dp, SaharaSection.Documents.solid)) {
+            Surface(Modifier.animateItem().saharaStagger(visibleNotes.size + visibleReports.indexOf(report)).fillMaxWidth(), shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.5.dp, SaharaSection.Documents.solid)) {
                 Column(Modifier.saharaAccentBar(SaharaSection.Documents)) {
                     var menuOpen by remember { mutableStateOf(false) }
                     val editable = canEdit && prescriptionOriginals.none { it.id == report.id }
@@ -348,7 +348,7 @@ internal val CancerTone = FolderTone(SaharaTone.Rose.ink, SaharaTone.Rose.wash, 
             Surface(shape = RoundedCornerShape(10.dp), color = if (open) Paper else tone.soft) { Icon(if (open) Icons.Default.FolderOpen else tone.icon, null, Modifier.padding(7.dp).size(20.dp), tint = tone.accent) }
             Spacer(Modifier.width(8.dp))
             Text(title, Modifier.weight(1f), color = ink, fontSize = 15.sp, lineHeight = 19.sp, fontWeight = FontWeight.SemiBold, style = LocalTextStyle.current.copy(hyphens = androidx.compose.ui.text.style.Hyphens.None, lineBreak = androidx.compose.ui.text.style.LineBreak.Heading))
-            SaharaAnimatedText("$count") { Text(it, color = if (open) Paper else tone.accent, fontSize = 16.sp, fontWeight = FontWeight.Bold) }
+            SaharaAnimatedText("${saharaCountUp(count)}") { Text(it, color = if (open) Paper else tone.accent, fontSize = 16.sp, fontWeight = FontWeight.Bold) }
         }
     }
 }

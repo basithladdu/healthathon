@@ -90,6 +90,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.delay
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.Spring
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -144,6 +159,14 @@ object SaharaMotion {
     /** Idle motion: one slow breath in (and the same out), and one shimmer sweep. Both rest after a few cycles. */
     const val BREATHE_MS = 1600
     const val SHIMMER_MS = 1100
+    /** [saharaStagger]: one step between list items, and the deepest position that still waits (later items rise with the last one). */
+    const val STAGGER_STEP_MS = 30
+    const val STAGGER_CAP = 8
+    /** Idle float: one slow bob up and back. Pulse glow: one ring spreading out. Count-up and fill-up from zero. */
+    const val FLOAT_MS = 3600
+    const val GLOW_MS = 1400
+    const val COUNT_MS = 700
+    const val FILL_MS = 600
 
     enum class Direction { Forward, Back, Switch }
 
@@ -225,6 +248,8 @@ class SaharaStagger(private val enabled: Boolean = SaharaMotion.enabled, private
     private var next = 0
     /** The delay for the next card, or null when it should simply appear (animations off, or the first-load window has passed). */
     fun claim(): Int? = if (!enabled || now() - opened > SaharaMotion.STAGGER_WINDOW_MS) null else SaharaMotion.staggerDelay(next++, enabled)
+    /** True while the screen is still in its first-load window (so items composed later by scrolling just appear). */
+    val fresh: Boolean get() = enabled && now() - opened <= SaharaMotion.STAGGER_WINDOW_MS
 }
 
 /** Each hosted screen gets a fresh stagger, so its cards rise in gently once, when it first opens. */
@@ -260,8 +285,8 @@ fun Modifier.saharaContentSize(): Modifier = animateContentSize(SaharaMotion.twe
 /** Snackbar host whose save confirmations carry the saved tick. Other messages look as before. */
 @Composable fun SaharaSnackbarHost(state: SnackbarHostState, modifier: Modifier = Modifier) = SnackbarHost(state, modifier) { data ->
     val saved = SaharaMotion.isSavedMessage(data.visuals.message)
-    if (!saved) Snackbar(data)
-    else Snackbar(Modifier.padding(12.dp)) {
+    if (!saved) Snackbar(data, Modifier.saharaSlideIn())
+    else Snackbar(Modifier.saharaSlideIn().padding(12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             val shown = remember { MutableTransitionState(false).apply { targetState = true } }
             AnimatedVisibility(shown, enter = fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS, 80)) + scaleIn(SaharaMotion.tween(SaharaMotion.SAVED_MS, 80), initialScale = 0.7f)) {
@@ -309,7 +334,7 @@ fun Modifier.saharaContentSize(): Modifier = animateContentSize(SaharaMotion.twe
             Column(Modifier.padding(horizontal = 32.dp).a11yCard().announce(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 SaharaBrandMark(size = 80)
                 Text(text, color = Ink, fontSize = 18.sp, lineHeight = 24.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
-                SaharaProgressBar(null, Modifier.widthIn(max = 180.dp))
+                SaharaLottie(SaharaLottieKind.Loading)
             }
         }
     }
@@ -434,7 +459,196 @@ fun Modifier.saharaContentSize(): Modifier = animateContentSize(SaharaMotion.twe
     val m = modifier.fillMaxWidth().height(8.dp).clip(CircleShape).semantics { if (label != null) { contentDescription = label; liveRegion = LiveRegionMode.Polite } }
     if (progress == null) LinearProgressIndicator(m, color = tone.solid, trackColor = tone.wash)
     else {
-        val shown by animateFloatAsState(progress.coerceIn(0f, 1f), SaharaMotion.tween(SaharaMotion.VALUE_MS + 120), label = "progress-glide")
+        val shown = saharaFill(progress)
         LinearProgressIndicator(progress = { shown }, modifier = m, color = tone.solid, trackColor = tone.wash, drawStopIndicator = {})
+    }
+}
+
+/*
+ * Round 3 motion set. Every one of these is draw-only (graphicsLayer / draw modifiers), so layout, semantics and tests
+ * are unaffected, and every one is still when animations are removed or Battery Saver is on. Idle ones run a few
+ * cycles and then rest. Not for the goals-of-care recording or sign-off screens (only their record pulse moves).
+ */
+
+/**
+ * List item enter: fades in and rises 10 dp, [SaharaMotion.STAGGER_STEP_MS] after the item above it, at most
+ * [SaharaMotion.STAGGER_CAP] steps deep. Only on a screen's first load: rows scrolled into view later simply appear.
+ */
+@Composable fun Modifier.saharaStagger(index: Int): Modifier {
+    if (!SaharaMotion.enabled) return this
+    val screen = LocalSaharaStagger.current
+    val run = remember { screen?.fresh ?: (index <= SaharaMotion.STAGGER_CAP * 2) }
+    if (!run) return this
+    val progress = remember { Animatable(0f) }
+    LaunchedEffect(Unit) {
+        progress.animateTo(1f, SaharaMotion.tween(SaharaMotion.LIST_ITEM_MS, index.coerceIn(0, SaharaMotion.STAGGER_CAP) * SaharaMotion.STAGGER_STEP_MS, LinearOutSlowInEasing))
+    }
+    return graphicsLayer { val p = progress.value; alpha = p; translationY = (1f - p) * 10.dp.toPx() }
+}
+
+/** Gentle idle bob for an icon or illustration: up [amplitude] and back over [SaharaMotion.FLOAT_MS], [cycles] times, then rest. */
+@Composable fun Modifier.saharaFloat(amplitude: Dp = 1.5.dp, cycles: Int = 4): Modifier {
+    if (!SaharaMotion.enabled) return this
+    val p = remember { Animatable(0f) }
+    LaunchedEffect(cycles) {
+        repeat(cycles) {
+            if (!SaharaMotion.enabled) { p.snapTo(0f); return@LaunchedEffect }
+            p.animateTo(1f, androidx.compose.animation.core.tween(SaharaMotion.FLOAT_MS / 2, easing = FastOutSlowInEasing))
+            p.animateTo(0f, androidx.compose.animation.core.tween(SaharaMotion.FLOAT_MS / 2, easing = FastOutSlowInEasing))
+        }
+    }
+    return graphicsLayer { translationY = -p.value * amplitude.toPx() }
+}
+
+/**
+ * A soft ring that spreads out from the one primary action on a screen and fades, [cycles] times, then rests.
+ * [corner] matches the button's shape. Off while [active] is false (e.g. once the action is done).
+ */
+@Composable fun Modifier.saharaPulseGlow(color: Color = SaharaColors.Primary, corner: Dp = SaharaRadius.Lg, active: Boolean = true, cycles: Int = 3): Modifier {
+    if (!SaharaMotion.enabled || !active) return this
+    val p = remember { Animatable(0f) }
+    LaunchedEffect(cycles) {
+        delay(700)
+        repeat(cycles) {
+            if (!SaharaMotion.enabled) { p.snapTo(0f); return@LaunchedEffect }
+            p.snapTo(0f); p.animateTo(1f, androidx.compose.animation.core.tween(SaharaMotion.GLOW_MS, easing = LinearOutSlowInEasing)); p.snapTo(0f)
+            delay(1000)
+        }
+    }
+    return drawBehind {
+        val v = p.value
+        if (v > 0f && v < 1f) {
+            val spread = 7.dp.toPx() * v
+            drawRoundRect(color.copy(alpha = .45f * (1f - v)), topLeft = Offset(-spread, -spread), size = Size(size.width + 2 * spread, size.height + 2 * spread),
+                cornerRadius = CornerRadius(corner.toPx() + spread), style = Stroke(width = 3.dp.toPx()))
+        }
+    }
+}
+
+/** A small attention nudge: a quick side-to-side tilt once, [delayMs] after it appears and again whenever [trigger] changes. */
+@Composable fun Modifier.saharaWiggleOnce(trigger: Any? = Unit, delayMs: Long = 800): Modifier {
+    if (!SaharaMotion.enabled) return this
+    val angle = remember { Animatable(0f) }
+    LaunchedEffect(trigger) {
+        delay(delayMs)
+        if (!SaharaMotion.enabled) return@LaunchedEffect
+        listOf(-5f, 5f, -3.5f, 3.5f, -1.5f, 0f).forEach { angle.animateTo(it, androidx.compose.animation.core.tween(70, easing = LinearEasing)) }
+    }
+    return graphicsLayer { rotationZ = angle.value }
+}
+
+/**
+ * Press bounce for tiles and big buttons: shrinks to 94% while a finger is down and springs back with a small overshoot.
+ * It only watches the touch (never consumes it), so the element's own click, ripple and scrolling work as before;
+ * moving past touch slop (a scroll) releases it at once.
+ */
+@Composable fun Modifier.saharaPressBounce(): Modifier {
+    if (!SaharaMotion.enabled) return this
+    val scale = remember { Animatable(1f) }
+    val scope = rememberCoroutineScope()
+    return pointerInput(Unit) {
+        awaitEachGesture {
+            val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+            scope.launch { scale.animateTo(.94f, androidx.compose.animation.core.tween(SaharaMotion.PRESS_MS)) }
+            val slop = viewConfiguration.touchSlop
+            while (true) {
+                val change = awaitPointerEvent(PointerEventPass.Initial).changes.firstOrNull { it.id == down.id } ?: break
+                if (!change.pressed || (change.position - down.position).getDistance() > slop) break
+            }
+            scope.launch { scale.animateTo(1f, spring(dampingRatio = .45f, stiffness = Spring.StiffnessMediumLow)) }
+        }
+    }.graphicsLayer { scaleX = scale.value; scaleY = scale.value }
+}
+
+/** A number that counts up from 0 when first shown and glides to each new value. Returns [target] at once when motion is off. */
+@Composable fun saharaCountUp(target: Int): Int {
+    val shown = remember { Animatable(if (SaharaMotion.enabled) 0f else target.toFloat()) }
+    LaunchedEffect(target) {
+        if (!SaharaMotion.enabled) shown.snapTo(target.toFloat())
+        else shown.animateTo(target.toFloat(), androidx.compose.animation.core.tween(SaharaMotion.COUNT_MS, easing = SaharaMotion.Emphasized))
+    }
+    return shown.value.roundToInt()
+}
+
+/** A progress fraction (0..1) that fills up from empty when first shown and glides to each new value. */
+@Composable fun saharaFill(target: Float): Float {
+    val goal = target.coerceIn(0f, 1f)
+    val shown = remember { Animatable(if (SaharaMotion.enabled) 0f else goal) }
+    LaunchedEffect(goal) {
+        if (!SaharaMotion.enabled) shown.snapTo(goal)
+        else shown.animateTo(goal, androidx.compose.animation.core.tween(SaharaMotion.FILL_MS, easing = SaharaMotion.Emphasized))
+    }
+    return shown.value
+}
+
+/** Charts and graphs: drawn in from the start edge once, when first shown. */
+@Composable fun Modifier.saharaReveal(): Modifier {
+    if (!SaharaMotion.enabled) return this
+    val p = remember { Animatable(0f) }
+    LaunchedEffect(Unit) { p.animateTo(1f, androidx.compose.animation.core.tween(SaharaMotion.FILL_MS + 200, 120, SaharaMotion.Emphasized)) }
+    val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    return drawWithContent {
+        val w = size.width * p.value
+        if (rtl) clipRect(left = size.width - w) { this@drawWithContent.drawContent() } else clipRect(right = w) { this@drawWithContent.drawContent() }
+    }
+}
+
+/** A small celebration on a tap (a hug, a like): springs in from 80% each time [trigger] changes to a value other than false/null (not on first show). */
+@Composable fun Modifier.saharaPop(trigger: Any?): Modifier {
+    if (!SaharaMotion.enabled) return this
+    val scale = remember { Animatable(1f) }
+    var first by remember { mutableStateOf(true) }
+    LaunchedEffect(trigger) {
+        if (first) { first = false; return@LaunchedEffect }
+        if (trigger == null || trigger == false) return@LaunchedEffect
+        scale.snapTo(.8f); scale.animateTo(1f, spring(dampingRatio = .35f, stiffness = Spring.StiffnessMedium))
+    }
+    return graphicsLayer { scaleX = scale.value; scaleY = scale.value }
+}
+
+/** Map pins and result markers: drop in from above with one small bounce, staggered by [index]. */
+@Composable fun Modifier.saharaDropIn(index: Int = 0): Modifier {
+    if (!SaharaMotion.enabled) return this
+    val p = remember { Animatable(0f) }
+    LaunchedEffect(Unit) {
+        delay(index.coerceIn(0, SaharaMotion.STAGGER_CAP) * 40L)
+        p.animateTo(1f, spring(dampingRatio = .5f, stiffness = Spring.StiffnessMediumLow))
+    }
+    return graphicsLayer { val v = p.value; alpha = v.coerceIn(0f, 1f); translationY = (1f - v) * -14.dp.toPx() }
+}
+
+/** Dialog content arriving: a quick scale-up from 92% with a fade. */
+@Composable fun Modifier.saharaDialogEnter(): Modifier {
+    if (!SaharaMotion.enabled) return this
+    val p = remember { Animatable(0f) }
+    LaunchedEffect(Unit) { p.animateTo(1f, androidx.compose.animation.core.tween(SaharaMotion.ENTER_MS - 60, easing = SaharaMotion.Emphasized)) }
+    return graphicsLayer { val v = p.value; alpha = v; val s = .92f + .08f * v; scaleX = s; scaleY = s }
+}
+
+/** Snackbars, banners and inline results: slide up 16 dp (or down, when [fromTop]) and fade in once. */
+@Composable fun Modifier.saharaSlideIn(fromTop: Boolean = false): Modifier {
+    if (!SaharaMotion.enabled) return this
+    val p = remember { Animatable(0f) }
+    LaunchedEffect(Unit) { p.animateTo(1f, androidx.compose.animation.core.tween(SaharaMotion.ENTER_MS, easing = SaharaMotion.Emphasized)) }
+    return graphicsLayer { val v = p.value; alpha = v; translationY = (1f - v) * (if (fromTop) -16 else 16).dp.toPx() }
+}
+
+/**
+ * The selected-tab marker for a row of [count] equal-width tabs (bottom navigation, segmented tabs): a short rounded bar on
+ * the top edge that slides to [index] (hidden when [index] is -1). [gap] is the space between tabs in the row.
+ */
+@Composable fun Modifier.saharaNavIndicator(index: Int, count: Int, color: Color = SaharaColors.Primary, gap: Dp = 0.dp, width: Dp = 32.dp): Modifier {
+    if (count <= 0) return this
+    val x by animateFloatAsState(index.coerceAtLeast(0).toFloat(), SaharaMotion.tween(SaharaMotion.ENTER_MS, easing = SaharaMotion.Emphasized), label = "navIndicatorX")
+    val shown by animateFloatAsState(if (index in 0 until count) 1f else 0f, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "navIndicatorAlpha")
+    val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    return drawWithContent {
+        drawContent()
+        if (shown <= 0f) return@drawWithContent
+        val g = gap.toPx(); val cell = (size.width + g) / count
+        val bar = width.toPx().coerceAtMost(cell - g); val h = 3.dp.toPx()
+        val center = cell * x + (cell - g) / 2f
+        val left = if (rtl) size.width - center - bar / 2f else center - bar / 2f
+        drawRoundRect(color.copy(alpha = color.alpha * shown), topLeft = Offset(left, 0f), size = Size(bar, h), cornerRadius = CornerRadius(h / 2f))
     }
 }

@@ -44,7 +44,7 @@ internal fun doctorHubSingleColumn(widthDp: Float, fontScale: Float): Boolean = 
             Column {
                 rest.forEachIndexed { index, tab ->
                     if (index > 0) HorizontalDivider(color = SaharaColors.Surface, thickness = 2.dp)
-                    DoctorSectionRow(tab, onSection, tagPrefix, meta[tab.section], selected == tab.section)
+                    Box(Modifier.saharaStagger(index + 1)) { DoctorSectionRow(tab, onSection, tagPrefix, meta[tab.section], selected == tab.section) }
                 }
             }
         }
@@ -70,7 +70,7 @@ internal fun doctorTabTone(section: String): DoctorTone = when (section) {
     val press = remember { MutableInteractionSource() }
     Surface(onClick = { onSection(tab.section) }, interactionSource = press, shape = RoundedCornerShape(16.dp), color = tone.solid, contentColor = tone.onSolid, shadowElevation = 2.dp,
         border = if (selected) BorderStroke(3.dp, DoctorCardInk) else null,
-        modifier = Modifier.fillMaxWidth().saharaAppear().saharaPress(press).heightIn(min = 64.dp).testTag("$tagPrefix-${tab.section}").semantics { role = Role.Button; semanticsSelected = selected }) {
+        modifier = Modifier.fillMaxWidth().saharaAppear().saharaPulseGlow(tone.solid, 16.dp, active = !selected).saharaPress(press).heightIn(min = 64.dp).testTag("$tagPrefix-${tab.section}").semantics { role = Role.Button; semanticsSelected = selected }) {
         Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(tab.icon, null, tint = tone.onSolid, modifier = Modifier.size(28.dp))
             Spacer(Modifier.width(16.dp))

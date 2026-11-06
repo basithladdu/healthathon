@@ -73,11 +73,11 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
     val capturedAccount = remember(person) { vm.accountNamespace }
     val done = today != null
     val band by animateColorAsState(if (done) TodayHero.doneBand else TodayHero.dueBand, SaharaMotion.tween(SaharaMotion.VALUE_MS))
-    Surface(shape = RoundedCornerShape(TodayHero.radius), color = band, contentColor = Color.White, modifier = Modifier.fillMaxWidth().saharaAppear().testTag("today-checkin")) {
+    Surface(shape = RoundedCornerShape(TodayHero.radius), color = band, contentColor = Color.White, modifier = Modifier.fillMaxWidth().saharaAppear().saharaPulseGlow(TodayHero.dueBand, TodayHero.radius, active = !done).testTag("today-checkin")) {
         Column(Modifier.saharaContentSize().padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 6.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 // The one main card on Today: its icon swells slowly a few times, then rests (off when animations are off).
-                SaharaIconChip(Icons.Default.WbSunny, SaharaTone.Gold, size = 36, breathe = true); Spacer(Modifier.width(10.dp))
+                Box(contentAlignment = Alignment.Center) { SaharaLottie(SaharaLottieKind.Breathe); SaharaIconChip(Icons.Default.WbSunny, SaharaTone.Gold, Modifier.saharaFloat(), size = 32) }; Spacer(Modifier.width(6.dp))
                 Text(t("How was today?", "आज का दिन कैसा रहा?"), fontFamily = SaharaTitleFont, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Medium, color = Color.White, modifier = Modifier.weight(1f).a11yHeading())
                 // The saved tick pops in once the check-in is stored (it follows the saved record, not a timer).
                 AnimatedVisibility(done, enter = scaleIn(spring(dampingRatio = Spring.DampingRatioMediumBouncy), initialScale = .6f) + fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)), exit = fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS))) {
@@ -91,7 +91,7 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
             }
             Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 CareDailyFlow.moods.forEachIndexed { index, mood ->
-                    TodayMoodButton(checkInMoodLabel(mood, hindi), index / 2f, selected = today?.title == mood, enabled = !busy, ink = band, modifier = Modifier.weight(1f).fillMaxHeight().testTag("today-checkin-$index")) {
+                    TodayMoodButton(checkInMoodLabel(mood, hindi), index / 2f, selected = today?.title == mood, enabled = !busy, ink = band, modifier = Modifier.weight(1f).fillMaxHeight().saharaStagger(index).testTag("today-checkin-$index")) {
                         val change = CareDailyFlow.checkInChange(today, mood)
                         if (change != null && canEditCareContext(vm, person, capturedAccount)) { if (today != null) vm.updateItem(change) {} else vm.saveItem("checkin", mood, "") }
                     }
@@ -206,9 +206,9 @@ internal object CareModules {
 
 /** Every row of one module group, always open (a module already has its own screen, so no "Show all" toggle). [label] adds a small sub-group heading. */
 @Composable fun <T> CareModuleList(key: String, items: List<T>, empty: String, label: String? = null, keyOf: (T) -> Any, row: @Composable (T) -> Unit) {
-    if (label != null) Text("$label · ${items.size}", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub, modifier = Modifier.padding(start = 4.dp, top = 4.dp).a11yHeading())
+    if (label != null) Text("$label · ${saharaCountUp(items.size)}", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub, modifier = Modifier.padding(start = 4.dp, top = 4.dp).a11yHeading())
     SaharaStateSwitch(items.isEmpty(), Modifier.fillMaxWidth(), label = "care-module-$key") { isEmpty -> if (isEmpty) QuietLine(empty) else Column(Modifier.saharaContentSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-    items.forEach { item -> key(keyOf(item)) { row(item) } }
+    items.forEachIndexed { i, item -> key(keyOf(item)) { Box(Modifier.saharaStagger(i)) { row(item) } } }
     } }
 }
 
@@ -264,8 +264,8 @@ internal fun careModuleIcon(name: String): ImageVector = when (name) {
 @Composable internal fun CareModuleScreen(tile: CareModuleTile, onBack: () -> Unit) {
     BackHandler(onBack = onBack)
     LazyColumn(Modifier.fillMaxSize().saharaScreenEnter().testTag("care-list"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        // The module's header band in its section colour (medicines plum, visits indigo, check-ins teal), white title and back.
-        item { SaharaSectionBand(tile.title, careModuleTone(tile.name), onBack = onBack, backTag = "care-module-back") { SaharaBandArt(tile.art) } }
+        // The module's header band in its section colour (medicines plum, visits indigo, check-ins teal), white title and back; the art floats gently.
+        item { SaharaSectionBand(tile.title, careModuleTone(tile.name), onBack = onBack, backTag = "care-module-back") { SaharaBandArt(tile.art, modifier = Modifier.saharaFloat()) } }
         item { Column(Modifier.testTag("care-module-${tile.key}"), verticalArrangement = Arrangement.spacedBy(12.dp), content = tile.content) }
     }
 }

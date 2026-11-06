@@ -71,7 +71,7 @@ internal fun DoctorContributionChart(checks: List<CareItem>, zone: ZoneId, now: 
                     Box(Modifier.height(rowHeight), contentAlignment = Alignment.CenterStart) { Text(it, fontSize = 12.sp, lineHeight = 15.sp, color = DoctorCardSub) }
                 }
             }
-            Canvas(Modifier.weight(1f).height(rowHeight * 7).testTag("doctor-condition-chart").semantics {
+            Canvas(Modifier.weight(1f).height(rowHeight * 7).saharaReveal().testTag("doctor-condition-chart").semantics {
                 contentDescription = "$monthLabel calendar, Monday to Sunday. ${calendar.actualCount} actual reports this month; latest report per day is shown. Missing days and unrecognized reports are neutral; future days are blank. Dates and full text are listed below. Not a clinical score."
             }) {
                 val column = size.width / calendar.weekCount

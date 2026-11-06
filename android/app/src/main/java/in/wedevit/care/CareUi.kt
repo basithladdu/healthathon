@@ -383,7 +383,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                         Surface(color = Paper, contentColor = Ink, shape = RoundedCornerShape(topStart = SaharaRadius.Hero, topEnd = SaharaRadius.Hero), modifier = Modifier.fillMaxWidth().weight(1f)) {
                             Box(Modifier.fillMaxSize().padding(top = 16.dp)) { when(shown) {
                                 "family" -> Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 16.dp).saharaScreenEnter(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                                    SaharaIllustration(SaharaArtKind.Welcome, Modifier.fillMaxWidth())
+                                    Box(Modifier.fillMaxWidth()) { SaharaIllustration(SaharaArtKind.Welcome, Modifier.fillMaxWidth()); SaharaLottie(SaharaLottieKind.Wave, Modifier.align(Alignment.TopEnd).size(56.dp)) }
                                     SaharaPrimaryButton(if (role == "family") t("Add the person you care for", "जिनकी देखभाल करते हैं, उन्हें जोड़ें") else t("Start with your name", "अपने नाम से शुरू करें"),
                                         onClick = { if (addPersonContent == null) onStart() else select("person") }, enabled = !entryBusy, icon = Icons.Default.PersonAdd, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("welcome-add-person"))
                                     SaharaSecondaryButton(t("Sign in", "साइन इन"), onClick = { if (accountContent == null) onAccount() else select("account") }, enabled = !entryBusy, icon = Icons.Default.AccountCircle,
@@ -478,7 +478,7 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
     val tasks = items.filter { it.kind == "task" && !CareEntryCodec.isStructured(it.detail) }.sortedBy { it.doneOn.isNotBlank() }
     // A soft warm wash behind Today so the white and tinted cards stand off the ground.
     LazyColumn(Modifier.fillMaxSize().background(SaharaColors.GroundWarm).saharaScreenEnter().testTag("today-list"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item(key = "today-header") { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        item(key = "today-header") { Row(Modifier.fillMaxWidth().saharaStagger(0), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text(CareTodayRules.greetingLine(hour, hindi, personName, patient = !family && !clinician), Modifier.a11yHeading().testTag("today-greeting"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 22.sp, lineHeight = 28.sp, color = DoctorCardInk)
                 Text(today.format(careDateFormat("EEEE, d MMMM", hindi)), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub, modifier = Modifier.padding(top = 2.dp).testTag("today-date"))
@@ -493,7 +493,7 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
             // A labelled button, not a bare arrow icon nobody can name.
             if (vm.cloud != null) TextButton(onClick = vm::refresh, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Icon(Icons.Default.Refresh, null, Modifier.size(20.dp)); Spacer(Modifier.width(6.dp)); Text(t("Refresh", "रिफ़्रेश करें")) }
         } }
-        if (!clinician) item(key = "today-sos") { CareSosBar(onSos = { sosOpen = true }) }
+        if (!clinician) item(key = "today-sos") { Box(Modifier.saharaStagger(1)) { CareSosBar(onSos = { sosOpen = true }) } }
         // Patient: SOS, the check-in (the one main action), today's medicines, the at-a-glance register, then All care tools.
         // Family: SOS, how the patient is doing, medicines, to-dos, their own check, then All care tools. Everything else is in the Care tab.
         val summary: androidx.compose.foundation.lazy.LazyListScope.() -> Unit = {
@@ -504,8 +504,8 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
         if (family) summary() else if (!clinician && canEdit) item(key = "today-checkin") { TodayCheckInBar(vm, onOpen = onCheckInWords, onSymptom = onSymptomNote) }
         val medicineSection: androidx.compose.foundation.lazy.LazyListScope.() -> Unit = {
             // The doses card under the title carries the one "x of y taken" count.
-            item(key = "today-doses") { TodayDosesCard(vm) }
-            item(key = "medicines-open") { SaharaSecondaryButton(t("Open medicines", "दवाइयाँ खोलें"), { onCare("Medicines") }, Modifier.fillMaxWidth().testTag("today-medicines-title"), icon = careIcon("medicine"), tone = SaharaTone.Plum, navigates = true) }
+            item(key = "today-doses") { Box(Modifier.saharaStagger(3)) { TodayDosesCard(vm) } }
+            item(key = "medicines-open") { SaharaSecondaryButton(t("Open medicines", "दवाइयाँ खोलें"), { onCare("Medicines") }, Modifier.fillMaxWidth().saharaStagger(4).testTag("today-medicines-title"), icon = careIcon("medicine"), tone = SaharaTone.Plum, navigates = true) }
             if (medicines.isEmpty() && loaded && canEdit) item { SaharaSecondaryButton(t("Add a medicine", "दवा जोड़ें"), { onAdd("medicine") }, Modifier.fillMaxWidth(), icon = Icons.Default.Add, tone = SaharaTone.Plum) }
         }
         if (!clinician) medicineSection()
@@ -519,11 +519,11 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
             if (family) {
                 item(key = "todo-title") { SaharaSectionHeader(t("To do", "करने के काम"), Modifier.testTag("today-todo-title"), tone = SaharaTone.Leaf, actionLabel = t("Open to do", "काम खोलें"), onAction = { onCare("To do") }, icon = careIcon("task")) }
                 if (tasks.isEmpty() && loaded) item { SurfaceCard { Text(CareTodayRules.emptyText("tasks", canEdit, hindi), color = DoctorCardSub) } }
-                items(tasks.take(3), key = { it.id }) { CareRow(it, vm) }
+                itemsIndexed(tasks.take(3), key = { _, it -> it.id }) { i, it -> Box(Modifier.saharaStagger(5 + i)) { CareRow(it, vm) } }
                 if (canEdit) item(key = "todo-add") { SaharaSecondaryButton(t("Add task", "काम जोड़ें"), { onAdd("task") }, Modifier.fillMaxWidth(), icon = Icons.Default.Add, tone = SaharaTone.Leaf) }
                 item(key = "family-check") { FamilyCaregiverCheckCard(vm, personName.ifBlank { t("the patient", "मरीज़") }) }
             }
-            item(key = "all-care-tools") { TodayAllCareTools { onCare("All") } }
+            item(key = "all-care-tools") { Box(Modifier.saharaStagger(6)) { TodayAllCareTools { onCare("All") } } }
             return@LazyColumn
         }
         // Doctor view (clinician) below: unchanged.
@@ -1042,7 +1042,7 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
             CareModuleList("conversations", versions, t("No saved conversations yet.", "अभी कोई सहेजी हुई बातचीत नहीं।"), keyOf = { it.id }) { CareConversationRow(it, onReadNote) }
         },
         CareModuleTile("Medicines", t("Medicines", "दवाइयाँ"), "", SaharaSoftBlue, R.drawable.care_medicines_art, currentMeds.size + pastMeds.size) {
-                if (currentMeds.isEmpty() && pastMeds.isEmpty()) { SaharaIllustration(SaharaArtKind.NoMedicines, Modifier.fillMaxWidth()); QuietLine(t("No medicines yet.", "अभी कोई दवा नहीं।")) } else {
+                if (currentMeds.isEmpty() && pastMeds.isEmpty()) { SaharaLottie(SaharaLottieKind.Pill, Modifier.fillMaxWidth()); QuietLine(t("No medicines yet.", "अभी कोई दवा नहीं।")) } else {
                     CareModuleList("medicines-current", currentMeds, t("No current medicines.", "अभी कोई दवा नहीं चल रही।"), t("Current", "अभी चल रही"), { it.id }) { CareRow(it, vm) }
                     CareModuleList("medicines-past", pastMeds, t("No past medicines yet.", "पहले की कोई दवा नहीं।"), t("Past", "पहले की"), { it.id }) { CareRow(it, vm) }
                 }
@@ -1081,13 +1081,13 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
             Box(Modifier.weight(1f)) { Heading(title ?: t("Daily care", "रोज़ की देखभाल"), 26) }
             CareAddMenuButton(onAdd, onScanPrescription)
         } }
-        groups.forEach { (group, groupTone, rows) -> item(key = "care-group-$group") {
+        groups.forEachIndexed { g, (group, groupTone, rows) -> item(key = "care-group-$group") {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 // Each group's name sits on a solid pill in its colour; its register takes the matching wash and edge bar.
                 Text(group, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = groupTone.onSolid, modifier = Modifier.clip(RoundedCornerShape(SaharaRadius.Pill)).background(groupTone.solid).padding(horizontal = 12.dp, vertical = 4.dp).a11yHeading())
                 SaharaRegister(tone = groupTone) { rows.forEachIndexed { index, row ->
                     if (index > 0) HorizontalDivider(color = groupTone.solid.copy(alpha = .35f), modifier = Modifier.padding(horizontal = 12.dp))
-                    SaharaListRow(row.label, Modifier.testTag(row.tag), detail = row.detail, icon = row.icon, tone = row.tone, onClick = row.onClick)
+                    SaharaListRow(row.label, Modifier.saharaStagger(g * 3 + index).testTag(row.tag), detail = row.detail, icon = row.icon, tone = row.tone, onClick = row.onClick)
                 } }
             }
         } }
@@ -1170,9 +1170,9 @@ private class CareToolRow(val label: String, val icon: ImageVector, val tone: Sa
         else item { PatientProfileCard(vm, person) }
         if (!doctorEmbedded && !walkthrough) item { MoreGroup(t("Account", "खाता")) {
             MoreRow(Icons.Default.AccountCircle, FamilyAccent.Leaf, if (vm.cloud == null) t("Sign in", "साइन इन") else t("Account and sharing", "खाता और साझा करना"),
-                if (vm.cloud == null) t("Share care with family", "परिवार के साथ देखभाल साझा करें") else email, Modifier.testTag("more-account"), onAccount)
+                if (vm.cloud == null) t("Share care with family", "परिवार के साथ देखभाल साझा करें") else email, Modifier.saharaStagger(1).testTag("more-account"), onAccount)
             // Inviting family is one tap from here, not hidden in the header's person menu.
-            if (onInviteFamily != null && vm.cloud != null && owner) MoreRow(Icons.Default.PersonAdd, FamilyAccent.Leaf, t("Invite family", "परिवार को बुलाएँ"), t("Send a link on WhatsApp", "व्हाट्सऐप पर लिंक भेजें"), Modifier.testTag("more-invite-family"), onInviteFamily)
+            if (onInviteFamily != null && vm.cloud != null && owner) MoreRow(Icons.Default.PersonAdd, FamilyAccent.Leaf, t("Invite family", "परिवार को बुलाएँ"), t("Send a link on WhatsApp", "व्हाट्सऐप पर लिंक भेजें"), Modifier.saharaStagger(2).testTag("more-invite-family"), onInviteFamily)
         } }
         // Patients and family reach Documents, Calendar, Lab history, the emergency plan and tubes and lines from All care tools (the Care tab),
         // so those rows are only here for doctors. More keeps the account, settings and help.
@@ -1182,12 +1182,12 @@ private class CareToolRow(val label: String, val icon: ImageVector, val tone: Sa
             open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), t("Export care notes", "देखभाल नोट भेजें")))
         }
         if (!shortcutsElsewhere) item { MoreGroup(t("Care", "देखभाल")) {
-            MoreRow(Icons.Default.FolderOpen, SaharaSection.Documents.solid, t("Documents", "दस्तावेज़"), "", Modifier.testTag("more-documents-entry"), onDocuments)
-            if (onCarePlan != null) MoreRow(Icons.Default.LocalHospital, SaharaSection.Emergency.solid, t("Emergency plan", "आपातकालीन योजना"), t("Plan, pocket emergency card, living will", "योजना, जेब वाला आपातकालीन कार्ड, लिविंग विल"), Modifier.testTag("more-care-plan-entry"), onCarePlan)
-            if (onDevices != null && !clinicianView) MoreRow(Icons.Default.Healing, FamilyAccent.Plum, t("Tubes and lines", "नलियाँ और लाइनें"), "", Modifier.testTag("more-devices"), onDevices)
-            MoreRow(Icons.Default.CalendarMonth, SaharaSection.Visits.solid, t("Calendar", "कैलेंडर"), "", Modifier.testTag("more-calendar"), onCalendar)
-            MoreRow(Icons.Default.Science, SaharaSection.Labs.solid, t("Lab history", "जाँच का इतिहास"), "", Modifier.testTag("more-labs"), onLabs)
-            MoreRow(Icons.Default.Share, FamilyAccent.Brick, t("Export care notes", "देखभाल नोट भेजें"), t("${versions.size} saved", "${versions.size} सहेजे गए"), Modifier.testTag("more-export-notes"), enabled = versions.isNotEmpty(), onClick = exportNotes)
+            MoreRow(Icons.Default.FolderOpen, SaharaSection.Documents.solid, t("Documents", "दस्तावेज़"), "", Modifier.saharaStagger(3).testTag("more-documents-entry"), onDocuments)
+            if (onCarePlan != null) MoreRow(Icons.Default.LocalHospital, SaharaSection.Emergency.solid, t("Emergency plan", "आपातकालीन योजना"), t("Plan, pocket emergency card, living will", "योजना, जेब वाला आपातकालीन कार्ड, लिविंग विल"), Modifier.saharaStagger(4).testTag("more-care-plan-entry"), onCarePlan)
+            if (onDevices != null && !clinicianView) MoreRow(Icons.Default.Healing, FamilyAccent.Plum, t("Tubes and lines", "नलियाँ और लाइनें"), "", Modifier.saharaStagger(5).testTag("more-devices"), onDevices)
+            MoreRow(Icons.Default.CalendarMonth, SaharaSection.Visits.solid, t("Calendar", "कैलेंडर"), "", Modifier.saharaStagger(6).testTag("more-calendar"), onCalendar)
+            MoreRow(Icons.Default.Science, SaharaSection.Labs.solid, t("Lab history", "जाँच का इतिहास"), "", Modifier.saharaStagger(7).testTag("more-labs"), onLabs)
+            MoreRow(Icons.Default.Share, FamilyAccent.Brick, t("Export care notes", "देखभाल नोट भेजें"), t("${versions.size} saved", "${versions.size} सहेजे गए"), Modifier.saharaStagger(8).testTag("more-export-notes"), enabled = versions.isNotEmpty(), onClick = exportNotes)
         } }
         item { MoreGroup(t("Settings", "सेटिंग")) {
             // Language opens the same menu as the header, from a full-width row.
@@ -1196,20 +1196,20 @@ private class CareToolRow(val label: String, val icon: ImageVector, val tone: Sa
                 Text(t("Language", "भाषा"), Modifier.weight(1f), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
                 CareLanguageMenu(contentColor = RustText)
             }
-            if (!walkthrough) MoreRow(Icons.Default.NotificationsNone, FamilyAccent.Marigold, t("Notifications", "सूचनाएँ"), t("Medicine and visit reminders", "दवा और मुलाक़ात के रिमाइंडर"), Modifier.testTag("more-reminders"), onReminders)
-            MoreRow(Icons.Default.Lock, FamilyAccent.Plum, t("Privacy and data", "निजता और डेटा"), "", Modifier.testTag("more-privacy"), { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url)))) })
-            if (shortcutsElsewhere) MoreRow(Icons.Default.Share, FamilyAccent.Brick, t("Export care notes", "देखभाल नोट भेजें"), t("${versions.size} saved", "${versions.size} सहेजे गए"), Modifier.testTag("more-export-notes"), enabled = versions.isNotEmpty(), onClick = exportNotes)
+            if (!walkthrough) MoreRow(Icons.Default.NotificationsNone, FamilyAccent.Marigold, t("Notifications", "सूचनाएँ"), t("Medicine and visit reminders", "दवा और मुलाक़ात के रिमाइंडर"), Modifier.saharaStagger(9).testTag("more-reminders"), onReminders)
+            MoreRow(Icons.Default.Lock, FamilyAccent.Plum, t("Privacy and data", "निजता और डेटा"), "", Modifier.saharaStagger(10).testTag("more-privacy"), { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url)))) })
+            if (shortcutsElsewhere) MoreRow(Icons.Default.Share, FamilyAccent.Brick, t("Export care notes", "देखभाल नोट भेजें"), t("${versions.size} saved", "${versions.size} सहेजे गए"), Modifier.saharaStagger(11).testTag("more-export-notes"), enabled = versions.isNotEmpty(), onClick = exportNotes)
         } }
         item { MoreGroup(t("Help", "मदद")) {
-            if (!walkthrough) MoreRow(Icons.Default.SentimentSatisfiedAlt, FamilyAccent.Leaf, t("Send feedback", "राय भेजें"), "", Modifier.testTag("patient-feedback-entry"), onFeedback)
+            if (!walkthrough) MoreRow(Icons.Default.SentimentSatisfiedAlt, FamilyAccent.Leaf, t("Send feedback", "राय भेजें"), "", Modifier.saharaStagger(12).testTag("patient-feedback-entry"), onFeedback)
             if (doctorEmbedded) MoreRow(Icons.Default.Groups, FamilyAccent.Teal, t("Shared care", "साझा देखभाल"), "", Modifier, onSharedWorkspace)
-            else if (!walkthrough) MoreRow(Icons.Default.MedicalServices, FamilyAccent.Teal, t("I'm a doctor", "मैं डॉक्टर हूँ"), "", Modifier.testTag("more-doctor-workspace-entry"), onSharedWorkspace)
-            MoreRow(Icons.Default.Info, FamilyAccent.Brick, t("About", "ऐप के बारे में"), t("Version ${BuildConfig.VERSION_NAME}", "संस्करण ${BuildConfig.VERSION_NAME}"), Modifier.testTag("more-about"), { about = true })
+            else if (!walkthrough) MoreRow(Icons.Default.MedicalServices, FamilyAccent.Teal, t("I'm a doctor", "मैं डॉक्टर हूँ"), "", Modifier.saharaStagger(13).testTag("more-doctor-workspace-entry"), onSharedWorkspace)
+            MoreRow(Icons.Default.Info, FamilyAccent.Brick, t("About", "ऐप के बारे में"), t("Version ${BuildConfig.VERSION_NAME}", "संस्करण ${BuildConfig.VERSION_NAME}"), Modifier.saharaStagger(14).testTag("more-about"), { about = true })
         } }
         if (owner && !walkthrough) item { TextButton(onClick = onDelete, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Icon(Icons.Default.DeleteOutline, null); Spacer(Modifier.width(8.dp)); Text(t("Remove this person's records", "इस व्यक्ति के रिकॉर्ड हटाएँ")) } }
     }
     // About is a standard dialog, not an unfolding card at the bottom of the list.
-    if (about) AlertDialog(onDismissRequest = { about = false }, containerColor = Paper, modifier = Modifier.testTag("more-about-dialog"),
+    if (about) AlertDialog(onDismissRequest = { about = false }, containerColor = Paper, modifier = Modifier.saharaDialogEnter().testTag("more-about-dialog"),
         title = { Text(androidx.compose.ui.res.stringResource(R.string.app_name), fontWeight = FontWeight.Bold) },
         text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(androidx.compose.ui.res.stringResource(R.string.app_full_name))

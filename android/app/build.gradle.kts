@@ -130,6 +130,8 @@ dependencies {
     implementation("com.google.mlkit:text-recognition:16.0.1")
     implementation("com.google.mlkit:text-recognition-devanagari:16.0.1")
     implementation("com.google.mlkit:translate:17.0.3")
+    // Lottie for Compose (Apache-2.0); plays the small bundled res/raw/lottie_*.json animations (SaharaLottie.kt).
+    implementation("com.airbnb.android:lottie-compose:6.7.1")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.json:json:20251224")
     androidTestImplementation(platform("androidx.compose:compose-bom:2025.09.01"))

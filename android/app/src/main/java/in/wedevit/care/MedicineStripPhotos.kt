@@ -16,7 +16,6 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -327,6 +326,7 @@ class MedicineStripPhotos(context: Context, storage: String) {
                 Text(t("Today's doses", "आज की दवाएँ"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
                 // The count as a status pill, green once every dose is ticked; the number rises in when it changes.
                 val allDone = taken == total
+                val taken = saharaCountUp(taken)
                 // Solid pill: plum while doses are due, green once all are taken; bold white count on it.
                 val pillBg by animateColorAsState(if (allDone) SaharaTone.Success.solid else SaharaSection.Medicines.solid, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "doses-pill")
                 Surface(shape = RoundedCornerShape(50), color = pillBg) {
@@ -335,8 +335,10 @@ class MedicineStripPhotos(context: Context, storage: String) {
                     }
                 }
             }
-            val share by animateFloatAsState(if (total == 0) 0f else taken.toFloat() / total, SaharaMotion.tween(SaharaMotion.ENTER_MS, easing = SaharaMotion.Emphasized), label = "doses-progress")
+            val share = saharaFill(if (total == 0) 0f else taken.toFloat() / total)
             LinearProgressIndicator(progress = { share }, modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(50)), color = SaharaTone.Success.solid, trackColor = SaharaColors.Surface, drawStopIndicator = {}, gapSize = 0.dp)
+            // All of today's doses taken, by the tick just made: a small burst while its Undo shows.
+            if (total > 0 && taken == total && held?.personId == person) SaharaLottie(SaharaLottieKind.Confetti, Modifier.align(Alignment.CenterHorizontally))
             if (canEdit && taken < total && held?.personId != person) Text(t("Tap a dose when taken. Hold it for Missed.", "दवा लेने पर उसे छुएँ। छूटी हो तो दबाकर रखें।"), fontSize = 14.sp, color = DoctorCardSub)
             // "Marked taken · Undo" sits right under the count, in the first screenful, while a one-tap tick waits.
             DoseUndoRow(person)

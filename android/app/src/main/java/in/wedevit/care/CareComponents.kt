@@ -52,7 +52,7 @@ import androidx.compose.ui.unit.sp
     // Material 3 bar in Sahara colours: a hairline on top; the selected tab's icon sits white in a solid rust pill above a bold rust label.
     Surface(color = SaharaColors.Surface, shadowElevation = 3.dp) { Column {
         HorizontalDivider(color = DoctorHairline)
-        Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 4.dp, vertical = 4.dp).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+        Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 4.dp, vertical = 4.dp).saharaNavIndicator(routes.indexOfFirst { lit(it) }, labels.size, gap = 2.dp).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
             labels.forEachIndexed { index, label ->
                 val active = lit(routes[index])
                 val pill by animateColorAsState(if (active) SaharaColors.Primary else Color.Transparent, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "selected tab")
@@ -229,7 +229,7 @@ fun careIcon(kind: String): ImageVector = when (kind) {
         Surface(shape = RoundedCornerShape(16.dp), color = fill, contentColor = Color.White, shadowElevation = 6.dp,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp).fillMaxWidth().testTag("care-toast-${kind.name.lowercase()}").announce()) {
             Row(Modifier.padding(start = 12.dp, end = 4.dp, top = 8.dp, bottom = 8.dp).heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.size(32.dp).clip(CircleShape).background(Color.White.copy(alpha = .18f)), contentAlignment = Alignment.Center) {
+                Box(Modifier.then(if (kind == CareToastKind.PROBLEM) Modifier.saharaWiggleOnce(delayMs = 250) else Modifier).size(32.dp).clip(CircleShape).background(Color.White.copy(alpha = .18f)), contentAlignment = Alignment.Center) {
                     Icon(icon, null, Modifier.size(20.dp).then(if (kind == CareToastKind.SAVED) Modifier.testTag("sahara-saved-tick") else Modifier), tint = if (kind == CareToastKind.SAVED) Gold else Color.White)
                 }
                 Spacer(Modifier.width(12.dp))

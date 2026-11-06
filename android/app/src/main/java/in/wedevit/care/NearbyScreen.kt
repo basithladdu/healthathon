@@ -119,12 +119,12 @@ internal const val NEARBY_PAGE = 10
         // Empty results: one icon, one line, one way out.
         if (visible.isEmpty()) item(key = "nearby-empty") { SurfaceCard {
             Column(Modifier.fillMaxWidth().testTag("nearby-empty"), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                SaharaIllustration(SaharaArtKind.Nearby)
+                SaharaLottie(SaharaLottieKind.MapPin)
                 Text(t("No centres found", "कोई केंद्र नहीं मिला"), fontSize = 16.sp, color = DoctorCardInk)
                 if (filtersOn) OutlinedButton(onClick = clear, shape = RoundedCornerShape(12.dp), modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Clear filters", "सभी चुनाव हटाएँ"), color = RustText) }
             }
         } }
-        items(listed, key = { it.id }) { c -> Box(Modifier.animateItem()) { NearbyCentreCard(c, here) } }
+        items(listed, key = { it.id }) { c -> Box(Modifier.animateItem().saharaStagger(listed.indexOf(c))) { NearbyCentreCard(c, here) } }
         if (visible.size > listed.size) item(key = "nearby-show-more") {
             OutlinedButton(onClick = { shown += NEARBY_PAGE }, shape = RoundedCornerShape(12.dp), border = androidx.compose.foundation.BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("nearby-show-more")) {
                 Text(t("Show more", "और दिखाएँ"), color = RustText, fontWeight = FontWeight.SemiBold)
@@ -140,7 +140,7 @@ internal const val NEARBY_PAGE = 10
         // Several centres can share one approximate area pin; the sheet lists all of them.
         LazyColumn(Modifier.padding(start = 16.dp, end = 16.dp), contentPadding = PaddingValues(bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             if (chosen.size > 1) item { Text(t("${chosen.size} centres here", "यहाँ ${chosen.size} केंद्र"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading()) }
-            items(chosen, key = { it.id }) { NearbyCentreCard(it, here) }
+            items(chosen, key = { it.id }) { Box(Modifier.saharaStagger(chosen.indexOf(it))) { NearbyCentreCard(it, here) } }
         }
     }
     if (filtersOpen) NearbyFilterSheet(state, district, service, layers, states, districts, optionLabel, visible.size, filtersOn,
@@ -280,7 +280,7 @@ internal const val NEARBY_PAGE = 10
     val layer = NearbyHelp.layerOf(c)
     SurfaceCard {
         Row(verticalAlignment = Alignment.Top) {
-            Surface(shape = CircleShape, color = Color(NearbyHelp.tagColors(layer).first), modifier = Modifier.size(40.dp).testTag("centre-layer-$layer")) {
+            Surface(shape = CircleShape, color = Color(NearbyHelp.tagColors(layer).first), modifier = Modifier.saharaDropIn().size(40.dp).testTag("centre-layer-$layer")) {
                 Box(contentAlignment = Alignment.Center) { Icon(Icons.Default.LocalHospital, null, tint = Color(NearbyHelp.layerColor(layer)), modifier = Modifier.size(22.dp)) }
             }
             Spacer(Modifier.width(12.dp))

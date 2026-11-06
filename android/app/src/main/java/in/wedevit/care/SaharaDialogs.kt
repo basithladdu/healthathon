@@ -37,8 +37,8 @@ import androidx.core.content.ContextCompat
     confirmLabel: String? = null, onConfirm: (() -> Unit)? = null, dismissLabel: String? = null, modifier: Modifier = Modifier) {
     val t = careText()
     val glyph = icon ?: when (tone) { SaharaTone.Success -> Icons.Default.CheckCircle; SaharaTone.Error -> Icons.Default.ErrorOutline; SaharaTone.Warning -> Icons.Default.WarningAmber; else -> Icons.Default.Info }
-    AlertDialog(onDismissRequest = onDismiss, modifier = modifier.testTag("sahara-dialog"), containerColor = SaharaColors.Surface, shape = androidx.compose.foundation.shape.RoundedCornerShape(SaharaRadius.Hero),
-        icon = { if (tone == SaharaTone.Success) SaharaSuccessTick(size = 48) else SaharaIconChip(glyph, tone, size = 48) },
+    AlertDialog(onDismissRequest = onDismiss, modifier = modifier.saharaDialogEnter().testTag("sahara-dialog"), containerColor = SaharaColors.Surface, shape = androidx.compose.foundation.shape.RoundedCornerShape(SaharaRadius.Hero),
+        icon = { if (tone == SaharaTone.Success) SaharaSuccessTick(size = 48) else SaharaIconChip(glyph, tone, if (tone == SaharaTone.Error || tone == SaharaTone.Warning) Modifier.saharaWiggleOnce(delayMs = 300) else Modifier, size = 48) },
         title = { Text(title, Modifier.a11yHeading(), style = MaterialTheme.typography.titleLarge, color = SaharaColors.Ink, textAlign = TextAlign.Center) },
         text = text?.let { { Text(it, Modifier.announce(), style = MaterialTheme.typography.bodyLarge, color = SaharaColors.InkSub, textAlign = TextAlign.Center) } },
         confirmButton = {

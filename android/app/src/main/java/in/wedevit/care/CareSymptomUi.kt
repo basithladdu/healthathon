@@ -86,7 +86,7 @@ import java.time.format.DateTimeFormatter
                 tiles.chunked(if (largeText) 1 else 2).forEach { row ->
                     Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         row.forEach { (key, label) ->
-                            SymptomTile(false, label, key, if (key == "Other") "symptom-add" else "symptom-quick-$key", Modifier.weight(1f).fillMaxHeight(), role = androidx.compose.ui.semantics.Role.Button) {
+                            SymptomTile(false, label, key, if (key == "Other") "symptom-add" else "symptom-quick-$key", Modifier.weight(1f).fillMaxHeight().saharaStagger(tiles.indexOfFirst { it.first == key }), role = androidx.compose.ui.semantics.Role.Button) {
                                 quickStart = if (key == "Other") "" else key; adding = true
                             }
                         }
@@ -113,7 +113,7 @@ import java.time.format.DateTimeFormatter
         if (notes.isNotEmpty()) item(key = "notes-head") {
             // One row: the list's name and count, with Share beside it (it shares this list).
             Row(Modifier.fillMaxWidth().padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text("${t("Notes", "नोट")} · ${notes.size}", fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = SaharaSection.Symptoms.ink, modifier = Modifier.weight(1f).a11yHeading())
+                Text("${t("Notes", "नोट")} · ${saharaCountUp(notes.size)}", fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = SaharaSection.Symptoms.ink, modifier = Modifier.weight(1f).a11yHeading())
                 TextButton(onClick = {
                 val text = listOf("Sahara — ${t("Personal symptom notes", "तबीयत के निजी नोट")}", person?.name.orEmpty(),
                     *notes.map { "${SymptomNoteCodec.decode(it.detail)?.let { n -> SymptomDiaryRules.symptomLabel(n.symptom, hindi) }.orEmpty()}\n${SymptomNoteCodec.readable(it.detail, hindi)}" }.toTypedArray()).joinToString("\n\n")

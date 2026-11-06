@@ -318,7 +318,7 @@ private const val HOME = "home"
             CommunityNotice(if (waiting == 1) CommunityCopy("1 post or reply is waiting to send.", "1 पोस्ट या जवाब भेजा जाना बाकी है।")
                 else CommunityCopy("$waiting posts or replies are waiting to send.", "$waiting पोस्ट या जवाब भेजे जाने बाकी हैं।"), onRetry)
         }
-        if (home == null && error != null) item(key = "community-offline-art") { SaharaIllustration(SaharaArtKind.Offline, Modifier.fillMaxWidth()) }
+        if (home == null && error != null) item(key = "community-offline-art") { SaharaLottie(SaharaLottieKind.Offline, Modifier.fillMaxWidth()) }
         if (error != null) item { CommunityNotice(error, onRetry) }
         if (home == null && error == null && loading) item { SaharaInlineLoading(t("Loading…", "खुल रहा है…")) }
         home?.groups?.let { groups ->
@@ -390,7 +390,7 @@ private const val HOME = "home"
             item { CommunityGuideline() }
             if (error != null) item { CommunityNotice(error, onRetry) }
             if (feed == null && error == null && loading) item { SaharaInlineLoading(t("Loading…", "खुल रहा है…")) }
-            if (feed != null && posts.isEmpty()) item(key = "community-empty-art") { SaharaIllustration(SaharaArtKind.CommunityEmpty, Modifier.fillMaxWidth()) }
+            if (feed != null && posts.isEmpty()) item(key = "community-empty-art") { SaharaLottie(SaharaLottieKind.Hug, Modifier.fillMaxWidth()) }
             if (feed != null && posts.isEmpty()) item {
                 SaharaEmpty(t("No posts here yet", "यहाँ अभी कोई पोस्ट नहीं है"), t("Say hello, or ask what helped others. Your words could help someone today.", "नमस्ते कहें, या पूछें कि दूसरों को किस बात से मदद मिली। आपकी बात आज किसी के काम आ सकती है।"),
                     actionLabel = t("Write the first post", "पहली पोस्ट लिखें"), onAction = onWrite, modifier = Modifier.saharaAppear())
@@ -409,11 +409,11 @@ private const val HOME = "home"
                     onReport = onReport, onRemove = onRemove, onModerate = onModerate,
                     // A new post fades in and the others slide down to make room.
                     modifier = Modifier.animateItem(fadeInSpec = SaharaMotion.tween(SaharaMotion.LIST_ITEM_MS), placementSpec = SaharaMotion.tween<IntOffset>(SaharaMotion.EXPAND_MS, easing = SaharaMotion.Emphasized),
-                        fadeOutSpec = SaharaMotion.tween(SaharaMotion.EXIT_MS)))
+                        fadeOutSpec = SaharaMotion.tween(SaharaMotion.EXIT_MS)).saharaStagger(posts.indexOf(post)))
             }
         }
         if (feed != null) ExtendedFloatingActionButton(text = { Text(t("Write a post", "पोस्ट लिखें"), fontSize = 16.sp) }, icon = { Icon(Icons.Default.Edit, null) }, onClick = onWrite,
-            containerColor = SaharaColors.Primary, contentColor = SaharaColors.OnPrimary, modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp).heightIn(min = 56.dp).testTag("community-write"))
+            containerColor = SaharaColors.Primary, contentColor = SaharaColors.OnPrimary, modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp).saharaPulseGlow(corner = 16.dp, active = posts.isEmpty()).heightIn(min = 56.dp).testTag("community-write"))
     }
 }
 
@@ -427,7 +427,7 @@ private const val HOME = "home"
             // The sent tick: pops in once, then the pill stays for a moment.
             val shown = remember { MutableTransitionState(false).apply { targetState = true } }
             AnimatedVisibility(shown, enter = fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)) + scaleIn(SaharaMotion.tween(SaharaMotion.SAVED_MS), initialScale = .6f)) {
-                SaharaStatusPill(t("Posted", "भेज दिया"), SaharaTone.Success, Modifier.testTag("community-sent-tick"), icon = Icons.Default.CheckCircle)
+                Row(verticalAlignment = Alignment.CenterVertically) { SaharaLottie(SaharaLottieKind.Success, Modifier.size(28.dp)); SaharaStatusPill(t("Posted", "भेज दिया"), SaharaTone.Success, Modifier.testTag("community-sent-tick"), icon = Icons.Default.CheckCircle) }
             }
         }
         byTeam -> SaharaStatusPill(t("Sahara team", "Sahara टीम"), SaharaTone.Indigo)
@@ -461,7 +461,7 @@ private fun authorTone(name: String, byTeam: Boolean): SaharaTone = if (byTeam) 
         border = BorderStroke(1.5.dp, if (selected) tone.solid else SaharaColors.Edge),
         colors = ButtonDefaults.outlinedButtonColors(containerColor = fill, contentColor = if (selected) tone.ink else SaharaColors.Ink),
         modifier = Modifier.heightIn(min = 48.dp).then(if (tag.isNotEmpty()) Modifier.testTag(tag) else Modifier)) {
-        Icon(icon, null, Modifier.size(18.dp).graphicsLayer { scaleX = iconScale; scaleY = iconScale }, tint = if (selected) tone.solid else SaharaColors.Ink); Spacer(Modifier.width(6.dp))
+        Icon(icon, null, Modifier.size(18.dp).saharaPop(selected).graphicsLayer { scaleX = iconScale; scaleY = iconScale }, tint = if (selected) tone.solid else SaharaColors.Ink); Spacer(Modifier.width(6.dp))
         SaharaAnimatedText(text) { Text(it, style = MaterialTheme.typography.labelLarge, maxLines = 1, softWrap = false) }
     }
 }
