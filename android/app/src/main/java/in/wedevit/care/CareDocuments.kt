@@ -231,7 +231,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
                 }
             }
         }
-        if (visibleReports.isNotEmpty()) item(key = "reports-title") { SaharaStateSwitch(folderFilter, Modifier.animateItem(), label = "open folder") { open ->
+        if (visibleReports.isNotEmpty()) item(key = "reports-title") { SaharaStateSwitch(folderFilter, Modifier.animateItem(), label = "open-folder") { open ->
             if (open.isEmpty()) SectionTitle(t("Reports", "रिपोर्टें")) else SectionTitle(DocumentFolderRules.label(open, t), t("Show all", "सभी दिखाएँ")) { folderFilter = "" }
         } }
         items(visibleReports, key = { it.id }) { report ->
@@ -352,12 +352,12 @@ internal val CancerTone = FolderTone(androidx.compose.ui.graphics.Color(0xFF386D
 
 /** One folder tile: coloured icon chip, name and count. The open folder fills with its colour. */
 @Composable private fun FolderTile(title: String, folder: String, count: Int, open: Boolean, modifier: Modifier, onClick: () -> Unit) {
-    val tone = documentFolderTone(folder); val t = careText()
-    val fill by androidx.compose.animation.animateColorAsState(if (open) tone.accent else Paper, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "folder tile")
-    val ink by androidx.compose.animation.animateColorAsState(if (open) Paper else DoctorCardInk, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "folder ink")
+    val tone = documentFolderTone(folder)
+    val fill by androidx.compose.animation.animateColorAsState(if (open) tone.accent else Paper, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "folder-tile")
+    val ink by androidx.compose.animation.animateColorAsState(if (open) Paper else DoctorCardInk, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "folder-ink")
     val interaction = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
     Surface(onClick = onClick, shape = RoundedCornerShape(12.dp), color = fill, border = BorderStroke(1.5.dp, tone.accent), interactionSource = interaction,
-        modifier = modifier.saharaPress(interaction).heightIn(min = 56.dp).semantics { selected = open; contentDescription = "$title, $count" + if (open) t(", open", ", खुला") else "" }) {
+        modifier = modifier.saharaPress(interaction).heightIn(min = 56.dp).semantics { selected = open; contentDescription = "$title, $count" }) {
         Row(Modifier.padding(horizontal = 10.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             Surface(shape = RoundedCornerShape(10.dp), color = if (open) Paper else tone.soft) { Icon(if (open) Icons.Default.FolderOpen else tone.icon, null, Modifier.padding(7.dp).size(20.dp), tint = tone.accent) }
             Spacer(Modifier.width(8.dp))

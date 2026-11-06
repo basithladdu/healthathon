@@ -326,14 +326,14 @@ internal val MedicinesPlum = androidx.compose.ui.graphics.Color(0xFF8A3B78)
                 Text(t("Today's doses", "आज की दवाएँ"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
                 // The count as a status pill, green once every dose is ticked; the number rises in when it changes.
                 val allDone = taken == total
-                val pillBg by animateColorAsState(if (allDone) DoctorStatusGoodBg else Cream, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "doses pill")
+                val pillBg by animateColorAsState(if (allDone) DoctorStatusGoodBg else Cream, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "doses-pill")
                 Surface(shape = RoundedCornerShape(50), color = pillBg) {
                     SaharaAnimatedText(t("$taken of $total taken", "$total में से $taken ली"), Modifier.padding(horizontal = 12.dp, vertical = 6.dp)) { text ->
                         Text(text, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = if (allDone) DoctorStatusGood else DoctorCardSub, maxLines = 1, softWrap = false, modifier = Modifier.testTag("today-doses-count"))
                     }
                 }
             }
-            val share by animateFloatAsState(if (total == 0) 0f else taken.toFloat() / total, SaharaMotion.tween(SaharaMotion.ENTER_MS, easing = SaharaMotion.Emphasized), label = "doses progress")
+            val share by animateFloatAsState(if (total == 0) 0f else taken.toFloat() / total, SaharaMotion.tween(SaharaMotion.ENTER_MS, easing = SaharaMotion.Emphasized), label = "doses-progress")
             LinearProgressIndicator(progress = { share }, modifier = Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(50)), color = DoctorStatusGood, trackColor = DoctorHairline, drawStopIndicator = {}, gapSize = 0.dp)
             if (canEdit && taken < total) Text(t("Tap a dose when taken. Hold it for Missed.", "दवा लेने पर उसे छुएँ। छूटी हो तो दबाकर रखें।"), fontSize = 14.sp, color = DoctorCardSub)
             groups.forEach { group ->
@@ -376,7 +376,7 @@ internal val MedicinesPlum = androidx.compose.ui.graphics.Color(0xFF8A3B78)
     Column(Modifier.width(100.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Box {
             // Ring colour echoes the state: green taken, red-brown missed, a hairline while not yet marked.
-            val ringColor by animateColorAsState(when (state) { MedicineDoseState.TAKEN -> DoctorStatusGood; MedicineDoseState.MISSED -> DoctorStatusRest; else -> DoctorHairline }, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "pillbox ring")
+            val ringColor by animateColorAsState(when (state) { MedicineDoseState.TAKEN -> DoctorStatusGood; MedicineDoseState.MISSED -> DoctorStatusRest; else -> DoctorHairline }, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "pillbox-ring")
             val label = medicineDoseLabel(dose)
             val stateWord = when (state) { MedicineDoseState.TAKEN -> t("Taken", "ली"); MedicineDoseState.MISSED -> t("Missed", "छूटी"); else -> t("Not yet", "अभी नहीं") }
             val pending = state == MedicineDoseState.PENDING
@@ -387,7 +387,7 @@ internal val MedicinesPlum = androidx.compose.ui.graphics.Color(0xFF8A3B78)
                     .semantics { contentDescription = "${item.title}, $label: $stateWord" }.testTag("today-dose-${item.id}-${dose.key}")) { StripThumb(photo, 80) }
             // The tick or cross pops in on the corner the moment the dose is marked.
             AnimatedVisibility(!pending, Modifier.align(Alignment.TopEnd).padding(4.dp), enter = fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)) + scaleIn(SaharaMotion.tween(SaharaMotion.SAVED_MS, easing = SaharaMotion.Emphasized), initialScale = 0.3f), exit = fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS))) {
-                val badge by animateColorAsState(if (state == MedicineDoseState.MISSED) DoctorStatusRest else DoctorStatusGood, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "pillbox badge")
+                val badge by animateColorAsState(if (state == MedicineDoseState.MISSED) DoctorStatusRest else DoctorStatusGood, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "pillbox-badge")
                 Surface(shape = RoundedCornerShape(50), color = badge, modifier = Modifier.size(26.dp)) {
                     Box(Modifier.padding(3.dp), contentAlignment = Alignment.Center) { DoseStateIcon(state, Paper, 20) }
                 }

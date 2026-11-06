@@ -66,7 +66,7 @@ import java.time.ZoneId
                 Icon(if (enabled && allowed) Icons.Default.NotificationsActive else Icons.Default.NotificationsOff, null, Modifier.size(24.dp), tint = DoctorCardInk); Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) { Text(t("Care reminders", "देखभाल रिमाइंडर"), fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = DoctorCardInk)
                     // Status as a chip, not a sentence.
-                    SaharaStateSwitch(enabled && allowed, label = "reminders status") { on -> Surface(shape = RoundedCornerShape(50), color = if (on) Paper else Cream) { Text(if (on) t("On", "चालू") else t("Off", "बंद"), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = if (on) DoctorStatusGood else DoctorCardSub) } } }
+                    SaharaStateSwitch(enabled && allowed, label = "reminders-status") { on -> Surface(shape = RoundedCornerShape(50), color = if (on) Paper else Cream) { Text(if (on) t("On", "चालू") else t("Off", "बंद"), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = if (on) DoctorStatusGood else DoctorCardSub) } } }
                 Switch(checked = enabled && allowed, onCheckedChange = { turnOn ->
                 error = ""
                 if (!turnOn) scheduler.enable(false)

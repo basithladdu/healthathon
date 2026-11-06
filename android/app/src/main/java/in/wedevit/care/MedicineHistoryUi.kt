@@ -183,7 +183,7 @@ internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: C
         late -> DoctorStatusWarn to DoctorStatusWarnBg
         else -> DoctorCardSub to Paper
     }
-    val bg by animateColorAsState(bgTarget, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "dose chip")
+    val bg by animateColorAsState(bgTarget, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "dose-chip")
     val label = medicineDoseLabel(dose)
     val stateWord = when (state) { MedicineDoseState.TAKEN -> t("Taken", "ली"); MedicineDoseState.MISSED -> t("Missed", "छूटी"); else -> t("Not yet", "अभी नहीं") }
     val pending = state == MedicineDoseState.PENDING
@@ -212,7 +212,7 @@ internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: C
 @Composable internal fun DoseStateIcon(state: MedicineDoseState, tint: androidx.compose.ui.graphics.Color, size: Int) {
     AnimatedContent(state, transitionSpec = {
         (fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)) + scaleIn(SaharaMotion.tween(SaharaMotion.SAVED_MS, easing = SaharaMotion.Emphasized), initialScale = 0.4f)) togetherWith fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS))
-    }, label = "dose state") { shown ->
+    }, label = "dose-state") { shown ->
         Icon(when (shown) { MedicineDoseState.TAKEN -> Icons.Default.Check; MedicineDoseState.MISSED -> Icons.Default.Close; else -> Icons.Default.RadioButtonUnchecked }, null, Modifier.size(size.dp), tint = tint)
     }
 }

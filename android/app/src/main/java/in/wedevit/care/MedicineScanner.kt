@@ -144,7 +144,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
     }
 
     // Photos → reading → review slide forward and back like the rest of the app.
-    SaharaScreenHost(phase, Modifier.fillMaxSize(), label = "Medicine scanner", direction = { from, to -> if (to.ordinal > from.ordinal) SaharaMotion.Direction.Forward else SaharaMotion.Direction.Back }) { shown -> when (shown) {
+    SaharaScreenHost(phase, Modifier.fillMaxSize(), label = "medicine-scanner", direction = { from, to -> if (to.ordinal > from.ordinal) SaharaMotion.Direction.Forward else SaharaMotion.Direction.Back }) { shown -> when (shown) {
         MedicineScannerPhase.Select -> LazyColumn(
             Modifier.fillMaxSize().imePadding().testTag("medicine-scanner-select"),
             contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 28.dp),
