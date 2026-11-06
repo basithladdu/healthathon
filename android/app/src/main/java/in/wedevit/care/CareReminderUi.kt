@@ -44,11 +44,25 @@ import java.time.ZoneId
     val scheduler = remember(vm.accountNamespace) { CareReminderScheduler(context.applicationContext, vm.accountNamespace) }
     var revision by remember { mutableIntStateOf(0) }
     var error by remember { mutableStateOf("") }
+    // Before Android's prompt: why, Allow / Not now. When Android will no longer ask ("Don't allow" twice), a dialog opens Settings instead.
+    var permissionDialog by remember { mutableStateOf("") } // "" | "why" | "settings"
+    val prefs = remember { context.getSharedPreferences("care_reminder_permission", android.content.Context.MODE_PRIVATE) }
     val request = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (granted) scheduler.enable(true)
-        else { scheduler.enable(false); error = t("Notifications are off.", "सूचनाएँ बंद हैं।") }
+        else {
+            scheduler.enable(false)
+            val activity = nearbyActivity(context)
+            if (Build.VERSION.SDK_INT >= 33 && activity != null && !activity.shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) { prefs.edit().putBoolean("blocked", true).apply(); permissionDialog = "settings" }
+        }
         revision++
     }
+    val openNotificationSettings = { runCatching { context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)) }.onFailure { error = t("Allow notifications in Settings.", "Settings में सूचनाएँ चालू करें।") }; Unit }
+    if (permissionDialog == "why") FamilyPermissionDialog(Icons.Default.NotificationsActive, t("Get a gentle reminder when a medicine is due?", "दवा का समय होने पर हल्की याद दिलाएँ?"),
+        t("Reminders come at the times you choose, for medicines and visits.", "आपके चुने समय पर दवा और मुलाक़ात की याद आएगी।"),
+        t("Turn on reminders", "याद दिलाना चालू करें"), onConfirm = { permissionDialog = ""; request.launch(Manifest.permission.POST_NOTIFICATIONS) }, onDismiss = { permissionDialog = "" })
+    if (permissionDialog == "settings") FamilyPermissionDialog(Icons.Default.NotificationsOff, t("Notifications are off", "सूचनाएँ बंद हैं"),
+        t("Turn on notifications for Sahara in Settings to get reminders.", "रिमाइंडर पाने के लिए सेटिंग में Sahara की सूचनाएँ चालू करें।"),
+        t("Open Settings", "सेटिंग खोलें"), onConfirm = { permissionDialog = ""; openNotificationSettings() }, onDismiss = { permissionDialog = "" })
     DisposableEffect(lifecycle, scheduler) {
         val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_RESUME) { scheduler.reschedule(); revision++ } }
         lifecycle.lifecycle.addObserver(observer); onDispose { lifecycle.lifecycle.removeObserver(observer) }
@@ -70,12 +84,12 @@ import java.time.ZoneId
                 Switch(checked = enabled && allowed, onCheckedChange = { turnOn ->
                 error = ""
                 if (!turnOn) scheduler.enable(false)
-                else if (Build.VERSION.SDK_INT >= 33 && !allowed) request.launch(Manifest.permission.POST_NOTIFICATIONS)
-                else if (!allowed) error = t("Allow notifications in Settings.", "Settings में सूचनाएँ चालू करें।")
+                else if (Build.VERSION.SDK_INT >= 33 && !allowed && !prefs.getBoolean("blocked", false)) permissionDialog = "why"
+                else if (!allowed) permissionDialog = "settings"
                 else scheduler.enable(true)
                 revision++
             }) }
-            if (!allowed) OutlinedButton(onClick = { runCatching { context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)) }.onFailure { error = t("Allow notifications in Settings.", "Settings में सूचनाएँ चालू करें।") } }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().padding(top = 12.dp).heightIn(min = 48.dp)) { Text(t("Open settings", "सेटिंग खोलें"), fontSize = 15.sp) }
+            if (!allowed) OutlinedButton(onClick = openNotificationSettings, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().padding(top = 12.dp).heightIn(min = 48.dp)) { Text(t("Open settings", "सेटिंग खोलें"), fontSize = 15.sp) }
             if (enabled && allowed && !exact && Build.VERSION.SDK_INT >= 31) {
                 OutlinedButton(onClick = { runCatching { context.startActivity(Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, android.net.Uri.parse("package:${context.packageName}"))) }.onFailure { error = t("Allow alarms in Settings.", "Settings में अलार्म चालू करें।") } }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().padding(top = 12.dp).heightIn(min = 48.dp).testTag("reminder-exact-off")) { Text(t("Allow on-time alerts", "समय पर सूचना की अनुमति दें"), fontSize = 15.sp) }
             }

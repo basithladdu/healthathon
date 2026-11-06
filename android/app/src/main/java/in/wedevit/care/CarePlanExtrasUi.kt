@@ -53,7 +53,7 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
 }
 
 @Composable internal fun LegalPendingBox() { val t = careText(); val hindi = careHindi()
-    Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag("legal-pending")) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+    Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().testTag("legal-pending")) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(AmdText.LEGAL_PENDING_TITLE.pick(hindi), fontWeight = FontWeight.Bold)
         Text(AmdText.LEGAL_PENDING.pick(hindi), style = MaterialTheme.typography.bodyMedium)
         BoardPathway(t("Board process", "बोर्ड प्रक्रिया"))
@@ -63,15 +63,15 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
 /** Notice at the start of the plan and the living will, with a working download and delete. Family members see the notice only. */
 @Composable internal fun DpdpNoticeCard(scope: DpdpScope, state: CarePlanState, patientId: String, store: CarePlanStore, canManage: Boolean, commit: ((CarePlanState) -> CarePlanState) -> Boolean, actor: String) {
     val t = careText(); val hindi = careHindi(); val context = LocalContext.current; val coroutine = rememberCoroutineScope()
-    var open by rememberSaveable(scope) { mutableStateOf(false) }
+    // Always shown (no Show/Hide): the notice is short and people should not have to look for it. Seeing the screen counts as seeing it.
+    LaunchedEffect(scope, patientId) { runCatching { store.markNoticeSeen(scope) } }
     var confirming by rememberSaveable { mutableStateOf(false) }; var busy by remember { mutableStateOf(false) }; var message by remember { mutableStateOf("") }
     val blocks = Dpdp.notice(scope)
     PlanCard {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(t("Your data", "आपका डेटा"), Modifier.weight(1f).testTag("dpdp-title"), fontWeight = FontWeight.SemiBold)
-            TextButton(onClick = { if (open) store.markNoticeSeen(scope); open = !open }, modifier = Modifier.testTag("dpdp-toggle")) { Text(if (open) t("Hide", "छिपाएँ") else t("Show", "दिखाएँ")) }
         }
-        if (open) {
+        run {
             blocks.forEach { b -> Text(b.title.pick(hindi), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium); Text(b.body.pick(hindi), style = Small) }
             if (canManage) {
                 OutlinedButton(enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("dpdp-download"), onClick = {
@@ -93,7 +93,7 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
                     }
                 }) { Text(t("Download my data", "मेरा डेटा डाउनलोड करें")) }
                 if (!confirming) TextButton(onClick = { confirming = true }, enabled = !busy, modifier = Modifier.testTag("dpdp-delete")) { Text(t("Delete draft", "ड्राफ़्ट मिटाएँ"), color = RustText) }
-                else Surface(color = DoctorStatusRestBg, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                else Surface(color = DoctorStatusRestBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(t("Delete the unsigned draft? This cannot be undone.", "बिना साइन का ड्राफ़्ट मिटाएँ? इसे वापस नहीं लाया जा सकता।"), style = MaterialTheme.typography.bodyMedium)
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         OutlinedButton(onClick = { confirming = false }, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Text(t("Keep", "रखें")) }
@@ -301,10 +301,10 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
         item { PlanHeader(t("Living will", "लिविंग विल"), onBack, "amd-header") }
         if (familyReadOnly) item { Text(t("Only ${person.name} can change this.", "इसे सिर्फ़ ${person.name} बदल सकते हैं।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub, modifier = Modifier.testTag("amd-family-read-only")) }
         (working ?: current)?.let { a -> item { PlanReadAloud({ PlanSpeech.livingWill(a.content, hindi) }, "amd-${a.id}") } }
-        if (latest?.status == AmdStatus.REVOKED) item { val on = latest.revocation?.revokedOn.orEmpty(); Surface(color = DoctorStatusRestBg, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag("amd-cancelled")) { Text(t("Cancelled on $on", "$on को रद्द"), Modifier.padding(12.dp)) } }
+        if (latest?.status == AmdStatus.REVOKED) item { val on = latest.revocation?.revokedOn.orEmpty(); Surface(color = DoctorStatusRestBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().testTag("amd-cancelled")) { Text(t("Cancelled on $on", "$on को रद्द"), Modifier.padding(12.dp)) } }
         current?.let { c -> item(key = "executed-" + c.id + c.updatedAt) { ExecutedCard(c, store, person.id, canEdit && !clinician, working == null, clinician, actor, commit) } }
         if (clinician) {
-            if (current == null) item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth()) { Text(if (latest != null && latest.status != AmdStatus.REVOKED) t("Not signed. Not valid.", "हस्ताक्षर नहीं। वैध नहीं।") else t("No living will", "कोई लिविंग विल नहीं"), Modifier.padding(12.dp)) } }
+            if (current == null) item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) { Text(if (latest != null && latest.status != AmdStatus.REVOKED) t("Not signed. Not valid.", "हस्ताक्षर नहीं। वैध नहीं।") else t("No living will", "कोई लिविंग विल नहीं"), Modifier.padding(12.dp)) } }
         } else {
             if (working == null && current == null) item { Button(onClick = { commit { CarePlanBook.startAmd(it, person.id, actor, planNow(), person.name).first } }, enabled = canEdit, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("amd-start")) { Text(if (latest != null) t("New living will", "नई लिविंग विल") else t("Start", "शुरू करें")) } }
             working?.let { w -> when (w.status) {
@@ -398,14 +398,14 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
         }
         IssueList(issues)
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            OutlinedButton(onClick = { onSave(c) }, enabled = canEdit && c != record.content, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("amd-save")) { Text(t("Save", "सहेजें")) }
-            Button(onClick = { onPrint(c) }, enabled = canEdit && AmdRules.blocking(issues).isEmpty(), shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("amd-generate")) { Text(t("Make PDF", "PDF बनाएँ")) }
+            OutlinedButton(onClick = { onSave(c) }, enabled = canEdit && c != record.content, shape = RoundedCornerShape(12.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("amd-save")) { Text(t("Save", "सहेजें")) }
+            Button(onClick = { onPrint(c) }, enabled = canEdit && AmdRules.blocking(issues).isEmpty(), shape = RoundedCornerShape(12.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("amd-generate")) { Text(t("Make PDF", "PDF बनाएँ")) }
         }
     }
 }
 
 @Composable private fun AmdDhrFields(index: Int, dhr: AmdDhr, count: Int, today: LocalDate, onChange: (AmdDhr) -> Unit, onRemove: () -> Unit, onMoveUp: () -> Unit) { val t = careText(); val n = index + 1
-    Surface(color = Cream, shape = RoundedCornerShape(14.dp), border = androidx.compose.foundation.BorderStroke(1.dp, DoctorHairline)) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Surface(color = Cream, shape = RoundedCornerShape(12.dp), border = androidx.compose.foundation.BorderStroke(1.dp, DoctorHairline)) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(t("Representative $n", "प्रतिनिधि $n"), fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
             if (index > 0) IconButton(onClick = onMoveUp) { Icon(Icons.Default.ArrowUpward, t("Move up", "ऊपर करें")) }
@@ -475,7 +475,7 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
         OutlinedButton(onClick = { pick.launch("*/*") }, enabled = canEdit, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("amd-scan")) { Icon(Icons.Default.PhotoCamera, null); Spacer(Modifier.width(8.dp)); Text(if (e.scanSha256.isBlank()) t("Add signed scan", "हस्ताक्षरित स्कैन जोड़ें") else t("Added · change", "जुड़ गया · बदलें")) }
         if (scanError) Text(t("Could not read file. Try another.", "फ़ाइल पढ़ी नहीं जा सकी। दूसरी आज़माएँ।"), color = RustText, style = Small)
         IssueList(issues)
-        Button(onClick = { commit { CarePlanBook.executeAmd(it, w.id, e, custodian, actor, planNow(), today) } }, enabled = canEdit && AmdRules.blocking(issues).isEmpty(), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("amd-execute")) { Text(t("Mark as signed", "हस्ताक्षरित दर्ज करें")) }
+        Button(onClick = { commit { CarePlanBook.executeAmd(it, w.id, e, custodian, actor, planNow(), today) } }, enabled = canEdit && AmdRules.blocking(issues).isEmpty(), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("amd-execute")) { Text(t("Mark as signed", "हस्ताक्षरित दर्ज करें")) }
         TextButton(onClick = { commit { CarePlanBook.startAmd(it, w.patientId, actor, planNow()).first } }, enabled = canEdit, modifier = Modifier.testTag("amd-new-version")) { Text(t("New version", "नया संस्करण")) }
     }
 }
@@ -503,7 +503,7 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
         Text(t("Representatives, in order", "प्रतिनिधि, क्रम से") + ": " + c.content.dhrs.filter { it.name.isNotBlank() }.mapIndexed { i, d -> "${i + 1}. ${d.name} (${d.relation}) ${d.phone}" }.joinToString(" · "), style = MaterialTheme.typography.bodyMedium)
         if (!clinician) {
             SectionTitle(t("Copies", "प्रतियाँ"))
-            c.copies.forEach { copy -> Surface(color = Cream, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag("amd-copy-${copy.kind.name.lowercase()}")) { Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            c.copies.forEach { copy -> Surface(color = Cream, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().testTag("amd-copy-${copy.kind.name.lowercase()}")) { Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(copy.name + " · " + AmdText.copyKind(copy.kind).pick(hindi), fontWeight = FontWeight.SemiBold)
                 CheckLine(copy.consent, { v -> if (canEdit) commit { CarePlanBook.amdCopy(it, c.id, copy.id, v, null, null, actor, planNow(), today) } }, if (copy.kind == AmdRecipientKind.CUSTODIAN) t("The patient agrees to send a copy to the custodian.", "मरीज़ संरक्षक को प्रति भेजने के लिए सहमत है।") else t("The patient agrees to share it, and this person agrees to receive and keep it.", "मरीज़ इसे साझा करने के लिए, और यह व्यक्ति इसे लेने और रखने के लिए सहमत है।"))
                 if (copy.consent) {
@@ -538,7 +538,7 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
 @Composable private fun AmdCancelForm(canEdit: Boolean, onRevoke: (String, Boolean, String) -> Unit) { val t = careText(); val today = LocalDate.now()
     var open by rememberSaveable { mutableStateOf(false) }; var on by rememberSaveable { mutableStateOf("") }; var written by rememberSaveable { mutableStateOf(false) }; var reason by rememberSaveable { mutableStateOf("") }
     if (!open) TextButton(onClick = { open = true }, enabled = canEdit, modifier = Modifier.testTag("amd-cancel")) { Text(t("Cancel the living will", "लिविंग विल रद्द करें"), color = RustText) }
-    else Surface(color = DoctorStatusRestBg, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    else Surface(color = DoctorStatusRestBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         PlanDateField(on, t("Date of the written cancellation", "लिखित रद्दीकरण की तारीख़"), { on = it }, latest = today)
         CheckLine(written, { written = it }, t("The person signed a written cancellation.", "व्यक्ति ने लिखित रद्दीकरण पर हस्ताक्षर किए हैं।"))
         CareField(reason, { reason = it }, t("Reason (optional)", "कारण (वैकल्पिक)"))

@@ -100,12 +100,12 @@ import java.io.File
         }
         if (!ready) {
             Text(t("Hindi / English language pack · 987 MB", "हिन्दी / अंग्रेज़ी भाषा पैक · 987 MB"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.padding(vertical = 4.dp))
-            Button(onClick = { runOperation(t("Downloading…", "डाउनलोड हो रहा है…")) { models.download { done, total -> progressFlow.value = done to total }; ready = true } }, enabled = enabled && !checking && !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("offline-model-download")) { Icon(Icons.Default.Download, null); Spacer(Modifier.width(8.dp)); Text(if (checking) t("Checking language pack…", "भाषा पैक जाँच रहे हैं…") else t("Download", "डाउनलोड करें")) }
+            Button(onClick = { runOperation(t("Downloading…", "डाउनलोड हो रहा है…")) { models.download { done, total -> progressFlow.value = done to total }; ready = true } }, enabled = enabled && !checking && !busy, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("offline-model-download")) { Icon(Icons.Default.Download, null); Spacer(Modifier.width(8.dp)); Text(if (checking) t("Checking language pack…", "भाषा पैक जाँच रहे हैं…") else t("Download", "डाउनलोड करें")) }
         } else {
             Button(onClick = { runOperation(t("Turning into text", "लिखाई बन रही है")) {
                 val next = engine.transcribe(file, consent, consent.personId, OfflineSpeechLanguage.valueOf(language)) { done, total -> progressFlow.value = done to total }
                 result = next; words = next.originalText; checked = false
-            } }, enabled = enabled && !busy && !checking, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("offline-transcribe")) { Icon(Icons.Default.GraphicEq, null); Spacer(Modifier.width(8.dp)); Text(if (result == null) t("Turn into text", "लिखाई बनाएँ") else t("Try again", "फिर कोशिश करें")) }
+            } }, enabled = enabled && !busy && !checking, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("offline-transcribe")) { Icon(Icons.Default.GraphicEq, null); Spacer(Modifier.width(8.dp)); Text(if (result == null) t("Turn into text", "लिखाई बनाएँ") else t("Try again", "फिर कोशिश करें")) }
         }
         if (busy) {
             Text(color = DoctorCardInk, fontSize = 14.sp, modifier = Modifier.padding(top = 8.dp), text = if (progress.second > 0) "$operation · ${(progress.first * 100 / progress.second).coerceIn(0, 100)}%" else if (operation == t("Turning into text", "लिखाई बन रही है")) t("Preparing audio…", "ऑडियो तैयार हो रहा है…") else operation)
@@ -125,7 +125,7 @@ import java.io.File
                 val reviewed = original.reviewed(words, checked)
                 engine.saveReview(file, consent, consent.personId, reviewed)
                 if (latestUse(reviewed)) result = reviewed else error = t("Conversation changed. Open it again.", "बातचीत बदल गई। इसे फिर खोलें।")
-            } }, enabled = enabled && checked && words.isNotBlank() && words.length <= NoteRules.MAX_SOURCE_CHARS && !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("offline-use-reviewed")) { Text(t("Use text", "लिखाई इस्तेमाल करें"), fontWeight = FontWeight.SemiBold) }
+            } }, enabled = enabled && checked && words.isNotBlank() && words.length <= NoteRules.MAX_SOURCE_CHARS && !busy, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("offline-use-reviewed")) { Text(t("Use text", "लिखाई इस्तेमाल करें"), fontWeight = FontWeight.SemiBold) }
         }
     }
 }

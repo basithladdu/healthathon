@@ -275,7 +275,7 @@ private val CareSurfaceHigh = Color(0xFFF1E9DE)
                     10 -> CarePlanScreen(vm, clinician, onBack = { back() })
                     11 -> CareCommunityScreen(onBack = { back() })
                     12 -> CareDevicesScreen(onBack = { back() }, namespace = vm.storageNamespace, personId = selected)
-                    else -> More(vm, person, onAccount = onAccount, onDelete = { dialog = "delete" }, onCalendar = { openCalendar() }, onWorkflow = { go(7) }, onLabs = { go(8) }, walkthrough = walkthrough != null, onFeedback = { if (activeRecording) vm.stopRecording(); feedbackOpen = true }, onReminders = { if (activeRecording) vm.stopRecording(); remindersOpen = true }, onSharedWorkspace = { if (activeRecording) vm.stopRecording(); openDoctorWorkspace() }, onDocuments = { if (activeRecording) vm.stopRecording(); go(5) }, onCarePlan = { if (activeRecording) vm.stopRecording(); go(10) })
+                    else -> More(vm, person, onAccount = onAccount, onDelete = { dialog = "delete" }, onCalendar = { openCalendar() }, onWorkflow = { go(7) }, onLabs = { go(8) }, walkthrough = walkthrough != null, onFeedback = { if (activeRecording) vm.stopRecording(); feedbackOpen = true }, onReminders = { if (activeRecording) vm.stopRecording(); remindersOpen = true }, onSharedWorkspace = { if (activeRecording) vm.stopRecording(); openDoctorWorkspace() }, onDocuments = { if (activeRecording) vm.stopRecording(); go(5) }, onCarePlan = { if (activeRecording) vm.stopRecording(); go(10) }, onDevices = { if (activeRecording) vm.stopRecording(); go(12) }, onInviteFamily = if (!clinician && isOwnerTop) ({ if (activeRecording) vm.stopRecording(); inviteFamilyOpen = true }) else null)
                 } }
             } }
             refreshError?.let { error -> Surface(Modifier.align(Alignment.TopCenter).fillMaxWidth(), color = Peach) { Row(Modifier.padding(start = 16.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.ErrorOutline, null, Modifier.size(20.dp), tint = RustText); Text(error, Modifier.weight(1f).padding(12.dp).announce(), style = MaterialTheme.typography.bodySmall, color = Ink); TextButton(onClick = vm::refresh, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Retry", "फिर कोशिश करें"), color = RustText, fontWeight = FontWeight.Bold) } } } }
@@ -1081,86 +1081,87 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     if (editing) AddCareItem(item.kind, vm, onDismiss = { editing = false }, initial = item)
 }
 
-@Composable fun More(vm: CareModel, person: Person, onAccount: () -> Unit, onDelete: () -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}, onFeedback: () -> Unit = {}, onReminders: () -> Unit = {}, onSharedWorkspace: () -> Unit = {}, onDocuments: () -> Unit = {}, doctorEmbedded: Boolean = false, walkthrough: Boolean = false, onCarePlan: (() -> Unit)? = null) {
+@Composable fun More(vm: CareModel, person: Person, onAccount: () -> Unit, onDelete: () -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}, onFeedback: () -> Unit = {}, onReminders: () -> Unit = {}, onSharedWorkspace: () -> Unit = {}, onDocuments: () -> Unit = {}, doctorEmbedded: Boolean = false, walkthrough: Boolean = false, onCarePlan: (() -> Unit)? = null, onDevices: (() -> Unit)? = null, onInviteFamily: (() -> Unit)? = null) {
     val owner by vm.isOwner.collectAsStateWithLifecycle()
     val context = LocalContext.current; val versions by vm.versions.collectAsStateWithLifecycle(); val acks by vm.acknowledgements.collectAsStateWithLifecycle()
     val t = careText()
     val clinicianView by vm.clinician.collectAsStateWithLifecycle()
-    // The heading and the patient's profile card stay pinned; the rest scrolls under them.
-    Column(Modifier.fillMaxSize()) {
-    Column(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Heading(if (doctorEmbedded) t("Daily care & tools", "रोज़ की देखभाल और साधन") else if (!clinicianView) t("Account", "खाता") else t("More", "और"))
-        if (!doctorEmbedded && !clinicianView) PatientProfileCard(vm, person)
-    }
-    LazyColumn(Modifier.fillMaxWidth().weight(1f), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
-        if (!doctorEmbedded && !walkthrough) item {
-            // The patient's profile card sits above; this row is the way into sign-in and sharing. Doctors keep the old name card.
-            if (clinicianView) ActionCard(Paper, Modifier.fillMaxWidth().testTag("more-account"), onAccount) {
-                Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Surface(shape = CircleShape, color = SaharaApricot, modifier = Modifier.size(52.dp)) { Box(contentAlignment = Alignment.Center) { Text(person.name.take(1).uppercase(), fontFamily = SaharaTitleFont, fontSize = 24.sp, color = DoctorAccent) } }
-                    Spacer(Modifier.width(14.dp))
-                    Column(Modifier.weight(1f)) {
-                        Text(person.name, fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 1)
-                        Text(if (vm.cloud == null) t("Sign in", "साइन इन") else t("Account", "खाता"), fontSize = 14.sp, color = RustText)
-                    }
-                    Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(20.dp), tint = Rust)
-                }
-            } else Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
-                MoreRow(Icons.Default.AccountCircle, SaharaSoftBlue, if (vm.cloud == null) t("Sign in", "साइन इन") else t("Account", "खाता"), "", Modifier.testTag("more-account"), onAccount)
-            }
-        }
+    val email = vm.cloud?.session?.collectAsStateWithLifecycle()?.value?.email.orEmpty()
+    var about by rememberSaveable { mutableStateOf(false) }
+    // An Android settings page: the person's profile at the top, then one plain grouped list. Every row is a title, one short line and a chevron.
+    LazyColumn(Modifier.fillMaxSize().testTag("more-list"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        if (doctorEmbedded || clinicianView) item { Heading(if (doctorEmbedded) t("Daily care & tools", "रोज़ की देखभाल और साधन") else t("More", "और"), 26) }
+        else item { PatientProfileCard(vm, person) }
+        if (!doctorEmbedded && !walkthrough) item { MoreGroup(t("Account", "खाता")) {
+            MoreRow(Icons.Default.AccountCircle, FamilyAccent.Leaf, if (vm.cloud == null) t("Sign in", "साइन इन") else t("Account and sharing", "खाता और साझा करना"),
+                if (vm.cloud == null) t("Share care with family", "परिवार के साथ देखभाल साझा करें") else email, Modifier.testTag("more-account"), onAccount)
+            // Inviting family is one tap from here, not hidden in the header's person menu.
+            if (onInviteFamily != null && vm.cloud != null && owner) MoreRow(Icons.Default.PersonAdd, FamilyAccent.Leaf, t("Invite family", "परिवार को बुलाएँ"), t("Send a link on WhatsApp", "व्हाट्सऐप पर लिंक भेजें"), Modifier.testTag("more-invite-family"), onInviteFamily)
+        } }
         // Patients and family already have Docs in the bottom bar and Calendar and Lab history on the Care tab, so those rows are only here for doctors.
         val shortcutsElsewhere = !doctorEmbedded && !clinicianView
-        item { MoreGroup(t("Your care", "आपकी देखभाल")) {
-            if (!shortcutsElsewhere) MoreRow(Icons.Default.FolderOpen, SaharaSoftBlue, t("Documents", "दस्तावेज़"), "", Modifier.testTag("more-documents-entry"), onDocuments)
-            if (onCarePlan != null) MoreRow(Icons.Default.LocalHospital, Peach, t("Emergency plan", "आपातकालीन योजना"), "", Modifier.testTag("more-care-plan-entry"), onCarePlan)
-            if (!shortcutsElsewhere) MoreRow(Icons.Default.CalendarMonth, Mint, t("Calendar", "कैलेंडर"), "", Modifier.testTag("more-calendar"), onCalendar)
-            if (!shortcutsElsewhere) MoreRow(Icons.Default.Science, SaharaApricot, t("Lab history", "जाँच का इतिहास"), "", Modifier.testTag("more-labs"), onLabs)
-            if (!walkthrough) MoreRow(Icons.Default.NotificationsNone, SaharaSoftGold, t("Reminders", "रिमाइंडर"), "", Modifier.testTag("more-reminders"), onReminders)
+        item { MoreGroup(t("Care", "देखभाल")) {
+            if (!shortcutsElsewhere) MoreRow(Icons.Default.FolderOpen, FamilyAccent.Teal, t("Documents", "दस्तावेज़"), "", Modifier.testTag("more-documents-entry"), onDocuments)
+            if (onCarePlan != null) MoreRow(Icons.Default.LocalHospital, FamilyAccent.Marigold, t("Emergency plan", "आपातकालीन योजना"), t("Plan, wallet card, living will", "योजना, वॉलेट कार्ड, लिविंग विल"), Modifier.testTag("more-care-plan-entry"), onCarePlan)
+            if (onDevices != null && !clinicianView) MoreRow(Icons.Default.Healing, FamilyAccent.Plum, t("Tubes and lines", "नलियाँ और लाइनें"), "", Modifier.testTag("more-devices"), onDevices)
+            if (!shortcutsElsewhere) MoreRow(Icons.Default.CalendarMonth, FamilyAccent.Leaf, t("Calendar", "कैलेंडर"), "", Modifier.testTag("more-calendar"), onCalendar)
+            if (!shortcutsElsewhere) MoreRow(Icons.Default.Science, FamilyAccent.Marigold, t("Lab history", "जाँच का इतिहास"), "", Modifier.testTag("more-labs"), onLabs)
+            MoreRow(Icons.Default.Share, FamilyAccent.Brick, t("Export care notes", "देखभाल नोट भेजें"), t("${versions.size} saved", "${versions.size} सहेजे गए"), Modifier.testTag("more-export-notes"), enabled = versions.isNotEmpty(), onClick = {
+                val text = versions.joinToString("\n\n──────────\n\n") { v -> NoteRules.text(v, acks.filter { it.versionId == v.id && it.contentHash == v.contentHash }) }
+                open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), t("Export care notes", "देखभाल नोट भेजें")))
+            })
         } }
-        if (!walkthrough || doctorEmbedded) item { MoreGroup(t("Help and settings", "मदद और सेटिंग")) {
-            if (!walkthrough) MoreRow(Icons.Default.SentimentSatisfiedAlt, Mint, t("Feedback", "राय दें"), "", Modifier.testTag("patient-feedback-entry"), onFeedback)
-            if (doctorEmbedded) MoreRow(Icons.Default.Groups, SaharaSoftBlue, t("Shared care", "साझा देखभाल"), "", Modifier, onSharedWorkspace)
-            else if (!walkthrough) MoreRow(Icons.Default.MedicalServices, SaharaSoftBlue, t("I'm a doctor", "मैं डॉक्टर हूँ"), "", Modifier.testTag("more-doctor-workspace-entry"), onSharedWorkspace)
-            MoreRow(Icons.Default.Lock, Peach, t("Privacy", "निजता"), "", Modifier.testTag("more-privacy"), { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url)))) })
-        } }
-        item { SurfaceCard(Gold) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(shape = CircleShape, color = Paper) { Icon(Icons.Default.Description, null, Modifier.padding(10.dp).size(22.dp), tint = RustText) }
-                Spacer(Modifier.width(12.dp))
-                Text(t("${person.name}'s care notes", "${person.name} के देखभाल नोट"), Modifier.weight(1f), fontFamily = SaharaTitleFont, fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.Medium, color = Ink)
-                Surface(shape = RoundedCornerShape(50), color = Paper) { Text(t("${versions.size} saved", "${versions.size} सहेजे गए"), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Ink) }
+        item { MoreGroup(t("Settings", "सेटिंग")) {
+            // Language opens the same menu as the header, from a full-width row.
+            Row(Modifier.fillMaxWidth().heightIn(min = 60.dp).padding(start = 16.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                MoreIcon(Icons.Default.Translate, FamilyAccent.Teal); Spacer(Modifier.width(16.dp))
+                Text(t("Language", "भाषा"), Modifier.weight(1f), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
+                CareLanguageMenu(contentColor = RustText)
             }
-            Spacer(Modifier.height(12.dp))
-            Button(onClick = { val text = versions.joinToString("\n\n──────────\n\n") { v -> NoteRules.text(v, acks.filter { it.versionId == v.id && it.contentHash == v.contentHash }) }; open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), t("Export care notes", "देखभाल नोट भेजें"))) }, enabled = versions.isNotEmpty(), shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Export notes", "नोट भेजें")) }
+            if (!walkthrough) MoreRow(Icons.Default.NotificationsNone, FamilyAccent.Marigold, t("Notifications", "सूचनाएँ"), t("Medicine and visit reminders", "दवा और मुलाक़ात के रिमाइंडर"), Modifier.testTag("more-reminders"), onReminders)
+            MoreRow(Icons.Default.Lock, FamilyAccent.Plum, t("Privacy and data", "निजता और डेटा"), "", Modifier.testTag("more-privacy"), { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url)))) })
         } }
-        item { InfoDisclosure(t("About", "ऐप के बारे में")) {
-            Text(androidx.compose.ui.res.stringResource(R.string.app_full_name))
-            Spacer(Modifier.height(10.dp)); Text(t(MedicineNames.ATTRIBUTION, "दवा के नाम: CDCI (NRCeS / C-DAC), CC BY 4.0"), style = MaterialTheme.typography.bodySmall)
-            TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse("https://creativecommons.org/licenses/by/4.0/"))) }) { Text(t("CC BY 4.0 licence", "CC BY 4.0 लाइसेंस")) }
-            Spacer(Modifier.height(12.dp)); Text(t("Version ${BuildConfig.VERSION_NAME}", "संस्करण ${BuildConfig.VERSION_NAME}"), style = MaterialTheme.typography.bodySmall)
+        item { MoreGroup(t("Help", "मदद")) {
+            if (!walkthrough) MoreRow(Icons.Default.SentimentSatisfiedAlt, FamilyAccent.Leaf, t("Help and feedback", "मदद और राय"), "", Modifier.testTag("patient-feedback-entry"), onFeedback)
+            if (doctorEmbedded) MoreRow(Icons.Default.Groups, FamilyAccent.Teal, t("Shared care", "साझा देखभाल"), "", Modifier, onSharedWorkspace)
+            else if (!walkthrough) MoreRow(Icons.Default.MedicalServices, FamilyAccent.Teal, t("I'm a doctor", "मैं डॉक्टर हूँ"), "", Modifier.testTag("more-doctor-workspace-entry"), onSharedWorkspace)
+            MoreRow(Icons.Default.Info, FamilyAccent.Brick, t("About", "ऐप के बारे में"), t("Version ${BuildConfig.VERSION_NAME}", "संस्करण ${BuildConfig.VERSION_NAME}"), Modifier.testTag("more-about"), { about = true })
         } }
         if (owner && !walkthrough) item { TextButton(onClick = onDelete, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Icon(Icons.Default.DeleteOutline, null); Spacer(Modifier.width(8.dp)); Text(t("Remove this person's records", "इस व्यक्ति के रिकॉर्ड हटाएँ")) } }
     }
-}
+    // About is a standard dialog, not an unfolding card at the bottom of the list.
+    if (about) AlertDialog(onDismissRequest = { about = false }, containerColor = Paper, modifier = Modifier.testTag("more-about-dialog"),
+        title = { Text(androidx.compose.ui.res.stringResource(R.string.app_name), fontWeight = FontWeight.Bold) },
+        text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(androidx.compose.ui.res.stringResource(R.string.app_full_name))
+            Text(t(MedicineNames.ATTRIBUTION, "दवा के नाम: CDCI (NRCeS / C-DAC), CC BY 4.0"), style = MaterialTheme.typography.bodySmall)
+            TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse("https://creativecommons.org/licenses/by/4.0/"))) }, contentPadding = PaddingValues(0.dp), modifier = Modifier.heightIn(min = 48.dp)) { Text(t("CC BY 4.0 licence", "CC BY 4.0 लाइसेंस")) }
+            Text(t("Version ${BuildConfig.VERSION_NAME}", "संस्करण ${BuildConfig.VERSION_NAME}"), style = MaterialTheme.typography.bodySmall)
+        } },
+        confirmButton = { TextButton(onClick = { about = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Close", "बंद करें"), fontWeight = FontWeight.Bold) } })
 }
 
-/** A titled group of More rows on one rounded card. */
+/** A titled group of settings rows on one card, rows split by inset dividers. */
 @Composable private fun MoreGroup(title: String, content: @Composable ColumnScope.() -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(title, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub, modifier = Modifier.padding(start = 4.dp).a11yHeading())
-        Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(vertical = 4.dp), content = content) }
+    Column(Modifier.saharaAppear(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(title, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = RustText, modifier = Modifier.padding(start = 4.dp).a11yHeading())
+        Surface(shape = RoundedCornerShape(12.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(vertical = 2.dp), content = content) }
     }
 }
 
-/** One More row: a coloured icon, a title, an optional short line and an arrow. */
-@Composable private fun MoreRow(icon: ImageVector, tint: Color, title: String, subtitle: String, modifier: Modifier, onClick: () -> Unit) {
-    Row(modifier.fillMaxWidth().heightIn(min = 60.dp).clickable(role = Role.Button, onClick = onClick).padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        Surface(shape = CircleShape, color = tint) { Icon(icon, null, Modifier.padding(9.dp).size(22.dp), tint = RustText) }
+@Composable private fun MoreIcon(icon: ImageVector, accent: Color) {
+    Surface(shape = RoundedCornerShape(10.dp), color = accent, contentColor = Color.White, modifier = Modifier.size(36.dp)) { Box(contentAlignment = Alignment.Center) { Icon(icon, null, Modifier.size(20.dp)) } }
+}
+
+/** One settings row: a solid coloured icon, a title, an optional short line and a chevron. */
+@Composable private fun MoreRow(icon: ImageVector, accent: Color, title: String, subtitle: String, modifier: Modifier, onClick: () -> Unit, enabled: Boolean = true) {
+    val press = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+    Row(modifier.fillMaxWidth().heightIn(min = 60.dp).clickable(press, LocalIndication.current, enabled = enabled, role = Role.Button, onClick = onClick).saharaPress(press).padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        MoreIcon(icon, if (enabled) accent else DoctorCardFaint)
         Spacer(Modifier.width(16.dp))
         Column(Modifier.weight(1f)) {
-            Text(title, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
-            if (subtitle.isNotBlank()) Text(subtitle, fontSize = 14.sp, color = DoctorCardSub)
+            Text(title, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = if (enabled) DoctorCardInk else DoctorCardSub)
+            if (subtitle.isNotBlank()) Text(subtitle, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, Modifier.size(22.dp), tint = DoctorCardSub)
     }

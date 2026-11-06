@@ -1,20 +1,18 @@
 package `in`.wedevit.care
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddLocationAlt
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -119,7 +117,7 @@ internal suspend fun CareCloud.myCentreSuggestions(account: String): List<Centre
     var more by rememberSaveable { mutableStateOf(false) }
     val sending by vm.centreSuggestionSending.collectAsState()
     ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Cream) {
-        val fieldShape = RoundedCornerShape(14.dp)
+        val fieldShape = RoundedCornerShape(12.dp)
         val fieldColors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper, focusedBorderColor = Rust, focusedLabelColor = RustText, cursorColor = Rust)
         Column(Modifier.padding(horizontal = 16.dp).padding(bottom = 32.dp).verticalScroll(rememberScrollState()).testTag("centre-suggestion-sheet"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(t("Suggest a centre", "केंद्र सुझाएँ"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 22.sp, color = DoctorCardInk, modifier = Modifier.a11yHeading())
@@ -131,8 +129,8 @@ internal suspend fun CareCloud.myCentreSuggestions(account: String): List<Centre
                 result.isNotBlank() -> {
                     val (en, hi) = CentreSuggestionRules.statusText(result)
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Outlined.CheckCircle, null, Modifier.size(24.dp), tint = DoctorStatusGood); Spacer(Modifier.width(8.dp))
-                        Text(t(en, hi), fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.weight(1f).testTag("centre-suggestion-result").announce())
+                        Icon(Icons.Outlined.CheckCircle, null, Modifier.size(28.dp), tint = DoctorStatusGood); Spacer(Modifier.width(10.dp))
+                        FamilyPill(t(en, hi), if (result == "kept") FamilyTone.NEUTRAL else FamilyTone.WAIT, Modifier.testTag("centre-suggestion-result").announce())
                     }
                     Button(onClick = onDismiss, shape = fieldShape, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(t("Done", "हो गया"), fontWeight = FontWeight.SemiBold) }
                 }
@@ -164,25 +162,16 @@ internal suspend fun CareCloud.myCentreSuggestions(account: String): List<Centre
     }
 }
 
-/** The person's own suggestions with their review state; shown on Nearby only when there are some, folded to one line until opened. */
+/** The person's own suggestions with their review state, shown on Nearby only when there are some. Each row carries a status pill; nothing is folded away. */
 @Composable fun CentreSuggestionList(items: List<CentreSuggestion>) {
     val t = careText()
-    var open by rememberSaveable { mutableStateOf(false) }
-    SurfaceCard {
-        TextButton(onClick = { open = !open }, contentPadding = PaddingValues(0.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("centre-suggestion-toggle")) {
-            Text(t("Your suggestions (${items.size})", "आपके सुझाव (${items.size})"), fontWeight = FontWeight.SemiBold, color = Ink, modifier = Modifier.weight(1f))
-            Text(if (open) t("Hide", "छिपाएँ") else t("Show", "दिखाएँ"), color = RustText)
-        }
-        if (open) items.forEachIndexed { index, s ->
-            if (index > 0) HorizontalDivider(Modifier.padding(vertical = 8.dp), color = DoctorHairline) else Spacer(Modifier.height(8.dp))
-            Text(s.name + listOf(s.city, s.state).filter(String::isNotBlank).joinToString(", ").let { if (it.isBlank()) "" else " · $it" }, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+    FamilyTile(t("Your suggestions", "आपके सुझाव"), Icons.Default.AddLocationAlt, FamilyAccent.Marigold, Modifier.testTag("centre-suggestion-list"),
+        trailing = { FamilyPill("${items.size}", FamilyTone.NEUTRAL) }) {
+        items.forEachIndexed { index, s ->
+            if (index > 0) HorizontalDivider(color = DoctorHairline)
             val (en, hi) = CentreSuggestionRules.statusText(s.status)
-            // A colour dot carries the state at a glance: green approved, rust not added, amber still waiting.
-            val dot = when (s.status) { "approved" -> DoctorStatusGood; "rejected" -> DoctorStatusRest; else -> DoctorStatusWarn }
-            Row(Modifier.padding(top = 4.dp), verticalAlignment = Alignment.Top) {
-                Box(Modifier.padding(top = 6.dp).size(8.dp).clip(CircleShape).background(dot)); Spacer(Modifier.width(8.dp))
-                Text(t(en, hi), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.weight(1f).testTag("centre-suggestion-status-${s.id}"))
-            }
+            val tone = when (s.status) { "approved" -> FamilyTone.GOOD; "rejected" -> FamilyTone.STOP; "kept" -> FamilyTone.NEUTRAL; else -> FamilyTone.WAIT }
+            FamilyRegisterRow(s.name, listOf(s.city, s.state).filter(String::isNotBlank).joinToString(", "), t(en, hi) to tone, Modifier.testTag("centre-suggestion-status-${s.id}"))
         }
     }
 }

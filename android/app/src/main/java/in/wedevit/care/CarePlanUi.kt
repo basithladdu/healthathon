@@ -124,10 +124,11 @@ internal fun planStepOf(field: String): Int = when {
         if (EctprLifecycle.draft(state.ectprs, selected) != null) { gocDirect = true; page = "wizard" }
     }
     val canManageData = clinician || actor != "Family"
-    when (page) {
+    // Pages slide in from the end and back out to the plan home, the same motion as the rest of the app.
+    SaharaScreenHost(page, Modifier.fillMaxSize(), label = "Care plan page", direction = { _, to -> if (to == "home") SaharaMotion.Direction.Back else SaharaMotion.Direction.Forward }) { shownPage -> when (shownPage) {
         "wizard" -> {
             val draft = EctprLifecycle.draft(state.ectprs, selected)
-            if (draft == null) { LaunchedEffect(Unit) { page = "home" }; return }
+            if (draft == null) { LaunchedEffect(Unit) { page = "home" }; return@SaharaScreenHost }
             CompositionLocalProvider(LocalGocFolder provides runCatching { store.folder(selected) }.getOrNull()) { EctprWizard(draft, clinician, canEdit, familyReadOnly = actor == "Family" && !clinician, personName = person.name, startStep = if (gocDirect) 5 else 0,
                 onSave = { r -> commit { CarePlanBook.saveDraft(it, r, actor, planNow(), today) } },
                 onSign = { r -> commit { CarePlanBook.sign(CarePlanBook.saveDraft(it, r, actor, planNow(), today), r.id, actor, planNow(), today) }.also { ok -> if (ok) page = "ed" } },
@@ -144,7 +145,7 @@ internal fun planStepOf(field: String): Int = when {
             onReview = { trigger -> if (commit { CarePlanBook.requestReview(it, selected, trigger, actor, planNow(), today).first }) page = "wizard" },
             onWithdraw = { id, reason, by -> if (commit { CarePlanBook.withdraw(it, id, reason, by, actor, planNow()) }) vm.message.value = t("Plan withdrawn", "योजना वापस ली गई") },
             onDiscard = { id -> commit { CarePlanBook.discard(it, id, actor, planNow()) } })
-    }
+    } }
 }
 
 @Composable internal fun PlanHeader(title: String, onBack: () -> Unit, tag: String) { val t = careText()
@@ -156,7 +157,7 @@ internal fun planStepOf(field: String): Int = when {
 
 /** Always on: clinical spec §6 / Sahaara §1. */
 @Composable internal fun IfInDoubtBox(compact: Boolean = false) { val hindi = careHindi()
-    Surface(color = RustText, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().testTag("if-in-doubt")) {
+    Surface(color = RustText, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().testTag("if-in-doubt")) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Warning, null, tint = Color.White); Spacer(Modifier.width(8.dp)); Text(IfInDoubt.TITLE.pick(hindi), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp) }
             if (!compact) {
@@ -169,7 +170,7 @@ internal fun planStepOf(field: String): Int = when {
 
 /** V9: printed on every record and shown on every ED view. */
 @Composable internal fun CareContinuesBox() { val hindi = careHindi()
-    Surface(color = Mint, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().testTag("care-continues")) {
+    Surface(color = Mint, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().testTag("care-continues")) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Favorite, null, tint = Rust); Spacer(Modifier.width(8.dp)); Text(CareThatContinues.TITLE.pick(hindi), fontWeight = FontWeight.Bold, fontSize = 17.sp) }
             CareThatContinues.ITEMS.forEach { Text("• " + it.pick(hindi), style = MaterialTheme.typography.bodyMedium) }
@@ -183,7 +184,7 @@ internal fun planStepOf(field: String): Int = when {
     Column(Modifier.fillMaxWidth().testTag("plan-issues"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         issues.forEach { i ->
             val warn = i.severity == IssueSeverity.WARN
-            Surface(color = if (warn) DoctorStatusWarnBg else DoctorStatusRestBg, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth()) {
+            Surface(color = if (warn) DoctorStatusWarnBg else DoctorStatusRestBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
                 Row(Modifier.padding(12.dp), verticalAlignment = Alignment.Top) {
                     Icon(if (warn) Icons.Default.Info else Icons.Default.ErrorOutline, null, tint = if (warn) DoctorStatusWarn else DoctorStatusRest, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(8.dp))
                     Text(i.text(hindi), style = MaterialTheme.typography.bodyMedium, color = Ink)
@@ -195,7 +196,7 @@ internal fun planStepOf(field: String): Int = when {
 
 @Composable internal fun PlanOption(label: String, meaning: String?, selected: Boolean, tag: String, onClick: () -> Unit) {
     // A selectable card: radio mark on the left, label, then one line of meaning. Selected = sage fill and an ink border.
-    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(if (selected) Sage else Paper).border(if (selected) 2.dp else 1.dp, if (selected) Ink else Ink.copy(alpha = .3f), RoundedCornerShape(14.dp))
+    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(if (selected) Sage else Paper).border(if (selected) 2.dp else 1.dp, if (selected) Ink else Ink.copy(alpha = .3f), RoundedCornerShape(12.dp))
         .selectable(selected, role = Role.RadioButton, onClick = onClick).heightIn(min = 56.dp).padding(horizontal = 12.dp, vertical = 12.dp).testTag(tag), verticalAlignment = Alignment.Top) {
         Icon(if (selected) Icons.Default.RadioButtonChecked else Icons.Default.RadioButtonUnchecked, null, Modifier.padding(top = 1.dp).size(22.dp), tint = if (selected) Ink else DoctorCardSub)
         Spacer(Modifier.width(12.dp))
@@ -227,7 +228,7 @@ internal fun planStepOf(field: String): Int = when {
 
 @Composable internal fun PlanNumberField(value: Int?, label: String, tag: String, onChange: (Int?) -> Unit) {
     OutlinedTextField(value?.toString().orEmpty(), { s -> onChange(s.filter(Char::isDigit).take(4).toIntOrNull()) }, label = { Text(label) }, singleLine = true,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().testTag(tag),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().testTag(tag),
         colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper))
 }
 
@@ -236,7 +237,7 @@ internal fun planStepOf(field: String): Int = when {
 }
 
 @Composable internal fun PlanCard(content: @Composable ColumnScope.() -> Unit) {
-    Surface(color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
+    Surface(color = Paper, shape = RoundedCornerShape(12.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp), content = content)
     }
 }
@@ -251,16 +252,20 @@ internal fun planStepOf(field: String): Int = when {
     var dialog by rememberSaveable { mutableStateOf("") }
     LazyColumn(Modifier.fillMaxSize().testTag("care-plan-home"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { PlanHeader(t("Emergency plan & living will", "आपातकालीन योजना और लिविंग विल"), onBack, "care-plan-header") }
-        if (loadProblem) item { Surface(color = Peach, shape = RoundedCornerShape(14.dp)) { Text(t("Couldn't read the saved plan.", "सहेजी योजना पढ़ी नहीं जा सकी।"), Modifier.padding(12.dp)) } }
+        if (loadProblem) item { Surface(color = Peach, shape = RoundedCornerShape(12.dp)) { Text(t("Couldn't read the saved plan.", "सहेजी योजना पढ़ी नहीं जा सकी।"), Modifier.padding(12.dp)) } }
         item { ActionCard(if (interp.kind == EdKind.ACTIVE) Mint else Peach, Modifier.fillMaxWidth().testTag("care-plan-ed-entry"), onClick = { onPage("ed") }) {
             Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.LocalHospital, null, tint = Rust); Spacer(Modifier.width(12.dp))
-                Column(Modifier.weight(1f)) { Text(t("ED Quick View", "ED क्विक व्यू"), fontWeight = FontWeight.Bold, fontSize = 17.sp) }
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(t("ED Quick View", "ED क्विक व्यू"), fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                    // The plan's state at a glance: signed and in force, a draft, or none yet.
+                    FamilyPill(when { active != null -> t("Plan v${active.version} active", "योजना v${active.version} लागू"); draft != null -> t("Draft", "मसौदा"); else -> t("No plan yet", "अभी योजना नहीं") },
+                        when { active != null -> FamilyTone.GOOD; draft != null -> FamilyTone.WAIT; else -> FamilyTone.NEUTRAL }, Modifier.testTag("care-plan-status"))
+                }
                 Icon(Icons.AutoMirrored.Filled.ArrowForward, null)
             }
         } }
-        item { PlanCard {
-            SectionTitle(t("Emergency care plan", "आपातकालीन देखभाल योजना"))
+        item { FamilyTile(t("Emergency care plan", "आपातकालीन देखभाल योजना"), Icons.Default.LocalHospital, FamilyAccent.Marigold) {
             when {
                 draft != null -> {
                     Button(onClick = { onPage("wizard") }, enabled = canEdit, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-continue")) { Text(t("Continue draft", "मसौदा जारी रखें")) }
@@ -276,13 +281,14 @@ internal fun planStepOf(field: String): Int = when {
             OutlinedButton(onClick = { onPage("card") }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-card-entry")) { Icon(Icons.Default.QrCode, null); Spacer(Modifier.width(8.dp)); Text(t("Wallet card", "वॉलेट कार्ड")) }
         } }
         if (active != null && transport != null && ReviewReminder.due(active, today)) item { ReviewReminderCard(active, canEdit, transport) { status -> commit { CarePlanBook.reminded(it, active.id, actor, planNow(), status) } } }
-        item { PlanCard {
-            SectionTitle(t("Living will", "लिविंग विल"))
+        item { FamilyTile(t("Living will", "लिविंग विल"), Icons.Default.Gavel, FamilyAccent.Plum) {
             Button(onClick = { onPage("amd") }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-amd-entry")) { Icon(Icons.Default.Gavel, null); Spacer(Modifier.width(8.dp)); Text(t("Open", "खोलें")) }
         } }
-        if (state.ectprs.any { it.patientId == person.id }) item { InfoDisclosure(t("Plan versions", "योजना के संस्करण")) {
-            state.ectprs.filter { it.patientId == person.id }.sortedByDescending { it.version }.forEach { r ->
-                Text("v${r.version} · ${PlanText.status(r.status).pick(hindi)} · ${r.updatedAt.take(10)}" + (r.revokedReason?.let { " · $it" } ?: ""), style = MaterialTheme.typography.bodyMedium)
+        // Versions as a plain register, always visible: version, status, date.
+        if (state.ectprs.any { it.patientId == person.id }) item { FamilyTile(t("Plan versions", "योजना के संस्करण"), Icons.Default.History, FamilyAccent.Indigo, Modifier.testTag("care-plan-versions")) {
+            state.ectprs.filter { it.patientId == person.id }.sortedByDescending { it.version }.forEachIndexed { i, r ->
+                if (i > 0) HorizontalDivider(color = DoctorHairline)
+                Text("v${r.version} · ${PlanText.status(r.status).pick(hindi)} · ${r.updatedAt.take(10)}" + (r.revokedReason?.let { " · $it" } ?: ""), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(vertical = 6.dp))
             }
         } }
         if (clinician && state.audit.events.isNotEmpty()) item { InfoDisclosure(t("Audit log", "ऑडिट लॉग")) {
@@ -307,7 +313,7 @@ internal fun planStepOf(field: String): Int = when {
 
 @Composable private fun WithdrawPlanForm(plan: EctprRecord, onCancel: () -> Unit, onWithdraw: (String, String) -> Unit) { val t = careText()
     var reason by rememberSaveable { mutableStateOf("") }; var by by rememberSaveable { mutableStateOf("") }
-    Surface(color = DoctorStatusRestBg, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().testTag("care-plan-withdraw-form")) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Surface(color = DoctorStatusRestBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().testTag("care-plan-withdraw-form")) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(t("Withdraw plan v${plan.version}?", "योजना v${plan.version} वापस लें?"), fontWeight = FontWeight.SemiBold)
         CareField(reason, { reason = it }, t("Reason", "कारण")); CareField(by, { by = it }, t("Signed by (name)", "हस्ताक्षर करने वाले (नाम)"))
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -368,7 +374,7 @@ internal fun planStepOf(field: String): Int = when {
                 else -> item { Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     val stop = EctprRules.activationBlockers(d, today); val warn = EctprRules.warnings(d, today)
                     val ready = stop.isEmpty()
-                    Surface(color = if (ready) DoctorStatusGoodBg else DoctorStatusWarnBg, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().testTag(if (ready) "ectpr-ready" else "ectpr-not-ready")) {
+                    Surface(color = if (ready) DoctorStatusGoodBg else DoctorStatusWarnBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().testTag(if (ready) "ectpr-ready" else "ectpr-not-ready")) {
                         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
                             Icon(if (ready) Icons.Default.CheckCircle else Icons.Default.ErrorOutline, null, tint = if (ready) DoctorStatusGood else DoctorStatusWarn, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(12.dp))
                             Text(if (ready) t("Ready to sign", "हस्ताक्षर के लिए तैयार")
@@ -378,8 +384,8 @@ internal fun planStepOf(field: String): Int = when {
                     IssueList(stop); IssueList(warn)
                     PlanSummaryExtras(d)
                     GocNoteForSigning(d)
-                    Button(onClick = { onSign(d) }, enabled = canEdit && stop.isEmpty(), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("ectpr-sign")) { Icon(Icons.Default.Verified, null); Spacer(Modifier.width(8.dp)); Text(t("Sign plan", "योजना पर हस्ताक्षर करें")) }
-                    OutlinedButton(onClick = { if (blockers.isEmpty() && onSave(d)) onClose() else shown = blockers }, enabled = canEdit, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Save draft", "मसौदा सहेजें")) }
+                    Button(onClick = { onSign(d) }, enabled = canEdit && stop.isEmpty(), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("ectpr-sign")) { Icon(Icons.Default.Verified, null); Spacer(Modifier.width(8.dp)); Text(t("Sign plan", "योजना पर हस्ताक्षर करें")) }
+                    OutlinedButton(onClick = { if (blockers.isEmpty() && onSave(d)) onClose() else shown = blockers }, enabled = canEdit, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Save draft", "मसौदा सहेजें")) }
                 } }
             }
             // The treatment step already lists its own checks; only show what is not on screen there.
@@ -388,11 +394,11 @@ internal fun planStepOf(field: String): Int = when {
         }
         Surface(color = Paper, shadowElevation = 2.dp) {
             Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 16.dp, vertical = 12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                OutlinedButton(onClick = { if (step > 0) { step--; shown = emptyList() } else tryLeave() }, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 52.dp)) {
+                OutlinedButton(onClick = { if (step > 0) { step--; shown = emptyList() } else tryLeave() }, shape = RoundedCornerShape(12.dp), modifier = Modifier.weight(1f).heightIn(min = 52.dp)) {
                     if (step > 0) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)) }
                     Text(if (step > 0) t("Back", "पीछे") else t("Close", "बंद करें"))
                 }
-                if (step < steps.lastIndex) Button(onClick = ::next, enabled = canEdit, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 52.dp).testTag("ectpr-next")) {
+                if (step < steps.lastIndex) Button(onClick = ::next, enabled = canEdit, shape = RoundedCornerShape(12.dp), modifier = Modifier.weight(1f).heightIn(min = 52.dp).testTag("ectpr-next")) {
                     Text(t("Next", "आगे")); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(18.dp))
                 }
             }
@@ -606,7 +612,7 @@ private fun LazyListScope.withdrawalStep(d: EctprRecord, today: LocalDate, updat
 }
 
 @Composable private fun LockedTreatment(d: EctprRecord) { val t = careText()
-    Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(18.dp), modifier = Modifier.fillMaxWidth().testTag("treatment-locked")) {
+    Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().testTag("treatment-locked")) {
         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
             Icon(Icons.Default.Lock, null, tint = DoctorStatusWarn); Spacer(Modifier.width(10.dp))
             Text(if (!d.prognosticUnderstanding.confirmed) t("Confirm Understanding first", "पहले 'समझ' की पुष्टि करें")
@@ -674,7 +680,7 @@ private fun LazyListScope.withdrawalStep(d: EctprRecord, today: LocalDate, updat
         OptionGroup(t("Highest breathing support", "साँस की सबसे ऊँची मदद"), c.respCeiling, (0..5).toList(), PlanText::ceiling, tag = "ceiling") { v -> choices { it.copy(respCeiling = v, nivTrial = it.nivTrial.takeIf { _ -> (v ?: 0) >= 4 }) } }
         val level = c.respCeiling
         if (level != null && level >= 1) OutlinedTextField(c.maxOxygenLpm?.let { if (it % 1.0 == 0.0) it.toInt().toString() else it.toString() }.orEmpty(), { s -> choices { it.copy(maxOxygenLpm = s.filter { ch -> ch.isDigit() || ch == '.' }.take(5).toDoubleOrNull()) } },
-            label = { Text(t("Maximum oxygen (L/min)", "अधिकतम ऑक्सीजन (L/min)")) }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth(),
+            label = { Text(t("Maximum oxygen (L/min)", "अधिकतम ऑक्सीजन (L/min)")) }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper))
         if (level != null && level < 5) CheckLine(c.ceilingConditions.reversibleCauseException == true, { v -> choices { it.copy(ceilingConditions = it.ceilingConditions.copy(reversibleCauseException = v)) } },
             t("A new, reversible cause (such as choking or a drug reaction) is treated fully, above this ceiling", "नया और ठीक हो सकने वाला कारण (जैसे गले में अटकना या दवा का रिएक्शन) इस सीमा से ऊपर भी पूरा इलाज पाएगा"))
@@ -811,13 +817,13 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
         item { PlanHeader(t("ED Quick View", "ED क्विक व्यू"), onBack, "ed-header") }
         item { PlanReadAloud({ PlanSpeech.edView(interp, amdLine, hindi) }, "ed-$patientId") }
         if (r != null) item { Text(listOfNotNull(r.patient.name.ifBlank { null }, r.patient.uhid.takeIf { it.isNotBlank() }?.let { "UHID $it" }, PlanDates.age(r.patient.dob, today)?.let { t("$it years", "$it साल") }).joinToString(" · "), fontWeight = FontWeight.SemiBold, fontSize = 18.sp) }
-        item { Surface(color = if (interp.kind == EdKind.ACTIVE) DoctorStatusGoodBg else DoctorStatusRestBg, shape = RoundedCornerShape(20.dp), border = BorderStroke(2.dp, if (interp.kind == EdKind.ACTIVE) DoctorStatusGood else DoctorStatusRest), modifier = Modifier.fillMaxWidth().testTag("ed-banner-${interp.kind.name.lowercase()}")) {
+        item { Surface(color = if (interp.kind == EdKind.ACTIVE) DoctorStatusGoodBg else DoctorStatusRestBg, shape = RoundedCornerShape(12.dp), border = BorderStroke(2.dp, if (interp.kind == EdKind.ACTIVE) DoctorStatusGood else DoctorStatusRest), modifier = Modifier.fillMaxWidth().testTag("ed-banner-${interp.kind.name.lowercase()}")) {
             Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(if (interp.kind == EdKind.ACTIVE) Icons.Default.Verified else Icons.Default.Warning, null, tint = if (interp.kind == EdKind.ACTIVE) DoctorStatusGood else DoctorStatusRest, modifier = Modifier.size(28.dp)); Spacer(Modifier.width(12.dp))
                 Text(interp.banner.pick(hindi), Modifier.weight(1f).announce(), fontWeight = FontWeight.Bold, fontSize = 18.sp, lineHeight = 23.sp, color = if (interp.kind == EdKind.ACTIVE) DoctorStatusGood else DoctorStatusRest)
             }
         } }
-        if (interp.flags.isNotEmpty()) item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag("ed-flags")) {
+        if (interp.flags.isNotEmpty()) item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().testTag("ed-flags")) {
             Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) { interp.flags.forEach { Text(it.pick(hindi), fontWeight = FontWeight.SemiBold, color = RustText) } }
         } }
         // An active plan leads with its decisions (tech spec §6), so the always-on box is the short form there; every condition stays on screen.
@@ -827,7 +833,7 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
             items(rows, key = { it.key }) { row -> EdRowView(row) }
             val fullRecord = PlanText.fullRecordLines(r)
             if (fullRecord.isNotEmpty()) item { InfoDisclosure(t("Full record", "पूरा रिकॉर्ड")) { fullRecord.forEach { Text(it.pick(hindi), style = MaterialTheme.typography.bodyMedium) } } }
-            if (r.choices.feeding.removeExistingTube) item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(14.dp)) { Text(t("Wish to remove feeding tube: needs the medical board process", "खाने की नली हटाने की इच्छा: मेडिकल बोर्ड की प्रक्रिया चाहिए"), Modifier.padding(12.dp)) } }
+            if (r.choices.feeding.removeExistingTube) item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(12.dp)) { Text(t("Wish to remove feeding tube: needs the medical board process", "खाने की नली हटाने की इच्छा: मेडिकल बोर्ड की प्रक्रिया चाहिए"), Modifier.padding(12.dp)) } }
         } else {
             item { Text(t("Give full standard emergency care.", "पूरा सामान्य आपातकालीन इलाज दें।"), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold) }
             // A living will stands on its own: it is shown whatever state the plan is in.
@@ -842,7 +848,7 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
 }
 
 @Composable private fun EdRowView(row: EdRow) { val hindi = careHindi()
-    Row(Modifier.fillMaxWidth().background(Paper, RoundedCornerShape(14.dp)).border(if (row.flag) 2.dp else 1.dp, if (row.flag) Rust else DoctorHairline, RoundedCornerShape(14.dp)).padding(horizontal = 16.dp, vertical = 12.dp).testTag("ed-row-${row.key.lowercase()}"), verticalAlignment = Alignment.Top) {
+    Row(Modifier.fillMaxWidth().background(Paper, RoundedCornerShape(12.dp)).border(if (row.flag) 2.dp else 1.dp, if (row.flag) Rust else DoctorHairline, RoundedCornerShape(12.dp)).padding(horizontal = 16.dp, vertical = 12.dp).testTag("ed-row-${row.key.lowercase()}"), verticalAlignment = Alignment.Top) {
         Column(Modifier.weight(1f)) {
             Text(row.label.pick(hindi), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub)
             Text(row.value.pick(hindi), fontWeight = if (row.value == NO_PREFERENCE || row.value == NOT_RECORDED) FontWeight.Normal else FontWeight.Bold, fontSize = 17.sp, lineHeight = 22.sp, color = if (row.flag) RustText else Ink)
@@ -864,7 +870,7 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
 /** Honest about where the card stands: on the server, or on this phone only. */
 @Composable private fun CardStatus(card: CardToken, online: Boolean, onRetry: () -> Unit) { val t = careText()
     val issued = card.server == CardServerState.ISSUED
-    Surface(color = if (issued) DoctorStatusGoodBg else DoctorStatusWarnBg, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag(if (issued) "card-issued" else "card-local-only")) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+    Surface(color = if (issued) DoctorStatusGoodBg else DoctorStatusWarnBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().testTag(if (issued) "card-issued" else "card-local-only")) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(if (issued) t("Card ready", "कार्ड तैयार") else t("Not uploaded yet", "अभी अपलोड नहीं हुआ"), fontWeight = FontWeight.Bold)
         if (!issued) {
             card.serverMessage?.let { Text(if (it == EdCardApi.NETWORK) t("No internet right now.", "अभी इंटरनेट नहीं है।") else it, style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("card-server-message")) }
@@ -882,18 +888,18 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
     LaunchedEffect(active?.id) { active?.let { onViewed(it.id) } }
     LazyColumn(Modifier.fillMaxSize().testTag("wallet-card"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { PlanHeader(t("Wallet card", "वॉलेट कार्ड"), onBack, "wallet-header") }
-        if (withdrawnPending > 0) item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag("card-revoke-pending")) { Text(t("Old QR may still open until the phone is online.", "फ़ोन ऑनलाइन होने तक पुराना QR खुल सकता है।"), Modifier.padding(12.dp)) } }
+        if (withdrawnPending > 0) item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().testTag("card-revoke-pending")) { Text(t("Old QR may still open until the phone is online.", "फ़ोन ऑनलाइन होने तक पुराना QR खुल सकता है।"), Modifier.padding(12.dp)) } }
         if (active == null || token == null) item { Column(Modifier.fillMaxWidth().padding(vertical = 32.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Icon(Icons.Default.QrCode, null, Modifier.size(40.dp), tint = DoctorCardSub)
             Text(t("No signed plan yet", "अभी कोई हस्ताक्षरित योजना नहीं"), fontWeight = FontWeight.SemiBold, color = Ink)
         } }
         else {
             item { CardStatus(token, online, onRetry) }
-            item { Surface(color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(2.dp, Ink), modifier = Modifier.fillMaxWidth()) {
+            item { Surface(color = Paper, shape = RoundedCornerShape(12.dp), border = BorderStroke(2.dp, Ink), modifier = Modifier.fillMaxWidth()) {
                 // Read at a glance by ambulance or ED staff: dark on white, large values, one divider per line.
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(t("SAHARA EMERGENCY CARE PLAN", "सहारा आपातकालीन देखभाल योजना"), fontWeight = FontWeight.Bold, fontSize = 18.sp, letterSpacing = 1.sp, color = Ink, modifier = Modifier.a11yHeading())
-                    Surface(color = RustText, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth()) { Text(WalletCard.TREAT_LINE.pick(hindi), Modifier.padding(12.dp), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp, lineHeight = 21.sp) }
+                    Surface(color = RustText, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) { Text(WalletCard.TREAT_LINE.pick(hindi), Modifier.padding(12.dp), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp, lineHeight = 21.sp) }
                     WalletCard.lines(active).forEach { (label, value) -> Column(Modifier.fillMaxWidth()) {
                         HorizontalDivider(color = DoctorHairline); Spacer(Modifier.height(8.dp))
                         Text(label.pick(hindi), fontSize = 14.sp, color = DoctorCardSub)
@@ -908,11 +914,11 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
                 }
             } }
             val issuedAmd = runCatching { org.json.JSONObject(token.snapshot).optJSONObject("amdAtIssue") }.getOrNull()
-            if (issuedAmd?.optString("status").orEmpty() != amdNow?.status?.name.orEmpty() || (amdNow != null && issuedAmd?.optInt("version") != amdNow.version)) item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag("card-amd-changed")) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            if (issuedAmd?.optString("status").orEmpty() != amdNow?.status?.name.orEmpty() || (amdNow != null && issuedAmd?.optInt("version") != amdNow.version)) item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().testTag("card-amd-changed")) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(t("Living will changed. Issue a new card.", "लिविंग विल बदली है। नया कार्ड जारी करें।"), style = MaterialTheme.typography.bodyMedium)
                 OutlinedButton(onClick = onReissue, enabled = canEdit, modifier = Modifier.heightIn(min = 48.dp).testTag("card-reissue")) { Text(t("New card", "नया कार्ड")) }
             } } }
-            item { Button(onClick = onShare, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.Print, null); Spacer(Modifier.width(8.dp)); Text(t("Print or share", "प्रिंट या साझा करें")) } }
+            item { Button(onClick = onShare, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.Print, null); Spacer(Modifier.width(8.dp)); Text(t("Print or share", "प्रिंट या साझा करें")) } }
         }
     }
 }

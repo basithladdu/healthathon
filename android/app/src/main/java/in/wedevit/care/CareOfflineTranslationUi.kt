@@ -57,7 +57,7 @@ import kotlinx.coroutines.launch
                     if (failure is CancellationException) throw failure
                     error = CareOfflineTranslationCopy.downloadFailed
                 } finally { downloadBusy = false } }
-            }, enabled = !downloadBusy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("offline-translation-download")) { Text(if (downloadBusy) t("Downloading…", "डाउनलोड हो रहा है…") else t("Download", "डाउनलोड करें")) }
+            }, enabled = !downloadBusy, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("offline-translation-download")) { Text(if (downloadBusy) t("Downloading…", "डाउनलोड हो रहा है…") else t("Download", "डाउनलोड करें")) }
             if (downloadBusy) TextButton(onClick = { job?.cancel(); downloadBusy = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें")) }
         } else {
             Button(onClick = {
@@ -65,7 +65,7 @@ import kotlinx.coroutines.launch
                 job = scope.launch { try { result = service.translate(source, target) { done, total -> progress = done to total } }
                 catch (failure: Exception) { if (failure is CancellationException) throw failure; error = failure.message ?: t("Couldn't translate.", "अनुवाद नहीं हो सका।") }
                 finally { busy = false } }
-            }, enabled = !busy && source.isNotBlank(), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("offline-translation-start")) { Text(if (busy) t("Reading line ${progress.first} / ${progress.second}", "पंक्ति ${progress.first} / ${progress.second} पढ़ रहे हैं") else t("Translate", "अनुवाद करें")) }
+            }, enabled = !busy && source.isNotBlank(), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("offline-translation-start")) { Text(if (busy) t("Reading line ${progress.first} / ${progress.second}", "पंक्ति ${progress.first} / ${progress.second} पढ़ रहे हैं") else t("Translate", "अनुवाद करें")) }
             if (busy) TextButton(onClick = { job?.cancel(); busy = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें")) }
         }
         if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error, fontSize = 14.sp, modifier = Modifier.announce())
@@ -81,7 +81,7 @@ import kotlinx.coroutines.launch
             if (checked) {
                 val translated = result.joinToString("\n") { it.translated }
                 CareReadAloudControl(translated, "$versionId-offline-$target", if (target == "hi") "hi-IN" else "en-IN")
-                OutlinedButton(shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp), onClick = { clipboard.setText(AnnotatedString("Machine translation · human checked\n${result.joinToString("\n\n") { "${it.original}\n${it.translated}" }}")) }) { Text(t("Copy both languages", "दोनों भाषाएँ कॉपी करें")) }
+                OutlinedButton(shape = RoundedCornerShape(12.dp), modifier = Modifier.heightIn(min = 48.dp), onClick = { clipboard.setText(AnnotatedString("Machine translation · human checked\n${result.joinToString("\n\n") { "${it.original}\n${it.translated}" }}")) }) { Text(t("Copy both languages", "दोनों भाषाएँ कॉपी करें")) }
             }
             Image(painterResource(R.drawable.google_translate_attribution), contentDescription = "Powered by Google Translate", modifier = Modifier.width(150.dp))
             TextButton(onClick = { notices = true }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Notices", "सूचनाएँ")) }

@@ -5,7 +5,6 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
@@ -16,11 +15,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -56,6 +62,7 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
     var canAdd by rememberSaveable { mutableStateOf(false) }; var careTeam by rememberSaveable { mutableStateOf(false) }
     var code by rememberSaveable { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) }; var error by remember { mutableStateOf<String?>(null) }
+    val sendPress = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
     val hindi = careHindi(); val t = careText()
     fun send(whatsApp: Boolean) {
         val service = cloud ?: return
@@ -80,81 +87,91 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
             finally { busy = false }
         }
     }
+    val focus = remember { FocusRequester() }
+    val canSend = !busy && name.isNotBlank()
     ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
-        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = 16.dp).padding(bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = 16.dp).padding(bottom = 24.dp).testTag("invite-family-sheet"), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            // Title row: a solid badge, the task, and close. No art or second heading pushing the form down.
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(shape = CircleShape, color = Mint, modifier = Modifier.size(56.dp)) { Box(contentAlignment = Alignment.Center) { Image(saharaImage(R.drawable.quick_family_art, 40.dp), null, Modifier.size(40.dp), contentScale = ContentScale.Fit) } }
+                Surface(shape = RoundedCornerShape(10.dp), color = FamilyAccent.Leaf, contentColor = Color.White, modifier = Modifier.size(40.dp)) { Box(contentAlignment = Alignment.Center) { Icon(Icons.Default.PersonAdd, null, Modifier.size(22.dp)) } }
                 Spacer(Modifier.width(12.dp))
-                Heading(t("Invite family", "परिवार को बुलाएँ"), 28)
+                Text(t("Invite family", "परिवार को बुलाएँ"), Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+                IconButton(onClick = onDismiss, enabled = !busy, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Close, t("Close", "बंद करें"), tint = DoctorCardSub) }
             }
             if (cloud == null) {
-                Button(onClick = { onDismiss(); onSignIn() }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.AccountCircle, null); Spacer(Modifier.width(8.dp)); Text(t("Sign in", "साइन इन करें")) }
+                Button(onClick = { onDismiss(); onSignIn() }, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.AccountCircle, null); Spacer(Modifier.width(8.dp)); Text(t("Sign in", "साइन इन करें")) }
             } else if (!owner || selected.isBlank()) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Lock, null, Modifier.size(20.dp), tint = DoctorCardSub); Spacer(Modifier.width(12.dp))
                     Text(t("Only the owner can invite.", "सिर्फ़ मालिक बुला सकते हैं।"), color = DoctorCardSub)
                 }
             } else {
-                InviteSection(t("Person", "व्यक्ति")) {
-                    CareField(name, { name = it.take(40); code = "" }, t("Name", "नाम"), singleLine = true)
-                    Text(t("Relationship", "रिश्ता"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub)
-                    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { CareRelations.forEach { r ->
-                        FilterChip(selected = relation == r, onClick = { relation = if (relation == r) "" else r }, modifier = Modifier.heightIn(min = 48.dp), shape = RoundedCornerShape(50),
-                            label = { Text(careTr(hindi, r, CareRelationsHindi[r] ?: r)) }, leadingIcon = if (relation == r) { { Icon(Icons.Default.Check, null, Modifier.size(16.dp)) } } else null,
-                            colors = FilterChipDefaults.filterChipColors(containerColor = Paper, selectedContainerColor = Mint, selectedLabelColor = DoctorCardInk, selectedLeadingIconColor = Rust))
-                    } }
+                // The name field is focused on open and the keyboard's Send key sends on WhatsApp: no tap on the field, no hunting for the button.
+                LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }
+                OutlinedTextField(name, { name = it.take(40); code = "" }, label = { Text(t("Name", "नाम")) }, singleLine = true, shape = RoundedCornerShape(12.dp),
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words, imeAction = ImeAction.Send), keyboardActions = KeyboardActions(onSend = { if (canSend) send(true) }),
+                    colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper, focusedLabelColor = RustText, unfocusedLabelColor = DoctorCardSub),
+                    modifier = Modifier.fillMaxWidth().focusRequester(focus).testTag("invite-name"))
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { CareRelations.forEach { r ->
+                    FilterChip(selected = relation == r, onClick = { relation = if (relation == r) "" else r }, modifier = Modifier.heightIn(min = 48.dp), shape = RoundedCornerShape(50),
+                        label = { Text(careTr(hindi, r, CareRelationsHindi[r] ?: r), softWrap = false) }, leadingIcon = if (relation == r) { { Icon(Icons.Default.Check, null, Modifier.size(16.dp)) } } else null,
+                        colors = FilterChipDefaults.filterChipColors(containerColor = Paper, selectedContainerColor = FamilyAccent.Leaf, selectedLabelColor = Color.White, selectedLeadingIconColor = Color.White))
+                } }
+                // Access: two choices side by side (view is the default), then the one switch.
+                Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    AccessOption(t("Can view", "सिर्फ़ देख सकें"), Icons.Default.Visibility, !canAdd, Modifier.weight(1f).fillMaxHeight()) { canAdd = false; code = "" }
+                    AccessOption(t("Can view and add", "देख सकें और जोड़ सकें"), Icons.Default.Edit, canAdd, Modifier.weight(1f).fillMaxHeight()) { canAdd = true; code = "" }
                 }
-                InviteSection(t("Access", "पहुँच")) {
-                    Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        AccessOption(t("Can view", "सिर्फ़ देख सकें"), Icons.Default.Visibility, !canAdd, Modifier.weight(1f).fillMaxHeight()) { canAdd = false; code = "" }
-                        AccessOption(t("Can view and add", "देख सकें और जोड़ सकें"), Icons.Default.Edit, canAdd, Modifier.weight(1f).fillMaxHeight()) { canAdd = true; code = "" }
-                    }
-                    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).toggleable(careTeam, role = Role.Switch) { careTeam = it; code = "" }.heightIn(min = 48.dp).padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Text(t("Share care-team contacts", "देखभाल टीम के नंबर भी साझा करें"), Modifier.weight(1f), fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = DoctorCardInk)
-                        Switch(checked = careTeam, onCheckedChange = null)
-                    }
+                Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).toggleable(careTeam, role = Role.Switch) { careTeam = it; code = "" }.heightIn(min = 48.dp).padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(t("Share care-team contacts", "देखभाल टीम के नंबर भी साझा करें"), Modifier.weight(1f), fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = DoctorCardInk)
+                    Switch(checked = careTeam, onCheckedChange = null)
                 }
-                Button(onClick = { send(true) }, enabled = !busy && name.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp).testTag("invite-send-whatsapp"), shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = DoctorStatusGood, contentColor = Color.White)) {
+                AnimatedVisibility(code.isNotEmpty(), enter = SaharaMotion.expand, exit = SaharaMotion.collapse) {
+                    FamilyPill(t("Invite link made · expires in 3 days", "निमंत्रण लिंक बना · 3 दिन में बंद होगा"), FamilyTone.GOOD, Modifier.testTag("invite-ready"))
+                }
+                error?.let { Row(Modifier.fillMaxWidth().background(DoctorStatusRestBg, RoundedCornerShape(12.dp)).padding(12.dp).announce(), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.ErrorOutline, null, Modifier.size(20.dp), tint = DoctorStatusRest); Spacer(Modifier.width(8.dp)); Text(it, color = DoctorStatusRest, fontWeight = FontWeight.Medium)
+                } }
+                // One main action; other apps is the quieter way.
+                Button(onClick = { send(true) }, enabled = canSend, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).saharaPress(sendPress).testTag("invite-send-whatsapp"), shape = RoundedCornerShape(12.dp), interactionSource = sendPress,
+                    colors = ButtonDefaults.buttonColors(containerColor = DoctorStatusGood, contentColor = Color.White), elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp, pressedElevation = 0.dp)) {
                     if (busy) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = Color.White) else Icon(Icons.AutoMirrored.Filled.Send, null)
-                    Spacer(Modifier.width(8.dp)); Text(if (busy) t("Please wait…", "कृपया रुकें…") else t("WhatsApp", "व्हाट्सऐप"), fontWeight = FontWeight.SemiBold)
+                    Spacer(Modifier.width(8.dp)); Text(if (busy) t("Please wait…", "कृपया रुकें…") else t("Send on WhatsApp", "व्हाट्सऐप पर भेजें"), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 }
-                OutlinedButton(onClick = { send(false) }, enabled = !busy && name.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp), shape = RoundedCornerShape(14.dp)) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Other apps", "दूसरे ऐप")) }
+                OutlinedButton(onClick = { send(false) }, enabled = canSend, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp), shape = RoundedCornerShape(12.dp), border = BorderStroke(1.5.dp, if (canSend) DoctorCardInk else DoctorHairline)) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Share link", "लिंक भेजें"), fontWeight = FontWeight.SemiBold) }
             }
-            error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
-            TextButton(onClick = onDismiss, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp).align(Alignment.CenterHorizontally)) { Text(t("Close", "बंद करें")) }
-        }
-    }
-}
-
-@Composable private fun InviteSection(title: String, content: @Composable ColumnScope.() -> Unit) {
-    Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(title, fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
-            content()
+            if (cloud == null || !owner || selected.isBlank()) error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
         }
     }
 }
 
 /** One access choice: an icon and a name. */
 @Composable private fun AccessOption(title: String, icon: ImageVector, selected: Boolean, modifier: Modifier, onSelect: () -> Unit) {
-    Surface(shape = RoundedCornerShape(14.dp), color = if (selected) Mint else Cream, border = BorderStroke(if (selected) 2.dp else 1.dp, if (selected) DoctorAccent else DoctorHairline),
+    Surface(shape = RoundedCornerShape(12.dp), color = if (selected) DoctorStatusGoodBg else Paper, border = BorderStroke(if (selected) 2.dp else 1.dp, if (selected) DoctorStatusGood else DoctorHairline),
         modifier = modifier.selectable(selected, role = Role.RadioButton, onClick = onSelect)) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(shape = CircleShape, color = if (selected) Paper else Mint) { Icon(icon, null, Modifier.padding(7.dp).size(20.dp), tint = DoctorAccent) }
+                Surface(shape = CircleShape, color = if (selected) DoctorStatusGood else Cream) { Icon(icon, null, Modifier.padding(7.dp).size(20.dp), tint = if (selected) Color.White else DoctorCardSub) }
                 Spacer(Modifier.weight(1f))
-                if (selected) Icon(Icons.Default.CheckCircle, null, Modifier.size(22.dp), tint = DoctorAccent)
+                if (selected) Icon(Icons.Default.CheckCircle, null, Modifier.size(22.dp), tint = DoctorStatusGood)
             }
             Text(title, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = DoctorCardInk)
         }
     }
 }
 
-/** Asks before joining from an invite link. */
+/** Asks before joining from an invite link (the email consent stays word for word), then shows the result in the same small dialog. */
 @Composable fun PendingJoinDialog(cloud: CareCloud, vm: CareModel, pending: PendingJoin, email: String, onClear: () -> Unit) {
     val scope = rememberCoroutineScope()
     var busy by remember { mutableStateOf(false) }; val t = careText(); val careHindiNow = careHindi()
+    var result by remember { mutableStateOf<Pair<Boolean, String>?>(null) }
+    result?.let { (joined, text) ->
+        AlertDialog(onDismissRequest = onClear, containerColor = Paper, modifier = Modifier.testTag("join-result"),
+            icon = { Icon(if (joined) Icons.Default.CheckCircle else Icons.Default.ErrorOutline, null, tint = if (joined) DoctorStatusGood else DoctorStatusRest) },
+            text = { Text(text, fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.announce()) },
+            confirmButton = { TextButton(onClick = onClear, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("OK", "ठीक है"), fontWeight = FontWeight.Bold) } })
+        return
+    }
     AlertDialog(onDismissRequest = { if (!busy) onClear() },
         title = { Text(t("Join ${pending.possessive} care?", "क्या आप इस देखभाल से जुड़ना चाहते हैं?")) },
         text = { Text(t("${pending.who.replaceFirstChar { it.uppercase() }} will see your email ($email).", "बुलाने वाले व्यक्ति को आपका ईमेल ($email) दिखेगा।")) },
@@ -167,9 +184,9 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
                     cloud.join(pending.code)
                     val added = vm.joinedRefresh(before)
                     val access = if (added != null && vm.canEditPerson(added.id)) t(" · you can read and add", " · आप देख और जोड़ सकते हैं") else t(" · you can read", " · आप देख सकते हैं")
-                    vm.message.value = (added?.name?.let { t("You can now see $it's care", "अब आप $it की देखभाल देख सकते हैं") } ?: t("You can now see ${pending.possessive} care", "अब आप यह देखभाल देख सकते हैं")) + access
-                } catch (e: Exception) { if (e is CancellationException) throw e; vm.message.value = careJoinFailureMessage(e.message, careHindiNow) }
-                finally { busy = false; onClear() }
+                    result = true to ((added?.name?.let { t("You can now see $it's care", "अब आप $it की देखभाल देख सकते हैं") } ?: t("You can now see ${pending.possessive} care", "अब आप यह देखभाल देख सकते हैं")) + access)
+                } catch (e: Exception) { if (e is CancellationException) throw e; result = false to careJoinFailureMessage(e.message, careHindiNow) }
+                finally { busy = false }
             }
         }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(if (busy) t("Joining…", "जुड़ रहे हैं…") else t("Join", "जुड़ें")) } },
         dismissButton = { TextButton(onClick = onClear, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Not now", "अभी नहीं")) } })
