@@ -1,5 +1,8 @@
 package `in`.wedevit.care
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -41,28 +45,31 @@ import java.time.LocalDate
     }
     val note = summary.latestNote
     // Four rows, always open; each names its page. Medicines have their own section on Today, so they are not repeated here.
-    SaharaRegister(Modifier.testTag("patient-summary")) {
-        Row(Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            Surface(shape = CircleShape, color = SaharaTone.Teal.wash, modifier = Modifier.size(40.dp)) { Box(contentAlignment = Alignment.Center) { Text(name.take(1).uppercase(), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = SaharaTone.Teal.ink) } }
+    // A solid teal header strip with the patient's initial; each row below sits on its own section's wash.
+    Surface(Modifier.fillMaxWidth().saharaAppear().testTag("patient-summary"), shape = RoundedCornerShape(SaharaRadius.Lg), color = SaharaColors.Surface, border = BorderStroke(1.5.dp, SaharaTone.Teal.solid)) { Column {
+        Row(Modifier.fillMaxWidth().background(SaharaTone.Teal.solid).padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+            Surface(shape = CircleShape, color = SaharaColors.Surface, modifier = Modifier.size(40.dp)) { Box(contentAlignment = Alignment.Center) { Text(name.take(1).uppercase(), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = SaharaTone.Teal.ink) } }
             Spacer(Modifier.width(12.dp))
-            Text(t("$name at a glance", "$name एक नज़र में"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 2, modifier = Modifier.weight(1f).semantics { heading() })
+            Text(t("$name at a glance", "$name एक नज़र में"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = SaharaTone.Teal.onSolid, maxLines = 2, modifier = Modifier.weight(1f).semantics { heading() })
         }
-        GlanceRow(Icons.Default.Healing, SaharaTone.Rose, t("Pain and symptoms", "दर्द और लक्षण"), summary.symptoms.firstOrNull()?.let { CarePatientSummaryRules.symptomLine(it, hindi) } ?: CarePatientSummaryRules.noSymptoms(hindi), "summary-symptoms", onSymptoms)
-        GlanceRow(Icons.Default.Event, SaharaTone.Indigo, t("Next visit", "अगली मुलाक़ात"), visitLine, "summary-visit") { if (visit == null && onAddVisit != null) onAddVisit() else onVisit(visit) }
-        GlanceRow(Icons.Default.Description, SaharaTone.Marigold, t("Goals of care", "देखभाल के लक्ष्य"), CarePatientSummaryRules.noteLine(note, note?.let { date(it.published) }.orEmpty(), hindi), "today-goals-of-care") { onGoals(note) }
-        GlanceRow(Icons.Default.LocalHospital, SaharaTone.Rust, t("Emergency plan", "आपातकालीन योजना"), CarePatientSummaryRules.planLine(summary.plan, hindi), "summary-plan", onCarePlan)
-    }
+        Column(Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        GlanceRow(Icons.Default.Healing, SaharaSection.Symptoms, t("Pain and symptoms", "दर्द और लक्षण"), summary.symptoms.firstOrNull()?.let { CarePatientSummaryRules.symptomLine(it, hindi) } ?: CarePatientSummaryRules.noSymptoms(hindi), "summary-symptoms", onSymptoms)
+        GlanceRow(Icons.Default.Event, SaharaSection.Visits, t("Next visit", "अगली मुलाक़ात"), visitLine, "summary-visit") { if (visit == null && onAddVisit != null) onAddVisit() else onVisit(visit) }
+        GlanceRow(Icons.Default.Description, SaharaSection.GoalsOfCare, t("Goals of care", "देखभाल के लक्ष्य"), CarePatientSummaryRules.noteLine(note, note?.let { date(it.published) }.orEmpty(), hindi), "today-goals-of-care") { onGoals(note) }
+        GlanceRow(Icons.Default.LocalHospital, SaharaSection.Emergency, t("Emergency plan", "आपातकालीन योजना"), CarePatientSummaryRules.planLine(summary.plan, hindi), "summary-plan", onCarePlan)
+        }
+    } }
 }
 
 /** The last row on Today: the one way into every other care page (the Care tab). */
 @Composable fun TodayAllCareTools(onOpen: () -> Unit) {
     val t = careText()
-    SaharaRegister { SaharaListRow(t("All care tools", "देखभाल के सभी साधन"), Modifier.testTag("today-all-care-tools"), detail = t("Medicines, visits, documents, labs and more", "दवाइयाँ, मुलाक़ातें, कागज़ात, जाँच और बाक़ी सब"),
-        icon = Icons.Default.Apps, tone = SaharaTone.Teal, onClick = onOpen) }
+    SaharaRegister(tone = SaharaTone.Rust) { SaharaListRow(t("All care tools", "देखभाल के सभी साधन"), Modifier.testTag("today-all-care-tools"), detail = t("Medicines, visits, documents, labs and more", "दवाइयाँ, मुलाक़ातें, कागज़ात, जाँच और बाक़ी सब"),
+        icon = Icons.Default.Apps, tone = SaharaTone.Rust, onClick = onOpen) }
 }
 
-/** One register row: a coloured icon tile, the title, today's line under it, and a chevron; the whole row opens its page. */
+/** One glance row: its section's wash with a solid edge, a solid icon chip, the title, today's line and a chevron; the whole row opens its page. */
 @Composable private fun GlanceRow(icon: ImageVector, tone: SaharaTone, title: String, subtitle: String, tag: String, onClick: () -> Unit) {
-    HorizontalDivider(color = DoctorHairline, modifier = Modifier.padding(horizontal = 12.dp))
-    SaharaListRow(title, Modifier.testTag(tag), detail = subtitle, icon = icon, tone = tone, onClick = onClick)
+    val shape = RoundedCornerShape(SaharaRadius.Md)
+    SaharaListRow(title, Modifier.clip(shape).background(tone.wash).border(1.dp, tone.solid, shape).testTag(tag), detail = subtitle, icon = icon, tone = tone, onClick = onClick)
 }

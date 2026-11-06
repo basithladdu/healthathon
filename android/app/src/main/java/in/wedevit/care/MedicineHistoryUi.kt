@@ -90,7 +90,8 @@ import java.time.format.DateTimeFormatter
         val food = when (e.food) { MedicineMealTiming.BEFORE_FOOD -> t("Before food", "खाने से पहले"); MedicineMealTiming.WITH_FOOD -> t("With food", "खाने के साथ"); MedicineMealTiming.AFTER_FOOD -> t("After food", "खाने के बाद"); else -> "" }
         listOf(e.strength, e.howMuch, e.howOften, food).filter(String::isNotBlank).joinToString(" · ")
     }.orEmpty()
-    SurfaceCard(if (allTaken) DoctorStatusGoodBg else Paper) {
+    // Medicines plum wash (green once every dose today is taken), so each medicine reads as part of its section.
+    SurfaceCard(if (allTaken) DoctorStatusGoodBg else SaharaSection.Medicines.wash) {
         Row(verticalAlignment = Alignment.Top) {
             // The pillbox: the strip photo once one is taken; tap an empty one to add it.
             Box(Modifier.clickable(enabled = canEdit && !busy, onClickLabel = t("Edit", "बदलें")) { editing = true }.testTag("medicine-photo-${item.id}")) { StripThumb(photo, 56) }
@@ -251,11 +252,12 @@ internal suspend fun markMedicineDose(context: Context, vm: CareModel, item: Car
 @Composable internal fun MedicineDoseChip(item: CareItem, dose: MedicineDose, state: MedicineDoseState, enabled: Boolean, onMark: (taken: Boolean, quick: Boolean) -> Unit) {
     val t = careText(); var menu by remember { mutableStateOf(false) }
     val late = state == MedicineDoseState.PENDING && dose.timed && LocalTime.now() > LocalTime.parse(dose.time)
+    // Solid once there is a state (green taken, red missed, amber late) with a white icon and time; white with a plum edge before.
     val (fg, bgTarget) = when {
-        state == MedicineDoseState.TAKEN -> DoctorStatusGood to DoctorStatusGoodBg
-        state == MedicineDoseState.MISSED -> DoctorStatusRest to DoctorStatusRestBg
-        late -> DoctorStatusWarn to DoctorStatusWarnBg
-        else -> DoctorCardSub to Paper
+        state == MedicineDoseState.TAKEN -> SaharaTone.Success.onSolid to SaharaTone.Success.solid
+        state == MedicineDoseState.MISSED -> SaharaTone.Error.onSolid to SaharaTone.Error.solid
+        late -> SaharaTone.Warning.onSolid to SaharaTone.Warning.solid
+        else -> SaharaSection.Medicines.ink to Paper
     }
     val bg by animateColorAsState(bgTarget, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "dose-chip")
     val label = medicineDoseLabel(dose)
@@ -264,7 +266,7 @@ internal suspend fun markMedicineDose(context: Context, vm: CareModel, item: Car
     val tapLabel = if (pending) t("Mark taken", "ली हुई दर्ज करें") else t("Change", "बदलें")
     val holdLabel = t("Taken or missed", "ली या छूटी")
     Box {
-        Surface(shape = RoundedCornerShape(50), color = bg, border = if (pending && !late) BorderStroke(1.dp, DoctorCardFaint.copy(alpha = .4f)) else null,
+        Surface(shape = RoundedCornerShape(50), color = bg, border = if (pending && !late) BorderStroke(1.5.dp, SaharaSection.Medicines.solid) else null,
             modifier = Modifier.minimumInteractiveComponentSize().clip(RoundedCornerShape(50))
                 .combinedClickable(enabled = enabled, role = Role.Button, onClickLabel = tapLabel, onLongClickLabel = holdLabel, onLongClick = { menu = true }) { if (pending) onMark(true, true) else menu = true }
                 .semantics { contentDescription = "${item.title}, $label: $stateWord" }.testTag("medicine-dose-${item.id}-${dose.key}")) {
@@ -310,7 +312,7 @@ internal suspend fun markMedicineDose(context: Context, vm: CareModel, item: Car
         val mine = events.filter { it.medicineId == item.id }.let { all -> all.filterNot { MedicineDoses.redundantCheckoff(it, all, zone) } }
         val now = System.currentTimeMillis()
         LazyColumn(Modifier.fillMaxWidth().testTag("care-medicine-history-sheet"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            item { Heading("${item.title} · ${t("History", "इतिहास")}", 24) }
+            item { SaharaSectionBand("${item.title} · ${t("History", "इतिहास")}", SaharaSection.Medicines) }
             // Friendly empty state: icon and one line; the Side effect? action sits below.
             if (mine.isEmpty()) item { Column(Modifier.fillMaxWidth().padding(vertical = 24.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Icon(Icons.Default.History, null, Modifier.size(32.dp), tint = DoctorCardSub)
@@ -328,10 +330,11 @@ internal suspend fun markMedicineDose(context: Context, vm: CareModel, item: Car
 /** A small rounded action capsule under a medicine's details. */
 @Composable private fun DoseChip(icon: ImageVector, label: String, tag: String, enabled: Boolean, onClick: () -> Unit) {
     // Slim capsule so the actions fit on one line; the touch area still meets 48dp.
-    Surface(onClick = onClick, enabled = enabled, shape = RoundedCornerShape(50), color = Mint, modifier = Modifier.minimumInteractiveComponentSize().testTag(tag)) {
+    // White capsule with a solid plum edge on the plum card, so it reads as a button.
+    Surface(onClick = onClick, enabled = enabled, shape = RoundedCornerShape(50), color = Paper, border = BorderStroke(1.5.dp, SaharaSection.Medicines.solid), modifier = Modifier.minimumInteractiveComponentSize().testTag(tag)) {
         Row(Modifier.heightIn(min = 40.dp).padding(start = 10.dp, end = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(icon, null, Modifier.size(18.dp), tint = RustText); Spacer(Modifier.width(6.dp))
-            Text(label, color = DoctorCardInk, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+            Icon(icon, null, Modifier.size(18.dp), tint = SaharaSection.Medicines.ink); Spacer(Modifier.width(6.dp))
+            Text(label, color = SaharaSection.Medicines.ink, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
         }
     }
 }
@@ -345,11 +348,12 @@ private const val FAMILY_ONLY_NOTE = "Family report only. Not confirmed as taken
 @Composable private fun CompactMedicineReport(event: MedicineIntakeEvent, all: List<MedicineIntakeEvent>, now: Long) {
     val t = careText()
     val status = MedicineHistoryRules.status(event, all, now)
-    val (word, fg, bg) = when {
-        event.outcome == "skipped" -> Triple(t("Missed", "छूटी"), DoctorStatusRest, DoctorStatusRestBg)
-        status.startsWith("Late") -> Triple(t("Late", "देर से"), DoctorStatusWarn, DoctorStatusWarnBg)
-        event.outcome == "taken" -> Triple(t("Taken", "ली"), DoctorStatusGood, DoctorStatusGoodBg)
-        else -> Triple(t(status, MedicineStatusHindi[status] ?: status), DoctorStatusWarn, DoctorStatusWarnBg)
+    // Solid status pills: green taken, amber late, red missed, bold white word.
+    val (word, pillTone) = when {
+        event.outcome == "skipped" -> t("Missed", "छूटी") to SaharaTone.Error
+        status.startsWith("Late") -> t("Late", "देर से") to SaharaTone.Warning
+        event.outcome == "taken" -> t("Taken", "ली") to SaharaTone.Success
+        else -> t(status, MedicineStatusHindi[status] ?: status) to SaharaTone.Warning
     }
     val doseAt = event.plannedAt.takeIf { event.outcome in setOf("taken", "skipped") && event.reportedTakenAt == null }
     val main = when {
@@ -362,7 +366,7 @@ private const val FAMILY_ONLY_NOTE = "Family report only. Not confirmed as taken
     }
     SurfaceCard(Paper) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Surface(color = bg, shape = RoundedCornerShape(50)) { Text(word, Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = fg) }
+            Surface(color = pillTone.solid, shape = RoundedCornerShape(50)) { Text(word, Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = pillTone.onSolid) }
             Spacer(Modifier.width(12.dp))
             Text(main, Modifier.weight(1f), fontSize = 15.sp, color = DoctorCardInk)
             if (MedicineHistoryRules.loggedByFamily(event)) SymptomLoggedByFamilyChip(careHindi(), "medicine-report-family-${event.id}")

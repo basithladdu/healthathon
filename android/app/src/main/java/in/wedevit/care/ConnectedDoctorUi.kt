@@ -341,16 +341,17 @@ private fun connectedTopicLabel(status: WorkflowTopicStatus, t: (String, String)
             t("Last check-in: ", "आख़िरी हालचाल: ") + checkInMoodLabel(check.title, hindi) + " · " + DateTimeFormatter.ofPattern("d MMM", careLocale(hindi)).withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(check.created)) to DoctorTones.Teal
         }
     } ?: (t("No check-ins yet", "अभी कोई हालचाल नहीं") to DoctorTones.Teal)
-    Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().saharaAppear().testTag("doctor-patient-header")) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.size(48.dp).background(tone.solid, CircleShape), contentAlignment = Alignment.Center) { Text(person.name.trim().take(1).uppercase(), color = tone.onSolid, fontFamily = SaharaTitleFont, fontWeight = FontWeight.Bold, fontSize = 22.sp) }
+    // The patient's header band: their colour as a solid strip with a white initial disc, name and facts in white; status, allergies and ID below on white.
+    Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.5.dp, tone.solid), modifier = Modifier.fillMaxWidth().saharaAppear().testTag("doctor-patient-header")) { Column {
+            Row(Modifier.fillMaxWidth().background(tone.band).padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.size(48.dp).background(Paper, CircleShape), contentAlignment = Alignment.Center) { Text(person.name.trim().take(1).uppercase(), color = tone.ink, fontFamily = SaharaTitleFont, fontWeight = FontWeight.Bold, fontSize = 22.sp) }
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text(person.name, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = if (pane) 20.sp else 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, style = DoctorWholeWords)
-                    if (facts.isNotBlank()) Text(facts, fontSize = 15.sp, lineHeight = 20.sp, color = DoctorCardSub, style = DoctorWholeWords, modifier = Modifier.testTag("doctor-patient-facts"))
+                    Text(person.name, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = if (pane) 20.sp else 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Bold, color = tone.onSolid, style = DoctorWholeWords)
+                    if (facts.isNotBlank()) Text(facts, fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.SemiBold, color = tone.onSolid, style = DoctorWholeWords, modifier = Modifier.testTag("doctor-patient-facts"))
                 }
             }
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.size(10.dp).background(status.second.solid, CircleShape))
                 Spacer(Modifier.width(8.dp))
@@ -364,7 +365,7 @@ private fun connectedTopicLabel(status: WorkflowTopicStatus, t: (String, String)
                 if (entries != null) TextButton(onClick = { details = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-patient-details")) { Text(t("Profile details", "प्रोफ़ाइल की जानकारी"), color = RustText, fontWeight = FontWeight.SemiBold) }
             }
         }
-    }
+    } }
     if (details && entries != null) AlertDialog(onDismissRequest = { details = false }, title = { Text(t("Profile details", "प्रोफ़ाइल की जानकारी")) },
         text = { Column(Modifier.verticalScroll(rememberScrollState())) { DoctorPatientProfileCard(entries, person) } },
         confirmButton = { TextButton(onClick = { details = false }, modifier = Modifier.testTag("doctor-patient-details-close")) { Text(t("Close", "बंद करें")) } })

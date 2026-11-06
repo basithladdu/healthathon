@@ -41,6 +41,9 @@ object SaharaColors {
     val Warning = Color(0xFFB45309); val WarningWash = Color(0xFFFDEBC8)
     val Error = Color(0xFFD32F2F); val ErrorWash = Color(0xFFFDE0E0)
     val Info = Color(0xFF0277BD); val InfoWash = Color(0xFFD6EEFB)
+
+    /** Round 3: the soft warm wash behind Today, so white and tinted cards stand off it (ink keeps >= 7:1). */
+    val GroundWarm = Color(0xFFFFEBD9)
 }
 
 /**
@@ -63,6 +66,16 @@ enum class SaharaTone(val solid: Color, val onSolid: Color, val wash: Color, val
     Error(SaharaColors.Error, Color.White, SaharaColors.ErrorWash, Color(0xFFB71C1C)),
     Info(SaharaColors.Info, Color.White, SaharaColors.InfoWash, Color(0xFF01579B)),
     Neutral(SaharaColors.InkSub, Color.White, SaharaColors.Well, SaharaColors.Ink),
+}
+
+/** Fill for a section's header band with white text and back arrow: the solid, except Marigold, which steps to a deeper orange so a small white subtitle also keeps 4.5:1. */
+val SaharaTone.band: Color get() = if (this == SaharaTone.Marigold) Color(0xFFB85400) else solid
+
+/** One colour per section (round 3), used for its header band, cards, list chips and rows everywhere. */
+object SaharaSection {
+    val Medicines = SaharaTone.Plum; val Symptoms = SaharaTone.Rose; val Visits = SaharaTone.Indigo; val CheckIns = SaharaTone.Teal
+    val ToDo = SaharaTone.Leaf; val Documents = SaharaTone.Marigold; val Labs = SaharaTone.Info; val Community = SaharaTone.Rose
+    val Emergency = SaharaTone.Error; val GoalsOfCare = SaharaTone.Indigo; val Help = SaharaTone.Teal; val Conversations = SaharaTone.Marigold
 }
 
 // Supporting category colours, now the vivid section washes. Older screens read these names.
