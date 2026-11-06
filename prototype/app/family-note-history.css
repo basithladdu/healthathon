@@ -11,12 +11,12 @@
 .family-note-history label { display: grid; gap: 7px; font-size: 14px; font-weight: 600; }
 .family-note-history select { width: auto; max-width: 100%; padding: 9px 12px; border: 1px solid var(--care-line-strong); border-radius: var(--care-radius-control); background: var(--care-surface); color: var(--care-ink); font: inherit; font-size: 15px; }
 .family-note-selected { padding: 20px; border: 1px solid var(--care-line); border-radius: var(--care-radius-card); background: var(--care-surface); }
-.family-note-version-meta { display: grid; gap: 4px; font-size: 14px; line-height: 1.5; color: var(--care-muted); overflow-wrap: anywhere; }
+.family-note-version-meta { display: grid; gap: 4px; font-size: 14px; line-height: 1.5; color: var(--care-muted); overflow-wrap: normal; }
 .family-note-version-meta strong { color: var(--care-ink); font-size: 15px; }
 .family-note-selected dl { display: grid; gap: 16px; margin: 20px 0 0; }
 .family-note-selected dt { color: var(--care-muted); font-size: 14px; font-weight: 600; line-height: 1.5; }
 .family-note-selected dd { margin: 5px 0 0; }
-.family-note-selected p, .family-note-comparison-values p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 15px; line-height: 1.65; }
+.family-note-selected p, .family-note-comparison-values p { margin: 0; white-space: pre-wrap; overflow-wrap: normal; font-size: 15px; line-height: 1.65; }
 .family-note-selected > p { margin-top: 18px; }
 .family-note-history .family-note-no-text { color: var(--care-muted); font-size: 14px; }
 .family-note-single, .family-note-comparison-rule { font-size: 14px; line-height: 1.6; color: var(--care-muted); }

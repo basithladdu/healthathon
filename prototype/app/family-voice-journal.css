@@ -33,9 +33,9 @@
 .voice-storage-status.is-unavailable { padding: 12px 14px; border: 1px solid #e7a983; border-radius: var(--care-radius-control); background: var(--care-danger-soft); color: var(--care-danger); }
 .voice-journal-entry { padding: 18px; margin-bottom: 14px; background: var(--care-surface-2); border: 1px solid var(--care-line); border-radius: var(--care-radius-card); }
 .voice-entry-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 14px; margin-bottom: 12px; }
-.voice-entry-heading h3 { margin: 0; font-size: 18px; line-height: 1.35; overflow-wrap: anywhere; }
+.voice-entry-heading h3 { margin: 0; font-size: 18px; line-height: 1.35; overflow-wrap: normal; }
 .voice-entry-heading time { font-size: 14px; color: var(--care-muted); }
-.voice-entry-thought { margin: 12px 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 15px; line-height: 1.7; }
+.voice-entry-thought { margin: 12px 0; white-space: pre-wrap; overflow-wrap: normal; font-size: 15px; line-height: 1.7; }
 .voice-entry-footer { padding-top: 8px; border-top: 1px solid var(--care-line); margin-top: 8px; }
 .voice-entry-footer > span { display: block; font-size: 14px; line-height: 1.6; color: var(--care-muted); }
 .voice-entry-footer > div { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 5px; }

@@ -10,7 +10,7 @@
 }
 .cma-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
 .cma-heading > div > p { margin: 0 0 4px; color: var(--cma-muted); font-size: 14px; font-weight: 650; }
-.cma-heading h1 { margin: 0; font: 500 clamp(28px, 3vw, 36px)/1.15 Georgia, 'Times New Roman', serif; letter-spacing: -.6px; }
+.cma-heading h1 { margin: 0; font: 500 clamp(28px, 3vw, 36px)/1.15 var(--care-font-display); letter-spacing: -.6px; }
 .cma-back { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 8px 12px; border-radius: 14px; color: var(--cma-lavender-ink); font-size: 14px; font-weight: 600; text-decoration: none; white-space: nowrap; }
 .cma-back svg { width: 16px; height: 16px; }
 .cma-search, .cma-questions, .cma-followup { min-width: 0; padding: 16px; border: 1px solid var(--cma-line); border-radius: 20px; background: var(--cma-surface); box-shadow: var(--care-shadow, 0 5px 20px #664b3010); }

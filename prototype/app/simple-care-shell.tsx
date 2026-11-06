@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import type { SummaryRelease } from './summary-state';
 import { CareRouteLink } from './care-route-link';
 import type { CareView } from './care-routes';
@@ -30,9 +30,25 @@ function CareNavIcon({ name }: { name: CareNavIconName }) {
 
 type CareRole = 'family' | 'patient' | 'doctor';
 
-export function SimpleCareShell({ children, view, role, lang, saveStatus, onNavigate, onRole, onLanguage, onSignOut }: {
+/** A result the person should see (consent recorded, card issued): a small dialog, closed in one tap. */
+function CareNoticeDialog({ message, lang, onClose }: { message: string; lang: CareLang; onClose: () => void }) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const element = dialog.current;
+    if (element && !element.open) element.showModal();
+  }, []);
+  return <dialog ref={dialog} className="care-notice-dialog" lang={lang} dir={careDir(lang)} aria-live="polite" onClose={onClose}>
+    <form method="dialog">
+      <p><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5" /></svg><span>{message}</span></p>
+      <button type="submit" autoFocus>{careText(lang, 'Close', 'बंद करें')}</button>
+    </form>
+  </dialog>;
+}
+
+export function SimpleCareShell({ children, view, role, lang, saveStatus, notice, onNoticeClose, onNavigate, onRole, onLanguage, onSignOut }: {
   children: ReactNode; view: string; role: CareRole; lang: CareLang;
   saveStatus: 'saving' | 'saved' | 'unavailable';
+  notice?: string | null; onNoticeClose?: () => void;
   onNavigate: (view: CareView) => void;
   onRole: (role: CareRole) => void; onLanguage: (lang: CareLang) => void;
   onSignOut: () => void;
@@ -64,6 +80,7 @@ export function SimpleCareShell({ children, view, role, lang, saveStatus, onNavi
     </header>
     <nav className="simple-care-nav" aria-label={t('Main navigation', 'मुख्य मेन्यू')}>{links.map(({ key, label, shortLabel, icon }) => <CareRouteLink className="simple-care-nav-link" key={key} view={key} aria-label={label} aria-current={(role === 'doctor' ? view : careSectionFor(view)) === key ? 'page' : undefined} onOpen={() => onNavigate(key)}><CareNavIcon name={icon} /><span className="simple-care-nav-label">{label}</span><span className="simple-care-nav-short-label">{shortLabel}</span></CareRouteLink>)}</nav>
     <main key={view} className="simple-care-content" lang={lang} dir={careDir(lang)}>{children}</main>
+    {notice && onNoticeClose && <CareNoticeDialog key={notice} message={notice} lang={lang} onClose={onNoticeClose} />}
     {saveStatus === 'unavailable' && <p className="care-save-error" role="alert">{t('Could not save your latest changes. Download a copy before closing.', 'नए बदलाव सेव नहीं हुए। बंद करने से पहले कॉपी डाउनलोड करें।')}</p>}
   </div>;
 }

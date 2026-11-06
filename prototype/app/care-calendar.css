@@ -47,8 +47,8 @@
 .care-calendar .care-agenda-list > li.care-agenda-chemo { --agenda-tint: #e5f1ed; --agenda-time: #c9e2db; --agenda-ink: #286365; background: var(--agenda-tint); border-color: #c9dfd7; border-left: 4px solid #247f86; }
 .care-calendar .care-agenda-list > li.care-agenda-radiotherapy { --agenda-tint: #fff0d7; --agenda-time: #f0dab0; --agenda-ink: #875b20; background: var(--agenda-tint); border-color: #eddbb9; border-left: 4px solid #c17823; }
 .care-agenda-list time { font-size: 15px; font-weight: 650; font-variant-numeric: tabular-nums; }
-.care-agenda-list strong { display: block; font-size: 16px; font-weight: 600; line-height: 1.4; overflow-wrap: anywhere; }
-.care-agenda-list > li > div > span { display: block; margin-top: 4px; font-size: 14px; color: var(--care-muted, #76675d); line-height: 1.45; overflow-wrap: anywhere; }
+.care-agenda-list strong { display: block; font-size: 16px; font-weight: 600; line-height: 1.4; overflow-wrap: normal; }
+.care-agenda-list > li > div > span { display: block; margin-top: 4px; font-size: 14px; color: var(--care-muted, #76675d); line-height: 1.45; overflow-wrap: normal; }
 .care-agenda-list > li > div > .care-agenda-kind { font-size: 12px; font-weight: 700; margin: 0 0 4px; letter-spacing: .03em; }
 .care-agenda-list .care-entry-author { font-size: 13px; }
 .care-agenda-list .care-any-time { font-size: 13px; color: var(--care-muted, #76675d); }

@@ -9,7 +9,7 @@ button.medicine-photo-trigger { position: relative; display: grid; place-items: 
 .medicine-photo-dialog::backdrop { background: #2b211bb8; -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
 .medicine-photo-dialog-panel { display: grid; gap: 12px; padding: 16px; }
 .medicine-photo-dialog-panel header { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
-.medicine-photo-dialog-panel strong { font: 650 19px/1.35 var(--font-sora, sans-serif); overflow-wrap: anywhere; }
+.medicine-photo-dialog-panel strong { font: 650 19px/1.35 var(--font-sora, sans-serif); overflow-wrap: normal; }
 .medicine-photo-dialog-panel header button { min-height: 44px; flex: none; padding: 10px 16px; border: 1px solid var(--care-line, #e6ddd1); border-radius: 14px; background: #fff; color: var(--care-ink, #382e29); font: 600 14px/1.4 var(--font-inter, sans-serif); cursor: pointer; }
 .medicine-photo-large { display: block; width: 100%; height: min(66dvh, 620px); object-fit: contain; border: 1px solid var(--care-line, #e6ddd1); border-radius: 14px; background: #fff; }
 .medicine-photo-dialog-panel p { margin: 0; color: var(--care-muted, #76675d); font-size: 14px; line-height: 1.5; text-align: center; }

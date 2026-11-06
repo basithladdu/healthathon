@@ -26,6 +26,9 @@ export function CareConversationImpact({ episodes, requests, loading = false }: 
     window.setTimeout(() => URL.revokeObjectURL(url), 0);
   }
 
+  // Nothing recorded yet: show nothing rather than an empty panel above the doctor's work.
+  if (!loading && activity.length === 0) return null;
+
   return <section className="care-impact-panel" aria-labelledby="care-impact-title">
     <header>
       <h2 id="care-impact-title">Conversation activity</h2>

@@ -1,6 +1,6 @@
 .care-community { color: #493b31; min-width: 0; }
 .care-community-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
-.care-community-heading h1 { margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(28px, 3vw, 38px); font-weight: 500; letter-spacing: -.025em; line-height: 1.15; }
+.care-community-heading h1 { margin: 0; font-family: var(--care-font-display); font-size: clamp(28px, 3vw, 38px); font-weight: 500; letter-spacing: -.025em; line-height: 1.15; }
 .care-community-choices { min-width: 0; border: 0; margin: 0; padding: 0; }
 .care-community-choices legend, .care-community-filter label { padding: 0; margin-bottom: 8px; font-size: 14px; font-weight: 650; }
 .care-community-choices > div { display: flex; gap: 8px; }
@@ -28,7 +28,7 @@
 .care-community-card-top p { display: flex; align-items: center; justify-content: flex-end; gap: 6px; margin: 0; max-width: 170px; font-size: 14px; line-height: 1.5; text-align: right; color: var(--community-ink); }
 .care-community-card-top p > span { display: flex; flex-shrink: 0; }
 .care-community-card-top p svg { width: 15px; height: 15px; }
-.care-community-card h2 { margin: 0; max-width: 28ch; font: 500 24px/1.25 Georgia, 'Times New Roman', serif; letter-spacing: -.02em; overflow-wrap: anywhere; }
+.care-community-card h2 { margin: 0; max-width: 28ch; font: 500 24px/1.25 var(--care-font-display); letter-spacing: -.02em; overflow-wrap: normal; }
 .care-community-audience { margin: 8px 0 16px; max-width: 42ch; font-size: 14px; line-height: 1.5; color: #675548; }
 .care-community-card > a { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; margin-top: auto; padding: 11px 14px; border: 1px solid #ffffff9c; border-radius: 13px; background: #fffdf8b8; color: var(--community-ink); font-size: 14px; font-weight: 650; text-decoration: none; transition: background 120ms, transform 120ms; }
 .care-community-card > a:hover { background: #fffdf8; }

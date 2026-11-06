@@ -18,7 +18,7 @@
 .goc-choice .ep-option { flex: 1 1 140px; align-items: center; }
 .goc-note > summary { min-height: 44px; display: flex; align-items: center; font-weight: 700; cursor: pointer; }
 .goc-note p { white-space: pre-wrap; margin: 8px 0 0; max-height: 240px; overflow: auto; }
-.goc-declare { margin: 0; padding: 12px 16px; border-inline-start: 3px solid var(--ep-primary, #b9472c); background: #fdf6f0; font-weight: 650; font-family: Georgia, 'Noto Serif', 'Noto Serif Devanagari', serif; }
+.goc-declare { margin: 0; padding: 12px 16px; border-inline-start: 3px solid var(--ep-primary, #b9472c); background: #fdf6f0; font-weight: 650; font-family: var(--care-font-display); }
 
 /* The pad: a signature box with a line to sign on, like the paper form */
 .goc-pad { display: grid; gap: 8px; }

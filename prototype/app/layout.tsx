@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Sora } from 'next/font/google';
+import { Anek_Devanagari, Noto_Sans } from 'next/font/google';
 import './globals.css';
 import './auth.css';
 import './landing.css';
@@ -36,18 +36,18 @@ import './family-cost-help.css';
 import './doctor-care-home.css';
 import './care-colors.css';
 import './doctor-notes.css';
+import './sahara-theme.css';
 
-const inter = Inter({
-  variable: '--font-inter',
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+// Noto Sans for reading and Anek for headings and commands (both OFL), each with Latin and Devanagari.
+const noto = Noto_Sans({
+  variable: '--font-noto',
+  subsets: ['latin', 'devanagari'],
   display: 'swap',
 });
 
-const sora = Sora({
-  variable: '--font-sora',
-  subsets: ['latin'],
-  weight: ['600', '700', '800'],
+const anek = Anek_Devanagari({
+  variable: '--font-anek',
+  subsets: ['latin', 'devanagari'],
   display: 'swap',
 });
 
@@ -68,7 +68,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${sora.variable}`}>
+    <html lang="en" className={`${noto.variable} ${anek.variable}`}>
       <body className="antialiased">
         {children}
       </body>

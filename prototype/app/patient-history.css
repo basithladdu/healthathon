@@ -66,7 +66,7 @@
   font-size: 14px;
   font-weight: 600;
   color: var(--bp-ink, #0a2118);
-  overflow-wrap: break-word;
+  overflow-wrap: normal;
 }
 
 .ph-filters {
@@ -218,7 +218,7 @@
   font-weight: 600;
   color: var(--bp-ink, #0a2118);
   min-width: 0;
-  overflow-wrap: break-word;
+  overflow-wrap: normal;
 }
 
 .ph-row-detail {
@@ -226,7 +226,7 @@
   font-size: 14px;
   color: var(--bp-muted, #4d6259);
   min-width: 0;
-  overflow-wrap: break-word;
+  overflow-wrap: normal;
 }
 
 .ph-row-actor {

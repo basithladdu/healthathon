@@ -1,0 +1,532 @@
+/* Sahara theme layer. Loaded after the global sheets; every rule is scoped under :root so it also
+   wins over the sheets that components import later.
+   AI-FIR's interaction grammar (header band, bento tiles, tabs, compact registers, status pills,
+   one solid primary per screen) in Sahara's own vivid rust/cream family.
+   Every section keeps its own saturated accent; buttons are solid or strongly outlined. */
+
+:root {
+  /* Palette: the same values as SaharaColors / SaharaTone in the Android app (SaharaPalette.kt).
+     Flat fills only; colour comes from one accent per section, never from gradients. */
+  --sh-band: #4a1f14;       /* SaharaColors.Band */
+  --sh-band-raised: #63291b;
+  --sh-on-band-sub: #f3d9cf;
+  --sh-line: #e6d8cc;
+  --sh-line-strong: #8d7b70; /* control edges, 3:1 on paper */
+  --sh-edge: #9c887b;
+  --sh-well: #efe7df;
+  --sh-rust: #b9472c;       /* primary actions, links, selected state */
+  --sh-rust-600: #9e3b23;   /* RustText: rust text on tints, hover */
+  --sh-rust-50: #ffe2d2;    /* PrimaryWash */
+  --sh-ink: #382e29;
+  --sh-ink-sub: #4a3e36;
+  --sh-cream: #fff8ee;
+  --sh-paper: #fffdf9;
+
+  /* Section accents (white text passes AA on every main tone) */
+  --sh-teal: #0f6e6a;     --sh-teal-50: #d3eeec;     /* Today, my space */
+  --sh-indigo: #3f51a3;   --sh-indigo-50: #e0e4f7;   /* Doctor, visits */
+  --sh-plum: #8a3b78;     --sh-plum-50: #f4ddee;     /* Medicines */
+  --sh-leaf: #386d29;     --sh-leaf-50: #ddefd5;     /* Family, care team, support */
+  --sh-marigold: #8f5a00; --sh-marigold-50: #fcebc7; /* Care plan, documents */
+
+  /* Status: one meaning per colour, always with a word */
+  --sh-ok: #2f6b46;   --sh-ok-50: #dbeadf;
+  --sh-warn: #8a5a1b; --sh-warn-50: #fbe8c8;
+  --sh-bad: #b3261e;  --sh-bad-50: #f9dedc;
+
+  /* Radii, depth, motion (AI-FIR scale) */
+  --sh-r-sm: 12px; --sh-r-md: 14px; --sh-r-lg: 16px; --sh-r-hero: 22px; --sh-r-pill: 999px;
+  --sh-shadow: 0 0 0 1px rgba(56, 46, 41, .07), 0 1px 2px rgba(56, 46, 41, .08);
+  --sh-shadow-up: 0 16px 40px rgba(56, 46, 41, .18);
+  --sh-press: 0 2px 0 #7a2b17;
+  --sh-ease: cubic-bezier(.22, 1, .36, 1);
+  --sh-fast: 160ms;
+  --sh-enter: 260ms;
+
+  /* Fonts: Noto Sans for reading, Anek for headings and commands. Old names point at them. */
+  --font-inter: var(--font-noto), 'Noto Sans', sans-serif;
+  --font-sora: var(--font-anek), var(--font-noto), sans-serif;
+  --font-ui: var(--font-noto), 'Noto Sans', 'Segoe UI', sans-serif;
+  --sh-display: var(--font-anek), var(--font-noto), 'Noto Sans', sans-serif;
+}
+
+/* Whole words only, everywhere: no word is ever split across lines. */
+html, body { overflow-wrap: normal; word-break: normal; hyphens: manual; }
+body { background: var(--care-canvas); }
+@view-transition { navigation: auto; }
+
+/* ===================================================================== shell */
+:root .simple-care-app { background: var(--care-canvas); color: var(--care-ink); font-family: var(--font-ui); }
+
+/* One solid band: brand, language, sign out. */
+:root .simple-care-app .simple-care-header {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  min-height: 64px;
+  margin: 0;
+  padding: 6px max(16px, calc((100% - 1180px) / 2 + 32px)) 9px;
+  border: 0;
+  background: var(--sh-band);
+  color: #fff;
+  box-shadow: 0 4px 18px rgba(56, 46, 41, .24);
+}
+:root .simple-care-app .simple-care-brand { color: #fff; font-family: var(--sh-display); letter-spacing: 0; }
+:root .simple-care-app .simple-care-brand-logo { padding: 3px; border-radius: 10px; background: #fff; box-shadow: 0 3px 10px rgba(0, 0, 0, .2); }
+:root .simple-care-app .simple-care-brand-name { font: 800 24px/1 var(--sh-display); letter-spacing: 0; color: #fff; }
+:root .simple-care-app .simple-care-brand-tagline { color: var(--sh-on-band-sub); font: 600 12px/1.25 var(--font-ui); }
+:root .simple-care-app .simple-care-switches > button,
+:root .simple-care-app .simple-care-role-trigger,
+/* The header select sits on the dark band; :not(#sh-none) outranks the generic field rule in care-colors.css. */
+:root .simple-care-app .simple-care-header .care-language-select > select:not(#sh-none),
+:root .care-sign-in .care-sign-in-header .care-language-select > select:not(#sh-none) {
+  min-height: 44px;
+  border: 1px solid rgba(255, 255, 255, .34);
+  border-radius: var(--sh-r-sm);
+  background: var(--sh-band-raised);
+  color: #fff;
+  font: 700 15px/1.2 var(--sh-display);
+}
+:root .simple-care-app .simple-care-header .care-language-select,
+:root .care-sign-in .care-sign-in-header .care-language-select { color: #fff; }
+:root .simple-care-app .simple-care-header .care-language-select > select option,
+:root .care-sign-in .care-sign-in-header .care-language-select > select option { color: var(--care-ink); background: #fff; }
+:root .simple-care-app .simple-care-switches > button:hover,
+:root .simple-care-app .simple-care-header .care-language-select > select:not(#sh-none):hover,
+:root .care-sign-in .care-sign-in-header .care-language-select > select:not(#sh-none):hover { background: #7a3424; border-color: rgba(255, 255, 255, .6); }
+:root .simple-care-app .simple-care-header :is(a, button, select):focus-visible,
+:root .care-sign-in .care-sign-in-header :is(a, button, select):focus-visible { outline: 3px solid #f5c060; outline-offset: 2px; }
+
+/* Navigation: AI-FIR tab strip on wide screens. Each destination keeps its own colour. */
+:root .simple-care-app .simple-care-nav { --a: var(--sh-rust); }
+:root .simple-care-app .simple-care-nav > :nth-child(1) { --a: var(--sh-rust); }
+:root .simple-care-app .simple-care-nav > :nth-child(2) { --a: var(--sh-marigold); }
+:root .simple-care-app .simple-care-nav > :nth-child(3) { --a: var(--sh-leaf); }
+:root .simple-care-app .simple-care-nav > :nth-child(4) { --a: var(--sh-teal); }
+:root .simple-care-app .simple-care-nav > :nth-child(5) { --a: var(--sh-indigo); }
+:root .simple-care-app .simple-care-nav > :nth-child(6) { --a: var(--sh-plum); }
+@media (min-width: 701px) {
+  :root .simple-care-app .simple-care-nav {
+    width: min(1116px, calc(100% - 64px));
+    margin: 16px auto 0;
+    padding: 6px;
+    gap: 4px;
+    border: 0;
+    border-radius: var(--sh-r-md);
+    background: #fff;
+    box-shadow: var(--sh-shadow);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  :root .simple-care-app .simple-care-nav :is(a, button) {
+    min-height: 44px;
+    padding: 0 16px;
+    border-radius: 10px;
+    color: var(--care-ink);
+    font: 650 16px/1.2 var(--sh-display);
+    white-space: nowrap;
+  }
+  :root .simple-care-app .simple-care-nav :is(a, button) .simple-care-nav-icon { width: 20px; height: 20px; color: var(--a); }
+  :root .simple-care-app .simple-care-nav :is(a, button)[aria-current='page'] { background: var(--a); color: #fff; box-shadow: none; font-weight: 750; }
+  :root .simple-care-app .simple-care-nav :is(a, button)[aria-current='page'] .simple-care-nav-icon { color: #fff; }
+}
+@media (hover: hover) and (min-width: 701px) {
+  :root .simple-care-app .simple-care-nav :is(a, button):hover:not([aria-current='page']) { background: var(--care-surface-2); color: var(--care-ink); }
+}
+
+/* ===================================================================== type */
+:root .simple-care-app .simple-care-content :is(h1, h2, h3),
+:root .care-sign-in :is(h1, h2) { font-family: var(--sh-display); letter-spacing: 0; text-wrap: balance; }
+:root .simple-care-app .simple-care-content h1 { font-size: clamp(26px, 2.4vw, 32px); font-weight: 800; line-height: 1.2; }
+:root .simple-care-app .simple-care-content :where(h2) { font-size: 20px; font-weight: 750; line-height: 1.3; }
+:root .simple-care-app .simple-care-content :where(h3) { font-size: 17px; font-weight: 700; }
+
+/* ===================================================================== buttons */
+/* Primary: one solid rust command with a pressed edge. */
+:root .simple-care-app .simple-care-content .primary-button,
+:root .simple-care-app .primary-button,
+:root .care-home-note-open,
+:root .care-sign-in .care-sign-in-submit {
+  border: 0;
+  border-radius: var(--sh-r-md);
+  background: var(--sh-rust);
+  color: #fff;
+  font-family: var(--sh-display);
+  font-weight: 750;
+  box-shadow: var(--sh-press);
+  transition: transform var(--sh-fast) var(--sh-ease), box-shadow var(--sh-fast) ease, filter var(--sh-fast) ease;
+}
+:root .simple-care-app .simple-care-content .primary-button:hover:not(:disabled),
+:root .care-home-note-open:hover,
+:root .care-sign-in .care-sign-in-submit:hover:not(:disabled) { background: var(--sh-rust); filter: brightness(1.08); }
+:root .simple-care-app .primary-button:active:not(:disabled),
+:root .care-home-note-open:active,
+:root .care-sign-in .care-sign-in-submit:active:not(:disabled) { transform: translateY(2px); box-shadow: none; }
+/* Secondary: white with a strong rust outline. */
+:root .simple-care-app .simple-care-content .secondary-button,
+:root .simple-care-app .secondary-button {
+  border: 1.5px solid var(--sh-rust);
+  border-radius: var(--sh-r-md);
+  background: #fff;
+  color: var(--sh-rust-600);
+  font-family: var(--sh-display);
+  font-weight: 750;
+  box-shadow: 0 2px 0 rgba(143, 42, 19, .18);
+}
+:root .simple-care-app .simple-care-content .secondary-button:hover:not(:disabled) { background: var(--sh-rust-50); border-color: var(--sh-rust-600); color: var(--sh-rust-600); }
+:root .simple-care-app .secondary-button:active:not(:disabled) { transform: translateY(1px); box-shadow: none; }
+/* Disabled: readable, clearly inactive. */
+:root .simple-care-app .simple-care-content :is(.primary-button, .secondary-button):disabled,
+:root .simple-care-app button:disabled,
+:root .care-sign-in .care-sign-in-submit:disabled {
+  border-color: #cbbcad;
+  background: #efe7df;
+  color: #4a3e36;
+  box-shadow: none;
+  filter: none;
+  opacity: 1;
+  cursor: not-allowed;
+}
+:root .simple-care-app :where(.care-text-button, .text-button) { color: var(--sh-rust-600); font-weight: 700; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+:root .simple-care-app :where(.danger-button, .destructive-button) { background: var(--sh-bad); border-color: var(--sh-bad); color: #fff; }
+
+/* Focus: one marigold ring everywhere. */
+:root .simple-care-app :is(button, input, select, textarea, summary, a):focus-visible,
+:root .care-sign-in :is(button, input, select, summary, a):focus-visible { outline: 3px solid var(--care-focus); outline-offset: 2px; }
+
+/* Inputs: 48px, strong border, royal-style focus halo in rust. */
+:root .simple-care-app .simple-care-content :is(input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']), select, textarea) {
+  border: 1.5px solid var(--sh-line-strong);
+  border-radius: var(--sh-r-md);
+  background-color: #fff;
+  transition: border-color var(--sh-fast) ease, box-shadow var(--sh-fast) ease;
+}
+:root .simple-care-app .simple-care-content :is(input:not([type='checkbox']):not([type='radio']), select, textarea):hover:not(:disabled):not(:focus) { border-color: var(--care-line-strong); }
+:root .simple-care-app .simple-care-content :is(input:not([type='checkbox']):not([type='radio']), select, textarea):focus { border-color: var(--sh-rust); box-shadow: 0 0 0 4px rgba(185, 71, 44, .16); }
+:root .simple-care-app .simple-care-content :is(input, textarea)::placeholder { color: #7a6455; }
+:root .simple-care-app label { color: var(--care-ink); font-weight: 600; }
+
+/* ===================================================================== status pills */
+:root .simple-care-app :where(.care-chip, .care-home-note-status, .family-care-home-eyebrow) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+  padding: 2px 10px;
+  border: 0;
+  border-radius: 6px;
+  font: 700 13px/1.2 var(--font-ui);
+}
+:root .simple-care-app :where(.care-chip, .care-home-note-status)::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+:root .simple-care-app :where(.care-chip) { background: #f0e6dc; color: #4a3328; }
+:root .simple-care-app :where(.care-chip.is-good) { background: var(--sh-ok-50); color: var(--sh-ok); }
+:root .simple-care-app :where(.care-chip.is-warn) { background: var(--sh-warn-50); color: var(--sh-warn); }
+:root .simple-care-app :where(.care-chip.is-alert) { background: var(--sh-bad-50); color: var(--sh-bad); }
+:root .simple-care-app :where(.care-chip.is-info) { background: var(--sh-indigo-50); color: var(--sh-indigo); }
+
+/* ===================================================================== surfaces */
+:root .simple-care-app :where(.care-card, .care-home-section) { border: 0; border-radius: var(--sh-r-lg); background: #fff; box-shadow: var(--sh-shadow); }
+:root .simple-care-app :where(.care-empty) { border: 0; border-radius: var(--sh-r-lg); background: #fff; box-shadow: var(--sh-shadow); color: var(--care-muted); }
+:root .simple-care-app :where(.care-empty) > :where(svg) { box-sizing: border-box; width: 64px; height: 64px; padding: 16px; border-radius: 18px; background: var(--sh-rust); color: #fff; }
+:root .simple-care-app :where(.care-inline-error, [role='alert'].care-error) { border: 1px solid #f7a8b8; border-radius: var(--sh-r-sm); background: var(--sh-bad-50); color: #8f1229; }
+:root .care-save-error { border-color: #f7a8b8; background: var(--sh-bad-50); color: #8f1229; }
+
+/* Dialogs: AI-FIR modal with a rust top edge. */
+:root .simple-care-app dialog,
+:root dialog.care-notice-dialog {
+  border: 0;
+  border-top: 5px solid var(--sh-rust);
+  border-radius: var(--sh-r-lg);
+  background: #fff;
+  color: var(--care-ink);
+  box-shadow: 0 24px 60px rgba(56, 30, 20, .3);
+}
+:root .simple-care-app dialog::backdrop,
+:root dialog.care-notice-dialog::backdrop { background: rgba(56, 30, 20, .5); }
+:root .simple-care-app dialog[open],
+:root dialog.care-notice-dialog[open] { animation: sh-dialog-in var(--sh-enter) var(--sh-ease) both; }
+
+:root .care-notice-dialog { width: min(420px, calc(100vw - 32px)); margin: auto; padding: 20px; font-family: var(--font-ui); }
+:root .care-notice-dialog form { display: grid; gap: 16px; margin: 0; }
+:root .care-notice-dialog p { display: flex; align-items: flex-start; gap: 12px; margin: 0; font: 650 17px/1.45 var(--sh-display); }
+:root .care-notice-dialog p > svg { flex: none; width: 36px; height: 36px; padding: 8px; border-radius: 12px; background: var(--sh-ok-50); color: var(--sh-ok); }
+:root .care-notice-dialog button { justify-self: end; min-width: 96px; min-height: 48px; padding: 0 20px; border: 0; border-radius: var(--sh-r-md); background: var(--sh-rust); color: #fff; font: 750 16px/1 var(--sh-display); box-shadow: var(--sh-press); cursor: pointer; }
+:root .care-notice-dialog button:focus-visible { outline: 3px solid var(--care-focus); outline-offset: 2px; }
+:root .care-notice-dialog p > svg path { stroke-dasharray: 24; stroke-dashoffset: 0; animation: sh-tick 420ms 120ms var(--sh-ease) backwards; }
+
+/* ===================================================================== sign-in */
+:root .care-sign-in { background: var(--care-canvas); font-family: var(--font-ui); }
+:root .care-sign-in .care-sign-in-header { position: relative; min-height: 64px; margin-top: -22px; padding-block: 6px 9px; box-shadow: 0 0 0 100vmax var(--sh-band); clip-path: inset(0 -100vmax); background: var(--sh-band); color: #fff; }
+@media (max-width: 760px) { :root .care-sign-in .care-sign-in-header { margin-top: -12px; } }
+:root .care-sign-in .care-sign-in-brand,
+:root .care-sign-in .care-sign-in-brand strong { color: #fff; font-family: var(--sh-display); letter-spacing: 0; }
+:root .care-sign-in .care-sign-in-brand strong { font-weight: 800; }
+:root .care-sign-in .care-sign-in-brand small { color: var(--sh-on-band-sub); }
+:root .care-sign-in .care-sign-in-logo { padding: 3px; border-radius: 10px; background: #fff; }
+:root .care-sign-in .care-sign-in-card { border: 0; border-radius: var(--sh-r-hero); background: #fff; box-shadow: var(--sh-shadow-up); animation: sh-rise var(--sh-enter) var(--sh-ease) both; }
+:root .care-sign-in .care-sign-in-art { background: var(--sh-marigold-50); }
+:root .care-sign-in h1 { color: var(--care-ink); font-weight: 800; }
+:root .care-sign-in .care-sign-in-roles legend,
+:root .care-sign-in .care-sign-in-label { color: var(--care-ink); font-weight: 700; }
+:root .care-sign-in .care-sign-in-role { --a: var(--sh-teal); --a50: var(--sh-teal-50); border: 2px solid transparent; border-radius: var(--sh-r-lg); background: var(--a50); color: var(--care-ink); font-family: var(--sh-display); font-weight: 750; transition: transform var(--sh-fast) var(--sh-ease), border-color var(--sh-fast) ease, background-color var(--sh-fast) ease; }
+:root .care-sign-in .care-sign-in-role-family { --a: var(--sh-leaf); --a50: var(--sh-leaf-50); }
+:root .care-sign-in .care-sign-in-role-doctor { --a: var(--sh-indigo); --a50: var(--sh-indigo-50); }
+:root .care-sign-in .care-sign-in-role[aria-pressed='true'] { border-color: var(--a); background: var(--a); color: #fff; box-shadow: 0 2px 0 rgba(0, 0, 0, .25); }
+:root .care-sign-in .care-sign-in-role[aria-pressed='true'] svg { filter: drop-shadow(0 2px 0 rgba(255, 255, 255, .6)); }
+:root .care-sign-in .care-sign-in-role:active { transform: scale(.97); }
+:root .care-sign-in input { border: 1.5px solid var(--sh-line-strong); border-radius: var(--sh-r-md); background: #fff; color: var(--care-ink); }
+:root .care-sign-in input:focus { border-color: var(--sh-rust); box-shadow: 0 0 0 4px rgba(185, 71, 44, .16); }
+:root .care-sign-in .care-sign-in-submit { min-height: 52px; font-size: 17px; }
+
+/* A heading that receives focus after navigation shows no ring; real controls keep theirs. */
+:root .simple-care-app :is(h1, h2)[tabindex='-1']:focus { outline: none; }
+
+/* ===================================================================== home */
+:root .care-home-top { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "copy profile" "sos sos"; align-items: start; gap: 12px 16px; margin-bottom: 16px; }
+:root .care-home-top > .care-today-greeting { display: contents; }
+:root .care-home-top .care-today-greeting-copy { grid-area: copy; min-width: 0; }
+:root .care-home-top .care-today-sos-bar { grid-area: sos; }
+:root .care-home-top > .family-care-home-heading { grid-area: profile; margin: 0; }
+@media (min-width: 760px) {
+  :root .care-home-top { grid-template-columns: minmax(0, 1fr) minmax(280px, 360px) auto; grid-template-areas: "copy sos profile"; align-items: center; }
+}
+:root .simple-care-app .care-today-hello { font-family: var(--sh-display); font-weight: 800; letter-spacing: 0; color: var(--care-ink); }
+:root .simple-care-app .care-today-date { color: var(--care-muted); }
+:root .simple-care-app .care-today-sos { border-radius: var(--sh-r-md); background: var(--sh-bad); color: #fff; font-family: var(--sh-display); font-weight: 800; box-shadow: 0 2px 0 #7d1a14; }
+:root .simple-care-app .care-today-qr,
+:root .care-home-profile { border: 1.5px solid var(--sh-rust); border-radius: var(--sh-r-md); background: #fff; color: var(--sh-rust-600); font-family: var(--sh-display); font-weight: 750; box-shadow: 0 2px 0 rgba(143, 42, 19, .18); }
+:root .family-care-home-eyebrow { background: var(--sh-plum-50); color: var(--sh-plum); }
+:root .family-care-home-tip { border-radius: var(--sh-r-sm); background: var(--sh-marigold-50); color: #5a2d06; }
+:root .family-care-home-tip > span:first-child { color: var(--sh-rust); }
+
+/* Care Note: a compact hero band, slim when there is nothing signed yet. */
+:root .care-home-note-feature { border: 0; border-radius: var(--sh-r-hero); background: var(--sh-teal); color: #fff; box-shadow: none; }
+:root .care-home-note-feature :is(h2, p) { color: #fff; }
+:root .care-home-note-copy p { color: #fff; }
+:root .care-home-note-feature .care-home-note-status { background: rgba(255, 255, 255, .18); color: #fff; }
+:root .care-home-note-feature .care-home-note-open { background: #fff; color: var(--sh-teal); box-shadow: 0 2px 0 rgba(0, 0, 0, .18); }
+:root .care-home-note-feature .care-home-note-open:hover { background: #fff; filter: none; }
+:root .care-home-note-qr figcaption { color: #fff; }
+:root .care-home-note-qr img { border: 3px solid #fff; }
+:root .care-home-note-qr-pending { border-color: rgba(255, 255, 255, .6); color: #fff; }
+:root .care-home-note-feature.is-empty { padding: 12px 16px; background: #fff; color: var(--care-ink); box-shadow: var(--sh-shadow); border-inline-start: 5px solid var(--sh-warn); border-radius: var(--sh-r-lg); }
+:root .care-home-note-feature.is-empty .care-home-note-empty { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+:root .care-home-note-feature.is-empty .care-home-note-empty h2 { flex: 1 1 220px; margin: 0; color: var(--care-ink); font: 750 18px/1.3 var(--sh-display); }
+:root .care-home-note-feature.is-empty .care-home-note-status { background: var(--sh-warn-50); color: var(--sh-warn); }
+:root .care-home-note-feature.is-empty .care-home-note-open { margin: 0; border: 1.5px solid var(--sh-rust); background: #fff; color: var(--sh-rust-600); box-shadow: 0 2px 0 rgba(143, 42, 19, .18); }
+:root .care-home-note-feature.is-empty .care-home-note-open svg { color: var(--sh-rust); }
+
+/* Launchpad tiles: a solid fill per section, white title, 5px darker bottom edge (AI-FIR tile grammar). */
+:root .care-home-category,
+:root .care-section-links > a,
+:root .care-home-quick-card { --a: var(--sh-rust); --edge: #7a2b17; }
+:root .care-home-category-nav > :nth-child(1) { --a: var(--sh-marigold); --edge: #5c3a00; }
+:root .care-home-category-nav > :nth-child(2) { --a: var(--sh-leaf); --edge: #22441a; }
+:root .care-home-category-nav > :nth-child(3) { --a: var(--sh-teal); --edge: #094543; }
+:root .care-home-category-nav > :nth-child(4) { --a: var(--sh-indigo); --edge: #283469; }
+:root .care-home-category,
+:root .care-home-category.tone-lavender,
+:root .care-home-category.tone-mint,
+:root .care-home-category.tone-peach:nth-child(4) {
+  min-height: 92px;
+  border: 0;
+  border-bottom: 5px solid var(--edge);
+  border-radius: var(--sh-r-lg);
+  background: var(--a);
+  color: #fff;
+  box-shadow: none;
+}
+:root .care-home-category > strong { color: #fff; font: 750 19px/1.25 var(--sh-display); }
+:root .care-home-category > svg:first-child { box-sizing: border-box; padding: 4px; border-radius: 12px; background: var(--sh-paper); }
+:root .care-home-category > svg:last-child { color: #fff; }
+
+/* Quick access and section links: compact register rows, each with its own colour chip. */
+:root .care-home-quick-section { border-top: 0; }
+:root .care-home-quick-section h2 { color: var(--care-ink); font: 750 18px/1.3 var(--sh-display); }
+:root .care-home-quick-grid > :nth-child(1),
+:root .care-section-links > :nth-child(5n + 1) { --a: var(--sh-indigo); }
+:root .care-home-quick-grid > :nth-child(2),
+:root .care-section-links > :nth-child(5n + 2) { --a: var(--sh-leaf); }
+:root .care-home-quick-grid > :nth-child(3),
+:root .care-section-links > :nth-child(5n + 3) { --a: var(--sh-teal); }
+:root .care-home-quick-grid > :nth-child(4),
+:root .care-section-links > :nth-child(5n + 4) { --a: var(--sh-plum); }
+:root .care-section-links > :nth-child(5n + 5) { --a: var(--sh-marigold); }
+:root .care-home-quick-card,
+:root .care-section-links > a {
+  min-height: 72px;
+  border: 0;
+  border-inline-start: 5px solid var(--a);
+  border-radius: var(--sh-r-lg);
+  background: #fff;
+  color: var(--care-ink);
+  box-shadow: var(--sh-shadow);
+}
+:root .care-home-quick-card > strong,
+:root .care-section-links strong { color: var(--care-ink); font: 700 17px/1.3 var(--sh-display); }
+:root .care-home-quick-card > svg:last-of-type,
+:root .care-section-links > a > svg:last-child { color: var(--a); opacity: 1; }
+:root .care-section-links > a > svg:first-child,
+:root .care-home-quick-card > svg:first-child { box-sizing: border-box; padding: 3px; border-radius: 12px; background: color-mix(in srgb, var(--a) 12%, #fff); }
+
+/* Section page heading: one solid band in the section's colour. */
+:root .care-section-page { --b: var(--sh-marigold); }
+:root .care-section-page.tone-lavender { --b: var(--sh-leaf); }
+:root .care-section-page.tone-mint { --b: var(--sh-teal); }
+:root .care-section-page > header { padding: 12px 16px; border-radius: var(--sh-r-lg); background: var(--b); color: #fff; }
+:root .simple-care-app .care-section-page > header h1 { color: #fff; font-family: var(--sh-display); font-weight: 750; }
+:root .care-section-page > header > svg { padding: 4px; border-radius: 12px; background: var(--sh-paper); }
+:root .simple-care-app .care-section-page > header .care-section-upload { background: var(--sh-paper); color: var(--sh-rust-600); box-shadow: 0 2px 0 rgba(0, 0, 0, .25); }
+
+/* Next medicines */
+:root .simple-care-app .care-today-all-tasks { color: var(--sh-rust-600); font-weight: 750; }
+:root .simple-care-app .care-today-count { background: #f5c060; color: #2a1208; font-weight: 800; }
+:root .simple-care-app .care-today-empty { border: 0; border-radius: var(--sh-r-lg); background: #fff; box-shadow: var(--sh-shadow); color: var(--care-muted); }
+
+/* ===================================================================== doctor */
+:root .doctor-overview-cards > :is(button, div) { --a: var(--sh-leaf); --edge: #22441a; border: 0; border-bottom: 5px solid var(--edge); border-radius: var(--sh-r-lg); background: var(--a); color: #fff; }
+:root .doctor-overview-cards > :nth-child(2) { --a: var(--sh-marigold); --edge: #5c3a00; background: var(--a); color: #fff; }
+:root .doctor-overview-cards > :nth-child(3) { --a: var(--sh-indigo); --edge: #283469; background: var(--a); color: #fff; }
+:root .doctor-overview-cards > :nth-child(4) { --a: var(--sh-teal); --edge: #094543; background: var(--a); color: #fff; }
+:root .doctor-overview-cards strong { font: 800 34px/1.1 var(--sh-display); font-variant-numeric: tabular-nums; color: #fff; }
+:root .doctor-overview-cards span { color: #fff; font-weight: 650; }
+:root .doctor-overview-cards svg { color: #fff; }
+:root .doctor-home-panel { border: 0; border-radius: var(--sh-r-lg); background: #fff; box-shadow: var(--sh-shadow); }
+:root .doctor-conversation-queue { background: #fff; border-inline-start: 5px solid var(--sh-plum); }
+:root .doctor-schedule-toggle { background: var(--care-surface-2); }
+:root .doctor-schedule-toggle button { color: var(--care-ink); }
+:root .doctor-schedule-toggle button[aria-pressed=true] { background: var(--sh-rust); color: #fff; }
+:root .doctor-patient-initial { background: var(--sh-indigo-50); color: var(--sh-indigo); font-weight: 800; }
+:root .doctor-care-heading span,
+:root .doctor-patient-queue span,
+:root .doctor-visit-list span,
+:root .doctor-patient-queue small,
+:root .doctor-visit-list small,
+:root .doctor-conversation-person span,
+:root .doctor-conversation-person small,
+:root .doctor-conversation-status > span,
+:root .doctor-conversation-empty { color: var(--care-muted); }
+:root .doctor-conversation-status button { border: 1.5px solid var(--sh-rust); color: var(--sh-rust-600); background: #fff; font-weight: 700; }
+:root .doctor-visit-date { background: var(--sh-indigo-50); color: var(--sh-indigo); }
+
+/* ===================================================================== motion */
+@keyframes sh-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes sh-pop { from { opacity: 0; transform: translateY(8px) scale(.97); } to { opacity: 1; transform: none; } }
+@keyframes sh-dialog-in { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes sh-tick { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
+
+/* Page enter, then a short capped stagger for tiles and rows (30 ms steps, at most 8). */
+:root .simple-care-app .simple-care-content { animation: sh-rise var(--sh-enter) var(--sh-ease) both; }
+:root .care-home-category-nav > *,
+:root .care-home-quick-grid > *,
+:root .care-section-links > *,
+:root .doctor-overview-cards > * { animation: sh-pop var(--sh-enter) var(--sh-ease) both; }
+:root :is(.care-home-category-nav, .care-home-quick-grid, .care-section-links, .doctor-overview-cards) > :nth-child(2) { animation-delay: 30ms; }
+:root :is(.care-home-category-nav, .care-home-quick-grid, .care-section-links, .doctor-overview-cards) > :nth-child(3) { animation-delay: 60ms; }
+:root :is(.care-home-category-nav, .care-home-quick-grid, .care-section-links, .doctor-overview-cards) > :nth-child(4) { animation-delay: 90ms; }
+:root :is(.care-home-category-nav, .care-home-quick-grid, .care-section-links, .doctor-overview-cards) > :nth-child(5) { animation-delay: 120ms; }
+:root :is(.care-home-category-nav, .care-home-quick-grid, .care-section-links, .doctor-overview-cards) > :nth-child(6) { animation-delay: 150ms; }
+:root :is(.care-home-category-nav, .care-home-quick-grid, .care-section-links, .doctor-overview-cards) > :nth-child(n + 7) { animation-delay: 180ms; }
+
+/* Press feedback on tiles and rows. */
+:root .care-home-category,
+:root .care-section-links > a,
+:root .care-home-quick-card,
+:root .doctor-overview-cards > button {
+  transition: transform var(--sh-fast) var(--sh-ease), box-shadow var(--sh-fast) ease;
+}
+:root .care-home-category:active,
+:root .care-section-links > a:active,
+:root .care-home-quick-card:active,
+:root .doctor-overview-cards > button:active { transform: scale(.98); }
+@media (hover: hover) {
+  :root .care-home-category:hover,
+:root .doctor-overview-cards > button:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(56, 46, 41, .18); }
+  :root .care-section-links > a:hover,
+:root .care-home-quick-card:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(56, 46, 41, .12); }
+}
+
+/* No endless background motion: the old floating tile icons stop after their entrance. */
+:root .simple-care-app .family-tool-buttons [data-tool] .family-tool-icon { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+  :root .simple-care-app .simple-care-content,
+:root .care-sign-in .care-sign-in-card,
+:root .care-home-category-nav > *,
+:root .care-home-quick-grid > *,
+:root .care-section-links > *,
+:root .doctor-overview-cards > *,
+:root .simple-care-app dialog[open],
+:root dialog.care-notice-dialog[open],
+:root .care-notice-dialog p > svg path { animation: none; }
+  :root .care-home-category,
+:root .care-section-links > a,
+:root .care-home-quick-card,
+:root .doctor-overview-cards > button,
+:root .simple-care-app .primary-button,
+:root .care-sign-in .care-sign-in-submit,
+:root .care-sign-in .care-sign-in-role { transition: none; }
+  :root .care-home-category:hover,
+:root .care-section-links > a:hover,
+:root .care-home-quick-card:hover,
+:root .doctor-overview-cards > button:hover,
+:root .care-home-category:active,
+:root .care-section-links > a:active,
+:root .care-home-quick-card:active,
+:root .doctor-overview-cards > button:active,
+:root .simple-care-app .primary-button:active,
+:root .care-sign-in .care-sign-in-role:active { transform: none; }
+}
+
+/* ===================================================================== phones */
+@media (max-width: 700px) {
+  :root .simple-care-app .simple-care-header { min-height: 60px; padding: 6px 12px 9px; border-bottom: 0; flex-wrap: nowrap; }
+  :root .simple-care-app .simple-care-brand-name { font-size: 22px; }
+  :root .simple-care-app .simple-care-switches > button { padding-inline: 10px; font-size: 14px; }
+  /* Dock: white bar, each destination its own colour; the current one fills. */
+  :root .simple-care-app .simple-care-nav { background: #fff; border-top: 1px solid var(--care-line); box-shadow: 0 -8px 24px rgba(56, 46, 41, .12); }
+  :root .simple-care-app .simple-care-nav :is(a, button) { min-height: 60px; color: var(--care-ink); font: 700 12px/1.1 var(--sh-display); }
+  /* Devanagari vowel signs need room above the line; the short label clips without it. */
+  :root .simple-care-app .simple-care-nav-short-label { line-height: 1.45; }
+  :root .simple-care-app .simple-care-nav :is(a, button) .simple-care-nav-icon { box-sizing: border-box; width: 34px; height: 30px; padding: 4px 6px; border-radius: 10px; color: var(--a); background: color-mix(in srgb, var(--a) 12%, #fff); transition: background-color var(--sh-fast) ease, color var(--sh-fast) ease; }
+  :root .simple-care-app .simple-care-nav :is(a, button)[aria-current='page'] { background: transparent; box-shadow: none; color: var(--a); font-weight: 800; }
+  :root .simple-care-app .simple-care-nav :is(a, button)[aria-current='page'] .simple-care-nav-icon { background: var(--a); color: #fff; }
+  :root .simple-care-app .simple-care-content h1 { font-size: 26px; letter-spacing: 0; }
+  :root .care-home-top { margin-bottom: 12px; }
+  :root .care-home-category { min-height: 96px; }
+  :root .care-home-category > strong { font-size: 17px; }
+  :root .care-section-page > header { padding: 10px 12px; }
+}
+@media (max-width: 700px) and (prefers-reduced-motion: reduce) {
+  :root .simple-care-app .simple-care-nav :is(a, button) .simple-care-nav-icon { transition: none; }
+}
+
+/* ===================================================================== standalone pages */
+/* Shared care records and reviewed hospital updates: the same band, Anek headings, rust actions. */
+:root .shared-care > header,
+:root .directory-review > header {
+  max-width: none;
+  margin: 0 0 20px;
+  padding: 12px max(16px, calc((100% - 1160px) / 2));
+  background: var(--sh-band);
+  box-shadow: 0 0 0 100vmax var(--sh-band);
+  clip-path: inset(0 -100vmax);
+  color: #fff;
+}
+:root :is(.shared-care, .directory-review) > header :is(a, h1) { color: #fff; font-family: var(--sh-display); letter-spacing: 0; }
+:root :is(.shared-care, .directory-review) > header a:focus-visible { outline: 3px solid #f5c060; outline-offset: 2px; }
+:root .directory-review { padding-top: 0; color: var(--sh-ink); }
+:root .directory-review :is(h1, h2) { font-family: var(--sh-display); letter-spacing: 0; }
+:root .directory-review a { color: var(--sh-rust-600); }
+:root .directory-review button { border: 1.5px solid var(--sh-rust); background: #fff; color: var(--sh-rust-600); font-weight: 700; }
+:root .directory-review input, :root .directory-review select, :root .directory-review textarea { border: 1.5px solid var(--sh-line-strong); }
+:root .directory-review :focus-visible { outline-color: var(--care-focus); }
+:root .shared-care button:not(.secondary):not(.quiet) { border: 0; border-radius: var(--sh-r-md); background: var(--sh-rust); box-shadow: var(--sh-press); font-family: var(--sh-display); font-weight: 750; }
+:root .shared-care :is(h1, h2, h3) { font-family: var(--sh-display); letter-spacing: 0; }
+:root .shared-care > :not(header), :root .directory-review > :not(header) { animation: sh-rise var(--sh-enter) var(--sh-ease) both; }
+@media (prefers-reduced-motion: reduce) {
+  :root .shared-care > :not(header), :root .directory-review > :not(header) { animation: none; }
+}
+:root .shared-care > header { margin-top: calc(-1 * clamp(16px, 3vw, 36px)); }
+:root .care-community-choices input:checked + span { border-color: var(--sh-rust); background: var(--sh-rust); color: #fff; }

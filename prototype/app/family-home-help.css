@@ -23,12 +23,12 @@
 .home-help-filters button { padding-inline: 12px; }
 .home-help-card { padding: 16px 0; border-bottom: 1px solid var(--care-line); }
 .home-help-card-heading { display: flex; gap: 10px 16px; align-items: baseline; justify-content: space-between; }
-.home-help-card h3 { margin: 0; font-size: 17px; font-weight: 650; line-height: 1.45; overflow-wrap: anywhere; }
+.home-help-card h3 { margin: 0; font-size: 17px; font-weight: 650; line-height: 1.45; overflow-wrap: normal; }
 .home-help-card-heading > span { font-size: 14px; color: var(--care-muted); flex-shrink: 0; }
 .home-help-category { color: var(--care-muted); font-size: 14px; line-height: 1.5; margin: 6px 0; }
-.home-help-person { margin: 0; font-size: 14px; line-height: 1.65; overflow-wrap: anywhere; }
+.home-help-person { margin: 0; font-size: 14px; line-height: 1.65; overflow-wrap: normal; }
 .home-help-person a { display: inline-flex; align-items: center; min-height: 44px; color: var(--care-primary); text-underline-offset: 3px; }
-.home-help-note { margin: 10px 0 0; font-size: 15px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.home-help-note { margin: 10px 0 0; font-size: 15px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: normal; }
 .home-help-card.is-done h3 { color: var(--care-muted); }
 .home-help-card-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .home-help-card-actions button { padding: 8px 10px; border: 0; border-radius: var(--care-radius-control); background: transparent; color: var(--care-primary); font-size: 14px; }

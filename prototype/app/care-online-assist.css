@@ -17,7 +17,7 @@
 .care-online-audio audio { width: 100%; min-width: 0; }
 .care-online-audio a { display: inline-flex; align-items: center; min-height: 44px; color: var(--care-lavender-ink, #655278); font-size: 14px; }
 .care-online-hint { margin: 8px 0 12px; color: var(--coa-muted); font-size: 14px; line-height: 1.5; }
-.care-online-words { padding: 12px; border-radius: 14px; background: #faf5ee; font-size: 16px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.care-online-words { padding: 12px; border-radius: 14px; background: #faf5ee; font-size: 16px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: normal; }
 .care-online-review { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--coa-line); }
 .care-online-review details summary { min-height: 44px; font-size: 15px; }
 .care-online-languages { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }

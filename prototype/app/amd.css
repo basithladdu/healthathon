@@ -21,7 +21,7 @@
   line-height: 1.5;
 }
 .amd-screen * { box-sizing: border-box; }
-.amd-head h1 { margin: 2px 0 8px; font-family: Georgia, 'Times New Roman', serif; font-weight: 500; }
+.amd-head h1 { margin: 2px 0 8px; font-family: var(--care-font-display); font-weight: 500; }
 .amd-eyebrow { margin: 0; color: var(--amd-muted); font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
 .amd-lede { margin: 0; max-width: 62ch; color: var(--amd-muted); }
 .amd-card {
@@ -34,7 +34,7 @@
   box-shadow: var(--care-shadow, 0 5px 20px #664b3010);
   min-width: 0;
 }
-.amd-card h2 { margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 23px; font-weight: 500; }
+.amd-card h2 { margin: 0; font-family: var(--care-font-display); font-size: 23px; font-weight: 500; }
 .amd-card h3 { margin: 8px 0 0; font-size: 17px; }
 .amd-prose p, .amd-prose ul { margin: 0 0 10px; }
 .amd-prose li, .amd-numbered li { margin-bottom: 6px; }
@@ -110,7 +110,7 @@
 .amd-summary > div { display: grid; grid-template-columns: minmax(130px, 30%) 1fr; gap: 12px; padding: 10px 14px; border-top: 1px solid var(--amd-line); }
 .amd-summary > div:first-child { border-top: 0; }
 .amd-summary dt { color: var(--amd-muted); font-weight: 600; }
-.amd-summary dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.amd-summary dd { margin: 0; min-width: 0; overflow-wrap: normal; }
 .amd-copies { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
 .amd-copies li { display: grid; gap: 8px; padding: 12px 14px; border: 1px solid var(--amd-line); border-radius: 14px; }
 .amd-copies select { min-height: 44px; padding: 8px 10px; border-radius: 11px; border: 1px solid #cfc1b3; background: var(--amd-surface); font: inherit; }

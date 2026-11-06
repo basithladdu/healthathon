@@ -29,7 +29,7 @@
 .comfort-history[open] > summary::before { content: '−'; }
 .comfort-history-heading, .comfort-history li, .comfort-undo { display: flex; align-items: center; justify-content: space-between; gap: var(--care-space-3); }
 .comfort-history-heading { border-bottom: 1px solid var(--care-line); font-size: 14px; color: var(--care-muted); }
-.comfort-history-heading > span { overflow-wrap: anywhere; min-width: 0; }
+.comfort-history-heading > span { overflow-wrap: normal; min-width: 0; }
 .comfort-history :is(button), .comfort-undo button { min-height: 44px; padding: var(--care-space-2); border: 0; border-radius: 10px; background: transparent; font: inherit; font-size: 14px; color: var(--care-primary); font-weight: 600; cursor: pointer; flex-shrink: 0; }
 .comfort-history ol { list-style: none; padding: 0; margin: 0; }
 .comfort-history li { padding-block: var(--care-space-3); border-bottom: 1px solid var(--care-line); }
@@ -40,7 +40,7 @@
 .comfort-history > p { padding-bottom: var(--care-space-3); }
 .comfort-message:not(:empty) { margin-top: var(--care-space-1); }
 .comfort-undo { margin: var(--care-space-2) var(--care-space-6); padding: var(--care-space-1) var(--care-space-3); border: 1px solid #dfc891; border-radius: var(--care-radius-control); background: #fff0c5; color: #5b391f; font-size: 14px; }
-.comfort-undo > span { min-width: 0; overflow-wrap: anywhere; }
+.comfort-undo > span { min-width: 0; overflow-wrap: normal; }
 .comfort-undo button { text-decoration: underline; text-underline-offset: 3px; }
 .family-comfort-space :is(button, summary):focus-visible { outline: 3px solid var(--care-focus); outline-offset: 3px; }
 @media (max-width: 700px) {

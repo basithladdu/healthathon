@@ -73,6 +73,7 @@ export function FamilyCareHome({ patientName, lang, signedCareNote, patientId, t
   }, [patientId, signedVersion]);
 
   return <section className="family-care-home care-home-organised">
+    <div className="care-home-top">
     <CareTodayGreeting name={patientName} role={role} today={today} lang={lang} />
     <header className="family-care-home-heading">
       {/* The greeting above is the visible title; the h1 stays for screen readers and page structure. */}
@@ -80,6 +81,7 @@ export function FamilyCareHome({ patientName, lang, signedCareNote, patientId, t
       {isFamily && <span className="family-care-home-eyebrow">{t('Family view', 'परिवार का दृश्य')}</span>}
       <CareRouteLink view="my-details" className="care-home-profile">{t('My profile', 'मेरी जानकारी')}</CareRouteLink>
     </header>
+    </div>
     {isFamily && <p className="family-care-home-tip"><span aria-hidden="true">✦</span><span><strong>{t('Tip', 'सुझाव')}</strong> {careText(lang, tip.en, tip.hi)}</span></p>}
     <section className={`care-home-note-feature${signedCareNote ? '' : ' is-empty'}`} aria-labelledby={`${id}-note-title`}>
       {signedCareNote ? <>

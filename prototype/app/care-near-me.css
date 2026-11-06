@@ -33,7 +33,7 @@
 /* Header: title, care-type chips, Call 112 bar */
 .cnm-header { display: grid; gap: 12px; margin-bottom: 12px; }
 .cnm-topline { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
-.cnm-root .cnm-topline h1 { margin: 0; color: var(--cnm-ink); font: 500 clamp(26px, 3vw, 34px)/1.15 Georgia, 'Times New Roman', serif; letter-spacing: -.6px; }
+.cnm-root .cnm-topline h1 { margin: 0; color: var(--cnm-ink); font: 500 clamp(26px, 3vw, 34px)/1.15 var(--care-font-display); letter-spacing: -.6px; }
 .cnm-categories { display: flex; flex-wrap: wrap; gap: 8px; }
 .cnm-categories button { min-height: 44px; padding: 8px 16px; border: 1px solid var(--cnm-line); border-radius: 999px; background: var(--cnm-surface); color: var(--cnm-ink); font: 600 14px var(--font-body, sans-serif); cursor: pointer; }
 .cnm-categories button:hover { border-color: var(--cnm-field-line); }
@@ -68,13 +68,13 @@
 .cnm-karnataka-filters { padding-top: 12px; border-top: 1px solid var(--cnm-line); }
 
 .cnm-origin-line { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
-.cnm-origin-chip { display: inline-flex; align-items: center; gap: 8px; min-height: 32px; padding: 4px 12px; border-radius: 999px; background: #e3f2ef; color: #245b52; font-size: 14px; font-weight: 600; overflow-wrap: anywhere; }
+.cnm-origin-chip { display: inline-flex; align-items: center; gap: 8px; min-height: 32px; padding: 4px 12px; border-radius: 999px; background: #e3f2ef; color: #245b52; font-size: 14px; font-weight: 600; overflow-wrap: normal; }
 .cnm-origin-dot { width: 10px; height: 10px; flex-shrink: 0; border: 2px solid #fff; border-radius: 50%; background: #258780; box-shadow: 0 0 0 2px #25878040; }
 .cnm-origin-line button, .cnm-list-heading button, .cnm-message button, .cnm-empty button { min-height: 44px; border: 0; border-radius: 10px; padding: 8px; background: transparent; color: var(--cnm-primary); font: 600 15px var(--font-body, sans-serif); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .cnm-location-matches { list-style: none; margin: 0; padding: 0; display: grid; max-height: 240px; overflow-y: auto; border: 1px solid var(--cnm-line); border-radius: 14px; background: #fff; }
 .cnm-location-matches li + li, .cnm-centre-matches button + button { border-top: 1px solid var(--cnm-line); }
 .cnm-location-matches button, .cnm-centre-matches button { display: grid; gap: 4px; width: 100%; min-height: 48px; padding: 12px; border: 0; background: transparent; color: var(--cnm-ink); font: 15px/1.4 var(--font-body, sans-serif); cursor: pointer; text-align: left; }
-.cnm-location-matches span, .cnm-centre-matches span { font-size: 14px; color: var(--cnm-muted); overflow-wrap: anywhere; }
+.cnm-location-matches span, .cnm-centre-matches span { font-size: 14px; color: var(--cnm-muted); overflow-wrap: normal; }
 .cnm-location-matches button:hover, .cnm-centre-matches button:hover { background: var(--cnm-canvas); }
 
 /* Results: map first (left on desktop, first tab on phones), list beside it */
@@ -91,7 +91,7 @@
 /* Selected destination panel */
 .cnm-route-panel { flex: 0 0 auto; max-height: 50%; overflow-y: auto; padding: 16px; background: var(--cnm-surface); border: 1px solid var(--cnm-line); border-left: 6px solid var(--cnm-kind-listed); border-radius: 20px; box-shadow: var(--care-shadow, 0 5px 20px #664b3010); }
 .cnm-route-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--cnm-ink); }
-.cnm-route-heading > strong { display: flex; align-items: center; font-size: 17px; line-height: 1.35; overflow-wrap: anywhere; }
+.cnm-route-heading > strong { display: flex; align-items: center; font-size: 17px; line-height: 1.35; overflow-wrap: normal; }
 .cnm-route-heading > button { flex-shrink: 0; min-width: 44px; min-height: 44px; padding: 0; border: 1px solid var(--cnm-line); border-radius: 999px; background: var(--cnm-surface); font-size: 22px; color: var(--cnm-muted); cursor: pointer; }
 .cnm-route-heading > button:hover { color: var(--cnm-ink); background: var(--cnm-canvas); }
 .cnm-selected-address { margin: 4px 0 8px; color: var(--cnm-muted); font: normal 14px/1.45 var(--font-body, sans-serif); }
@@ -132,8 +132,8 @@
 .cnm-community-select, .cnm-place-select { display: grid; width: 100%; gap: 4px; min-height: 44px; padding: 0; border: 0; background: transparent; color: var(--cnm-ink); text-align: left; cursor: pointer; }
 .cnm-community-select > span, .cnm-place-select > span { display: flex; align-items: center; color: var(--cnm-muted); font-size: 14px; font-weight: 600; }
 .cnm-community-select > span { color: #8a5a09; }
-.cnm-community-select > strong, .cnm-place-select > strong { font: 650 17px/1.35 var(--font-body, sans-serif); overflow-wrap: anywhere; }
-.cnm-community-hospital address, .cnm-place address { display: grid; gap: 2px; margin: 8px 0; color: var(--cnm-muted); font: normal 14px/1.5 var(--font-body, sans-serif); overflow-wrap: anywhere; }
+.cnm-community-select > strong, .cnm-place-select > strong { font: 650 17px/1.35 var(--font-body, sans-serif); overflow-wrap: normal; }
+.cnm-community-hospital address, .cnm-place address { display: grid; gap: 2px; margin: 8px 0; color: var(--cnm-muted); font: normal 14px/1.5 var(--font-body, sans-serif); overflow-wrap: normal; }
 .cnm-community-status, .cnm-place > p { margin: 4px 0; color: var(--cnm-muted); font-size: 14px; line-height: 1.45; }
 .cnm-place-actions { display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: center; }
 .cnm-place-actions a, .cnm-place-actions button { display: inline-flex; align-items: center; min-height: 44px; padding: 0; border: 0; background: transparent; color: var(--cnm-primary); font: 600 15px var(--font-body, sans-serif); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }

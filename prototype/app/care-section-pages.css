@@ -3,7 +3,7 @@
 .care-section-page.tone-mint { --section-color: #bce7d6; --section-border: #8cc5af; }
 .care-section-page > header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
 .care-section-page > header > svg { width: 68px; height: 64px; }
-.simple-care-app .care-section-page h1 { flex: 1; min-width: 0; margin: 0; font: 500 clamp(26px, 3vw, 36px)/1.2 Georgia, serif; }
+.simple-care-app .care-section-page h1 { flex: 1; min-width: 0; margin: 0; font: 500 clamp(26px, 3vw, 36px)/1.2 var(--care-font-display); }
 .simple-care-app .care-section-upload { display: inline-flex; align-items: center; justify-content: center; gap: 9px; flex: none; white-space: nowrap; }
 .simple-care-app .care-section-upload > svg { width: 19px; height: 19px; flex: none; }
 .care-section-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }

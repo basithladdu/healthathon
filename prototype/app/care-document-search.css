@@ -13,7 +13,7 @@
 .care-document-heading-title { justify-content: flex-start; min-width: 0; }
 .care-document-heading-icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 16px; color: #7e4829; background: #ffe5b9; }
 .care-document-heading-icon svg { width: 26px; height: 26px; }
-.care-document-search .care-document-heading h2 { margin: 0; font: 500 27px/1.16 Georgia, 'Times New Roman', serif; letter-spacing: -.55px; }
+.care-document-search .care-document-heading h2 { margin: 0; font: 500 27px/1.16 var(--care-font-display); letter-spacing: -.55px; }
 .care-document-count { display: block; margin-top: 3px; color: #7c6b80; font-size: 12px; }
 .care-document-search button.care-document-add { color: #fff; border-color: #ae563d; background: #ae563d; }
 .care-document-search button.care-document-add:hover { background: #974931; }
@@ -41,7 +41,7 @@
 .care-document-file-icon { display: grid; place-items: center; flex: none; width: 44px; height: 49px; border-radius: 11px; color: #845d28; background: #fbeab7; }
 .care-document-file-icon[data-folder='cancer'] { color: #ab5537; background: #ffdfd0; }
 .care-document-file-icon[data-folder='monitoring'] { color: #547234; background: #deedc7; }
-.care-document-search button.care-document-file-title { justify-content: flex-start; text-align: left; min-height: 28px; padding: 0; border: 0; border-radius: 2px; background: transparent; font-size: 14px; color: #44374b; overflow-wrap: anywhere; }
+.care-document-search button.care-document-file-title { justify-content: flex-start; text-align: left; min-height: 28px; padding: 0; border: 0; border-radius: 2px; background: transparent; font-size: 14px; color: #44374b; overflow-wrap: normal; }
 .care-document-file-meta { display: flex; flex-wrap: wrap; gap: 2px 8px; margin-top: 3px; color: #88778a; font-size: 11px; line-height: 1.5; }
 .care-document-file-meta > span::before { content: '·'; padding-right: 8px; }
 .care-document-search button.care-document-file-action { background: #f4edf8; border-color: transparent; font-size: 12px; padding-inline: 12px; }
@@ -50,16 +50,16 @@
 .care-document-search button.care-document-remove:hover { background: #fbe8df; }
 .care-document-file-actions .care-document-remove { width: 44px; min-width: 44px; padding-inline: 10px; }
 .care-document-undo { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 12px; margin-top: 12px; border: 1px solid #e5c7a5; border-radius: 12px; background: #fff0d9; color: #956440; font-size: 12px; }
-.care-document-undo > span { min-width: 0; overflow-wrap: anywhere; }
+.care-document-undo > span { min-width: 0; overflow-wrap: normal; }
 .care-document-undo button { flex: none; }
 .care-document-results { margin-top: 16px; }
-.care-document-search :is(h3, h4) { margin: 0; font: 600 15px/1.45 var(--font-inter), sans-serif; overflow-wrap: anywhere; }
+.care-document-search :is(h3, h4) { margin: 0; font: 600 15px/1.45 var(--font-inter), sans-serif; overflow-wrap: normal; }
 .care-document-source-count { margin: 0; color: #85728a; font-size: 11px; }
 .care-document-match { min-width: 0; padding: 17px; margin-top: 12px; border: 1px solid #dfd0e9; border-radius: 17px; background: #faf5ff; }
 .care-document-match header { justify-content: flex-start; }
 .care-document-match time { display: block; margin-top: 3px; color: #826f8c; font-size: 12px; }
 .care-document-match blockquote { margin: 15px 0; padding: 2px 0 2px 14px; border-left: 3px solid #ba95d6; }
-.care-document-match blockquote p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; color: #4e4056; font-size: 14px; line-height: 1.65; }
+.care-document-match blockquote p { margin: 0; white-space: pre-wrap; overflow-wrap: normal; color: #4e4056; font-size: 14px; line-height: 1.65; }
 .care-document-match cite { display: block; margin-top: 7px; color: #836691; font-size: 11px; font-style: normal; font-weight: 600; }
 .care-document-match footer { flex-wrap: wrap; border-top: 1px solid #e3d6ec; padding-top: 8px; }
 .care-document-search button.care-document-download { margin-top: 12px; }
@@ -84,10 +84,10 @@
 .care-document-preview { display: flex; align-items: center; justify-content: center; width: 100%; min-width: 0; height: 380px; border-radius: 15px; overflow: hidden; border: 1px solid #e3d8e3; background: #f0e8e0; }
 .care-document-preview img { width: 100%; height: 100%; object-fit: contain; }
 .care-document-preview object { width: 100%; height: 100%; }
-.care-document-preview-fallback { display: grid; justify-items: center; gap: 14px; width: 100%; padding: 20px; font-size: 13px; overflow-wrap: anywhere; }
+.care-document-preview-fallback { display: grid; justify-items: center; gap: 14px; width: 100%; padding: 20px; font-size: 13px; overflow-wrap: normal; }
 .care-document-preview-fallback svg { width: 42px; height: 42px; color: #927099; }
 .care-document-original-caption { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
-.care-document-original-caption strong { font-size: 11px; color: #88788b; font-weight: 500; overflow-wrap: anywhere; }
+.care-document-original-caption strong { font-size: 11px; color: #88788b; font-weight: 500; overflow-wrap: normal; }
 .care-document-review-fields { display: grid; min-width: 0; gap: 12px; }
 .care-document-fields-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .care-document-editor label { display: grid; gap: 6px; min-width: 0; font-size: 12px; font-weight: 600; }
@@ -192,7 +192,7 @@
 .care-document-results-heading { justify-content: flex-start; }
 .care-document-search button.care-document-back { gap: 8px; padding-inline: 8px 14px; border-color: transparent; background: transparent; color: var(--doc-muted); }
 .care-document-chat { display: grid; gap: 12px; margin-top: 8px; }
-.care-document-chat-question { justify-self: end; max-width: min(85%, 560px); margin: 0; padding: 12px 16px; border-radius: 20px 20px 6px 20px; background: var(--doc-primary); color: #fff; font-size: 16px; line-height: 1.45; overflow-wrap: anywhere; }
+.care-document-chat-question { justify-self: end; max-width: min(85%, 560px); margin: 0; padding: 12px 16px; border-radius: 20px 20px 6px 20px; background: var(--doc-primary); color: #fff; font-size: 16px; line-height: 1.45; overflow-wrap: normal; }
 .care-document-chat-answer { justify-self: start; display: grid; gap: 12px; width: 100%; max-width: 760px; padding: 16px; border: 1px solid var(--doc-line); border-radius: 6px 20px 20px 20px; background: #fff; }
 .care-document-source-count { display: flex; align-items: center; gap: 8px; margin: 0; color: var(--doc-ink); font-size: 15px; line-height: 1.45; }
 .care-document-answer-mark { display: grid; place-items: center; width: 32px; height: 32px; flex: none; border-radius: 999px; background: #f3e8da; color: var(--doc-primary); }

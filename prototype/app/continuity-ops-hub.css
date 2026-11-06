@@ -511,7 +511,7 @@
 .ops-signal-list strong {
   font-size: 14px;
   color: #0a2118;
-  word-break: break-word;
+  word-break: normal;
 }
 
 .ops-check-list li {
@@ -649,7 +649,7 @@
   margin: 0;
   font-size: 14px;
   color: #0a2118;
-  word-break: break-word;
+  word-break: normal;
 }
 
 .ops-mro-actions {

@@ -1,29 +1,31 @@
-/* Sunset palette and shared design tokens. Defined on :root so every Sahara page (landing,
+/* Sahara palette and shared design tokens. Defined on :root so every Sahara page (landing,
    loading, public care finder) can use them; the family workspace and sign-in also apply them. */
 :root {
+  /* Sahara palette shared with the Android app, on AI-FIR's multi-colour grammar.
+     Rust is the one primary action colour; every section keeps its own saturated accent. */
   --care-ink: #382e29;
-  --care-muted: #6f6056;
+  --care-muted: #4a3e36;
   --care-canvas: #fff8ee;
   --care-surface: #fffdf9;
-  --care-surface-2: #fbf3e8;
-  --care-line: #e6ddd1;
-  --care-line-strong: #cbbcad;
+  --care-surface-2: #f7ede1;
+  --care-line: #e6d8cc;
+  --care-line-strong: #8d7b70;
   --care-primary: #b9472c;
-  --care-primary-hover: #923522;
-  --care-primary-soft: #fbe6dc;
-  --care-on-primary: #fffaf5;
-  --care-peach: #ffd1b3;
-  --care-marigold: #ffcf5c;
-  --care-honey: #ffe69f;
-  --care-sage: #d9eaa8;
-  --care-sage-ink: #465e45;
-  --care-lavender: #ddc8ff;
-  --care-lavender-ink: #655278;
-  --care-danger: #a3271f;
-  --care-danger-soft: #fdeceb;
-  --care-focus: #8a4a26;
-  --care-shadow: 0 5px 20px #664b3010;
-  --care-shadow-raised: 0 10px 30px #664b301f;
+  --care-primary-hover: #9e3b23;
+  --care-primary-soft: #ffe2d2;
+  --care-on-primary: #ffffff;
+  --care-peach: #ffd8c2;
+  --care-marigold: #f5c060;
+  --care-honey: #fcebc7;
+  --care-sage: #ddefd5;
+  --care-sage-ink: #386d29;
+  --care-lavender: #f4ddee;
+  --care-lavender-ink: #8a3b78;
+  --care-danger: #b3261e;
+  --care-danger-soft: #f9dedc;
+  --care-focus: #8f5a00;
+  --care-shadow: 0 0 0 1px rgba(56, 46, 41, .07), 0 1px 2px rgba(56, 46, 41, .08);
+  --care-shadow-raised: 0 16px 40px rgba(56, 46, 41, .18);
 
   /* Spacing scale: 4, 8, 12, 16, 20, 24, 32. */
   --care-space-1: 4px;
@@ -35,7 +37,7 @@
   --care-space-7: 32px;
 
   /* Radius: cards 20, buttons and inputs 14, chips fully rounded. */
-  --care-radius-card: 20px;
+  --care-radius-card: 16px;
   --care-radius-control: 14px;
   --care-radius-pill: 999px;
 
@@ -44,8 +46,8 @@
   --care-text-md: 16px;
   --care-text-lg: 18px;
   --care-text-xl: 22px;
-  --care-font-display: Georgia, 'Times New Roman', serif;
-  --care-font-ui: var(--font-inter), 'Noto Sans', sans-serif;
+  --care-font-display: var(--font-anek), var(--font-noto), 'Noto Sans', sans-serif;
+  --care-font-ui: var(--font-noto), 'Noto Sans', sans-serif;
   --care-control-height: 48px;
 }
 

@@ -24,7 +24,7 @@
 .care-story-message { margin: 0; color: var(--care-muted); font-size: 14px; line-height: 1.5; }
 .care-story-message:not(:empty) { margin-bottom: var(--care-space-3); }
 .care-story-undo { justify-content: space-between; border: 1px solid var(--care-line); border-radius: var(--care-radius-control); padding: var(--care-space-1) var(--care-space-4); margin-bottom: var(--care-space-3); background: var(--care-surface-2); font-size: 14px; }
-.care-story-undo span { overflow-wrap: anywhere; min-width: 0; }
+.care-story-undo span { overflow-wrap: normal; min-width: 0; }
 .care-story-undo button, .care-story-card-heading button { border: 0; background: transparent; color: var(--care-primary); font: inherit; font-size: 14px; font-weight: 600; padding: var(--care-space-2); border-radius: 10px; }
 .care-story-undo button { flex-shrink: 0; text-decoration: underline; text-underline-offset: 3px; }
 .care-story-timeline { list-style: none; margin: 0; padding: 0 6px 0 0; max-height: min(70svh, 760px); overflow-y: auto; overscroll-behavior: contain; }
@@ -45,18 +45,18 @@
 .care-story-card-heading { justify-content: space-between; gap: var(--care-space-2); }
 .family-care-story .care-story-card-heading > span { display: inline-flex; align-items: center; min-height: 26px; padding: 2px 10px; border-radius: var(--care-radius-pill); background: var(--story-tint); color: var(--story-accent); font-size: 14px; font-weight: 650; }
 .care-story-card-heading > div { display: flex; flex-shrink: 0; }
-.family-care-story .care-story-card h2 { color: var(--care-ink); font-size: 18px; line-height: 1.4; margin: var(--care-space-2) 0; overflow-wrap: anywhere; }
+.family-care-story .care-story-card h2 { color: var(--care-ink); font-size: 18px; line-height: 1.4; margin: var(--care-space-2) 0; overflow-wrap: normal; }
 .care-story-note { margin-top: var(--care-space-1); }
 .care-story-note blockquote { margin: var(--care-space-2) 0; padding-left: var(--care-space-3); border-left: 3px solid var(--story-accent); }
 .care-story-note cite { display: block; font-size: 14px; line-height: 1.5; font-style: normal; color: var(--care-muted); }
-.care-story-note :is(p, dd) { margin: 0 0 var(--care-space-2); white-space: pre-wrap; overflow-wrap: anywhere; font-size: 16px; line-height: 1.6; color: var(--care-ink); }
+.care-story-note :is(p, dd) { margin: 0 0 var(--care-space-2); white-space: pre-wrap; overflow-wrap: normal; font-size: 16px; line-height: 1.6; color: var(--care-ink); }
 .care-story-note h3, .care-story-note dt { margin: 0 0 var(--care-space-1); font-size: 14px; line-height: 1.5; font-weight: 600; color: var(--care-muted); }
 .care-story-note dl { display: flex; flex-wrap: wrap; gap: var(--care-space-2) var(--care-space-6); margin: var(--care-space-3) 0 0; }
 .care-story-note dl > div { min-width: 0; }
 .care-story-note dl dt { font-size: 14px; margin-bottom: 2px; }
 .care-story-note dl dd { font-size: 15px; }
 .care-story-note dd { margin-left: 0; }
-.care-story-author { margin: var(--care-space-2) 0 0; color: var(--care-muted); font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+.care-story-author { margin: var(--care-space-2) 0 0; color: var(--care-muted); font-size: 14px; line-height: 1.5; overflow-wrap: normal; }
 .care-story-empty { margin: var(--care-space-4) 0; max-width: 440px; padding: var(--care-space-5); border: 1px dashed var(--care-line-strong); border-radius: var(--care-radius-card); background: var(--care-surface); color: var(--care-muted); font-size: 16px; line-height: 1.6; }
 @media (max-width: 700px) {
   .care-story-heading { align-items: flex-start; gap: var(--care-space-3); margin-bottom: var(--care-space-4); }
