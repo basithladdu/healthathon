@@ -335,6 +335,8 @@ class MedicineStripPhotos(context: Context, storage: String) {
             }
             val share by animateFloatAsState(if (total == 0) 0f else taken.toFloat() / total, SaharaMotion.tween(SaharaMotion.ENTER_MS, easing = SaharaMotion.Emphasized), label = "doses-progress")
             LinearProgressIndicator(progress = { share }, modifier = Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(50)), color = DoctorStatusGood, trackColor = DoctorHairline, drawStopIndicator = {}, gapSize = 0.dp)
+            // All of today's doses taken, by the tick just made: a small burst while its Undo shows.
+            if (total > 0 && taken == total && held?.personId == person) SaharaLottie(SaharaLottieKind.Confetti, Modifier.align(Alignment.CenterHorizontally))
             if (canEdit && taken < total && held?.personId != person) Text(t("Tap a dose when taken. Hold it for Missed.", "दवा लेने पर उसे छुएँ। छूटी हो तो दबाकर रखें।"), fontSize = 14.sp, color = DoctorCardSub)
             // "Marked taken · Undo" sits right under the count, in the first screenful, while a one-tap tick waits.
             DoseUndoRow(person)

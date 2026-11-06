@@ -309,7 +309,7 @@ fun Modifier.saharaContentSize(): Modifier = animateContentSize(SaharaMotion.twe
             Column(Modifier.padding(horizontal = 32.dp).a11yCard().announce(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 SaharaBrandMark(size = 80)
                 Text(text, color = Ink, fontSize = 18.sp, lineHeight = 24.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
-                SaharaProgressBar(null, Modifier.widthIn(max = 180.dp))
+                SaharaLottie(SaharaLottieKind.Loading)
             }
         }
     }

@@ -80,7 +80,7 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
         Column(Modifier.saharaContentSize().padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 6.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 // The one main card on Today: its icon swells slowly a few times, then rests (off when animations are off).
-                SaharaIconChip(Icons.Default.WbSunny, SaharaTone.Gold, size = 36, breathe = true); Spacer(Modifier.width(10.dp))
+                Box(contentAlignment = Alignment.Center) { SaharaLottie(SaharaLottieKind.Breathe); SaharaIconChip(Icons.Default.WbSunny, SaharaTone.Gold, size = 32) }; Spacer(Modifier.width(6.dp))
                 Text(t("How was today?", "आज का दिन कैसा रहा?"), fontFamily = SaharaTitleFont, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Medium, color = Color.White, modifier = Modifier.weight(1f).a11yHeading())
                 // The saved tick pops in once the check-in is stored (it follows the saved record, not a timer).
                 AnimatedVisibility(done, enter = scaleIn(spring(dampingRatio = Spring.DampingRatioMediumBouncy), initialScale = .6f) + fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)), exit = fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS))) {
