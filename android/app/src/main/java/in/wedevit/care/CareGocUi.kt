@@ -355,7 +355,7 @@ private val GocTickSoft get() = DoctorStatusGoodBg
         recorder?.stopPlayback(); lastClip = clip; askLanguage = false
         val before = lines.size
         if (!(gemini && consentAt > 0 && readOnline(clip))) {
-            if (!engine.models.ready()) { operation = t("Downloading", "डाउनलोड हो रहा है"); engine.models.download { done, total -> progressFlow.value = done to total } }
+            if (!engine.models.ready()) { requireWhisperDownloadAllowed(context); operation = t("Downloading", "डाउनलोड हो रहा है"); engine.models.download { done, total -> progressFlow.value = done to total } }
             operation = readingLabel; progressFlow.value = 0L to 0L
             val segments = engine.transcribe(clip, d.patientId, GocSpeechLanguage.valueOf(language), { done, total -> progressFlow.value = done to total }) { segment ->
                 scope.launch {

@@ -313,3 +313,12 @@ internal class GocDraftFile(folder: File, private val recordId: String) {
     fun delete() { file.delete() }
 }
 internal data class GocDraft(val transcript: GocTranscript, val ticked: Set<GocDecision>)
+
+
+/** The 375 MB Whisper backup is fetched only on Wi-Fi (never on mobile data); otherwise the recording stays saved for a later retry. */
+fun requireWhisperDownloadAllowed(context: android.content.Context) {
+    val cm = context.getSystemService(android.content.Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
+    val net = cm.getNetworkCapabilities(cm.activeNetwork)
+    val wifi = net != null && net.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_NOT_METERED) && net.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    require(wifi) { careTr(false, "Couldn't turn into text now. The recording is saved. Try again when online.", "अभी लिखाई नहीं बन सकी। रिकॉर्डिंग सुरक्षित है। ऑनलाइन होने पर फिर कोशिश करें।") }
+}

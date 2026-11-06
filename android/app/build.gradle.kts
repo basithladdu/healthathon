@@ -49,6 +49,8 @@ android {
         applicationId = "in.wedevit.sahara"
         minSdk = 26
         targetSdk = 36
+        // -PsaharaAbi=arm64-v8a builds a phones-only APK (about half the size); the default keeps every ABI for emulators and tests.
+        (project.findProperty("saharaAbi") as String?)?.let { ndk { abiFilters += it.split(",") } }
         versionCode = 9
         versionName = "0.6.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
