@@ -7,9 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.*
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
@@ -141,18 +139,19 @@ internal fun doctorWhen(item: CareItem, hindi: Boolean, zone: ZoneId = ZoneId.sy
         shape = RoundedCornerShape(14.dp), keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), keyboardActions = KeyboardActions(onSearch = { focus.clearFocus() }))
 }
 
-/** Sahara section tones in the u-FIR multi-colour grammar: a saturated ink for chips and pill text, its wash for pill and avatar fills. Ink on wash and white on ink are both above 4.5:1. */
+/** Sahara section and status tones (HUMAN_APP_GUIDE §3): the main tone for icon tiles and pill text, its light container for fills. Main on light and white on main are both AA. */
 internal data class DoctorTone(val ink: Color, val wash: Color)
 internal object DoctorTones {
-    val Rust = DoctorTone(Color(0xFFA3361A), Color(0xFFFDE7DD))
-    val Teal = DoctorTone(Color(0xFF0B6E65), Color(0xFFDDF3EF))
-    val Marigold = DoctorTone(Color(0xFF9A4D00), Color(0xFFFFEBCC))
-    val Plum = DoctorTone(Color(0xFF7B2D8E), Color(0xFFF4E4F7))
-    val Leaf = DoctorTone(Color(0xFF276B2B), Color(0xFFE3F2E1))
-    val Rose = DoctorTone(Color(0xFFB0174F), Color(0xFFFCE4EC))
-    val Info = DoctorTone(Color(0xFF0B5F8A), Color(0xFFE0F0FA))
-    val Red = DoctorTone(Color(0xFFB3261E), Color(0xFFFDE4E1))
-    private val cycle = listOf(Rust, Teal, Plum, Rose, Leaf, Marigold, Info)
+    val Rust = DoctorTone(Color(0xFFB9472C), Color(0xFFFFE3D6))
+    val Teal = DoctorTone(Color(0xFF0F6E6A), Color(0xFFD3EEEC))
+    val Indigo = DoctorTone(Color(0xFF3F51A3), Color(0xFFE0E4F7))
+    val Plum = DoctorTone(Color(0xFF8A3B78), Color(0xFFF4DDEE))
+    val Leaf = DoctorTone(Color(0xFF386D29), Color(0xFFDDEFD5))
+    val Marigold = DoctorTone(Color(0xFF8F5A00), Color(0xFFFCEBC7))
+    val Good = DoctorTone(Color(0xFF2F6B46), Color(0xFFDBEADF))
+    val Attention = DoctorTone(Color(0xFF8A5A1B), Color(0xFFFBE8C8))
+    val Red = DoctorTone(Color(0xFFB3261E), Color(0xFFF9DEDC))
+    private val cycle = listOf(Rust, Teal, Indigo, Plum, Leaf, Marigold)
     /** A stable tone per name so the same patient always gets the same avatar colour. */
     fun forName(name: String): DoctorTone = cycle[Math.floorMod(name.trim().lowercase().hashCode(), cycle.size)]
 }
@@ -166,9 +165,9 @@ internal val DoctorBand = Color(0xFF4A1D14)
     }
 }
 
-/** u-FIR icon chip: a small gradient tile in the section colour with a white glyph. */
+/** u-FIR icon chip: a small flat tile in the section colour with a white glyph. */
 @Composable internal fun DoctorIconChip(icon: ImageVector, tone: DoctorTone, size: Dp = 44.dp) {
-    Box(Modifier.size(size).background(Brush.linearGradient(listOf(lerp(tone.ink, Color.White, .22f), tone.ink)), RoundedCornerShape(14.dp)), contentAlignment = Alignment.Center) {
+    Box(Modifier.size(size).background(tone.ink, RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) {
         Icon(icon, null, tint = Color.White, modifier = Modifier.size(size * .5f))
     }
 }
@@ -211,7 +210,7 @@ internal val DoctorWholeWords = TextStyle(lineBreak = LineBreak.Heading, hyphens
     Surface(onClick = onClick, interactionSource = press, color = Paper, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, DoctorHairline),
         modifier = modifier.fillMaxWidth().saharaAppear().saharaPress(press).heightIn(min = 64.dp)) {
         Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            if (lead != null) Text(lead, Modifier.widthIn(min = 64.dp), fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Bold, color = DoctorTones.Rust.ink, style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"))
+            if (lead != null) Text(lead, Modifier.widthIn(min = 64.dp), fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Bold, color = DoctorTones.Indigo.ink, style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"))
             else Box(Modifier.size(40.dp).background(tone.wash, CircleShape), contentAlignment = Alignment.Center) { Text(name.trim().take(1).uppercase(), color = tone.ink, fontWeight = FontWeight.Bold, fontSize = 17.sp) }
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(1.dp)) {
                 Text(name, fontSize = 17.sp, lineHeight = 22.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -223,12 +222,12 @@ internal val DoctorWholeWords = TextStyle(lineBreak = LineBreak.Heading, hyphens
     }
 }
 
-/** What a patient needs today, for the register pill: a visit today, a hard day reported this week, or a recent check-in. */
+/** What a patient needs today, for the register pill: a visit today or a hard day reported this week. Nothing otherwise (guide rule 21: chips only for status to act on). */
 internal fun doctorPatientStatus(person: Person, items: List<CareItem>, now: Long, hindi: Boolean, zone: ZoneId = ZoneId.systemDefault()): Pair<String, DoctorTone>? {
     val today = Instant.ofEpochMilli(now).atZone(zone).toLocalDate()
-    if (doctorUpcomingVisits(items, person.id, now, zone).any { it.due > 0 && Instant.ofEpochMilli(it.due).atZone(zone).toLocalDate() == today }) return careTr(hindi, "Visit today", "आज विज़िट") to DoctorTones.Marigold
+    if (doctorUpcomingVisits(items, person.id, now, zone).any { it.due > 0 && Instant.ofEpochMilli(it.due).atZone(zone).toLocalDate() == today }) return careTr(hindi, "Visit today", "आज विज़िट") to DoctorTones.Indigo
     val check = doctorCheckIns(items, person.id, now).firstOrNull { now - it.created <= 7 * 86_400_000L } ?: return null
-    return if (check.title == DoctorReportedMood.HARD.title) careTr(hindi, "Hard day", "मुश्किल दिन") to DoctorTones.Red else careTr(hindi, "Check-in", "हालचाल") to DoctorTones.Teal
+    return if (check.title == DoctorReportedMood.HARD.title) careTr(hindi, "Hard day", "मुश्किल दिन") to DoctorTones.Attention else null
 }
 
 /**
@@ -253,10 +252,10 @@ internal fun LazyListScope.doctorConnectedHomeItems(people: List<Person>, items:
             val paired = doctorTilesPaired(maxWidth.value, LocalDensity.current.fontScale)
             val tiles: List<@Composable (Modifier) -> Unit> = listOf(
                 { m -> DoctorStatTile(Icons.Default.People, people.size, t("Patients", "मरीज़"), DoctorTones.Rust, onPatients, "doctor-home-tile-patients", m) },
-                { m -> DoctorStatTile(Icons.Default.Today, todayVisits.size, t("Visits today", "आज की विज़िट"), DoctorTones.Marigold, onSchedule, "doctor-home-tile-today", m) },
-                { m -> DoctorStatTile(Icons.Default.EventAvailable, laterVisits.size, t("Coming up", "आगे की विज़िट"), DoctorTones.Teal, onSchedule, "doctor-home-tile-upcoming", m) },
-                { m -> DoctorStatTile(Icons.Default.Favorite, checks.size, t("Check-ins, 7 days", "हालचाल, 7 दिन"), DoctorTones.Rose, { onScrollTo(checksIndex) }, "doctor-home-tile-checkins", m,
-                    pill = if (hard > 0) t("$hard hard", "$hard मुश्किल") to DoctorTones.Red else null) },
+                { m -> DoctorStatTile(Icons.Default.Today, todayVisits.size, t("Visits today", "आज की विज़िट"), DoctorTones.Indigo, onSchedule, "doctor-home-tile-today", m) },
+                { m -> DoctorStatTile(Icons.Default.EventAvailable, laterVisits.size, t("Coming up", "आगे की विज़िट"), DoctorTones.Plum, onSchedule, "doctor-home-tile-upcoming", m) },
+                { m -> DoctorStatTile(Icons.Default.Favorite, checks.size, t("Check-ins, 7 days", "हालचाल, 7 दिन"), DoctorTones.Teal, { onScrollTo(checksIndex) }, "doctor-home-tile-checkins", m,
+                    pill = if (hard > 0) t("$hard hard", "$hard मुश्किल") to DoctorTones.Attention else null) },
             )
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 if (paired) tiles.chunked(2).forEach { pair -> Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) { pair.forEach { it(Modifier.weight(1f).fillMaxHeight()) } } }
@@ -265,26 +264,26 @@ internal fun LazyListScope.doctorConnectedHomeItems(people: List<Person>, items:
         }
     }
     if (people.isEmpty()) return
-    item(key = "home-today-title") { DoctorHomeSection(t("Today", "आज"), todayVisits.size + todayChecks.size, DoctorTones.Marigold) }
+    item(key = "home-today-title") { DoctorHomeSection(t("Today", "आज"), todayVisits.size + todayChecks.size, DoctorTones.Indigo) }
     if (todayVisits.isEmpty() && todayChecks.isEmpty()) item(key = "home-today-empty") { DoctorHomeEmpty(Icons.Default.EventAvailable, t("Nothing due today", "आज कुछ तय नहीं")) }
     items(todayVisits, key = { "home-today-${it.item.id}" }) { visit ->
-        DoctorRegisterRow(visit.person.name, visit.item.title, { onVisit(visit.person.id) }, lead = doctorTimeOrDay(visit.item, hindi, zone), pill = t("Visit", "विज़िट") to DoctorTones.Marigold)
+        DoctorRegisterRow(visit.person.name, visit.item.title, { onVisit(visit.person.id) }, lead = doctorTimeOrDay(visit.item, hindi, zone))
     }
     items(todayChecks, key = { "home-today-check-${it.second.id}" }) { (person, check) ->
         DoctorRegisterRow(person.name, checkInMoodLabel(check.title, hindi), { onProgress(person.id) }, lead = DateTimeFormatter.ofPattern("h:mm a", careLocale(hindi)).withZone(zone).format(Instant.ofEpochMilli(check.created)),
-            pill = if (check.title == DoctorReportedMood.HARD.title) t("Hard day", "मुश्किल दिन") to DoctorTones.Red else t("Check-in", "हालचाल") to DoctorTones.Teal)
+            pill = if (check.title == DoctorReportedMood.HARD.title) t("Hard day", "मुश्किल दिन") to DoctorTones.Attention else null)
     }
     if (laterVisits.isNotEmpty()) {
-        item(key = "home-visits-title") { DoctorHomeSection(t("Coming up", "आगे की विज़िट"), laterVisits.size, DoctorTones.Teal) }
+        item(key = "home-visits-title") { DoctorHomeSection(t("Coming up", "आगे की विज़िट"), laterVisits.size, DoctorTones.Plum) }
         items(laterVisits.take(5), key = { "home-visit-${it.item.id}" }) { visit ->
             DoctorRegisterRow(visit.person.name, "${doctorWhen(visit.item, hindi, zone)} · ${visit.item.title}", { onVisit(visit.person.id) })
         }
     }
-    item(key = "home-checks-title") { DoctorHomeSection(t("Check-ins", "हालचाल"), weekChecks.size, DoctorTones.Rose) }
+    item(key = "home-checks-title") { DoctorHomeSection(t("Check-ins", "हालचाल"), weekChecks.size, DoctorTones.Teal) }
     if (weekChecks.isEmpty()) item(key = "home-checks-empty") { DoctorHomeEmpty(Icons.Default.Favorite, t("No other check-ins this week", "इस हफ़्ते और कोई हालचाल नहीं")) }
     items(weekChecks, key = { "home-check-${it.second.id}" }) { (person, check) ->
         DoctorRegisterRow(person.name, "${checkInMoodLabel(check.title, hindi)} · ${DateTimeFormatter.ofPattern("d MMM, h:mm a", careLocale(hindi)).withZone(zone).format(Instant.ofEpochMilli(check.created))}", { onProgress(person.id) },
-            pill = if (check.title == DoctorReportedMood.HARD.title) t("Hard day", "मुश्किल दिन") to DoctorTones.Red else null)
+            pill = if (check.title == DoctorReportedMood.HARD.title) t("Hard day", "मुश्किल दिन") to DoctorTones.Attention else null)
     }
 }
 
@@ -297,7 +296,7 @@ private fun doctorTimeOrDay(item: CareItem, hindi: Boolean, zone: ZoneId): Strin
     Row(Modifier.fillMaxWidth().padding(top = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Box(Modifier.size(width = 4.dp, height = 18.dp).background(tone.ink, RoundedCornerShape(2.dp)))
         Text(title, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
-        if (count > 0) DoctorPill("$count", tone)
+        if (count > 0) Text("$count", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = tone.ink)
     }
 }
 
@@ -313,7 +312,7 @@ private fun doctorTimeOrDay(item: CareItem, hindi: Boolean, zone: ZoneId): Strin
 internal fun LazyListScope.doctorConnectedScheduleItems(people: List<Person>, items: List<CareItem>, now: Long, hindi: Boolean, onVisit: (String) -> Unit) {
     val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     val visits = DoctorConnectedHome.upcomingVisits(people, items, now)
-    item(key = "schedule-title") { Text(t("Schedule", "समय-सारणी"), style = MaterialTheme.typography.headlineMedium) }
+    item(key = "schedule-title") { Text(t("Schedule", "शेड्यूल"), style = MaterialTheme.typography.headlineMedium) }
     if (people.isEmpty()) item(key = "schedule-no-people") { Text(t("No patients yet", "अभी कोई मरीज़ नहीं"), fontWeight = FontWeight.Medium) }
     else if (visits.isEmpty()) item(key = "schedule-empty") { Text(t("No visits", "कोई विज़िट नहीं")) }
     items(visits, key = { "schedule-${it.item.id}" }) { visit -> DoctorPatientListCard(visit.person.name, "${doctorWhen(visit.item, hindi)} · ${visit.item.title}", { onVisit(visit.person.id) }) }

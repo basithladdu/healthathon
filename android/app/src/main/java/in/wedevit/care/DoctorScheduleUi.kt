@@ -40,7 +40,7 @@ import java.time.ZoneId
 internal data class DoctorSchedulePatient(val id: String, val name: String)
 
 // Visit-card colour bars, cycled per card so neighbouring visits are easy to tell apart.
-private val ScheduleTones get() = listOf(DoctorTones.Rust, DoctorTones.Teal, DoctorTones.Plum, DoctorTones.Info)
+private val ScheduleTones get() = listOf(DoctorTones.Rust, DoctorTones.Teal, DoctorTones.Plum, DoctorTones.Indigo)
 
 private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone(zone).toLocalDate()
 
@@ -67,7 +67,7 @@ private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone
             Column {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     Icon(Icons.Default.CalendarMonth, null, tint = DoctorAccent, modifier = Modifier.size(28.dp))
-                    Text(t("Schedule", "समय-सूची"), Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 28.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+                    Text(t("Schedule", "शेड्यूल"), Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 28.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
                     Button(onClick = { picking = true }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorTones.Rust.ink, contentColor = Color.White), elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-schedule-add")) {
                         Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Add", "जोड़ें"))
                     }
@@ -143,8 +143,8 @@ private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone
             Box(Modifier.width(5.dp).fillMaxHeight().background(tone.ink))
             Column(Modifier.weight(1f).padding(horizontal = 14.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    DoctorPill(time, tone)
-                    DoctorPill(if (done) t("Completed", "पूरी हुई") else t("Planned", "तय"), if (done) DoctorTones.Leaf else DoctorTones.Marigold)
+                    Text(time, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = tone.ink, softWrap = false)
+                    if (done) DoctorPill(t("Completed", "पूरी हुई"), DoctorTones.Good)
                 }
                 Text(patient.name, fontFamily = SaharaTitleFont, fontSize = 18.sp, lineHeight = 23.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {

@@ -13,7 +13,6 @@ import androidx.compose.material3.Text
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -55,14 +54,13 @@ internal fun doctorHubSingleColumn(widthDp: Float, fontScale: Float): Boolean = 
 
 /** Each patient tab keeps its own colour on the hub tile and the tab row. */
 internal fun doctorTabTone(section: String): DoctorTone = when (section) {
-    "GoalsOfCare" -> DoctorTones.Rust
-    "CarePlan" -> DoctorTones.Teal
-    "Progress", "Summary" -> DoctorTones.Rose
-    "Labs" -> DoctorTones.Info
-    "Conversations" -> DoctorTones.Plum
-    "Visits" -> DoctorTones.Marigold
-    "Medicines" -> DoctorTones.Leaf
-    else -> DoctorTones.Marigold.copy(ink = Color(0xFF6B4A1F), wash = Color(0xFFF5ECDD))
+    "GoalsOfCare", "Conversations" -> DoctorTones.Rust
+    "CarePlan", "Reports" -> DoctorTones.Marigold
+    "Progress", "Summary" -> DoctorTones.Teal
+    "Labs" -> DoctorTones.Leaf
+    "Visits" -> DoctorTones.Indigo
+    "Medicines" -> DoctorTones.Plum
+    else -> DoctorTones.Indigo
 }
 
 @Composable private fun PatientHubTile(tab: DoctorPatientTab, modifier: Modifier = Modifier, wide: Boolean = false, onSection: (String) -> Unit, tagPrefix: String = "demo-record", meta: String? = null, selected: Boolean = false) { val t = careText()

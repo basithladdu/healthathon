@@ -280,6 +280,13 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
     }
 }
 
+/** Discussed / Not discussed / Later, in the chosen language, never the raw stored value. */
+private fun connectedTopicLabel(status: WorkflowTopicStatus, t: (String, String) -> String) = when (status) {
+    WorkflowTopicStatus.NOT_DISCUSSED -> t("Not discussed", "बात नहीं हुई")
+    WorkflowTopicStatus.DISCUSSED -> t("Discussed", "बात हुई")
+    WorkflowTopicStatus.DEFERRED -> t("Later", "बाद में")
+}
+
 @Composable private fun ConnectedCard(title: String, content: @Composable ColumnScope.() -> Unit) {
     Surface(color = Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) { Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.a11yHeading()); content() } }
 }
@@ -450,7 +457,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                                     saved = false
                                 },
                                 enabled = !busy,
-                                label = { Text(status.name.lowercase().replace('_', ' ')) }
+                                label = { Text(connectedTopicLabel(status, t), softWrap = false) }
                             )
                         }
                     }
@@ -535,10 +542,10 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
         TextButton(onClick={expanded=!expanded}) {Text(if(expanded)t("Show less", "कम दिखाएँ") else t("Read full discussion", "पूरी चर्चा पढ़ें"))}
         if(expanded) {
             listOf(t("Original words", "मूल शब्द") to note.draft.sourceText,t("Participants", "भागीदार") to note.draft.participants,t("Questions", "सवाल") to note.draft.questions,t("Undecided", "तय नहीं") to note.draft.undecided,t("Next steps", "अगले क़दम") to note.draft.nextSteps).forEach {(label,value)->Text(label,fontWeight=FontWeight.SemiBold);Text(value.ifBlank {t("Not recorded", "दर्ज नहीं")},lineHeight=25.sp)}
-            note.draft.checklist.forEach {Text("${it.title}: ${it.status.name.lowercase().replace('_',' ')}")}
+            note.draft.checklist.forEach {Text("${it.title}: ${connectedTopicLabel(it.status, t)}")}
             if(note.draft.audioClipId.isNotBlank())Text(t("Associated local audio: ", "जुड़ा लोकल ऑडियो: ") + note.draft.audioClipId,style=MaterialTheme.typography.bodySmall)
             if(note.draft.transcriptModel.isNotBlank())Text(t("Transcript source: ", "लिखाई का स्रोत: ") + "${note.draft.transcriptProvider} / ${note.draft.transcriptModel}",style=MaterialTheme.typography.bodySmall)
-            if(note.draft.mockGenerated)Text(t("Practice draft, written in advance, not from your recording", "अभ्यास ड्राफ़्ट, पहले से लिखा, आपकी रिकॉर्डिंग से नहीं"),color=Rust)
+            if(note.draft.mockGenerated)Text(t("Practice draft · not from your recording", "अभ्यास ड्राफ़्ट · आपकी रिकॉर्डिंग से नहीं"),color=Rust)
             note.draft.aiWarnings.forEach {Text(it,color=Rust)}
             note.draft.evidence.forEach {Text("${it.section}: ${it.quote}",style=MaterialTheme.typography.bodySmall)}
         }
