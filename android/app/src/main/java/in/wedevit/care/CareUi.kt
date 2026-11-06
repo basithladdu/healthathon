@@ -564,7 +564,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     var purposeAccepted by rememberSaveable { mutableStateOf(false) }
     var storageAccepted by rememberSaveable { mutableStateOf(false) }
     var accessAccepted by rememberSaveable { mutableStateOf(false) }
-    var transcriptionAccepted by rememberSaveable { mutableStateOf(false) }
+    var transcriptionAccepted by rememberSaveable { mutableStateOf(BuildConfig.CLOUD_AUDIO_ENABLED) }
     // Who is present, and their agreement, is captured once in step 1 ("Who's here"). This dialog confirms it rather than asking again.
     val consentNames = attendees.map { it.name.trim() }.filter { it.isNotBlank() }
     val allParticipantsAgreed = attendeesConsented
@@ -626,7 +626,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     }
     if (doctorCapture && captureMode == "Record") DoctorRecordStage(mode = captureMode, onMode = { captureMode = it }, recording = recording, saving = recordingSaving, saveError = recordingSaveError != null, onRetry = vm::retrySavingRecording, level = level, seconds = seconds.toLong(),
         recordEnabled = recordingCanEdit && recordingSaveError == null && vm.localAudioRecordingAllowed && !recordingSaving && draft.personId.isNotBlank() && !dictating && (!busy || recording),
-        onRecord = { recordingExpected = doctorConversationIdentity(vm.accountNamespace, draft); purposeAccepted = false; storageAccepted = false; accessAccepted = false; transcriptionAccepted = false; permissionDialog = true },
+        onRecord = { recordingExpected = doctorConversationIdentity(vm.accountNamespace, draft); purposeAccepted = false; storageAccepted = false; accessAccepted = false; transcriptionAccepted = BuildConfig.CLOUD_AUDIO_ENABLED; permissionDialog = true },
         onStop = { vm.stopRecording() }, onBack = onDoctorBack, backEnabled = !recording && !dictating && !permissionDialog && !audienceBusy && !recordingSaving && recordingSaveError == null,
         demo = vm.demoMode, localRecordingAllowed = vm.localAudioRecordingAllowed && recordingCanEdit && !recordingSaving && recordingSaveError == null, testRecord = vm.demoMode && DoctorTestProfiles.contains(draft.personId),
         menuEnabled = !recording && !dictating && !permissionDialog && !audienceBusy,
@@ -689,7 +689,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                         }
                         Button(onClick = { if (recording) vm.stopRecording() else {
                             recordingExpected = if (doctorPresentation) doctorConversationIdentity(vm.accountNamespace,draft) else null
-                            purposeAccepted = false; storageAccepted = false; accessAccepted = false; transcriptionAccepted = false
+                            purposeAccepted = false; storageAccepted = false; accessAccepted = false; transcriptionAccepted = BuildConfig.CLOUD_AUDIO_ENABLED
                             permissionDialog = true
                         } }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp), enabled = recordingCanEdit && recordingSaveError == null && vm.localAudioRecordingAllowed && !recordingSaving && draft.personId.isNotBlank() && !dictating && (!busy || recording)) { Icon(if (recording) Icons.Default.Stop else Icons.Default.Mic, null); Spacer(Modifier.width(8.dp)); Text(if (recordingSaving) t("Saving…", "सहेज रहे हैं…") else if (!vm.localAudioRecordingAllowed) t("Recording unavailable", "रिकॉर्डिंग उपलब्ध नहीं") else if (recording) t("Stop", "रोकें") else t("Record conversation", "बातचीत रिकॉर्ड करें")) }
                     } } }
@@ -730,8 +730,15 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                     item { Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         // The doctor flow's recordings are transcribed here, on this phone, once the language pack is present; otherwise the doctor types.
                         if (doctorPresentation && draft.source.isBlank() && !recordingSaving && recordingSaveError == null) recordings.filter { it.absolutePath in savedAudioPicked }.ifEmpty { listOfNotNull(recordings.maxByOrNull { it.lastModified() }) }.forEach { file -> key(file.absolutePath) {
-                            OfflineConversationTranscription(file = file, identity = "${vm.accountNamespace}:${draft.personId}", consent = recordingConsents.firstOrNull { it.audioPath == file.absolutePath },
-                                enabled = !busy && !dictating && !recording && draft.source.isBlank(), onUse = { vm.useOfflineTranscript(file.absolutePath, it) })
+                            // Gemini first (Whisper on this phone if Gemini fails) — runs on its own when this step opens, so nothing has to be typed.
+                            val clipConsent = recordingConsents.firstOrNull { it.audioPath == file.absolutePath }
+                            LaunchedEffect(file.absolutePath, clipConsent != null) {
+                                if (BuildConfig.CLOUD_AUDIO_ENABLED && clipConsent != null && autoTranscribed != file.absolutePath && vm.draft.value.source.isBlank() && transcribingPath == null) { autoTranscribed = file.absolutePath; vm.transcribeAudio(file.absolutePath, clipConsent) }
+                            }
+                            if (clipConsent != null) Button(onClick = { vm.transcribeAudio(file.absolutePath, clipConsent) }, enabled = BuildConfig.CLOUD_AUDIO_ENABLED && transcribingPath == null && !busy && !dictating && !recording, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-gemini-transcribe")) {
+                                if (transcribingPath == file.absolutePath) { CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = Color.White); Spacer(Modifier.width(8.dp)); Text(t("Turning into text…", "लिखाई बन रही है…")) }
+                                else { Icon(Icons.Default.AutoAwesome, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Turn into text", "लिखाई बनाएँ")) }
+                            }
                         } }
                         if (isSample) Surface(shape = RoundedCornerShape(16.dp), color = DoctorStatusWarnBg, modifier = Modifier.fillMaxWidth().testTag("transcript-sample")) { Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(t("Practice", "अभ्यास"), fontWeight = FontWeight.Medium, color = DoctorStatusWarn)
