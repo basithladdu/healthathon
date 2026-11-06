@@ -202,6 +202,8 @@ fun EmbeddedPatientCare(
                         "shared" -> EmbeddedSharedCare(vm, onAccount, ::leaveTool, onNavigationBlockedChange = { sharedBusy = it })
                         "resources" -> More(vm, person, onAccount, onDelete = { if (samePerson() && vm.isOwner.value) dialog = "delete" }, onCalendar = { openTool("calendar") }, onWorkflow = { openTool("workflows") }, onLabs = { openTool("labs") }, onFeedback = { openTool("feedback") }, onReminders = { openTool("reminders") }, onSharedWorkspace = { openTool("shared") }, onDocuments = { openTool("documents") }, doctorEmbedded = true)
                         else -> when (section) {
+                            "GoalsOfCare" -> CarePlanScreen(vm, clinician = true, onBack = { changeSection("Summary") }, startAt = "goc")
+                            "CarePlan" -> CarePlanScreen(vm, clinician = true, onBack = { changeSection("Summary") })
                             "Summary" -> DoctorPatientDay(vm, person, onOverview = { openTool("care-story") }, onCheckIns = { openTool("checkin-history") }, onMedicines = { changeSection("Medicines") }, onCalendar = { changeSection("Visits") }, onLabs = { openTool("labs") }, onCareTeam = { openTool("care-team") }, onAddVisit = { add("doctor-visit") }, onReadNote = ::read)
                             "Progress" -> DoctorCheckInHistory(personId, entries)
                             "Medicines" -> DoctorMedicines(vm, personId, onAddManual = { add("medicine") }, onScanPrescription = { openTool("scanner") }, onNavigationBlockedChange = { medicineBusy = it })

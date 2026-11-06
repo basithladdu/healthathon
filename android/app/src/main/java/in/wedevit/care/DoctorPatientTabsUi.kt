@@ -13,6 +13,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.Assignment
+import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material.icons.outlined.Forum
 import androidx.compose.material.icons.outlined.GridView
@@ -44,9 +46,12 @@ internal data class DoctorPatientTab(val section: String, val en: String, val hi
 
 /** The patient's tabs, most used first (3 Nov meeting: symptoms and distress, labs, goals of care, visits, medicines). */
 internal val doctorPatientTabs = listOf(
+    // Goals of care first: it opens Ritu's legal form with the recording (record → Gemini → ticks), not a menu.
+    DoctorPatientTab("GoalsOfCare", "Goals of care", "देखभाल के लक्ष्य", Icons.Outlined.Assignment, DoctorCardConversation),
+    DoctorPatientTab("CarePlan", "Care plan & card", "देखभाल योजना और कार्ड", Icons.Outlined.Description, DoctorCardReport),
     DoctorPatientTab("Progress", "Symptoms & distress", "लक्षण और परेशानी", Icons.Outlined.Insights, DoctorCardProgress),
     DoctorPatientTab("Labs", "Lab reports", "जाँच रिपोर्टें", Icons.Outlined.Science, DoctorCardOverview),
-    DoctorPatientTab("Conversations", "Goals of care", "देखभाल के लक्ष्य", Icons.Outlined.Forum, DoctorCardConversation),
+    DoctorPatientTab("Conversations", "Conversations", "बातचीत", Icons.Outlined.Forum, DoctorCardConversation),
     DoctorPatientTab("Visits", "Visits", "विज़िट", Icons.Outlined.CalendarMonth, DoctorCardVisit),
     DoctorPatientTab("Medicines", "Medicines", "दवाइयाँ", Icons.Outlined.Medication, DoctorCardMedicine),
     DoctorPatientTab("Reports", "Documents", "कागज़ात", Icons.Outlined.FolderOpen, DoctorCardReport),

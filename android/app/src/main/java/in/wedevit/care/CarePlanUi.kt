@@ -76,7 +76,7 @@ internal fun planStepOf(field: String): Int = when {
  * Emergency care plan (ECTPR) and living will (AMD), offline on this phone. Reached from Today and More (family and patient)
  * and from the doctor's patient tools. Pages: home, plan wizard, ED Quick View, wallet card, living will.
  */
-@Composable fun CarePlanScreen(vm: CareModel, clinician: Boolean, onBack: () -> Unit) {
+@Composable fun CarePlanScreen(vm: CareModel, clinician: Boolean, onBack: () -> Unit, startAt: String = "") {
     val context = LocalContext.current; val t = careText(); val hindi = careHindi(); val scope = rememberCoroutineScope()
     val people by vm.people.collectAsStateWithLifecycle(); val selected by vm.selected.collectAsStateWithLifecycle(); val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     val person = people.firstOrNull { it.id == selected }
@@ -84,6 +84,8 @@ internal fun planStepOf(field: String): Int = when {
     var loadProblem by remember(selected) { mutableStateOf(false) }
     var state by remember(selected) { mutableStateOf(runCatching { store.load(selected) }.getOrElse { loadProblem = true; CarePlanState() }) }
     var page by rememberSaveable(selected) { mutableStateOf("home") }
+    // startAt "goc": straight to the goals-of-care recording on the treatment step (a draft is opened if none is).
+    var gocDirect by rememberSaveable(selected) { mutableStateOf(false) }
     val actor = remember(clinician) { if (clinician) "Doctor" else vm.viewRole.value }
     val today = LocalDate.now()
     // The practice walkthrough never reaches the card server.
@@ -116,15 +118,20 @@ internal fun planStepOf(field: String): Int = when {
     }
     BackHandler(page != "home") { page = "home" }
     if (person == null) { Box(Modifier.fillMaxSize()); return }
+    if (startAt == "goc") LaunchedEffect(selected) {
+        if (page != "home") return@LaunchedEffect
+        if (EctprLifecycle.draft(state.ectprs, selected) == null && canEdit) commit { CarePlanBook.startPlan(it, selected, actor, planNow(), EctprPatient(name = person.name)).first }
+        if (EctprLifecycle.draft(state.ectprs, selected) != null) { gocDirect = true; page = "wizard" }
+    }
     val canManageData = clinician || actor != "Family"
     when (page) {
         "wizard" -> {
             val draft = EctprLifecycle.draft(state.ectprs, selected)
             if (draft == null) { LaunchedEffect(Unit) { page = "home" }; return }
-            CompositionLocalProvider(LocalGocFolder provides runCatching { store.folder(selected) }.getOrNull()) { EctprWizard(draft, clinician, canEdit, familyReadOnly = actor == "Family" && !clinician, personName = person.name,
+            CompositionLocalProvider(LocalGocFolder provides runCatching { store.folder(selected) }.getOrNull()) { EctprWizard(draft, clinician, canEdit, familyReadOnly = actor == "Family" && !clinician, personName = person.name, startStep = if (gocDirect) 5 else 0,
                 onSave = { r -> commit { CarePlanBook.saveDraft(it, r, actor, planNow(), today) } },
                 onSign = { r -> commit { CarePlanBook.sign(CarePlanBook.saveDraft(it, r, actor, planNow(), today), r.id, actor, planNow(), today) }.also { ok -> if (ok) page = "ed" } },
-                onClose = { page = "home" }) }
+                onClose = { gocDirect = false; page = "home" }) }
         }
         "pilot" -> PilotLogPage(state, selected, actor, ED_VIEW_DETAIL, onBack = { page = "home" }, commit = ::commit)
         "ed" -> EdQuickViewPage(state, selected, onBack = { page = "home" }, onCard = { page = "card" }, onShare = ::sharePlanPdf,
@@ -312,10 +319,10 @@ internal fun planStepOf(field: String): Int = when {
 
 // ───────────────────────────── Wizard ─────────────────────────────
 
-@Composable private fun EctprWizard(record: EctprRecord, clinician: Boolean, canEdit: Boolean, familyReadOnly: Boolean = false, personName: String = "", onSave: (EctprRecord) -> Boolean, onSign: (EctprRecord) -> Unit, onClose: () -> Unit) {
+@Composable private fun EctprWizard(record: EctprRecord, clinician: Boolean, canEdit: Boolean, familyReadOnly: Boolean = false, personName: String = "", onSave: (EctprRecord) -> Boolean, onSign: (EctprRecord) -> Unit, onClose: () -> Unit, startStep: Int = 0) {
     val t = careText(); val hindi = careHindi(); val today = LocalDate.now()
     var d by remember(record.id) { mutableStateOf(record) }
-    var step by rememberSaveable(record.id) { mutableIntStateOf(0) }
+    var step by rememberSaveable(record.id) { mutableIntStateOf(startStep) }
     var shown by remember { mutableStateOf<List<RuleIssue>>(emptyList()) }
     var leaving by remember { mutableStateOf(false) }
     val listState = androidx.compose.foundation.lazy.rememberLazyListState()
@@ -546,9 +553,10 @@ private fun LazyListScope.valuesStep(d: EctprRecord, update: ((EctprRecord) -> E
 
 private fun LazyListScope.treatmentStep(d: EctprRecord, today: LocalDate, update: ((EctprRecord) -> EctprRecord) -> Unit, choices: ((PlanChoices) -> PlanChoices) -> Unit) {
     val locked = !d.prognosticUnderstanding.confirmed || (d.surrogateDeclaration.answeringAsSurrogate && !d.surrogateDeclaration.confirmed)
+    // The recording comes first and is never locked: the talk is where understanding and the decision-maker get covered.
+    item(key = "goc-conversation") { GocConversationCard(d, update) }
     if (locked) { item { LockedTreatment(d) }; item { HomeCareFields(d, update) }; return }
     item { TreatmentIntro() }
-    item(key = "goc-conversation") { GocConversationCard(d, update) }
     item { GoalAndTransfer(d, choices) }
     item { CprFields(d, update, choices) }
     item { BreathingFields(d, today, choices) }
