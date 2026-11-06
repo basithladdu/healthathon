@@ -446,7 +446,7 @@ private const val HOME = "home"
 
 
 /** Each author keeps one bright colour, so a busy feed is easy to follow; the Sahara team is always indigo. */
-private val authorTones = listOf(SaharaTone.Teal, SaharaTone.Plum, SaharaTone.Leaf, SaharaTone.Marigold, SaharaTone.Rose, SaharaTone.Rust)
+private val authorTones = listOf(SaharaTone.Teal, SaharaTone.Plum, SaharaTone.Leaf, SaharaTone.Rose, SaharaTone.Rust) // white letters stay AA on each solid
 private fun authorTone(name: String, byTeam: Boolean): SaharaTone = if (byTeam) SaharaTone.Indigo else authorTones[Math.floorMod(name.trim().hashCode(), authorTones.size)]
 
 @Composable private fun CommunityAvatar(name: String, tone: SaharaTone, size: Int = 40) {
