@@ -33,14 +33,14 @@ internal fun WelcomeHero(modifier: Modifier = Modifier) {
             val unit = size.height / 215f
             val imageWidth = minOf(size.width, size.height)
             val left = (size.width - imageWidth) / 2f
-            val orange = Color(0xFFD97757)
+            val orange = SaharaColors.Primary
 
             // Asymmetric, quiet colour fields connect the two people without competing with them.
-            drawOval(Color(0xFFFFE0CB), Offset(left - 16f * unit, 44f * unit), Size(146f * unit, 133f * unit))
-            drawOval(Color(0xFFFFE9AD), Offset(left + 87f * unit, 45f * unit), Size(139f * unit, 131f * unit))
-            drawOval(Color(0xFFECE2F2), Offset(left + 13f * unit, 135f * unit), Size(186f * unit, 60f * unit))
+            drawOval(SaharaTone.Rust.wash, Offset(left - 16f * unit, 44f * unit), Size(146f * unit, 133f * unit))
+            drawOval(SaharaTone.Gold.wash, Offset(left + 87f * unit, 45f * unit), Size(139f * unit, 131f * unit))
+            drawOval(SaharaTone.Plum.wash, Offset(left + 13f * unit, 135f * unit), Size(186f * unit, 60f * unit))
             drawCircle(orange.copy(alpha = .45f), 3f * unit, Offset(18f * unit, 102f * unit))
-            drawCircle(Color(0xFFE8C26F), 4f * unit, Offset(size.width - 18f * unit, 148f * unit))
+            drawCircle(SaharaTone.Gold.solid, 4f * unit, Offset(size.width - 18f * unit, 148f * unit))
 
             val cloudWidth = minOf(57f * unit, left + 9f * unit).coerceAtLeast(30f * unit)
             thoughtCloud(6f * unit, 2f * unit, cloudWidth, unit, orange, doctor = true)
@@ -58,7 +58,7 @@ internal fun WelcomeHero(modifier: Modifier = Modifier) {
 
 private fun DrawScope.thoughtCloud(x: Float, y: Float, width: Float, unit: Float, ink: Color, doctor: Boolean) {
     val height = 34f * unit
-    val fill = Color(0xFFFFFDFA)
+    val fill = SaharaColors.Surface
     val outline = ink.copy(alpha = .34f)
     val cloud = Path().apply {
         moveTo(x + width * .15f, y + height * .92f)
