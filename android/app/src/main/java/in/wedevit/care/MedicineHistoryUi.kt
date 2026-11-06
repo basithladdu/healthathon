@@ -4,6 +4,15 @@ package `in`.wedevit.care
 import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.togetherWith
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -153,7 +162,8 @@ internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: C
         }
         if (showHistory) DoseChip(Icons.Default.History, t("History", "इतिहास"), "care-medicine-history-${item.id}", true) { history = true }
     }
-    if (problem.isNotBlank()) Text(problem, fontSize = 14.sp, color = RustText, modifier = Modifier.padding(top = 4.dp).announce())
+    if (problem.isNotBlank()) AlertDialog(onDismissRequest = { problem = "" }, title = { Text(t("Not saved", "सहेजा नहीं गया")) }, text = { Text(problem) },
+        confirmButton = { TextButton(onClick = { problem = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("OK", "ठीक है")) } })
     if (history) MedicineHistorySheet(item, vm) { history = false }
 }
 
@@ -162,31 +172,50 @@ internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: C
     return when { dose.timed -> dose.time; dose.count == 1 -> t("Today", "आज"); else -> t("Dose ${dose.index}", "खुराक ${dose.index}") }
 }
 
-/** One dose: tap to choose Taken or Missed. Green when taken, red-brown when missed, amber once its time has passed unmarked. */
+/**
+ * One dose. A dose not marked yet is ticked Taken with one tap; a marked dose (or a long press) opens Taken / Missed,
+ * so a mistake can be corrected. Green when taken, red-brown when missed, amber once its time has passed unmarked.
+ */
 @Composable internal fun MedicineDoseChip(item: CareItem, dose: MedicineDose, state: MedicineDoseState, enabled: Boolean, onMark: (Boolean) -> Unit) {
     val t = careText(); var menu by remember { mutableStateOf(false) }
     val late = state == MedicineDoseState.PENDING && dose.timed && LocalTime.now() > LocalTime.parse(dose.time)
-    val (icon, fg, bg) = when {
-        state == MedicineDoseState.TAKEN -> Triple(Icons.Default.Check, DoctorStatusGood, DoctorStatusGoodBg)
-        state == MedicineDoseState.MISSED -> Triple(Icons.Default.Close, DoctorStatusRest, DoctorStatusRestBg)
-        late -> Triple(Icons.Default.RadioButtonUnchecked, DoctorStatusWarn, DoctorStatusWarnBg)
-        else -> Triple(Icons.Default.RadioButtonUnchecked, DoctorCardSub, Paper)
+    val (fg, bgTarget) = when {
+        state == MedicineDoseState.TAKEN -> DoctorStatusGood to DoctorStatusGoodBg
+        state == MedicineDoseState.MISSED -> DoctorStatusRest to DoctorStatusRestBg
+        late -> DoctorStatusWarn to DoctorStatusWarnBg
+        else -> DoctorCardSub to Paper
     }
+    val bg by animateColorAsState(bgTarget, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "dose chip")
     val label = medicineDoseLabel(dose)
     val stateWord = when (state) { MedicineDoseState.TAKEN -> t("Taken", "ली"); MedicineDoseState.MISSED -> t("Missed", "छूटी"); else -> t("Not yet", "अभी नहीं") }
+    val pending = state == MedicineDoseState.PENDING
+    val tapLabel = if (pending) t("Mark taken", "ली हुई दर्ज करें") else t("Change", "बदलें")
+    val holdLabel = t("Taken or missed", "ली या छूटी")
     Box {
-        Surface(onClick = { menu = true }, enabled = enabled, shape = RoundedCornerShape(50), color = bg, border = if (state == MedicineDoseState.PENDING && !late) BorderStroke(1.dp, DoctorCardFaint.copy(alpha = .4f)) else null,
-            modifier = Modifier.minimumInteractiveComponentSize().semantics { contentDescription = "${item.title}, $label: $stateWord" }.testTag("medicine-dose-${item.id}-${dose.key}")) {
+        Surface(shape = RoundedCornerShape(50), color = bg, border = if (pending && !late) BorderStroke(1.dp, DoctorCardFaint.copy(alpha = .4f)) else null,
+            modifier = Modifier.minimumInteractiveComponentSize().clip(RoundedCornerShape(50))
+                .combinedClickable(enabled = enabled, role = Role.Button, onClickLabel = tapLabel, onLongClickLabel = holdLabel, onLongClick = { menu = true }) { if (pending) onMark(true) else menu = true }
+                .semantics { contentDescription = "${item.title}, $label: $stateWord" }.testTag("medicine-dose-${item.id}-${dose.key}")) {
             // A clear time chip: the dose time in bold; the state shows as icon and colour (the word is in the description).
             Row(Modifier.heightIn(min = 40.dp).padding(start = 10.dp, end = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-                Icon(icon, null, Modifier.size(18.dp), tint = fg); Spacer(Modifier.width(6.dp))
-                Text(label, color = if (state == MedicineDoseState.PENDING && !late) DoctorCardInk else fg, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
+                DoseStateIcon(state, fg, 18)
+                Spacer(Modifier.width(6.dp))
+                Text(label, color = if (pending && !late) DoctorCardInk else fg, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
             }
         }
         DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
             DropdownMenuItem(text = { Text(t("Taken", "ली"), color = DoctorCardInk) }, leadingIcon = { Icon(Icons.Default.Check, null, tint = DoctorStatusGood) }, onClick = { menu = false; onMark(true) }, modifier = Modifier.heightIn(min = 48.dp).testTag("medicine-dose-taken-${item.id}-${dose.key}"))
             DropdownMenuItem(text = { Text(t("Missed", "छूटी"), color = DoctorCardInk) }, leadingIcon = { Icon(Icons.Default.Close, null, tint = DoctorStatusRest) }, onClick = { menu = false; onMark(false) }, modifier = Modifier.heightIn(min = 48.dp).testTag("medicine-dose-missed-${item.id}-${dose.key}"))
         }
+    }
+}
+
+/** The dose's state as an icon that pops in when it changes: a tick once taken, a cross once missed, an empty ring before. */
+@Composable internal fun DoseStateIcon(state: MedicineDoseState, tint: androidx.compose.ui.graphics.Color, size: Int) {
+    AnimatedContent(state, transitionSpec = {
+        (fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)) + scaleIn(SaharaMotion.tween(SaharaMotion.SAVED_MS, easing = SaharaMotion.Emphasized), initialScale = 0.4f)) togetherWith fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS))
+    }, label = "dose state") { shown ->
+        Icon(when (shown) { MedicineDoseState.TAKEN -> Icons.Default.Check; MedicineDoseState.MISSED -> Icons.Default.Close; else -> Icons.Default.RadioButtonUnchecked }, null, Modifier.size(size.dp), tint = tint)
     }
 }
 

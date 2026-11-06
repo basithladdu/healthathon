@@ -11,6 +11,16 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -174,7 +184,7 @@ class MedicineStripPhotos(context: Context, storage: String) {
             latestOnRead?.let { read ->
                 val reading = runCatching { MedicineStripPhotos.read(saved) }.getOrNull()
                 if (reading != null) read(reading)
-                note = if (reading?.name.isNullOrBlank()) t("No name found. Type it.", "नाम नहीं मिला। ख़ुद लिखें।") else ""
+                note = if (reading?.name.isNullOrBlank()) t("No name found. Type it.", "नाम नहीं मिला। ख़ुद लिखें।") else t("Read from the photo. Check it.", "फ़ोटो से पढ़ा गया। जाँच लें।")
             }
         } catch (failure: Exception) { if (failure is CancellationException) throw failure; note = t("Couldn't save photo.", "फ़ोटो नहीं सहेजी गई।") }
         finally { temporary?.delete() }
@@ -184,7 +194,7 @@ class MedicineStripPhotos(context: Context, storage: String) {
         if (taken && file != null) keep(FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file), file) else file?.delete()
     }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) keep(uri, null) }
-    Column(Modifier.fillMaxWidth().testTag("strip-photos-$itemId"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(Modifier.fillMaxWidth().saharaContentSize().testTag("strip-photos-$itemId"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(t("Strip photos", "पत्ते की फ़ोटो"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
         if (photos.isNotEmpty()) Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             photos.forEachIndexed { index, file -> Box {
@@ -240,6 +250,11 @@ class MedicineStripPhotos(context: Context, storage: String) {
     val t = careText(); val hindi = careHindi()
     val entry = MedicineEntryText.parse(detail) ?: MedicineEntry()
     fun change(next: MedicineEntry) = onDetail(MedicineEntryText.detail(next))
+    StripPhotoRow(storage, personId, itemId, enabled = !busy) { reading ->
+        if (name.isBlank() && reading.name.isNotBlank()) onName(reading.name.take(200))
+        val filled = entry.copy(strength = entry.strength.ifBlank { reading.strength }, form = entry.form.ifBlank { reading.form })
+        if (filled != entry) change(filled)
+    }
     CareField(name, onName, t("Medicine name", "दवा का नाम"), singleLine = true, placeholder = t("e.g. Paracetamol", "जैसे Paracetamol"))
     MedicineNameSuggestions(name, enabled = !busy) { onName(it) }
     CareField(entry.strength, { change(entry.copy(strength = it.take(80))) }, t("Strength", "ताक़त"), singleLine = true, placeholder = t("e.g. 500 mg, 5 mg/5 ml", "जैसे 500 mg, 5 mg/5 ml"))
@@ -250,6 +265,8 @@ class MedicineStripPhotos(context: Context, storage: String) {
                 label = { Text(careTr(hindi, english, hindiName), fontSize = 15.sp) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp))
         }
     }
+    // What the strip shows comes first (the photo above can fill it); how to take it is always typed by hand.
+    Text(t("How to take it", "कैसे लेनी है"), Modifier.padding(top = 8.dp).a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
     CareField(entry.howMuch, { change(entry.copy(howMuch = it.take(80))) }, t("How much each time", "हर बार कितनी"), singleLine = true, placeholder = t("e.g. 1 tablet, 1½ tablets, 5 ml", "जैसे 1 गोली, 1½ गोली, 5 ml"))
     CareField(entry.howOften, { change(entry.copy(howOften = it.take(120))) }, t("How often", "कितनी बार"), singleLine = true, placeholder = t("e.g. twice a day, only when needed", "जैसे दिन में दो बार, ज़रूरत होने पर ही"))
     DoseTimesField(entry.times, { change(entry.copy(times = it)) }, enabled = !busy)
@@ -262,11 +279,6 @@ class MedicineStripPhotos(context: Context, storage: String) {
     CareField(entry.days?.toString().orEmpty(), { value -> if (value.isBlank()) change(entry.copy(days = null)) else value.toIntOrNull()?.takeIf { it in 1..365 }?.let { change(entry.copy(days = it)) } },
         t("For how many days", "कितने दिन"), singleLine = true, placeholder = t("e.g. 5 · leave empty if ongoing", "जैसे 5 · चलती रहे तो ख़ाली छोड़ें"))
     CareField(entry.directions, { change(entry.copy(directions = it.take(500))) }, t("Directions", "तरीक़ा"), placeholder = t("e.g. as written: dissolve in water", "जैसे पर्चे में लिखा: पानी में घोलकर"))
-    StripPhotoRow(storage, personId, itemId, enabled = !busy) { reading ->
-        if (name.isBlank() && reading.name.isNotBlank()) onName(reading.name.take(200))
-        val filled = entry.copy(strength = entry.strength.ifBlank { reading.strength }, form = entry.form.ifBlank { reading.form })
-        if (filled != entry) change(filled)
-    }
 }
 
 /**
@@ -306,11 +318,18 @@ class MedicineStripPhotos(context: Context, storage: String) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(t("Today's doses", "आज की दवाएँ"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
-                // The count as a badge, green once every dose is ticked.
-                Surface(shape = RoundedCornerShape(50), color = if (taken == total) DoctorStatusGoodBg else Cream) {
-                    Text(t("$taken of $total taken", "$total में से $taken ली"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = if (taken == total) DoctorStatusGood else DoctorCardSub, maxLines = 1, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp).testTag("today-doses-count"))
+                // The count as a status pill, green once every dose is ticked; the number rises in when it changes.
+                val allDone = taken == total
+                val pillBg by animateColorAsState(if (allDone) DoctorStatusGoodBg else Cream, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "doses pill")
+                Surface(shape = RoundedCornerShape(50), color = pillBg) {
+                    SaharaAnimatedText(t("$taken of $total taken", "$total में से $taken ली"), Modifier.padding(horizontal = 12.dp, vertical = 6.dp)) { text ->
+                        Text(text, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = if (allDone) DoctorStatusGood else DoctorCardSub, maxLines = 1, softWrap = false, modifier = Modifier.testTag("today-doses-count"))
+                    }
                 }
             }
+            val share by animateFloatAsState(if (total == 0) 0f else taken.toFloat() / total, SaharaMotion.tween(SaharaMotion.ENTER_MS, easing = SaharaMotion.Emphasized), label = "doses progress")
+            LinearProgressIndicator(progress = { share }, modifier = Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(50)), color = DoctorStatusGood, trackColor = DoctorHairline, drawStopIndicator = {}, gapSize = 0.dp)
+            if (canEdit && taken < total) Text(t("Tap a dose when taken. Hold it for Missed.", "दवा लेने पर उसे छुएँ। छूटी हो तो दबाकर रखें।"), fontSize = 14.sp, color = DoctorCardSub)
             groups.forEach { group ->
                 Column(Modifier.testTag("today-doses-${group.time}"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     HorizontalDivider(color = DoctorHairline)
@@ -334,30 +353,46 @@ class MedicineStripPhotos(context: Context, storage: String) {
                     } }
                 }
             }
-            if (problem.isNotBlank()) Text(problem, fontSize = 14.sp, color = RustText, modifier = Modifier.announce())
         }
     }
+    if (problem.isNotBlank()) AlertDialog(onDismissRequest = { problem = "" }, title = { Text(t("Not saved", "सहेजा नहीं गया")) }, text = { Text(problem) },
+        confirmButton = { TextButton(onClick = { problem = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("OK", "ठीक है")) } })
 }
 
-/** One dose in Today's doses: the strip photo (or the empty pillbox), a tick or cross once marked, and a Taken / Missed menu. */
+/**
+ * One dose in Today's doses: the strip photo (or the empty pillbox) and a tick or cross once marked.
+ * One tap on a dose not marked yet ticks it Taken; a marked dose, or a long press, opens Taken / Missed.
+ */
 @Composable private fun MedicinePillbox(item: CareItem, dose: MedicineDose, state: MedicineDoseState, photo: File?, caption: String, enabled: Boolean, family: Boolean = false, onMark: (Boolean) -> Unit) {
     val t = careText(); var menu by remember { mutableStateOf(false) }
-    Column(Modifier.width(92.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    val interaction = remember { MutableInteractionSource() }
+    Column(Modifier.width(100.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Box {
             // Ring colour echoes the state: green taken, red-brown missed, a hairline while not yet marked.
-            val ring = when (state) { MedicineDoseState.TAKEN -> BorderStroke(2.dp, DoctorStatusGood); MedicineDoseState.MISSED -> BorderStroke(2.dp, DoctorStatusRest); else -> BorderStroke(1.dp, DoctorHairline) }
+            val ringColor by animateColorAsState(when (state) { MedicineDoseState.TAKEN -> DoctorStatusGood; MedicineDoseState.MISSED -> DoctorStatusRest; else -> DoctorHairline }, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "pillbox ring")
             val label = medicineDoseLabel(dose)
             val stateWord = when (state) { MedicineDoseState.TAKEN -> t("Taken", "ली"); MedicineDoseState.MISSED -> t("Missed", "छूटी"); else -> t("Not yet", "अभी नहीं") }
-            Surface(onClick = { menu = true }, enabled = enabled, shape = RoundedCornerShape(14.dp), color = Paper, border = ring, modifier = Modifier.semantics { contentDescription = "${item.title}, $label: $stateWord" }.testTag("today-dose-${item.id}-${dose.key}")) { StripThumb(photo, 80) }
-            if (state != MedicineDoseState.PENDING) Surface(shape = RoundedCornerShape(50), color = if (state == MedicineDoseState.TAKEN) DoctorStatusGood else DoctorStatusRest, modifier = Modifier.align(Alignment.TopEnd).padding(4.dp).size(24.dp)) {
-                Icon(if (state == MedicineDoseState.TAKEN) Icons.Default.Check else Icons.Default.Close, if (state == MedicineDoseState.TAKEN) t("Taken", "ली") else t("Missed", "छूटी"), Modifier.padding(3.dp), tint = Paper)
+            val pending = state == MedicineDoseState.PENDING
+            Surface(shape = RoundedCornerShape(14.dp), color = Paper, border = BorderStroke(if (pending) 1.dp else 2.dp, ringColor),
+                modifier = Modifier.saharaPress(interaction).clip(RoundedCornerShape(14.dp))
+                    .combinedClickable(interactionSource = interaction, indication = LocalIndication.current, enabled = enabled, role = Role.Button,
+                        onClickLabel = if (pending) t("Mark taken", "ली हुई दर्ज करें") else t("Change", "बदलें"), onLongClickLabel = t("Taken or missed", "ली या छूटी"), onLongClick = { menu = true }) { if (pending) onMark(true) else menu = true }
+                    .semantics { contentDescription = "${item.title}, $label: $stateWord" }.testTag("today-dose-${item.id}-${dose.key}")) { StripThumb(photo, 80) }
+            // The tick or cross pops in on the corner the moment the dose is marked.
+            AnimatedVisibility(!pending, Modifier.align(Alignment.TopEnd).padding(4.dp), enter = fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)) + scaleIn(SaharaMotion.tween(SaharaMotion.SAVED_MS, easing = SaharaMotion.Emphasized), initialScale = 0.3f), exit = fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS))) {
+                val badge by animateColorAsState(if (state == MedicineDoseState.MISSED) DoctorStatusRest else DoctorStatusGood, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "pillbox badge")
+                Surface(shape = RoundedCornerShape(50), color = badge, modifier = Modifier.size(26.dp)) {
+                    Box(Modifier.padding(3.dp), contentAlignment = Alignment.Center) { DoseStateIcon(state, Paper, 20) }
+                }
             }
             DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
-                DropdownMenuItem(text = { Text(t("Taken", "ली"), color = DoctorCardInk) }, leadingIcon = { Icon(Icons.Default.Check, null, tint = DoctorStatusGood) }, onClick = { menu = false; onMark(true) }, modifier = Modifier.heightIn(min = 48.dp))
-                DropdownMenuItem(text = { Text(t("Missed", "छूटी"), color = DoctorCardInk) }, leadingIcon = { Icon(Icons.Default.Close, null, tint = DoctorStatusRest) }, onClick = { menu = false; onMark(false) }, modifier = Modifier.heightIn(min = 48.dp))
+                DropdownMenuItem(text = { Text(t("Taken", "ली"), color = DoctorCardInk) }, leadingIcon = { Icon(Icons.Default.Check, null, tint = DoctorStatusGood) }, onClick = { menu = false; onMark(true) }, modifier = Modifier.heightIn(min = 48.dp).testTag("today-dose-taken-${item.id}-${dose.key}"))
+                DropdownMenuItem(text = { Text(t("Missed", "छूटी"), color = DoctorCardInk) }, leadingIcon = { Icon(Icons.Default.Close, null, tint = DoctorStatusRest) }, onClick = { menu = false; onMark(false) }, modifier = Modifier.heightIn(min = 48.dp).testTag("today-dose-missed-${item.id}-${dose.key}"))
             }
         }
-        Text(item.title, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis, lineHeight = 18.sp, textAlign = TextAlign.Center)
+        // Whole words only: a medicine name never breaks mid-word under its pillbox.
+        Text(item.title, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis, lineHeight = 18.sp, textAlign = TextAlign.Center,
+            style = LocalTextStyle.current.copy(hyphens = androidx.compose.ui.text.style.Hyphens.None, lineBreak = androidx.compose.ui.text.style.LineBreak.Heading))
         if (caption.isNotBlank()) Text(caption, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1)
         // A dose ticked by an invited family member says so, so the patient and the doctor can tell who logged it.
         if (family && state != MedicineDoseState.PENDING) Text(t("Logged by family", "परिवार ने दर्ज किया"), fontSize = 14.sp, color = DoctorCardSub, maxLines = 2, lineHeight = 18.sp, textAlign = TextAlign.Center, modifier = Modifier.testTag("today-dose-family-${item.id}-${dose.key}"))

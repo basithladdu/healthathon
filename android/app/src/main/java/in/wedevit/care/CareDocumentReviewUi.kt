@@ -82,7 +82,11 @@ import java.time.ZoneId
     BackHandler { job?.cancel(); onClose() }
 
     LazyColumn(Modifier.fillMaxSize().imePadding().testTag("document-review"), contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Row(verticalAlignment = Alignment.CenterVertically) { IconButton(onClick = { job?.cancel(); onClose() }, modifier = Modifier.size(48.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back to documents", "कागज़ात पर वापस")) }; Column(Modifier.weight(1f)) { Heading(t("Review report", "रिपोर्ट जाँचें"), 26); Text(report.name, fontSize = 14.sp, color = DoctorCardSub, maxLines = 2, overflow = TextOverflow.Ellipsis) } } }
+        item { Row(verticalAlignment = Alignment.CenterVertically) { IconButton(onClick = { job?.cancel(); onClose() }, modifier = Modifier.size(48.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back to documents", "कागज़ात पर वापस")) }; Column(Modifier.weight(1f)) { Heading(t("Review report", "रिपोर्ट जाँचें"), 26); Text(report.name, fontSize = 14.sp, color = DoctorCardSub, maxLines = 2, overflow = TextOverflow.Ellipsis) }
+            // Whether this text has been checked against the original, as a status pill that changes in place.
+            value?.let { document -> SaharaStateSwitch(document.reviewedAt > 0, label = "review status") { done ->
+                Surface(shape = RoundedCornerShape(50), color = if (done) DoctorStatusGoodBg else DoctorStatusWarnBg) { Text(if (done) t("Checked", "जाँची गई") else t("Not checked yet", "अभी जाँचा नहीं"), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = if (done) DoctorStatusGood else DoctorStatusWarn, maxLines = 1, softWrap = false) }
+            } } } }
         item { OutlinedButton(onClick = { runCatching { open(context, vm.reportFiles.intent(report, false)) }.onFailure { error = t("Couldn't open this file.", "यह फ़ाइल नहीं खुल सकी।") } }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.OpenInNew, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("View original", "असली फ़ाइल देखें")) } }
         if (loading) item { SurfaceCard { LinearProgressIndicator(Modifier.fillMaxWidth(), color = DoctorAccent, trackColor = DoctorHairline); Spacer(Modifier.height(8.dp)); Text(t("Reading page ${progress.first} of ${progress.second.coerceAtLeast(1)}", "पेज ${progress.first} / ${progress.second.coerceAtLeast(1)} पढ़ रहे हैं")); TextButton(onClick = { job?.cancel(); loading = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel reading", "पढ़ना रोकें")) } } }
         if (error.isNotBlank()) item { SurfaceCard { Text(error, color = MaterialTheme.colorScheme.error, fontSize = 14.sp, modifier = Modifier.announce()); TextButton(onClick = ::read, enabled = !loading, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Read again", "फिर पढ़ें"), color = RustText) } } }
@@ -139,7 +143,7 @@ import java.time.ZoneId
                                     val day = runCatching { LocalDate.parse(dateText.trim()) }.getOrElse { throw IllegalArgumentException(t("Enter the report date as YYYY-MM-DD.", "रिपोर्ट की तारीख़ YYYY-MM-DD में लिखें।")) }
                                     val lab = CareEntry(type = "lab", detail = detail, sender = vm.cloud?.session?.value?.email.orEmpty(), value = labValue.trim(), unit = labUnit.trim(), rangeLow = labLow.trim(), rangeHigh = labHigh.trim(), reportId = report.id, reportName = report.name)
                                     CareLabRules.validate(title, lab, careEpoch(day))
-                                    vm.saveItem("task", title.trim(), CareEntryCodec.encode(lab), careEpoch(day), done = { factLine = 0; factChecked = false; vm.message.value = t("Added to Lab history", "लैब इतिहास में जुड़ गया") })
+                                    vm.saveItem("task", title.trim(), CareEntryCodec.encode(lab), careEpoch(day), done = { factLine = 0; factChecked = false; vm.message.value = t("Added to Lab history", "जाँच रिपोर्टों में जुड़ गया") })
                                     error = ""; return@Button
                                 }
                                 val due = if (kind in listOf("Follow-up", "Test")) LocalDateTime.of(LocalDate.parse(dateText), LocalTime.parse(timeText)).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() else 0
@@ -152,7 +156,7 @@ import java.time.ZoneId
                                 vm.saveItem(targetKind, title, savedDetail, due, done = { factLine = 0; factChecked = false; vm.message.value = if (due > 0) t("Added to Calendar", "कैलेंडर में जुड़ गया") else t("Checked fact copied", "जाँची हुई बात कॉपी हो गई") })
                                 error = ""
                             } catch (failure: Exception) { error = failure.message ?: t("Check the date and exact time.", "तारीख़ और सही समय जाँचें।") }
-                        }, enabled = factChecked && !busy, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("document-copy-fact")) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else if (kind == "Lab result") t("Add to Lab history", "लैब इतिहास में जोड़ें") else if (kind in listOf("Follow-up", "Test")) t("Copy to Calendar", "कैलेंडर में कॉपी करें") else t("Copy checked fact", "जाँची हुई बात कॉपी करें")) } }
+                        }, enabled = factChecked && !busy, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("document-copy-fact")) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else if (kind == "Lab result") t("Add to Lab history", "जाँच रिपोर्टों में जोड़ें") else if (kind in listOf("Follow-up", "Test")) t("Copy to Calendar", "कैलेंडर में कॉपी करें") else t("Copy checked fact", "जाँची हुई बात कॉपी करें")) } }
                     }
                 }
             }

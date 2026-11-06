@@ -4,6 +4,8 @@ package `in`.wedevit.care
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -231,7 +233,7 @@ import kotlinx.coroutines.withContext
 }
 
 /** One source: its number, the document's name and type, where in it, the lines, and a link to open it. */
-@Composable private fun DocumentAskSource(number: Int, name: String, folder: String?, where: String?, reviewed: Boolean, onOpen: (() -> Unit)?, lines: @Composable ColumnScope.() -> Unit) {
+@Composable private fun DocumentAskSource(number: Int, name: String, folder: String?, where: String?, reviewed: Boolean, onOpen: (() -> Unit)?, lines: @Composable ColumnScope.() -> Unit) = DocumentAskArrive {
     val t = careText()
     Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -251,13 +253,19 @@ import kotlinx.coroutines.withContext
 }
 
 /** One message in the ask thread: the person's question on the right, the reply on the left. */
-@Composable private fun DocumentAskBubble(mine: Boolean, content: @Composable ColumnScope.() -> Unit) {
+@Composable private fun DocumentAskBubble(mine: Boolean, content: @Composable ColumnScope.() -> Unit) = DocumentAskArrive {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = if (mine) Arrangement.End else Arrangement.Start) {
         Surface(shape = if (mine) RoundedCornerShape(topStart = 20.dp, topEnd = 4.dp, bottomEnd = 20.dp, bottomStart = 20.dp) else RoundedCornerShape(topStart = 4.dp, topEnd = 20.dp, bottomEnd = 20.dp, bottomStart = 20.dp),
             color = if (mine) SaharaSoftGold else Mint, modifier = if (mine) Modifier.padding(start = 48.dp) else Modifier.fillMaxWidth().padding(end = 16.dp)) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp), content = content)
         }
     }
+}
+
+/** A reply or source card rises in once when it arrives, instead of popping onto the screen. */
+@Composable private fun DocumentAskArrive(content: @Composable () -> Unit) {
+    val shown = remember { MutableTransitionState(false).apply { targetState = true } }
+    AnimatedVisibility(shown, enter = SaharaMotion.enter) { content() }
 }
 
 /** The number that ties an answer to its source card. */
@@ -270,18 +278,20 @@ import kotlinx.coroutines.withContext
 /** What kind of document this is, as sorted on the phone or chosen by the person. */
 @Composable internal fun DocumentAskTypeBadge(folder: String?) {
     val t = careText()
-    val (label, color) = when (folder) {
-        DocumentFolderRules.BILLS -> t("Bill", "बिल") to Peach
-        DocumentFolderRules.LAB -> t("Lab report", "लैब रिपोर्ट") to Mint
-        DocumentFolderRules.PRESCRIPTIONS -> t("Prescription", "पर्चा") to Sage
-        DocumentFolderRules.DISCHARGE -> t("Discharge summary", "डिस्चार्ज सारांश") to SaharaSoftGold
-        else -> t("Other", "अन्य") to SaharaLavender
+    val label = when (folder) {
+        DocumentFolderRules.BILLS -> t("Bill", "बिल")
+        DocumentFolderRules.LAB -> t("Lab report", "लैब रिपोर्ट")
+        DocumentFolderRules.PRESCRIPTIONS -> t("Prescription", "पर्चा")
+        DocumentFolderRules.DISCHARGE -> t("Discharge summary", "डिस्चार्ज सारांश")
+        else -> t("Other", "अन्य")
     }
-    DocumentAskPill(label, color, Modifier.testTag("document-ask-type-${folder ?: DocumentFolderRules.OTHER}"))
+    // The same colour as the folder's tile on the Documents screen.
+    val tone = documentFolderTone(folder)
+    DocumentAskPill(label, tone.soft, Modifier.testTag("document-ask-type-${folder ?: DocumentFolderRules.OTHER}"), ink = tone.accent)
 }
 
-@Composable private fun DocumentAskPill(text: String, color: Color, modifier: Modifier = Modifier) {
-    Surface(shape = RoundedCornerShape(50), color = color, contentColor = DoctorCardInk, modifier = modifier) {
+@Composable private fun DocumentAskPill(text: String, color: Color, modifier: Modifier = Modifier, ink: Color = DoctorCardInk) {
+    Surface(shape = RoundedCornerShape(50), color = color, contentColor = ink, modifier = modifier) {
         Text(text, Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1)
     }
 }
