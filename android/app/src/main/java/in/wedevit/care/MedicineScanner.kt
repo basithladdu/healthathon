@@ -225,7 +225,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
 
         MedicineScannerPhase.Scanning -> Box(Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                CircularProgressIndicator(color = Rust)
+                SaharaBrandMark(size = 72)
                 Heading(t("Reading prescription", "पर्चा पढ़ रहे हैं"), 26)
                 val value = progress
                 if (value?.stage == MedicineScanStage.PREPARING && value.total > 0) {

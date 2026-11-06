@@ -42,7 +42,7 @@ import kotlinx.coroutines.launch
             if (requests.isNotEmpty()) Surface(shape = RoundedCornerShape(50), color = Paper, contentColor = RustText) { Text("${requests.size}", Modifier.padding(horizontal = 10.dp, vertical = 2.dp), fontWeight = FontWeight.Bold) }
             IconButton(onClick = refresh, enabled = !busy, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Refresh, t("Refresh requests", "अनुरोध ताज़ा करें"), tint = DoctorCardInk) }
         }
-        if (loading || busy && requests.isEmpty()) LinearProgressIndicator(Modifier.fillMaxWidth().padding(vertical = 8.dp), color = Rust)
+        if (loading || busy && requests.isEmpty()) SaharaSkeleton(Modifier.padding(vertical = 8.dp), rows = 2)
         else if (requests.isEmpty()) Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.CheckCircle, null, Modifier.size(20.dp), tint = DoctorStatusGood); Spacer(Modifier.width(8.dp))
             Text(t("No requests", "कोई अनुरोध नहीं"), color = DoctorCardInk)

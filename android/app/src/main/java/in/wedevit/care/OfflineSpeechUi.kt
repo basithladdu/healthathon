@@ -109,8 +109,7 @@ import java.io.File
         }
         if (busy) {
             Text(color = DoctorCardInk, fontSize = 14.sp, modifier = Modifier.padding(top = 8.dp), text = if (progress.second > 0) "$operation · ${(progress.first * 100 / progress.second).coerceIn(0, 100)}%" else if (operation == t("Turning into text", "लिखाई बन रही है")) t("Preparing audio…", "ऑडियो तैयार हो रहा है…") else operation)
-            if (progress.second > 0) LinearProgressIndicator(progress = { (progress.first.toFloat() / progress.second).coerceIn(0f, 1f) }, modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp), color = Rust)
-            else LinearProgressIndicator(Modifier.fillMaxWidth().padding(vertical = 4.dp), color = Rust)
+            SaharaProgressBar(if (progress.second > 0) (progress.first.toFloat() / progress.second).coerceIn(0f, 1f) else null, Modifier.padding(vertical = 4.dp))
             TextButton(onClick = { task?.cancel() }, modifier = Modifier.heightIn(min = 48.dp).testTag("offline-cancel")) { Text(t("Stop", "रोकें"), color = RustText) }
         }
         if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp).testTag("offline-error").announce())

@@ -20,13 +20,28 @@ class SaharaPaletteTest {
         aa("outline edge", SaharaColors.LineStrong, SaharaColors.Surface, 3f)
     }
 
+    /**
+     * Round 2 (vivid): every section solid is a bright, saturated fill for tiles, chips, headers and big buttons with bold
+     * white text: at least 3:1 (large or bold text), and 4.5:1 for every tone except Marigold, so small white text is
+     * still safe on all others. Small text on light grounds uses the darker ink: 4.5:1 on its wash, on white and on cream.
+     */
     @Test fun everyToneReadsOnItsSolidAndItsWash() {
         SaharaTone.entries.forEach { tone ->
-            aa("${tone.name} on solid", tone.onSolid, tone.solid)
+            aa("${tone.name} bold text on solid", tone.onSolid, tone.solid, 3f)
+            if (tone != SaharaTone.Marigold) aa("${tone.name} small text on solid", tone.onSolid, tone.solid)
             aa("${tone.name} ink on wash", tone.ink, tone.wash)
+            aa("${tone.name} ink on white", tone.ink, SaharaColors.Surface)
+            aa("${tone.name} ink on cream", tone.ink, SaharaColors.Ground)
             aa("${tone.name} sub text on wash", SaharaColors.InkSub, tone.wash)
             aa("${tone.name} chip vs surface", tone.solid, SaharaColors.Surface, if (tone == SaharaTone.Gold) 1.5f else 3f)
         }
+    }
+
+    @Test fun vividButtonsStayReadable() {
+        // The bright rust is also the legacy Rust text colour on cream, so it keeps 4.5:1 there.
+        aa("rust on cream", SaharaColors.Primary, SaharaColors.Ground)
+        aa("white on pressed rust", SaharaColors.OnPrimary, SaharaColors.PrimaryPressed, 7f)
+        listOf(DoctorStatusGood to DoctorStatusGoodBg, DoctorStatusWarn to DoctorStatusWarnBg, DoctorStatusRest to DoctorStatusRestBg).forEach { (fg, bg) -> aa("status text", fg, bg) }
     }
 
     @Test fun readableOnPicksTheBetterInk() {
