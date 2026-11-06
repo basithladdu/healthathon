@@ -86,7 +86,7 @@ abstract class TextFitRenderTest(private val flow: String, private val hindi: Bo
         screen("More: care plan") { click("nav-More"); click("more-care-plan-entry") }
         back()
         // Last: MapLibre native code may not load on the JVM; a failure here loses nothing above.
-        screen("Nearby") { click("nav-Nearby"); if (has("permission-not-now")) click("permission-not-now") }
+        screen("Nearby") { click("nav-Help"); if (has("permission-not-now")) click("permission-not-now") }
     }
 
     private fun family() {

@@ -43,7 +43,7 @@ class FamilyMoreRenderTest {
         step("01-today") {}
         step("02-emergency-qr") { click("today-qr") }
         back()
-        step("03-nearby-location-why") { click("nav-Nearby") }
+        step("03-nearby-location-why") { click("nav-Help") }
         step("03b-nearby") { click("permission-not-now") }
         step("03c-nearby-filters") { click("nearby-filters"); click("nearby-layer-palliative") }
         back()
