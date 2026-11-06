@@ -70,7 +70,7 @@ for i, (ic, a, b) in enumerate(story):
 stats = [(7, '15.6 lakh', RUST, 'new cancer cases in India in 2024.', 'IARC, GLOBOCAN 2024', 'https://gco.iarc.who.int/media/globocan/factsheets/populations/356-india-fact-sheet.pdf'),
          (8, '98%', TEAL, 'of patients whose cancer had spread did not get the comfort care (palliative care) they needed.', 'Patil et al., 2024', 'https://doi.org/10.1136/spcare-2024-004978'),
          (9, '88%', PURPLE, 'of surveyed city patients wanted to choose their own end-of-life treatment.', 'IndiaSpend, 2019', 'https://scroll.in/article/925875/73-urban-indians-do-not-know-about-their-right-to-make-a-living-will-finds-a-survey'),
-         (10, '11.5%', BLUE, 'of doctors (45 of 391) in one hospital were trained to record these wishes.', 'Jacob et al., 2026', 'https://doi.org/10.25259/NMJI_817_2023')]
+         (10, '11.5%', BLUE, 'of doctors (45 of 391) in one hospital were trained in advance directives (recording these wishes).', 'Jacob et al., 2026', 'https://doi.org/10.25259/NMJI_817_2023')]
 for i, (ic, big, col, desc, src, url) in enumerate(stats):
     x = 6.55 + (i % 2) * 3.15; y = 1.2 + (i // 2) * 1.85
     icon(prob, ic, x, y + 0.08, 0.45)
@@ -268,8 +268,8 @@ for i, (big, lbl, col) in enumerate(tiles):
 text(evals, 0.55, 3.15, 12.2, 0.3, [[R('Automatic checks are small test programs that run after every change, so a broken feature is caught before release. The practice talks are made up, not real patients.', size=10.5, color=MUTED, italic=True)]])
 text(evals, 0.55, 3.5, 12.2, 0.38, [[R('2. What experts told us, and what we changed', size=16, bold=True, color=RUST)]])
 fb = [(11, 'Dr Sujay Halkur Shankar', 'doctor, used the whole app on 3 Nov',
-       'Patients have tubes and drains to look after; text looks faded on cheap phones; ask in the order doctors do.',
-       'Tubes-and-drains tracker, darker text, checklist in the doctors’ order.'),
+       'Is there a guide telling the doctor what to talk about next? And a medicine taken 4 times a day needs 4 ticks.',
+       'Checklist in the doctors’ order with a “not yet discussed” prompt; one tick per dose. Team chat: tubes-and-drains tracker, darker text.'),
       (28, 'Rituparna P', 'lawyer, checked the form on 31 Oct',
        'Use the exact wording of India’s living-will form.',
        'Form copied word for word; signing locks it.'),
