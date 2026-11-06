@@ -518,7 +518,7 @@ function ContextCheckerPane(props: {
       <div className="ops-context-hero">
         <div>
           <div className="ops-kicker">Continuity context checker</div>
-          <h3>Inspect live session · patient · location · handoff readiness</h3>
+          <h3>Check session, patient, place and hand-over</h3>
           <p className="ops-muted">
             Reads ContinuityProvider + shell session state and surfaces pass/fail gates judges can click through.
           </p>
@@ -669,7 +669,7 @@ function MroVaultPane(props: {
       </div>
 
       <div className="ops-mro-more">
-        <h4>MORE · adjacent OS surfaces in this hub</h4>
+        <h4>More tools</h4>
         <ul>
           <li>
             <IconMapPin className="w-4 h-4" /> MapLibre community GIS dispatch with live ASHA / 108 routing
@@ -730,7 +730,7 @@ export function ContinuityOpsHub(props: ContinuityOpsHubProps) {
           <div>
             <span className="ops-hub-badge">P0 Continuity OS</span>
             <h2 id="ops-hub-title">Continuity Ops Hub</h2>
-            <p>MapLibre · QR · Context · MRO — pitch-ready operating surfaces</p>
+            <p>Map, QR, live check and record</p>
           </div>
           <button type="button" className="close-btn" onClick={onClose} aria-label="Close Continuity Ops Hub">
             ✕

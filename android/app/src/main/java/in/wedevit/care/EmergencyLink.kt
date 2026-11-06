@@ -15,7 +15,7 @@ enum class EmergencyLinkProblem(val en: String, val hi: String) {
     NOT_SET_UP("Web link not available yet.", "वेब लिंक अभी उपलब्ध नहीं है।"),
     SIGNED_OUT("Sign in to add a web link.", "वेब लिंक के लिए साइन इन करें।"),
     NOT_OWNER("Only the profile owner can make a web link.", "वेब लिंक केवल प्रोफ़ाइल का मालिक बना सकता है।"),
-    WALKTHROUGH("Web links are off in the walkthrough.", "वॉकथ्रू में वेब लिंक बंद है।"),
+    WALKTHROUGH("Web links are off in Practice.", "अभ्यास में वेब लिंक बंद हैं।"),
     LINK_OFF("This link is off or expired.", "यह लिंक बंद है या समाप्त हो गया है।"),
     OFFLINE("Couldn't connect. Try again.", "कनेक्ट नहीं हो सका। फिर कोशिश करें।"),
 }
