@@ -132,6 +132,13 @@ dependencies {
     implementation("com.google.mlkit:translate:17.0.3")
     // Lottie for Compose (Apache-2.0); plays the small bundled res/raw/lottie_*.json animations (SaharaLottie.kt).
     implementation("com.airbnb.android:lottie-compose:6.7.1")
+    // kizitonwose Calendar (MIT): swipeable month and week rows for the Calendar and the doctor's Schedule (CareCalendarGrid.kt).
+    // 2.9.1 is the newest release built for Compose 1.9 / Kotlin 2.2 (2.10.x needs Compose 1.10 and Kotlin 2.3).
+    // Its POM lists ui-tooling as a runtime dependency (previews only); excluded so the release app does not ship it.
+    implementation("com.kizitonwose.calendar:compose:2.9.1") { exclude(group = "androidx.compose.ui", module = "ui-tooling") }
+    // Coil 3 (Apache-2.0): strip-photo thumbnails off the main thread with a memory cache and a fade-in (MedicineStripPhotos.kt).
+    // Local files only, no network module. 3.3.0 is the newest release built with Kotlin 2.2 (3.4+ needs Kotlin 2.3/2.4).
+    implementation("io.coil-kt.coil3:coil-compose:3.3.0")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.json:json:20251224")
     androidTestImplementation(platform("androidx.compose:compose-bom:2025.09.01"))

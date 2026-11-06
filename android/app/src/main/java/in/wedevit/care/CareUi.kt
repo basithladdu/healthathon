@@ -476,6 +476,8 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
     val medicines = CareDailyFlow.medicinesForToday(items, today)
     val visits = CareTodayRules.upcomingVisits(items, dayStart)
     val tasks = items.filter { it.kind == "task" && !CareEntryCodec.isStructured(it.detail) }.sortedBy { it.doneOn.isNotBlank() }
+    // Signed in: pull the list down to refresh (Material 3), as well as the Refresh button in the header.
+    SaharaPullRefresh(vm.refreshing, vm::refresh, enabled = vm.cloud != null) {
     // A soft warm wash behind Today so the white and tinted cards stand off the ground.
     LazyColumn(Modifier.fillMaxSize().background(SaharaColors.GroundWarm).saharaScreenEnter().testTag("today-list"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item(key = "today-header") { Row(Modifier.fillMaxWidth().saharaStagger(0), verticalAlignment = Alignment.CenterVertically) {
@@ -563,6 +565,7 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
         val notes = items.filter { it.kind == "journal" && !PatientProfileCodec.isStructured(it.detail) && !SideEffectCodec.isStructured(it.detail) }
         if (notes.isEmpty() && loaded) item { SurfaceCard { Text(CareTodayRules.emptyText("journal", canEdit, hindi), color = DoctorCardSub) } }
         items(notes.take(2), key = { it.id }) { CareRow(it, vm) }
+    }
     }
 }
 

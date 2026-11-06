@@ -213,7 +213,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                     }
                 }
             } else SaharaScreenHost(tab, Modifier.fillMaxSize(), label = "doctorTabs", direction = { from, to -> if (to > from) SaharaMotion.Direction.Forward else SaharaMotion.Direction.Back }) { shownTab -> when(shownTab) {
-                0 -> CompositionLocalProvider(LocalSaharaStagger provides remember { SaharaStagger() }) { LazyColumn(Modifier.fillMaxSize().testTag("doctor-home"), state = homeList, contentPadding = PaddingValues(start = 16.dp, top = 12.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                0 -> CompositionLocalProvider(LocalSaharaStagger provides remember { SaharaStagger() }) { SaharaPullRefresh(vm.refreshing, { vm.refresh(); checkClinician() }, enabled = !earlierWorkspace) { LazyColumn(Modifier.fillMaxSize().testTag("doctor-home"), state = homeList, contentPadding = PaddingValues(start = 16.dp, top = 12.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Text(LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, d MMMM", careLocale(hindi))), Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
                         if (!earlierWorkspace) IconButton(onClick = { vm.refresh(); checkClinician() }, enabled = !realRefreshing, modifier = Modifier.size(48.dp).testTag("doctor-home-refresh")) { if (realRefreshing) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp, color = DoctorAccent) else Icon(Icons.Default.Refresh, t("Refresh records", "रिकॉर्ड रिफ़्रेश करें"), tint = DoctorAccent) } } }
                     if (earlierWorkspace) {
@@ -225,12 +225,12 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                         doctorConnectedHomeItems(realPeople, allItems, System.currentTimeMillis(), hindi, onVisit = { openReal(it); section = "Visits" }, onProgress = { openReal(it); section = "Progress" }, onPatients = { tab = 1 },
                             onScrollTo = { index -> scope.launch { homeList.animateScrollToItem(index) } }, firstIndex = 1 + (if (showVerification) 1 else 0) + (if (realRefreshError != null) 1 else 0))
                     }
-                } }
+                } } }
                 1 -> {
                     val shown = DoctorConnectedHome.search(realPeople, patientQuery)
                     val t = { en: String, hi: String -> careTr(hindi, en, hi) }
                     val now = System.currentTimeMillis()
-                    CompositionLocalProvider(LocalSaharaStagger provides remember { SaharaStagger() }) { LazyColumn(Modifier.fillMaxSize().testTag("doctor-patients-list"), contentPadding = PaddingValues(start = 16.dp, top = 12.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    CompositionLocalProvider(LocalSaharaStagger provides remember { SaharaStagger() }) { SaharaPullRefresh(vm.refreshing, vm::refresh) { LazyColumn(Modifier.fillMaxSize().testTag("doctor-patients-list"), contentPadding = PaddingValues(start = 16.dp, top = 12.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         item { Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) { Text(t("Patients", "मरीज़"), Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 24.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk); if (realPeople.isNotEmpty()) DoctorPill(if (patientQuery.isBlank()) "${realPeople.size}" else "${shown.size}/${realPeople.size}", DoctorTones.Rust) } }
                         if (realPeople.isNotEmpty()) item { DoctorPatientSearchField(patientQuery, { patientQuery = it }, hindi) }
                         if (realPeople.isEmpty()) item(key = "patients-empty-art") { SaharaIllustration(SaharaArtKind.NoPatients, Modifier.fillMaxWidth()) }
@@ -245,7 +245,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                                 Button(onClick = ::joinPatient, enabled = !joining && joinCode.isNotBlank(), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorTones.Rust.solid, contentColor = Color.White), modifier = Modifier.heightIn(min = 56.dp).testTag("doctor-join")) { if (joining) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = Color.White) else Icon(Icons.Default.PersonAdd, null); Spacer(Modifier.width(6.dp)); Text(t("Join", "जुड़ें"), softWrap = false) }
                             }
                         } }
-                    } }
+                    } } }
                 }
                 2 -> {
                     var day by rememberSaveable { mutableStateOf(LocalDate.now().toString()) }
