@@ -394,21 +394,22 @@ internal object CommunityLocal {
 
     private fun mine(state: CommunityLocalState, kind: String) = state.items.filter { it.kind == kind }
 
-    fun home(state: CommunityLocalState): CommunityHome = CommunityHome(state.name, canModerate = false, groups = baseGroups.map { group ->
-        group.copy(posts = posts.count { it.groupId == group.id } + mine(state, CommunityPending.POST).count { it.target == group.id }, joined = group.id in state.joined)
+    /** [builtIn] false (outside Practice, owner 6 Nov) leaves out the built-in posts: only this phone's own posts show. */
+    fun home(state: CommunityLocalState, builtIn: Boolean = true): CommunityHome = CommunityHome(state.name, canModerate = false, groups = baseGroups.map { group ->
+        group.copy(posts = (if (builtIn) posts.count { it.groupId == group.id } else 0) + mine(state, CommunityPending.POST).count { it.target == group.id }, joined = group.id in state.joined)
     })
 
     /**
      * Newest first. Built-in times are counted back from [anchorMs] (when the screen opened), so they read as recent; [pick] chooses
      * English or Hindi. [groupId] [CommunityRules.SAVED] lists the saved posts from every group.
      */
-    fun feed(groupId: String, state: CommunityLocalState, anchorMs: Long, pick: (CommunityVoice) -> String): CommunityFeed {
+    fun feed(groupId: String, state: CommunityLocalState, anchorMs: Long, builtIn: Boolean = true, pick: (CommunityVoice) -> String): CommunityFeed {
         val wanted = { postGroup: String, postId: String -> if (groupId == CommunityRules.SAVED) postId in state.saved else postGroup == groupId }
         val myName = state.name.orEmpty()
         val replies = mine(state, CommunityPending.REPLY)
         fun counted(id: String, kind: String) = if ("$id:$kind" in state.reactions) 1 else 0
         fun yours(postId: String) = replies.filter { it.target == postId }.map { CommunityReply(it.id, it.body, it.savedAt, myName, mine = true, byTeam = false, hidden = false, reported = false, reports = 0) }
-        val built = posts.filter { wanted(it.groupId, it.id) }.map { post ->
+        val built = posts.filter { builtIn && wanted(it.groupId, it.id) }.map { post ->
             CommunityPost(post.id, post.groupId, pick(post.body), anchorMs - post.minutesAgo * 60_000L, pick(post.name), mine = false, byTeam = false, hidden = false,
                 helpful = post.helpful + counted(post.id, "helpful"), hugs = post.hugs + counted(post.id, "hugs"), myHelpful = counted(post.id, "helpful") == 1, myHugs = counted(post.id, "hugs") == 1,
                 reported = post.id in state.reported, reports = 0,

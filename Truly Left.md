@@ -3,7 +3,7 @@
 ## 6 Nov 2026: what is left (plain words)
 
 **Not working yet**
-- Community: people sign in with their real account and can join groups, post, reply and save. Until Awaiz switches on the server, the posts stay on each phone (built-in posts fill the groups).
+- Community: people sign in with their real account and can join groups, post, reply and save. Until Awaiz switches on the server, the posts stay on each phone. The built-in example posts show only in Practice (owner, 6 Nov).
 - Website (sahara.wedevit.in): the new look with the brighter colours is live.
 - New look on the phone: nobody has tried it on a real phone yet.
 - Hindi, Telugu, Urdu, Kannada words added this week: written by computer, not checked by a native speaker.
@@ -12,10 +12,8 @@
 - PPT: new screenshots of the new look. Update the slides.
 - Video: record the app walkthrough again with the new look.
 - Awaiz: switch on community on the server (one database update).
-- Doctors: say yes to the 4 community groups. Pick who can hide bad posts.
-- Doctors: check that "Confirm and continue" (one button now) is OK in Goals of care.
+- Doctors: say yes to the 4 community groups. Pick who can hide bad posts (owner OK'd: they use the clinician-review role).
 - Test on a phone: sign in, Practice, Today check-in, take a dose (and Undo), Goals of care, Nearby, community.
-- Before real patients: show the built-in community posts only in Practice.
 
 **Known small problems**
 - One old test fails (emergency card field names). It also failed before this week.

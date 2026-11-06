@@ -4,6 +4,8 @@
 
 ## 6 Nov: Awaiz, switch on the community
 
+Owner decisions (6 Nov): moderators use the existing `clinical_verifier` role (yes, it also allows clinician review); the built-in example posts show only in Practice; the single "Confirm and continue" button in Goals of care stays.
+
 The app's Community works without the server: anyone can read the groups; signing in (or creating an account) lets a person join groups, post, reply, react ("I've been there", hugs), save posts and choose the name others see (it starts as the first name from their email). Until the server part below is on, what a signed-in person writes stays on their phone, under their account. After it is on, everyone sees each other's posts.
 
 - [ ] **1. Check it offline first** (from the repository root, no project touched):

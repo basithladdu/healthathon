@@ -106,7 +106,8 @@ private const val SAVED_ROUTE = "saved"
 /** Tele-MANAS, the national tele mental health helpline (MoHFW): toll-free, 24x7. */
 private const val TELE_MANAS = "14416"
 
-@Composable fun CareCommunityScreen(cloud: CareCloud?, onAccount: () -> Unit, onBack: () -> Unit) {
+/** [practice]: built-in posts show only in Practice (owner, 6 Nov); elsewhere only real posts and this phone's own. */
+@Composable fun CareCommunityScreen(cloud: CareCloud?, onAccount: () -> Unit, onBack: () -> Unit, practice: Boolean = false) {
     val t = careText()
     val context = LocalContext.current
     val store = remember { CommunityStore(context) }
@@ -140,7 +141,7 @@ private const val TELE_MANAS = "14416"
     var localState by remember(accountId) { mutableStateOf(accountId?.let(store::local) ?: CommunityLocalState()) }
     val anchor = remember { System.currentTimeMillis() }
     fun saveLocal(next: CommunityLocalState) { if (accountId == null) return; localState = next; store.saveLocal(accountId, next) }
-    val shownHome = if (local) CommunityLocal.home(localState) else home
+    val shownHome = if (local) CommunityLocal.home(localState, builtIn = practice) else home
     val myName = if (local) localState.name else home?.myName ?: feeds.values.firstNotNullOfOrNull { it.myName }
     val canModerate = !local && home?.canModerate == true
     /** Signed out: reading is open, everything else asks to sign in or create an account first. */
@@ -247,7 +248,7 @@ private const val TELE_MANAS = "14416"
                 BackHandler { leaveGroup() }
                 val group = shownHome?.groups?.firstOrNull { it.id == feedId }
                 val lang = careLanguage()
-                val localFeed = if (local) remember(localState, feedId, lang) { CommunityLocal.feed(feedId, localState, anchor) { careTr(lang, it.en, it.hi) } } else null
+                val localFeed = if (local) remember(localState, feedId, lang) { CommunityLocal.feed(feedId, localState, anchor, builtIn = practice) { careTr(lang, it.en, it.hi) } } else null
                 val waitingHere = if (local) emptyList() else pending.filter { (it.kind == CommunityPending.POST && it.target == feedId) || (it.kind == CommunityPending.REPLY && feeds[feedId]?.posts?.any { p -> p.id == it.target } == true) }
                 CommunityFeedPage(group = group, groupId = feedId, feed = localFeed ?: feeds[feedId], error = if (local) null else feedErrors[feedId], loading = loading && !local, pending = waitingHere,
                     myName = myName, signedIn = signedIn, canModerate = !local && (canModerate || feeds[feedId]?.canModerate == true), justSent = justSent, sending = sending,

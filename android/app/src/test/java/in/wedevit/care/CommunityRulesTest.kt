@@ -119,6 +119,14 @@ class CommunityRulesTest {
         localVoices().forEach { assertFalse(it.en, banned.containsMatchIn(it.en) || banned.containsMatchIn(it.hi)) }
     }
 
+    @Test fun builtInPostsShowOnlyInPractice() {
+        val mine = CommunityPending("mine-1", "acct-a", CommunityPending.POST, "family-carers", "Hello", 5L)
+        val state = CommunityLocal.add(CommunityLocalState(name = "Asha"), mine)
+        assertTrue(CommunityLocal.home(CommunityLocalState(), builtIn = false).groups.all { it.posts == 0 })
+        assertEquals(1, CommunityLocal.home(state, builtIn = false).groups.first { it.id == "family-carers" }.posts)
+        assertEquals(listOf("mine-1"), CommunityLocal.feed("family-carers", state, 1_000_000_000L, builtIn = false) { it.en }.posts.map { it.id })
+    }
+
     private fun localVoices(): List<CommunityVoice> = CommunityLocal.posts.flatMap { post -> listOf(post.name, post.body) + post.replies.flatMap { listOf(it.name, it.body) } }
 
     @Test fun builtInCommunityMatchesTheServerGroupsAndIsLively() {
