@@ -16,11 +16,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.Dp
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
@@ -30,10 +26,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Groups
-import androidx.compose.material.icons.filled.Healing
-import androidx.compose.material.icons.filled.Science
+import androidx.compose.material.icons.filled.Forum
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.DocumentScanner
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -84,6 +79,8 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
     Surface(shape = RoundedCornerShape(TodayHero.radius), color = band, contentColor = Color.White, modifier = Modifier.fillMaxWidth().saharaAppear().testTag("today-checkin")) {
         Column(Modifier.saharaContentSize().padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 6.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
+                // The one main card on Today: its icon swells slowly a few times, then rests (off when animations are off).
+                SaharaIconChip(Icons.Default.WbSunny, SaharaTone.Gold, size = 36, breathe = true); Spacer(Modifier.width(10.dp))
                 Text(t("How was today?", "आज का दिन कैसा रहा?"), fontFamily = SaharaTitleFont, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Medium, color = Color.White, modifier = Modifier.weight(1f).a11yHeading())
                 // The saved tick pops in once the check-in is stored (it follows the saved record, not a timer).
                 AnimatedVisibility(done, enter = scaleIn(spring(dampingRatio = Spring.DampingRatioMediumBouncy), initialScale = .6f) + fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)), exit = fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS))) {
@@ -108,11 +105,11 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
             FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 TextButton(onClick = onOpen, colors = ButtonDefaults.textButtonColors(contentColor = Color.White), contentPadding = PaddingValues(horizontal = 4.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("today-checkin-words")) {
                     Text(if (today?.detail.isNullOrBlank()) t("Add a few words", "कुछ शब्द लिखें") else t("Change the words", "शब्द बदलें"), fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-                    Spacer(Modifier.width(4.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(18.dp))
+                    Icon(Icons.Default.ChevronRight, null, Modifier.size(20.dp))
                 }
                 TextButton(onClick = onSymptom, colors = ButtonDefaults.textButtonColors(contentColor = Color.White), contentPadding = PaddingValues(horizontal = 4.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("today-checkin-symptom")) {
-                    Icon(Icons.Default.Healing, null, Modifier.size(18.dp)); Spacer(Modifier.width(4.dp))
                     Text(t("Note a symptom", "तबीयत का नोट लिखें"), fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                    Icon(Icons.Default.ChevronRight, null, Modifier.size(20.dp))
                 }
             }
         }
@@ -253,101 +250,25 @@ internal class CareModuleTile(val name: String, val title: String, val subtitle:
     val key get() = name.lowercase().replace(' ', '-')
 }
 
-/** The six modules as a bento grid: one wide tile, a tall one beside two short ones, then two even ones. */
-@Composable internal fun CareModuleGrid(tiles: List<CareModuleTile>, onOpen: (String) -> Unit) {
-    val byName = tiles.associateBy { it.name }
-    @Composable fun tile(name: String, modifier: Modifier, layout: Int) { byName[name]?.let { CareBentoTile(it, modifier, layout) { onOpen(name) } } }
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        tile("Conversations", Modifier.fillMaxWidth().heightIn(min = 108.dp), BENTO_WIDE)
-        Row(Modifier.fillMaxWidth().heightIn(min = 208.dp).height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            tile("Medicines", Modifier.weight(1f).fillMaxHeight(), BENTO_TALL)
-            Column(Modifier.weight(1f).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                tile("Visits", Modifier.fillMaxWidth().weight(1f).heightIn(min = 98.dp), BENTO_SMALL)
-                tile("To do", Modifier.fillMaxWidth().weight(1f).heightIn(min = 98.dp), BENTO_SMALL)
-            }
-        }
-        Row(Modifier.fillMaxWidth().heightIn(min = 124.dp).height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            tile("Check-ins", Modifier.weight(1f).fillMaxHeight(), BENTO_TALL)
-            tile("Journal", Modifier.weight(1f).fillMaxHeight(), BENTO_TALL)
-        }
-    }
-}
-
-private const val BENTO_WIDE = 0
-private const val BENTO_TALL = 1
-private const val BENTO_SMALL = 2
-
 /** Each Daily care module keeps one section colour everywhere (tile wash, count, icon tile): medicines plum, visits indigo, check-ins teal. */
 internal fun careModuleTone(name: String): SaharaTone = when (name) {
     "Conversations" -> SaharaTone.Marigold; "Medicines" -> SaharaTone.Plum; "Visits" -> SaharaTone.Indigo
     "To do" -> SaharaTone.Leaf; "Check-ins" -> SaharaTone.Teal; else -> SaharaTone.Rose
 }
 
-@Composable private fun CareBentoTile(tile: CareModuleTile, modifier: Modifier, layout: Int, onClick: () -> Unit) {
-    val t = careText()
-    val tone = careModuleTone(tile.name)
-    val count = if (tile.count == 0) t("Nothing yet", "अभी कुछ नहीं") else "${tile.count}"
-    val label = "${tile.title}, $count"
-    ActionCard(tone.wash, modifier.testTag("care-module-${tile.key}-toggle").semantics(mergeDescendants = true) { contentDescription = label }, onClick) {
-        @Composable fun art(size: Dp, m: Modifier = Modifier) = Image(saharaImage(tile.art, size), null, m.size(size), contentScale = ContentScale.Fit)
-        @Composable fun number() = SaharaAnimatedText(count) {
-            if (tile.count == 0) Text(it, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = tone.ink)
-            else Text(it, fontSize = 26.sp, fontWeight = FontWeight.Bold, color = tone.ink)
-        }
-        @Composable fun title() = Text(tile.title, fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 2, modifier = Modifier.a11yHeading(),
-            style = LocalTextStyle.current.copy(lineBreak = androidx.compose.ui.text.style.LineBreak.Heading, hyphens = androidx.compose.ui.text.style.Hyphens.None))
-        when (layout) {
-            BENTO_WIDE -> Row(Modifier.fillMaxSize().padding(start = 18.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) { title(); Spacer(Modifier.height(10.dp)); number() }
-                art(100.dp)
-            }
-            BENTO_TALL -> Box(Modifier.fillMaxSize().padding(14.dp)) {
-                Column(Modifier.align(Alignment.TopStart)) { title() }
-                Box(Modifier.align(Alignment.BottomStart)) { number() }
-                art(if (tile.name == "Medicines") 112.dp else 72.dp, Modifier.align(Alignment.BottomEnd).offset(x = 6.dp, y = 6.dp))
-            }
-            else -> Row(Modifier.fillMaxSize().padding(start = 14.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) { title(); number() }
-                art(60.dp)
-            }
-        }
-    }
+/** The module's icon in the All care tools list. */
+internal fun careModuleIcon(name: String): ImageVector = when (name) {
+    "Conversations" -> Icons.Default.Forum; "Medicines" -> careIcon("medicine"); "Visits" -> careIcon("visit")
+    "To do" -> careIcon("task"); "Check-ins" -> careIcon("checkin"); else -> careIcon("journal")
 }
 
-/** The Care tab's page shortcuts, two by two: Calendar, Lab history, Community (peer support) and Tubes and lines. */
-@Composable fun CareTabShortcuts(onCalendar: () -> Unit, onLabs: () -> Unit, onCommunity: () -> Unit, onDevices: () -> Unit) {
-    val t = careText()
-    val rows = listOf(
-        listOf(CareShortcut(t("Calendar", "कैलेंडर"), Icons.Default.CalendarMonth, SaharaTone.Indigo, "shortcut-calendar", onCalendar), CareShortcut(t("Lab history", "जाँच रिपोर्टें"), Icons.Default.Science, SaharaTone.Marigold, "shortcut-labs", onLabs)),
-        listOf(CareShortcut(t("Community", "समुदाय"), Icons.Default.Groups, SaharaTone.Leaf, "shortcut-community", onCommunity), CareShortcut(t("Tubes and lines", "नलियाँ और लाइनें"), Icons.Default.Healing, SaharaTone.Teal, "shortcut-devices", onDevices)),
-    )
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        rows.forEach { row ->
-            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                row.forEach { s ->
-                    ActionCard(s.tone.wash, Modifier.weight(1f).fillMaxHeight().heightIn(min = 64.dp).testTag(s.tag), s.onClick) {
-                        Row(Modifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Surface(shape = RoundedCornerShape(12.dp), color = s.tone.solid) { Icon(s.icon, null, Modifier.padding(8.dp).size(22.dp), tint = s.tone.onSolid) }
-                            Spacer(Modifier.width(10.dp))
-                            Text(s.label, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.weight(1f),
-                                style = LocalTextStyle.current.copy(lineBreak = androidx.compose.ui.text.style.LineBreak.Heading, hyphens = androidx.compose.ui.text.style.Hyphens.None))
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-private class CareShortcut(val label: String, val icon: ImageVector, val tone: SaharaTone, val tag: String, val onClick: () -> Unit)
-
-/** A module on its own screen, with a back arrow to the grid. */
+/** A module on its own screen, with a back arrow to where it was opened from (All care tools, or Today). */
 @Composable internal fun CareModuleScreen(tile: CareModuleTile, onBack: () -> Unit) {
     val t = careText()
     BackHandler(onBack = onBack)
-    LazyColumn(Modifier.fillMaxSize().testTag("care-list"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    LazyColumn(Modifier.fillMaxSize().saharaScreenEnter().testTag("care-list"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack, modifier = Modifier.size(48.dp).testTag("care-module-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back to daily care", "रोज़ की देखभाल पर वापस")) }
+            IconButton(onClick = onBack, modifier = Modifier.size(48.dp).testTag("care-module-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) }
             Text(tile.title, fontFamily = SaharaTitleFont, fontSize = 28.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
             Image(saharaImage(tile.art, 56.dp), null, Modifier.size(56.dp), contentScale = ContentScale.Fit)
         } }

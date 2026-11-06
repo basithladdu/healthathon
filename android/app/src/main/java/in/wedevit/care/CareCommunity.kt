@@ -4,6 +4,9 @@ package `in`.wedevit.care
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
@@ -25,17 +28,16 @@ import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.CloudOff
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FamilyRestroom
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.QuestionAnswer
 import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material.icons.filled.ThumbUp
-import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.VolunteerActivism
 import androidx.compose.material3.*
@@ -44,6 +46,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -53,6 +56,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.CancellationException
@@ -65,6 +69,8 @@ import java.util.UUID
  * Community for patients, families and carers (owner, 6 Nov 2026: "add an actual thing"). Real groups, posts and replies on
  * Sahara's server (20261106120000_community.sql), for signed-in members only. Authors show by a community name they choose.
  * The group list is server data; the clinicians confirm it (blockers.md). Moderation is by the Sahara team's verifier role.
+ * When the server can't be used (signed out, community not set up on the server, or Practice) the same groups open with
+ * built-in posts (CommunityLocal), and what the person writes, reacts or reports stays on this phone. The server wins when it answers.
  */
 /** Each group keeps one Sahara section colour everywhere (design lane tokens). The server stores the key. */
 private fun communityTone(key: String): SaharaTone = when (key) {
@@ -109,8 +115,16 @@ private const val HOME = "home"
     var removeTarget by remember { mutableStateOf<Pair<String, String>?>(null) }
     var draft by rememberSaveable { mutableStateOf("") }
     var nameDraft by rememberSaveable { mutableStateOf("") }
-    val myName = home?.myName ?: feeds.values.firstNotNullOfOrNull { it.myName }
-    val canModerate = home?.canModerate == true
+    // Built-in community: used while signed out (or in Practice) and while the server lacks the community functions.
+    val signedIn = cloud != null && accountId != null
+    var serverMissing by remember(accountId) { mutableStateOf(false) }
+    val local = !signedIn || serverMissing
+    var localState by remember { mutableStateOf(store.local()) }
+    val anchor = remember { System.currentTimeMillis() }
+    fun saveLocal(next: CommunityLocalState) { localState = next; store.saveLocal(next) }
+    val shownHome = if (local) CommunityLocal.home(localState) else home
+    val myName = if (local) localState.name else home?.myName ?: feeds.values.firstNotNullOfOrNull { it.myName }
+    val canModerate = !local && home?.canModerate == true
 
     suspend fun flushOutbox() {
         if (cloud == null || accountId == null) return
@@ -121,19 +135,19 @@ private const val HOME = "home"
         if (cloud == null || accountId == null) return
         scope.launch {
             loading = true
-            try { flushOutbox(); home = cloud.communityHome(); homeError = null }
+            try { flushOutbox(); home = cloud.communityHome(); homeError = null; serverMissing = false }
             catch (cancel: CancellationException) { throw cancel }
-            catch (error: Exception) { homeError = CommunityRules.serverMessage(error) }
+            catch (error: Exception) { if (error.isMissingServerFeature()) serverMissing = true else homeError = CommunityRules.serverMessage(error) }
             finally { loading = false }
         }
     }
     fun loadFeed(groupId: String) {
-        if (cloud == null || accountId == null) return
+        if (cloud == null || accountId == null || serverMissing) return
         scope.launch {
             loading = true
             try { flushOutbox(); feeds[groupId] = cloud.communityFeed(groupId); feedErrors.remove(groupId) }
             catch (cancel: CancellationException) { throw cancel }
-            catch (error: Exception) { feedErrors[groupId] = CommunityRules.serverMessage(error) }
+            catch (error: Exception) { if (error.isMissingServerFeature()) serverMissing = true else feedErrors[groupId] = CommunityRules.serverMessage(error) }
             finally { loading = false }
         }
     }
@@ -180,24 +194,35 @@ private const val HOME = "home"
         when {
             shown == HOME -> {
                 BackHandler(onBack = onBack)
-                CommunityHomePage(signedIn = cloud != null && accountId != null, home = home, error = homeError, loading = loading, waiting = pending.size,
-                    onBack = onBack, onAccount = onAccount, onRetry = ::loadHome, onOpen = { route = "group:$it"; loadFeed(it) })
+                CommunityHomePage(signedIn = signedIn, home = shownHome, error = if (local) null else homeError, loading = loading && !local, waiting = if (local) 0 else pending.size,
+                    onBack = onBack, onAccount = onAccount, onRetry = ::loadHome, onOpen = { route = "group:$it"; if (!local) loadFeed(it) })
             }
             shown.startsWith("group:") -> {
                 val groupId = shown.removePrefix("group:")
-                BackHandler { route = HOME; loadHome() }
-                val group = home?.groups?.firstOrNull { it.id == groupId }
-                val waitingHere = pending.filter { (it.kind == CommunityPending.POST && it.target == groupId) || (it.kind == CommunityPending.REPLY && feeds[groupId]?.posts?.any { p -> p.id == it.target } == true) }
-                CommunityFeedPage(group = group, groupId = groupId, feed = feeds[groupId], error = feedErrors[groupId], loading = loading, pending = waitingHere,
-                    myName = myName, canModerate = canModerate || feeds[groupId]?.canModerate == true, justSent = justSent, sending = sending,
-                    onBack = { route = HOME; loadHome() }, onRetry = { loadFeed(groupId) }, onWrite = { route = "write:$groupId" },
+                fun leaveGroup() { route = HOME; if (!local) loadHome() }
+                BackHandler { leaveGroup() }
+                val group = shownHome?.groups?.firstOrNull { it.id == groupId }
+                val lang = careLanguage()
+                val localFeed = if (local) remember(localState, groupId, lang) { CommunityLocal.feed(groupId, localState, anchor) { careTr(lang, it.en, it.hi) } } else null
+                val waitingHere = if (local) emptyList() else pending.filter { (it.kind == CommunityPending.POST && it.target == groupId) || (it.kind == CommunityPending.REPLY && feeds[groupId]?.posts?.any { p -> p.id == it.target } == true) }
+                CommunityFeedPage(group = group, groupId = groupId, feed = localFeed ?: feeds[groupId], error = if (local) null else feedErrors[groupId], loading = loading && !local, pending = waitingHere,
+                    myName = myName, canModerate = !local && (canModerate || feeds[groupId]?.canModerate == true), justSent = justSent, sending = sending,
+                    onBack = ::leaveGroup, onRetry = { loadFeed(groupId) }, onWrite = { route = "write:$groupId" },
                     onReact = { post, kind ->
-                        val on = if (kind == "helpful") !post.myHelpful else !post.myHugs
-                        val toggle = { p: CommunityPost, value: Boolean -> if (kind == "helpful") p.copy(myHelpful = value, helpful = (p.helpful + if (value) 1 else -1).coerceAtLeast(0)) else p.copy(myHugs = value, hugs = (p.hugs + if (value) 1 else -1).coerceAtLeast(0)) }
-                        updatePost(groupId, post.id) { toggle(it, on) }
-                        call({ it.communityReact(post.id, kind, on) }, onFailure = { updatePost(groupId, post.id) { p -> toggle(p, !on) } })
+                        if (local) saveLocal(CommunityLocal.react(localState, post.id, kind))
+                        else {
+                            val on = if (kind == "helpful") !post.myHelpful else !post.myHugs
+                            val toggle = { p: CommunityPost, value: Boolean -> if (kind == "helpful") p.copy(myHelpful = value, helpful = (p.helpful + if (value) 1 else -1).coerceAtLeast(0)) else p.copy(myHugs = value, hugs = (p.hugs + if (value) 1 else -1).coerceAtLeast(0)) }
+                            updatePost(groupId, post.id) { toggle(it, on) }
+                            call({ it.communityReact(post.id, kind, on) }, onFailure = { updatePost(groupId, post.id) { p -> toggle(p, !on) } })
+                        }
                     },
-                    onReply = { postId, text, done -> accountId?.let { send(CommunityPending(UUID.randomUUID().toString(), it, CommunityPending.REPLY, postId, text.trim(), System.currentTimeMillis()), groupId, done) } },
+                    onReply = { postId, text, done ->
+                        if (local) {
+                            val id = UUID.randomUUID().toString()
+                            saveLocal(CommunityLocal.add(localState, CommunityPending(id, CommunityLocal.ACCOUNT, CommunityPending.REPLY, postId, text.trim(), System.currentTimeMillis())))
+                            justSent = id; done()
+                        } else accountId?.let { send(CommunityPending(UUID.randomUUID().toString(), it, CommunityPending.REPLY, postId, text.trim(), System.currentTimeMillis()), groupId, done) } },
                     onReport = { kind, id -> reportTarget = kind to id },
                     onRemove = { kind, id -> removeTarget = kind to id },
                     onModerate = { kind, id, hide -> call({ it.communityModerate(kind, id, hide) }, onSuccess = { loadFeed(groupId) }) })
@@ -205,12 +230,18 @@ private const val HOME = "home"
             else -> {
                 val groupId = shown.removePrefix("write:")
                 BackHandler { route = "group:$groupId" }
-                CommunityWritePage(groups = home?.groups.orEmpty(), groupId = groupId, needsName = myName == null, name = nameDraft, onName = { nameDraft = it.take(CommunityRules.NAME_MAX + 10) },
+                CommunityWritePage(groups = shownHome?.groups.orEmpty(), groupId = groupId, needsName = myName == null, name = nameDraft, onName = { nameDraft = it.take(CommunityRules.NAME_MAX + 10) },
                     text = draft, onText = { draft = it.take(CommunityRules.POST_MAX + 50) }, sending = sending,
                     onGroup = { route = "write:$it" }, onBack = { route = "group:$groupId" },
                     onPost = {
                         val problem = (if (myName == null) CommunityRules.nameError(nameDraft) else null) ?: CommunityRules.postError(draft)
                         if (problem != null) message = problem
+                        else if (local) {
+                            val id = UUID.randomUUID().toString()
+                            val named = if (myName == null) localState.copy(name = nameDraft.trim()) else localState
+                            saveLocal(CommunityLocal.add(named, CommunityPending(id, CommunityLocal.ACCOUNT, CommunityPending.POST, groupId, draft.trim(), System.currentTimeMillis())))
+                            justSent = id; draft = ""; route = "group:$groupId"
+                        }
                         else accountId?.let { send(CommunityPending(UUID.randomUUID().toString(), it, CommunityPending.POST, groupId, draft.trim(), System.currentTimeMillis()), groupId) { draft = ""; route = "group:$groupId" } }
                     })
             }
@@ -225,7 +256,8 @@ private const val HOME = "home"
         CommunityReportDialog(kind, onDismiss = { reportTarget = null }, onReport = { reason ->
             reportTarget = null
             val groupId = route.substringAfter(":")
-            call({ if (kind == "post") it.communityReport(id, null, reason) else it.communityReport(null, id, reason) }, onSuccess = {
+            if (local) saveLocal(CommunityLocal.report(localState, id))
+            else call({ if (kind == "post") it.communityReport(id, null, reason) else it.communityReport(null, id, reason) }, onSuccess = {
                 if (kind == "post") updatePost(groupId, id) { it.copy(reported = true) }
                 else feeds[groupId]?.let { feed -> feeds[groupId] = feed.copy(posts = feed.posts.map { p -> p.copy(replies = p.replies.map { r -> if (r.id == id) r.copy(reported = true) else r }) }) }
             })
@@ -233,14 +265,15 @@ private const val HOME = "home"
     }
     removeTarget?.let { (kind, id) ->
         val groupId = route.substringAfter(":")
-        val queued = pending.any { it.id == id }
+        val queued = !local && pending.any { it.id == id }
         SaharaConfirmDialog(if (kind == "post") t("Delete your post?", "अपनी पोस्ट हटाएँ?") else t("Delete your reply?", "अपना जवाब हटाएँ?"),
             confirmLabel = t("Delete", "हटाएँ"), dismissLabel = t("Keep", "रहने दें"), danger = true,
-            text = if (queued) t("It hasn't been sent yet. It will be removed from this phone.", "यह अभी भेजा नहीं गया है। इसे इस फ़ोन से हटा दिया जाएगा।")
+            text = if (local) t("This can't be undone.", "इसे वापस नहीं किया जा सकता।") else if (queued) t("It hasn't been sent yet. It will be removed from this phone.", "यह अभी भेजा नहीं गया है। इसे इस फ़ोन से हटा दिया जाएगा।")
                 else t("It will be removed for everyone. This can't be undone.", "यह सबके लिए हट जाएगा। इसे वापस नहीं लाया जा सकता।"),
             onConfirm = {
                 removeTarget = null
-                if (queued) { store.remove(id); pending = accountId?.let(store::pending).orEmpty() }
+                if (local) saveLocal(CommunityLocal.remove(localState, id))
+                else if (queued) { store.remove(id); pending = accountId?.let(store::pending).orEmpty() }
                 else call({ it.communityRemoveMine(kind, id) }, onSuccess = { loadFeed(groupId) })
             },
             onDismiss = { removeTarget = null })
@@ -286,36 +319,36 @@ private const val HOME = "home"
 @Composable private fun CommunityHomePage(signedIn: Boolean, home: CommunityHome?, error: CommunityCopy?, loading: Boolean, waiting: Int,
     onBack: () -> Unit, onAccount: () -> Unit, onRetry: () -> Unit, onOpen: (String) -> Unit) {
     val t = careText()
+    // The four groups come first, so they fit on a 360x800 phone without scrolling; signing in sits below them.
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { CommunityTitleRow(t("Community", "समुदाय"), onBack) }
+        if (waiting > 0) item {
+            CommunityNotice(if (waiting == 1) CommunityCopy("1 post or reply is waiting to send.", "1 पोस्ट या जवाब भेजा जाना बाकी है।")
+                else CommunityCopy("$waiting posts or replies are waiting to send.", "$waiting पोस्ट या जवाब भेजे जाने बाकी हैं।"), onRetry)
+        }
+        if (home == null && error != null) item(key = "community-offline-art") { SaharaIllustration(SaharaArtKind.Offline, Modifier.fillMaxWidth()) }
+        if (error != null) item { CommunityNotice(error, onRetry) }
+        if (home == null && error == null && loading) item { SaharaInlineLoading(t("Loading…", "खुल रहा है…")) }
+        home?.groups?.let { groups ->
+            // Two tiles per row; each group keeps its own colour everywhere.
+            items(groups.chunked(2), key = { row -> row.joinToString { it.id } }) { row ->
+                Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    row.forEach { group -> CommunityGroupTile(group, Modifier.weight(1f).fillMaxHeight()) { onOpen(group.id) } }
+                    if (row.size == 1) Spacer(Modifier.weight(1f))
+                }
+            }
+            if (groups.isEmpty()) item { CommunityNotice(CommunityCopy("No groups are open right now.", "अभी कोई समूह खुला नहीं है।"), onRetry) }
+        }
         if (!signedIn) item {
-            Surface(shape = RoundedCornerShape(12.dp), color = SaharaColors.Surface, border = BorderStroke(1.dp, SaharaColors.Line), modifier = Modifier.fillMaxWidth().saharaAppear().testTag("community-sign-in")) {
+            Surface(shape = RoundedCornerShape(SaharaRadius.Lg), color = SaharaColors.Surface, border = BorderStroke(1.5.dp, SaharaTone.Teal.solid), modifier = Modifier.fillMaxWidth().saharaAppear().testTag("community-sign-in")) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Box(Modifier.size(40.dp).clip(RoundedCornerShape(12.dp)).background(SaharaTone.Teal.solid), contentAlignment = Alignment.Center) { Icon(Icons.Default.Forum, null, Modifier.size(24.dp), tint = SaharaTone.Teal.onSolid) }
-                    Text(t("Talk with families and patients who understand", "उन परिवारों और मरीज़ों से बात करें जो समझते हैं"), style = communityTitle(), color = SaharaColors.Ink)
-                    Text(t("Only signed-in members can read and write posts.", "पोस्ट सिर्फ़ साइन इन किए सदस्य पढ़ और लिख सकते हैं।"), style = communityBody(), color = SaharaColors.InkSub)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        SaharaIconChip(Icons.Default.Forum, SaharaTone.Teal)
+                        Spacer(Modifier.width(12.dp))
+                        Text(t("Talk with families and patients who understand", "उन परिवारों और मरीज़ों से बात करें जो समझते हैं"), Modifier.weight(1f), style = communityBody(), fontWeight = FontWeight.SemiBold, color = SaharaColors.Ink)
+                    }
                     SaharaPrimaryButton(t("Sign in to join", "जुड़ने के लिए साइन इन करें"), onClick = onAccount, modifier = Modifier.fillMaxWidth().testTag("community-sign-in-button"))
                 }
-            }
-        }
-        else {
-            if (waiting > 0) item {
-                CommunityNotice(if (waiting == 1) CommunityCopy("1 post or reply is waiting to send.", "1 पोस्ट या जवाब भेजा जाना बाकी है।")
-                    else CommunityCopy("$waiting posts or replies are waiting to send.", "$waiting पोस्ट या जवाब भेजे जाने बाकी हैं।"), onRetry)
-            }
-            if (home == null && error != null) item(key = "community-offline-art") { SaharaIllustration(SaharaArtKind.Offline, Modifier.fillMaxWidth()) }
-            if (error != null) item { CommunityNotice(error, onRetry) }
-            if (home == null && error == null && loading) item { SaharaInlineLoading(t("Loading…", "खुल रहा है…")) }
-            home?.groups?.let { groups ->
-                item { Text(t("Groups", "समूह"), Modifier.a11yHeading().padding(top = 4.dp), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = SaharaColors.Ink) }
-                // Two tiles per row; each group keeps its own colour everywhere.
-                items(groups.chunked(2), key = { row -> row.joinToString { it.id } }) { row ->
-                    Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        row.forEach { group -> CommunityGroupTile(group, Modifier.weight(1f).fillMaxHeight()) { onOpen(group.id) } }
-                        if (row.size == 1) Spacer(Modifier.weight(1f))
-                    }
-                }
-                if (groups.isEmpty()) item { CommunityNotice(CommunityCopy("No groups are open right now.", "अभी कोई समूह खुला नहीं है।"), onRetry) }
             }
         }
     }
@@ -325,15 +358,16 @@ private const val HOME = "home"
     val t = careText()
     val tone = communityTone(group.tone)
     val interaction = remember { MutableInteractionSource() }
-    Column(modifier.saharaAppear().saharaPress(interaction).heightIn(min = 140.dp).clip(RoundedCornerShape(SaharaRadius.Lg)).background(tone.wash)
-        .border(1.dp, tone.solid.copy(alpha = .45f), RoundedCornerShape(SaharaRadius.Lg))
+    Column(modifier.saharaAppear().saharaPress(interaction).heightIn(min = 148.dp).clip(RoundedCornerShape(SaharaRadius.Lg)).background(tone.wash)
+        .border(1.5.dp, tone.solid, RoundedCornerShape(SaharaRadius.Lg))
         .clickable(interactionSource = interaction, indication = ripple(), role = Role.Button, onClick = onClick).a11yCard().padding(16.dp).testTag("community-group-${group.id}"),
         verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Box(Modifier.size(40.dp).clip(RoundedCornerShape(12.dp)).background(tone.solid), contentAlignment = Alignment.Center) { Icon(communityIcon(group.id), null, Modifier.size(24.dp), tint = tone.onSolid) }
-        Text(t(group.nameEn, group.nameHi), style = MaterialTheme.typography.titleMedium.copy(fontSize = 17.sp, lineHeight = 22.sp, lineBreak = LineBreak.Heading, hyphens = Hyphens.None), fontWeight = FontWeight.SemiBold, color = tone.ink)
-        if (group.aboutEn.isNotBlank()) Text(t(group.aboutEn, group.aboutHi.ifBlank { group.aboutEn }), style = MaterialTheme.typography.bodyMedium.copy(lineBreak = LineBreak.Paragraph, hyphens = Hyphens.None), color = SaharaColors.InkSub)
+        Box(Modifier.size(44.dp).clip(RoundedCornerShape(12.dp)).background(tone.solid), contentAlignment = Alignment.Center) { Icon(communityIcon(group.id), null, Modifier.size(26.dp), tint = tone.onSolid) }
+        Text(t(group.nameEn, group.nameHi), style = MaterialTheme.typography.titleMedium.copy(fontSize = 17.sp, lineHeight = 22.sp, lineBreak = LineBreak.Heading, hyphens = Hyphens.None), fontWeight = FontWeight.Bold, color = tone.ink)
         Spacer(Modifier.weight(1f))
-        Text(if (group.posts == 1) t("1 post", "1 पोस्ट") else t("${group.posts} posts", "${group.posts} पोस्ट"), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold, color = tone.ink)
+        // The count as a solid pill in the group's colour.
+        Text(if (group.posts == 1) t("1 post", "1 पोस्ट") else t("${group.posts} posts", "${group.posts} पोस्ट"), Modifier.clip(RoundedCornerShape(SaharaRadius.Pill)).background(tone.solid).padding(horizontal = 10.dp, vertical = 4.dp),
+            style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold, color = tone.onSolid, maxLines = 1, softWrap = false)
     }
 }
 
@@ -370,7 +404,7 @@ private const val HOME = "home"
                     actionLabel = t("Write the first post", "पहली पोस्ट लिखें"), onAction = onWrite, modifier = Modifier.saharaAppear())
             }
             items(posts, key = { it.id }) { post ->
-                CommunityPostCard(post, now = now, tone = tone, queued = post.id in queuedIds, queuedIds = queuedIds, justSent = justSent == post.id, canModerate = canModerate,
+                CommunityPostCard(post, now = now, tone = tone, queued = post.id in queuedIds, queuedIds = queuedIds, justSent = justSent, canModerate = canModerate,
                     replying = replyingTo == post.id, replyText = if (replyingTo == post.id) replyText else "", replyError = if (replyingTo == post.id) replyError else null, sending = sending,
                     onReact = { onReact(post, it) }, onReplyOpen = { replyingTo = if (replyingTo == post.id) null else post.id; replyText = ""; replyError = null },
                     onReplyText = { replyText = it.take(CommunityRules.REPLY_MAX + 50); replyError = null },
@@ -380,7 +414,10 @@ private const val HOME = "home"
                         else if (myName == null) replyError = CommunityCopy("Write a post first to choose the name others will see.", "दूसरों को दिखने वाला नाम चुनने के लिए पहले एक पोस्ट लिखें।")
                         else onReply(post.id, replyText) { replyingTo = null; replyText = "" }
                     },
-                    onReport = onReport, onRemove = onRemove, onModerate = onModerate)
+                    onReport = onReport, onRemove = onRemove, onModerate = onModerate,
+                    // A new post fades in and the others slide down to make room.
+                    modifier = Modifier.animateItem(fadeInSpec = SaharaMotion.tween(SaharaMotion.LIST_ITEM_MS), placementSpec = SaharaMotion.tween<IntOffset>(SaharaMotion.EXPAND_MS, easing = SaharaMotion.Emphasized),
+                        fadeOutSpec = SaharaMotion.tween(SaharaMotion.EXIT_MS)))
             }
         }
         if (feed != null) ExtendedFloatingActionButton(text = { Text(t("Write a post", "पोस्ट लिखें"), fontSize = 16.sp) }, icon = { Icon(Icons.Default.Edit, null) }, onClick = onWrite,
@@ -408,51 +445,84 @@ private const val HOME = "home"
 }
 
 
+/** Each author keeps one bright colour, so a busy feed is easy to follow; the Sahara team is always indigo. */
+private val authorTones = listOf(SaharaTone.Teal, SaharaTone.Plum, SaharaTone.Leaf, SaharaTone.Rose, SaharaTone.Rust) // white letters stay AA on each solid
+private fun authorTone(name: String, byTeam: Boolean): SaharaTone = if (byTeam) SaharaTone.Indigo else authorTones[Math.floorMod(name.trim().hashCode(), authorTones.size)]
+
 @Composable private fun CommunityAvatar(name: String, tone: SaharaTone, size: Int = 40) {
-    Box(Modifier.size(size.dp).clip(CircleShape).background(tone.wash), contentAlignment = Alignment.Center) {
-        Text(name.trim().take(1).uppercase(), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = tone.ink)
+    Box(Modifier.size(size.dp).clip(CircleShape).background(tone.solid), contentAlignment = Alignment.Center) {
+        Text(name.trim().take(1).uppercase(), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = tone.onSolid)
     }
+}
+
+/** Something just sent: rises into place once. Off with Remove animations or Battery Saver (SaharaMotion). */
+@Composable private fun Modifier.communityArrive(active: Boolean): Modifier {
+    val progress = remember { Animatable(if (active) 0f else 1f) }
+    LaunchedEffect(Unit) { if (progress.value < 1f) progress.animateTo(1f, SaharaMotion.tween(SaharaMotion.ENTER_MS, easing = SaharaMotion.Emphasized)) }
+    return graphicsLayer { val p = progress.value; alpha = p; translationY = (1f - p) * 16.dp.toPx() }
 }
 
 @Composable private fun CommunityAction(text: String, icon: ImageVector, onClick: () -> Unit, selected: Boolean = false, tone: SaharaTone = SaharaTone.Rust, tag: String = "") {
+    val fill by animateColorAsState(if (selected) tone.wash else SaharaColors.Surface, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "communityactionfill")
+    val iconScale by animateFloatAsState(if (selected) 1.15f else 1f, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "communityactionicon")
     OutlinedButton(onClick = onClick, shape = RoundedCornerShape(50), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
-        border = BorderStroke(1.dp, if (selected) tone.solid else SaharaColors.Edge),
-        colors = ButtonDefaults.outlinedButtonColors(containerColor = if (selected) tone.wash else SaharaColors.Surface, contentColor = if (selected) tone.ink else SaharaColors.Ink),
+        border = BorderStroke(1.5.dp, if (selected) tone.solid else SaharaColors.Edge),
+        colors = ButtonDefaults.outlinedButtonColors(containerColor = fill, contentColor = if (selected) tone.ink else SaharaColors.Ink),
         modifier = Modifier.heightIn(min = 48.dp).then(if (tag.isNotEmpty()) Modifier.testTag(tag) else Modifier)) {
-        Icon(icon, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp))
-        Text(text, style = MaterialTheme.typography.labelLarge, maxLines = 1, softWrap = false)
+        Icon(icon, null, Modifier.size(18.dp).graphicsLayer { scaleX = iconScale; scaleY = iconScale }, tint = if (selected) tone.solid else SaharaColors.Ink); Spacer(Modifier.width(6.dp))
+        SaharaAnimatedText(text) { Text(it, style = MaterialTheme.typography.labelLarge, maxLines = 1, softWrap = false) }
     }
 }
 
-@Composable private fun CommunityPostCard(post: CommunityPost, now: Long, tone: SaharaTone, queued: Boolean, queuedIds: Set<String>, justSent: Boolean, canModerate: Boolean,
-    replying: Boolean, replyText: String, replyError: CommunityCopy?, sending: Boolean, onReact: (String) -> Unit, onReplyOpen: () -> Unit, onReplyText: (String) -> Unit,
-    onReplySend: () -> Unit, onReport: (String, String) -> Unit, onRemove: (String, String) -> Unit, onModerate: (String, String, Boolean) -> Unit) {
+/** Less-used actions (delete, report, hide) live in one menu, so each post shows at most three buttons. */
+@Composable private fun CommunityMenu(actions: List<Pair<String, () -> Unit>>, tag: String) {
+    if (actions.isEmpty()) return
     val t = careText()
-    Surface(shape = RoundedCornerShape(12.dp), color = SaharaColors.Surface, border = BorderStroke(1.dp, SaharaColors.Line), modifier = Modifier.fillMaxWidth().saharaAppear().saharaContentSize().testTag("community-post")) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(Modifier.a11yCard(), verticalAlignment = Alignment.CenterVertically) {
-                CommunityAvatar(post.name, tone)
-                Spacer(Modifier.width(12.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(post.name, style = MaterialTheme.typography.titleSmall, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = SaharaColors.Ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    val ago = CommunityRules.ago(now, post.createdMs)
-                    Text(t(ago.en, ago.hi), style = MaterialTheme.typography.bodySmall, fontSize = 14.sp, color = SaharaColors.InkSub)
+    var open by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { open = true }, modifier = Modifier.size(48.dp).testTag(tag)) { Icon(Icons.Default.MoreVert, t("More options", "और विकल्प"), tint = SaharaColors.InkSub) }
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+            actions.forEach { (label, action) -> DropdownMenuItem(text = { Text(label) }, onClick = { open = false; action() }, modifier = Modifier.heightIn(min = 48.dp).testTag("$tag-item")) }
+        }
+    }
+}
+
+@Composable private fun CommunityPostCard(post: CommunityPost, now: Long, tone: SaharaTone, queued: Boolean, queuedIds: Set<String>, justSent: String?, canModerate: Boolean,
+    replying: Boolean, replyText: String, replyError: CommunityCopy?, sending: Boolean, onReact: (String) -> Unit, onReplyOpen: () -> Unit, onReplyText: (String) -> Unit,
+    onReplySend: () -> Unit, onReport: (String, String) -> Unit, onRemove: (String, String) -> Unit, onModerate: (String, String, Boolean) -> Unit, modifier: Modifier = Modifier) {
+    val t = careText()
+    val sentNow = justSent == post.id
+    val edge by animateColorAsState(if (sentNow) tone.solid else SaharaColors.Line, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "communitypostedge")
+    val menu = buildList<Pair<String, () -> Unit>> {
+        if (post.mine) add(t("Delete", "हटाएँ") to { onRemove("post", post.id) })
+        else if (!post.reported && !post.hidden) add(t("Report", "रिपोर्ट करें") to { onReport("post", post.id) })
+        if (canModerate && !queued) add((if (post.hidden) t("Show again", "फिर दिखाएँ") else t("Hide", "छिपाएँ")) to { onModerate("post", post.id, !post.hidden) })
+    }
+    Surface(shape = RoundedCornerShape(SaharaRadius.Lg), color = SaharaColors.Surface, border = BorderStroke(if (sentNow) 2.dp else 1.dp, edge),
+        modifier = modifier.fillMaxWidth().saharaAppear().communityArrive(sentNow).saharaContentSize().testTag("community-post")) {
+        Column(Modifier.padding(start = 16.dp, end = 8.dp, top = 12.dp, bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(Modifier.weight(1f).a11yCard(), verticalAlignment = Alignment.CenterVertically) {
+                    CommunityAvatar(post.name, authorTone(post.name, post.byTeam))
+                    Spacer(Modifier.width(12.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(post.name, style = MaterialTheme.typography.titleSmall, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = SaharaColors.Ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        val ago = CommunityRules.ago(now, post.createdMs)
+                        Text(t(ago.en, ago.hi), style = MaterialTheme.typography.bodySmall, fontSize = 14.sp, color = SaharaColors.InkSub)
+                    }
+                    CommunityStatus(post.hidden, queued, sentNow, post.byTeam, post.reports, post.reported, canModerate)
                 }
-                CommunityStatus(post.hidden, queued, justSent, post.byTeam, post.reports, post.reported, canModerate)
+                CommunityMenu(menu, "community-post-menu")
             }
-            Text(post.body, style = communityBody(), color = SaharaColors.Ink)
+            Text(post.body, Modifier.padding(end = 8.dp), style = communityBody(), color = SaharaColors.Ink)
             if (!queued && !post.hidden) FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 CommunityAction(if (post.helpful > 0) t("Helpful ${post.helpful}", "मददगार ${post.helpful}") else t("Helpful", "मददगार"), Icons.Default.ThumbUp, { onReact("helpful") }, post.myHelpful, SaharaTone.Teal, "community-helpful")
                 CommunityAction(if (post.hugs > 0) t("Hugs ${post.hugs}", "झप्पी ${post.hugs}") else t("Hugs", "झप्पी"), Icons.Default.Favorite, { onReact("hugs") }, post.myHugs, SaharaTone.Rose, "community-hugs")
                 CommunityAction(t("Reply", "जवाब दें"), Icons.AutoMirrored.Filled.Reply, onReplyOpen, replying, tone, "community-reply")
-                if (post.mine) CommunityAction(t("Delete", "हटाएँ"), Icons.Default.Delete, { onRemove("post", post.id) }, tag = "community-delete")
-                else if (!post.reported) CommunityAction(t("Report", "रिपोर्ट करें"), Icons.Default.Flag, { onReport("post", post.id) }, tag = "community-report")
-                if (canModerate) CommunityAction(t("Hide", "छिपाएँ"), Icons.Default.VisibilityOff, { onModerate("post", post.id, true) }, tag = "community-hide")
-            } else if (queued) Row { CommunityAction(t("Delete", "हटाएँ"), Icons.Default.Delete, { onRemove("post", post.id) }, tag = "community-delete") }
-            else if (canModerate) Row { CommunityAction(t("Show again", "फिर दिखाएँ"), Icons.Default.Visibility, { onModerate("post", post.id, false) }, tag = "community-show") }
-            post.replies.forEach { reply -> CommunityReplyRow(reply, now, tone, reply.id in queuedIds, canModerate, onReport, onRemove, onModerate) }
+            }
+            post.replies.forEach { reply -> CommunityReplyRow(reply, now, reply.id in queuedIds, justSent == reply.id, canModerate, onReport, onRemove, onModerate) }
             AnimatedVisibility(replying, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(Modifier.padding(end = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(value = replyText, onValueChange = onReplyText, modifier = Modifier.fillMaxWidth().testTag("community-reply-field"),
                         label = { Text(t("Your reply", "आपका जवाब")) }, minLines = 2, isError = replyError != null, textStyle = communityBody(),
                         supportingText = { Text(replyError?.let { t(it.en, it.hi) } ?: "${replyText.trim().length} / ${CommunityRules.REPLY_MAX}") },
@@ -464,29 +534,29 @@ private const val HOME = "home"
     }
 }
 
-@Composable private fun CommunityReplyRow(reply: CommunityReply, now: Long, tone: SaharaTone, queued: Boolean, canModerate: Boolean,
+@Composable private fun CommunityReplyRow(reply: CommunityReply, now: Long, queued: Boolean, sentNow: Boolean, canModerate: Boolean,
     onReport: (String, String) -> Unit, onRemove: (String, String) -> Unit, onModerate: (String, String, Boolean) -> Unit) {
     val t = careText()
-    Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min).saharaAppear().testTag("community-reply-row")) {
-        Box(Modifier.width(3.dp).fillMaxHeight().clip(CircleShape).background(tone.solid.copy(alpha = .45f)))
+    val tone = authorTone(reply.name, reply.byTeam)
+    val menu = buildList<Pair<String, () -> Unit>> {
+        if (reply.mine) add(t("Delete", "हटाएँ") to { onRemove("reply", reply.id) })
+        else if (!reply.reported && !reply.hidden) add(t("Report", "रिपोर्ट करें") to { onReport("reply", reply.id) })
+        if (canModerate && !queued) add((if (reply.hidden) t("Show again", "फिर दिखाएँ") else t("Hide", "छिपाएँ")) to { onModerate("reply", reply.id, !reply.hidden) })
+    }
+    Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min).saharaAppear().communityArrive(sentNow).testTag("community-reply-row")) {
+        Box(Modifier.width(3.dp).fillMaxHeight().clip(CircleShape).background(tone.solid))
         Spacer(Modifier.width(12.dp))
-        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Column(Modifier.weight(1f).padding(vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Row(Modifier.a11yCard(), verticalAlignment = Alignment.CenterVertically) {
                 val ago = CommunityRules.ago(now, reply.createdMs)
-                Text(reply.name, Modifier.weight(1f, fill = false), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold, color = SaharaColors.Ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(reply.name, Modifier.weight(1f, fill = false), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold, color = tone.ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text("  ·  " + t(ago.en, ago.hi), style = MaterialTheme.typography.bodySmall, fontSize = 14.sp, color = SaharaColors.InkSub, maxLines = 1, softWrap = false)
                 Spacer(Modifier.weight(1f))
                 CommunityStatus(reply.hidden, queued, false, reply.byTeam, reply.reports, reply.reported, canModerate)
             }
             Text(reply.body, style = communityBody(), color = SaharaColors.Ink)
-            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                if (reply.mine) TextButton(onClick = { onRemove("reply", reply.id) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Delete", "हटाएँ"), color = SaharaColors.PrimaryPressed) }
-                else if (!reply.reported && !reply.hidden) TextButton(onClick = { onReport("reply", reply.id) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Report", "रिपोर्ट करें"), color = SaharaColors.PrimaryPressed) }
-                if (canModerate && !queued) TextButton(onClick = { onModerate("reply", reply.id, !reply.hidden) }, modifier = Modifier.heightIn(min = 48.dp)) {
-                    Text(if (reply.hidden) t("Show again", "फिर दिखाएँ") else t("Hide", "छिपाएँ"), color = SaharaColors.PrimaryPressed)
-                }
-            }
         }
+        CommunityMenu(menu, "community-reply-menu")
     }
 }
 

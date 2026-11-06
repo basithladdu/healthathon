@@ -21,30 +21,30 @@ import org.junit.Test
 class DoctorPatientNavigationTilesTest {
     @get:Rule val ui=createComposeRule()
     private val sections=listOf("Progress","Labs","Conversations","Visits","Medicines","Reports")
-    private val titles=mapOf("Progress" to "Symptoms & distress","Labs" to "Lab reports","Conversations" to "Goals of care","Visits" to "Visits","Medicines" to "Medicines","Reports" to "Documents")
+    private val titles=mapOf("Progress" to "Symptoms & distress","Labs" to "Lab reports","Conversations" to "Conversations","Visits" to "Visits","Medicines" to "Medicines","Reports" to "Documents")
     @Test fun actualHubLongPersonNameHasReadableLinesAboveItsSubtitle() {
         val person=Person("long-header-fixture","Fictional person with a deliberately long display name")
         ui.setContent {CareTheme {Box(Modifier.width(320.dp).fillMaxSize()){DoctorSharedPatientHub(person,{},deviceLocal=true)}}}
-        val title=ui.onNodeWithText("${person.name}'s care")
-        // The source subtitle under the name was removed (3 Nov meeting); the first tile is the next thing below the name.
+        val title=ui.onNodeWithText(person.name)
+        // The patient header comes first; the section list starts below it.
         ui.onNodeWithText("Device-local care · not synced or shared").assertDoesNotExist()
         val subtitle=ui.onNodeWithTag("doctor-shared-Progress")
         val layouts=mutableListOf<TextLayoutResult>()
         title.performSemanticsAction(SemanticsActions.GetTextLayoutResult){it(layouts)}
         assertTrue(layouts.single().lineCount>1)
-        assertEquals(36.sp,layouts.single().layoutInput.style.lineHeight)
+        assertEquals(28.sp,layouts.single().layoutInput.style.lineHeight)
         assertTrue(title.fetchSemanticsNode().boundsInRoot.bottom<=subtitle.fetchSemanticsNode().boundsInRoot.top)
     }
-    @Test fun symptomsTileIsWideThenTabsPairAt320Dp() {
+    @Test fun sectionsAreOneOrderedFullWidthListGoalsOfCareFirst() {
         val opened=mutableListOf<String>()
         ui.setContent {CareTheme {Column(Modifier.width(320.dp).fillMaxSize().verticalScroll(rememberScrollState())){DoctorPatientNavigationTiles({opened+=it})}}}
-        fun bounds(section:String)=ui.onNodeWithTag("doctor-shared-$section").fetchSemanticsNode().boundsInRoot
-        val progress=bounds("Progress");val labs=bounds("Labs");val goals=bounds("Conversations");val visits=bounds("Visits");val medicines=bounds("Medicines");val documents=bounds("Reports")
-        assertTrue(progress.bottom<labs.top);assertEquals(labs.top,goals.top,1f);assertTrue(labs.right<goals.left);assertEquals(labs.height,goals.height,1f)
-        assertTrue(visits.top>labs.bottom);assertEquals(visits.top,medicines.top,1f)
-        assertEquals(progress.width,documents.width,1f);assertTrue(documents.top>visits.bottom)
-        sections.forEach {section->ui.onNodeWithTag("doctor-shared-$section").performScrollTo().assertIsDisplayed().assertHasClickAction().performClick()}
-        assertEquals(sections,opened)
+        val order=doctorPatientTabs.map {it.section}
+        assertEquals("GoalsOfCare",order.first())
+        val bounds=order.map {ui.onNodeWithTag("doctor-shared-$it").fetchSemanticsNode().boundsInRoot}
+        bounds.zipWithNext().forEach {(a,b)->assertTrue(a.bottom<=b.top+1f)}
+        bounds.drop(1).forEach {assertEquals(bounds[1].width,it.width,1f)}
+        order.forEach {section->ui.onNodeWithTag("doctor-shared-$section").performScrollTo().assertIsDisplayed().assertHasClickAction().performClick()}
+        assertEquals(order,opened)
         ui.onNodeWithTag("doctor-shared-Summary").assertDoesNotExist()
     }
     @Test fun largeTextUsesFullWidthGrowingRowsAndKeepsAllSixActions() {

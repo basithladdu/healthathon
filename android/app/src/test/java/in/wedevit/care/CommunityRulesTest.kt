@@ -114,5 +114,75 @@ class CommunityRulesTest {
         listOf("Coming soon", "जल्द आ रहा है", "Sample", "नमूना", "CommunitySample", "Mock").forEach { assertFalse(it, ui.contains(it)) }
         val missing = HindiScan.missing(ui, setOf("community pages"))
         assertTrue("English-only text in CareCommunity.kt:\n" + missing.joinToString("\n"), missing.isEmpty())
+        // The built-in community reads as the community itself: no sample, mock, demo or coming-soon wording in any of its words.
+        val banned = Regex("sample|mock|simulat|demo|dummy|fake|coming soon|placeholder|नमूना|नकली|जल्द आ रहा", RegexOption.IGNORE_CASE)
+        localVoices().forEach { assertFalse(it.en, banned.containsMatchIn(it.en) || banned.containsMatchIn(it.hi)) }
+    }
+
+    private fun localVoices(): List<CommunityVoice> = CommunityLocal.posts.flatMap { post -> listOf(post.name, post.body) + post.replies.flatMap { listOf(it.name, it.body) } }
+
+    @Test fun builtInCommunityMatchesTheServerGroupsAndIsLively() {
+        val sql = listOf("supabase/migrations", "android/supabase/migrations", "../supabase/migrations").map(::File).first { it.isDirectory }.resolve("20261106120000_community.sql").readText()
+        assertEquals(listOf("family-carers", "living-with-cancer", "grief-loss", "ask-care-team"), CommunityLocal.baseGroups.map { it.id })
+        CommunityLocal.baseGroups.forEach { g -> assertTrue(g.id, sql.contains("('${g.id}', '${g.nameEn}', '${g.nameHi}', '${g.aboutEn}', '${g.aboutHi}', '${g.tone}'")) }
+        val home = CommunityLocal.home(CommunityLocalState())
+        home.groups.forEach { g ->
+            assertTrue("${g.id} needs about five posts", g.posts in 4..6)
+            val feed = CommunityLocal.feed(g.id, CommunityLocalState(), 1_000_000_000L) { it.en }
+            assertEquals(g.posts, feed.posts.size)
+            assertEquals(feed.posts.sortedByDescending { it.createdMs }, feed.posts)
+            assertTrue(feed.posts.all { it.replies.isNotEmpty() && (it.helpful + it.hugs) > 0 })
+        }
+        val ids = CommunityLocal.posts.map { it.id } + CommunityLocal.posts.flatMap { p -> p.replies.map { it.id } }
+        assertEquals(ids.size, ids.toSet().size)
+        // Every question to the care team has a Sahara team answer.
+        CommunityLocal.posts.filter { it.groupId == "ask-care-team" }.forEach { post -> assertTrue(post.id, post.replies.any { it.byTeam }) }
+        // Replies come after their post.
+        CommunityLocal.posts.forEach { post -> post.replies.forEach { assertTrue(it.id, it.minutesAgo < post.minutesAgo) } }
+    }
+
+    @Test fun builtInWordsAreSafeAndBilingual() {
+        val dose = Regex("\\d\\s*(mg|ml|mcg|g|tab|tablet|drops?|units?)\\b|\\bdose|\\bdosage|खुराक|मिलीग्राम", RegexOption.IGNORE_CASE)
+        val drugs = Regex("morphine|paracetamol|tramadol|fentanyl|ondansetron|dexamethasone|ibuprofen|codeine|oxycodone|मॉर्फ़ीन|मॉर्फिन|पैरासिटामोल", RegexOption.IGNORE_CASE)
+        localVoices().forEach { v ->
+            assertTrue("No Hindi for: ${v.en}", hindi.containsMatchIn(v.hi)); assertTrue(v.en.isNotBlank())
+            listOf(v.en, v.hi).forEach { text -> assertFalse(text, dose.containsMatchIn(text) || drugs.containsMatchIn(text) || CommunityRules.hasContact(text)) }
+        }
+        CommunityLocal.posts.forEach { post ->
+            assertNull(post.id, CommunityRules.postError(post.body.en)); assertNull(post.id, CommunityRules.postError(post.body.hi))
+            assertNull(post.id, CommunityRules.nameError(post.name.en))
+            post.replies.forEach { r ->
+                assertNull(r.id, CommunityRules.replyError(r.body.en)); assertNull(r.id, CommunityRules.replyError(r.body.hi))
+                if (r.byTeam) assertEquals("Sahara team", r.name.en) else assertNull(r.id, CommunityRules.nameError(r.name.en))
+            }
+        }
+        // The team never gives treatment advice; anything medical goes back to the care team, a doctor or a counsellor.
+        CommunityLocal.posts.flatMap { it.replies }.filter { it.byTeam }.forEach { r -> assertTrue(r.id, Regex("care team|doctor|nurse|counsellor|Sahara").containsMatchIn(r.body.en)) }
+    }
+
+    @Test fun whatThisPhoneAddsShowsAtOnceAndSurvivesARestart() {
+        val anchor = 5_000_000_000L
+        var state = CommunityLocalState(name = "Asha's daughter")
+        state = CommunityLocal.add(state, CommunityPending("mine-1", CommunityLocal.ACCOUNT, CommunityPending.POST, "family-carers", "Hello all", anchor + 1000))
+        state = CommunityLocal.add(state, CommunityPending("mine-r", CommunityLocal.ACCOUNT, CommunityPending.REPLY, "local-fc-2", "Same here", anchor + 2000))
+        state = CommunityLocal.add(state, CommunityPending("mine-r2", CommunityLocal.ACCOUNT, CommunityPending.REPLY, "mine-1", "Thank you", anchor + 3000))
+        state = CommunityLocal.react(state, "local-fc-2", "hugs")
+        state = CommunityLocal.report(state, "local-fc-3")
+        val base = CommunityLocal.home(CommunityLocalState()).groups.first { it.id == "family-carers" }.posts
+        assertEquals(base + 1, CommunityLocal.home(state).groups.first { it.id == "family-carers" }.posts)
+        val feed = CommunityLocal.feed("family-carers", state, anchor) { it.hi }
+        val first = feed.posts.first()
+        assertEquals("mine-1", first.id); assertTrue(first.mine); assertEquals("Asha's daughter", first.name); assertEquals("Thank you", first.replies.single().body)
+        val nights = feed.posts.first { it.id == "local-fc-2" }
+        assertTrue(nights.myHugs); assertEquals(CommunityLocal.posts.first { it.id == "local-fc-2" }.hugs + 1, nights.hugs)
+        assertTrue(nights.replies.last().mine); assertTrue(hindi.containsMatchIn(nights.body))
+        assertTrue(feed.posts.first { it.id == "local-fc-3" }.reported)
+        assertEquals(state, CommunityLocal.decode(CommunityLocal.encode(state)))
+        assertEquals(CommunityLocalState(), CommunityLocal.decode(null))
+        // A second tap takes the hug back; deleting a post takes its replies with it; built-in posts stay.
+        assertFalse(CommunityLocal.feed("family-carers", CommunityLocal.react(state, "local-fc-2", "hugs"), anchor) { it.en }.posts.first { it.id == "local-fc-2" }.myHugs)
+        val removed = CommunityLocal.remove(state, "mine-1")
+        assertEquals(listOf("mine-r"), removed.items.map { it.id })
+        assertEquals(base, CommunityLocal.home(removed).groups.first { it.id == "family-carers" }.posts)
     }
 }

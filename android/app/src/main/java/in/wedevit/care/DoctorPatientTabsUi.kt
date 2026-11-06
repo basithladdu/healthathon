@@ -3,12 +3,8 @@ package `in`.wedevit.care
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInParent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -20,7 +16,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.Apps
 import androidx.compose.material.icons.outlined.Assignment
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material.icons.outlined.Forum
@@ -62,6 +60,12 @@ internal val doctorPatientTabs = listOf(
     DoctorPatientTab("Visits", "Visits", "विज़िट", Icons.Outlined.CalendarMonth, DoctorCardVisit),
     DoctorPatientTab("Medicines", "Medicines", "दवाइयाँ", Icons.Outlined.Medication, DoctorCardMedicine),
     DoctorPatientTab("Reports", "Documents", "कागज़ात", Icons.Outlined.FolderOpen, DoctorCardReport),
+)
+
+/** The hub's two less used routes; named here so the section bar can title them too. */
+internal val doctorMoreSections = listOf(
+    DoctorPatientTab("Tools", "Daily care", "रोज़ की देखभाल", Icons.Outlined.Apps, DoctorCardReport),
+    DoctorPatientTab("Shared", "Sharing & access", "साझा करना और पहुँच", Icons.Outlined.Lock, DoctorCardReport),
 )
 
 /** The earlier practice record (DoctorDemoUi) still routes these six sections, Overview included. */
@@ -202,24 +206,39 @@ internal fun doctorLabRange(data: CareEntry): Pair<Double?, Double?> {
     return if (nums.size == 2 && nums[0] <= nums[1]) nums[0] to nums[1] else null to null
 }
 
-/** Phone: one row of tabs on a white track (u-FIR tab grammar). The open tab is a solid fill in its own colour; the row scrolls to keep it in view. */
-@Composable internal fun DoctorPatientTabRow(selected: String, onSection: (String) -> Unit, modifier: Modifier = Modifier) {
+/**
+ * Phone, inside a section: the section's colour chip and title, and one compact "Sections" button that opens the
+ * ordered section list in a sheet. No permanent tab row (owner, 6 Nov: it distracts while working in a section).
+ * The host's top bar keeps the back arrow (back to the patient) and the patient's name.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable internal fun DoctorPatientSectionBar(selected: String, onSection: (String) -> Unit, modifier: Modifier = Modifier) {
     val t = careText()
-    val scroll = rememberScrollState()
-    val positions = remember { mutableStateMapOf<String, Int>() }
-    LaunchedEffect(selected, positions[selected]) { positions[selected]?.let { scroll.animateScrollTo((it - 48).coerceAtLeast(0), SaharaMotion.tween(SaharaMotion.SELECT_MS * 2)) } }
-    Box(modifier.fillMaxWidth().background(Cream).padding(horizontal = 12.dp, vertical = 8.dp)) {
-        Row(Modifier.fillMaxWidth().background(Paper, RoundedCornerShape(14.dp)).border(1.dp, DoctorHairline, RoundedCornerShape(14.dp)).horizontalScroll(scroll).padding(4.dp).testTag("doctor-patient-tabs"), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            doctorPatientTabs.forEach { tab ->
-                val on = tab.section == selected
-                val tone = doctorTabTone(tab.section)
-                val fill by animateColorAsState(if (on) tone.solid else Color.Transparent, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "tab fill")
-                val ink by animateColorAsState(if (on) tone.onSolid else DoctorCardSub, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "tab ink")
-                Row(Modifier.onGloballyPositioned { positions[tab.section] = it.positionInParent().x.toInt() }.heightIn(min = 48.dp).background(fill, RoundedCornerShape(10.dp))
-                    .selectable(selected = on, role = Role.Tab) { if (!on) onSection(tab.section) }.padding(horizontal = 12.dp).testTag("doctor-tab-${tab.section}"),
-                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Icon(tab.icon, null, Modifier.size(18.dp), tint = if (on) tone.onSolid else tone.ink)
-                    Text(t(tab.en, tab.hi), fontSize = 14.sp, fontWeight = if (on) FontWeight.Bold else FontWeight.SemiBold, color = ink, maxLines = 1, softWrap = false)
+    val tab = (doctorPatientTabs + doctorMoreSections).firstOrNull { it.section == selected }
+    var open by rememberSaveable { mutableStateOf(false) }
+    Row(modifier.fillMaxWidth().background(Cream).padding(start = 16.dp, end = 12.dp, top = 8.dp, bottom = 8.dp).testTag("doctor-section-bar"), verticalAlignment = Alignment.CenterVertically) {
+        // The title changes in place when the doctor jumps to another section.
+        AnimatedContent(tab, Modifier.weight(1f), transitionSpec = { SaharaMotion.crossfade() }, label = "sectiontitle") { shown ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (shown != null) { DoctorIconChip(shown.icon, doctorTabTone(shown.section), 36.dp); Spacer(Modifier.width(12.dp)) }
+                Text(shown?.let { t(it.en, it.hi) } ?: "", Modifier.a11yHeading().testTag("doctor-section-title"), fontFamily = SaharaTitleFont, fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, style = DoctorWholeWords)
+            }
+        }
+        Spacer(Modifier.width(8.dp))
+        OutlinedButton(onClick = { open = true }, shape = RoundedCornerShape(50), border = BorderStroke(1.5.dp, DoctorTones.Rust.solid), colors = ButtonDefaults.outlinedButtonColors(contentColor = DoctorTones.Rust.ink),
+            contentPadding = PaddingValues(horizontal = 14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-sections-open")) {
+            Icon(Icons.Outlined.GridView, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Sections", "हिस्से"), fontWeight = FontWeight.SemiBold, softWrap = false)
+        }
+    }
+    if (open) ModalBottomSheet(onDismissRequest = { open = false }, containerColor = Cream) {
+        Column(Modifier.fillMaxWidth().navigationBarsPadding().padding(start = 16.dp, end = 16.dp, bottom = 16.dp).testTag("doctor-sections-sheet"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text(t("Sections", "हिस्से"), Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 22.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+            Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
+                Column {
+                    doctorPatientTabs.forEachIndexed { index, item ->
+                        if (index > 0) HorizontalDivider(Modifier.padding(start = 64.dp), color = DoctorHairline)
+                        DoctorSectionRow(item, { next -> open = false; if (next != selected) onSection(next) }, "doctor-tab", selected = item.section == selected)
+                    }
                 }
             }
         }
@@ -227,7 +246,7 @@ internal fun doctorLabRange(data: CareEntry): Pair<Double?, Double?> {
 }
 
 /**
- * The doctor's patient screen. Phone: the hub, then one tab at a time with the tab row on top (one tap between tabs).
+ * The doctor's patient screen. Phone: the hub, then one section at a time under a slim section bar ("Sections" jumps to another).
  * 840dp and wider: the hub stays on the left as the list and the chosen tab fills the right.
  * [hub] gets (pane, selected): pane is true in the two-pane layout. [care] draws every section except "Labs".
  */
@@ -241,7 +260,7 @@ internal fun doctorLabRange(data: CareEntry): Pair<Double?, Double?> {
             Box(Modifier.weight(1f).fillMaxHeight().testTag("doctor-patient-pane-detail")) { DoctorPatientSectionContent(vm, personId, shown, care) }
         } else if (section == "Hub") hub(false, null)
         else Column(Modifier.fillMaxSize()) {
-            DoctorPatientTabRow(shown, onSection)
+            DoctorPatientSectionBar(shown, onSection)
             HorizontalDivider(color = DoctorHairline)
             // Tab change: the new tab fades in and drifts from the side it sits on in the row. One instance only, so its saved state stays single.
             val order = doctorPatientTabs.indexOfFirst { it.section == shown }
@@ -279,8 +298,9 @@ internal fun doctorLabRange(data: CareEntry): Pair<Double?, Double?> {
     val groups = remember(entries, personId) { labGroups(entries.filter { it.personId == personId }) }
     LazyColumn(Modifier.fillMaxSize().testTag("doctor-labs"), contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 96.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item {
+            // The section bar already names this section; only its own route stays here.
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Heading(t("Lab reports", "जाँच रिपोर्टें"), 26); Spacer(Modifier.weight(1f))
+                Spacer(Modifier.weight(1f))
                 if (groups.isNotEmpty()) TextButton(onClick = { full = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-labs-all")) { Text(t("All results", "सभी नतीजे"), color = RustText) }
             }
         }

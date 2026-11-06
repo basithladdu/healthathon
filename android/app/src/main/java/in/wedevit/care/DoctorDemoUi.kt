@@ -255,7 +255,7 @@ private val DoctorMist = Peach
             else if(workflowRoute != null) {
                 val target = demoStore.patients.firstOrNull { it.id == workflowRoute }
                 if(target!=null) key(target.id,workflowNamespace) { DoctorConversationWorkspace(target,workflow,onBack={workflowRoute=null},cloud=cloud,onSignIn=onSignIn,enableOnlineAi=enableOnlineAi) }
-            } else Crossfade(targetState = patientId to tab, animationSpec = tween(160), label = t("Doctor destination", "डॉक्टर कहाँ जाएँ")) { destination ->
+            } else Crossfade(targetState = patientId to tab, animationSpec = tween(160), label = "doctordestination") { destination ->
             val shownPatient = demoStore.patients.firstOrNull { it.id == destination.first }
             when {
                 shownPatient != null && recordTab=="Hub" -> LazyColumn(Modifier.fillMaxSize().testTag("demo-patient-hub"),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(16.dp)) {
@@ -723,7 +723,7 @@ private suspend fun loadHomeVisits(context: android.content.Context): List<HomeV
         if (visits.isNotEmpty()) {
             item(key = "home-coming-up") { Box(Modifier.animateItem()) { DoctorSection(t("Coming up", "आने वाला"), Modifier.padding(top = 12.dp)) } }
             items(visits.take(4), key = { "home-visit-${it.key}" }) { v ->
-                Surface(onClick = onSchedule, color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.animateItem().fillMaxWidth().heightIn(min = 72.dp).semantics(mergeDescendants = true) { contentDescription = t("${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} at ${demoTime(v.due)}. Opens the schedule.", "${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} को ${demoTime(v.due)}. समय-सूची खोलता है।") }) {
+                Surface(onClick = onSchedule, color = Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.animateItem().fillMaxWidth().heightIn(min = 72.dp).semantics(mergeDescendants = true) { contentDescription = t("${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} at ${demoTime(v.due)}. Opens the schedule.", "${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} को ${demoTime(v.due)}. समय-सूची खोलता है।") }) {
                     Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                         Column(Modifier.widthIn(min = 76.dp)) { Text(demoTime(v.due), fontSize = 15.sp, fontWeight = FontWeight.Medium, color = DoctorAccent, softWrap = false); Text(demoDate(v.due).format(DateTimeFormatter.ofPattern("EEE d MMM")), fontSize = 14.sp, color = DoctorCardSub, softWrap = false) }
                         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) { Text(v.profile.name, fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk); Text(v.kind, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis) }
@@ -735,7 +735,7 @@ private suspend fun loadHomeVisits(context: android.content.Context): List<HomeV
         if (pending.isNotEmpty()) {
             item(key = "home-pick-up") { Box(Modifier.animateItem()) { DoctorSection(t("Continue", "जारी रखें"), Modifier.padding(top = 12.dp)) } }
             items(pending, key = { it.key }) { c ->
-                Surface(onClick = { onPending(c) }, color = if (c.section == "Visits") DoctorCardVisit else DoctorCardConversation, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.animateItem().fillMaxWidth().heightIn(min = 72.dp).testTag("home-conversation-${c.key}").semantics(mergeDescendants = true) { contentDescription = "${c.profile.name}: ${c.title}. ${c.detail}. Opens ${c.section.lowercase()}." }) {
+                Surface(onClick = { onPending(c) }, color = if (c.section == "Visits") DoctorCardVisit else DoctorCardConversation, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.animateItem().fillMaxWidth().heightIn(min = 72.dp).testTag("home-conversation-${c.key}").semantics(mergeDescendants = true) { contentDescription = "${c.profile.name}: ${c.title}. ${c.detail}. Opens ${c.section.lowercase()}." }) {
                     Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                         Icon(if (c.section == "Visits") Icons.Default.CalendarMonth else Icons.Default.Forum, null, tint = DoctorAccent)
                         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) { Text(c.profile.name, fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk); Text(c.title, fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardInk); Text(c.detail, fontSize = 14.sp, color = DoctorCardSub) }
@@ -748,7 +748,7 @@ private suspend fun loadHomeVisits(context: android.content.Context): List<HomeV
         if (newRequests.isEmpty()) item { Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) { Icon(Icons.Default.CheckCircle, null, Modifier.size(20.dp), tint = DoctorStatusGood); Text(t("No requests", "कोई अनुरोध नहीं"), fontSize = 15.sp, color = DoctorCardSub) } }
         items(newRequests.take(3), key = { "home-request-${it.id}" }) { r ->
             val name = byId.getValue(r.patientId).displayName()
-            Surface(onClick = { onConversation(r.patientId) }, color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().heightIn(min = 72.dp).testTag("home-request-${r.id}").semantics(mergeDescendants = true) { contentDescription = t("Conversation to plan, listed under $name: ${r.reason}. Opens the conversation.", "तय करने वाली बातचीत, $name के नाम: ${r.reason}. बातचीत खोलता है।") }) {
+            Surface(onClick = { onConversation(r.patientId) }, color = Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.animateItem().fillMaxWidth().heightIn(min = 72.dp).testTag("home-request-${r.id}").semantics(mergeDescendants = true) { contentDescription = t("Conversation to plan, listed under $name: ${r.reason}. Opens the conversation.", "तय करने वाली बातचीत, $name के नाम: ${r.reason}. बातचीत खोलता है।") }) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(name, fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
                     Text(r.reason, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
@@ -756,6 +756,6 @@ private suspend fun loadHomeVisits(context: android.content.Context): List<HomeV
                 }
             }
         }
-        item { TextButton(onClick = onRequests, modifier = Modifier.heightIn(min = 48.dp).testTag("workflow-open-requests")) { Text(t("View all", "सब देखें")); Icon(Icons.Default.ChevronRight, null) } }
+        item { TextButton(onClick = onRequests, modifier = Modifier.heightIn(min = 48.dp).testTag("workflow-open-requests")) { Text(t("All requests", "सभी अनुरोध")); Icon(Icons.Default.ChevronRight, null) } }
     }
 }

@@ -84,7 +84,10 @@ class CareFlowTest {
         ui.onNodeWithTag("choose-role").assertDoesNotExist()
         ui.onNodeWithTag("walkthrough-user-menu").assertDoesNotExist()
         screenshot("no-role-menu")
-        ui.onNodeWithTag("nav-Docs").assertIsDisplayed().performClick()
+        // Documents moved from the bottom bar into All care tools (the Care tab).
+        ui.onNodeWithTag("nav-Care").assertIsDisplayed().performClick()
+        ui.onNodeWithTag("care-list").performScrollToNode(hasTestTag("care-tool-documents"))
+        ui.onNodeWithTag("care-tool-documents").performClick()
         ui.onNodeWithTag("documents-list").assertIsDisplayed()
         ui.activityRule.scenario.recreate(); ui.waitForIdle()
         ui.runOnIdle { vm = ui.activity.careModel }
@@ -263,7 +266,7 @@ class CareFlowTest {
         ui.onNode(hasSetTextAction()).performTextInput("No such hospital xyz")
         ui.onNodeWithText("No centres found").assertIsDisplayed()
         ui.onNodeWithTag("nav-Today").performClick()
-        ui.onNodeWithTag("nav-Nearby").performClick()
+        ui.onNodeWithTag("nav-Help").performClick()
         ui.onNode(hasSetTextAction()).assertTextContains("No such hospital xyz")
         ui.onNodeWithText("Clear filters").performClick()
         ui.onNodeWithText("All India · ${vm.centres.size} centres").assertIsDisplayed()
@@ -341,7 +344,10 @@ class CareFlowTest {
     @Test fun homeSymptomTileOpensDiaryWithoutCreatingACheckin() {
         ui.runOnIdle { vm.role(false) }
         val before = vm.items.value.toList()
-        ui.onNodeWithTag("symptom-tracker-entry").performScrollTo().performClick()
+        // Symptoms is a row in All care tools (the Care tab).
+        ui.onNodeWithTag("nav-Care").performClick()
+        ui.onNodeWithTag("care-list").performScrollToNode(hasTestTag("symptom-tracker-entry"))
+        ui.onNodeWithTag("symptom-tracker-entry").performClick()
         ui.onNodeWithTag("symptom-diary").assertIsDisplayed()
         ui.onNodeWithTag("symptom-add").assertExists()
         ui.onNodeWithTag("feedback-screen").assertDoesNotExist()
