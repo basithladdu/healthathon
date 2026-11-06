@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- No symptom notes yet: an open diary with a heart and a pencil. Original Sahara art (CC0), see android/licenses/art/README.md. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="240dp" android:height="180dp" android:viewportWidth="240" android:viewportHeight="180">
+    <path android:fillColor="#D3EEEC" android:pathData="M20,96C20,36.6 85,26.7 130,30C190,33.3 222,63 220,99.3C218,142.2 170,162 115,162C60,162 20,135.6 20,96z"/>
+    <path android:fillColor="#0F6E6A" android:pathData="M58,60h124a10,10 0 0 1 10,10v70a10,10 0 0 1 -10,10h-124a10,10 0 0 1 -10,-10v-70a10,10 0 0 1 10,-10z"/>
+    <path android:fillColor="#FFFDF9" android:pathData="M62,54h50a6,6 0 0 1 6,6v76a6,6 0 0 1 -6,6h-50a6,6 0 0 1 -6,-6v-76a6,6 0 0 1 6,-6z"/>
+    <path android:fillColor="#FFFDF9" android:pathData="M128,54h50a6,6 0 0 1 6,6v76a6,6 0 0 1 -6,6h-50a6,6 0 0 1 -6,-6v-76a6,6 0 0 1 6,-6z"/>
+    <path android:fillColor="#E6D8CC" android:pathData="M120,56h0a3,3 0 0 1 3,3v78a3,3 0 0 1 -3,3h0a3,3 0 0 1 -3,-3v-78a3,3 0 0 1 3,-3z"/>
+    <path android:strokeColor="#E6D8CC" android:strokeWidth="3" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M66,72H108M66,84H108M66,96H100M66,108H108M66,120H96"/>
+    <path android:fillColor="#A8325E" android:pathData="M153,81.7C140.9,72.9 146.4,63 153,69.6C159.6,63 165.1,72.9 153,81.7z"/>
+    <path android:strokeColor="#0F6E6A" android:strokeWidth="3" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M132,124L144,114L154,118L166,104L176,98"/>
+    <path android:fillColor="#0F6E6A" android:pathData="M172.8,98a3.2,3.2 0 1,0 6.4,0a3.2,3.2 0 1,0 -6.4,0z"/>
+    <path android:fillColor="#F2B33D" android:pathData="M176,154L206,112L214,118L184,160z"/>
+    <path android:fillColor="#B9472C" android:pathData="M206,112L210,106.4L218,112L214,118z"/>
+    <path android:fillColor="#E9C79C" android:pathData="M176,154L184,160L172,166z"/>
+    <path android:fillColor="#382E29" android:pathData="M172,166L174.5,162.5L176.5,164z"/>
+    <path android:fillColor="#386D29" android:pathData="M28,140Q43.4,132.9 42,116Q26.6,123.1 28,140z"/>
+</vector>
