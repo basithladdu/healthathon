@@ -6,15 +6,16 @@ import org.json.JSONObject
 /** One piece of community wording in English and Hindi; screens show it with t(copy.en, copy.hi). */
 internal data class CommunityCopy(val en: String, val hi: String)
 
-/** A group as the server lists it (public.community_groups, editable by the team). [tone] picks the tile colour. */
-internal data class CommunityGroup(val id: String, val nameEn: String, val nameHi: String, val aboutEn: String, val aboutHi: String, val tone: String, val posts: Int)
+/** A group as the server lists it (public.community_groups, editable by the team). [tone] picks the tile colour; [joined]: the signed-in member is in it. */
+internal data class CommunityGroup(val id: String, val nameEn: String, val nameHi: String, val aboutEn: String, val aboutHi: String, val tone: String, val posts: Int, val joined: Boolean = false)
 internal data class CommunityHome(val myName: String?, val canModerate: Boolean, val groups: List<CommunityGroup>)
 
 /** Authors appear by their chosen community name only; [mine] and [byTeam] come from the server, never a user id. */
 internal data class CommunityReply(val id: String, val body: String, val createdMs: Long, val name: String, val mine: Boolean, val byTeam: Boolean,
     val hidden: Boolean, val reported: Boolean, val reports: Int)
 internal data class CommunityPost(val id: String, val groupId: String, val body: String, val createdMs: Long, val name: String, val mine: Boolean, val byTeam: Boolean,
-    val hidden: Boolean, val helpful: Int, val hugs: Int, val myHelpful: Boolean, val myHugs: Boolean, val reported: Boolean, val reports: Int, val replies: List<CommunityReply>)
+    val hidden: Boolean, val helpful: Int, val hugs: Int, val myHelpful: Boolean, val myHugs: Boolean, val reported: Boolean, val reports: Int, val replies: List<CommunityReply>,
+    val beenThere: Int = 0, val myBeenThere: Boolean = false, val saved: Boolean = false)
 internal data class CommunityFeed(val canModerate: Boolean, val myName: String?, val posts: List<CommunityPost>)
 
 /** A post or reply kept on this phone because it could not be sent. [target] is the group id for a post and the post id for a reply. */
@@ -24,6 +25,11 @@ internal data class CommunityPending(val id: String, val accountId: String, val 
 }
 
 internal object CommunityRules {
+    /** The feed id of the member's saved posts (never a group id: those have no underscore). */
+    const val SAVED = "_saved"
+    const val HELPFUL = "helpful"
+    const val HUGS = "hugs"
+    const val BEEN_THERE = "been-there"
     const val POST_MIN = 2
     const val POST_MAX = 1000
     const val REPLY_MAX = 500
@@ -80,6 +86,23 @@ internal object CommunityRules {
         }
     }
 
+    /**
+     * A first name to offer from the sign-in email ("asha.verma@…" -> "Asha"), so joining takes no typing. The person can change it;
+     * only the first word is used, so the email itself is never shown. Null when nothing usable is there.
+     */
+    fun suggestName(email: String?): String? {
+        val word = email.orEmpty().substringBefore('@').split(Regex("[^A-Za-z]+")).firstOrNull { it.length >= NAME_MIN } ?: return null
+        val name = word.lowercase().replaceFirstChar { it.uppercase() }.take(NAME_MAX)
+        return name.takeIf { nameError(it) == null }
+    }
+
+    /** Opening words for the three gentle prompts on the write screen. */
+    val prompts = listOf(
+        CommunityCopy("Ask a question", "सवाल पूछें") to CommunityCopy("My question:", "मेरा सवाल:"),
+        CommunityCopy("Share a good moment", "अच्छा पल बाँटें") to CommunityCopy("A good moment today:", "आज का अच्छा पल:"),
+        CommunityCopy("Say thank you", "शुक्रिया कहें") to CommunityCopy("Thank you to", "शुक्रिया,"),
+    )
+
     /** What to tell the person when a community call fails. Server messages are fixed English sentences (20261106120000_community.sql). */
     fun serverMessage(error: Throwable): CommunityCopy {
         val message = error.message.orEmpty()
@@ -123,7 +146,7 @@ internal object CommunityJson {
     fun home(json: JSONObject): CommunityHome {
         val rows = json.getJSONArray("groups")
         return CommunityHome(json.nullableString("my_name"), json.optBoolean("can_moderate"), (0 until rows.length()).map { i ->
-            rows.getJSONObject(i).let { CommunityGroup(it.getString("id"), it.getString("name_en"), it.getString("name_hi"), it.optString("about_en"), it.optString("about_hi"), it.optString("tone", "teal"), it.optInt("posts")) }
+            rows.getJSONObject(i).let { CommunityGroup(it.getString("id"), it.getString("name_en"), it.getString("name_hi"), it.optString("about_en"), it.optString("about_hi"), it.optString("tone", "teal"), it.optInt("posts"), it.optBoolean("joined")) }
         })
     }
     private fun reply(it: JSONObject) = CommunityReply(it.getString("id"), it.getString("body"), it.getLong("created_ms"), it.getString("name"), it.optBoolean("mine"), it.optBoolean("by_team"),
@@ -135,7 +158,7 @@ internal object CommunityJson {
             val replies = it.optJSONArray("replies") ?: JSONArray()
             CommunityPost(it.getString("id"), it.getString("group_id"), it.getString("body"), it.getLong("created_ms"), it.getString("name"), it.optBoolean("mine"), it.optBoolean("by_team"),
                 it.optBoolean("hidden"), it.optInt("helpful"), it.optInt("hugs"), it.optBoolean("my_helpful"), it.optBoolean("my_hugs"), it.optBoolean("reported"), it.optInt("reports"),
-                (0 until replies.length()).map { r -> reply(replies.getJSONObject(r)) })
+                (0 until replies.length()).map { r -> reply(replies.getJSONObject(r)) }, it.optInt("been_there"), it.optBoolean("my_been_there"), it.optBoolean("saved"))
         })
     }
 }
@@ -178,18 +201,22 @@ internal object CommunityOutbox {
 internal data class CommunityVoice(val en: String, val hi: String)
 internal data class CommunityLocalReply(val id: String, val minutesAgo: Long, val name: CommunityVoice, val body: CommunityVoice, val byTeam: Boolean = false)
 internal data class CommunityLocalPost(val id: String, val groupId: String, val minutesAgo: Long, val name: CommunityVoice, val body: CommunityVoice,
-    val helpful: Int, val hugs: Int, val replies: List<CommunityLocalReply> = emptyList())
+    val helpful: Int, val hugs: Int, val replies: List<CommunityLocalReply> = emptyList(), val beenThere: Int = 0)
 
-/** What this phone added to the built-in community: the chosen name, posts and replies (as [CommunityPending] items), reactions ("postId:kind") and reports. */
-internal data class CommunityLocalState(val name: String? = null, val items: List<CommunityPending> = emptyList(), val reactions: Set<String> = emptySet(), val reported: Set<String> = emptySet())
+/**
+ * What one signed-in account added to the built-in community: its community name, posts and replies (as [CommunityPending] items),
+ * reactions ("postId:kind"), reports, the groups it joined and the posts it saved. Kept per account (CommunityStore.local).
+ */
+internal data class CommunityLocalState(val name: String? = null, val items: List<CommunityPending> = emptyList(), val reactions: Set<String> = emptySet(), val reported: Set<String> = emptySet(),
+    val joined: Set<String> = emptySet(), val saved: Set<String> = emptySet())
 
 /**
  * The community shown when Sahara's community server can't be used (signed out, not set up, or Practice): the same four groups
- * as 20261106120000_community.sql, built-in posts from families and patients, and whatever this phone adds. The server wins
- * whenever it answers. No medical advice: questions about symptoms or medicines go to the care team.
+ * as 20261106120000_community.sql, built-in posts from families and patients, and whatever the signed-in account adds. Signed
+ * out, it can be read but not joined. The server wins whenever it answers. No medical advice: questions about symptoms or
+ * medicines go to the care team.
  */
 internal object CommunityLocal {
-    const val ACCOUNT = "phone"
 
     val baseGroups = listOf(
         CommunityGroup("family-carers", "Family carers", "परिवार के देखभाल करने वाले", "For family looking after someone at home", "घर पर किसी की देखभाल करने वाले परिवार के लिए", "teal", 0),
@@ -215,6 +242,9 @@ internal object CommunityLocal {
     private val sunita = CommunityVoice(en = "Sunita", hi = "सुनीता")
     private val ajay = CommunityVoice(en = "Ajay", hi = "अजय")
     private val priyaMother = CommunityVoice(en = "Priya's mother", hi = "प्रिया की माँ")
+    private val harpreet = CommunityVoice(en = "Harpreet", hi = "हरप्रीत")
+    private val shabnam = CommunityVoice(en = "Shabnam, Lucknow", hi = "शबनम, लखनऊ")
+    private val joseph = CommunityVoice(en = "Joseph uncle", hi = "जोसेफ़ अंकल")
 
     private const val H = 60L
     private const val D = 24 * 60L
@@ -229,7 +259,7 @@ internal object CommunityLocal {
         )),
         CommunityLocalPost("local-fc-2", "family-carers", 5 * H, suresh,
             CommunityVoice(en = "How do you all manage the nights? My brother and I now take turns. He sits with Papa till two, then I take over. It has helped us both.",
-                hi = "आप सब रातें कैसे संभालते हैं? मैं और मेरा भाई अब बारी-बारी से जागते हैं। दो बजे तक वह पापा के पास बैठता है, फिर मैं। इससे हम दोनों को राहत मिली है।"), helpful = 12, hugs = 5, replies = listOf(
+                hi = "आप सब रातें कैसे संभालते हैं? मैं और मेरा भाई अब बारी-बारी से जागते हैं। दो बजे तक वह पापा के पास बैठता है, फिर मैं। इससे हम दोनों को राहत मिली है।"), helpful = 12, hugs = 5, beenThere = 9, replies = listOf(
             CommunityLocalReply("local-fc-2-r1", 4 * H, kavita, CommunityVoice(en = "We do the same with my sister. A small bell by the bed helped Ma call us without raising her voice.", hi = "हम भी बहन के साथ ऐसा ही करते हैं। बिस्तर के पास एक छोटी घंटी रखी, तो माँ बिना ज़ोर से बोले हमें बुला लेती हैं।")),
             CommunityLocalReply("local-fc-2-r2", 3 * H, anilWife, CommunityVoice(en = "Thank you for this. I have been doing every night alone. I will ask my son to share.", hi = "इसके लिए शुक्रिया। मैं हर रात अकेले जाग रही थी। अब बेटे से बात करूँगी।")),
         )),
@@ -246,9 +276,15 @@ internal object CommunityLocal {
         )),
         CommunityLocalPost("local-fc-5", "family-carers", 5 * D, anilWife,
             CommunityVoice(en = "Some days I feel angry, and then guilty for feeling angry. Is this normal?",
-                hi = "कुछ दिन मुझे ग़ुस्सा आता है, और फिर ग़ुस्सा आने पर ही बुरा लगता है। क्या ऐसा होना आम है?"), helpful = 6, hugs = 24, replies = listOf(
+                hi = "कुछ दिन मुझे ग़ुस्सा आता है, और फिर ग़ुस्सा आने पर ही बुरा लगता है। क्या ऐसा होना आम है?"), helpful = 6, hugs = 24, beenThere = 15, replies = listOf(
             CommunityLocalReply("local-fc-5-r1", 5 * D - 3 * H, lakshmi, CommunityVoice(en = "Yes. I feel it too. It doesn't mean you love him any less.", hi = "हाँ। मुझे भी ऐसा लगता है। इसका मतलब यह नहीं कि आप उनसे कम प्यार करती हैं।")),
             CommunityLocalReply("local-fc-5-r2", 4 * D, team, CommunityVoice(en = "Many carers feel this. Please look after yourself too. If it feels like too much, tell your care team. They are there for you as well, not only for the patient.", hi = "बहुत से देखभाल करने वाले ऐसा महसूस करते हैं। अपना भी ध्यान रखिए। अगर बोझ ज़्यादा लगे, तो अपनी देखभाल टीम को बताइए। वे सिर्फ़ मरीज़ के लिए नहीं, आपके लिए भी हैं।"), byTeam = true),
+        )),
+
+        CommunityLocalPost("local-fc-6", "family-carers", 7 * D, harpreet,
+            CommunityVoice(en = "Thank you to whoever here said to ask for help. Today our neighbour sat with Maa for an hour and I went for a walk. First time in weeks.",
+                hi = "जिसने भी यहाँ मदद माँगने को कहा था, उसका शुक्रिया। आज पड़ोसन एक घंटा माँ के पास बैठीं और मैं टहलने गई। हफ़्तों में पहली बार।"), helpful = 5, hugs = 14, beenThere = 7, replies = listOf(
+            CommunityLocalReply("local-fc-6-r1", 6 * D, suresh, CommunityVoice(en = "Good. That hour is for both of you.", hi = "अच्छा किया। वह एक घंटा आप दोनों के लिए है।")),
         )),
 
         // Living with cancer
@@ -259,7 +295,7 @@ internal object CommunityLocal {
         )),
         CommunityLocalPost("local-lc-2", "living-with-cancer", 4 * H, nisha,
             CommunityVoice(en = "Bad day. Tired of being tired. Not looking for advice, just wanted to say it somewhere.",
-                hi = "आज बुरा दिन है। थक-थक कर थक गई हूँ। सलाह नहीं चाहिए, बस कहीं कहना था।"), helpful = 2, hugs = 31, replies = listOf(
+                hi = "आज बुरा दिन है। थक-थक कर थक गई हूँ। सलाह नहीं चाहिए, बस कहीं कहना था।"), helpful = 2, hugs = 31, beenThere = 11, replies = listOf(
             CommunityLocalReply("local-lc-2-r1", 3 * H, gopal, CommunityVoice(en = "Said and heard, beta. Tomorrow may be lighter.", hi = "कह दिया और हमने सुन लिया, बेटा। कल शायद हल्का हो।")),
             CommunityLocalReply("local-lc-2-r2", 2 * H, farida, CommunityVoice(en = "Sending you a hug. Some days are just like this.", hi = "आपको झप्पी भेज रही हूँ। कुछ दिन बस ऐसे ही होते हैं।")),
         )),
@@ -279,10 +315,17 @@ internal object CommunityLocal {
             CommunityLocalReply("local-lc-5-r1", 6 * D - 2 * H, gopal, CommunityVoice(en = "Very wise, Kamla ji.", hi = "बहुत समझदारी की बात, कमला जी।")),
         )),
 
+        CommunityLocalPost("local-lc-6", "living-with-cancer", 8 * D, shabnam,
+            CommunityVoice(en = "My question: how did you tell young children? My son is eight and he knows something is wrong.",
+                hi = "मेरा सवाल: आपने छोटे बच्चों को कैसे बताया? मेरा बेटा आठ साल का है और समझता है कि कुछ ठीक नहीं है।"), helpful = 11, hugs = 13, beenThere = 9, replies = listOf(
+            CommunityLocalReply("local-lc-6-r1", 7 * D, farida, CommunityVoice(en = "We told our grandchildren in simple words, a little at a time. They handled it better than we feared.", hi = "हमने पोते-पोतियों को आसान शब्दों में, थोड़ा-थोड़ा करके बताया। वे हमारे डर से कहीं बेहतर संभल गए।")),
+            CommunityLocalReply("local-lc-6-r2", 6 * D, team, CommunityVoice(en = "Many families find this hard. Your care team or a counsellor can help you find words that suit his age.", hi = "बहुत से परिवारों को यह मुश्किल लगता है। आपकी देखभाल टीम या कोई काउंसलर उसकी उम्र के हिसाब से शब्द ढूँढने में मदद कर सकते हैं।"), byTeam = true),
+        )),
+
         // Grief and loss
         CommunityLocalPost("local-gl-1", "grief-loss", 3 * H, deepa,
             CommunityVoice(en = "Three months since Papa left. I still make two cups of chai in the morning.",
-                hi = "पापा को गए तीन महीने हो गए। सुबह अब भी दो कप चाय बना लेती हूँ।"), helpful = 2, hugs = 34, replies = listOf(
+                hi = "पापा को गए तीन महीने हो गए। सुबह अब भी दो कप चाय बना लेती हूँ।"), helpful = 2, hugs = 34, beenThere = 13, replies = listOf(
             CommunityLocalReply("local-gl-1-r1", 2 * H, imran, CommunityVoice(en = "I set a plate for Ammi for a long time. Be gentle with yourself.", hi = "मैं बहुत समय तक अम्मी की थाली लगाता रहा। ख़ुद के साथ नरमी रखिए।")),
             CommunityLocalReply("local-gl-1-r2", 1 * H, team, CommunityVoice(en = "We're so sorry, Deepa. If the sadness feels too heavy, please talk to your doctor or a counsellor. You don't have to carry it alone.", hi = "हमें बहुत दुख है, दीपा। अगर दुख बहुत भारी लगे, तो अपने डॉक्टर या किसी काउंसलर से बात कीजिए। यह बोझ अकेले मत उठाइए।"), byTeam = true),
         )),
@@ -304,8 +347,14 @@ internal object CommunityLocal {
         )),
         CommunityLocalPost("local-gl-5", "grief-loss", 8 * D, ajay,
             CommunityVoice(en = "Grief comes in waves. Some days feel almost normal, then a song on the radio and I'm back at the start.",
-                hi = "दुख लहरों में आता है। कुछ दिन लगभग सामान्य लगते हैं, फिर रेडियो पर एक गाना और मैं फिर वहीं पहुँच जाता हूँ।"), helpful = 10, hugs = 21, replies = listOf(
+                hi = "दुख लहरों में आता है। कुछ दिन लगभग सामान्य लगते हैं, फिर रेडियो पर एक गाना और मैं फिर वहीं पहुँच जाता हूँ।"), helpful = 10, hugs = 21, beenThere = 10, replies = listOf(
             CommunityLocalReply("local-gl-5-r1", 7 * D, sunita, CommunityVoice(en = "Waves is the right word. You are not back at the start, even if it feels that way.", hi = "लहरें, सही शब्द है। भले ऐसा लगे, पर आप फिर शुरुआत पर नहीं हैं।")),
+        )),
+
+        CommunityLocalPost("local-gl-6", "grief-loss", 10 * D, joseph,
+            CommunityVoice(en = "A good moment today: my granddaughter laughed exactly like her grandmother. It hurt and it was beautiful.",
+                hi = "आज का अच्छा पल: मेरी पोती बिल्कुल अपनी दादी की तरह हँसी। दर्द भी हुआ और बहुत सुंदर भी लगा।"), helpful = 4, hugs = 29, beenThere = 12, replies = listOf(
+            CommunityLocalReply("local-gl-6-r1", 9 * D, deepa, CommunityVoice(en = "Both at once. I know that feeling.", hi = "दोनों एक साथ। यह एहसास मैं जानती हूँ।")),
         )),
 
         // Ask the care team
@@ -335,47 +384,65 @@ internal object CommunityLocal {
                 hi = "रात में कोई बात परेशान करे तो हमें किसे फ़ोन करना चाहिए?"), helpful = 13, hugs = 2, replies = listOf(
             CommunityLocalReply("local-ac-5-r1", 6 * D - 3 * H, team, CommunityVoice(en = "Ask your care team now, on a calm day, whom to call at night, and write it on the first page of your file. Sahara's Care plan can keep it too.", hi = "किसी शांत दिन अभी अपनी देखभाल टीम से पूछ लीजिए कि रात में किसे फ़ोन करें, और उसे अपनी फ़ाइल के पहले पन्ने पर लिख लीजिए। Sahara की देखभाल योजना में भी इसे रख सकते हैं।"), byTeam = true),
         )),
+        CommunityLocalPost("local-ac-6", "ask-care-team", 9 * D, harpreet,
+            CommunityVoice(en = "Is it okay to take a day off from the hospital visits? I feel guilty even asking.",
+                hi = "क्या अस्पताल जाने से एक दिन की छुट्टी लेना ठीक है? पूछते हुए भी बुरा लग रहा है।"), helpful = 10, hugs = 8, beenThere = 6, replies = listOf(
+            CommunityLocalReply("local-ac-6-r1", 9 * D - 3 * H, team, CommunityVoice(en = "Yes. Rest helps you keep going. Let the nurse or care team know which days you'll be there, so they can reach you.", hi = "हाँ। आराम से ही आप आगे चल पाएँगे। नर्स या देखभाल टीम को बता दीजिए कि आप किन दिनों में आएँगे, ताकि वे आपसे बात कर सकें।"), byTeam = true),
+            CommunityLocalReply("local-ac-6-r2", 8 * D, rafiq, CommunityVoice(en = "I take Sundays off. Abbu insisted.", hi = "मैं रविवार की छुट्टी लेता हूँ। अब्बू ने ही ज़िद की थी।")),
+        )),
     )
 
     private fun mine(state: CommunityLocalState, kind: String) = state.items.filter { it.kind == kind }
 
     fun home(state: CommunityLocalState): CommunityHome = CommunityHome(state.name, canModerate = false, groups = baseGroups.map { group ->
-        group.copy(posts = posts.count { it.groupId == group.id } + mine(state, CommunityPending.POST).count { it.target == group.id })
+        group.copy(posts = posts.count { it.groupId == group.id } + mine(state, CommunityPending.POST).count { it.target == group.id }, joined = group.id in state.joined)
     })
 
-    /** Newest first. Built-in times are counted back from [anchorMs] (when the screen opened), so they read as recent; [pick] chooses English or Hindi. */
+    /**
+     * Newest first. Built-in times are counted back from [anchorMs] (when the screen opened), so they read as recent; [pick] chooses
+     * English or Hindi. [groupId] [CommunityRules.SAVED] lists the saved posts from every group.
+     */
     fun feed(groupId: String, state: CommunityLocalState, anchorMs: Long, pick: (CommunityVoice) -> String): CommunityFeed {
+        val wanted = { postGroup: String, postId: String -> if (groupId == CommunityRules.SAVED) postId in state.saved else postGroup == groupId }
         val myName = state.name.orEmpty()
         val replies = mine(state, CommunityPending.REPLY)
         fun counted(id: String, kind: String) = if ("$id:$kind" in state.reactions) 1 else 0
         fun yours(postId: String) = replies.filter { it.target == postId }.map { CommunityReply(it.id, it.body, it.savedAt, myName, mine = true, byTeam = false, hidden = false, reported = false, reports = 0) }
-        val built = posts.filter { it.groupId == groupId }.map { post ->
-            CommunityPost(post.id, groupId, pick(post.body), anchorMs - post.minutesAgo * 60_000L, pick(post.name), mine = false, byTeam = false, hidden = false,
+        val built = posts.filter { wanted(it.groupId, it.id) }.map { post ->
+            CommunityPost(post.id, post.groupId, pick(post.body), anchorMs - post.minutesAgo * 60_000L, pick(post.name), mine = false, byTeam = false, hidden = false,
                 helpful = post.helpful + counted(post.id, "helpful"), hugs = post.hugs + counted(post.id, "hugs"), myHelpful = counted(post.id, "helpful") == 1, myHugs = counted(post.id, "hugs") == 1,
                 reported = post.id in state.reported, reports = 0,
-                replies = post.replies.map { CommunityReply(it.id, pick(it.body), anchorMs - it.minutesAgo * 60_000L, pick(it.name), mine = false, byTeam = it.byTeam, hidden = false, reported = it.id in state.reported, reports = 0) } + yours(post.id))
+                replies = post.replies.map { CommunityReply(it.id, pick(it.body), anchorMs - it.minutesAgo * 60_000L, pick(it.name), mine = false, byTeam = it.byTeam, hidden = false, reported = it.id in state.reported, reports = 0) } + yours(post.id),
+                beenThere = post.beenThere + counted(post.id, CommunityRules.BEEN_THERE), myBeenThere = counted(post.id, CommunityRules.BEEN_THERE) == 1, saved = post.id in state.saved)
         }
-        val written = mine(state, CommunityPending.POST).filter { it.target == groupId }.map { post ->
-            CommunityPost(post.id, groupId, post.body, post.savedAt, myName, mine = true, byTeam = false, hidden = false,
+        val written = mine(state, CommunityPending.POST).filter { wanted(it.target, it.id) }.map { post ->
+            CommunityPost(post.id, post.target, post.body, post.savedAt, myName, mine = true, byTeam = false, hidden = false,
                 helpful = counted(post.id, "helpful"), hugs = counted(post.id, "hugs"), myHelpful = counted(post.id, "helpful") == 1, myHugs = counted(post.id, "hugs") == 1,
-                reported = false, reports = 0, replies = yours(post.id))
+                reported = false, reports = 0, replies = yours(post.id),
+                beenThere = counted(post.id, CommunityRules.BEEN_THERE), myBeenThere = counted(post.id, CommunityRules.BEEN_THERE) == 1, saved = post.id in state.saved)
         }
         return CommunityFeed(canModerate = false, myName = state.name, posts = (written + built).sortedByDescending { it.createdMs })
     }
 
-    fun add(state: CommunityLocalState, item: CommunityPending): CommunityLocalState = state.copy(items = state.items.filterNot { it.id == item.id } + item)
+    /** Adds a post or reply; a post also joins its group, as on the server. */
+    fun add(state: CommunityLocalState, item: CommunityPending): CommunityLocalState = state.copy(items = state.items.filterNot { it.id == item.id } + item,
+        joined = if (item.kind == CommunityPending.POST) state.joined + item.target else state.joined)
+    fun join(state: CommunityLocalState, groupId: String, on: Boolean): CommunityLocalState = state.copy(joined = if (on) state.joined + groupId else state.joined - groupId)
+    fun save(state: CommunityLocalState, postId: String, on: Boolean): CommunityLocalState = state.copy(saved = if (on) state.saved + postId else state.saved - postId)
     fun react(state: CommunityLocalState, postId: String, kind: String): CommunityLocalState = "$postId:$kind".let { key -> state.copy(reactions = if (key in state.reactions) state.reactions - key else state.reactions + key) }
     fun report(state: CommunityLocalState, id: String): CommunityLocalState = state.copy(reported = state.reported + id)
     /** Removes this phone's post (with the replies under it) or reply. Built-in posts are never removed. */
     fun remove(state: CommunityLocalState, id: String): CommunityLocalState =
-        state.copy(items = state.items.filterNot { it.id == id || (it.kind == CommunityPending.REPLY && it.target == id) }, reactions = state.reactions.filterNot { it.startsWith("$id:") }.toSet())
+        state.copy(items = state.items.filterNot { it.id == id || (it.kind == CommunityPending.REPLY && it.target == id) }, reactions = state.reactions.filterNot { it.startsWith("$id:") }.toSet(), saved = state.saved - id)
 
     fun encode(state: CommunityLocalState): String = JSONObject().put("name", state.name ?: JSONObject.NULL).put("items", JSONArray(CommunityOutbox.encode(state.items)))
-        .put("reactions", JSONArray(state.reactions.sorted())).put("reported", JSONArray(state.reported.sorted())).toString()
+        .put("reactions", JSONArray(state.reactions.sorted())).put("reported", JSONArray(state.reported.sorted()))
+        .put("joined", JSONArray(state.joined.sorted())).put("saved", JSONArray(state.saved.sorted())).toString()
     fun decode(text: String?): CommunityLocalState {
         if (text == null) return CommunityLocalState()
         val json = JSONObject(text)
         fun strings(key: String) = json.optJSONArray(key)?.let { a -> (0 until a.length()).map(a::getString).toSet() }.orEmpty()
-        return CommunityLocalState(if (json.isNull("name")) null else json.optString("name").ifBlank { null }, CommunityOutbox.decode(json.optJSONArray("items")?.toString()), strings("reactions"), strings("reported"))
+        return CommunityLocalState(if (json.isNull("name")) null else json.optString("name").ifBlank { null }, CommunityOutbox.decode(json.optJSONArray("items")?.toString()), strings("reactions"), strings("reported"),
+            strings("joined"), strings("saved"))
     }
 }

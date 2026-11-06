@@ -184,7 +184,7 @@ Details in [docs/SAHARA_SVK_BUILD_HANDOFF.md](docs/SAHARA_SVK_BUILD_HANDOFF.md).
 
 ### Sahara community, 6 Nov (ui-community lane)
 The owner asked for a real community. The app side is built; it stays on "The community isn't open yet" until this is done:
-- [ ] **Awaiz:** apply `android/supabase/migrations/20261106120000_community.sql` (groups, posts, replies, reactions, reports, moderation; signed-in members only, nothing public). Offline check: `PGLITE_MODULE=<pglite>/dist/index.js node android/scripts/test-community-sql.mjs` (36 checks).
+- [ ] **Awaiz:** apply `android/supabase/migrations/20261106120000_community.sql` (groups, posts, replies, reactions, reports, moderation; signed-in members only, nothing public). Offline check: `PGLITE_MODULE=<pglite>/dist/index.js node android/scripts/test-community-sql.mjs` (47 checks; adds group joining and saved posts). Steps: HANDOFF.md "6 Nov: Awaiz, switch on the community".
 - [ ] **Clinicians (Sujay, Sharada, Shirin):** confirm the starting groups (Family carers, Living with cancer, Grief and loss, Ask the care team) and their one-line descriptions, or send changes; they are rows in `public.community_groups` (set `active = false` to close one). The 28 Oct meeting asked for research first; the owner asked on 6 Nov to build it.
 - [ ] **Owner/team:** name who moderates. Moderators are accounts with the existing `clinical_verifier` (or `admin`) staff role; they see report counts and can hide or show posts in the app. Three reports from different members hide a post until a moderator looks.
 - [ ] **Team:** who answers in "Ask the care team"? Replies from staff-role accounts show a "Sahara team" label.

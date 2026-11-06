@@ -2,6 +2,31 @@
 
 > **30 Oct 2026:** SVK spec build (emergency care plan, living will, QR card, languages): see [docs/SAHARA_SVK_BUILD_HANDOFF.md](docs/SAHARA_SVK_BUILD_HANDOFF.md).
 
+## 6 Nov: Awaiz, switch on the community
+
+The app's Community works without the server: anyone can read the groups; signing in (or creating an account) lets a person join groups, post, reply, react ("I've been there", hugs), save posts and choose the name others see (it starts as the first name from their email). Until the server part below is on, what a signed-in person writes stays on their phone, under their account. After it is on, everyone sees each other's posts.
+
+- [ ] **1. Check it offline first** (from the repository root, no project touched):
+  ```bash
+  PGLITE_MODULE=<path to node_modules>/@electric-sql/pglite/dist/index.js node android/scripts/test-community-sql.mjs
+  ```
+  It must end with `Community SQL: 47 checks PASS`.
+- [ ] **2. Apply the migration** `android/supabase/migrations/20261106120000_community.sql` to Saanthvana (`kjnhtakqzboayqorrlue`). From `android/`:
+  ```bash
+  supabase link --project-ref kjnhtakqzboayqorrlue
+  supabase db push --dry-run
+  ```
+  If the dry run lists **only** `20261106120000_community.sql`, run `supabase db push`. If it lists older files too (they were applied by hand), don't push: open Supabase → SQL Editor, paste the whole file and run it once.
+- [ ] **3. Give the moderators their role** (they can hide and restore posts and see reports). For each team member, replace `TEAM_EMAIL`, in the SQL Editor:
+  ```sql
+  insert into healthathon_private.staff_roles(user_id, role) select id, 'clinical_verifier' from auth.users where email = 'TEAM_EMAIL' on conflict do nothing;
+  ```
+  Their posts and replies then show the "Sahara team" badge.
+- [ ] **4. Confirm the groups with the doctors** (Sujay, Sharada, Shirin): Family carers, Living with cancer, Grief and loss, Ask the care team, and their one-line descriptions. They are rows in `public.community_groups`; set `active = false` to close one. The same four are built into the app, so tell Basith if a name changes.
+- [ ] **5. Phone check:** signed out, open Community: groups readable, "Sign in or create an account to join" opens the account screen. Signed in: join a group (it moves to "Your groups"), post, reply, save a post, change your name; sign in as a second account and see the first account's post.
+
+The help card (Tele-MANAS 14416, free, 24 hours; 112 for emergencies) opens the phone's dialler; it never calls by itself.
+
 ## 5 Nov: Awaiz's tasks from the 4 Nov handoff (Awaiz, with Claude Code)
 
 Done:
