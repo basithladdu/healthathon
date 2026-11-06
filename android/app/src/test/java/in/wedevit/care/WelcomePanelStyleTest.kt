@@ -6,10 +6,10 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class WelcomePanelStyleTest {
-    @Test fun warmerOrangeUsesReadableDarkTextInsteadOfLowContrastWhite() {
-        assertEquals(Color(0xFFD97757), WelcomePanelOrange)
-        assertEquals(Color(0xFF2B1F19), WelcomePanelInk)
-        val contrast = (WelcomePanelOrange.luminance() + .05f) / (WelcomePanelInk.luminance() + .05f)
+    @Test fun welcomePanelIsTheHeaderBandWithWhiteText() {
+        assertEquals(SaharaColors.Band, WelcomePanelOrange)
+        assertEquals(Color.White, WelcomePanelInk)
+        val contrast = (WelcomePanelInk.luminance() + .05f) / (WelcomePanelOrange.luminance() + .05f)
         assertTrue("Normal-size welcome text needs at least 4.5:1 contrast", contrast >= 4.5f)
     }
 
