@@ -361,7 +361,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
                 Heading(t(if (prior != null && initial == null) "Update rating" else if (initial == null) "How are you feeling?" else "Edit symptom note", if (prior != null && initial == null) "नया अंक लिखें" else if (initial == null) "तबीयत कैसी है?" else "तबीयत का नोट बदलें"), 26)
                 Text(personName, color = DoctorCardSub, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 if (!quick) {
-                    Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) { steps.forEachIndexed { i, _ -> val bar by androidx.compose.animation.animateColorAsState(if (i <= pos) DoctorAccent else DoctorHairline, SaharaMotion.tween(SaharaMotion.ENTER_MS), label = "step bar"); Box(Modifier.weight(1f).height(6.dp).clip(RoundedCornerShape(3.dp)).background(bar)) } }
+                    Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) { steps.forEachIndexed { i, _ -> val bar by androidx.compose.animation.animateColorAsState(if (i <= pos) DoctorAccent else DoctorHairline, SaharaMotion.tween(SaharaMotion.ENTER_MS), label = "step-bar"); Box(Modifier.weight(1f).height(6.dp).clip(RoundedCornerShape(3.dp)).background(bar)) } }
                     Text("${pos + 1} ${t("of", "/")} ${steps.size}", color = DoctorCardSub, fontSize = 14.sp, modifier = Modifier.testTag("symptom-step-indicator"))
                 }
             }
@@ -481,7 +481,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
                 val back: @Composable (Modifier) -> Unit = { m -> OutlinedButton(onClick = goBack, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, DoctorCardSub.copy(alpha = .5f)), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp), modifier = m.heightIn(min = 56.dp).testTag("symptom-step-back")) { Text(if (quick || pos <= 0) t("Cancel", "रद्द करें") else t("Back", "पीछे"), color = DoctorCardInk, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, style = SymptomWords) } }
                 val save: @Composable (Modifier) -> Unit = { m -> Button(onClick = saveNow, enabled = !busy && canEdit && personId == capturedPerson && (quick || saveFromWhere || stepValid), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = Color.White), elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp, pressedElevation = 0.dp), modifier = m.heightIn(min = 56.dp).testTag("symptom-save")) {
                     // Saving shows a small spinner in the button itself; the sheet closes when the note is stored.
-                    AnimatedContent(busy, transitionSpec = { SaharaMotion.crossfade() }, label = "save state") { saving ->
+                    AnimatedContent(busy, transitionSpec = { SaharaMotion.crossfade() }, label = "save-state") { saving ->
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             if (saving) { CircularProgressIndicator(Modifier.size(18.dp), color = Color.White, strokeWidth = 2.dp); Spacer(Modifier.width(8.dp)) }
                             Text(if (saving) t("Saving…", "सहेज रहे हैं…") else t("Save note", "नोट सहेजें"), fontSize = 17.sp, fontWeight = FontWeight.SemiBold, style = SymptomWords)

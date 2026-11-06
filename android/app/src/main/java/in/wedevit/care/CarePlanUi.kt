@@ -125,7 +125,7 @@ internal fun planStepOf(field: String): Int = when {
     }
     val canManageData = clinician || actor != "Family"
     // Pages slide in from the end and back out to the plan home, the same motion as the rest of the app.
-    SaharaScreenHost(page, Modifier.fillMaxSize(), label = "Care plan page", direction = { _, to -> if (to == "home") SaharaMotion.Direction.Back else SaharaMotion.Direction.Forward }) { shownPage -> when (shownPage) {
+    SaharaScreenHost(page, Modifier.fillMaxSize(), label = "care-plan-page", direction = { _, to -> if (to == "home") SaharaMotion.Direction.Back else SaharaMotion.Direction.Forward }) { shownPage -> when (shownPage) {
         "wizard" -> {
             val draft = EctprLifecycle.draft(state.ectprs, selected)
             if (draft == null) { LaunchedEffect(Unit) { page = "home" }; return@SaharaScreenHost }

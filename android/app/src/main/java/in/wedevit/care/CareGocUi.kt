@@ -717,7 +717,7 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
     val ring by animateFloatAsState(if (recording && !paused) level.coerceIn(0f, 1f) else 0f, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "voice level")
     // A slow breath while recording (about one every 2.4 s), only while the screen records and animations are on.
     val breathing = recording && !paused && SaharaMotion.enabled
-    val breath = if (breathing) androidx.compose.animation.core.rememberInfiniteTransition(label = "record pulse").animateFloat(0f, 1f, androidx.compose.animation.core.infiniteRepeatable(androidx.compose.animation.core.tween(1200, easing = androidx.compose.animation.core.FastOutSlowInEasing), androidx.compose.animation.core.RepeatMode.Reverse), label = "breath").value else 0f
+    val breath = if (breathing) androidx.compose.animation.core.rememberInfiniteTransition(label = "record-pulse").animateFloat(0f, 1f, androidx.compose.animation.core.infiniteRepeatable(androidx.compose.animation.core.tween(1200, easing = androidx.compose.animation.core.FastOutSlowInEasing), androidx.compose.animation.core.RepeatMode.Reverse), label = "breath").value else 0f
     Box(Modifier.size(196.dp), contentAlignment = Alignment.Center) {
         if (recording) Box(Modifier.size(156.dp + 24.dp * breath + 16.dp * ring).background(Rust.copy(alpha = .08f + .10f * breath + .10f * ring), CircleShape))
         if (recording) Box(Modifier.size(156.dp + 16.dp * ring).background(Rust.copy(alpha = .14f), CircleShape))

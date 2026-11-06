@@ -117,7 +117,7 @@ internal const val NEARBY_PAGE = 10
         item { Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min).testTag("nearby-layers"), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             NearbyHelp.layerOptions.forEach { layer ->
                 val on = layer in layers; val accent = Color(NearbyHelp.layerColor(layer))
-                val fill by animateColorAsState(if (on) accent else Paper, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "nearby layer")
+                val fill by animateColorAsState(if (on) accent else Paper, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "nearby-layer")
                 val ink = if (on) readableOn(accent) else DoctorCardInk
                 Surface(selected = on, onClick = { layerKey = NearbyHelp.layerOptions.filter { it in NearbyHelp.toggleLayer(layers, layer) }.joinToString(",") }, shape = RoundedCornerShape(12.dp), color = fill, contentColor = ink,
                     border = androidx.compose.foundation.BorderStroke(if (on) 0.dp else 1.5.dp, accent), modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = 56.dp).testTag("nearby-layer-$layer")) {

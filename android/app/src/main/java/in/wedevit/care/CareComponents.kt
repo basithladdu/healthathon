@@ -53,7 +53,7 @@ import androidx.compose.ui.unit.sp
             labels.forEachIndexed { index, label ->
                 val active = selected == routes[index] || (!clinician && index == 1 && selected == 1)
                 val pill by animateColorAsState(if (active) SaharaColors.Primary else Color.Transparent, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "selected tab")
-                val iconTint by animateColorAsState(if (active) SaharaColors.OnPrimary else SaharaColors.InkSub, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "selected tab icon")
+                val iconTint by animateColorAsState(if (active) SaharaColors.OnPrimary else SaharaColors.InkSub, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "selected-tab-icon")
                 Column(Modifier.weight(1f).testTag("nav-${keys[index]}").clip(RoundedCornerShape(SaharaRadius.Lg))
                     .selectable(selected = active, role = Role.Tab, onClick = { onSelect(routes[index]) }).heightIn(min = 64.dp).padding(vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                     Box(Modifier.size(width = 56.dp, height = 32.dp).clip(RoundedCornerShape(SaharaRadius.Pill)).background(pill), contentAlignment = Alignment.Center) {
