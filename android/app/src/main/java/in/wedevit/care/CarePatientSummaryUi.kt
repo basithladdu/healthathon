@@ -1,12 +1,9 @@
 package `in`.wedevit.care
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -15,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -25,10 +21,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import java.time.LocalDate
 
 /**
- * "Rahul at a glance": a short, read-only summary at the top of Today for patient and family. Every number comes from entries already
- * on the phone. It only opens existing screens, so a read-only family member sees the same card with no edit action.
+ * "Rahul at a glance": a short, read-only register on Today for patient and family. Every line comes from entries already on the
+ * phone and every row opens the page it names (trailing chevron). A read-only family member sees the same rows; [onAddVisit] is null for them.
  */
-@Composable fun PatientSummaryCard(vm: CareModel, onSymptoms: () -> Unit, onMedicines: () -> Unit, onVisit: (CareItem) -> Unit, onRead: (CareVersion) -> Unit, onCarePlan: () -> Unit) {
+@Composable fun PatientSummaryCard(vm: CareModel, onSymptoms: () -> Unit, onVisit: (CareItem?) -> Unit, onAddVisit: (() -> Unit)?, onGoals: (CareVersion?) -> Unit, onCarePlan: () -> Unit) {
     val t = careText(); val hindi = careHindi(); val context = LocalContext.current
     val items by vm.items.collectAsStateWithLifecycle(); val versions by vm.versions.collectAsStateWithLifecycle()
     val people by vm.people.collectAsStateWithLifecycle(); val selected by vm.selected.collectAsStateWithLifecycle()
@@ -37,56 +33,46 @@ import java.time.LocalDate
     val store = remember(vm.storageNamespace) { CarePlanStore(context.applicationContext, vm.storageNamespace) }
     val plans = remember(selected) { runCatching { store.load(selected).ectprs }.getOrDefault(emptyList()) }
     val summary = remember(items, versions, selected, plans, today) { CarePatientSummaryRules.build(items, versions, selected, plans, today) }
-    // A plain register, always open: symptoms and the emergency plan. Medicines, visits and the latest note each have
-    // their own section on Today ([onMedicines], [onVisit], [onRead] stay for callers), so they are not repeated here.
-    Surface(shape = RoundedCornerShape(12.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().saharaAppear().testTag("patient-summary")) {
-        Column(Modifier.saharaContentSize().padding(top = 12.dp, start = 16.dp, end = 16.dp)) {
-            Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                Surface(shape = CircleShape, color = SaharaTone.Teal.wash, modifier = Modifier.size(40.dp)) { Box(contentAlignment = Alignment.Center) { Text(name.take(1).uppercase(), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = SaharaTone.Teal.ink) } }
-                Spacer(Modifier.width(12.dp))
-                Text(t("$name at a glance", "$name एक नज़र में"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 2, modifier = Modifier.weight(1f).semantics { heading() })
-            }
-            GlanceRow(Icons.Default.Healing, SaharaTone.Rose, t("Pain and symptoms", "दर्द और लक्षण"), summary.symptoms.firstOrNull()?.let { CarePatientSummaryRules.symptomLine(it, hindi) } ?: CarePatientSummaryRules.noSymptoms(hindi), "summary-symptoms", onSymptoms)
-            GlanceRow(Icons.Default.LocalHospital, SaharaTone.Marigold, t("Emergency care plan", "आपातकालीन देखभाल योजना"), CarePatientSummaryRules.planLine(summary.plan, hindi), "summary-plan", onCarePlan)
+    val visit = summary.nextVisit
+    val visitLine = when {
+        visit != null -> CareTodayRules.whenLabel(visit.due, today, hindi) + visit.title.takeIf { it.isNotBlank() }?.let { " · $it" }.orEmpty()
+        onAddVisit != null -> t("None planned · Add a visit", "कोई तय नहीं · मुलाक़ात जोड़ें")
+        else -> CarePatientSummaryRules.nextVisit(null, hindi)
+    }
+    val note = summary.latestNote
+    // Four rows, always open; each names its page. Medicines have their own section on Today, so they are not repeated here.
+    SaharaRegister(Modifier.testTag("patient-summary")) {
+        Row(Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            Surface(shape = CircleShape, color = SaharaTone.Teal.wash, modifier = Modifier.size(40.dp)) { Box(contentAlignment = Alignment.Center) { Text(name.take(1).uppercase(), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = SaharaTone.Teal.ink) } }
+            Spacer(Modifier.width(12.dp))
+            Text(t("$name at a glance", "$name एक नज़र में"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 2, modifier = Modifier.weight(1f).semantics { heading() })
+        }
+        GlanceRow(Icons.Default.Healing, SaharaTone.Rose, t("Pain and symptoms", "दर्द और लक्षण"), summary.symptoms.firstOrNull()?.let { CarePatientSummaryRules.symptomLine(it, hindi) } ?: CarePatientSummaryRules.noSymptoms(hindi), "summary-symptoms", onSymptoms)
+        GlanceRow(Icons.Default.Event, SaharaTone.Indigo, t("Next visit", "अगली मुलाक़ात"), visitLine, "summary-visit") { if (visit == null && onAddVisit != null) onAddVisit() else onVisit(visit) }
+        GlanceRow(Icons.Default.Description, SaharaTone.Marigold, t("Goals of care", "देखभाल के लक्ष्य"), CarePatientSummaryRules.noteLine(note, note?.let { date(it.published) }.orEmpty(), hindi), "today-goals-of-care") { onGoals(note) }
+        GlanceRow(Icons.Default.LocalHospital, SaharaTone.Rust, t("Emergency plan", "आपातकालीन योजना"), CarePatientSummaryRules.planLine(summary.plan, hindi), "summary-plan", onCarePlan)
+    }
+}
+
+/** A Today section title with the one page it opens on the right ("Open medicines" and a chevron). */
+@Composable fun TodaySectionHeader(title: String, action: String, tag: String, onAction: () -> Unit) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text(title, fontSize = 20.sp, fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
+        TextButton(onClick = onAction, modifier = Modifier.heightIn(min = 48.dp).testTag(tag), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) {
+            Text(action, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false); Icon(Icons.Default.ChevronRight, null, Modifier.size(20.dp))
         }
     }
 }
 
-/** Today's page shortcuts, two by two, with full-word labels (the same names as on the Care tab). SOS has its own bar above. */
-@Composable fun TodayQuickActions(onCalendar: () -> Unit, onSymptoms: () -> Unit, onLabs: () -> Unit, onCommunity: () -> Unit) {
+/** The last row on Today: the one way into every other care page (the Care tab). */
+@Composable fun TodayAllCareTools(onOpen: () -> Unit) {
     val t = careText()
-    val actions = listOf(
-        QuickAction(t("Calendar", "कैलेंडर"), Icons.Default.CalendarMonth, SaharaTone.Indigo, "shortcut-calendar", onCalendar),
-        QuickAction(t("Symptoms", "लक्षण"), Icons.Default.MonitorHeart, SaharaTone.Rose, "symptom-tracker-entry", onSymptoms),
-        QuickAction(t("Lab history", "जाँच रिपोर्टें"), Icons.Default.Science, SaharaTone.Marigold, "shortcut-labs", onLabs),
-        QuickAction(t("Community", "समुदाय"), Icons.Default.Groups, SaharaTone.Leaf, "shortcut-community", onCommunity),
-    )
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        actions.chunked(2).forEach { row ->
-            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                row.forEach { action ->
-                    ActionCard(action.tone.wash, Modifier.weight(1f).fillMaxHeight().heightIn(min = 64.dp).testTag(action.tag), action.onClick) {
-                        Row(Modifier.fillMaxSize().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Surface(shape = RoundedCornerShape(12.dp), color = action.tone.solid) { Icon(action.icon, null, Modifier.padding(8.dp).size(22.dp), tint = action.tone.onSolid) }
-                            Spacer(Modifier.width(10.dp))
-                            Text(action.label, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.weight(1f),
-                                style = LocalTextStyle.current.copy(lineBreak = androidx.compose.ui.text.style.LineBreak.Heading, hyphens = androidx.compose.ui.text.style.Hyphens.None))
-                        }
-                    }
-                }
-            }
-        }
-    }
+    SaharaRegister { SaharaListRow(t("All care tools", "देखभाल के सभी साधन"), Modifier.testTag("today-all-care-tools"), detail = t("Medicines, visits, documents, labs and more", "दवाइयाँ, मुलाक़ातें, कागज़ात, जाँच और बाक़ी सब"),
+        icon = Icons.Default.Apps, tone = SaharaTone.Teal, onClick = onOpen) }
 }
 
-private class QuickAction(val label: String, val icon: ImageVector, val tone: SaharaTone, val tag: String, val onClick: () -> Unit)
-
-/** One register row: a coloured icon tile, the title, today's line under it, and an arrow; the whole row opens its page. */
+/** One register row: a coloured icon tile, the title, today's line under it, and a chevron; the whole row opens its page. */
 @Composable private fun GlanceRow(icon: ImageVector, tone: SaharaTone, title: String, subtitle: String, tag: String, onClick: () -> Unit) {
-    HorizontalDivider(color = DoctorHairline)
-    Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).clickable(role = Role.Button, onClick = onClick).padding(vertical = 8.dp).semantics(mergeDescendants = true) {}.testTag(tag), verticalAlignment = Alignment.CenterVertically) {
-        Surface(shape = RoundedCornerShape(12.dp), color = tone.solid) { Icon(icon, null, Modifier.padding(6.dp).size(20.dp), tint = tone.onSolid) }; Spacer(Modifier.width(12.dp))
-        Column(Modifier.weight(1f)) { Text(title, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk); Text(subtitle, fontSize = 14.sp, color = DoctorCardSub, maxLines = 3) }
-        Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(18.dp), tint = RustText)
-    }
+    HorizontalDivider(color = DoctorHairline, modifier = Modifier.padding(horizontal = 12.dp))
+    SaharaListRow(title, Modifier.testTag(tag), detail = subtitle, icon = icon, tone = tone, onClick = onClick)
 }

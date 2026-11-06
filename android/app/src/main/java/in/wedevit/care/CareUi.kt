@@ -268,6 +268,7 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
                         onCarePlanFromSos = { go(10, reopen = "sos") }, sosReopen = sosReopen, onSosReopened = { sosReopen = false }, onCommunity = { go(11) })
                     1 -> Talk(vm, clinician && canEdit, onRead = { reading = it }, onRequestConversation = { go(7) })
                     2 -> CareList(vm, initialFilter = careFilter, onReadNote = { reading = it }, onCalendar = { openCalendar() }, onCalendarAt = ::openCalendar, onWorkflow = { go(7) }, onLabs = { go(8) }, onSymptoms = { go(9) }, onCommunity = { go(11) }, onDevices = { go(12) }, onExit = { back() },
+                        onDocuments = { go(5) }, onCarePlan = { go(10) }, title = t("All care tools", "देखभाल के सभी साधन"),
                         onAdd = { if (canEdit) dialog = it else vm.message.value = askOwner },
                         onScanPrescription = {
                             if (canEdit) {
@@ -455,9 +456,8 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
     val hindi = careHindi(); val t = careText()
     val family = CareFamilyRules.isFamily(role, clinician)
     val personName = todayPeople.firstOrNull { it.id == selectedPerson }?.name.orEmpty()
-    // SOS opens one sheet with the emergency numbers, the emergency card and the emergency plan; "QR card" opens the card alone.
+    // SOS opens one sheet with the emergency numbers, the emergency QR card and the emergency plan.
     var sosOpen by rememberSaveable { mutableStateOf(false) }
-    var qrOpen by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(sosReopen) { if (sosReopen) { sosOpen = true; onSosReopened() } }
     val showSummary = !clinician && selectedPerson.isNotBlank()
     if (sosOpen) ModalBottomSheet(onDismissRequest = { sosOpen = false }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Paper) {
@@ -468,9 +468,6 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
             Spacer(Modifier.height(12.dp))
             CarePlanEntryCard { sosOpen = false; onCarePlanFromSos() }
         }
-    }
-    if (qrOpen) ModalBottomSheet(onDismissRequest = { qrOpen = false }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Paper) {
-        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 16.dp, end = 16.dp, bottom = 32.dp).testTag("today-qr-sheet")) { EmergencyCardOnToday(vm, onRead) }
     }
     val hour = java.time.LocalTime.now().hour
     val medicines = CareDailyFlow.medicinesForToday(items, today)
@@ -492,46 +489,56 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
             // A labelled button, not a bare arrow icon nobody can name.
             if (vm.cloud != null) TextButton(onClick = vm::refresh, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Icon(Icons.Default.Refresh, null, Modifier.size(20.dp)); Spacer(Modifier.width(6.dp)); Text(t("Refresh", "रिफ़्रेश करें")) }
         } }
-        if (!clinician) item(key = "today-sos") { CareSosBar(onSos = { sosOpen = true }, onQr = { qrOpen = true }) }
-        if (family) {
-            // Family: how the patient is doing first; their own check (not the patient's) comes after the day's tasks.
-            if (showSummary) item(key = "patient-summary") { PatientSummaryCard(vm, onSymptoms = onSymptoms, onMedicines = { onCare("Medicines") }, onVisit = { if (it.due == 0L) onCalendar() else onCalendarAt(it.due) }, onRead = onRead, onCarePlan = onCarePlan) }
-        } else {
-            if (!clinician && canEdit) item(key = "today-checkin") { TodayCheckInBar(vm, onOpen = onCheckInWords, onSymptom = onSymptomNote) }
+        if (!clinician) item(key = "today-sos") { CareSosBar(onSos = { sosOpen = true }) }
+        // Patient: SOS, the check-in (the one main action), today's medicines, the at-a-glance register, then All care tools.
+        // Family: SOS, how the patient is doing, medicines, to-dos, their own check, then All care tools. Everything else is in the Care tab.
+        val summary: androidx.compose.foundation.lazy.LazyListScope.() -> Unit = {
+            if (showSummary) item(key = "patient-summary") { PatientSummaryCard(vm, onSymptoms = if (family) onSymptomNote else onSymptoms,
+                onVisit = { v -> if (v == null || v.due == 0L) onCalendar() else onCalendarAt(v.due) }, onAddVisit = if (canEdit) ({ onAdd("visit") }) else null,
+                onGoals = { note -> if (note != null) onRead(note) else onTalk() }, onCarePlan = onCarePlan) }
         }
-        // Today's doses come straight after the check-in (patient) or the caregiver's own check (family): the day's direct actions sit together at the top.
+        if (family) summary() else if (!clinician && canEdit) item(key = "today-checkin") { TodayCheckInBar(vm, onOpen = onCheckInWords, onSymptom = onSymptomNote) }
         val medicineSection: androidx.compose.foundation.lazy.LazyListScope.() -> Unit = {
-            // Medicines: the doses card under the title carries the one "x of y taken" count; no second count here, no explanatory text.
-            item(key = "medicines-title") { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(t("Medicines", "दवाइयाँ"), fontSize = 20.sp, fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
-                Spacer(Modifier.weight(1f))
-                TextButton(onClick = { onCare("Medicines") }, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Text(t("See all", "सब देखें")); Icon(Icons.Default.ChevronRight, null, Modifier.size(18.dp)) }
-            } }
+            // The doses card under the title carries the one "x of y taken" count.
+            item(key = "medicines-title") { TodaySectionHeader(t("Medicines today", "आज की दवाइयाँ"), t("Open medicines", "दवाइयाँ खोलें"), "today-open-medicines") { onCare("Medicines") } }
             item(key = "today-doses") { TodayDosesCard(vm) }
-            if (medicines.isEmpty() && loaded && canEdit) item { OutlinedButton(onClick = { onAdd("medicine") }, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, Rust.copy(alpha = .6f)), colors = ButtonDefaults.outlinedButtonColors(containerColor = Paper, contentColor = RustText), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.Add, null); Spacer(Modifier.width(8.dp)); Text(t("Add a medicine", "दवा जोड़ें")) } }
+            if (medicines.isEmpty() && loaded && canEdit) item { SaharaSecondaryButton(t("Add a medicine", "दवा जोड़ें"), { onAdd("medicine") }, Modifier.fillMaxWidth(), icon = Icons.Default.Add, tone = SaharaTone.Plum) }
         }
         if (!clinician) medicineSection()
-        if (!family && showSummary) item(key = "patient-summary") { PatientSummaryCard(vm, onSymptoms = onSymptoms, onMedicines = { onCare("Medicines") }, onVisit = { if (it.due == 0L) onCalendar() else onCalendarAt(it.due) }, onRead = onRead, onCarePlan = onCarePlan) }
-        // Goals of care sits high on Today (3 Nov meeting: "maybe this can go up").
-        // One name for one card, no illustration (goals of care is a serious conversation, not a decoration).
-        item(key = "goals-of-care") { ActionCard(SaharaTone.Marigold.wash, Modifier.testTag("today-goals-of-care"), onClick = { if (!clinician && latest != null) onRead(latest) else onTalk() }) {
+        if (!clinician && !family) summary()
+        if (!clinician) {
+            // View-only family see the patient's own check-in for today (they cannot change it).
+            if (!canEdit) {
+                CareTodayRules.todayCheckIn(items, dayStart)?.let { item(key = "today-checkin-seen") { CareRow(it, vm) } }
+                DistressRules.today(items, selectedPerson, dayStart)?.let { item(key = "today-distress-seen") { CareRow(it, vm) } }
+            }
+            if (family) {
+                item(key = "todo-title") { TodaySectionHeader(t("To do", "करने के काम"), t("Open to do", "काम खोलें"), "today-open-todo") { onCare("To do") } }
+                if (tasks.isEmpty() && loaded) item { SurfaceCard { Text(CareTodayRules.emptyText("tasks", canEdit, hindi), color = DoctorCardSub) } }
+                items(tasks.take(3), key = { it.id }) { CareRow(it, vm) }
+                if (canEdit) item(key = "todo-add") { SaharaSecondaryButton(t("Add task", "काम जोड़ें"), { onAdd("task") }, Modifier.fillMaxWidth(), icon = Icons.Default.Add, tone = SaharaTone.Leaf) }
+                item(key = "family-check") { FamilyCaregiverCheckCard(vm, personName.ifBlank { t("the patient", "मरीज़") }) }
+            }
+            item(key = "all-care-tools") { TodayAllCareTools { onCare("All") } }
+            return@LazyColumn
+        }
+        // Doctor view (clinician) below: unchanged.
+        item(key = "goals-of-care") { ActionCard(SaharaTone.Marigold.wash, Modifier.testTag("today-goals-of-care"), onClick = onTalk) {
             Row(Modifier.fillMaxWidth().heightIn(min = 64.dp).padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                 Surface(shape = RoundedCornerShape(12.dp), color = SaharaTone.Marigold.solid) { Icon(Icons.Default.Description, null, Modifier.padding(8.dp).size(22.dp), tint = SaharaTone.Marigold.onSolid) }
                 Spacer(Modifier.width(12.dp))
-                Column(Modifier.weight(1f)) {
-                    Heading(if (clinician) t("Let's talk", "बात करें") else t("Goals of care", "देखभाल के लक्ष्य"), 22)
-                }
-                Icon(Icons.AutoMirrored.Filled.ArrowForward, if (clinician) t("Start talking", "बात शुरू करें") else t("Read notes", "नोट पढ़ें"), Modifier.size(22.dp), tint = DoctorCardInk)
+                Column(Modifier.weight(1f)) { Heading(t("Let's talk", "बात करें"), 22) }
+                Icon(Icons.AutoMirrored.Filled.ArrowForward, t("Start talking", "बात शुरू करें"), Modifier.size(22.dp), tint = DoctorCardInk)
             }
         } }
         if (clinician && latest != null) item { ActionCard(Paper, onClick = { onRead(latest) }) {
             Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Description, null, tint = Rust); Spacer(Modifier.width(12.dp)); Column(Modifier.weight(1f)) { Text(t("Latest care note", "सबसे नया देखभाल नोट"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium); Text("${date(latest.published)} · ${latest.doctor}", style = MaterialTheme.typography.bodySmall); Text(ReviewWorkflow.label(latest), style = MaterialTheme.typography.labelSmall, color = RustText) }; Icon(Icons.AutoMirrored.Filled.ArrowForward, t("Read note", "नोट पढ़ें"), Modifier.size(20.dp)) }
         } }
-        if (clinician) item { DailyCareShortcuts(onCalendar, onWorkflow, onLabs) }
-        if (clinician) item { WorkflowSummary(vm, onWorkflow) }
+        item { DailyCareShortcuts(onCalendar, onWorkflow, onLabs) }
+        item { WorkflowSummary(vm, onWorkflow) }
         val checkin = CareTodayRules.todayCheckIn(items, dayStart)
-        if (checkin != null && (clinician || !canEdit)) item { CareRow(checkin, vm) }
-        DistressRules.today(items, selectedPerson, dayStart)?.takeIf { clinician || !canEdit }?.let { item { CareRow(it, vm) } }
+        if (checkin != null) item { CareRow(checkin, vm) }
+        DistressRules.today(items, selectedPerson, dayStart)?.let { item { CareRow(it, vm) } }
         item(key = "up-next-title") { SectionTitle(t("Up next", "आगे क्या है"), if (canEdit && visits.isNotEmpty()) t("Add visit", "मुलाक़ात जोड़ें") else null) { onAdd("visit") } }
         if (visits.isEmpty() && loaded) item(key = "up-next-empty") { ActionCard(SaharaSoftBlue, Modifier.fillMaxWidth(), onClick = { if (canEdit) onAdd("visit") else onCalendar() }) {
             Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -543,23 +550,15 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
         itemsIndexed(visits.take(2), key = { _, v -> "up-next-${v.id}" }) { index, v ->
             CareUpNextCard(v, CareTodayRules.whenLabel(v.due, today, hindi), if (index == 0) SaharaSoftBlue else SaharaApricot) { if (v.due == 0L) onCalendar() else onCalendarAt(v.due) }
         }
-        if (clinician) medicineSection()
-        // The family's own to-dos stay on their Today; the patient reaches To do from the Care tab.
-        if (family || clinician) {
-            item(key = "todo-title") { SectionTitle(t("To do", "करने के काम"), if (canEdit) t("Add task", "काम जोड़ें") else null) { onAdd("task") } }
-            if (tasks.isEmpty() && loaded) item { SurfaceCard { Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Checklist, null, Modifier.size(22.dp), tint = DoctorAccent); Spacer(Modifier.width(12.dp)); Text(CareTodayRules.emptyText("tasks", canEdit, hindi), color = DoctorCardSub) } } }
-            items(tasks.take(4), key = { it.id }) { CareRow(it, vm) }
-            if (tasks.size > 4) item { TextButton(onClick = { onCare("To do") }, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Text(t("See all", "सब देखें")) } }
-        }
-        if (family) item(key = "family-check") { FamilyCaregiverCheckCard(vm, personName.ifBlank { t("the patient", "मरीज़") }) }
-        if (clinician) {
-            item { SectionTitle(t("Journal", "डायरी"), t("Write a note", "नोट लिखें")) { onAdd("journal") } }
-            val notes = items.filter { it.kind == "journal" && !PatientProfileCodec.isStructured(it.detail) && !SideEffectCodec.isStructured(it.detail) }
-            if (notes.isEmpty() && loaded) item { SurfaceCard { Text(CareTodayRules.emptyText("journal", canEdit, hindi), color = DoctorCardSub) } }
-            items(notes.take(2), key = { it.id }) { CareRow(it, vm) }
-        }
-        // Pages: Today points to them instead of listing everything.
-        if (!clinician) item(key = "quick-actions") { TodayQuickActions(onCalendar = onCalendar, onSymptoms = if (family) onSymptomNote else onSymptoms, onLabs = onLabs, onCommunity = onCommunity) }
+        medicineSection()
+        item(key = "todo-title") { SectionTitle(t("To do", "करने के काम"), if (canEdit) t("Add task", "काम जोड़ें") else null) { onAdd("task") } }
+        if (tasks.isEmpty() && loaded) item { SurfaceCard { Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Checklist, null, Modifier.size(22.dp), tint = DoctorAccent); Spacer(Modifier.width(12.dp)); Text(CareTodayRules.emptyText("tasks", canEdit, hindi), color = DoctorCardSub) } } }
+        items(tasks.take(4), key = { it.id }) { CareRow(it, vm) }
+        if (tasks.size > 4) item { TextButton(onClick = { onCare("To do") }, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Text(t("See all", "सब देखें")) } }
+        item { SectionTitle(t("Journal", "डायरी"), t("Write a note", "नोट लिखें")) { onAdd("journal") } }
+        val notes = items.filter { it.kind == "journal" && !PatientProfileCodec.isStructured(it.detail) && !SideEffectCodec.isStructured(it.detail) }
+        if (notes.isEmpty() && loaded) item { SurfaceCard { Text(CareTodayRules.emptyText("journal", canEdit, hindi), color = DoctorCardSub) } }
+        items(notes.take(2), key = { it.id }) { CareRow(it, vm) }
     }
 }
 
@@ -1015,21 +1014,24 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
     }
 }
 
+/**
+ * The Care tab: every care page in one plain grouped list (icon, name, one short line, chevron). Each row opens its page and Back
+ * returns here. A row whose page is not passed in (the doctor's embedded view) is left out. [title] is "All care tools" in the family app.
+ */
 @Composable fun CareList(vm: CareModel, onAdd: (String) -> Unit, onScanPrescription: () -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}, initialFilter: String = "All", onReadNote: (CareVersion) -> Unit = {}, onSymptoms: () -> Unit = {}, onCalendarAt: (Long) -> Unit = { onCalendar() },
-    onCommunity: () -> Unit = {}, onDevices: () -> Unit = {}, onExit: (() -> Unit)? = null) {
+    onCommunity: (() -> Unit)? = null, onDevices: (() -> Unit)? = null, onExit: (() -> Unit)? = null, onDocuments: (() -> Unit)? = null, onCarePlan: (() -> Unit)? = null, title: String? = null) {
     val entries by vm.items.collectAsStateWithLifecycle(); val everything by vm.allItems.collectAsStateWithLifecycle(); val versions by vm.versions.collectAsStateWithLifecycle()
     val listState = rememberLazyListState(); val target = CareModules.moduleFor(initialFilter)
     val shown = entries.filter { !CareEntryCodec.isStructured(it.detail) || isDoctorStructuredVisit(it) }
     val (currentMeds, pastMeds) = CareModules.splitMedicines(everything.filter { !CareEntryCodec.isStructured(it.detail) }, shown)
     val now = remember(entries) { System.currentTimeMillis() }; val (upcoming, pastVisits) = CareModules.splitVisits(shown.filter { it.kind == "visit" }, now)
     val tasks = shown.filter { it.kind == "task" }; val checkins = shown.filter { it.kind == "checkin" }; val journal = shown.filter { it.kind == "journal" && !SideEffectCodec.isStructured(it.detail) && !PatientProfileCodec.isStructured(it.detail) }
-    val empty = shown.isEmpty() && pastMeds.isEmpty() && versions.isEmpty()
     val selectedPerson by vm.selected.collectAsStateWithLifecycle(); val loadedFor by vm.itemsLoadedFor.collectAsStateWithLifecycle()
-    // A tile opens its module on its own screen; Back returns to the grid. [initialFilter] can open one directly.
+    // A row opens its module on its own screen; Back returns to the list. [initialFilter] can open one directly.
     var openModule by rememberSaveable(target) { mutableStateOf(target) }
-    // A module opened straight from another page (Today's "See all") goes back to that page, not to the grid.
+    // A module opened straight from another page (Today's "Open medicines") goes back to that page, not to the list.
     fun closeModule() { if (target != null && openModule == target && onExit != null) onExit() else openModule = null }
-    val hindi = careHindi(); val t = careText()
+    val t = careText()
     // [name] stays English: it is the module's key and test tag; only [title] is shown.
     val tiles = listOf(
         CareModuleTile("Conversations", t("Conversations", "बातचीत"), "", SaharaLavender, R.drawable.conversation_recent_art, versions.size) {
@@ -1056,27 +1058,39 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
             CareModuleList("journal", journal, t("No journal notes yet.", "डायरी में अभी कोई नोट नहीं।"), keyOf = { it.id }) { CareRow(it, vm) }
         },
     )
-    val opened = tiles.firstOrNull { it.name == openModule }.takeIf { loadedFor == selectedPerson && !empty }
+    val opened = tiles.firstOrNull { it.name == openModule }.takeIf { loadedFor == selectedPerson }
+    val byName = tiles.associateBy { it.name }
+    fun module(name: String): CareToolRow? = byName[name]?.let { tile -> CareToolRow(tile.title, careModuleIcon(name), careModuleTone(name), "care-module-${tile.key}-toggle",
+        if (tile.count == 0) t("Nothing yet", "अभी कुछ नहीं") else "${tile.count}") { openModule = name } }
+    fun page(label: String, icon: ImageVector, tone: SaharaTone, tag: String, open: (() -> Unit)?): CareToolRow? = open?.let { CareToolRow(label, icon, tone, tag, null, it) }
+    val groups = listOf(
+        t("Every day", "हर दिन") to listOfNotNull(module("Medicines"), page(t("Symptoms", "लक्षण"), Icons.Default.MonitorHeart, SaharaTone.Rose, "symptom-tracker-entry", onSymptoms), module("Check-ins"), module("To do"), module("Journal")),
+        t("Visits and records", "मुलाक़ातें और रिकॉर्ड") to listOfNotNull(module("Visits"), page(t("Calendar", "कैलेंडर"), Icons.Default.CalendarMonth, SaharaTone.Indigo, "shortcut-calendar", onCalendar),
+            page(t("Documents", "कागज़ात"), Icons.Default.FolderOpen, SaharaTone.Teal, "care-tool-documents", onDocuments), page(t("Lab history", "जाँच रिपोर्टें"), Icons.Default.Science, SaharaTone.Marigold, "shortcut-labs", onLabs), module("Conversations")),
+        t("Plans and support", "योजना और सहारा") to listOfNotNull(page(t("Emergency plan", "आपातकालीन योजना"), Icons.Default.LocalHospital, SaharaTone.Rust, "care-tool-plan", onCarePlan),
+            page(t("Tubes and lines", "नलियाँ और लाइनें"), Icons.Default.Healing, SaharaTone.Plum, "shortcut-devices", onDevices), page(t("Community", "समुदाय"), Icons.Default.Groups, SaharaTone.Leaf, "shortcut-community", onCommunity)),
+    ).filter { it.second.isNotEmpty() }
     if (opened != null) CareModuleScreen(opened) { closeModule() } else
-    LazyColumn(Modifier.fillMaxSize().testTag("care-list"), state = listState, contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    LazyColumn(Modifier.fillMaxSize().testTag("care-list"), state = listState, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        // One title and the one main action (Add) on top; then the list.
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) { Heading(t("Daily care", "रोज़ की देखभाल"), 30); Text(LocalDate.now().format(careDateFormat("EEEE, d MMMM", hindi)), fontSize = 13.sp, color = DoctorCardSub) }
+            Box(Modifier.weight(1f)) { Heading(title ?: t("Daily care", "रोज़ की देखभाल"), 26) }
             CareAddMenuButton(onAdd, onScanPrescription)
         } }
-        item { FilledTonalButton(onClick = onSymptoms, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("daily-symptom-tracker-entry"), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Mint)) { Icon(Icons.Default.MonitorHeart, null); Spacer(Modifier.width(8.dp)); Text(t("Symptom tracker", "तबीयत के नोट")) } }
-        // "Care team" left the Care tab (3 Nov meeting: orphan it). Calendar, labs, community and tubes and lines remain.
-        item { CareTabShortcuts(onCalendar = onCalendar, onLabs = onLabs, onCommunity = onCommunity, onDevices = onDevices) }
-        if (loadedFor != selectedPerson) Unit else if (empty) item { SurfaceCard(Paper) {
-            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                Surface(shape = CircleShape, color = SaharaApricot) { Icon(careIcon("task"), null, Modifier.padding(14.dp).size(30.dp), tint = DoctorAccent) }
-                Spacer(Modifier.height(12.dp)); Text(t("Nothing added yet", "अभी कुछ नहीं जोड़ा गया"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-                Spacer(Modifier.height(12.dp)); CareAddMenuButton(onAdd, onScanPrescription)
+        groups.forEach { (group, rows) -> item(key = "care-group-$group") {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(group, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = RustText, modifier = Modifier.padding(start = 4.dp).a11yHeading())
+                SaharaRegister { rows.forEachIndexed { index, row ->
+                    if (index > 0) HorizontalDivider(color = DoctorHairline, modifier = Modifier.padding(horizontal = 12.dp))
+                    SaharaListRow(row.label, Modifier.testTag(row.tag), detail = row.detail, icon = row.icon, tone = row.tone, onClick = row.onClick)
+                } }
             }
-        } } else {
-            item { CareModuleGrid(tiles) { openModule = it } }
-        }
+        } }
     }
 }
+
+/** One row of All care tools: a module of this tab or another page. [detail] is the module's count. */
+private class CareToolRow(val label: String, val icon: ImageVector, val tone: SaharaTone, val tag: String, val detail: String?, val onClick: () -> Unit)
 
 /** The emergency numbers (tap to open the dialler) and a hospitals map link. Shown in Nearby and in Today's SOS sheet. */
 @Composable fun EmergencyNumbersCard() {
@@ -1154,18 +1168,20 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
             // Inviting family is one tap from here, not hidden in the header's person menu.
             if (onInviteFamily != null && vm.cloud != null && owner) MoreRow(Icons.Default.PersonAdd, FamilyAccent.Leaf, t("Invite family", "परिवार को बुलाएँ"), t("Send a link on WhatsApp", "व्हाट्सऐप पर लिंक भेजें"), Modifier.testTag("more-invite-family"), onInviteFamily)
         } }
-        // Patients and family already have Docs in the bottom bar and Calendar and Lab history on the Care tab, so those rows are only here for doctors.
+        // Patients and family reach Documents, Calendar, Lab history, the emergency plan and tubes and lines from All care tools (the Care tab),
+        // so those rows are only here for doctors. More keeps the account, settings and help.
         val shortcutsElsewhere = !doctorEmbedded && !clinicianView
-        item { MoreGroup(t("Care", "देखभाल")) {
-            if (!shortcutsElsewhere) MoreRow(Icons.Default.FolderOpen, FamilyAccent.Teal, t("Documents", "दस्तावेज़"), "", Modifier.testTag("more-documents-entry"), onDocuments)
+        val exportNotes = {
+            val text = versions.joinToString("\n\n──────────\n\n") { v -> NoteRules.text(v, acks.filter { it.versionId == v.id && it.contentHash == v.contentHash }) }
+            open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), t("Export care notes", "देखभाल नोट भेजें")))
+        }
+        if (!shortcutsElsewhere) item { MoreGroup(t("Care", "देखभाल")) {
+            MoreRow(Icons.Default.FolderOpen, FamilyAccent.Teal, t("Documents", "दस्तावेज़"), "", Modifier.testTag("more-documents-entry"), onDocuments)
             if (onCarePlan != null) MoreRow(Icons.Default.LocalHospital, FamilyAccent.Marigold, t("Emergency plan", "आपातकालीन योजना"), t("Plan, wallet card, living will", "योजना, वॉलेट कार्ड, लिविंग विल"), Modifier.testTag("more-care-plan-entry"), onCarePlan)
             if (onDevices != null && !clinicianView) MoreRow(Icons.Default.Healing, FamilyAccent.Plum, t("Tubes and lines", "नलियाँ और लाइनें"), "", Modifier.testTag("more-devices"), onDevices)
-            if (!shortcutsElsewhere) MoreRow(Icons.Default.CalendarMonth, FamilyAccent.Leaf, t("Calendar", "कैलेंडर"), "", Modifier.testTag("more-calendar"), onCalendar)
-            if (!shortcutsElsewhere) MoreRow(Icons.Default.Science, FamilyAccent.Marigold, t("Lab history", "जाँच का इतिहास"), "", Modifier.testTag("more-labs"), onLabs)
-            MoreRow(Icons.Default.Share, FamilyAccent.Brick, t("Export care notes", "देखभाल नोट भेजें"), t("${versions.size} saved", "${versions.size} सहेजे गए"), Modifier.testTag("more-export-notes"), enabled = versions.isNotEmpty(), onClick = {
-                val text = versions.joinToString("\n\n──────────\n\n") { v -> NoteRules.text(v, acks.filter { it.versionId == v.id && it.contentHash == v.contentHash }) }
-                open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), t("Export care notes", "देखभाल नोट भेजें")))
-            })
+            MoreRow(Icons.Default.CalendarMonth, FamilyAccent.Leaf, t("Calendar", "कैलेंडर"), "", Modifier.testTag("more-calendar"), onCalendar)
+            MoreRow(Icons.Default.Science, FamilyAccent.Marigold, t("Lab history", "जाँच का इतिहास"), "", Modifier.testTag("more-labs"), onLabs)
+            MoreRow(Icons.Default.Share, FamilyAccent.Brick, t("Export care notes", "देखभाल नोट भेजें"), t("${versions.size} saved", "${versions.size} सहेजे गए"), Modifier.testTag("more-export-notes"), enabled = versions.isNotEmpty(), onClick = exportNotes)
         } }
         item { MoreGroup(t("Settings", "सेटिंग")) {
             // Language opens the same menu as the header, from a full-width row.
@@ -1176,9 +1192,10 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
             }
             if (!walkthrough) MoreRow(Icons.Default.NotificationsNone, FamilyAccent.Marigold, t("Notifications", "सूचनाएँ"), t("Medicine and visit reminders", "दवा और मुलाक़ात के रिमाइंडर"), Modifier.testTag("more-reminders"), onReminders)
             MoreRow(Icons.Default.Lock, FamilyAccent.Plum, t("Privacy and data", "निजता और डेटा"), "", Modifier.testTag("more-privacy"), { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url)))) })
+            if (shortcutsElsewhere) MoreRow(Icons.Default.Share, FamilyAccent.Brick, t("Export care notes", "देखभाल नोट भेजें"), t("${versions.size} saved", "${versions.size} सहेजे गए"), Modifier.testTag("more-export-notes"), enabled = versions.isNotEmpty(), onClick = exportNotes)
         } }
         item { MoreGroup(t("Help", "मदद")) {
-            if (!walkthrough) MoreRow(Icons.Default.SentimentSatisfiedAlt, FamilyAccent.Leaf, t("Help and feedback", "मदद और राय"), "", Modifier.testTag("patient-feedback-entry"), onFeedback)
+            if (!walkthrough) MoreRow(Icons.Default.SentimentSatisfiedAlt, FamilyAccent.Leaf, t("Send feedback", "राय भेजें"), "", Modifier.testTag("patient-feedback-entry"), onFeedback)
             if (doctorEmbedded) MoreRow(Icons.Default.Groups, FamilyAccent.Teal, t("Shared care", "साझा देखभाल"), "", Modifier, onSharedWorkspace)
             else if (!walkthrough) MoreRow(Icons.Default.MedicalServices, FamilyAccent.Teal, t("I'm a doctor", "मैं डॉक्टर हूँ"), "", Modifier.testTag("more-doctor-workspace-entry"), onSharedWorkspace)
             MoreRow(Icons.Default.Info, FamilyAccent.Brick, t("About", "ऐप के बारे में"), t("Version ${BuildConfig.VERSION_NAME}", "संस्करण ${BuildConfig.VERSION_NAME}"), Modifier.testTag("more-about"), { about = true })

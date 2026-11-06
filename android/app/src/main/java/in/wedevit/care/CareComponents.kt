@@ -42,16 +42,19 @@ import androidx.compose.ui.unit.sp
 @Composable fun CareNavigation(selected: Int, clinician: Boolean, onSelect: (Int) -> Unit) {
     // [keys] stay English for test tags; [labels] follow the family's English/Hindi choice.
     val t = careText()
-    val keys = listOf("Today", if (clinician) "Talk" else "Docs", "Care", "Nearby", "More")
-    val labels = listOf(t("Today", "आज"), if (clinician) t("Talk", "बातचीत") else t("Docs", "कागज़ात"), t("Care", "देखभाल"), t("Nearby", "आसपास"), if (clinician) t("More", "और") else t("Account", "खाता"))
-    val routes = listOf(0, if (clinician) 1 else 5, 2, 3, 4)
-    val icons = listOf(Icons.Default.WbSunny, if (clinician) Icons.Default.Forum else Icons.Default.FolderOpen, Icons.Default.FavoriteBorder, Icons.Default.Place, if (clinician) Icons.Default.MoreHoriz else Icons.Default.AccountCircle)
+    // Patient and family: Today, Care (all care tools), Help (emergency numbers and care nearby), More. The doctor view adds Talk.
+    val keys = if (clinician) listOf("Today", "Talk", "Care", "Help", "More") else listOf("Today", "Care", "Help", "More")
+    val labels = (if (clinician) listOf(t("Today", "आज"), t("Talk", "बातचीत")) else listOf(t("Today", "आज"))) + listOf(t("Care", "देखभाल"), t("Help", "मदद"), t("More", "और"))
+    val routes = if (clinician) listOf(0, 1, 2, 3, 4) else listOf(0, 2, 3, 4)
+    val icons = (if (clinician) listOf(Icons.Default.WbSunny, Icons.Default.Forum) else listOf(Icons.Default.WbSunny)) + listOf(Icons.Default.FavoriteBorder, Icons.Default.Place, Icons.Default.MoreHoriz)
+    // Documents and a patient's conversations page are opened from All care tools, so Care stays lit while they are open.
+    fun lit(route: Int) = selected == route || (route == 2 && (selected == 5 || (!clinician && selected == 1)))
     // Material 3 bar in Sahara colours: a hairline on top; the selected tab's icon sits white in a solid rust pill above a bold rust label.
     Surface(color = SaharaColors.Surface, shadowElevation = 3.dp) { Column {
         HorizontalDivider(color = DoctorHairline)
         Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 4.dp, vertical = 4.dp).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
             labels.forEachIndexed { index, label ->
-                val active = selected == routes[index] || (!clinician && index == 1 && selected == 1)
+                val active = lit(routes[index])
                 val pill by animateColorAsState(if (active) SaharaColors.Primary else Color.Transparent, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "selected tab")
                 val iconTint by animateColorAsState(if (active) SaharaColors.OnPrimary else SaharaColors.InkSub, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "selected-tab-icon")
                 Column(Modifier.weight(1f).testTag("nav-${keys[index]}").clip(RoundedCornerShape(SaharaRadius.Lg))
@@ -253,24 +256,15 @@ fun careIcon(kind: String): ImageVector = when (kind) {
 }
 
 private val SosRed = SaharaColors.Error
-private val SosRedText = Color(0xFF8C1D18)
 
-/** SOS on Today: one large red button for the emergency sheet, and the emergency QR card one tap away beside it. */
-@Composable fun CareSosBar(onSos: () -> Unit, onQr: () -> Unit) {
+/** SOS on Today: one large red button that opens the emergency sheet (numbers, the emergency QR card and the emergency plan). */
+@Composable fun CareSosBar(onSos: () -> Unit) {
     val t = careText()
-    Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        Button(onClick = onSos, shape = RoundedCornerShape(20.dp), colors = ButtonDefaults.buttonColors(containerColor = SosRed, contentColor = Color.White),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp), modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = 64.dp).testTag("today-sos")) {
-            Icon(Icons.Default.Call, null, Modifier.size(26.dp)); Spacer(Modifier.width(10.dp))
-            Text(t("SOS", "SOS मदद"), Modifier.weight(1f), fontSize = 22.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-        }
-        OutlinedButton(onClick = onQr, shape = RoundedCornerShape(20.dp), border = BorderStroke(2.dp, SosRed), colors = ButtonDefaults.outlinedButtonColors(containerColor = Paper, contentColor = SosRedText),
-            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 10.dp), modifier = Modifier.fillMaxHeight().heightIn(min = 64.dp).testTag("today-qr")) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(Icons.Default.QrCode, null, Modifier.size(26.dp))
-                Text(t("QR card", "QR कार्ड"), fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-            }
-        }
+    Button(onClick = onSos, shape = RoundedCornerShape(20.dp), colors = ButtonDefaults.buttonColors(containerColor = SosRed, contentColor = Color.White),
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp).testTag("today-sos")) {
+        Icon(Icons.Default.Call, null, Modifier.size(26.dp)); Spacer(Modifier.width(10.dp))
+        Text(t("SOS · Emergency help", "SOS · आपातकालीन मदद"), Modifier.weight(1f), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Icon(Icons.Default.ChevronRight, null, Modifier.size(24.dp))
     }
 }
 
