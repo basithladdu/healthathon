@@ -15,7 +15,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Share
@@ -87,7 +89,7 @@ import java.time.format.DateTimeFormatter
         }
         if (canEdit && person != null) item(key = "quick-grid") {
             Column(Modifier.saharaAppear(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(t("How are you feeling?", "तबीयत कैसी है?"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.a11yHeading())
+                Text(t("Log a symptom", "लक्षण दर्ज करें"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.a11yHeading())
                 val tiles = quickKeys.map { it to SymptomDiaryRules.symptomLabel(it, hindi) } + ("Other" to t("All symptoms", "सभी लक्षण"))
                 tiles.chunked(if (largeText) 1 else 2).forEach { row ->
                     Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -228,17 +230,25 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
             HorizontalDivider(Modifier.padding(vertical = 4.dp))
             Text("${t("Last time", "पिछली बार")} ${SymptomDiaryRules.ratingLabel(previous.rating, hindi)} (${friendlyWhen(previous.observedDate, previous.observedTime, hindi)}) · ${t("Now", "अब")} ${SymptomDiaryRules.ratingLabel(note?.rating, hindi)} $change", style = MaterialTheme.typography.bodyMedium, color = DoctorCardInk, modifier = Modifier.testTag("symptom-card-change"))
         }
+        // One idea per card, few buttons: See graph and Update rating as buttons; Pain has gone stays one tap for pain;
+        // View on body, Edit and Remove sit in one clearly named "More" list.
         if (note != null) Row(Modifier.padding(end = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            if (isPain) FilledTonalButton(onClick = { showingPainHistory = true }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.filledTonalButtonColors(containerColor = SaharaApricot, contentColor = DoctorCardInk), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("symptom-pain-history-${item.id}")) { Icon(Icons.Default.AccessibilityNew, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("View on body", "शरीर पर देखें"), fontWeight = FontWeight.SemiBold, style = SymptomWords) }
-            OutlinedButton(onClick = { showingTrend = true }, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, DoctorCardSub.copy(alpha = .5f)), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("symptom-trend-${item.id}")) { Icon(Icons.Default.Timeline, null, Modifier.size(18.dp), tint = DoctorCardInk); Spacer(Modifier.width(6.dp)); Text(t("See graph", "ग्राफ़ देखें"), color = DoctorCardInk, fontWeight = FontWeight.SemiBold, style = SymptomWords) }
+            OutlinedButton(onClick = { showingTrend = true }, shape = RoundedCornerShape(14.dp), border = BorderStroke(2.dp, DoctorAccent), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("symptom-trend-${item.id}")) { Icon(Icons.Default.Timeline, null, Modifier.size(18.dp), tint = RustText); Spacer(Modifier.width(6.dp)); Text(t("See graph", "ग्राफ़ देखें"), color = RustText, fontWeight = FontWeight.SemiBold, style = SymptomWords) }
+            if (canEdit) Button(onClick = { followingUp = true }, enabled = !busy, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = Color.White), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("symptom-followup-${item.id}")) { Text(t("Update rating", "नया अंक लिखें"), fontWeight = FontWeight.SemiBold, style = SymptomWords) }
         }
-        // The note's own actions sit on the card as labelled buttons (no hidden ⋮ menu): one tap each.
-        if (canEdit && note != null) FlowRow(Modifier.testTag("symptom-card-actions-${item.id}"), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            TextButton(onClick = { followingUp = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp).testTag("symptom-followup-${item.id}")) { Text(t("Update rating", "नया अंक लिखें"), color = RustText, fontWeight = FontWeight.SemiBold) }
+        if (note != null && (canEdit || isPain)) Row(Modifier.fillMaxWidth().testTag("symptom-card-actions-${item.id}"), verticalAlignment = Alignment.CenterVertically) {
             // Pain that went away is a new 0 note at the same spots, so the trend drops to 0 instead of keeping the old number.
-            if (isPain && (PainBodyMapRules.overall(note.painBodyRatings) ?: note.rating ?: 0) > 0) TextButton(onClick = { painGone = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp).testTag("symptom-pain-gone-${item.id}")) { Text(t("Pain has gone (0)", "दर्द चला गया (0)"), color = RustText, fontWeight = FontWeight.SemiBold) }
-            TextButton(onClick = { editing = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp).testTag("symptom-edit-${item.id}")) { Icon(Icons.Default.Edit, null, Modifier.size(18.dp), tint = DoctorCardSub); Spacer(Modifier.width(4.dp)); Text(t("Edit", "बदलें"), color = DoctorCardInk) }
-            TextButton(onClick = { removing = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp).testTag("symptom-remove-${item.id}")) { Text(t("Remove", "हटाएँ"), color = MaterialTheme.colorScheme.error) }
+            if (canEdit && isPain && (PainBodyMapRules.overall(note.painBodyRatings) ?: note.rating ?: 0) > 0) TextButton(onClick = { painGone = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp).testTag("symptom-pain-gone-${item.id}")) { Text(t("Pain has gone (0)", "दर्द चला गया (0)"), color = RustText, fontWeight = FontWeight.SemiBold) }
+            Spacer(Modifier.weight(1f))
+            Box {
+                var more by remember { mutableStateOf(false) }
+                TextButton(onClick = { more = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("symptom-more-${item.id}")) { Text(t("More", "और"), color = DoctorCardInk, fontWeight = FontWeight.SemiBold); Icon(Icons.Default.ArrowDropDown, null, Modifier.size(20.dp), tint = DoctorCardInk) }
+                DropdownMenu(expanded = more, onDismissRequest = { more = false }) {
+                    if (isPain) DropdownMenuItem(text = { Text(t("View on body", "शरीर पर देखें")) }, leadingIcon = { Icon(Icons.Default.AccessibilityNew, null) }, onClick = { more = false; showingPainHistory = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("symptom-pain-history-${item.id}"))
+                    if (canEdit) DropdownMenuItem(text = { Text(t("Edit", "बदलें")) }, leadingIcon = { Icon(Icons.Default.Edit, null) }, enabled = !busy, onClick = { more = false; editing = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("symptom-edit-${item.id}"))
+                    if (canEdit) DropdownMenuItem(text = { Text(t("Remove", "हटाएँ"), color = MaterialTheme.colorScheme.error) }, leadingIcon = { Icon(Icons.Default.DeleteOutline, null, tint = MaterialTheme.colorScheme.error) }, enabled = !busy, onClick = { more = false; removing = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("symptom-remove-${item.id}"))
+                }
+            }
         }
     } } }
     if (editing) SymptomNoteEditor(vm, hindi, initial = item, onClose = { editing = false })
@@ -358,7 +368,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
         BackHandler(onBack = goBack)
         Column(Modifier.fillMaxWidth().imePadding()) {
             Column(Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Heading(t(if (prior != null && initial == null) "Update rating" else if (initial == null) "How are you feeling?" else "Edit symptom note", if (prior != null && initial == null) "नया अंक लिखें" else if (initial == null) "तबीयत कैसी है?" else "तबीयत का नोट बदलें"), 26)
+                Heading(t(if (prior != null && initial == null) "Update rating" else if (initial == null) "Log a symptom" else "Edit symptom note", if (prior != null && initial == null) "नया अंक लिखें" else if (initial == null) "लक्षण दर्ज करें" else "तबीयत का नोट बदलें"), 26)
                 Text(personName, color = DoctorCardSub, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 if (!quick) {
                     Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) { steps.forEachIndexed { i, _ -> val bar by androidx.compose.animation.animateColorAsState(if (i <= pos) DoctorAccent else DoctorHairline, SaharaMotion.tween(SaharaMotion.ENTER_MS), label = "step-bar"); Box(Modifier.weight(1f).height(6.dp).clip(RoundedCornerShape(3.dp)).background(bar)) } }

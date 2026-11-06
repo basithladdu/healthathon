@@ -5062,3 +5062,10 @@ Make the full care plan	دیکھ بھال کا پورا منصوبہ بنائی�
 Plan, pocket emergency card, living will	منصوبہ، جیب میں رکھنے کا ہنگامی کارڈ، لِوِنگ وِل
 Pocket emergency card	جیب میں رکھنے کا ہنگامی کارڈ
 Step ${step + 1} · $name	مرحلہ ${step + 1} · $name
+Log a symptom	علامت درج کریں
+Marked taken	لی گئی درج ہوئی
+Undo	واپس لیں
+Ask documents	کاغذات سے پوچھیں
+Search didn't work. Your documents are safe. Try again.	تلاش نہیں ہو سکی۔ آپ کے کاغذات محفوظ ہیں۔ دوبارہ کوشش کریں۔
+No answer this time. Your documents are safe. Try again.	اس بار جواب نہیں ملا۔ آپ کے کاغذات محفوظ ہیں۔ دوبارہ کوشش کریں۔
+Review not saved. Try again.	جانچ محفوظ نہیں ہوئی۔ دوبارہ کوشش کریں۔

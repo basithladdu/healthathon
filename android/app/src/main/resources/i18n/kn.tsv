@@ -5062,3 +5062,10 @@ Make the full care plan	ಪೂರ್ಣ ಆರೈಕೆ ಯೋಜನೆ ಮಾ�
 Plan, pocket emergency card, living will	ಯೋಜನೆ, ಜೇಬಿನಲ್ಲಿಡುವ ತುರ್ತು ಕಾರ್ಡ್, ಲಿವಿಂಗ್ ವಿಲ್
 Pocket emergency card	ಜೇಬಿನಲ್ಲಿಡುವ ತುರ್ತು ಕಾರ್ಡ್
 Step ${step + 1} · $name	ಹಂತ ${step + 1} · $name
+Log a symptom	ಲಕ್ಷಣ ದಾಖಲಿಸಿ
+Marked taken	ತೆಗೆದುಕೊಂಡಂತೆ ದಾಖಲಾಗಿದೆ
+Undo	ರದ್ದುಮಾಡಿ
+Ask documents	ದಾಖಲೆಗಳನ್ನು ಕೇಳಿ
+Search didn't work. Your documents are safe. Try again.	ಹುಡುಕಾಟ ಆಗಲಿಲ್ಲ. ನಿಮ್ಮ ದಾಖಲೆಗಳು ಸುರಕ್ಷಿತವಾಗಿವೆ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+No answer this time. Your documents are safe. Try again.	ಈ ಬಾರಿ ಉತ್ತರ ಸಿಗಲಿಲ್ಲ. ನಿಮ್ಮ ದಾಖಲೆಗಳು ಸುರಕ್ಷಿತವಾಗಿವೆ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Review not saved. Try again.	ಪರಿಶೀಲನೆ ಉಳಿಸಲಾಗಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.

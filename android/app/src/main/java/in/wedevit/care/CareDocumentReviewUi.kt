@@ -102,7 +102,7 @@ import java.time.ZoneId
                 item { CheckLine(checked || document.reviewedAt > 0, { checked = it }, t("I checked this against the original.", "मैंने इसे असली फ़ाइल से मिला लिया है।")) }
                 item { val saveReview: () -> Unit = { scope.launch {
                     try { val confirmed = DocumentEvidenceRules.confirm(requireNotNull(value), checked, System.currentTimeMillis()); withContext(Dispatchers.IO) { store.save(confirmed) }; value = confirmed; checked = false; error = ""; doneNote = t("Reviewed text saved", "जाँची गई लिखाई सहेज ली गई") }
-                    catch (failure: Exception) { error = failure.message ?: t("Something went wrong. Try again.", "कुछ गड़बड़ हुई। फिर कोशिश करें।") }
+                    catch (failure: Exception) { error = failure.message ?: t("Review not saved. Try again.", "जाँच सहेजी नहीं गई। फिर कोशिश करें।") }
                 } }
                     if (document.reviewedAt > 0) OutlinedButton(onClick = saveReview, enabled = checked && !loading && canEdit, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Save review again", "जाँच फिर सहेजें")) }
                     else Button(onClick = saveReview, enabled = checked && !loading && canEdit, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Save reviewed text", "जाँची गई लिखाई सहेजें"), fontWeight = FontWeight.SemiBold) } }

@@ -5062,3 +5062,10 @@ Make the full care plan	పూర్తి సంరక్షణ ప్రణా
 Plan, pocket emergency card, living will	ప్రణాళిక, జేబులో ఉంచే అత్యవసర కార్డ్, లివింగ్ విల్
 Pocket emergency card	జేబులో ఉంచే అత్యవసర కార్డ్
 Step ${step + 1} · $name	దశ ${step + 1} · $name
+Log a symptom	లక్షణం నమోదు చేయండి
+Marked taken	తీసుకున్నట్లు నమోదైంది
+Undo	వెనక్కి తీసుకోండి
+Ask documents	పత్రాలను అడగండి
+Search didn't work. Your documents are safe. Try again.	వెతకడం పని చేయలేదు. మీ పత్రాలు సురక్షితంగా ఉన్నాయి. మళ్లీ ప్రయత్నించండి.
+No answer this time. Your documents are safe. Try again.	ఈసారి జవాబు రాలేదు. మీ పత్రాలు సురక్షితంగా ఉన్నాయి. మళ్లీ ప్రయత్నించండి.
+Review not saved. Try again.	పరిశీలన సేవ్ కాలేదు. మళ్లీ ప్రయత్నించండి.
