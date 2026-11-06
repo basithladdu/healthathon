@@ -81,6 +81,8 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
     var timeline by rememberSaveable { mutableStateOf(false) }
     var reviewPage by rememberSaveable { mutableIntStateOf(1) }
     var sorting by remember { mutableStateOf(false) }
+    // A file that will not open, or no camera app, is said in a small dialog rather than a passing toast.
+    var docProblem by remember { mutableStateOf("") }
     fun folderOf(report: CareReport) = folders[report.id]?.folder ?: DocumentFolderRules.OTHER
     val listState = rememberLazyListState()
     val focus = LocalFocusManager.current; val t = careText()
@@ -124,7 +126,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         val directory = File(context.cacheDir, "report-scan").apply { deleteRecursively(); mkdirs() }
         val file = File(directory, "Scan ${java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH-mm"))}.jpg")
         runCatching { check(file.createNewFile()); importingFor = person; scanPath = file.absolutePath; camera.launch(FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)) }
-            .onFailure { file.delete(); importingFor = ""; scanPath = ""; vm.message.value = t("No camera app found.", "कैमरा ऐप नहीं मिला।") }
+            .onFailure { file.delete(); importingFor = ""; scanPath = ""; docProblem = t("No camera app found.", "कैमरा ऐप नहीं मिला।") }
         Unit
     }
     val bothLanguages: (String, String) -> String = { en, hi -> "$en $hi" }
@@ -135,7 +137,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         try {
             val intent = vm.reportFiles.intent(report, share)
             open(context, if (share) Intent.createChooser(intent, t("Share report", "रिपोर्ट भेजें")) else intent)
-        } catch (_: Exception) { vm.message.value = t("Couldn't open this report.", "यह रिपोर्ट नहीं खुल सकी।") }
+        } catch (_: Exception) { docProblem = t("Couldn't open this report.", "यह रिपोर्ट नहीं खुल सकी।") }
     }
 
     var addSheet by rememberSaveable { mutableStateOf(false) }
@@ -275,6 +277,8 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         }
         if (search.isBlank() && filter != "Reports") item { TextButton(onClick = onTalk, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Forum, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(if (clinician) t("Start a conversation", "बातचीत शुरू करें") else t("Talk with your doctor", "अपने डॉक्टर से बात करें")) } }
     }
+    if (docProblem.isNotBlank()) AlertDialog(onDismissRequest = { docProblem = "" }, text = { Text(docProblem) },
+        confirmButton = { TextButton(onClick = { docProblem = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("OK", "ठीक है")) } })
     remove?.let { report -> AlertDialog(onDismissRequest = { if (!busy) remove = null }, title = { Text(t("Remove this report?", "यह रिपोर्ट हटाएँ?")) }, text = { Text(report.name) },
         confirmButton = { TextButton(onClick = { vm.removeReport(report) { remove = null; cancerStore.remove(report.id); cancerChoices = cancerStore.all(); folderStore.remove(report.id); folders = folderStore.all() } }, enabled = !busy, colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Text(t("Remove", "हटाएँ"), fontWeight = FontWeight.SemiBold) } },
         dismissButton = { TextButton(onClick = { remove = null }, enabled = !busy) { Text(t("Keep", "रखें")) } }) }
@@ -337,13 +341,14 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
 /** Each auto-sorted folder keeps one colour everywhere: its tile, its file icons, its pills and the Ask badge. */
 internal data class FolderTone(val accent: androidx.compose.ui.graphics.Color, val soft: androidx.compose.ui.graphics.Color, val icon: androidx.compose.ui.graphics.vector.ImageVector)
 internal fun documentFolderTone(folder: String?): FolderTone = when (folder) {
-    DocumentFolderRules.BILLS -> FolderTone(androidx.compose.ui.graphics.Color(0xFF9A4A00), androidx.compose.ui.graphics.Color(0xFFFFE7C2), Icons.AutoMirrored.Filled.ReceiptLong)
-    DocumentFolderRules.LAB -> FolderTone(androidx.compose.ui.graphics.Color(0xFF0B6E64), androidx.compose.ui.graphics.Color(0xFFD5F2EC), Icons.Default.Science)
-    DocumentFolderRules.PRESCRIPTIONS -> FolderTone(androidx.compose.ui.graphics.Color(0xFF2E6B1F), androidx.compose.ui.graphics.Color(0xFFDDF1D3), Icons.Default.Medication)
-    DocumentFolderRules.DISCHARGE -> FolderTone(androidx.compose.ui.graphics.Color(0xFF6B2F8F), androidx.compose.ui.graphics.Color(0xFFF0E1F8), Icons.Default.LocalHospital)
-    else -> FolderTone(androidx.compose.ui.graphics.Color(0xFF5B4636), androidx.compose.ui.graphics.Color(0xFFEFE6DC), Icons.Default.Folder)
+    // Sahara section accents (HUMAN_APP_GUIDE §3): each main tone carries white text, each light tint carries the main tone at AA.
+    DocumentFolderRules.BILLS -> FolderTone(androidx.compose.ui.graphics.Color(0xFF8F5A00), androidx.compose.ui.graphics.Color(0xFFFCEBC7), Icons.AutoMirrored.Filled.ReceiptLong)      // Marigold
+    DocumentFolderRules.LAB -> FolderTone(androidx.compose.ui.graphics.Color(0xFF0F6E6A), androidx.compose.ui.graphics.Color(0xFFD3EEEC), Icons.Default.Science)                        // Teal
+    DocumentFolderRules.PRESCRIPTIONS -> FolderTone(androidx.compose.ui.graphics.Color(0xFF8A3B78), androidx.compose.ui.graphics.Color(0xFFF4DDEE), Icons.Default.Medication)           // Plum, the medicines colour
+    DocumentFolderRules.DISCHARGE -> FolderTone(androidx.compose.ui.graphics.Color(0xFF3F51A3), androidx.compose.ui.graphics.Color(0xFFE0E4F7), Icons.Default.LocalHospital)             // Indigo
+    else -> FolderTone(DoctorCardSub, androidx.compose.ui.graphics.Color(0xFFEFE7DF), Icons.Default.Folder)                                              // Ink sub
 }
-internal val CancerTone = FolderTone(androidx.compose.ui.graphics.Color(0xFFA3174E), androidx.compose.ui.graphics.Color(0xFFFCE1EA), Icons.Default.LocalHospital)
+internal val CancerTone = FolderTone(androidx.compose.ui.graphics.Color(0xFF386D29), androidx.compose.ui.graphics.Color(0xFFDDEFD5), Icons.Default.LocalHospital)                       // Leaf
 
 /** One folder tile: coloured icon chip, name and count. The open folder fills with its colour. */
 @Composable private fun FolderTile(title: String, folder: String, count: Int, open: Boolean, modifier: Modifier, onClick: () -> Unit) {

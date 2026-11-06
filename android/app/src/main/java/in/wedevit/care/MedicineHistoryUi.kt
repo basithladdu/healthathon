@@ -13,9 +13,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.togetherWith
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -66,7 +64,6 @@ import java.time.format.DateTimeFormatter
     var editing by rememberSaveable(item.id) { mutableStateOf(false) }
     var delete by rememberSaveable(item.id) { mutableStateOf(false) }
     var sideEffect by rememberSaveable(item.id) { mutableStateOf(false) }
-    var open by rememberSaveable(item.id) { mutableStateOf(false) }
     val capturedAccount = remember(item.id) { vm.accountNamespace }
     val store = remember(vm.storageNamespace) { MedicineStripPhotos(context.applicationContext, vm.storageNamespace) }
     val photoRevision by MedicineStripPhotos.revision.collectAsStateWithLifecycle()
@@ -86,12 +83,12 @@ import java.time.format.DateTimeFormatter
             // The pillbox: the strip photo once one is taken; tap an empty one to add it.
             Box(Modifier.clickable(enabled = canEdit && !busy, onClickLabel = t("Edit", "बदलें")) { editing = true }.testTag("medicine-photo-${item.id}")) { StripThumb(photo, 56) }
             Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f).clickable(enabled = !compact && rest.isNotBlank(), onClickLabel = if (open) t("Show less", "कम दिखाएँ") else t("Show more", "और दिखाएँ")) { open = !open }, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            // Everything about the medicine is shown at once: no tap-to-expand (20 Oct rule: no collapsible sections).
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(item.title, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, lineHeight = 22.sp, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                if (!compact && summary.isNotBlank()) Text(summary, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, maxLines = if (open) Int.MAX_VALUE else 1, overflow = TextOverflow.Ellipsis)
-                if (!compact && purpose.isNotBlank()) Text(purpose, fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardInk, maxLines = if (open) Int.MAX_VALUE else 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.testTag("medicine-purpose-${item.id}"))
-                if (!compact && open && rest.isNotBlank()) Text(rest, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
-                if (!compact && !open && rest.isNotBlank()) Text(t("More", "और"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = RustText)
+                if (!compact && summary.isNotBlank()) Text(summary, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
+                if (!compact && purpose.isNotBlank()) Text(purpose, fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardInk, modifier = Modifier.testTag("medicine-purpose-${item.id}"))
+                if (!compact && rest.isNotBlank()) Text(rest, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
             }
             if (canEdit) Box {
                 IconButton(onClick = { menu = true }, modifier = Modifier.size(48.dp).testTag("care-menu-${item.id}")) { Icon(Icons.Default.MoreVert, t("More actions", "और विकल्प"), tint = DoctorCardInk) }
@@ -150,7 +147,8 @@ internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: C
     val states = MedicineDoses.states(item, doses, events, today, zone)
     val editable = canEdit && current.any { it.id == item.id }
     val failed = t("Couldn't save. Please try again.", "सहेजा नहीं जा सका। कृपया फिर कोशिश करें।")
-    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+    // Dose chips wrap, so every dose of the day is visible without sideways scrolling.
+    FlowRow(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         doses.forEach { dose ->
             MedicineDoseChip(item, dose, states[dose.key] ?: MedicineDoseState.PENDING, enabled = editable && !busy && !working) { taken ->
                 if (canEditCareContext(vm, item.personId, capturedAccount)) { working = true; problem = ""; scope.launch {

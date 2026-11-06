@@ -281,6 +281,9 @@ class MedicineStripPhotos(context: Context, storage: String) {
     CareField(entry.directions, { change(entry.copy(directions = it.take(500))) }, t("Directions", "तरीक़ा"), placeholder = t("e.g. as written: dissolve in water", "जैसे पर्चे में लिखा: पानी में घोलकर"))
 }
 
+/** The Medicines section accent (HUMAN_APP_GUIDE §3, Plum); white text on it is 7.1:1. */
+internal val MedicinesPlum = androidx.compose.ui.graphics.Color(0xFF8A3B78)
+
 /**
  * Today's doses grouped by time ("Morning · 08:00 · 3 medicines"), each with its strip photo in the pillbox, so a family
  * member can match strips by sight. Every dose is its own tick: tap a pillbox to mark that dose taken or missed.
@@ -317,6 +320,9 @@ class MedicineStripPhotos(context: Context, storage: String) {
     Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("today-doses")) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
+                // Medicines keep the plum section colour on their icon tile.
+                Surface(shape = RoundedCornerShape(12.dp), color = MedicinesPlum) { Icon(Icons.Default.Medication, null, Modifier.padding(8.dp).size(20.dp), tint = Paper) }
+                Spacer(Modifier.width(12.dp))
                 Text(t("Today's doses", "आज की दवाएँ"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
                 // The count as a status pill, green once every dose is ticked; the number rises in when it changes.
                 val allDone = taken == total
@@ -334,7 +340,8 @@ class MedicineStripPhotos(context: Context, storage: String) {
                 Column(Modifier.testTag("today-doses-${group.time}"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     HorizontalDivider(color = DoctorHairline)
                     Text(MedicineDoseRules.title(group, hindi), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = RustText, modifier = Modifier.padding(top = 4.dp))
-                    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    // Wraps onto new lines instead of hiding doses off the side of the screen.
+                    FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         group.medicines.forEach { medicine ->
                             val item = byId[medicine.itemId]; val dose = doses[medicine.itemId].orEmpty().firstOrNull { it.time == group.time }
                             if (item != null && dose != null) key(item.id, dose.key) {
@@ -347,7 +354,7 @@ class MedicineStripPhotos(context: Context, storage: String) {
             if (untimed.isNotEmpty()) Column(Modifier.testTag("today-doses-any-time"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 HorizontalDivider(color = DoctorHairline)
                 Text(t("Any time", "कभी भी"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = RustText, modifier = Modifier.padding(top = 4.dp))
-                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     untimed.forEach { (item, dose) -> key(item.id, dose.key) {
                         MedicinePillbox(item, dose, MedicineDoses.state(item, dose, events, today, zone), photos[item.id], if (dose.count > 1) t("Dose ${dose.index}", "खुराक ${dose.index}") else "", canEdit && !busy && !working, MedicineDoses.loggedByFamily(item, dose, events, today, zone)) { mark(item, dose, it) }
                     } }

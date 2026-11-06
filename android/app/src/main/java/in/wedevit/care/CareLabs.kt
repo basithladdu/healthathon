@@ -169,6 +169,8 @@ private fun labRange(data: CareEntry): Pair<Double?, Double?> {
     val busy by vm.busy.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val report = reports.firstOrNull { it.id == data.reportId && it.personId == item.personId }
+    var openFailed by remember { mutableStateOf(false) }
+    if (openFailed) AlertDialog(onDismissRequest = { openFailed = false }, text = { Text(t("Couldn't open this report.", "यह रिपोर्ट नहीं खुल सकी।")) }, confirmButton = { TextButton(onClick = { openFailed = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("OK", "ठीक है")) } })
     HorizontalDivider(Modifier.padding(top = 12.dp, bottom = 8.dp), color = DoctorHairline)
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {
@@ -182,7 +184,7 @@ private fun labRange(data: CareEntry): Pair<Double?, Double?> {
         }
         if (canEdit) IconButton(onClick = onEdit, enabled = !busy) { Icon(Icons.Default.Edit, t("Edit ${item.title} result from ${labDateText(item, t)}", "${labDateText(item, t)} का ${item.title} नतीजा बदलें")) }
     }
-    if (report != null) TextButton(onClick = { runCatching { vm.reportFiles.intent(report, false) }.onSuccess { open(context, it) }.onFailure { vm.message.value = t("Couldn't open this report.", "यह रिपोर्ट नहीं खुल सकी।") } }, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Icon(Icons.Default.OpenInNew, null, Modifier.size(17.dp)); Spacer(Modifier.width(6.dp)); Text(t("Open report", "रिपोर्ट खोलें")) }
+    if (report != null) TextButton(onClick = { runCatching { vm.reportFiles.intent(report, false) }.onSuccess { open(context, it) }.onFailure { openFailed = true } }, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Icon(Icons.Default.OpenInNew, null, Modifier.size(17.dp)); Spacer(Modifier.width(6.dp)); Text(t("Open report", "रिपोर्ट खोलें")) }
 }
 
 @Composable private fun CareLabEditor(vm: CareModel, initial: CareItem? = null, onDismiss: () -> Unit) { val t = careText();

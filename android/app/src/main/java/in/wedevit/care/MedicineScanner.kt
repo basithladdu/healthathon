@@ -69,6 +69,8 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
     var pendingKind by rememberSaveable { mutableStateOf("") }
     var pendingUri by rememberSaveable { mutableStateOf("") }
     var pendingPath by rememberSaveable { mutableStateOf("") }
+    // Photo limits and a missing camera app are said beside the photo cards, not in a toast.
+    var pickNote by remember { mutableStateOf("") }
 
     fun releaseReadAccess(value: String) {
         runCatching {
@@ -88,7 +90,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
             runCatching { context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
         }
         val merged = (current + selected.map(Uri::toString)).distinct()
-        if (merged.size > maximum) vm.message.value = t("Use up to $maximum $label.", "ज़्यादा से ज़्यादा $maximum $label जोड़ें।")
+        pickNote = if (merged.size > maximum) t("Use up to $maximum $label.", "ज़्यादा से ज़्यादा $maximum $label जोड़ें।") else ""
         return merged.take(maximum)
     }
 
@@ -109,7 +111,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
     fun photograph(kind: String) {
         val maximumReached = if (kind == "prescription") prescriptionUris.size >= 5 else medicineUris.size >= 10
         if (maximumReached) {
-            vm.message.value = if (kind == "prescription") t("Use up to 5 prescription pages.", "पर्चे के ज़्यादा से ज़्यादा 5 पेज जोड़ें।") else t("Use up to 10 medicine photos.", "दवा की ज़्यादा से ज़्यादा 10 फ़ोटो जोड़ें।")
+            pickNote = if (kind == "prescription") t("Use up to 5 prescription pages.", "पर्चे के ज़्यादा से ज़्यादा 5 पेज जोड़ें।") else t("Use up to 10 medicine photos.", "दवा की ज़्यादा से ज़्यादा 10 फ़ोटो जोड़ें।")
             return
         }
         val directory = File(context.cacheDir, "medicine-scan").apply { mkdirs() }
@@ -121,7 +123,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
             camera.launch(uri)
         }.onFailure {
             file.delete(); pendingKind = ""; pendingUri = ""; pendingPath = ""
-            vm.message.value = t("No camera app is available. Choose a photo instead.", "कैमरा ऐप नहीं मिला। फ़ोटो चुनें।")
+            pickNote = t("No camera app is available. Choose a photo instead.", "कैमरा ऐप नहीं मिला। फ़ोटो चुनें।")
         }
     }
 
@@ -185,6 +187,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                     onMove = null,
                 )
             }
+            if (pickNote.isNotBlank()) item { Text(pickNote, color = RustText, fontSize = 15.sp, modifier = Modifier.animateItem().announce()) }
             item {
                 Spacer(Modifier.height(8.dp))
                 Button(
