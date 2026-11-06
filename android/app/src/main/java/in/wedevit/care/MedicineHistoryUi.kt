@@ -6,6 +6,12 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -32,6 +38,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -41,6 +48,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
@@ -59,7 +69,9 @@ import java.time.format.DateTimeFormatter
 @Composable fun MedicineCareCard(item: CareItem, vm: CareModel, compact: Boolean = false) {
     val t = careText(); val context = LocalContext.current
     val canEdit by vm.canEdit.collectAsStateWithLifecycle(); val busy by vm.busy.collectAsStateWithLifecycle()
-    val events by vm.medicineEvents.collectAsStateWithLifecycle()
+    val saved by vm.medicineEvents.collectAsStateWithLifecycle()
+    val held by DoseUndoWindow.app.pending.collectAsStateWithLifecycle()
+    val events = DoseUndoWindow.shown(saved, held, item.personId)
     var menu by remember { mutableStateOf(false) }
     var editing by rememberSaveable(item.id) { mutableStateOf(false) }
     var delete by rememberSaveable(item.id) { mutableStateOf(false) }
@@ -131,10 +143,71 @@ internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: C
     return true
 }
 
+/**
+ * Saves one dose tap. A one-tap Taken ([quick]) is held for a few seconds with "Marked taken · Undo" ([DoseUndoWindow]);
+ * Undo then writes nothing. A choice from the Taken / Missed menu is written at once, after any held tick.
+ */
+internal suspend fun markMedicineDose(context: Context, vm: CareModel, item: CareItem, doses: List<MedicineDose>, dose: MedicineDose, taken: Boolean, quick: Boolean, label: String) {
+    val window = DoseUndoWindow.app
+    if (!(quick && taken)) { window.flush(); recordMedicineDose(context, vm, item, doses, dose, taken); return }
+    val zone = ZoneId.systemDefault(); val app = context.applicationContext
+    val shown = MedicineDoses.report(item, dose, true, LocalDate.now(zone), zone, System.currentTimeMillis(), MedicineDoses.reporter(vm.viewRole.value))
+    window.hold(DoseUndoWindow.Pending(item.personId, item.id, dose.key, item.title, label, shown) { recordMedicineDose(app, vm, item, doses, dose, true) })
+}
+
+/**
+ * "Marked taken · Undo" under a dose list while a one-tap tick waits, with a bar that runs down for the few seconds Undo
+ * is offered. [itemId] limits it to one medicine (Care list); null shows any of the person's medicines (Today).
+ * The held tick is written when the app goes to the background or the list leaves the screen.
+ */
+@Composable internal fun DoseUndoRow(personId: String, itemId: String? = null) {
+    val t = careText(); val window = DoseUndoWindow.app
+    val held by window.pending.collectAsStateWithLifecycle()
+    val failure by window.failure.collectAsStateWithLifecycle()
+    val mine = held?.takeIf { it.personId == personId && (itemId == null || it.itemId == itemId) }
+    val lifecycle = LocalLifecycleOwner.current
+    val stillMine by rememberUpdatedState(mine != null)
+    DisposableEffect(lifecycle) {
+        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_STOP) window.flushSoon() }
+        lifecycle.lifecycle.addObserver(observer)
+        onDispose { lifecycle.lifecycle.removeObserver(observer); if (stillMine) window.flushSoon() }
+    }
+    // Keeps the last tick on screen while the row slides away.
+    var last by remember { mutableStateOf<DoseUndoWindow.Pending?>(null) }
+    if (mine != null) last = mine
+    AnimatedVisibility(mine != null, enter = fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)) + expandVertically(SaharaMotion.tween(SaharaMotion.SAVED_MS)),
+        exit = fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS)) + shrinkVertically(SaharaMotion.tween(SaharaMotion.EXIT_MS)), label = "dose-undo") {
+        val p = last ?: return@AnimatedVisibility
+        Surface(shape = RoundedCornerShape(SaharaRadius.Md), color = SaharaTone.Success.wash, border = BorderStroke(1.5.dp, SaharaTone.Success.solid), modifier = Modifier.fillMaxWidth().padding(top = 8.dp).testTag("dose-undo-${p.itemId}-${p.doseKey}")) {
+            Column {
+                Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(start = 12.dp, end = 4.dp).announce(), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Check, null, Modifier.size(22.dp), tint = SaharaTone.Success.ink)
+                    Spacer(Modifier.width(10.dp))
+                    Text("${t("Marked taken", "ली हुई दर्ज की")} · ${p.title} ${p.doseLabel}", Modifier.weight(1f), fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.SemiBold, color = SaharaColors.Ink, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    TextButton(onClick = { window.undo() }, modifier = Modifier.heightIn(min = 48.dp).testTag("dose-undo-button"), colors = ButtonDefaults.textButtonColors(contentColor = SaharaTone.Success.ink)) {
+                        Text(t("Undo", "वापस लें"), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
+                // The time left for Undo, as a bar that empties. Hidden when the phone's animations are off.
+                if (SaharaMotion.enabled) {
+                    val left = remember(p) { Animatable(1f) }
+                    LaunchedEffect(p) { left.animateTo(0f, tween(DoseUndoWindow.WINDOW_MS.toInt(), easing = LinearEasing)) }
+                    LinearProgressIndicator(progress = { left.value }, modifier = Modifier.fillMaxWidth().height(4.dp), color = SaharaTone.Success.solid, trackColor = Color.Transparent, drawStopIndicator = {}, gapSize = 0.dp)
+                }
+            }
+        }
+    }
+    failure?.takeIf { itemId == null || it.first == itemId }?.let { (_, message) ->
+        SaharaDialog(t("Not saved", "सहेजा नहीं गया"), onDismiss = { window.failure.value = null }, text = message.ifBlank { t("Couldn't save. Please try again.", "सहेजा नहीं जा सका। कृपया फिर कोशिश करें।") }, tone = SaharaTone.Error)
+    }
+}
+
 /** Under each medicine: one tick per dose (taken, missed or not yet), then History. */
 @Composable internal fun MedicineDoseActions(item: CareItem, vm: CareModel, showHistory: Boolean = true) {
     val t = careText(); val context = LocalContext.current; val scope = rememberCoroutineScope()
-    val events by vm.medicineEvents.collectAsStateWithLifecycle()
+    val saved by vm.medicineEvents.collectAsStateWithLifecycle()
+    val held by DoseUndoWindow.app.pending.collectAsStateWithLifecycle()
+    val events = DoseUndoWindow.shown(saved, held, item.personId)
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     val busy by vm.busy.collectAsStateWithLifecycle()
     val current by vm.items.collectAsStateWithLifecycle()
@@ -150,9 +223,10 @@ internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: C
     // Dose chips wrap, so every dose of the day is visible without sideways scrolling.
     FlowRow(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         doses.forEach { dose ->
-            MedicineDoseChip(item, dose, states[dose.key] ?: MedicineDoseState.PENDING, enabled = editable && !busy && !working) { taken ->
+            val label = medicineDoseLabel(dose)
+            MedicineDoseChip(item, dose, states[dose.key] ?: MedicineDoseState.PENDING, enabled = editable && !busy && !working) { taken, quick ->
                 if (canEditCareContext(vm, item.personId, capturedAccount)) { working = true; problem = ""; scope.launch {
-                    try { recordMedicineDose(context, vm, item, doses, dose, taken) }
+                    try { markMedicineDose(context, vm, item, doses, dose, taken, quick, label) }
                     catch (e: Exception) { if (e is CancellationException) throw e; problem = if (e is IllegalArgumentException) e.message ?: failed else failed }
                     finally { working = false }
                 } }
@@ -160,6 +234,7 @@ internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: C
         }
         if (showHistory) DoseChip(Icons.Default.History, t("History", "इतिहास"), "care-medicine-history-${item.id}", true) { history = true }
     }
+    DoseUndoRow(item.personId, item.id)
     if (problem.isNotBlank()) SaharaDialog(t("Not saved", "सहेजा नहीं गया"), onDismiss = { problem = "" }, text = problem, tone = SaharaTone.Error)
     if (history) MedicineHistorySheet(item, vm) { history = false }
 }
@@ -173,7 +248,7 @@ internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: C
  * One dose. A dose not marked yet is ticked Taken with one tap; a marked dose (or a long press) opens Taken / Missed,
  * so a mistake can be corrected. Green when taken, red-brown when missed, amber once its time has passed unmarked.
  */
-@Composable internal fun MedicineDoseChip(item: CareItem, dose: MedicineDose, state: MedicineDoseState, enabled: Boolean, onMark: (Boolean) -> Unit) {
+@Composable internal fun MedicineDoseChip(item: CareItem, dose: MedicineDose, state: MedicineDoseState, enabled: Boolean, onMark: (taken: Boolean, quick: Boolean) -> Unit) {
     val t = careText(); var menu by remember { mutableStateOf(false) }
     val late = state == MedicineDoseState.PENDING && dose.timed && LocalTime.now() > LocalTime.parse(dose.time)
     val (fg, bgTarget) = when {
@@ -191,7 +266,7 @@ internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: C
     Box {
         Surface(shape = RoundedCornerShape(50), color = bg, border = if (pending && !late) BorderStroke(1.dp, DoctorCardFaint.copy(alpha = .4f)) else null,
             modifier = Modifier.minimumInteractiveComponentSize().clip(RoundedCornerShape(50))
-                .combinedClickable(enabled = enabled, role = Role.Button, onClickLabel = tapLabel, onLongClickLabel = holdLabel, onLongClick = { menu = true }) { if (pending) onMark(true) else menu = true }
+                .combinedClickable(enabled = enabled, role = Role.Button, onClickLabel = tapLabel, onLongClickLabel = holdLabel, onLongClick = { menu = true }) { if (pending) onMark(true, true) else menu = true }
                 .semantics { contentDescription = "${item.title}, $label: $stateWord" }.testTag("medicine-dose-${item.id}-${dose.key}")) {
             // A clear time chip: the dose time in bold; the state shows as icon and colour (the word is in the description).
             Row(Modifier.heightIn(min = 40.dp).padding(start = 10.dp, end = 14.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -201,8 +276,8 @@ internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: C
             }
         }
         DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
-            DropdownMenuItem(text = { Text(t("Taken", "ली"), color = DoctorCardInk) }, leadingIcon = { Icon(Icons.Default.Check, null, tint = DoctorStatusGood) }, onClick = { menu = false; onMark(true) }, modifier = Modifier.heightIn(min = 48.dp).testTag("medicine-dose-taken-${item.id}-${dose.key}"))
-            DropdownMenuItem(text = { Text(t("Missed", "छूटी"), color = DoctorCardInk) }, leadingIcon = { Icon(Icons.Default.Close, null, tint = DoctorStatusRest) }, onClick = { menu = false; onMark(false) }, modifier = Modifier.heightIn(min = 48.dp).testTag("medicine-dose-missed-${item.id}-${dose.key}"))
+            DropdownMenuItem(text = { Text(t("Taken", "ली"), color = DoctorCardInk) }, leadingIcon = { Icon(Icons.Default.Check, null, tint = DoctorStatusGood) }, onClick = { menu = false; onMark(true, false) }, modifier = Modifier.heightIn(min = 48.dp).testTag("medicine-dose-taken-${item.id}-${dose.key}"))
+            DropdownMenuItem(text = { Text(t("Missed", "छूटी"), color = DoctorCardInk) }, leadingIcon = { Icon(Icons.Default.Close, null, tint = DoctorStatusRest) }, onClick = { menu = false; onMark(false, false) }, modifier = Modifier.heightIn(min = 48.dp).testTag("medicine-dose-missed-${item.id}-${dose.key}"))
         }
     }
 }

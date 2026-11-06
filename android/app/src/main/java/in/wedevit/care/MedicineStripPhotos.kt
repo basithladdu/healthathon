@@ -289,7 +289,10 @@ class MedicineStripPhotos(context: Context, storage: String) {
 @Composable fun TodayDosesCard(vm: CareModel) {
     val t = careText(); val hindi = careHindi(); val context = LocalContext.current; val scope = rememberCoroutineScope()
     val items by vm.items.collectAsStateWithLifecycle(); val person by vm.selected.collectAsStateWithLifecycle()
-    val events by vm.medicineEvents.collectAsStateWithLifecycle()
+    val saved by vm.medicineEvents.collectAsStateWithLifecycle()
+    // A one-tap Taken waits a few seconds with Undo before it is written; until then it is shown from the held tick.
+    val held by DoseUndoWindow.app.pending.collectAsStateWithLifecycle()
+    val events = DoseUndoWindow.shown(saved, held, person)
     val canEdit by vm.canEdit.collectAsStateWithLifecycle(); val busy by vm.busy.collectAsStateWithLifecycle()
     val scheduler = remember(vm.accountNamespace) { CareReminderScheduler(context.applicationContext, vm.accountNamespace) }
     val store = remember(vm.storageNamespace) { MedicineStripPhotos(context.applicationContext, vm.storageNamespace) }
@@ -307,9 +310,9 @@ class MedicineStripPhotos(context: Context, storage: String) {
     val total = doses.values.sumOf { it.size }
     val taken = medicines.sumOf { m -> MedicineDoses.takenCount(MedicineDoses.states(m, doses[m.id].orEmpty(), events, today, zone)) }
     val failed = t("Couldn't save. Please try again.", "सहेजा नहीं जा सका। कृपया फिर कोशिश करें।")
-    val mark: (CareItem, MedicineDose, Boolean) -> Unit = { item, dose, yes ->
+    val mark: (CareItem, MedicineDose, Boolean, Boolean, String) -> Unit = { item, dose, yes, quick, label ->
         if (canEditCareContext(vm, item.personId, vm.accountNamespace)) { working = true; problem = ""; scope.launch {
-            try { recordMedicineDose(context, vm, item, doses[item.id].orEmpty(), dose, yes) }
+            try { markMedicineDose(context, vm, item, doses[item.id].orEmpty(), dose, yes, quick, label) }
             catch (e: Exception) { if (e is CancellationException) throw e; problem = if (e is IllegalArgumentException) e.message ?: failed else failed }
             finally { working = false }
         } }
@@ -332,7 +335,9 @@ class MedicineStripPhotos(context: Context, storage: String) {
             }
             val share by animateFloatAsState(if (total == 0) 0f else taken.toFloat() / total, SaharaMotion.tween(SaharaMotion.ENTER_MS, easing = SaharaMotion.Emphasized), label = "doses-progress")
             LinearProgressIndicator(progress = { share }, modifier = Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(50)), color = DoctorStatusGood, trackColor = DoctorHairline, drawStopIndicator = {}, gapSize = 0.dp)
-            if (canEdit && taken < total) Text(t("Tap a dose when taken. Hold it for Missed.", "दवा लेने पर उसे छुएँ। छूटी हो तो दबाकर रखें।"), fontSize = 14.sp, color = DoctorCardSub)
+            if (canEdit && taken < total && held?.personId != person) Text(t("Tap a dose when taken. Hold it for Missed.", "दवा लेने पर उसे छुएँ। छूटी हो तो दबाकर रखें।"), fontSize = 14.sp, color = DoctorCardSub)
+            // "Marked taken · Undo" sits right under the count, in the first screenful, while a one-tap tick waits.
+            DoseUndoRow(person)
             groups.forEach { group ->
                 Column(Modifier.testTag("today-doses-${group.time}"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     HorizontalDivider(color = DoctorHairline)
@@ -342,7 +347,7 @@ class MedicineStripPhotos(context: Context, storage: String) {
                         group.medicines.forEach { medicine ->
                             val item = byId[medicine.itemId]; val dose = doses[medicine.itemId].orEmpty().firstOrNull { it.time == group.time }
                             if (item != null && dose != null) key(item.id, dose.key) {
-                                MedicinePillbox(item, dose, MedicineDoses.state(item, dose, events, today, zone), photos[item.id], "", canEdit && !busy && !working, MedicineDoses.loggedByFamily(item, dose, events, today, zone)) { mark(item, dose, it) }
+                                MedicinePillbox(item, dose, MedicineDoses.state(item, dose, events, today, zone), photos[item.id], "", canEdit && !busy && !working, MedicineDoses.loggedByFamily(item, dose, events, today, zone)) { yes, quick -> mark(item, dose, yes, quick, dose.time) }
                             }
                         }
                     }
@@ -353,7 +358,8 @@ class MedicineStripPhotos(context: Context, storage: String) {
                 Text(t("Any time", "कभी भी"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = RustText, modifier = Modifier.padding(top = 4.dp))
                 FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     untimed.forEach { (item, dose) -> key(item.id, dose.key) {
-                        MedicinePillbox(item, dose, MedicineDoses.state(item, dose, events, today, zone), photos[item.id], if (dose.count > 1) t("Dose ${dose.index}", "खुराक ${dose.index}") else "", canEdit && !busy && !working, MedicineDoses.loggedByFamily(item, dose, events, today, zone)) { mark(item, dose, it) }
+                        val doseLabel = medicineDoseLabel(dose)
+                        MedicinePillbox(item, dose, MedicineDoses.state(item, dose, events, today, zone), photos[item.id], if (dose.count > 1) t("Dose ${dose.index}", "खुराक ${dose.index}") else "", canEdit && !busy && !working, MedicineDoses.loggedByFamily(item, dose, events, today, zone)) { yes, quick -> mark(item, dose, yes, quick, doseLabel) }
                     } }
                 }
             }
@@ -366,7 +372,7 @@ class MedicineStripPhotos(context: Context, storage: String) {
  * One dose in Today's doses: the strip photo (or the empty pillbox) and a tick or cross once marked.
  * One tap on a dose not marked yet ticks it Taken; a marked dose, or a long press, opens Taken / Missed.
  */
-@Composable private fun MedicinePillbox(item: CareItem, dose: MedicineDose, state: MedicineDoseState, photo: File?, caption: String, enabled: Boolean, family: Boolean = false, onMark: (Boolean) -> Unit) {
+@Composable private fun MedicinePillbox(item: CareItem, dose: MedicineDose, state: MedicineDoseState, photo: File?, caption: String, enabled: Boolean, family: Boolean = false, onMark: (taken: Boolean, quick: Boolean) -> Unit) {
     val t = careText(); var menu by remember { mutableStateOf(false) }
     val interaction = remember { MutableInteractionSource() }
     Column(Modifier.width(100.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -379,7 +385,7 @@ class MedicineStripPhotos(context: Context, storage: String) {
             Surface(shape = RoundedCornerShape(14.dp), color = Paper, border = BorderStroke(if (pending) 1.dp else 2.dp, ringColor),
                 modifier = Modifier.saharaPress(interaction).clip(RoundedCornerShape(14.dp))
                     .combinedClickable(interactionSource = interaction, indication = LocalIndication.current, enabled = enabled, role = Role.Button,
-                        onClickLabel = if (pending) t("Mark taken", "ली हुई दर्ज करें") else t("Change", "बदलें"), onLongClickLabel = t("Taken or missed", "ली या छूटी"), onLongClick = { menu = true }) { if (pending) onMark(true) else menu = true }
+                        onClickLabel = if (pending) t("Mark taken", "ली हुई दर्ज करें") else t("Change", "बदलें"), onLongClickLabel = t("Taken or missed", "ली या छूटी"), onLongClick = { menu = true }) { if (pending) onMark(true, true) else menu = true }
                     .semantics { contentDescription = "${item.title}, $label: $stateWord" }.testTag("today-dose-${item.id}-${dose.key}")) { StripThumb(photo, 80) }
             // The tick or cross pops in on the corner the moment the dose is marked.
             androidx.compose.animation.AnimatedVisibility(visible = !pending, modifier = Modifier.align(Alignment.TopEnd).padding(4.dp), enter = fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)) + scaleIn(SaharaMotion.tween(SaharaMotion.SAVED_MS, easing = SaharaMotion.Emphasized), initialScale = 0.3f), exit = fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS))) {
@@ -389,8 +395,8 @@ class MedicineStripPhotos(context: Context, storage: String) {
                 }
             }
             DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
-                DropdownMenuItem(text = { Text(t("Taken", "ली"), color = DoctorCardInk) }, leadingIcon = { Icon(Icons.Default.Check, null, tint = DoctorStatusGood) }, onClick = { menu = false; onMark(true) }, modifier = Modifier.heightIn(min = 48.dp).testTag("today-dose-taken-${item.id}-${dose.key}"))
-                DropdownMenuItem(text = { Text(t("Missed", "छूटी"), color = DoctorCardInk) }, leadingIcon = { Icon(Icons.Default.Close, null, tint = DoctorStatusRest) }, onClick = { menu = false; onMark(false) }, modifier = Modifier.heightIn(min = 48.dp).testTag("today-dose-missed-${item.id}-${dose.key}"))
+                DropdownMenuItem(text = { Text(t("Taken", "ली"), color = DoctorCardInk) }, leadingIcon = { Icon(Icons.Default.Check, null, tint = DoctorStatusGood) }, onClick = { menu = false; onMark(true, false) }, modifier = Modifier.heightIn(min = 48.dp).testTag("today-dose-taken-${item.id}-${dose.key}"))
+                DropdownMenuItem(text = { Text(t("Missed", "छूटी"), color = DoctorCardInk) }, leadingIcon = { Icon(Icons.Default.Close, null, tint = DoctorStatusRest) }, onClick = { menu = false; onMark(false, false) }, modifier = Modifier.heightIn(min = 48.dp).testTag("today-dose-missed-${item.id}-${dose.key}"))
             }
         }
         // Whole words only: a medicine name never breaks mid-word under its pillbox.

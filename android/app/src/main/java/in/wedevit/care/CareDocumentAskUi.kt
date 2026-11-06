@@ -106,7 +106,7 @@ import kotlinx.coroutines.withContext
                 }
                 local = found
             } catch (cancel: CancellationException) { message = t("Stopped", "रोक दिया"); throw cancel }
-            catch (error: Exception) { message = error.message ?: t("Something went wrong. Try again.", "कुछ गड़बड़ हुई। फिर कोशिश करें।") }
+            catch (error: Exception) { message = error.message ?: t("No answer this time. Your documents are safe. Try again.", "इस बार जवाब नहीं मिला। आपके कागज़ सुरक्षित हैं। फिर कोशिश करें।") }
             finally { progress = ""; consent = false; job = null }
         }
     }

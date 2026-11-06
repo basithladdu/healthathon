@@ -156,9 +156,10 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
             }
             if (canEdit) SaharaPrimaryButton(t("Add document", "कागज़ जोड़ें"), onClick = { addSheet = true }, icon = Icons.Default.Add, enabled = !busy, modifier = Modifier.testTag("document-add"))
         } }
-        item { Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            DocsTile(t("Care timeline", "देखभाल की समय-रेखा"), Icons.Default.Timeline, Peach, Modifier.weight(1f).fillMaxHeight().testTag("care-timeline-open")) { timeline = true }
-            if (reports.isNotEmpty()) DocsTile(t("Ask your documents", "अपने कागज़ों से पूछें"), Icons.Default.QuestionAnswer, SaharaLavender, Modifier.weight(1f).fillMaxHeight().testTag("document-ask-open")) { asking = true }
+        // Timeline and Ask as two slim buttons (they open their own screens), so the list starts in the first screenful.
+        item { Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            SaharaSecondaryButton(t("Care timeline", "देखभाल की समय-रेखा"), onClick = { timeline = true }, icon = Icons.Default.Timeline, tone = SaharaTone.Marigold, navigates = true, modifier = Modifier.weight(1f).fillMaxHeight().testTag("care-timeline-open"))
+            if (reports.isNotEmpty()) SaharaSecondaryButton(t("Ask documents", "कागज़ों से पूछें"), onClick = { asking = true }, icon = Icons.Default.QuestionAnswer, tone = SaharaTone.Indigo, navigates = true, modifier = Modifier.weight(1f).fillMaxHeight().testTag("document-ask-open"))
         } }
         item { OutlinedTextField(value = search, onValueChange = { search = it }, placeholder = { Text(t("Search documents", "कागज़ात खोजें")) }, leadingIcon = { Icon(Icons.Default.Search, null) },
             trailingIcon = { if (search.isNotEmpty()) IconButton(onClick = { search = "" }) { Icon(Icons.Default.Close, t("Clear document search", "खोज मिटाएँ")) } },
@@ -168,9 +169,10 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
             listOf("All", "Care notes", "Reports", "Cancer").forEach { label -> FilterChip(selected = filter == label, onClick = { filter = label }, label = { Text(when (label) { "Care notes" -> t("Care notes", "देखभाल नोट"); "Reports" -> t("Reports", "रिपोर्टें"); "Cancer" -> t("Cancer documents", "कैंसर के कागज़"); else -> t("All", "सभी") }) }, shape = RoundedCornerShape(50), modifier = Modifier.testTag("document-filter-$label")) }
         } }
         // Auto-sorted folders as coloured tiles with their counts; tap one to open it, tap again to see everything.
+        // Only folders that hold something (and the open one) are shown, so empty tiles never push the list down.
         if (reports.isNotEmpty()) item { val counts = DocumentFolderRules.counts(reports.map(::folderOf))
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                DocumentFolderRules.folders.chunked(2).forEach { pair -> Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                DocumentFolderRules.folders.filter { (counts[it] ?: 0) > 0 || it == folderFilter }.chunked(2).forEach { pair -> Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     pair.forEach { folder -> FolderTile(DocumentFolderRules.label(folder, t), folder, counts[folder] ?: 0, folderFilter == folder, Modifier.weight(1f).fillMaxHeight().testTag("document-folder-$folder")) { folderFilter = if (folderFilter == folder) "" else folder } }
                     if (pair.size == 1) Spacer(Modifier.weight(1f))
                 } }
@@ -188,7 +190,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
                         DocumentEvidenceRules.find(query, saved)
                     }
                     if (vm.selected.value == capturedPerson) { textMatches = found; searchedText = query }
-                } catch (_: Exception) { textError = t("Something went wrong. Try again.", "कुछ गड़बड़ हुई। फिर कोशिश करें।") }
+                } catch (_: Exception) { textError = t("Search didn't work. Your documents are safe. Try again.", "खोज नहीं हो पाई। आपके कागज़ सुरक्षित हैं। फिर कोशिश करें।") }
                 finally { searching = false }
             }
         }, enabled = !searching, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Search, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(if (searching) t("Searching your reports…", "रिपोर्टों में खोज रहे हैं…") else t("Search checked reports", "जाँची गई रिपोर्टों में खोजें")) } }
@@ -309,19 +311,6 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
     }
 }
 
-
-/** A tappable tile on the Documents screen: icon and title. */
-@Composable private fun DocsTile(title: String, icon: androidx.compose.ui.graphics.vector.ImageVector, tint: androidx.compose.ui.graphics.Color, modifier: Modifier, onClick: () -> Unit) {
-    ActionCard(tint, modifier, onClick) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Surface(shape = CircleShape, color = Paper) { Icon(icon, null, Modifier.padding(8.dp).size(20.dp), tint = DoctorAccent) }
-                Spacer(Modifier.weight(1f)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(18.dp), tint = DoctorAccent)
-            }
-            Text(title, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
-        }
-    }
-}
 
 /** One choice in the Add document sheet. */
 @Composable private fun AddDocOption(title: String, icon: androidx.compose.ui.graphics.vector.ImageVector, tint: androidx.compose.ui.graphics.Color, modifier: Modifier, onClick: () -> Unit) {

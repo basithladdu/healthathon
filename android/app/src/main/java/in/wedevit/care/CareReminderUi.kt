@@ -89,7 +89,7 @@ import java.time.ZoneId
                 else scheduler.enable(true)
                 revision++
             }) }
-            if (!allowed) OutlinedButton(onClick = openNotificationSettings, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().padding(top = 12.dp).heightIn(min = 48.dp)) { Text(t("Open settings", "सेटिंग खोलें"), fontSize = 15.sp) }
+            // Notifications off: the switch itself opens the why / Settings dialog, so there is no second Settings button here.
             if (enabled && allowed && !exact && Build.VERSION.SDK_INT >= 31) {
                 OutlinedButton(onClick = { runCatching { context.startActivity(Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, android.net.Uri.parse("package:${context.packageName}"))) }.onFailure { error = t("Allow alarms in Settings.", "Settings में अलार्म चालू करें।") } }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().padding(top = 12.dp).heightIn(min = 48.dp).testTag("reminder-exact-off")) { Text(t("Allow on-time alerts", "समय पर सूचना की अनुमति दें"), fontSize = 15.sp) }
             }
