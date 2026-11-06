@@ -149,12 +149,12 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
             AddDocOption(t("Upload a file", "फ़ाइल अपलोड करें"), Icons.Default.UploadFile, SaharaSoftBlue, Modifier.testTag("document-upload")) { addSheet = false; addReport() }
         }
     }
-    LazyColumn(Modifier.fillMaxSize().testTag("documents-list"), state = listState, contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    LazyColumn(Modifier.fillMaxSize().saharaScreenEnter().testTag("documents-list"), state = listState, contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f).padding(end = 8.dp)) {
                 Heading(t("Documents", "कागज़ात"), 30)
             }
-            if (canEdit) SaharaPrimaryButton(t("Add document", "कागज़ जोड़ें"), onClick = { addSheet = true }, icon = Icons.Default.Add, enabled = !busy, modifier = Modifier.testTag("document-add"))
+            if (canEdit) SaharaPrimaryButton(t("Add document", "कागज़ जोड़ें"), onClick = { addSheet = true }, icon = Icons.Default.Add, enabled = !busy, modifier = Modifier.saharaPulseGlow(corner = SaharaRadius.Md, active = reports.isEmpty()).testTag("document-add"))
         } }
         // Timeline and Ask as two slim buttons (they open their own screens), so the list starts in the first screenful.
         item { Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -173,7 +173,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         if (reports.isNotEmpty()) item { val counts = DocumentFolderRules.counts(reports.map(::folderOf))
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 DocumentFolderRules.folders.filter { (counts[it] ?: 0) > 0 || it == folderFilter }.chunked(2).forEach { pair -> Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    pair.forEach { folder -> FolderTile(DocumentFolderRules.label(folder, t), folder, counts[folder] ?: 0, folderFilter == folder, Modifier.weight(1f).fillMaxHeight().testTag("document-folder-$folder")) { folderFilter = if (folderFilter == folder) "" else folder } }
+                    pair.forEach { folder -> FolderTile(DocumentFolderRules.label(folder, t), folder, counts[folder] ?: 0, folderFilter == folder, Modifier.weight(1f).fillMaxHeight().saharaStagger(DocumentFolderRules.folders.indexOf(folder)).testTag("document-folder-$folder")) { folderFilter = if (folderFilter == folder) "" else folder } }
                     if (pair.size == 1) Spacer(Modifier.weight(1f))
                 } }
             }
@@ -217,7 +217,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         if (visibleNotes.isNotEmpty()) item { SectionTitle(t("Care notes", "देखभाल नोट")) }
         items(visibleNotes, key = { it.id }) { note ->
             val latest = note.id == notes.firstOrNull()?.id
-            Card(onClick = { onRead(note) }, modifier = Modifier.animateItem().fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = Paper), border = BorderStroke(1.dp, DoctorHairline)) {
+            Card(onClick = { onRead(note) }, modifier = Modifier.animateItem().saharaStagger(visibleNotes.indexOf(note)).fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = Paper), border = BorderStroke(1.dp, DoctorHairline)) {
                 Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Surface(shape = RoundedCornerShape(14.dp), color = if (latest) SaharaSoftGold else SaharaLavender) { Icon(Icons.Default.Description, null, Modifier.padding(10.dp).size(22.dp), tint = DoctorAccent) }
                     Spacer(Modifier.width(12.dp))
@@ -235,7 +235,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
             if (open.isEmpty()) SectionTitle(t("Reports", "रिपोर्टें")) else SectionTitle(DocumentFolderRules.label(open, t), t("Show all", "सभी दिखाएँ")) { folderFilter = "" }
         } }
         items(visibleReports, key = { it.id }) { report ->
-            Surface(Modifier.animateItem().fillMaxWidth(), shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline)) {
+            Surface(Modifier.animateItem().saharaStagger(visibleNotes.size + visibleReports.indexOf(report)).fillMaxWidth(), shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline)) {
                 Column {
                     var menuOpen by remember { mutableStateOf(false) }
                     val editable = canEdit && prescriptionOriginals.none { it.id == report.id }
@@ -348,7 +348,7 @@ internal val CancerTone = FolderTone(SaharaTone.Rose.ink, SaharaTone.Rose.wash, 
             Surface(shape = RoundedCornerShape(10.dp), color = if (open) Paper else tone.soft) { Icon(if (open) Icons.Default.FolderOpen else tone.icon, null, Modifier.padding(7.dp).size(20.dp), tint = tone.accent) }
             Spacer(Modifier.width(8.dp))
             Text(title, Modifier.weight(1f), color = ink, fontSize = 15.sp, lineHeight = 19.sp, fontWeight = FontWeight.SemiBold, style = LocalTextStyle.current.copy(hyphens = androidx.compose.ui.text.style.Hyphens.None, lineBreak = androidx.compose.ui.text.style.LineBreak.Heading))
-            SaharaAnimatedText("$count") { Text(it, color = if (open) Paper else tone.accent, fontSize = 16.sp, fontWeight = FontWeight.Bold) }
+            SaharaAnimatedText("${saharaCountUp(count)}") { Text(it, color = if (open) Paper else tone.accent, fontSize = 16.sp, fontWeight = FontWeight.Bold) }
         }
     }
 }

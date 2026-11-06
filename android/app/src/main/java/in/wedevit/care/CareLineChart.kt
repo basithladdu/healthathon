@@ -135,7 +135,7 @@ object ChartRangeRules {
     val shownLabels = xLabels.filter { it.x >= minOf(lo, hi) && it.x <= maxOf(lo, hi) }
     val labelEach = shownPoints.count { it.y != null } <= pointTextLimit
     val titleStyle = axisStyle.copy(color = DoctorCardInk, fontWeight = FontWeight.SemiBold)
-    Canvas(modifier.fillMaxWidth().height(height).clearAndSetSemantics { contentDescription = description }.testTag("$tag-chart")) {
+    Canvas(modifier.fillMaxWidth().height(height).saharaReveal().clearAndSetSemantics { contentDescription = description }.testTag("$tag-chart")) {
         // Room above the plot for treatment-day labels, so they never sit on the top gridline.
         val topPad = ((if (shownMarkers.any { it.label.isNotBlank() }) 22 else 14) + (if (yTitle != null) 16 else 0)).dp.toPx()
         val bottomPad = (10 + 15 * xLabelLines + (if (xTitle != null) 16 else 0)).dp.toPx()

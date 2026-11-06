@@ -36,6 +36,6 @@ enum class SaharaArtKind(@param:DrawableRes val res: Int) {
     val shown = remember { Animatable(if (SaharaMotion.enabled) 0f else 1f) }
     LaunchedEffect(Unit) { if (shown.value < 1f) shown.animateTo(1f, SaharaMotion.tween(SaharaMotion.ENTER_MS, easing = SaharaMotion.Emphasized)) }
     Image(painterResource(kind.res), contentDescription = null, contentScale = ContentScale.Fit,
-        modifier = modifier.size(width = 160.dp, height = 120.dp).testTag("sahara-art-${kind.name}")
+        modifier = modifier.saharaFloat(2.dp).size(width = 160.dp, height = 120.dp).testTag("sahara-art-${kind.name}")
             .graphicsLayer { val p = shown.value; alpha = p; scaleX = .94f + .06f * p; scaleY = .94f + .06f * p })
 }

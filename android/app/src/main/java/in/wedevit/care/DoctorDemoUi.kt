@@ -230,7 +230,7 @@ private val DoctorMist = Peach
             }
         } }
     }, bottomBar = {
-        NavigationBar(containerColor = Paper, tonalElevation = 0.dp) {
+        NavigationBar(Modifier.saharaNavIndicator(if (sampleCareOpen || patientId != null || carePersonId != null) 1 else tab, 4, gap = 8.dp), containerColor = Paper, tonalElevation = 0.dp) {
             val labels = listOf("Home", "Patients", "Schedule", "Account")
             val icons = listOf(Icons.Default.Home, Icons.Default.PeopleOutline, Icons.Default.CalendarMonth, Icons.Default.PersonOutline)
             labels.forEachIndexed { i, label -> NavigationBarItem(selected = if (sampleCareOpen || patientId != null || carePersonId != null) i == 1 else tab == i, enabled = !careNavigationBlocked, onClick = { navigateCare { sampleCareOpen=false;tab = i; carePersonId = null; patientId = null; progressReportId=null;reportId=null;workflowRoute=null; notice = null } },
