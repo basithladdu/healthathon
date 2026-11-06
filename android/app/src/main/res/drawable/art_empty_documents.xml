@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- No documents yet: an open folder with two papers. Original Sahara art (CC0), see android/licenses/art/README.md. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="240dp" android:height="180dp" android:viewportWidth="240" android:viewportHeight="180">
+    <path android:fillColor="#FCEBC7" android:pathData="M20,96C20,36.6 85,26.7 130,30C190,33.3 222,63 220,99.3C218,142.2 170,162 115,162C60,162 20,135.6 20,96z"/>
+    <path android:fillColor="#D99A22" android:pathData="M46,64h46l10,10h86a8,8 0 0 1 8,8v66a8,8 0 0 1 -8,8H54a8,8 0 0 1 -8,-8z"/>
+    <path android:fillColor="#FFFDF9" android:pathData="M66,54L146,46L152,118L72,126z"/>
+    <path android:strokeColor="#9C887B" android:strokeWidth="1.2" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M66,54L146,46L152,118L72,126z"/>
+    <path android:strokeColor="#E6D8CC" android:strokeWidth="3" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M78,68L136,62M79,78L138,72M80,88L124,84"/>
+    <path android:fillColor="#FFFDF9" android:pathData="M101,58h72a5,5 0 0 1 5,5v62a5,5 0 0 1 -5,5h-72a5,5 0 0 1 -5,-5v-62a5,5 0 0 1 5,-5z"/>
+    <path android:strokeColor="#9C887B" android:strokeWidth="1.2" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M101,58h72a5,5 0 0 1 5,5v62a5,5 0 0 1 -5,5h-72a5,5 0 0 1 -5,-5v-62a5,5 0 0 1 5,-5z"/>
+    <path android:fillColor="#0F6E6A" android:pathData="M107,66h28a3,3 0 0 1 3,3v2a3,3 0 0 1 -3,3h-28a3,3 0 0 1 -3,-3v-2a3,3 0 0 1 3,-3z"/>
+    <path android:strokeColor="#E6D8CC" android:strokeWidth="3" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M105,84H168M105,94H168M105,104H150"/>
+    <path android:fillColor="#F2B33D" android:pathData="M51,94h138a9,9 0 0 1 9,9v46a9,9 0 0 1 -9,9h-138a9,9 0 0 1 -9,-9v-46a9,9 0 0 1 9,-9z"/>
+    <path android:fillColor="#FFFDF9" android:pathData="M108,126a12,12 0 1,0 24,0a12,12 0 1,0 -24,0z"/>
+    <path android:fillColor="#B9472C" android:pathData="M118.5,118h3a1.5,1.5 0 0 1 1.5,1.5v13a1.5,1.5 0 0 1 -1.5,1.5h-3a1.5,1.5 0 0 1 -1.5,-1.5v-13a1.5,1.5 0 0 1 1.5,-1.5z"/>
+    <path android:fillColor="#B9472C" android:pathData="M113.5,123h13a1.5,1.5 0 0 1 1.5,1.5v3a1.5,1.5 0 0 1 -1.5,1.5h-13a1.5,1.5 0 0 1 -1.5,-1.5v-3a1.5,1.5 0 0 1 1.5,-1.5z"/>
+    <path android:strokeColor="#B9472C" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M206,45V55M201,50H211"/>
+</vector>

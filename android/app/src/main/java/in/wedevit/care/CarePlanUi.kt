@@ -55,7 +55,7 @@ internal const val ED_VIEW_DETAIL = "ED Quick View"
 private const val CARD_VIEW_DETAIL = "wallet card"
 private fun planPdfName(version: Int) = "sahara-plan-v$version.pdf"
 /** Same content, ignoring when it was last saved. */
-private fun samePlan(a: EctprRecord, b: EctprRecord) = a.copy(updatedAt = "") == b.copy(updatedAt = "")
+internal fun samePlan(a: EctprRecord, b: EctprRecord) = a.copy(updatedAt = "") == b.copy(updatedAt = "")
 internal fun planNow(): String = Instant.now().toString()
 
 /** Which wizard step a rule's field belongs to, so "Next" checks only what has been asked so far. */
@@ -74,7 +74,7 @@ internal fun planStepOf(field: String): Int = when {
 
 /**
  * Emergency care plan (ECTPR) and living will (AMD), offline on this phone. Reached from Today and More (family and patient)
- * and from the doctor's patient tools. Pages: home, plan wizard, ED Quick View, wallet card, living will.
+ * and from the doctor's patient tools. Pages: home, plan wizard, goals of care (the doctor's Goals of care tab), ED Quick View, wallet card, living will.
  */
 @Composable fun CarePlanScreen(vm: CareModel, clinician: Boolean, onBack: () -> Unit, startAt: String = "") {
     val context = LocalContext.current; val t = careText(); val hindi = careHindi(); val scope = rememberCoroutineScope()
@@ -84,8 +84,7 @@ internal fun planStepOf(field: String): Int = when {
     var loadProblem by remember(selected) { mutableStateOf(false) }
     var state by remember(selected) { mutableStateOf(runCatching { store.load(selected) }.getOrElse { loadProblem = true; CarePlanState() }) }
     var page by rememberSaveable(selected) { mutableStateOf("home") }
-    // startAt "goc": straight to the goals-of-care recording on the treatment step (a draft is opened if none is).
-    var gocDirect by rememberSaveable(selected) { mutableStateOf(false) }
+    // startAt "goc": the goals-of-care talk as its own page (a draft is opened if none is); the full plan is one named tap away.
     val actor = remember(clinician) { if (clinician) "Doctor" else vm.viewRole.value }
     val today = LocalDate.now()
     // The practice walkthrough never reaches the card server.
@@ -121,18 +120,27 @@ internal fun planStepOf(field: String): Int = when {
     if (startAt == "goc") LaunchedEffect(selected) {
         if (page != "home") return@LaunchedEffect
         if (EctprLifecycle.draft(state.ectprs, selected) == null && canEdit) commit { CarePlanBook.startPlan(it, selected, actor, planNow(), EctprPatient(name = person.name)).first }
-        if (EctprLifecycle.draft(state.ectprs, selected) != null) { gocDirect = true; page = "wizard" }
+        if (EctprLifecycle.draft(state.ectprs, selected) != null) page = "goc"
     }
     val canManageData = clinician || actor != "Family"
     // Pages slide in from the end and back out to the plan home, the same motion as the rest of the app.
-    SaharaScreenHost(page, Modifier.fillMaxSize(), label = "care-plan-page", direction = { _, to -> if (to == "home") SaharaMotion.Direction.Back else SaharaMotion.Direction.Forward }) { shownPage -> when (shownPage) {
+    // From the Goals of care tab, closing the full plan goes back to the talk, and closing the talk leaves the tab.
+    val wizardBack = if (startAt == "goc") "goc" else "home"
+    SaharaScreenHost(page, Modifier.fillMaxSize(), label = "care-plan-page", direction = { from, to -> if (to == "home" || (from == "wizard" && to == "goc")) SaharaMotion.Direction.Back else SaharaMotion.Direction.Forward }) { shownPage -> when (shownPage) {
+        "goc" -> {
+            val draft = EctprLifecycle.draft(state.ectprs, selected)
+            if (draft == null) { LaunchedEffect(Unit) { page = "home" }; return@SaharaScreenHost }
+            CompositionLocalProvider(LocalGocFolder provides runCatching { store.folder(selected) }.getOrNull()) { GocTabFlow(draft, canEdit,
+                onSave = { r -> commit { CarePlanBook.saveDraft(it, r, actor, planNow(), today) } },
+                onClose = { if (startAt == "goc") onBack() else page = "home" }, onFullPlan = { page = "wizard" }) }
+        }
         "wizard" -> {
             val draft = EctprLifecycle.draft(state.ectprs, selected)
             if (draft == null) { LaunchedEffect(Unit) { page = "home" }; return@SaharaScreenHost }
-            CompositionLocalProvider(LocalGocFolder provides runCatching { store.folder(selected) }.getOrNull(), LocalGocOpenNow provides gocDirect) { EctprWizard(draft, clinician, canEdit, familyReadOnly = actor == "Family" && !clinician, personName = person.name, startStep = if (gocDirect) 5 else 0,
+            CompositionLocalProvider(LocalGocFolder provides runCatching { store.folder(selected) }.getOrNull()) { EctprWizard(draft, clinician, canEdit, familyReadOnly = actor == "Family" && !clinician, personName = person.name,
                 onSave = { r -> commit { CarePlanBook.saveDraft(it, r, actor, planNow(), today) } },
                 onSign = { r -> commit { CarePlanBook.sign(CarePlanBook.saveDraft(it, r, actor, planNow(), today), r.id, actor, planNow(), today) }.also { ok -> if (ok) page = "ed" } },
-                onClose = { gocDirect = false; page = "home" }) }
+                onClose = { page = wizardBack }) }
         }
         "pilot" -> PilotLogPage(state, selected, actor, ED_VIEW_DETAIL, onBack = { page = "home" }, commit = ::commit)
         "ed" -> EdQuickViewPage(state, selected, onBack = { page = "home" }, onCard = { page = "card" }, onShare = ::sharePlanPdf,
@@ -257,7 +265,8 @@ internal fun planStepOf(field: String): Int = when {
             Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.LocalHospital, null, tint = Rust); Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(t("ED Quick View", "ED क्विक व्यू"), fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                    Text(t("For the emergency room", "आपातकालीन कक्ष के लिए"), fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                    Text(t("A one-page summary hospital staff can read fast", "एक पन्ने का सारांश, जिसे अस्पताल के लोग जल्दी पढ़ सकें"), fontSize = 14.sp, lineHeight = 19.sp, color = DoctorCardSub)
                     // The plan's state at a glance: signed and in force, a draft, or none yet.
                     FamilyPill(when { active != null -> t("Plan v${active.version} active", "योजना v${active.version} लागू"); draft != null -> t("Draft", "मसौदा"); else -> t("No plan yet", "अभी योजना नहीं") },
                         when { active != null -> FamilyTone.GOOD; draft != null -> FamilyTone.WAIT; else -> FamilyTone.NEUTRAL }, Modifier.testTag("care-plan-status"))
@@ -278,7 +287,7 @@ internal fun planStepOf(field: String): Int = when {
                 }
                 else -> Button(onClick = { if (clinician) dialog = "start" else onStart(false) }, enabled = canEdit, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-start")) { Text(t("Start a plan", "योजना शुरू करें")) }
             }
-            OutlinedButton(onClick = { onPage("card") }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-card-entry")) { Icon(Icons.Default.QrCode, null); Spacer(Modifier.width(8.dp)); Text(t("Wallet card", "वॉलेट कार्ड")) }
+            OutlinedButton(onClick = { onPage("card") }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-card-entry")) { Icon(Icons.Default.QrCode, null); Spacer(Modifier.width(8.dp)); Text(t("Pocket emergency card", "जेब में रखने का आपातकालीन कार्ड")) }
         } }
         if (active != null && transport != null && ReviewReminder.due(active, today)) item { ReviewReminderCard(active, canEdit, transport) { status -> commit { CarePlanBook.reminded(it, active.id, actor, planNow(), status) } } }
         item { FamilyTile(t("Living will", "लिविंग विल"), Icons.Default.Gavel, FamilyAccent.Plum) {
@@ -325,10 +334,10 @@ internal fun planStepOf(field: String): Int = when {
 
 // ───────────────────────────── Wizard ─────────────────────────────
 
-@Composable private fun EctprWizard(record: EctprRecord, clinician: Boolean, canEdit: Boolean, familyReadOnly: Boolean = false, personName: String = "", onSave: (EctprRecord) -> Boolean, onSign: (EctprRecord) -> Unit, onClose: () -> Unit, startStep: Int = 0) {
+@Composable private fun EctprWizard(record: EctprRecord, clinician: Boolean, canEdit: Boolean, familyReadOnly: Boolean = false, personName: String = "", onSave: (EctprRecord) -> Boolean, onSign: (EctprRecord) -> Unit, onClose: () -> Unit) {
     val t = careText(); val hindi = careHindi(); val today = LocalDate.now()
     var d by remember(record.id) { mutableStateOf(record) }
-    var step by rememberSaveable(record.id) { mutableIntStateOf(startStep) }
+    var step by rememberSaveable(record.id) { mutableIntStateOf(0) }
     var shown by remember { mutableStateOf<List<RuleIssue>>(emptyList()) }
     var leaving by remember { mutableStateOf(false) }
     val listState = androidx.compose.foundation.lazy.rememberLazyListState()
@@ -351,14 +360,13 @@ internal fun planStepOf(field: String): Int = when {
     Column(Modifier.fillMaxSize().testTag("ectpr-wizard")) {
         Row(Modifier.fillMaxWidth().padding(start = 4.dp, end = 16.dp, top = 4.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = ::tryLeave, modifier = Modifier.testTag("ectpr-wizard-close")) { Icon(Icons.Default.Close, t("Close", "बंद करें")) }
+            // Which plan, whose, and the step by its name, so a step never shows as a bare number.
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Surface(color = Peach, shape = RoundedCornerShape(50)) {
-                    Text(t("Step ${step + 1} of ${steps.size}", "चरण ${step + 1} / ${steps.size}"), Modifier.padding(horizontal = 12.dp, vertical = 4.dp), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Ink)
-                }
-                Text(steps[step], fontFamily = SaharaTitleFont, fontSize = 24.sp, lineHeight = 28.sp, color = Ink, modifier = Modifier.a11yHeading())
+                Text(t("Emergency care plan", "आपातकालीन देखभाल योजना") + (personName.ifBlank { d.patient.name }.takeIf { it.isNotBlank() }?.let { " · $it" } ?: ""), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub)
+                SaharaAnimatedText(steps[step]) { name -> Text(t("Step ${step + 1} · $name", "चरण ${step + 1} · $name"), fontFamily = SaharaTitleFont, fontSize = 24.sp, lineHeight = 28.sp, color = Ink, modifier = Modifier.a11yHeading().testTag("ectpr-step-name")) }
             }
         }
-        LinearProgressIndicator(progress = { (step + 1f) / steps.size }, modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(6.dp).clip(RoundedCornerShape(50)), color = Rust, trackColor = DoctorHairline)
+        LinearProgressIndicator(progress = { (step + 1f) / steps.size }, modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(6.dp).clip(RoundedCornerShape(50)), color = SaharaColors.Primary, trackColor = SaharaColors.Well)
         LazyColumn(Modifier.weight(1f).fillMaxWidth(), state = listState, contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item(key = "read-aloud") { PlanReadAloud({ steps[step] + ".\n" + PlanSpeech.wizardStep(d, step, hindi) }, "wizard-${record.id}-$step") }
             when (step) {
@@ -814,7 +822,8 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
     LaunchedEffect(r?.id) { onViewed(r?.id ?: "none") }
     val amdLine = AmdLifecycle.edSummary(state.amds, patientId, r?.existingDirective)
     LazyColumn(Modifier.fillMaxSize().testTag("ed-quick-view"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { PlanHeader(t("ED Quick View", "ED क्विक व्यू"), onBack, "ed-header") }
+        item { PlanHeader(t("For the emergency room", "आपातकालीन कक्ष के लिए"), onBack, "ed-header") }
+        item { Text(t("A one-page summary hospital staff can read fast", "एक पन्ने का सारांश, जिसे अस्पताल के लोग जल्दी पढ़ सकें"), fontSize = 15.sp, lineHeight = 20.sp, color = DoctorCardSub) }
         item { PlanReadAloud({ PlanSpeech.edView(interp, amdLine, hindi) }, "ed-$patientId") }
         if (r != null) item { Text(listOfNotNull(r.patient.name.ifBlank { null }, r.patient.uhid.takeIf { it.isNotBlank() }?.let { "UHID $it" }, PlanDates.age(r.patient.dob, today)?.let { t("$it years", "$it साल") }).joinToString(" · "), fontWeight = FontWeight.SemiBold, fontSize = 18.sp) }
         item { Surface(color = if (interp.kind == EdKind.ACTIVE) DoctorStatusGoodBg else DoctorStatusRestBg, shape = RoundedCornerShape(12.dp), border = BorderStroke(2.dp, if (interp.kind == EdKind.ACTIVE) DoctorStatusGood else DoctorStatusRest), modifier = Modifier.fillMaxWidth().testTag("ed-banner-${interp.kind.name.lowercase()}")) {
@@ -841,7 +850,7 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
         }
         item { CareContinuesBox() }
         if (r != null) item { Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            OutlinedButton(onClick = onCard, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Icon(Icons.Default.QrCode, null); Spacer(Modifier.width(6.dp)); Text(t("Wallet card", "वॉलेट कार्ड")) }
+            OutlinedButton(onClick = onCard, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Icon(Icons.Default.QrCode, null); Spacer(Modifier.width(6.dp)); Text(t("Pocket emergency card", "जेब में रखने का आपातकालीन कार्ड")) }
             OutlinedButton(onClick = onShare, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Icon(Icons.Default.Share, null); Spacer(Modifier.width(6.dp)); Text(t("Share PDF", "PDF साझा करें")) }
         } }
     }
@@ -887,7 +896,7 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
     val withdrawnPending = state.tokens.count { it.patientId == patientId && !it.live && it.pending }
     LaunchedEffect(active?.id) { active?.let { onViewed(it.id) } }
     LazyColumn(Modifier.fillMaxSize().testTag("wallet-card"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { PlanHeader(t("Wallet card", "वॉलेट कार्ड"), onBack, "wallet-header") }
+        item { PlanHeader(t("Pocket emergency card", "जेब में रखने का आपातकालीन कार्ड"), onBack, "wallet-header") }
         if (withdrawnPending > 0) item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().testTag("card-revoke-pending")) { Text(t("Old QR may still open until the phone is online.", "फ़ोन ऑनलाइन होने तक पुराना QR खुल सकता है।"), Modifier.padding(12.dp)) } }
         if (active == null || token == null) item { Column(Modifier.fillMaxWidth().padding(vertical = 32.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Icon(Icons.Default.QrCode, null, Modifier.size(40.dp), tint = DoctorCardSub)
