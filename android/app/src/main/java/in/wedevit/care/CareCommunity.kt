@@ -127,6 +127,8 @@ private const val TELE_MANAS = "14416"
     var justSent by remember { mutableStateOf<String?>(null) }
     var message by remember { mutableStateOf<CommunityCopy?>(null) }
     var offlineSaved by remember { mutableStateOf(false) }
+    // Signed in while the server community is not switched on: say plainly the words stay on this phone for now.
+    var keptOnPhone by remember { mutableStateOf(false) }
     var reportTarget by remember { mutableStateOf<Pair<String, String>?>(null) }
     var removeTarget by remember { mutableStateOf<Pair<String, String>?>(null) }
     var askSignIn by remember { mutableStateOf(false) }
@@ -152,11 +154,29 @@ private const val TELE_MANAS = "14416"
         store.flush(accountId) { cloud.communitySend(it) }
         pending = store.pending(accountId)
     }
+    /** Once the server answers, sends what was written while it was not switched on (same ids, so a retry is harmless). Unsent items stay. */
+    suspend fun uploadKept(): Boolean {
+        if (cloud == null || accountId == null) return false
+        val kept = store.local(accountId)
+        if (kept.items.isEmpty()) return false
+        if (home?.myName == null && kept.name != null) runCatching { cloud.communitySetName(kept.name) }
+        val left = kept.items.sortedBy { it.savedAt }.toMutableList()
+        while (left.isNotEmpty()) {
+            try { cloud.communitySend(left.first()); left.removeAt(0) }
+            catch (cancel: CancellationException) { throw cancel }
+            catch (_: Exception) { break }
+        }
+        val next = kept.copy(items = left); localState = next; store.saveLocal(accountId, next)
+        return left.size < kept.items.size
+    }
     fun loadHome() {
         if (cloud == null || accountId == null) return
         scope.launch {
             loading = true
-            try { flushOutbox(); home = cloud.communityHome(); homeError = null; serverMissing = false }
+            try {
+                flushOutbox(); home = cloud.communityHome(); homeError = null; serverMissing = false
+                if (uploadKept()) home = cloud.communityHome()
+            }
             catch (cancel: CancellationException) { throw cancel }
             catch (error: Exception) { if (error.isMissingServerFeature()) serverMissing = true else homeError = CommunityRules.serverMessage(error) }
             finally { loading = false }
@@ -276,7 +296,7 @@ private const val TELE_MANAS = "14416"
                         else if (local) {
                             val id = UUID.randomUUID().toString()
                             saveLocal(CommunityLocal.add(localState, CommunityPending(id, accountId, CommunityPending.REPLY, postId, text.trim(), System.currentTimeMillis())))
-                            justSent = id; done()
+                            justSent = id; keptOnPhone = true; done()
                         } else send(CommunityPending(UUID.randomUUID().toString(), accountId, CommunityPending.REPLY, postId, text.trim(), System.currentTimeMillis()), feedId, done) },
                     onReport = { kind, id -> if (!needsAccount()) reportTarget = kind to id },
                     onRemove = { kind, id -> removeTarget = kind to id },
@@ -296,7 +316,7 @@ private const val TELE_MANAS = "14416"
                             val id = UUID.randomUUID().toString()
                             val named = if (myName == null) localState.copy(name = nameDraft.trim()) else localState
                             saveLocal(CommunityLocal.add(named, CommunityPending(id, accountId, CommunityPending.POST, groupId, draft.trim(), System.currentTimeMillis())))
-                            justSent = id; draft = ""; route = "group:$groupId"
+                            justSent = id; keptOnPhone = true; draft = ""; route = "group:$groupId"
                         }
                         else send(CommunityPending(UUID.randomUUID().toString(), accountId, CommunityPending.POST, groupId, draft.trim(), System.currentTimeMillis()), groupId) { draft = ""; route = "group:$groupId" }
                     })
@@ -308,13 +328,16 @@ private const val TELE_MANAS = "14416"
     if (offlineSaved) SaharaDialog(t("You're offline", "आप ऑफ़लाइन हैं"), onDismiss = { offlineSaved = false },
         text = t("Your words are saved on this phone. They will be sent when you're online and open Community.", "आपके शब्द इस फ़ोन में सुरक्षित हैं। इंटरनेट आने पर समुदाय खोलते ही भेज दिए जाएँगे।"),
         tone = SaharaTone.Warning, icon = Icons.Default.CloudOff, confirmLabel = t("Close", "बंद करें"), modifier = Modifier.testTag("community-offline-dialog"))
+    if (keptOnPhone) SaharaDialog(t("Saved on this phone", "इस फ़ोन में सहेजा गया"), onDismiss = { keptOnPhone = false },
+        text = t("The shared community is not open yet. Others will see this once it opens; it will be sent then.", "साझा समुदाय अभी खुला नहीं है। खुलते ही यह भेज दिया जाएगा और दूसरों को दिखेगा।"),
+        tone = SaharaTone.Info, icon = Icons.Default.CloudOff, confirmLabel = t("Close", "बंद करें"), modifier = Modifier.testTag("community-kept-dialog"))
     if (askSignIn) SaharaDialog(t("Join the community", "समुदाय से जुड़ें"), onDismiss = { askSignIn = false },
         text = t("Sign in or create an account to join groups, post and reply. Others see only the name you choose.", "समूहों से जुड़ने, पोस्ट और जवाब लिखने के लिए साइन इन करें या खाता बनाएँ। दूसरों को सिर्फ़ आपका चुना हुआ नाम दिखेगा।"),
         tone = SaharaTone.Teal, icon = Icons.Default.Forum, confirmLabel = t("Sign in or create an account", "साइन इन करें या खाता बनाएँ"), onConfirm = { askSignIn = false; onAccount() },
         dismissLabel = t("Not now", "अभी नहीं"), modifier = Modifier.testTag("community-sign-in-dialog"))
     if (editingName) CommunityNameDialog(myName ?: nameDraft, onDismiss = { editingName = false }, onSave = ::saveName)
     reportTarget?.let { (kind, id) ->
-        CommunityReportDialog(kind, onDismiss = { reportTarget = null }, onReport = { reason ->
+        CommunityReportDialog(kind, kept = local, onDismiss = { reportTarget = null }, onReport = { reason ->
             reportTarget = null
             val feedId = if (route == SAVED_ROUTE) CommunityRules.SAVED else route.substringAfter(":")
             if (local) saveLocal(CommunityLocal.report(localState, id))
@@ -515,7 +538,7 @@ private fun LazyListScope.communityTiles(groups: List<CommunityGroup>, onOpen: (
                 }
             }
             if (!savedList) item { CommunityGuideline(groupId) }
-            if (groupId == "grief-loss") item { CommunityHelpCard() }
+            if (!savedList) item { CommunityHelpCard() }
             if (error != null) item { CommunityNotice(error, onRetry) }
             if (feed == null && error == null && loading) item { SaharaInlineLoading(t("Loading…", "खुल रहा है…")) }
             if (feed != null && posts.isEmpty() && savedList) item {
@@ -738,6 +761,7 @@ private fun authorTone(name: String, byTeam: Boolean): SaharaTone = if (byTeam) 
                     supportingText = { Text("${text.trim().length} / ${CommunityRules.POST_MAX}") },
                     colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = SaharaColors.Primary, focusedLabelColor = SaharaColors.PrimaryPressed, cursorColor = SaharaColors.Primary))
             }
+            item { CommunityHelpCard() }
         }
         SaharaPrimaryButton(t("Share post", "पोस्ट भेजें"), onClick = onPost, busy = sending, icon = Icons.AutoMirrored.Filled.Send,
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp).testTag("community-post-send"))
@@ -760,14 +784,15 @@ private fun authorTone(name: String, byTeam: Boolean): SaharaTone = if (byTeam) 
         modifier = Modifier.testTag("community-name-dialog"))
 }
 
-@Composable private fun CommunityReportDialog(kind: String, onDismiss: () -> Unit, onReport: (String) -> Unit) {
+@Composable private fun CommunityReportDialog(kind: String, kept: Boolean, onDismiss: () -> Unit, onReport: (String) -> Unit) {
     val t = careText()
     var reason by rememberSaveable { mutableStateOf(CommunityRules.reportReasons.first().first) }
     AlertDialog(onDismissRequest = onDismiss, containerColor = SaharaColors.Surface, shape = RoundedCornerShape(SaharaRadius.Hero), icon = { SaharaIconChip(Icons.Default.Flag, SaharaTone.Rust, size = 48) },
         title = { Text(if (kind == "post") t("Report this post", "इस पोस्ट की रिपोर्ट करें") else t("Report this reply", "इस जवाब की रिपोर्ट करें")) },
         text = {
             Column(Modifier.selectableGroup()) {
-                Text(t("The Sahara team will look at it. The writer isn't told who reported.", "Sahara टीम इसे देखेगी। लिखने वाले को नहीं बताया जाएगा कि रिपोर्ट किसने की।"), style = communityBody(), color = SaharaColors.InkSub)
+                Text(if (kept) t("It will be hidden for you. The shared community is not open yet, so the Sahara team won't see this report.", "यह आपके लिए छिप जाएगा। साझा समुदाय अभी खुला नहीं है, इसलिए Sahara टीम यह रिपोर्ट नहीं देखेगी।")
+                    else t("The Sahara team will look at it. The writer isn't told who reported.", "Sahara टीम इसे देखेगी। लिखने वाले को नहीं बताया जाएगा कि रिपोर्ट किसने की।"), style = communityBody(), color = SaharaColors.InkSub)
                 Spacer(Modifier.height(8.dp))
                 CommunityRules.reportReasons.forEach { (key, label) ->
                     Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).selectable(selected = reason == key, onClick = { reason = key }, role = Role.RadioButton).testTag("community-report-$key"),

@@ -25,7 +25,7 @@ The app's Community works without the server: anyone can read the groups; signin
   ```
   Their posts and replies then show the "Sahara team" badge.
 - [ ] **4. Confirm the groups with the doctors** (Sujay, Sharada, Shirin): Family carers, Living with cancer, Grief and loss, Ask the care team, and their one-line descriptions. They are rows in `public.community_groups`; set `active = false` to close one. The same four are built into the app, so tell Basith if a name changes.
-- [ ] **5. Phone check:** signed out, open Community: groups readable, "Sign in or create an account to join" opens the account screen. Signed in: join a group (it moves to "Your groups"), post, reply, save a post, change your name; sign in as a second account and see the first account's post.
+- [ ] **5. Phone check:** signed out, open Community: the 4 groups show (example posts only in Practice), "Sign in or create an account to join" opens the account screen. Signed in: join a group (it moves to "Your groups"), post, reply, save a post, change your name; sign in as a second account and see the first account's post.
 
 The help card (Tele-MANAS 14416, free, 24 hours; 112 for emergencies) opens the phone's dialler; it never calls by itself.
 
