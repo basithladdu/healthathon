@@ -314,6 +314,8 @@ private fun connectedTopicLabel(status: WorkflowTopicStatus, t: (String, String)
             SaharaSectionHeader(t("More for this patient", "इस मरीज़ के लिए और"), Modifier.padding(top = 4.dp), tone = DoctorTones.Indigo, icon = Icons.Default.MoreHoriz)
             Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().saharaAppear()) {
                 Column {
+                    DoctorPlainRoute(Icons.Default.Today, t("Care today", "आज की देखभाल"), { onSection("Today") }, "doctor-shared-today")
+                    HorizontalDivider(Modifier.padding(start = 56.dp), color = DoctorHairline)
                     DoctorPlainRoute(Icons.Default.Apps, t("Daily care", "रोज़ की देखभाल"), { onSection("Tools") }, "doctor-shared-tools")
                     HorizontalDivider(Modifier.padding(start = 56.dp), color = DoctorHairline)
                     DoctorPlainRoute(Icons.Default.Lock, t("Sharing & access", "साझा करना और पहुँच"), { onSection("Shared") }, "doctor-shared-access")

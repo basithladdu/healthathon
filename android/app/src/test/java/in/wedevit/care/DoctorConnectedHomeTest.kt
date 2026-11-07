@@ -82,4 +82,19 @@ class DoctorConnectedHomeTest {
         assertNull(doctorPatientStatus(asha, listOf(item("g", asha, "checkin", created = now - 86_400_000)), now, false, zone))
         assertNull(doctorPatientStatus(asha, listOf(item("old", asha, "checkin", created = now - 9 * 86_400_000)), now, false, zone))
     }
+
+    @Test fun onlyAnApprovedDoctorIsWarnedBeforeSendingDetailsAgain() {
+        assertTrue(clinicianResubmitNeedsWarning("approved"))
+        listOf(null, "pending", "rejected", "suspended").forEach { assertFalse(clinicianResubmitNeedsWarning(it)) }
+    }
+
+    @Test fun newerSymptomNoteNeitherHidesHardDayNorCountsAsCheckIn() {
+        val symptom = SymptomNoteCodec.encode(SymptomNote(symptom = "Pain", rating = 8))
+        val rows = listOf(item("hard", asha, "checkin", "A hard day", created = now - 86_400_000),
+            item("pain", asha, "checkin", "Pain · Severe", created = now - 3_600_000, detail = symptom),
+            item("ravi-pain", ravi, "checkin", "Pain · Severe", created = now - 3_600_000, detail = symptom))
+        assertEquals("Hard day", doctorPatientStatus(asha, rows, now, false, zone)?.first)
+        assertEquals(listOf("hard"), DoctorConnectedHome.recentCheckIns(people, rows, now).map { it.second.id })
+        assertEquals(listOf("hard"), doctorCheckIns(rows, asha.id, now).map { it.id })
+    }
 }

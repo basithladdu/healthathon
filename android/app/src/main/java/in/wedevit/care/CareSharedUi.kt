@@ -35,6 +35,9 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
+/** An approved clinician who sends their details again goes back to pending on the server and loses patient access until re-approved. */
+internal fun clinicianResubmitNeedsWarning(status: String?) = status == "approved"
+
 /** Real account records only. The separate doctor walkthrough is unchanged. */
 @Composable fun CareSharedWorkspace(vm: CareModel, onAccount: () -> Unit, onClose: () -> Unit, embedded: Boolean = false, onBusyChange: (Boolean) -> Unit = {}) { val t = careText();
     val cloud = vm.cloud
@@ -96,7 +99,15 @@ import kotlinx.coroutines.launch
                         CareField(name, { name = it.take(100) }, t("Registered name", "रजिस्टर्ड नाम"), singleLine = true)
                         CareField(council, { council = it.take(160) }, t("Medical council", "मेडिकल काउंसिल"), singleLine = true)
                         CareField(registration, { registration = it.take(80) }, t("Registration number", "रजिस्ट्रेशन नंबर"), singleLine = true)
-                        Button(onClick = { run { cloud.requestClinician(name, council, registration); refresh(); notice = t("Request received. Verification is pending.", "अनुरोध मिल गया। पुष्टि बाक़ी है।") } }, enabled = !busy && name.isNotBlank() && council.length >= 2 && registration.length >= 2, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(t("Submit", "भेजें")) }
+                        val submit = { run { cloud.requestClinician(name, council, registration); refresh(); notice = t("Request received. Verification is pending.", "अनुरोध मिल गया। पुष्टि बाक़ी है।") } }
+                        // The server puts any re-submission back to pending, and patient access needs "approved": say so first.
+                        var confirmResubmit by remember { mutableStateOf(false) }
+                        if (confirmResubmit) AlertDialog(onDismissRequest = { confirmResubmit = false }, containerColor = Paper, modifier = Modifier.testTag("clinician-resubmit-dialog"),
+                            title = { Text(t("Send details for a new check?", "नई जाँच के लिए विवरण भेजें?"), fontWeight = FontWeight.Bold) },
+                            text = { Text(t("You are verified now. Sending your details again starts a new check, and you cannot open any patient until the Sahara team approves you again.", "आप अभी पुष्ट हैं। विवरण दोबारा भेजने पर नई जाँच शुरू होगी, और Sahara टीम की दोबारा मंज़ूरी तक आप किसी मरीज़ को नहीं खोल पाएँगे।"), fontSize = 16.sp, color = DoctorCardInk) },
+                            confirmButton = { Button(onClick = { confirmResubmit = false; submit() }, enabled = !busy, shape = RoundedCornerShape(12.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("clinician-resubmit-confirm")) { Text(t("Send for new check", "नई जाँच के लिए भेजें"), fontWeight = FontWeight.Bold) } },
+                            dismissButton = { TextButton(onClick = { confirmResubmit = false }, modifier = Modifier.heightIn(min = 48.dp).testTag("clinician-resubmit-cancel")) { Text(t("Cancel", "रद्द करें"), color = RustText) } })
+                        Button(onClick = { if (clinicianResubmitNeedsWarning(profile?.status)) confirmResubmit = true else submit() }, enabled = !busy && name.isNotBlank() && council.length >= 2 && registration.length >= 2, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(t("Submit", "भेजें")) }
                     }
                 } }
                 if (verifier) item { CareClinicianReviewPanel(cloud) }

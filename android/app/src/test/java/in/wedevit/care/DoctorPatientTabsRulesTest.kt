@@ -20,6 +20,12 @@ class DoctorPatientTabsRulesTest {
         assertEquals("Medicines", doctorContentSection("Medicines"))
     }
 
+    @Test fun careTodayHasItsOwnRouteAndTitle() {
+        assertEquals("Today", doctorContentSection("Today"))
+        assertEquals("Care today", doctorMoreSections.single { it.section == "Today" }.en)
+        assertTrue(doctorPatientTabs.none { it.section == "Today" })
+    }
+
     @Test fun unknownRangeFallsBackToAll() {
         assertEquals(DoctorTrendRange.ALL, DoctorTrendRange.of("nonsense"))
         assertEquals(DoctorTrendRange.MONTH_1, DoctorTrendRange.of("MONTH_1"))
