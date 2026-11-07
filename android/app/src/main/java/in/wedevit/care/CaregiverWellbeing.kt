@@ -6,6 +6,9 @@ import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.animation.animateContentSize
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -150,7 +153,7 @@ private val zbiAnswerHi = listOf("कभी नहीं", "शायद ही 
                     Modifier.fillMaxWidth().testTag("wellbeing-start"), tone = SaharaTone.Teal)
             }
 
-            if (flagged && !checking) CaregiverSupportCard(hindi = hindi)
+            if (!checking) CaregiverSupportCard(hindi = hindi, flagged = flagged)
 
             // Private journal
             Text(t("How are you feeling about caring for $personName?", "$personName की देखभाल को लेकर आप कैसा महसूस कर रहे हैं?"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
@@ -205,19 +208,26 @@ private val zbiAnswerHi = listOf("कभी नहीं", "शायद ही 
 }
 
 /** The calm red flag: "You're carrying a lot", with a counsellor, respite care and caregiver support groups. */
-@Composable fun CaregiverSupportCard(hindi: Boolean) {
+@Composable fun CaregiverSupportCard(hindi: Boolean, flagged: Boolean = true) {
     val t = careText(); val context = LocalContext.current
-    Surface(shape = RoundedCornerShape(16.dp), color = SaharaTone.Error.wash, border = BorderStroke(1.5.dp, SaharaTone.Error.solid), modifier = Modifier.fillMaxWidth().testTag("caregiver-flag")) {
+    // Always on the family home: calm and folded when the check is fine, open and flagged when it is high or rising.
+    var open by remember(flagged) { mutableStateOf(flagged) }
+    Surface(shape = RoundedCornerShape(16.dp), color = if (flagged) SaharaTone.Error.wash else SaharaTone.Teal.wash, border = BorderStroke(1.5.dp, if (flagged) SaharaTone.Error.solid else SaharaTone.Teal.solid), modifier = Modifier.fillMaxWidth().animateContentSize().testTag(if (flagged) "caregiver-flag" else "caregiver-support")) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(t("You're carrying a lot", "आप बहुत कुछ उठा रहे हैं"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
-            Text(t("Many family caregivers feel this way. It is not a failing, and help is there. This check is a screening, not a diagnosis.",
+            Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable { open = !open }, verticalAlignment = Alignment.CenterVertically) {
+                Text(if (flagged) t("You're carrying a lot", "आप बहुत कुछ उठा रहे हैं") else t("Support for you", "आपके लिए मदद"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
+                Icon(if (open) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, tint = DoctorCardInk)
+            }
+            if (!open) Text(t("Psychiatrists and counsellors, respite care and caregiver support groups.", "मनोचिकित्सक और काउंसलर, आराम के लिए देखभाल और देखभालकर्ता सहायता समूह।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
+            if (open) {
+            if (flagged) Text(t("Many family caregivers feel this way. It is not a failing, and help is there. This check is a screening, not a diagnosis.",
                 "कई परिवारजन ऐसा ही महसूस करते हैं। यह कोई कमी नहीं है, और मदद उपलब्ध है। यह जाँच सिर्फ़ एक शुरुआती संकेत है, निदान नहीं।"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk)
 
-            Text(t("Talk to a counsellor", "किसी काउंसलर से बात करें"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+            Text(t("Talk to a psychiatrist or counsellor", "मनोचिकित्सक या काउंसलर से बात करें"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
             Text(t("Tele-MANAS is free, day and night.", "टेली-मानस मुफ़्त है, दिन-रात।"), fontSize = 14.sp, color = DoctorCardSub)
             SaharaPrimaryButton(t("Call Tele-MANAS 14416", "टेली-मानस 14416 पर कॉल करें"), { open(context, Intent(Intent.ACTION_DIAL, Uri.parse(NearbyHelp.dialUri(CaregiverWellbeingRules.TELE_MANAS_NUMBER)))) },
                 Modifier.fillMaxWidth().testTag("caregiver-flag-call"), icon = Icons.Default.Call, tone = SaharaTone.Indigo)
-            SaharaSecondaryButton(t("Find a counsellor nearby", "पास में काउंसलर खोजें"), { open(context, Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q=" + Uri.encode(CaregiverWellbeingRules.MAPS_QUERY)))) },
+            SaharaSecondaryButton(t("Find a psychiatrist or counsellor nearby", "पास में मनोचिकित्सक या काउंसलर खोजें"), { open(context, Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q=" + Uri.encode(CaregiverWellbeingRules.MAPS_QUERY)))) },
                 Modifier.fillMaxWidth().testTag("caregiver-flag-nearby"), icon = Icons.Default.LocationOn, tone = SaharaTone.Indigo)
 
             Text(t("Respite care", "कुछ समय का आराम (रेस्पाइट केयर)"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
@@ -230,6 +240,7 @@ private val zbiAnswerHi = listOf("कभी नहीं", "शायद ही 
             SaharaSecondaryButton(t("SoulUp caregiving support group", "सोलअप देखभाल सहायता समूह"), { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(CaregiverWellbeingRules.SUPPORT_GROUP_SOULUP))) },
                 Modifier.fillMaxWidth().testTag("caregiver-flag-soulup"), icon = Icons.Default.OpenInNew, tone = SaharaTone.Teal)
             Text(t("These open in your browser. In an emergency, call 112.", "ये आपके ब्राउज़र में खुलते हैं। आपात स्थिति में 112 पर कॉल करें।"), fontSize = 14.sp, color = DoctorCardSub)
+            }
         }
     }
 }
