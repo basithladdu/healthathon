@@ -11,6 +11,7 @@ import { CareToday, CareTodayGreeting } from './care-today';
 import type { CareCheck, CareEvent } from './care-calendar-state';
 import type { Appointment } from './appointments-page';
 import type { FamilyTask } from './family-care-state';
+import { CaregiverWellbeingCard, FamilyDistressCard } from './caregiver-wellbeing';
 import './family-care-home.css';
 import { careLocale, careText, type CareLang } from './care-i18n';
 
@@ -107,6 +108,10 @@ export function FamilyCareHome({ patientName, lang, signedCareNote, patientId, t
       </CareRouteLink>)}
     </nav>
     <CareToday patientId={patientId} today={today} currentTime={currentTime} author={author} role={role} events={events} checks={checks} onMedicineTaken={onMedicineTaken} lang={lang} />
+    {isFamily && <div className="family-care-home-wellbeing">
+      <FamilyDistressCard patientId={patientId} author={author} today={today} lang={lang} />
+      <CaregiverWellbeingCard patientId={patientId} personName={patientName} author={author} today={today} lang={lang} />
+    </div>}
     <section className="care-home-quick-section" aria-labelledby={`${id}-quick-title`}>
       <h2 id={`${id}-quick-title`}>{t('Quick access', 'जल्दी खोलें')}</h2>
       <div className="care-home-quick-grid">

@@ -1,0 +1,52 @@
+.caregiver-wellbeing { display: grid; gap: 12px; margin: 0 0 16px; padding: 16px; border-radius: 20px; background: var(--care-sage, #e3f1ea); color: var(--care-ink, #382e29); }
+.caregiver-wellbeing.caregiver-distress { background: var(--care-lavender, #ece3fb); }
+.caregiver-wellbeing > header { display: flex; align-items: center; gap: 12px; }
+.caregiver-wellbeing h2 { margin: 0; font-size: 19px; font-weight: 500; line-height: 1.3; }
+.caregiver-wellbeing p { margin: 0; font-size: 16px; line-height: 1.5; }
+.caregiver-wellbeing p.caregiver-sub, .caregiver-sub { font-size: 14px; color: var(--care-muted, #76675d); }
+.caregiver-source { font-size: 12px !important; line-height: 1.4 !important; color: var(--care-muted, #76675d); }
+.caregiver-heart { display: inline-grid; place-items: center; flex: none; width: 44px; height: 44px; border-radius: 50%; background: #fff; color: #2f7a63; font-size: 22px; }
+.caregiver-pill { width: fit-content; padding: 4px 10px; border-radius: 999px; background: #fff; font-size: 14px !important; font-weight: 600; }
+.caregiver-primary, .caregiver-secondary { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; width: 100%; min-height: 48px; padding: 10px 16px; border-radius: 14px; font: inherit; font-weight: 600; text-align: center; text-decoration: none; cursor: pointer; }
+.caregiver-primary { border: 1px solid #2f7a63; background: #2f7a63; color: #fff; }
+.caregiver-primary:disabled { opacity: .5; cursor: not-allowed; }
+.caregiver-secondary { border: 1.5px solid #2f7a63; background: #fff; color: var(--care-ink, #382e29); }
+.caregiver-text-button { min-height: 48px; border: 0; background: none; color: var(--care-primary, #b9472c); font: inherit; cursor: pointer; }
+.caregiver-wellbeing :is(button, a, textarea):focus-visible { outline: 3px solid var(--care-focus, #1f5fbf); outline-offset: 2px; }
+.caregiver-check { display: grid; gap: 10px; }
+.caregiver-check fieldset { display: grid; gap: 6px; min-width: 0; margin: 0; padding: 0; border: 0; }
+.caregiver-check legend { padding: 0; margin-bottom: 6px; font-size: 16px; line-height: 1.4; }
+.caregiver-choices { display: flex; flex-wrap: wrap; gap: 6px; }
+.caregiver-choices button { min-height: 48px; padding: 8px 14px; border: 1.5px solid #2f7a63; border-radius: 999px; background: #fff; color: inherit; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.caregiver-choices button[aria-pressed='true'] { background: #2f7a63; color: #fff; }
+.caregiver-trend-bars { display: flex; align-items: flex-end; gap: 6px; height: 48px; }
+.caregiver-trend-bars span { flex: 1; border-radius: 6px; background: #2f7a63; }
+.caregiver-trend-bars span.is-high { background: #b9472c; }
+.caregiver-journal { display: grid; gap: 10px; }
+.caregiver-journal textarea { width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid var(--care-line-strong, #c9b8a8); border-radius: 12px; background: #fff; font: inherit; resize: vertical; }
+.caregiver-note { padding: 12px; border-radius: 14px; background: #fff; }
+.caregiver-note time { display: block; font-size: 13px; color: var(--care-muted, #76675d); }
+.caregiver-support { display: grid; gap: 10px; padding: 14px; border: 1.5px solid #2f7a63; border-radius: 16px; background: #f1f8f4; }
+.caregiver-support.is-flagged { border-color: #b3261e; background: #fbeceb; }
+.caregiver-support h3 { margin: 0; }
+.caregiver-support h3 button { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; min-height: 48px; padding: 0; border: 0; background: none; color: inherit; font: inherit; font-size: 19px; font-weight: 500; text-align: left; cursor: pointer; }
+.caregiver-support h4 { margin: 4px 0 0; font-size: 16px; font-weight: 600; }
+.caregiver-support-body { display: grid; gap: 10px; }
+.caregiver-you-matter { display: grid; justify-items: center; gap: 14px; max-width: 520px; margin: 24px auto; padding: 28px 20px; border-radius: 20px; background: var(--care-honey, #fff3dc); color: var(--care-ink, #382e29); text-align: center; }
+.caregiver-you-matter h2 { margin: 0; font-size: 26px; font-weight: 500; line-height: 1.25; }
+.caregiver-you-matter p { margin: 0; font-size: 17px; line-height: 1.5; }
+.caregiver-you-matter .caregiver-heart { width: 72px; height: 72px; font-size: 36px; }
+.distress-row-wrap { display: grid; gap: 4px; }
+.distress-row { display: flex; gap: 2px; width: 100%; }
+.distress-row button { flex: 1 1 0; min-width: 0; min-height: 48px; padding: 0; border: 0; background: none; cursor: pointer; display: grid; place-items: center; }
+.distress-row button span { display: grid; place-items: center; width: 100%; aspect-ratio: 1; border: 2px solid var(--distress); border-radius: 50%; background: #fff; color: var(--care-ink, #382e29); font-size: 14px; font-weight: 700; line-height: 1; transition: background .15s ease; }
+.distress-row button.is-chosen span { background: var(--distress); color: #fff; }
+.distress-row button:focus-visible { outline: 3px solid var(--care-focus, #1f5fbf); outline-offset: 1px; border-radius: 8px; }
+.distress-ends { display: flex; justify-content: space-between; font-size: 14px; color: var(--care-muted, #76675d); }
+.distress-bar { height: 10px; border-radius: 999px; background: #fff; overflow: hidden; }
+.distress-bar span { display: block; height: 100%; border-radius: 999px; }
+.distress-tile { display: grid; gap: 10px; margin: 0 0 16px; padding: 16px; border: 1px solid var(--care-line, #e5d6c8); border-radius: 18px; background: var(--care-surface-2, #fff9f2); color: var(--care-ink, #382e29); }
+.distress-tile h2 { margin: 0; font-size: 17px; font-weight: 700; }
+.distress-tile p { margin: 0; font-size: 14px; line-height: 1.5; }
+.distress-tile .distress-source { font-size: 12px; color: var(--care-muted, #76675d); }
+@media (prefers-reduced-motion: reduce) { .distress-row button span { transition: none; } }

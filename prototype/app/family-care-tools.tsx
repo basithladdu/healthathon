@@ -31,8 +31,8 @@ import { CareRouteLink } from './care-route-link';
 import { careText, type CareLang } from './care-i18n';
 
 export type FamilyTool = 'symptom-diary' | 'care-story' | 'doctor-pack' | 'home-help' | 'support-places' | 'open-questions' | 'copy-tracker' | 'voice-journal' | 'cancer-overview' | 'cost-help' | 'lab-history';
-export function FamilyCareTools({ tool, patientId, patientName, author, today, lang, symptoms, story, recordedStory, contacts, knownContacts, homeHelp, supportPlaces, questions, copies, releases, voiceJournal, onVoiceJournal, voiceSave, costs, onCosts, labResults, onLabResults, treatmentEvents, acknowledgements = [], signedRelease, diagnosis, team, reports, onOpen, onCareNote, onReports, onReadReport, onSymptoms, onStory, onContacts, onHomeHelp, onSupportPlaces, onQuestions, onCopies, note, calendarText, reportNames }: {
-  tool: FamilyTool; patientId: string; patientName: string; author: string; today: string; lang: CareLang;
+export function FamilyCareTools({ role, tool, patientId, patientName, author, today, lang, symptoms, story, recordedStory, contacts, knownContacts, homeHelp, supportPlaces, questions, copies, releases, voiceJournal, onVoiceJournal, voiceSave, costs, onCosts, labResults, onLabResults, treatmentEvents, acknowledgements = [], signedRelease, diagnosis, team, reports, onOpen, onCareNote, onReports, onReadReport, onSymptoms, onStory, onContacts, onHomeHelp, onSupportPlaces, onQuestions, onCopies, note, calendarText, reportNames }: {
+  role?: 'patient' | 'family'; tool: FamilyTool; patientId: string; patientName: string; author: string; today: string; lang: CareLang;
   symptoms: SymptomEntry[]; story: CareStoryEntry[]; contacts: HandoverContact[];
   recordedStory?: readonly CareStoryEntry[];
   knownContacts?: readonly HandoverContact[];
@@ -51,7 +51,7 @@ export function FamilyCareTools({ tool, patientId, patientName, author, today, l
   calendarText: string; reportNames: string[];
 }) {
   return <div className="family-care-tools">
-    {tool === 'symptom-diary' && <FamilySymptomDiary key={patientId} patientId={patientId} author={author} today={today} lang={lang} entries={symptoms} onChange={onSymptoms} />}
+    {tool === 'symptom-diary' && <FamilySymptomDiary key={patientId} role={role} patientId={patientId} author={author} today={today} lang={lang} entries={symptoms} onChange={onSymptoms} />}
     {tool === 'care-story' && <FamilyCareStory key={patientId} patientId={patientId} author={author} today={today} lang={lang} entries={story} recordedEntries={recordedStory} reports={reports} onReadReport={onReadReport} onChange={onStory} />}
     {tool === 'doctor-pack' && <FamilyHandoverPack key={patientId} patientId={patientId} patientName={patientName} author={author} lang={lang} note={note} signedRelease={signedRelease} acknowledgements={acknowledgements} calendarText={calendarText} reportNames={reportNames} contacts={contacts} knownContacts={knownContacts} onContactsChange={onContacts} />}
     {tool === 'home-help' && <FamilyHomeHelp key={patientId} patientId={patientId} author={author} today={today} lang={lang} entries={homeHelp} onChange={onHomeHelp} />}

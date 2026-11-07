@@ -5641,7 +5641,7 @@ export function ContinuityPrototype() {
       case 'lab-history': {
         const release = latestReleaseFor(portalPatientId);
         const author = portalAuthor;
-        return <FamilyCareTools tool={view} patientId={portalPatientId} patientName={portalPatientName} author={author} today={careToday} lang={lang}
+        return <FamilyCareTools role={isFamilySession ? 'family' : 'patient'} tool={view} patientId={portalPatientId} patientName={portalPatientName} author={author} today={careToday} lang={lang}
           recordedStory={recordedStoryFor(portalPatientId)} knownContacts={knownContactsFor(portalPatientId)}
           symptoms={canReadCareNote ? symptoms : []} story={canReadCareNote ? careStory : []} contacts={handoverContacts} onSymptoms={setSymptoms} onStory={setCareStory} onContacts={setHandoverContacts}
           homeHelp={homeHelp} supportPlaces={supportPlaces} onHomeHelp={setHomeHelp} onSupportPlaces={setSupportPlaces}

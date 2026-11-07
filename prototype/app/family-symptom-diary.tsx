@@ -8,6 +8,8 @@ import {
   type SymptomEntry, type SymptomRange, type SymptomSeverity, type SymptomRespondent, type SymptomRecall, type SymptomChange, type PainTrigger,
 } from './family-symptom-state';
 import type { CareSaveStatus } from './care-local-store';
+import { CaregiverYouMatter } from './caregiver-wellbeing';
+import { DistressThermometerTile } from './distress-thermometer-tile';
 import './family-symptom-diary.css';
 import { careLocale, careText, type CareLang } from './care-i18n';
 
@@ -19,6 +21,8 @@ export type FamilySymptomDiaryProps = {
   entries: SymptomEntry[];
   onChange: (entries: SymptomEntry[]) => void;
   saveStatus?: CareSaveStatus;
+  /** A family member sees the "You matter" screen once after finishing a symptom session. */
+  role?: 'patient' | 'family';
 };
 
 const symptoms = [
@@ -33,7 +37,7 @@ export function FamilySymptomDiary(props: FamilySymptomDiaryProps) {
   return <SymptomDiaryForPatient key={props.patientId} {...props} />;
 }
 
-function SymptomDiaryForPatient({ patientId, author, today, lang, entries, onChange, saveStatus }: FamilySymptomDiaryProps) {
+function SymptomDiaryForPatient({ patientId, author, today, lang, entries, onChange, saveStatus, role }: FamilySymptomDiaryProps) {
   const id = useId();
   const formRef = useRef<HTMLFormElement>(null);
   const t = (en: string, hi: string) => careText(lang, en, hi);
@@ -55,8 +59,15 @@ function SymptomDiaryForPatient({ patientId, author, today, lang, entries, onCha
   const [removed, setRemoved] = useState<SymptomEntry[]>([]);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  // One session = several symptoms picked, each rated in turn and saved as its own note, then "Add another symptom" or "Done".
+  const [session, setSession] = useState<{ queue: string[]; index: number } | null>(null);
+  const [finished, setFinished] = useState<string[] | null>(null);
+  const [youMatter, setYouMatter] = useState(false);
   const patientEntries = selectSymptomEntries(entries, patientId, today);
   const entryAuthor = entries.find((entry) => entry.id === editingId && entry.patientId === patientId)?.author ?? author;
+  const currentSymptom = session ? session.queue[session.index] : undefined;
+  const detailSymptoms = currentSymptom ? [currentSymptom] : selectedSymptoms;
+  const shownRatings = currentSymptom ? [currentSymptom] : editingId ? selectedSymptoms : [];
   const visibleEntries = selectSymptomEntries(entries, patientId, today, range, filter);
   const knownSymptoms = [...new Set(patientEntries.map((entry) => entry.symptom))].sort();
   const symptomLabel = (value: string) => careText(lang, value, symptoms.find(([name]) => name === value)?.[1] ?? value);
@@ -65,7 +76,7 @@ function SymptomDiaryForPatient({ patientId, author, today, lang, entries, onCha
   function clearForm() {
     setSelectedSymptoms([]); setCustomSymptom(''); setSymptomSeverities({});
     setDate(today); setTime(clockTime()); setStartedOn(''); setNote(''); setEditingId(null); setError('');
-    setOwnChanges({}); setPainLocation(''); setPainTriggers([]);
+    setOwnChanges({}); setPainLocation(''); setPainTriggers([]); setSession(null);
   }
 
   function toggleSymptom(value: string) {
@@ -83,7 +94,7 @@ function SymptomDiaryForPatient({ patientId, author, today, lang, entries, onCha
   function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const recordedAt = new Date().toISOString();
-    const inputs = selectedSymptoms.map((value) => {
+    const inputs = detailSymptoms.map((value) => {
       const input = {
       symptom: value === 'Other' ? customSymptom.trim() : value,
       severity: symptomSeverities[value] as SymptomSeverity,
@@ -118,9 +129,36 @@ function SymptomDiaryForPatient({ patientId, author, today, lang, entries, onCha
       }
     }
     if (updated === entries) { setError(t('This note could not be saved. Try adding it again.', 'यह नोट सेव नहीं हुआ। फिर से जोड़ें।')); return; }
+    if (session && !editingId) {
+      onChange(updated);
+      const doneNames = [...(finished ?? []), inputs[0].symptom];
+      if (session.index + 1 < session.queue.length) {
+        setFinished(doneNames); setSession({ queue: session.queue, index: session.index + 1 });
+        setNote(''); setStartedOn(''); setPainLocation(''); setPainTriggers([]); setOwnChanges({});
+        setMessage(''); setRange('all'); setFilter('');
+      } else {
+        clearForm(); setFinished(doneNames); setRange('all'); setFilter('');
+        setMessage(t(`${doneNames.length} symptom entries added.`, `${doneNames.length} परेशानियों के नोट जुड़ गए।`));
+      }
+      return;
+    }
     onChange(updated);
     setMessage(editingId ? t('Entry updated.', 'नोट बदल गया।') : inputs.length > 1 ? t(`${inputs.length} symptom entries added.`, `${inputs.length} परेशानियों के नोट जुड़ गए।`) : t('Entry added.', 'नोट जुड़ गया।'));
     setRange('all'); setFilter(''); clearForm();
+  }
+
+  function startSession() {
+    const queue = selectedSymptoms.map((value) => (value === 'Other' ? customSymptom.trim() : value)).filter(Boolean);
+    if (!queue.length || new Set(queue.map((value) => value.toLowerCase())).size !== queue.length) {
+      setError(t('Choose what is bothering you, or write it in 80 characters or fewer.', 'परेशानी चुनें, या 80 अक्षरों तक में लिखें।')); return;
+    }
+    setError(''); setFinished([]); setSession({ queue, index: 0 });
+    // Other is rated under its typed name from here on.
+    setSelectedSymptoms(queue); setSymptomSeverities((previous) => {
+      const renamed: Partial<Record<string, SymptomSeverity>> = {};
+      for (const [from, to] of selectedSymptoms.map((value, i) => [value, queue[i]] as const)) if (to !== undefined && previous[from] !== undefined) renamed[to] = previous[from];
+      return renamed;
+    });
   }
 
   function edit(entry: SymptomEntry) {
@@ -158,19 +196,42 @@ function SymptomDiaryForPatient({ patientId, author, today, lang, entries, onCha
     setMessage(t('Your notes are ready to download.', 'आपके नोट डाउनलोड के लिए तैयार हैं।'));
   }
 
+  const sessionDone = !session && !editingId && finished !== null && finished.length > 0;
+  function finishSession() {
+    const savedCount = finished?.length ?? 0;
+    setFinished(null); clearForm();
+    if (role === 'family' && savedCount > 0) setYouMatter(true);
+  }
+  if (youMatter) return <section className="family-symptom-diary" aria-label={t('You matter too', 'आप भी मायने रखते हैं')}>
+    <CaregiverYouMatter lang={lang} onDone={() => setYouMatter(false)}
+      onCheck={() => { setYouMatter(false); setMessage(t('Your wellbeing check is on the home page.', 'आपकी सेहत की जाँच होम पेज पर है।')); }} />
+  </section>;
+
   return <section className="family-symptom-diary" aria-labelledby={`${id}-title`}>
     <div className="family-workspace-heading"><h1 id={`${id}-title`}>{t('How are you feeling?', 'तबीयत कैसी है?')}</h1>{patientEntries.length > 0 && <button type="button" className="secondary-button" onClick={download}>{t('Save a copy', 'कॉपी डाउनलोड करें')}</button>}</div>
+    <DistressThermometerTile patientId={patientId} today={today} lang={lang} />
     <div className="symptom-diary-layout">
-      <form ref={formRef} tabIndex={-1} className="symptom-diary-form" onSubmit={save} aria-label={t(editingId ? 'Edit your note' : 'Add a feeling note', editingId ? 'अपना नोट बदलें' : 'तबीयत का नोट जोड़ें')}>
+      {sessionDone ? <section className="symptom-diary-form symptom-session-finished" data-testid="symptom-session-finished" aria-labelledby={`${id}-saved`}>
+        <h2 id={`${id}-saved`}>{t('Saved', 'सहेजा गया')}</h2>
+        <ul>{finished.map((name) => <li key={name}>✓ {symptomLabel(name)}</li>)}</ul>
+        <p>{t('Anything else to note?', 'कुछ और लिखना है?')}</p>
+        <div className="symptom-form-actions">
+          <button type="button" className="secondary-button" onClick={() => { setFinished(null); clearForm(); }} data-testid="symptom-session-add">{t('Add another symptom', 'एक और लक्षण जोड़ें')}</button>
+          <button type="button" className="primary-button" onClick={finishSession} data-testid="symptom-session-done">{t('Done', 'हो गया')}</button>
+        </div>
+      </section> : <form ref={formRef} tabIndex={-1} className="symptom-diary-form" onSubmit={save} aria-label={t(editingId ? 'Edit your note' : 'Add a feeling note', editingId ? 'अपना नोट बदलें' : 'तबीयत का नोट जोड़ें')}>
         <h2>{t(editingId ? 'Edit your note' : 'Add a note', editingId ? 'अपना नोट बदलें' : 'नोट जोड़ें')}</h2>
+        {currentSymptom && session && session.queue.length > 1 && <p className="symptom-session-step" data-testid="symptom-step-indicator" aria-live="polite"><strong>{currentSymptom === 'Other' ? customSymptom : symptomLabel(currentSymptom)}</strong> · {session.index + 1} {t('of', '/')} {session.queue.length}</p>}
+        {!session && <>
         <fieldset><legend>{t('Who is describing this?', 'यह किसने बताया?')}</legend><div className="symptom-choices">{(['patient', 'assisted-patient', 'caregiver', 'clinician'] as const).map((value) => <button key={value} type="button" aria-pressed={respondent === value} onClick={() => { setRespondent(value); setOwnChanges({}); }}>{symptomRespondentText(value, lang)}</button>)}</div></fieldset>
         <fieldset><legend>{t('Which time are you describing?', 'किस समय की बात है?')}</legend><div className="symptom-choices">{(['now', 'average-24h', 'worst-24h'] as const).map((value) => <button key={value} type="button" aria-pressed={recall === value} onClick={() => { setRecall(value); setOwnChanges({}); }}>{symptomRecallText(value, lang)}</button>)}</div></fieldset>
         <fieldset><legend>{t(editingId ? 'Symptom' : 'Symptoms (choose any)', editingId ? 'परेशानी' : 'परेशानियाँ (जो भी हैं चुनें)')}</legend><div className="symptom-choices">{symptoms.map(([value, hi]) => <button key={value} type="button" aria-pressed={selectedSymptoms.includes(value)} onClick={() => toggleSymptom(value)}>{t(value, hi)}</button>)}</div></fieldset>
         {selectedSymptoms.includes('Other') && <label>{t('Other symptom', 'दूसरी परेशानी')}<input value={customSymptom} onChange={(event) => setCustomSymptom(event.target.value)} maxLength={80} required /></label>}
-        {selectedSymptoms.length > 0 && <div className="symptom-ratings">
-          <h3>{t('How strong is each symptom?', 'हर परेशानी कितनी है?')}</h3>
+        </>}
+        {shownRatings.length > 0 && <div className="symptom-ratings">
+          <h3>{shownRatings.length > 1 ? t('How strong is each symptom?', 'हर परेशानी कितनी है?') : t('How strong is it?', 'यह कितनी है?')}</h3>
           <p className="symptom-scale-key">{t('0 = not at all · 10 = worst you can imagine', '0 = बिल्कुल नहीं · 10 = सबसे ज़्यादा जितना आप सोच सकते हैं')}</p>
-          {selectedSymptoms.map((value) => {
+          {shownRatings.map((value) => {
             const label = value === 'Other' && customSymptom.trim() ? customSymptom : symptomLabel(value);
             const rating = symptomSeverities[value];
             const comparison = rating === undefined ? null : symptomComparison(entries, {
@@ -190,16 +251,21 @@ function SymptomDiaryForPatient({ patientId, author, today, lang, entries, onCha
             </fieldset>;
           })}
         </div>}
+        {(session || editingId) && <>
         <div className="symptom-date-fields"><label>{t('Day', 'दिन')}<input type="date" value={date} max={today} onChange={(event) => { setDate(event.target.value); setOwnChanges({}); if (event.target.value !== today) setTime(''); }} required /></label><label>{t('Time being described', 'किस समय की हालत है')}<input type="time" value={time} onChange={(event) => { setTime(event.target.value); setOwnChanges({}); }} required /></label></div>
-        <label>{t(selectedSymptoms.length > 1 ? 'When did these start? (optional)' : 'When did it start? (optional)', 'कब शुरू हुआ? (ज़रूरी नहीं)')}<input type="date" value={startedOn} max={date || today} onChange={(event) => setStartedOn(event.target.value)} /></label>
-        {selectedSymptoms.includes('Pain') && <>
+        <label>{t(detailSymptoms.length > 1 ? 'When did these start? (optional)' : 'When did it start? (optional)', 'कब शुरू हुआ? (ज़रूरी नहीं)')}<input type="date" value={startedOn} max={date || today} onChange={(event) => setStartedOn(event.target.value)} /></label>
+        {detailSymptoms.includes('Pain') && <>
           <label>{t('Where is the pain? (optional)', 'दर्द कहाँ है? (ज़रूरी नहीं)')}<input maxLength={100} value={painLocation} onChange={(event) => { setPainLocation(event.target.value); setOwnChanges({}); }} /></label>
           <fieldset><legend>{t('When does it happen? (optional)', 'कब होता है? (ज़रूरी नहीं)')}</legend><div className="symptom-choices">{(['rest', 'turning', 'walking', 'coughing', 'other', 'not-sure'] as const).map((trigger) => <button key={trigger} type="button" aria-pressed={painTriggers.includes(trigger)} onClick={() => { setPainTriggers((previous) => previous.includes(trigger) ? previous.filter((item) => item !== trigger) : [...previous, trigger]); setOwnChanges({}); }}>{painTriggerText(trigger, lang)}</button>)}</div></fieldset>
         </>}
-        <label>{t(selectedSymptoms.length > 1 ? 'Note for these symptoms (optional)' : 'Anything else? (optional)', selectedSymptoms.length > 1 ? 'इन परेशानियों का नोट (ज़रूरी नहीं)' : 'कुछ और? (ज़रूरी नहीं)')}<textarea rows={2} value={note} onChange={(event) => setNote(event.target.value)} maxLength={500} /></label>
+        <label>{t(detailSymptoms.length > 1 ? 'Note for these symptoms (optional)' : 'Anything else? (optional)', detailSymptoms.length > 1 ? 'इन परेशानियों का नोट (ज़रूरी नहीं)' : 'कुछ और? (ज़रूरी नहीं)')}<textarea rows={2} value={note} onChange={(event) => setNote(event.target.value)} maxLength={500} /></label>
+        </>}
         {error && <p className="symptom-error" role="alert">{error}</p>}
-        <div className="symptom-form-actions"><button type="submit" className="primary-button">{editingId ? t('Save changes', 'बदलाव सेव करें') : selectedSymptoms.length > 1 ? t(`Save ${selectedSymptoms.length} symptoms`, `${selectedSymptoms.length} परेशानियाँ सेव करें`) : t('Save note', 'नोट सेव करें')}</button>{editingId && <button type="button" className="secondary-button" onClick={() => { clearForm(); setMessage(t('Changes cancelled.', 'बदलाव रद्द हो गए।')); }}>{t('Cancel', 'रद्द करें')}</button>}</div>
-      </form>
+        <div className="symptom-form-actions">{!editingId && !session
+          ? <button type="button" className="primary-button" disabled={selectedSymptoms.length === 0} onClick={startSession} data-testid="symptom-rate-start">{selectedSymptoms.length > 1 ? t(`Rate ${selectedSymptoms.length} symptoms`, `${selectedSymptoms.length} परेशानियों को अंक दें`) : t('Rate it', 'अंक दें')}</button>
+          : <button type="submit" className="primary-button" data-testid="symptom-save">{editingId ? t('Save changes', 'बदलाव सेव करें') : session && session.index + 1 < session.queue.length ? t('Save and next', 'सेव करें और आगे बढ़ें') : t('Save note', 'नोट सेव करें')}</button>}
+          {(editingId || session) && <button type="button" className="secondary-button" onClick={() => { clearForm(); setFinished(null); setMessage(editingId ? t('Changes cancelled.', 'बदलाव रद्द हो गए।') : ''); }}>{t('Cancel', 'रद्द करें')}</button>}</div>
+      </form>}
       <section className="symptom-history" aria-labelledby={`${id}-history`}>
         <div className="family-section-heading"><h2 id={`${id}-history`}>{t('Your notes', 'आपके नोट')}</h2><span>{visibleEntries.length}</span></div>
         <div className="symptom-history-filters"><div className="symptom-range" aria-label={t('Filter by day', 'दिन के हिसाब से देखें')}>{(['all', 'week', 'today'] as const).map((value) => <button type="button" key={value} aria-pressed={range === value} onClick={() => setRange(value)}>{value === 'all' ? t('All', 'सभी') : value === 'week' ? t('7 days', '7 दिन') : t('Today', 'आज')}</button>)}</div><div className="symptom-choices" aria-label={t('Filter by symptom', 'परेशानी के हिसाब से देखें')}><button type="button" aria-pressed={!filter} onClick={() => setFilter('')}>{t('All symptoms', 'सभी परेशानियाँ')}</button>{knownSymptoms.map((value) => <button type="button" aria-pressed={filter === value} onClick={() => setFilter(value)} key={value}>{symptomLabel(value)}</button>)}</div></div>

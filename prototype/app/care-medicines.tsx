@@ -25,6 +25,7 @@ import {
 } from './care-medicine-regimen-state';
 import { literalPrescriptionTime, makeMedicineEvent, medicinePrescription, prescriptionLines, type MedicineDraft } from './care-medicines-state';
 import { formatMedicineTime, medicineTimeGroups } from './care-medicine-schedule';
+import { MEDICINE_SEARCH_ABOVE, filterMedicinesByName, groupMedicines, medicineEntries, slotTitle, type MedicineEntry } from './care-medicine-groups';
 import './care-medicines.css';
 import { careLocale, careText, type CareLang } from './care-i18n';
 
@@ -81,7 +82,9 @@ function MedicinesForPatient({ patientId, author, today, lang, events, checks, r
   const t = (en: string, hi: string) => careText(lang, en, hi);
   const [date, setDate] = useState(today);
   const [view, setView] = useState<'day' | 'all'>('day');
-  const [selectedTime, setSelectedTime] = useState('all');
+  const [query, setQuery] = useState('');
+  const [pastOpen, setPastOpen] = useState(false);
+  const [openMedicines, setOpenMedicines] = useState<string[]>([]);
   const [draft, setDraft] = useState<MedicineDraft | null>(null);
   const [importing, setImporting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -102,9 +105,14 @@ function MedicinesForPatient({ patientId, author, today, lang, events, checks, r
     const regimenId = medicinePrescription(item)?.regimenId;
     return !regimenId || !regimenIds.has(regimenId);
   });
-  const visible = view === 'day'
-    ? selectedTime === 'all' ? scheduled : timeGroups.find((group) => group.time === selectedTime)?.medicines ?? []
-    : legacyMedicines;
+  const visible = view === 'day' ? scheduled : legacyMedicines;
+  // Each medicine is listed once, under its earliest dose time, with all its dose chips on that one row.
+  const entries = medicineEntries(visible, (event) => medicinePrescription(event)?.regimenId);
+  const isPastEntry = (entry: MedicineEntry) => view === 'all' && entry.events.every((event) => !event.repeatForever && (event.repeatUntil || event.date) < today);
+  const currentEntries = entries.filter((entry) => !isPastEntry(entry));
+  const pastEntries = entries.filter(isPastEntry);
+  const searching = currentEntries.length > MEDICINE_SEARCH_ABOVE;
+  const slotGroups = groupMedicines(filterMedicinesByName(currentEntries, searching ? query : ''));
   const checked = (item: CareEvent) => checks.find((check) => check.patientId === patientId && check.eventId === item.id && check.date === date);
   const takenCount = scheduled.filter((item) => checked(item)).length;
   const selectedReport = available.find((report) => report.id === draft?.reportId);
@@ -250,7 +258,6 @@ function MedicinesForPatient({ patientId, author, today, lang, events, checks, r
       }
       setView('day');
       setDate(medicine.date <= today && (!medicine.repeatUntil || medicine.repeatUntil >= today) ? (eventFallsOn(medicine, today) ? today : medicine.date) : medicine.date);
-      setSelectedTime(medicine.time);
       closeEditor(); setMessage(t('Medicine schedule saved.', 'दवा का समय सेव हो गया।'));
     } catch (reason) {
       if (pendingImageImportId) {
@@ -303,6 +310,42 @@ function MedicinesForPatient({ patientId, author, today, lang, events, checks, r
     </form>
   </section>;
 
+  const renderCard = (item: CareEvent, index: number) => {
+      const check = eventFallsOn(item, date) ? checked(item) : undefined;
+      const prescription = medicinePrescription(item);
+      const report = available.find((entry) => entry.id === prescription?.reportId);
+      const linkedRegimen = regimens.find((regimen) => regimen.id === prescription?.regimenId);
+      return <article className={`medicine-card medicine-color-${index % 3}${check ? ' is-taken' : ''}`} key={item.id}>
+        <div className="medicine-time"><MedicineIcon /><time>{item.time}</time></div>
+        <div className="medicine-card-body"><div className="medicine-card-title">{linkedRegimen?.medicineImageId ? <StoredMedicinePhoto imageId={linkedRegimen.medicineImageId} alt={item.title} lang={lang} /> : prescription?.medicineImageId ? <StoredMedicinePhoto imageId={prescription.medicineImageId} alt={item.title} lang={lang} /> : prescription?.medicineImage ? <MedicinePhoto file={prescription.medicineImage} alt={item.title} lang={lang} /> : null}<h2>{item.title}</h2></div><p className="medicine-directions">{item.instructions}</p><div className="medicine-card-meta"><span>{dateLabel(item.date)}{item.repeatUntil && ` – ${dateLabel(item.repeatUntil)}`}</span>{prescription?.mealTiming && <span className="medicine-meal-chip">{medicineMealTimingLabel(prescription.mealTiming)}</span>}{prescription && <span>{prescription.sourceName}</span>}</div>{report && <PrescriptionLink report={report} lang={lang} />}{!report && prescription?.prescriptionImage && <SavedFileLink file={prescription.prescriptionImage} label={t('Open prescription image', 'पर्चे की तस्वीर खोलें')} />}{!report && prescription?.sourceText && <details className="medicine-saved-source"><summary>{t('Read prescription text', 'पर्चे का टेक्स्ट पढ़ें')}</summary><p>{prescription.sourceText}</p></details>}</div>
+        <div className="medicine-card-actions">{view === 'day' && <button type="button" className="medicine-taken" aria-pressed={Boolean(check)} aria-label={`${t('Taken', 'ले ली')}: ${item.title}, ${item.time}`} disabled={date > today} onClick={() => { onCheck(item.id, date, !check); setMessage(check ? t('Taken mark removed.', 'लेने का निशान हटा दिया।') : t('Marked taken.', 'लेना दर्ज हो गया।')); }}><span className="medicine-tick" aria-hidden="true"><MedicineIcon kind="check" /></span><span>{check ? t('Taken', 'ले ली') : t('Mark taken', 'लेना दर्ज करें')}</span></button>}{check && <span className="medicine-taken-by">{t('By', 'द्वारा')} {check.actor}</span>}<button type="button" className="medicine-text-button" onClick={() => openEditor(item)}>{prescription ? t('Edit', 'बदलें') : t('Add prescription', 'पर्चा जोड़ें')}</button>{confirmRemove === item.id ? <div className="medicine-remove-confirm"><span>{t('Remove this schedule?', 'यह समय हटाएँ?')}</span><button type="button" onClick={() => { onRemove(item.id); setConfirmRemove(null); setMessage(t('Schedule removed.', 'समय हटा दिया।')); }}>{t('Remove', 'हटाएँ')}</button><button type="button" onClick={() => setConfirmRemove(null)}>{t('Keep', 'रहने दें')}</button></div> : <button type="button" className="medicine-text-button" onClick={() => setConfirmRemove(item.id)} aria-label={`${t('Remove schedule', 'समय हटाएँ')}: ${item.title}`}>{t('Remove', 'हटाएँ')}</button>}</div>
+      </article>;
+    };
+
+  // One compact row per medicine: name and dose chips (the tick stays one tap away). Tap the row for the full cards.
+  const renderEntry = (entry: MedicineEntry) => {
+    const open = openMedicines.includes(entry.id);
+    const first = entry.events[0];
+    const toggle = () => setOpenMedicines(open ? openMedicines.filter((item) => item !== entry.id) : [...openMedicines, entry.id]);
+    return <div key={entry.id} className="medicine-row" data-testid={`medicine-row-${entry.id}`}>
+      {open ? <>{entry.events.map((event, index) => renderCard(event, index))}
+        <button type="button" className="medicine-text-button" onClick={toggle} data-testid={`medicine-collapse-${entry.id}`}>{t('Show less', 'कम दिखाएँ')}</button></>
+        : <div className="medicine-compact">
+          <button type="button" className="medicine-compact-name" aria-expanded={false} onClick={toggle} data-testid={`medicine-expand-${entry.id}`}>
+            <strong>{first.title}</strong><span aria-hidden="true">▾</span><span className="medicine-sr">{t('Show details', 'ब्यौरा दिखाएँ')}</span></button>
+          <div className="medicine-dose-chips">{entry.events.map((event) => {
+            const check = eventFallsOn(event, date) ? checked(event) : undefined;
+            return view === 'day'
+              ? <button key={event.id} type="button" className="medicine-dose-chip" aria-pressed={Boolean(check)} disabled={date > today}
+                aria-label={`${t('Taken', 'ले ली')}: ${event.title}, ${event.time}`}
+                onClick={() => { onCheck(event.id, date, !check); setMessage(check ? t('Taken mark removed.', 'लेने का निशान हटा दिया।') : t('Marked taken.', 'लेना दर्ज हो गया।')); }}>
+                <span aria-hidden="true">{check ? '✓' : '○'}</span> {formatMedicineTime(event.time)}</button>
+              : <span key={event.id} className="medicine-dose-chip is-static">{formatMedicineTime(event.time)}</span>;
+          })}</div>
+        </div>}
+    </div>;
+  };
+
   return <section className="care-medicines" aria-labelledby={`${id}-heading`}>
     <header className="medicine-heading">
       <div className="medicine-heading-title"><span className="medicine-heading-icon"><MedicineIcon /></span><h1 id={`${id}-heading`} ref={heading} tabIndex={-1}>{t('Medicines', 'दवाएँ')}</h1></div>
@@ -316,15 +359,8 @@ function MedicinesForPatient({ patientId, author, today, lang, events, checks, r
       </details>
     </header>
     {message && <p className="medicine-message" role="status">{message}</p>}
-    <div className="medicine-day-controls"><div className="medicine-tabs"><button type="button" aria-pressed={view === 'day'} onClick={() => { setView('day'); setDate(today); setSelectedTime('all'); }}>{t('Today', 'आज')}</button><button type="button" aria-pressed={view === 'all'} onClick={() => { setView('all'); setSelectedTime('all'); }}>{t('All medicines', 'सभी दवाएँ')}</button></div>{view === 'day' && <input type="date" aria-label={t('Medicine schedule date', 'दवा की तारीख')} value={date} onChange={(event) => { if (event.target.value) { setDate(event.target.value); setSelectedTime('all'); } }} />}</div>
+    <div className="medicine-day-controls"><div className="medicine-tabs"><button type="button" aria-pressed={view === 'day'} onClick={() => { setView('day'); setDate(today); }}>{t('Today', 'आज')}</button><button type="button" aria-pressed={view === 'all'} onClick={() => { setView('all'); }}>{t('All medicines', 'सभी दवाएँ')}</button></div>{view === 'day' && <input type="date" aria-label={t('Medicine schedule date', 'दवा की तारीख')} value={date} onChange={(event) => { if (event.target.value) { setDate(event.target.value); } }} />}</div>
     {view === 'day' && <dl className="medicine-overview"><div><dt>{date === today ? t('On today’s list', 'आज की सूची में') : dateLabel(date)}</dt><dd>{scheduled.length}</dd></div><div><dt>{t('Taken', 'ले ली')}</dt><dd>{takenCount}</dd></div><div><dt>{t('Not marked yet', 'अभी दर्ज नहीं')}</dt><dd>{scheduled.length - takenCount}</dd></div></dl>}
-    {view === 'day' && timeGroups.length > 0 && <section className="medicine-time-filter" aria-labelledby={`${id}-time-filter`}>
-      <div className="medicine-time-filter-heading"><strong id={`${id}-time-filter`}>{t('Medicines by time', 'समय के अनुसार दवाएँ')}</strong></div>
-      <div className="medicine-time-capsules" role="group" aria-label={t('Filter medicines by time', 'समय के अनुसार दवाएँ छाँटें')}>
-        <button type="button" aria-pressed={selectedTime === 'all'} onClick={() => setSelectedTime('all')}><span>{t('All times', 'सभी समय')}</span><strong>{scheduled.length}</strong></button>
-        {timeGroups.map((group) => <button type="button" key={group.time} aria-pressed={selectedTime === group.time} onClick={() => setSelectedTime(group.time)}><time dateTime={group.time}>{formatMedicineTime(group.time)}</time><strong>{group.medicines.length}</strong></button>)}
-      </div>
-    </section>}
     {view === 'all' && regimens.length > 0 && <div className="medicine-regimen-list">{regimens.map((item, index) => <article className={`medicine-regimen-card medicine-color-${index % 3}`} key={item.id}>
       <div className="medicine-regimen-head">{item.medicineImageId ? <StoredMedicinePhoto imageId={item.medicineImageId} alt={item.medicineName} lang={lang} /> : <span className="medicine-regimen-placeholder"><MedicineIcon /></span>}<div><h2>{item.medicineName}</h2><p>{item.quantity}</p></div>{item.confidence !== null && <span className="medicine-confidence">{t('AI', 'AI')} {Math.round(item.confidence * 100)}%</span>}</div>
       {item.instructions && <p className="medicine-directions">{item.instructions}</p>}
@@ -334,17 +370,19 @@ function MedicinesForPatient({ patientId, author, today, lang, events, checks, r
       {item.uncertainties.length > 0 && <details className="medicine-saved-source"><summary>{t('Review notes', 'जाँच की टिप्पणियाँ')}</summary><ul>{item.uncertainties.map((uncertainty) => <li key={uncertainty}>{uncertainty}</li>)}</ul></details>}
       <div className="medicine-card-actions">{confirmRemove === item.id ? <div className="medicine-remove-confirm"><span>{t('Remove this medicine and all reminders?', 'यह दवा और सभी रिमाइंडर हटाएँ?')}</span><button type="button" onClick={() => removeRegimen(item)}>{t('Remove', 'हटाएँ')}</button><button type="button" onClick={() => setConfirmRemove(null)}>{t('Keep', 'रहने दें')}</button></div> : <button type="button" className="medicine-text-button" onClick={() => setConfirmRemove(item.id)}>{t('Remove medicine', 'दवा हटाएँ')}</button>}</div>
     </article>)}</div>}
-    <div className="medicine-list" ref={listMotion}>{visible.map((item, index) => {
-      const check = eventFallsOn(item, date) ? checked(item) : undefined;
-      const prescription = medicinePrescription(item);
-      const report = available.find((entry) => entry.id === prescription?.reportId);
-      const linkedRegimen = regimens.find((regimen) => regimen.id === prescription?.regimenId);
-      return <article className={`medicine-card medicine-color-${index % 3}${check ? ' is-taken' : ''}`} key={item.id}>
-        <div className="medicine-time"><MedicineIcon /><time>{item.time}</time></div>
-        <div className="medicine-card-body"><div className="medicine-card-title">{linkedRegimen?.medicineImageId ? <StoredMedicinePhoto imageId={linkedRegimen.medicineImageId} alt={item.title} lang={lang} /> : prescription?.medicineImageId ? <StoredMedicinePhoto imageId={prescription.medicineImageId} alt={item.title} lang={lang} /> : prescription?.medicineImage ? <MedicinePhoto file={prescription.medicineImage} alt={item.title} lang={lang} /> : null}<h2>{item.title}</h2></div><p className="medicine-directions">{item.instructions}</p><div className="medicine-card-meta"><span>{dateLabel(item.date)}{item.repeatUntil && ` – ${dateLabel(item.repeatUntil)}`}</span>{prescription?.mealTiming && <span className="medicine-meal-chip">{medicineMealTimingLabel(prescription.mealTiming)}</span>}{prescription && <span>{prescription.sourceName}</span>}</div>{report && <PrescriptionLink report={report} lang={lang} />}{!report && prescription?.prescriptionImage && <SavedFileLink file={prescription.prescriptionImage} label={t('Open prescription image', 'पर्चे की तस्वीर खोलें')} />}{!report && prescription?.sourceText && <details className="medicine-saved-source"><summary>{t('Read prescription text', 'पर्चे का टेक्स्ट पढ़ें')}</summary><p>{prescription.sourceText}</p></details>}</div>
-        <div className="medicine-card-actions">{view === 'day' && <button type="button" className="medicine-taken" aria-pressed={Boolean(check)} aria-label={`${t('Taken', 'ले ली')}: ${item.title}, ${item.time}`} disabled={date > today} onClick={() => { onCheck(item.id, date, !check); setMessage(check ? t('Taken mark removed.', 'लेने का निशान हटा दिया।') : t('Marked taken.', 'लेना दर्ज हो गया।')); }}><span className="medicine-tick" aria-hidden="true"><MedicineIcon kind="check" /></span><span>{check ? t('Taken', 'ले ली') : t('Mark taken', 'लेना दर्ज करें')}</span></button>}{check && <span className="medicine-taken-by">{t('By', 'द्वारा')} {check.actor}</span>}<button type="button" className="medicine-text-button" onClick={() => openEditor(item)}>{prescription ? t('Edit', 'बदलें') : t('Add prescription', 'पर्चा जोड़ें')}</button>{confirmRemove === item.id ? <div className="medicine-remove-confirm"><span>{t('Remove this schedule?', 'यह समय हटाएँ?')}</span><button type="button" onClick={() => { onRemove(item.id); setConfirmRemove(null); setMessage(t('Schedule removed.', 'समय हटा दिया।')); }}>{t('Remove', 'हटाएँ')}</button><button type="button" onClick={() => setConfirmRemove(null)}>{t('Keep', 'रहने दें')}</button></div> : <button type="button" className="medicine-text-button" onClick={() => setConfirmRemove(item.id)} aria-label={`${t('Remove schedule', 'समय हटाएँ')}: ${item.title}`}>{t('Remove', 'हटाएँ')}</button>}</div>
-      </article>;
-    })}</div>
-    {!visible.length && (view === 'day' || regimens.length === 0) && <div className="medicine-empty"><span><SaharaLottie name="pill" /></span><h2>{selectedTime !== 'all' ? t('No medicines at this time', 'इस समय कोई दवा नहीं है') : medicines.length || regimens.length ? t('Nothing scheduled for this day', 'इस दिन कोई दवा दर्ज नहीं है') : t('Keep your medicines together', 'अपनी दवाएँ एक जगह रखें')}</h2><button type="button" className={medicines.length || regimens.length ? undefined : 'medicine-primary'} onClick={() => selectedTime !== 'all' ? setSelectedTime('all') : medicines.length || regimens.length ? setView('all') : setImporting(true)}>{selectedTime !== 'all' ? t('Show all times', 'सभी समय दिखाएँ') : medicines.length || regimens.length ? t('See all medicines', 'सभी दवाएँ देखें') : t('Scan a prescription', 'पर्चा स्कैन करें')}</button></div>}
+    <div className="medicine-list" ref={listMotion}>
+      {searching && <label className="medicine-search"><span>{t('Search medicines', 'दवा खोजें')}</span><input type="search" value={query} maxLength={80} onChange={(event) => setQuery(event.target.value)} data-testid="medicines-search" /></label>}
+      {currentEntries.length > 0 && slotGroups.length === 0 && <p className="medicine-quiet">{t('No medicine matches that name.', 'इस नाम की कोई दवा नहीं मिली।')}</p>}
+      {slotGroups.map(({ slot, medicines: list }) => <section key={slot} className="medicine-slot" aria-labelledby={`${id}-slot-${slot}`} data-testid={`medicines-group-${slot}`}>
+        <h2 id={`${id}-slot-${slot}`} className="medicine-slot-title">{slotTitle(slot, t)} · {list.length}</h2>
+        {list.map((entry) => renderEntry(entry))}
+      </section>)}
+      {pastEntries.length > 0 && <section className="medicine-slot" data-testid="medicines-past">
+        <h2 className="medicine-slot-title"><button type="button" className="medicine-past-toggle" aria-expanded={pastOpen} onClick={() => setPastOpen(!pastOpen)} data-testid="medicines-past-toggle">
+          <span>{t('Past', 'पहले की')} ({pastEntries.length})</span><span aria-hidden="true">{pastOpen ? '▴' : '▾'}</span></button></h2>
+        {pastOpen && pastEntries.map((entry) => renderEntry(entry))}
+      </section>}
+    </div>
+    {!entries.length && (view === 'day' || regimens.length === 0) && <div className="medicine-empty"><span><SaharaLottie name="pill" /></span><h2>{medicines.length || regimens.length ? t('Nothing scheduled for this day', 'इस दिन कोई दवा दर्ज नहीं है') : t('Keep your medicines together', 'अपनी दवाएँ एक जगह रखें')}</h2><button type="button" className={medicines.length || regimens.length ? undefined : 'medicine-primary'} onClick={() => medicines.length || regimens.length ? setView('all') : setImporting(true)}>{medicines.length || regimens.length ? t('See all medicines', 'सभी दवाएँ देखें') : t('Scan a prescription', 'पर्चा स्कैन करें')}</button></div>}
   </section>;
 }

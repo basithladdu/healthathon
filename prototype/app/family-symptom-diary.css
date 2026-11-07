@@ -59,3 +59,6 @@
   .symptom-rating-options { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 }
 .simple-care-app .family-symptom-diary :is(.symptom-choices, .symptom-range) button { padding-inline: 16px; border-radius: var(--care-radius-pill); }
+.symptom-session-step { margin: 0; color: var(--care-muted); font-size: 15px; }
+.symptom-session-finished ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-weight: 600; }
+.symptom-session-finished p { margin: 0; color: var(--care-muted); }

@@ -516,3 +516,20 @@
 @media (prefers-reduced-motion: reduce) {
   .care-medicines *, .care-medicines *::before, .care-medicines *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+.medicine-slot { display: grid; gap: 10px; }
+.medicine-slot-title { margin: 6px 4px 0; color: #7f6b59; font-size: 15px; font-weight: 650; }
+.medicine-past-toggle { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 48px; padding: 0; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; }
+.medicine-search { display: grid; gap: 6px; font-size: 14px; font-weight: 600; }
+.medicine-search input { min-height: 44px; padding: 8px 12px; border: 1px solid #dac4b3; border-radius: 12px; font: inherit; background: #fff; }
+.medicine-quiet { margin: 0; color: #7f6b59; font-size: 14px; }
+.medicine-row { display: grid; gap: 8px; }
+.medicine-compact { display: grid; gap: 6px; padding: 6px 14px 12px; border: 1px solid #e8ccab; border-radius: 16px; background: #fff6e8; }
+.medicine-compact-name { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 48px; padding: 0; border: 0; background: none; color: inherit; font: inherit; font-size: 16px; text-align: left; cursor: pointer; }
+.medicine-compact-name strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.medicine-dose-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.medicine-dose-chip { min-height: 44px; padding: 6px 14px; border: 1.5px solid #99573e; border-radius: 999px; background: #fff; color: inherit; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.medicine-dose-chip[aria-pressed='true'] { background: #99573e; color: #fff; }
+.medicine-dose-chip.is-static { display: inline-flex; align-items: center; min-height: 36px; cursor: default; border-color: #dac4b3; }
+.medicine-dose-chip:disabled { opacity: .55; cursor: not-allowed; }
+.medicine-sr { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
