@@ -189,7 +189,7 @@ S[8] = r'''
 section(sprint, 'Build Sprint Journey and Progress', 'sand')
 import datetime as _dt
 GC_TODAY = '1A73E8'
-text(sprint, 0.55, 0.98, 6.0, 0.36, [[R('October – November 2026', size=16, bold=True, color=GREEN)]])
+text(sprint, 0.55, 0.98, 6.0, 0.36, [[R('30 days  ·  500 commits  ·  2 apps live', size=16, bold=True, color=GREEN)]])
 leg = [('Built', TEAL), ('Doctor / legal feedback', PURPLE), ('Milestone', RUST)]
 lx = 4.6
 for lbl, col in leg:
@@ -200,29 +200,33 @@ gx0, cw, rh, top = 1.2, 1.17, 1.06, 1.68
 days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
 for j, d in enumerate(days):
     text(sprint, gx0 + j * cw, 1.38, cw, 0.28, [[R(d, size=9.5, bold=True, color=MUTED)]], align=PP_ALIGN.CENTER)
-ev = {  # (day, month): [(label, colour)]
-    (9, 10): [('Shortlisted!', RUST), ('Android app + map of centres', TEAL)],
-    (10, 10): [('AI medicine organiser', TEAL)],
-    (11, 10): [('Prescription organiser', TEAL)],
-    (13, 10): [('Google Play test version', RUST)],
-    (14, 10): [('Testers invited', TEAL)],
-    (16, 10): [('Privacy and account safety', TEAL)],
-    (19, 10): [('Sent to Google Play', RUST)],
-    (20, 10): [('Mentor review', PURPLE)],
-    (23, 10): [('Hospital survey feedback', PURPLE)],
-    (25, 10): [('Symptom tracker', TEAL)],
-    (26, 10): [('Pain body map', TEAL)],
-    (27, 10): [('Hospital survey live', RUST)],
-    (28, 10): [('Team meeting: 9 changes', PURPLE), ('Ask your reports', TEAL)],
-    (29, 10): [('Dr Sharada’s medical rules', PURPLE)],
-    (30, 10): [('Goals of care + QR code', TEAL), ('Telugu, Urdu, Kannada', TEAL)],
-    (31, 10): [('Legal advice on format', PURPLE)],
-    (1, 11): [('Recording → text', TEAL)],
-    (2, 11): [('Doctor schedule', TEAL)],
-    (3, 11): [('Dr Sujay tests the whole app', PURPLE)],
-    (4, 11): [('Clinical document word for word', TEAL), ('8 practice talks pass', TEAL)],
-    (5, 11): [('Gemini AI + backups', TEAL), ('8 Nov: final polish', RUST)][:1],
-    (6, 11): [('Calmer, fewer taps', TEAL)],
+ev = {  # (day, month): [(label, colour)] - from the git history and team chat
+    (9, 10): [('Shortlisted!', RUST), ('Native Android + map', TEAL)],
+    (10, 10): [('Play closed test sent', RUST), ('Safe account deletion', TEAL)],
+    (11, 10): [('Prescription organiser', TEAL), ('Web features on Android', TEAL)],
+    (13, 10): [('Play test version 0.4', RUST), ('Scanner verified', TEAL)],
+    (14, 10): [('Closed testing live', RUST), ('Testers invited', TEAL)],
+    (15, 10): [('Production submission', RUST)],
+    (16, 10): [('Sahara 0.5 alpha', TEAL), ('Privacy and safety', TEAL)],
+    (19, 10): [('Sent to Google Play', RUST), ('On-device processing', TEAL)],
+    (20, 10): [('Mentor review', PURPLE), ('National care directory', TEAL)],
+    (21, 10): [('Release verified', TEAL), ('Research archive', TEAL)],
+    (22, 10): [('Daily health workflow', TEAL)],
+    (23, 10): [('Hospital survey feedback', PURPLE), ('Phase 2 deck', TEAL)],
+    (24, 10): [('Symptom list: Shirin, SVK', PURPLE), ('Production review', RUST)],
+    (25, 10): [('Symptom tracker', TEAL), ('Navigation, feedback', TEAL)],
+    (26, 10): [('Pain body map', TEAL), ('Motion and loading', TEAL)],
+    (27, 10): [('Hospital survey live', RUST), ('Hindi + offline speech', TEAL)],
+    (28, 10): [('Team meeting: 9 changes', PURPLE), ('Ask your documents', TEAL)],
+    (29, 10): [('Dr Sharada’s clinical spec', PURPLE), ('Survey to doctors', RUST)],
+    (30, 10): [('Goals of care + QR', TEAL), ('Telugu, Urdu, Kannada', TEAL)],
+    (31, 10): [('Legal advice on format', PURPLE), ('Patient summary', TEAL)],
+    (1, 11): [('Recording → text', TEAL), ('Today / Care redesign', TEAL)],
+    (2, 11): [('Doctor schedule', TEAL), ('Patient profile', TEAL)],
+    (3, 11): [('Dr Sujay tests whole app', PURPLE)],
+    (4, 11): [('Clinical document', TEAL), ('8 practice talks pass', TEAL)],
+    (5, 11): [('Gemini AI + backups', TEAL), ('Whisper + Gemini', TEAL)],
+    (6, 11): [('Community groups', TEAL), ('910 tests pass', TEAL)],
     (7, 11): [('Dr Sujay’s 13 topics', PURPLE), ('Caregiver wellbeing', TEAL)],
 }
 start = _dt.date(2026, 10, 5) if _dt.date(2026, 10, 5).weekday() == 0 else _dt.date(2026, 10, 6)
@@ -248,8 +252,8 @@ for w in range(5):
             cy = y + 0.3 + k * 0.37
             chip = card(sprint, x + 0.04, cy, cw - 0.08, 0.34, fill=col, radius=0.18)
             text(sprint, x + 0.07, cy, cw - 0.14, 0.34, [[R(lab, size=8, bold=True, color='FFFFFF')]], anchor=MSO_ANCHOR.MIDDLE, align=PP_ALIGN.CENTER)
-text(sprint, gx0, top + 5 * rh + 0.02, 7 * cw, 0.28, [[R('Blue circle: 7 Nov, the day of this submission. Grey days are outside the build sprint.', size=9.5, color=MUTED, italic=True)]])
-boxes = [('✓  Working now', TEAL, 'Patient and family app · doctor’s view · recording → signed clinical document · QR code · website live'),
+text(sprint, gx0, top + 5 * rh + 0.02, 7 * cw, 0.28, [[R('9 Oct – 7 Nov 2026. Blue circle: 7 Nov, the day of this submission. Every chip is a dated commit or meeting.', size=9.5, color=MUTED, italic=True)]])
+boxes = [('✓  Live today', TEAL, 'Android app on Google Play · website · doctor portal · recording → signed clinical document · emergency QR · 5 languages · 910 passing tests'),
          ('↻  Changed on the way', PURPLE, 'Website first, then a real Android app. The AI used to write the note; now the doctor leads and the AI only writes it down.'),
          ('⚠  Problems we solved', RUST, 'Google’s AI was often busy → automatic backups. Exact goals-of-care wording → copied.'),
          ('→  Next steps', BLUE, 'Field testing on more phones · recorded practice talk with Dr Sharada · clinic pilot')]
@@ -383,18 +387,32 @@ for k, (lbl, url) in enumerate(items):
         s_ = p.add_run(); s_.text = '   |   '; s_.font.size = Pt(14); s_.font.color.rgb = rgb(MUTED)
 style_runs(th[4], font='Calibri', size=12, bold=True, color=MUTED)
 style_runs(th[5], color=MUTED)
-th[1].top = Inches(1.75); th[1].height = Inches(0.75); style_runs(th[1], font='Georgia', size=34, bold=True, color=GREEN)
-th[2].top = Inches(2.45); th[2].height = Inches(0.4)
-# QR codes: app and website, big and centred, with the Play Store listing between them
-qs = 2.35; qy = 2.95
-pic(thanks, B / 'assets/qr-app.png', 1.35, qy, qs, qs)
-pic(thanks, B / 'assets/qr-web.png', 13.333 - 1.35 - qs, qy, qs, qs)
-sw = 5.6; sh_ = sw * 460 / 2150
-pic(thanks, B / 'assets/play-listing-top.png', (13.333 - sw) / 2, qy + (qs - sh_) / 2, sw, sh_, border='D9D2C3')
-pic(thanks, B / 'assets/google-play.png', 1.35 + 0.05, qy + qs + 0.07, 0.3, 0.33)
-text(thanks, 1.35 + 0.38, qy + qs + 0.02, qs, 0.42, [[R('Android app on Google Play', size=13, bold=True, color=GREEN)]], anchor=MSO_ANCHOR.MIDDLE)
-text(thanks, 13.333 - 1.35 - qs - 0.2, qy + qs + 0.02, qs + 0.4, 0.42, [[R('Website: sahara.wedevit.in', size=13, bold=True, color=GREEN)]], anchor=MSO_ANCHOR.MIDDLE, align=PP_ALIGN.CENTER)
-th[3].top = Inches(5.9)
-text(thanks, 0.8, 6.3, 11.7, 0.35, [[R('  ·  '.join(n for _, n in names), size=12.5, bold=True, color=GREEN)]], align=PP_ALIGN.CENTER)
-th[4].top = Inches(6.68)
+th[0].left = Inches(0.55); th[0].top = Inches(0.3); th[0].width = Inches(2.9); th[0].height = Inches(2.9 * th[0].height / th[0].width) if False else Inches(0.4)
+th[1].left = Inches(3.6); th[1].width = Inches(6.1); th[1].top = Inches(0.2); th[1].height = Inches(0.65)
+style_runs(th[1], font='Georgia', size=30, bold=True, color=GREEN)
+th[2].left = Inches(3.6); th[2].width = Inches(6.1); th[2].top = Inches(0.82); th[2].height = Inches(0.35)
+style_runs(th[2], font='Calibri', size=15, bold=True, color=RUST)
+text(thanks, 10.1, 0.28, 2.7, 0.6, [[R('dev', size=30, bold=False, color='E8333A', font='Consolas'), R('it.', size=30, color='111111', font='Consolas')]], align=PP_ALIGN.RIGHT, anchor=MSO_ANCHOR.MIDDLE)
+# two link cards, each with the Google Play mark and its own QR code
+cards_ = [(0.55, BG['mint'], '1C7A55', 'Website: doctor, patient and family portal', 'sahara.wedevit.in', B / 'assets/qr-web.png', MVP),
+          (6.75, 'E8EEFC', '2A55C4', 'Android app on Google Play', 'play.google.com  ·  in.wedevit.sahara', B / 'assets/qr-app.png', 'https://play.google.com/store/apps/details?id=in.wedevit.sahara')]
+for x, fill, col, h, sub, qr, url in cards_:
+    card(thanks, x, 1.35, 6.03, 1.75, fill=fill, line=fill)
+    pic(thanks, B / 'assets/google-play.png', x + 0.25, 1.6, 0.42, 0.46)
+    text(thanks, x + 0.82, 1.5, 3.4, 1.4, [([R(h, size=15, bold=True, color=col)], {'after': 3}), [R(sub, size=13, bold=True, color=GREEN, link=url)], [R('Scan the code to open', size=11, color=MUTED)]])
+    pic(thanks, qr, x + 6.03 - 1.6, 1.43, 1.5, 1.5)
+# Play Store listing, big, with a soft frame and caption
+card(thanks, 0.55, 3.25, 12.23, 3.05, fill='FFFFFF', line='D9D2C3', radius=0.05)
+pic(thanks, B / 'assets/play-listing-wide.png', 0.7, 3.35, 11.93, 11.93 * 520 / 2150)
+text(thanks, 0.55, 6.32, 12.23, 0.3, [[R('Live on Google Play: “Sahara: Palliative Companion” by WEDEVIT PRIVATE LIMITED', size=11, italic=True, color=MUTED)]])
+th[3].top = Inches(6.6); th[3].height = Inches(0.35)
+for r in th[3].text_frame.paragraphs[0].runs: r.font.size = Pt(11.5)
+th[4].text_frame.paragraphs[0].runs[0].text = ''
+STRIPE = ['2A6BCF', '1C8A5A', 'D96B2B', '7B4FC4']
+for sl in prs.slides:
+    w = 13.333 / 4
+    for k, col in enumerate(STRIPE):
+        bar = sl.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(k * w), 0, Inches(w + 0.01), Inches(0.07))
+        bar.fill.solid(); bar.fill.fore_color.rgb = rgb(col); bar.line.fill.background()
+    text(sl, 5.67, 7.08, 2.0, 0.3, [[R('dev', size=11, color='E8333A', font='Consolas'), R('it.', size=11, color='111111', font='Consolas')]], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
 '''
