@@ -10,6 +10,7 @@ export type EmergencyCard = {
   name?: string; goals?: EmergencyGoals;
   contacts?: { name: string; relationship: string; phone: string }[];
   medicines?: { name: string; detail: string }[];
+  allergies?: string;
   notRecorded?: string; notIncluded?: string[];
 };
 export type EmergencyResult =

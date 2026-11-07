@@ -115,7 +115,7 @@ internal fun planStepOf(field: String): Int = when {
         scope.launch {
             val amdSummary = AmdLifecycle.statusSummary(state.amds, selected); val card = CardTokens.live(state.tokens, r.id)
             val offline = EdCardOffline.forQr(r, amdSummary, hindi, today)
-            val file = runCatching { withContext(Dispatchers.IO) { File(store.folder(selected), planPdfName(r.version)).also { CarePlanPdf.plan(it, r, interp, AmdLifecycle.edSummary(r.existingDirective, amdSummary), card?.url, offline, card?.server == CardServerState.ISSUED, hindi, today) } } }.getOrNull()
+            val file = runCatching { withContext(Dispatchers.IO) { File(store.folder(selected), planPdfName(r.version)).also { CarePlanPdf.plan(it, r, interp, AmdLifecycle.edSummary(r.existingDirective, amdSummary), card?.url, offline, card?.server == CardServerState.ISSUED, hindi, today, CarePlanBook.openReview(state, r.id), AmdLifecycle.governs(state.amds, selected, r.existingDirective)) } } }.getOrNull()
             if (file == null) vm.message.value = t("Couldn't make the PDF. Try again.", "PDF नहीं बना। फिर कोशिश करें।")
             else { commit { CarePlanBook.printed(it, AuditRecordType.ECTPR, r.id, actor, planNow()) }; share(file, t("Share the emergency plan", "आपातकालीन योजना साझा करें"), AuditRecordType.ECTPR, r.id) }
         }
@@ -947,6 +947,8 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
         } }
         else {
             item { CardStatus(token, online, onRetry) }
+            // Past the review date the ED view says standard care applies; the card says the same instead of showing the plan as current.
+            EdView.interpret(active, today).takeIf { it.kind == EdKind.OUT_OF_DATE }?.let { stale -> item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().testTag("card-out-of-date")) { Text(stale.banner.pick(hindi), Modifier.padding(12.dp), fontWeight = FontWeight.Bold, color = Ink) } } }
             item { Surface(color = Paper, shape = RoundedCornerShape(12.dp), border = BorderStroke(2.dp, Ink), modifier = Modifier.fillMaxWidth()) {
                 // Read at a glance by ambulance or ED staff: dark on white, large values, one divider per line.
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {

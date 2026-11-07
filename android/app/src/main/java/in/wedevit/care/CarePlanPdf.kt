@@ -84,7 +84,7 @@ internal object CarePlanPdf {
         } finally { pdf.close() }
     }
 
-    fun plan(file: File, r: EctprRecord, interp: EdInterpretation, amd: Bi, cardUrl: String?, offlineText: String?, cardOnServer: Boolean, hindi: Boolean, today: LocalDate) {
+    fun plan(file: File, r: EctprRecord, interp: EdInterpretation, amd: Bi, cardUrl: String?, offlineText: String?, cardOnServer: Boolean, hindi: Boolean, today: LocalDate, reviewRequest: ReviewRequest? = null, amdGoverns: Boolean = false) {
         fun p(b: Bi) = b.pick(hindi)
         val h1 = paint(17f, true); val h2 = paint(13f, true); val body = paint(10.5f); val bold = paint(10.5f, true); val white = paint(10.5f, true, android.graphics.Color.WHITE); val whiteBody = paint(10f, false, android.graphics.Color.WHITE)
         val alert = android.graphics.Color.rgb(158, 59, 35); val mint = android.graphics.Color.rgb(220, 235, 228); val pale = android.graphics.Color.rgb(247, 221, 210)
@@ -96,7 +96,7 @@ internal object CarePlanPdf {
         d.space(6f)
         d.box(alert, p(IfInDoubt.TITLE) to paint(13f, true, android.graphics.Color.WHITE), *IfInDoubt.CONDITIONS.map { "• " + p(it) to whiteBody }.toTypedArray(), p(IfInDoubt.AFTER) to white)
         d.space(6f)
-        if (interp.showContent) EdView.rows(r, amd).forEach { row -> d.text(p(row.label).uppercase(), paint(8.5f, true, android.graphics.Color.rgb(85, 72, 63)), 12f); d.text(p(row.value), if (row.flag) paint(10.5f, true, alert) else bold, 14f); d.space(3f) }
+        if (interp.showContent) EdView.rows(r, amd, reviewRequest, amdGoverns).forEach { row -> d.text(p(row.label).uppercase(), paint(8.5f, true, android.graphics.Color.rgb(85, 72, 63)), 12f); d.text(p(row.value), if (row.flag) paint(10.5f, true, alert) else bold, 14f); d.space(3f) }
         else d.text(p(Bi("No plan content is shown: give full standard emergency care.", "योजना की जानकारी नहीं दिखाई जाती: पूरा सामान्य आपातकालीन इलाज दें।")), bold)
         d.space(6f)
         d.box(mint, p(CareThatContinues.TITLE) to h2, *CareThatContinues.ITEMS.map { "• " + p(it) to body }.toTypedArray(), p(CareThatContinues.NOTE) to bold)

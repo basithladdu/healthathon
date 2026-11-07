@@ -247,6 +247,19 @@ class CareEdCardTest {
         val hindi = EdCardOffline.text(r, null, true, today); assertTrue(HindiScan.hasHindi(hindi))
     }
 
+    @Test fun pocketCardAndOfflineQrListTheTickedTransferReasonsAndTheReviewDate() {
+        val r = signed().ectprs.single()
+        val lines = WalletCard.lines(r).associate { it.first.en to it.second.en }
+        assertEquals("Only for the reasons ticked: Uncontrolled pain", lines["Hospital transfer"])
+        assertEquals("2027-01-20 (v1)", lines["Review due"])
+        assertTrue(EdCardOffline.text(r, null, false, today).contains("Transfer: Only for the reasons ticked: Uncontrolled pain"))
+        assertTrue(EdCardOffline.forQr(r, null, false, today).toByteArray().size <= 1100)
+        val two = r.copy(choices = r.choices.copy(hospitalTransfer = HospitalTransfer(TransferKind.ONLY_FOR, listOf(TransferReason.PAIN, TransferReason.SEIZURES))))
+        assertEquals("Only for the reasons ticked: Uncontrolled pain, Seizures", WalletCard.transfer(two.choices.hospitalTransfer!!).en)
+        assertEquals("Only for the reasons ticked: Not recorded", WalletCard.transfer(HospitalTransfer(TransferKind.ONLY_FOR)).en)
+        assertEquals(PlanText.transfer(TransferKind.ANY), WalletCard.transfer(HospitalTransfer(TransferKind.ANY)))
+    }
+
     @Test fun offlineTextCarriesTheLivingWillWithItsCaveat() {
         val text = EdCardOffline.text(signed().ectprs.single(), AmdStatusSummary(AmdStatus.EXECUTED, "2026-10-01", 2, "Notary: R. Shah"), false, today)
         assertTrue(text.contains("The AMD governs over this plan.")); assertTrue(text.contains(AmdText.CAVEAT.en))

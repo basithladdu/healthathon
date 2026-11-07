@@ -69,12 +69,14 @@ object EmergencyLinkRules {
                 }
                 if (EmergencySection.CONTACTS in sections) j.put("contacts", JSONArray(source.contacts.take(20).map { JSONObject().put("name", EmergencyCardRules.clip(it.name, 120)).put("relationship", EmergencyCardRules.clip(it.relationship, 80)).put("phone", it.phone.take(40)) }))
                 if (EmergencySection.MEDICINES in sections) j.put("medicines", JSONArray(medicines.map { JSONObject().put("name", EmergencyCardRules.clip(it.name, 160)).put("detail", it.detail.take(400)) }))
-                j.put("notRecorded", EmergencyCardRules.NOT_IN_APP)
+                if (source.allergies.isNotBlank()) j.put("allergies", EmergencyCardRules.clip(source.allergies, 400))
+                j.put("notRecorded", EmergencyCardRules.notRecorded(source))
                 j.put("notIncluded", JSONArray(buildList {
                     EmergencySection.entries.filter { it !in sections }.forEach { add(it.en.substringBefore(" (").lowercase() + " (family chose not to include)") }
                     if (EmergencySection.GOALS in sections && source.goals == null) add("no confirmed goals-of-care note")
                     if (EmergencySection.CONTACTS in sections && source.contacts.isEmpty()) add("no contacts saved")
                     if (EmergencySection.MEDICINES in sections && source.medicines.isEmpty()) add("no current medicines listed")
+                    addAll(EmergencyCardRules.recordedNotOnCard(source))
                     val skipped = dropped + (if (EmergencySection.MEDICINES in sections) (source.medicines.size - 60).coerceAtLeast(0) else 0)
                     if (skipped > 0) add("$skipped medicine${if (skipped == 1) "" else "s"} (no room)")
                 }))
