@@ -39,11 +39,11 @@ text(cover, 1.2, 6.3, 10.9, 0.35, [[R('Try it: sahara.wedevit.in', size=13, colo
 S[2] = r'''
 section(team, 'Team Overview & Background', 'cream')
 members = [
-    ('basith', 'Shaik Abdul Basith', 'Technical lead', 'WeDevIT', 'Led the build of the website and Android app; the AI that transcribes the conversation and fills the goals-of-care document; answers from reports; server, security and releases'),
+    ('basith', 'Shaik Abdul Basith', 'Technical lead · Founder', 'WeDevIT Private Limited · wedevit.in', 'Led the build of the website and Android app; the AI that transcribes the conversation and fills the goals-of-care document; answers from reports; server, security and releases'),
     ('awaiz', 'Shaik Muhammad Awaiz', 'Android engineer', 'WeDevIT', 'Built Android screens: patient summary, care timeline, doctor schedule, family invites; AI retry and backup models; tested every version'),
-    ('sharada', 'Dr Sharada Vinod Kutty', 'Pulmonologist', 'AIIMS Mangalagiri', 'Wrote the clinical specifications and designed the goals of care document. Tested mock clinical conversations'),
-    ('sujay', 'Dr Sujay Halkur Shankar', 'Pulmonologist', 'Tata IISc Medical School', 'Defined the problem statement and the proposed solution. Provided relevant clinical documents and scores for design of tools'),
-    ('shirin', 'Shirin Ayub', 'Medical student', '', 'Designed the symptom log and defined caregiver portal needs. Instrumental in UI clean up and usability inputs'),
+    ('sharada', 'Dr Sharada Vinod Kutty', 'Pulmonologist', 'AIIMS Mangalagiri', 'Wrote Saanthvana v1.0, the goals-of-care structure the app grew from, the clinical specification and platform spec, and the comfort-care rule. Designed the goals of care document; reviewed the symptom list and survey'),
+    ('sujay', 'Dr Sujay Halkur Shankar', 'Pulmonologist', 'Tata IISc Medical School', 'Defined the problem statement, evidence and solution; distilled the goals-of-care form; designed the hospital survey; tested the whole app (3 Nov); designed the 13-topic checklist and guided conversation (7 Nov); led the clinical wording review'),
+    ('shirin', 'Shirin Ayub', 'Medical student', '', 'Designed the symptom log: symptom list, how often to log, trend graph for the doctor. Defined caregiver portal needs and researched caregiver stress for the wellbeing check. Asked hospitals about morphine access; UI clean up and usability inputs'),
 ]
 for i, (f, n, role, inst, c) in enumerate(members):
     x = 0.55 + i * 2.48
@@ -52,10 +52,10 @@ for i, (f, n, role, inst, c) in enumerate(members):
     text(team, x + 0.08, 2.6, 2.14, 3.05, [
         ([R(n, size=13, bold=True)], {'after': 1}),
         ([R(role, size=12, bold=True, color=RUST)], {'after': 0}),
-        ([R(inst or ' ', size=11, bold=True, color=TEAL)], {'after': 4}),
-        [R(c, size=10.5, color=MUTED)]], align=PP_ALIGN.CENTER)
+        ([R(inst or ' ', size=10.5, bold=True, color=TEAL)], {'after': 4}),
+        [R(c, size=10, color=MUTED)]], align=PP_ALIGN.CENTER)
 card(team, 0.55, 5.85, 12.2, 1.15, fill=BG['mint'])
-icon(team, 11, 0.8, 5.95, 0.42); text(team, 1.35, 5.88, 5.3, 0.6, [[R('Our doctors ', size=13.5, bold=True), R('chose this problem from their own clinics and checked every version.', size=13.5)]], anchor=MSO_ANCHOR.MIDDLE)
+icon(team, 11, 0.8, 5.95, 0.42); text(team, 1.35, 5.88, 5.3, 0.6, [[R('Our doctors ', size=13.5, bold=True), R('chose this problem from their own clinics, wrote the clinical rules and checked every version.', size=13)]], anchor=MSO_ANCHOR.MIDDLE)
 icon(team, 28, 6.85, 5.95, 0.42); text(team, 7.4, 5.88, 5.3, 0.6, [[R('Legal advice was sought: ', size=13.5, bold=True), R('inputs and refining the goals of care wording and format.', size=13.5)]], anchor=MSO_ANCHOR.MIDDLE)
 text(team, 0.8, 6.5, 11.8, 0.4, [[R('Built by WeDevIT, the team’s company. The app is on Google Play under WeDevIT.', size=12, color=MUTED)]])
 notes(team, 'Doctor background from Dr Sujay (team chat, 25 Aug 2026): pulmonary specialists who have worked extensively with lung cancer; Dr Sujay has palliative-medicine exposure.')
@@ -359,10 +359,9 @@ for i, (n, h, d, col) in enumerate(plan):
     if i < 3: arrow(nxt, x + 2.95, 2.8, 0.13, 0.22)
 card(nxt, 0.55, 4.85, 12.2, 0.8, fill=BG['mint'])
 text(nxt, 0.8, 4.85, 11.7, 0.8, [[R('Next version of the app: ', size=15, bold=True, color=TEAL), R('more features such as devices like feeding tubes  ·  an improved caregiver portal  ·  updates based on user feedback', size=14)]], anchor=MSO_ANCHOR.MIDDLE)
-card(nxt, 0.55, 5.8, 12.2, 1.2, fill='FFFFFF', line='D9C9E6')
-text(nxt, 0.8, 5.82, 11.7, 1.16, [
-    ([R('Can the organisers share our solution publicly?   ', size=18, bold=True), R('YES', size=22, bold=True, color=TEAL)], {'after': 2}),
-    [R('Slides, brief, video and app description. Not patient records, passwords or private code.', size=13, color=MUTED)]], anchor=MSO_ANCHOR.MIDDLE, align=PP_ALIGN.CENTER)
+card(nxt, 0.55, 5.8, 12.2, 1.0, fill='FFFFFF', line='D9C9E6')
+text(nxt, 0.8, 5.82, 11.7, 0.96, [
+    [R('Can the organisers share our solution publicly?   ', size=18, bold=True), R('YES', size=22, bold=True, color=TEAL)]], anchor=MSO_ANCHOR.MIDDLE, align=PP_ALIGN.CENTER)
 '''
 
 S[13] = r'''
