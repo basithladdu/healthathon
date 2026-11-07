@@ -95,6 +95,8 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
             }
             Spacer(Modifier.height(12.dp))
             if (cloud == null) {
+                Text(t("Saved only on this phone. Sign in to share it with family and the doctor.", "सिर्फ़ इस फ़ोन पर सेव। परिवार और डॉक्टर से साझा करने के लिए साइन इन करें।"), color = DoctorCardSub, modifier = Modifier.testTag("invite-needs-account"))
+                Spacer(Modifier.height(12.dp))
                 SaharaPrimaryButton(t("Sign in", "साइन इन करें"), onClick = { onDismiss(); onSignIn() }, icon = Icons.Default.AccountCircle, navigates = true, modifier = Modifier.fillMaxWidth())
             } else if (!owner || selected.isBlank()) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -122,6 +124,8 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
                         SegmentedButton(selected = canAdd, onClick = { canAdd = true; code = "" }, shape = SegmentedButtonDefaults.itemShape(1, 2), modifier = Modifier.heightIn(min = 52.dp).testTag("invite-access-add"),
                             icon = { Icon(Icons.Default.Edit, null, Modifier.size(18.dp)) }) { Text(t("Can view and add", "देख सकें और जोड़ सकें")) }
                     }
+                    // The link itself expires in 3 days; the access it gives ends 30 days after it is made (make_invite passes 30 on the server).
+                    Text(t("Access lasts 30 days. Invite them again to renew it.", "पहुँच 30 दिन रहती है। बढ़ाने के लिए फिर से बुलाएँ।"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.testTag("invite-access-length"))
                     // Rarely used: the care-team switch waits behind one "+ More options" chip (it opens still off) unless already on.
                     if (!moreOptions && !careTeam) SaharaAddChip(t("More options", "और विकल्प"), { moreOptions = true }, Modifier.testTag("invite-more-options"), tone = SaharaTone.Leaf)
                     else Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).toggleable(careTeam, role = Role.Switch) { careTeam = it; code = "" }.heightIn(min = 48.dp).padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {

@@ -30,7 +30,7 @@ class WelcomeInlinePanelTest {
         var walkthroughs = 0
         ui.setContent { CareTheme {
             Welcome({ legacyCallbacks++ }, { legacyCallbacks++ }, { legacyCallbacks++ }, { walkthroughs++ },
-                addPersonContent = { close -> Button(onClick = close, modifier = Modifier.testTag("fixture-person")) { Text("Synthetic person form") } },
+                addPersonContent = { close, _ -> Button(onClick = close, modifier = Modifier.testTag("fixture-person")) { Text("Synthetic person form") } },
                 accountContent = { close, _ -> Button(onClick = close, modifier = Modifier.testTag("fixture-account")) { Text("Synthetic account form") } },
                 doctorContent = { close, _ -> Button(onClick = close, modifier = Modifier.testTag("fixture-doctor")) { Text("Synthetic doctor sign-in") } },
                 onPanelChanged = { selections += it })
@@ -90,7 +90,7 @@ class WelcomeInlinePanelTest {
 
     @Test fun familyTileOpensTheSamePanelAsPatientWithFamilyWording() {
         val selections = mutableListOf<String>()
-        ui.setContent { CareTheme { Welcome({}, {}, addPersonContent = { _ -> Text("Synthetic person form") }, onPanelChanged = { selections += it }) } }
+        ui.setContent { CareTheme { Welcome({}, {}, addPersonContent = { _, _ -> Text("Synthetic person form") }, onPanelChanged = { selections += it }) } }
         ui.onNodeWithTag("welcome-family").performScrollTo().performClick()
         ui.onNodeWithTag("welcome-add-person").assertIsDisplayed()
         ui.onNodeWithText("Add the person you care for").assertIsDisplayed()
@@ -142,7 +142,7 @@ class WelcomeInlinePanelTest {
         val saving = mutableStateOf(false)
         val selections = mutableListOf<String>()
         ui.setContent { CareTheme {
-            Welcome({}, {}, addPersonContent = { _ ->
+            Welcome({}, {}, addPersonContent = { _, _ ->
                 Button(onClick = { saving.value = true }, modifier = Modifier.testTag("fixture-save-person")) { Text("Save synthetic profile") }
             }, onPanelChanged = { selections += it }, entryBusy = saving.value)
         } }

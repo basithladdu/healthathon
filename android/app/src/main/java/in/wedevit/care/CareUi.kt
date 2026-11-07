@@ -262,7 +262,7 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
             if (medicineScanner && person != null) MedicineScanner(vm, onClose = { medicineScanner = false }, onAccount = onAccount)
             else if (person == null) Welcome(onAccount = onAccount, onStart = { dialog = "person" }, onSharedWorkspace = onDoctorWorkspace ?: { sharedWorkspaceOpen = true }, onDoctorDemo = onDoctorDemo, onPatientWalkthrough = onPatientWalkthrough,
                 accountContent = welcomeAccountContent, doctorContent = welcomeDoctorContent, onPanelChanged = onWelcomePanelChanged,
-                entryBusy = busy || refreshing, addPersonContent = { close -> AddPersonContent(busy = busy || refreshing, error = actionError, onDismiss = close, onSave = { vm.addPerson(it) { close() } }) })
+                entryBusy = busy || refreshing, addPersonContent = { close, patient -> AddPersonContent(busy = busy || refreshing, error = actionError, onDismiss = close, onSave = { vm.addPerson(it) { close() } }, patient = patient) })
             else SaharaScreenHost(person.id to tab, Modifier.fillMaxSize(), label = "Care tab", direction = { from, _ -> if (from.first == person.id) tabDirection else SaharaMotion.Direction.Switch }) { (shownId, shownTab) -> screens.SaveableStateProvider("$shownId:$shownTab") {
                 Box(Modifier.fillMaxSize()) { when (shownTab) {
                     0 -> Today(vm, clinician, onTalk = { go(1) }, onCare = { careFilter = it; go(2) }, onNearby = { go(3) }, onAdd = { if (canEdit) dialog = it else vm.message.value = askOwner }, onRead = { reading = it }, onCalendar = { openCalendar() }, onWorkflow = { go(7) }, onLabs = { go(8) }, onSharedWorkspace = { go(7) }, onSymptoms = { go(9) }, onInviteFamily = { inviteFamilyOpen = true }, onCalendarAt = ::openCalendar,
@@ -299,7 +299,7 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
     if (dialog == "person") AddPerson(onDismiss = { dialog = "" }, busy = busy || refreshing, error = actionError, onSave = { vm.addPerson(it) { dialog = "" } })
     if (dialog in listOf("medicine", "visit", "task", "journal")) AddCareItem(dialog, vm, onDismiss = { dialog = "" })
     if (dialog == "delete") AlertDialog(onDismissRequest = { dialog = "" }, title = { Text(t("Remove ${person?.name}'s records?", "${person?.name} के रिकॉर्ड हटाएँ?")) },
-        text = { Text(t("This can't be undone.", "इसे वापस नहीं किया जा सकता।")) },
+        text = { Text(if (vm.cloud != null) t("It will be removed for everyone. This can't be undone.", "यह सबके लिए हट जाएगा। इसे वापस नहीं लाया जा सकता।") else t("This can't be undone.", "इसे वापस नहीं किया जा सकता।")) },
         confirmButton = { TextButton(onClick = { val removedId = person?.id; vm.removePerson { (0..12).forEach { screens.removeState("$removedId:$it") }; dialog = "" } }, enabled = !busy, colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Text(t("Remove records", "रिकॉर्ड हटाएँ"), fontWeight = FontWeight.Bold) } },
         dismissButton = { TextButton(onClick = { dialog = "" }) { Text(t("Keep records", "रिकॉर्ड रखें")) } })
     reading?.let { note -> NoteReader(vm, note, onDismiss = { reading = null }) }
@@ -316,7 +316,8 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
 internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, tab: Int, activeRecording: Boolean): Boolean = personShown && !medicineScanner && (tab != 0 || activeRecording)
 
 @Composable fun Welcome(onAccount: () -> Unit, onStart: () -> Unit, onSharedWorkspace: () -> Unit = {}, onDoctorDemo: () -> Unit = {}, onPatientWalkthrough: (String) -> Unit = {},
-    addPersonContent: (@Composable (() -> Unit) -> Unit)? = null,
+    /** The person form; the Boolean is true when the Patient tile opened it, so the form asks for the patient's own name. */
+    addPersonContent: (@Composable (() -> Unit, Boolean) -> Unit)? = null,
     accountContent: (@Composable (() -> Unit, (Boolean) -> Unit) -> Unit)? = null,
     doctorContent: (@Composable (() -> Unit, (Boolean) -> Unit) -> Unit)? = null,
     onPanelChanged: (String) -> Unit = {}, entryBusy: Boolean = false) {
@@ -392,7 +393,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                                     SaharaPracticeEntry(t("Practice", "अभ्यास करें"), t("Look around with a ready-made record. No account needed.", "तैयार रिकॉर्ड के साथ ऐप देखें। खाते की ज़रूरत नहीं।"),
                                         enabled = !entryBusy, onClick = { walkthroughChooser = true }, modifier = Modifier.testTag("patient-walkthrough-entry"))
                                 }
-                                "person" -> addPersonContent?.invoke(close)
+                                "person" -> addPersonContent?.invoke(close, role == "patient")
                                 "doctor" -> Column(Modifier.fillMaxSize()) {
                                     Box(Modifier.fillMaxWidth().weight(1f)) {
                                         if (doctorContent != null) doctorContent.invoke(close) { formBusy = it }
@@ -1255,10 +1256,10 @@ private class CareToolRow(val label: String, val icon: ImageVector, val tone: Sa
         confirmButton = { TextButton(onClick = { onSave(name.trim()) }, enabled = name.isNotBlank() && !busy) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Continue", "आगे बढ़ें")) } }, dismissButton = { TextButton(onClick = onDismiss, enabled = !busy) { Text(t("Cancel", "रद्द करें")) } })
 }
 
-@Composable fun AddPersonContent(onDismiss: () -> Unit, busy: Boolean, error: String?, onSave: (String) -> Unit) {
+@Composable fun AddPersonContent(onDismiss: () -> Unit, busy: Boolean, error: String?, patient: Boolean = false, onSave: (String) -> Unit) {
     var name by rememberSaveable { mutableStateOf("") }; val t = careText()
     Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        Heading(t("Who is this care for?", "यह देखभाल किसके लिए है?"), 27)
+        Heading(if (patient) t("Your name", "आपका नाम") else t("Who is this care for?", "यह देखभाल किसके लिए है?"), 27)
         CareField(name, { name = it.take(100) }, t("Name", "नाम"), singleLine = true)
         error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
         Button(onClick = { onSave(name.trim()) }, enabled = name.isNotBlank() && !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-save-person")) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Continue", "आगे बढ़ें")) }
