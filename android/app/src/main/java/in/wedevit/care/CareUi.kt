@@ -1058,6 +1058,8 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
     val selectedPerson by vm.selected.collectAsStateWithLifecycle(); val loadedFor by vm.itemsLoadedFor.collectAsStateWithLifecycle()
     // A row opens its module on its own screen; Back returns to the list. [initialFilter] can open one directly.
     var openModule by rememberSaveable(target) { mutableStateOf(target) }
+    // Opening from Today ("Open medicines") always lands on that section, even if it was closed here before.
+    LaunchedEffect(target) { if (target != null) openModule = target }
     // A module opened straight from another page (Today's "Open medicines") goes back to that page, not to the list.
     fun closeModule() { if (target != null && openModule == target && onExit != null) onExit() else openModule = null }
     val t = careText()
