@@ -22,6 +22,14 @@ class CareDistressTest {
         assertTrue(saved.detail.contains(DistressRules.VERSION))
     }
 
+    @Test fun patientGetsTheFamilyChecksCareTeamMessageAtTheSameScore() {
+        assertTrue(DistressRules.tellCareTeam(DistressCheck(true, CareFamilyRules.TALK_FROM)))
+        assertTrue(DistressRules.tellCareTeam(DistressCheck(true, 10)))
+        assertTrue(!DistressRules.tellCareTeam(DistressCheck(true, CareFamilyRules.TALK_FROM - 1)))
+        assertTrue(!DistressRules.tellCareTeam(DistressCheck(false)))
+        assertTrue(!DistressRules.tellCareTeam(null))
+    }
+
     @Test fun noIsOneAnswerWithNothingElse() {
         val saved = DistressRules.change(null, DistressCheck(false))!!
         assertEquals(DistressRules.NO_TITLE, saved.title)

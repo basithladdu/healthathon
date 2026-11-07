@@ -149,6 +149,8 @@ object SymptomDiaryRules {
     fun symptomSeries(items: List<CareItem>, personId: String, symptom: String): List<DatedRating> = observed(items, personId)
         .filter { it.second.symptom.trim().equals(symptom.trim(), true) }
         .mapNotNull { (item, note) -> (PainBodyMapRules.overall(note.painBodyRatings) ?: note.rating)?.let { dated(item, note, it) } }
+    /** True when the points come from more than one kind of reporter (the patient, with or without help, family, care team): the daily high then mixes them. */
+    fun mixesReporters(points: List<DatedRating>): Boolean = points.map { if (it.respondent == "assisted-patient") "patient" else it.respondent }.distinct().size > 1
     /** One body part's pain over time, oldest first: its own spot rating, or for older notes without spot ratings the note's rating for its marked parts. */
     fun painPartSeries(items: List<CareItem>, personId: String, site: String): List<DatedRating> = observed(items, personId)
         .filter { it.second.symptom.trim().equals("Pain", true) }

@@ -139,6 +139,9 @@ internal object DistressRules {
     fun series(history: List<Pair<CareItem, DistressCheck>>): List<Triple<Long, Int, Boolean>> =
         history.sortedBy { it.first.created }.map { (item, check) -> Triple(item.created, if (check.distress) check.score ?: 0 else 0, check.distress) }
 
+    /** Same cut-off and message as the family member's own check ([CareFamilyRules.TALK_FROM]): a saved score of 4 or more. */
+    fun tellCareTeam(check: DistressCheck?): Boolean = check?.distress == true && (check.score ?: 0) >= CareFamilyRules.TALK_FROM
+
     fun summary(check: DistressCheck, hindi: Boolean): String = (check.problems.map { problemLabel(it, hindi) } + listOfNotNull(check.other.trim().takeIf { it.isNotEmpty() })).joinToString(", ")
 }
 
@@ -179,6 +182,7 @@ internal object DistressCodec {
                 if (change != null && canEditCareContext(vm, person, capturedAccount)) { if (today != null) vm.updateItem(change) {} else vm.saveItem("checkin", change.title, change.detail) }
             }, label = { Text(t("No", "नहीं"), textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()) }, modifier = Modifier.weight(1f).heightIn(min = 56.dp).testTag("distress-no"))
         }
+        if (DistressRules.tellCareTeam(answer)) Text(t("Tell your care team how you are.", "देखभाल टीम को अपना हाल बताएँ।"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk, modifier = Modifier.testTag("distress-tell-team"))
     }
 }
 
@@ -188,7 +192,8 @@ internal object DistressCodec {
     val items by vm.items.collectAsStateWithLifecycle(); val person by vm.selected.collectAsStateWithLifecycle(); val busy by vm.busy.collectAsStateWithLifecycle()
     val modelError by vm.actionError.collectAsStateWithLifecycle()
     val dayStart = remember { LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() }
-    val today = remember(person) { DistressRules.today(items, person, dayStart) }
+    // Read live, not remembered: if the screen opened before items loaded, Save must still update today's answer instead of adding a second one.
+    val today = DistressRules.today(items, person, dayStart)
     val previous = remember(today) { today?.let { DistressCodec.decode(it.detail) }?.takeIf { it.distress } }
     var score by rememberSaveable { mutableStateOf(previous?.score ?: -1) }
     var ticked by rememberSaveable { mutableStateOf(previous?.problems.orEmpty().joinToString("\n")) }
