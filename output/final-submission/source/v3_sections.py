@@ -382,7 +382,19 @@ for k, (lbl, url) in enumerate(items):
     if k < len(items) - 1:
         s_ = p.add_run(); s_.text = '   |   '; s_.font.size = Pt(14); s_.font.color.rgb = rgb(MUTED)
 style_runs(th[4], font='Calibri', size=12, bold=True, color=MUTED)
-th[4].top = Inches(6.55)
 style_runs(th[5], color=MUTED)
-text(thanks, 0.8, 5.25, 11.7, 0.4, [[R('  ·  '.join(n for _, n in names), size=13, bold=True, color=GREEN)]], align=PP_ALIGN.CENTER)
+th[1].top = Inches(1.75); th[1].height = Inches(0.75); style_runs(th[1], font='Georgia', size=34, bold=True, color=GREEN)
+th[2].top = Inches(2.45); th[2].height = Inches(0.4)
+# QR codes: app and website, big and centred, with the Play Store listing between them
+qs = 2.35; qy = 2.95
+pic(thanks, B / 'assets/qr-app.png', 1.35, qy, qs, qs)
+pic(thanks, B / 'assets/qr-web.png', 13.333 - 1.35 - qs, qy, qs, qs)
+sw = 5.6; sh_ = sw * 460 / 2150
+pic(thanks, B / 'assets/play-listing-top.png', (13.333 - sw) / 2, qy + (qs - sh_) / 2, sw, sh_, border='D9D2C3')
+pic(thanks, B / 'assets/google-play.png', 1.35 + 0.05, qy + qs + 0.07, 0.3, 0.33)
+text(thanks, 1.35 + 0.38, qy + qs + 0.02, qs, 0.42, [[R('Android app on Google Play', size=13, bold=True, color=GREEN)]], anchor=MSO_ANCHOR.MIDDLE)
+text(thanks, 13.333 - 1.35 - qs - 0.2, qy + qs + 0.02, qs + 0.4, 0.42, [[R('Website: sahara.wedevit.in', size=13, bold=True, color=GREEN)]], anchor=MSO_ANCHOR.MIDDLE, align=PP_ALIGN.CENTER)
+th[3].top = Inches(5.9)
+text(thanks, 0.8, 6.3, 11.7, 0.35, [[R('  ·  '.join(n for _, n in names), size=12.5, bold=True, color=GREEN)]], align=PP_ALIGN.CENTER)
+th[4].top = Inches(6.68)
 '''
