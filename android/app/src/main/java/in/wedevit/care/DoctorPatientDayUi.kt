@@ -44,8 +44,9 @@ import java.time.format.DateTimeFormatter
 
 internal enum class DoctorReportedMood(val title: String) { GOOD("A good day"), OKAY("An okay day"), HARD("A hard day") }
 internal fun doctorMood(title: String) = DoctorReportedMood.entries.firstOrNull { it.title == title }
+/** Only the patient's daily check-ins: symptom-diary notes and distress checks share "checkin" storage but are not check-ins. */
 internal fun doctorCheckIns(entries: List<CareItem>, personId: String, now: Long) = entries.filter {
-    it.personId == personId && it.kind == "checkin" && it.created in 1..now && !CareEntryCodec.isStructured(it.detail) && !DistressCodec.isStructured(it.detail)
+    it.personId == personId && it.kind == "checkin" && it.created in 1..now && !CareEntryCodec.isStructured(it.detail) && !DistressCodec.isStructured(it.detail) && !SymptomNoteCodec.isStructured(it.detail)
 }.sortedWith(compareByDescending<CareItem> { it.created }.thenBy { it.id })
 internal data class DoctorMedicineCounts(val total: Int, val markedToday: Int) { val notMarked get() = total - markedToday }
 internal fun doctorMedicineCounts(entries: List<CareItem>, personId: String, today: LocalDate): DoctorMedicineCounts {

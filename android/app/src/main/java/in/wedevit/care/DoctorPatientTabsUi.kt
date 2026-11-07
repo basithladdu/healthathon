@@ -62,8 +62,9 @@ internal val doctorPatientTabs = listOf(
     DoctorPatientTab("Reports", "Documents", "कागज़ात", Icons.Outlined.FolderOpen, DoctorCardReport),
 )
 
-/** The hub's two less used routes; named here so the section bar can title them too. */
+/** The hub's less used routes ("Today" is the Care today page); named here so the section bar can title them too. */
 internal val doctorMoreSections = listOf(
+    DoctorPatientTab("Today", "Care today", "आज की देखभाल", Icons.Outlined.GridView, DoctorCardOverview),
     DoctorPatientTab("Tools", "Daily care", "रोज़ की देखभाल", Icons.Outlined.Apps, DoctorCardReport),
     DoctorPatientTab("Shared", "Sharing & access", "साझा करना और पहुँच", Icons.Outlined.Lock, DoctorCardReport),
 )
