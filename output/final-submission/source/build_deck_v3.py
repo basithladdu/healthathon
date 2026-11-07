@@ -86,7 +86,13 @@ def phone(slide, name, x, y, h):
     card(slide, x - 0.05, y - 0.05, w + 0.1, h + 0.1, fill='FFFFFF', line='D9D4C7', radius=0.06)
     return pic(slide, SC / f'{name}.jpg', x, y, w, h)
 
-def icon(slide, n, x, y, s=0.42): return pic(slide, IC / f'image{n}.png', x, y, s, s)
+BADGE = {"4": "249C87", "5": "AD8333", "6": "AD3F5B", "7": "7C3F2D", "8": "0E5346", "9": "4E3774", "10": "2D3B87", "11": "0E5246", "12": "7C3F2C", "13": "4E3774", "14": "2D3A87", "15": "7C3F2C", "16": "2D3B87", "17": "4E3874", "18": "4E3874", "19": "7B3F2D", "20": "7B3F2D", "21": "4E3774", "22": "4E3874", "23": "0E5346", "24": "2D3B87", "25": "7C3F2C", "26": "7B3F2D", "27": "4E3774", "28": "0E5246", "29": "2D3B87", "30": "7C3F2D"}
+IW = B / 'assets/icons-white'
+def icon(slide, n, x, y, s=0.42):
+    c = slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x), Inches(y), Inches(s), Inches(s))
+    c.fill.solid(); c.fill.fore_color.rgb = rgb(BADGE.get(str(n), '157B68')); c.line.fill.background(); c.shadow.inherit = False
+    k = s * 0.6
+    return pic(slide, IW / f'image{n}.png', x + (s - k) / 2, y + (s - k) / 2, k, k)
 
 def arrow(slide, x, y, w=0.32, h=0.26, color='9AA79F'):
     a = slide.shapes.add_shape(MSO_SHAPE.RIGHT_ARROW, Inches(x), Inches(y), Inches(w), Inches(h))
@@ -104,7 +110,7 @@ def section(slide, title, bg):
     for r in t.text_frame.paragraphs[0].runs[1:]: r.text = ''
     t.text_frame.word_wrap = True
     t.fill.background()
-    style_runs(t, font='Georgia', size=26, bold=True, color=GREEN)
+    style_runs(t, font='Calibri', size=30, bold=True, color='1B2621')
     style_runs(slide.shapes[2], color=MUTED)   # footer
     strip_guidance(slide)
 
@@ -140,7 +146,7 @@ sh = cover.shapes
 sh[2].text_frame.paragraphs[0].runs[0].text = 'FINAL SUBMISSION'; style_runs(sh[2], font='Calibri', size=16, bold=True, color=RUST)
 sh[3].text_frame.paragraphs[0].runs[0].text = 'Sahara'
 for r in sh[3].text_frame.paragraphs[0].runs[1:]: r.text = ''
-style_runs(sh[3], font='Georgia', size=44, bold=True, color=GREEN)
+style_runs(sh[3], font='Calibri', size=44, bold=True, color=GREEN)
 sh[4].text_frame.paragraphs[0].runs[0].text = ('A phone app for people with a serious illness, like advanced cancer, and their families. '
     'Their doctor discusses their end of life wishes; Sahara creates a clinical document, '
     'and an emergency doctor can read it in one scan.')
@@ -397,7 +403,7 @@ tiles = [('877', 'automatic checks on the Android app: all pass', TEAL), ('594 /
 for i, (big, lbl, col) in enumerate(tiles):
     x = 0.55 + i * 3.08
     card(evals, x, 1.38, 2.93, 1.75, fill='FFFFFF')
-    text(evals, x + 0.15, 1.4, 2.63, 0.7, [[R(big, size=32, bold=True, color=col, font='Georgia')]], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+    text(evals, x + 0.15, 1.4, 2.63, 0.7, [[R(big, size=32, bold=True, color=col, font='Calibri')]], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
     text(evals, x + 0.15, 2.1, 2.63, 1.0, [[R(lbl, size=12, color=MUTED)]], align=PP_ALIGN.CENTER)
 text(evals, 0.55, 3.15, 12.2, 0.3, [[R('Automatic checks are small test programs that run after every change, so a broken feature is caught before release. Practice talks use scripted conversations, so no patient data is exposed.', size=10.5, color=MUTED, italic=True)]])
 text(evals, 0.55, 3.5, 12.2, 0.38, [[R('2. What experts told us, and what we changed', size=16, bold=True, color=RUST)]])
@@ -478,7 +484,7 @@ for i, (n, h, d, col) in enumerate(plan):
     card(nxt, x, 1.3, 2.93, 3.4, fill='FFFFFF')
     circ = nxt.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x + 1.06), Inches(1.5), Inches(0.8), Inches(0.8))
     circ.fill.solid(); circ.fill.fore_color.rgb = rgb(col); circ.line.fill.background()
-    circ.text_frame.text = n; style_runs(circ, font='Georgia', size=26, bold=True, color='FFFFFF')
+    circ.text_frame.text = n; style_runs(circ, font='Calibri', size=26, bold=True, color='FFFFFF')
     circ.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
     text(nxt, x + 0.15, 2.45, 2.63, 2.2, [([R(h, size=18, bold=True, color=col)], {'after': 6}), [R(d, size=13.5, color=MUTED)]], align=PP_ALIGN.CENTER)
     if i < 3: arrow(nxt, x + 2.95, 2.8, 0.13, 0.22)
@@ -491,7 +497,7 @@ text(nxt, 0.8, 5.82, 11.7, 0.96, [
 # ---------------------------------------------------------------- 13 thank you
 set_bg(thanks, BG['cream'])
 th = thanks.shapes
-style_runs(th[1], font='Georgia', size=40, bold=True, color=GREEN)
+style_runs(th[1], font='Calibri', size=40, bold=True, color=GREEN)
 p = th[2].text_frame.paragraphs[0]; p.runs[0].text = 'Zeros and Ones  •  ' + TEAM_CODE
 for r in p.runs[1:]: r.text = ''
 style_runs(th[2], font='Calibri', size=18, bold=True, color=RUST)
@@ -509,7 +515,7 @@ style_runs(th[4], font='Calibri', size=12, bold=True, color=MUTED)
 style_runs(th[5], color=MUTED)
 th[0].left = Inches(0.55); th[0].top = Inches(0.3); th[0].width = Inches(2.9); th[0].height = Inches(2.9 * th[0].height / th[0].width) if False else Inches(0.4)
 th[1].left = Inches(3.6); th[1].width = Inches(6.1); th[1].top = Inches(0.2); th[1].height = Inches(0.65)
-style_runs(th[1], font='Georgia', size=30, bold=True, color=GREEN)
+style_runs(th[1], font='Calibri', size=30, bold=True, color=GREEN)
 th[2].left = Inches(3.6); th[2].width = Inches(6.1); th[2].top = Inches(0.82); th[2].height = Inches(0.35)
 style_runs(th[2], font='Calibri', size=15, bold=True, color=RUST)
 text(thanks, 10.1, 0.28, 2.7, 0.6, [[R('dev', size=30, bold=False, color='E8333A', font='Consolas'), R('it.', size=30, color='111111', font='Consolas')]], align=PP_ALIGN.RIGHT, anchor=MSO_ANCHOR.MIDDLE)
