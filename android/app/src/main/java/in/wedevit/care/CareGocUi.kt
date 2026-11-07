@@ -164,19 +164,27 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
  * The doctor's Goals of care tab: the talk as its own page (Record, Review, Sign), titled with the patient's name,
  * not as step 6 of the plan. Leaving saves the draft as the plan wizard does; [onFullPlan] opens the 10-step plan.
  */
-@Composable internal fun GocTabFlow(record: EctprRecord, canEdit: Boolean, onSave: (EctprRecord) -> Boolean, onClose: () -> Unit, onFullPlan: () -> Unit) {
+@Composable internal fun GocTabFlow(record: EctprRecord, canEdit: Boolean, onSave: (EctprRecord) -> Boolean, onClose: () -> Unit, onFullPlan: (EctprRecord?) -> Unit) {
     val t = careText(); val hindi = careHindi()
     val mic = rememberSaharaPermission(SaharaPermission.Microphone)
     var d by remember(record.id) { mutableStateOf(record) }
     var leaving by remember { mutableStateOf<(() -> Unit)?>(null) }
-    val blockers = EctprRules.saveBlockers(d, LocalDate.now())
+    val today = LocalDate.now()
+    val blockers = EctprRules.saveBlockers(d, today)
+    // The plan's rules can block its save (V4, V5, DNACPR), and this page has no control for them. The talk is still kept; its choices wait for the full plan.
+    fun keepTalk(): Boolean { val kept = GocKeep.talkOnly(record, d, today); return samePlan(kept, record) || onSave(kept) }
     fun leave(then: () -> Unit) { if (samePlan(d, record)) then() else if (blockers.isEmpty()) { if (onSave(d)) then() } else leaving = then }
+    // The full plan opens with this talk's unsaved choices, so the rules that block them can be fixed there.
+    fun fullPlan() { if (samePlan(d, record)) onFullPlan(null) else if (blockers.isEmpty()) { if (onSave(d)) onFullPlan(null) } else if (keepTalk()) onFullPlan(d) }
     androidx.activity.compose.BackHandler { leave(onClose) }
-    GocConversationPage(d, { change -> d = change(d) }, LocalGocFolder.current, mic::request, onClose = { leave(onClose) }, onFullPlan = if (canEdit) { { leave(onFullPlan) } } else null)
+    GocConversationPage(d, { change -> d = change(d) }, LocalGocFolder.current, mic::request, onClose = { leave(onClose) }, onFullPlan = if (canEdit) { { fullPlan() } } else null)
     leaving?.let { then -> androidx.compose.material3.AlertDialog(onDismissRequest = { leaving = null }, title = { Text(t("Can't save yet", "अभी सहेजा नहीं जा सकता")) },
-        text = { Column { blockers.forEach { Text("• " + it.text(hindi), style = MaterialTheme.typography.bodySmall) } } },
-        confirmButton = { TextButton(onClick = { leaving = null }) { Text(t("Fix them", "ठीक करें")) } },
-        dismissButton = { TextButton(onClick = { leaving = null; then() }) { Text(t("Discard changes", "बदलाव छोड़ें"), color = RustText) } }) }
+        text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            blockers.forEach { Text("• " + it.text(hindi), style = MaterialTheme.typography.bodySmall) }
+            Text(t("The talk is kept. These choices are saved once this is fixed in the full care plan.", "बातचीत सहेजी रहेगी। पूरी देखभाल योजना में यह ठीक होने पर ये फ़ैसले सहेजे जाएँगे।"), style = MaterialTheme.typography.bodySmall)
+        } },
+        confirmButton = { TextButton(onClick = { leaving = null; if (canEdit) fullPlan() }) { Text(if (canEdit) t("Fix in the full care plan", "पूरी देखभाल योजना में ठीक करें") else t("Fix them", "ठीक करें")) } },
+        dismissButton = { TextButton(onClick = { leaving = null; if (keepTalk()) then() }) { Text(t("Leave, keep the talk", "बातचीत सहेजकर बाहर जाएँ"), color = RustText) } }) }
 }
 
 /** The way from the talk into the 10-step plan, named for what it is. */
@@ -357,15 +365,19 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
         lines = lines.filter { it.text.isNotBlank() }, language = GocSpeechLanguage.valueOf(language).code,
         source = if (model.isNotBlank()) GocTranscript.SOURCE_RECORDED else GocTranscript.SOURCE_TYPED,
         model = model, participants = names.joinToString("\n"), consentAt = consentAt, planVersion = d.version,
-        topics = topics.values.sortedBy { it.decision.ordinal }, note = note, noteKind = GocNote.kind(topics.values), reviewedAt = now, reviewedBy = if (now.isBlank()) "" else d.createdBy, audioKept = false,
+        topics = topics.values.sortedBy { it.decision.ordinal }, note = note, noteKind = GocNote.kind(topics.values), reviewedAt = now, reviewedBy = if (now.isBlank()) "" else signedInDoctor?.name?.takeIf { it.isNotBlank() } ?: d.createdBy, audioKept = false,
         signOff = signOff, transcribedBy = transcribedBy,
     )
     LaunchedEffect(Unit) { gemini = gocOnlineEngines().gemini }
-    // Autosave, so a killed app or a long job loses nothing the doctor already corrected.
+    // Choices this talk confirmed that the plan no longer holds (the app was closed before the plan saved, or the plan's rules blocked it) come back.
+    LaunchedEffect(d.id) { initial?.topics?.let { saved -> if (GocKeep.restore(d, saved) != d) update { GocKeep.restore(it, saved) } } }
+    // Autosave, so a killed app or a long job loses nothing the doctor already corrected. Typed or pasted words are kept too; they need no recording consent.
     LaunchedEffect(lines, note, topics, consentAt, participants) {
         // A locked note is saved on the plan and its draft is gone; never bring the draft back after the lock.
-        if (consentAt > 0 && draftFile != null && signOff == null) { delay(1200); if (signOff == null) { val snapshot = GocDraft(build(), emptySet()); withContext(Dispatchers.IO) { draftFile.write(snapshot) } } }
+        if ((consentAt > 0 || lines.isNotEmpty()) && draftFile != null && signOff == null) { delay(1200); if (signOff == null) { val snapshot = GocDraft(build(), emptySet()); withContext(Dispatchers.IO) { draftFile.write(snapshot) } } }
     }
+    // Leaving within the autosave's wait still keeps the last confirm or edit.
+    DisposableEffect(draftFile) { onDispose { if (draftFile != null && signOff == null && (consentAt > 0 || lines.isNotEmpty())) draftFile.write(GocDraft(build(), emptySet())) } }
     DisposableEffect(recorder, owner) {
         val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_STOP) { recorder?.stop(); recorder?.stopPlayback(); task?.cancel() } }
         owner.lifecycle.addObserver(observer)
@@ -628,12 +640,14 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
             }
             item(key = "note-tools") {
                 var problem by remember { mutableStateOf("") }
+                // The same status line as the doctor-side PDF, so an unsigned draft never reads as a finished form.
+                val pdfStatus = signOff?.let { so -> t("Signed and locked", "साइन होकर बंद") + (if (so.signers.isNotEmpty()) ": " + so.signers.joinToString(", ") else "") } ?: t("Not signed yet", "अभी साइन नहीं")
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     if (signOff == null) TextButton(onClick = { stage = GocStage.REVIEW }, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = RustText); Spacer(Modifier.width(6.dp)); Text(t("Back", "वापस"), color = RustText) }
                     Spacer(Modifier.weight(1f))
                     OutlinedButton(onClick = { scope.launch {
                         val file = runCatching { withContext(Dispatchers.IO) { File(File(context.cacheDir, "doctor-preview-exports").apply { mkdirs() }, "goals-of-care-${d.id.filter { it.isLetterOrDigit() || it == '-' }.take(48)}.pdf").also {
-                            CarePlanPdf.gocNote(it, d, hindi, LocalDate.now(), note = note, topics = topics, signers = signOff?.formSigners().orEmpty()) } } }.getOrNull()
+                            CarePlanPdf.gocNote(it, d, hindi, LocalDate.now(), note = note, status = pdfStatus, topics = topics, signers = signOff?.formSigners().orEmpty()) } } }.getOrNull()
                         if (file == null) problem = t("Couldn't make the PDF. Try again.", "PDF नहीं बना। फिर कोशिश करें।") else runCatching { DoctorGocPdf.share(context, file, t("Share PDF", "PDF साझा करें")) }
                     } }, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("goc-pdf")) { Icon(Icons.Default.PictureAsPdf, null, tint = RustText); Spacer(Modifier.width(6.dp)); Text("PDF", color = RustText) }
                 }
