@@ -1,92 +1,148 @@
-# Sahara — A Palliative Care Companion
+<p align="center">
+  <img src="docs/screenshots/sahara-logo.png" alt="Sahara logo" width="120">
+</p>
 
-**Start with [the current team handoff](TEAM_HANDOFF.md).** It contains the latest APK/PDF locations, verification, remaining work, build commands and scope boundaries. [PROJECT_CONTEXT_MAP.md](PROJECT_CONTEXT_MAP.md) keeps the full timeline.
+<h1 align="center">Sahara</h1>
+<p align="center"><b>A palliative-care companion for patients, families and their doctors.</b><br>
+Record what matters, track how you feel, and find help nearby. On Android and the web.</p>
 
-Latest verified native update (20 October 2026): **0.6.0 (7) debug test APK**, national directory with 1,631 listings across 36 states/UTs, visible choices/actions, local Latin/Devanagari OCR and Hindi/English translation, and optional Qwen3-ASR recording transcription. The APK built and 147 unit checks passed; current phone and clinical-language validation remain pending. The 987 MB speech pack is a separate optional download with 64-bit / 2.5 GiB free RAM requirements. This test APK has not been uploaded to Play.
+<p align="center">
+  <a href="https://sahara.wedevit.in"><img alt="Live web" src="https://img.shields.io/badge/Live%20web-sahara.wedevit.in-3f7d6b"></a>
+  <a href="https://play.google.com/store/apps/details?id=in.wedevit.sahara"><img alt="Google Play" src="https://img.shields.io/badge/Google%20Play-Get%20the%20app-4a8f7a"></a>
+  <img alt="Health-a-thon 2026" src="https://img.shields.io/badge/Health--a--thon-2026-7a9e8e">
+  <img alt="Android and Web" src="https://img.shields.io/badge/platform-Android%20%7C%20Web-8aa89b">
+</p>
 
-Web: [shared care](https://sahara.wedevit.in/shared-care), [hospital survey (web only)](https://sahara.wedevit.in/hospital-survery). Last Play check 19 October: 0.4.1 production available ; 0.5 production update in review. See the release metadata before making a current release claim. No patient rollout is established.
+<p align="center">
+  <img src="docs/screenshots/hero-doctor-and-family.jpg" alt="A palliative-care doctor talking with a patient's family" width="720">
+</p>
 
-## Earlier project and release notes
+## The problem
 
-The following notes are retained from earlier checkpoints. Later implementation and status are described in the current handoff above; the older33-centre/dictation-only/preview-only descriptions do not describe the20 October source.
+- **98%** of India's metastatic (advanced) cancer patients had unmet palliative-care needs (Patil, *BMJ Support Palliat Care* 2024). Timely referral was only **30 to 37%** at two centres (Venketeswaran, *BMJ Support Palliat Care* 2026).
+- **Goals of care** (CPR, ventilation, ICU, place of death) are rarely written down: in one hospital only **41%** of cancer patients dying on active treatment had end-of-life care documented (Das, *Cancer Med* 2026), though **88%** of urban adults want this choice (Living Will Survey, IndiaSpend 2019).
+- **Symptoms** change between visits and are often missed. Patients who report symptoms online have better quality of life and fewer emergency visits (Basch, *J Clin Oncol* 2016).
+- **Pain relief:** India uses 0.11 mg of morphine per person against 6.27 mg globally (Rajagopal, *J Glob Oncol* 2017), and families rarely know where to find it.
 
+> A 62-year-old woman with advanced breast cancer tells her doctor her wishes. Two months later she is unconscious in the emergency department, her children disagree about CPR, and nobody can find what she said.
 
-**Sahara (सहारा)** is the approved name, chosen on 10 October 2026. Zeros and Ones was shortlisted for Health-a-thon 2026 Phase 2. The primary project is now native Android; the website is in `prototype/` and its earlier checkpoint is preserved in [Healthathon-Copy](https://github.com/basithladdu/Healthathon-Copy).
+Sahara helps patients and caregivers align care with their values and needs.
 
-Website: https://sahara.wedevit.in. The earlier https://saanthvana.wedevit.in address remains active for the submitted deck. Android privacy and account-deletion requests are available at `/privacy` and `/delete-account` on either address. `/android-account` handles email confirmation and password recovery; the exact Supabase redirect and ordinary-tester email delivery still need provider setup.
+## What Sahara does
 
-## Android
+| | |
+|---|---|
+| **Goals of care** | The doctor records the conversation (after consent). Gemini transcribes it, labels who said what, and fills the advance-care-planning clinical document with a 13-item checklist. Guide me or Free flow topic tapping, sign and lock, version history, Start a new version. |
+| **Emergency QR card and SOS** | Wishes, contacts and medicines in one scan, plus one-tap emergency help. |
+| **Symptoms** | Log several at once, rate 0 to 10 in the style of ESAS-r, mark pain on a body map, and use the NCCN distress thermometer. |
+| **Medicines** | Built from prescription or tablet-strip photos, grouped by time of day, with dose ticks and reminders. |
+| **Documents** | Uploads sorted by Gemini (prescriptions, bills, reports), with questions answered from them ("When is my next follow-up?"). |
+| **Find care** | 1,628 palliative centres, morphine-listed hospitals, and 112. |
+| **Caregiver wellbeing** | ZBI-4 check, Tele-MANAS 14416, counsellors, support groups, and a journal. |
+| **Languages** | Telugu, Urdu, Kannada, Hindi and English. |
+| **Calm by design** | A quiet sage and cream palette, large text, plain words. |
 
-Kotlin, Jetpack Compose, Room, MapLibre Native and consented audio recording. The main flow is **conversation → doctor review → saved care note → patient/family confirmation of that exact version**. Earlier versions remain unchanged and the original words remain readable.
+## Screenshots
 
-Also included: multiple people, prescribed-medicine lists, visits, tasks, check-ins, a journal, and 33 source-linked Karnataka care centres with search, service filters, calls and directions. MapLibre with OpenFreeMap tiles shows nine checked hospital locations; the other 24 remain in the address list until coordinates are verified. Source links for each coordinate are retained in the directory asset. Morphine listings do not establish current stock.
+Android app, on a real phone.
 
-The home screen shows saved visits, medicines, tasks, check-ins and journal entries. Forms use optional details, quick date choices and a single journal field. Tab position and filters survive navigation; animations follow system motion settings. Routine screens contain no demo, native-build or storage-explanation copy.
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshots/01-home.png" width="230" alt="Home"><br><sub><b>Today</b><br>SOS, a daily check-in, medicines</sub></td>
+    <td align="center"><img src="docs/screenshots/02-log-symptom.png" width="230" alt="Log a symptom"><br><sub><b>Log a symptom</b><br>Pick several, rate 0 to 10</sub></td>
+    <td align="center"><img src="docs/screenshots/03-add-medicine.png" width="230" alt="Add a medicine"><br><sub><b>Add a medicine</b><br>Form, dose times, reminders</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/04-find-care.png" width="230" alt="Find care"><br><sub><b>Find care</b><br>1,628 centres, morphine-listed hospitals, 112</sub></td>
+    <td align="center"><img src="docs/screenshots/06-goc-consent-record.png" width="230" alt="Goals of care consent and recording"><br><sub><b>Goals of care: consent and record</b><br>Everyone present agrees first</sub></td>
+    <td align="center"><img src="docs/screenshots/05-goc-checklist.png" width="230" alt="Goals of care checklist"><br><sub><b>Goals of care: checklist</b><br>Topics ticked as covered, missed ones flagged</sub></td>
+  </tr>
+</table>
 
-Version 0.4 brings Awaiz's Sahara logo, compact Patient/Family/Doctor menu and highlighted bottom navigation into Android. Documents gathers reviewed care notes and user-selected PDFs or photos, with search, open, share and remove actions. Reports are private copies on the phone, separated by account and person; they do not sync to the care team. Care notes have Save copy and Share at the top. The last physical-phone build was 0.4.0.
+All names in the screenshots are demo data.
 
-The 0.5.0 (6) candidate adds consented, attributed speaker-turn dictation on phones with Android's on-device recognizer, exact source excerpts for care-note review, installed-voice read aloud, patient-first and separate family confirmations, a shared care-team request/task queue, dated calendar and numeric lab history. Room schema 6 merges the two branches with explicit migrations from schemas 3, 4 and 5. The shared confirmation migration and rollback permission suites passed against the restored service on 16 October. Dictation does not transcribe saved recordings, identify speakers or translate. Excerpt assignment is clinician-directed, not a connected generative model.
+## Try it in 2 minutes
 
-The latest merged doctor workspace has patient search, scheduled visits, recording playback, review steps and PDF export in an isolated fictional preview. It does not establish clinician verification or connect those sample records to real care accounts. Its disclosures and PDF labels remain visible. Release builds disable cloud audio at the interface, model and transport boundaries; the restored Sahara backend and existing account-token namespace are retained. Published source is capped at 12,000 characters to match that service. The upstream synthetic developer transcription code is preserved separately from public patient use. See [the doctor workspace scope](docs/doctor-demo-workspace.md) for the preview's separate storage and retention limits.
+No sign-up is needed. See also [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md).
 
-The combined source includes upstream merge `865f624`, preserving merge `504b09b`, release/account fixes `51c0fec` and keyboard sheet fix `9bd9bda`. [CI run 38881300006](https://github.com/basithladdu/healthathon/actions/runs/38881300006) built source `ebffb7b043a5e8725f190ab8f8f3574c768d9058`: **104 unit tests across 16 suites passed**, with no failures, errors or skips. Debug lint reported **0 errors / 37 warnings**; `lintVitalRelease` passed in the build step, but no separate release-lint XML counts were collected. Fresh APK/AAB packages were signed locally with the existing upload key and verified as `in.wedevit.sahara` **0.5.0 (6)**, non-debuggable, with the same signer as 0.4.1. ZIP alignment and all four native ELF libraries passed static 16 KB checks. [Build evidence](output/android/verification/0.5.0/combined-build-checks.json) and [signed artifact identity](output/android/verification/0.5.0-artifacts.json) are saved separately.
+**Web** ([sahara.wedevit.in](https://sahara.wedevit.in)): the landing page has demo buttons.
 
-[Current-source runtime evidence](output/android/verification/0.5.0/combined-runtime-checks.json) records **35 latest passes, 1 credential-dependent skip and 0 failures** across 36 distinct instrumentation cases. These are the latest results per unique test across **six runs**, not a single clean 36-case run. The [first CI runtime run](output/android/verification/0.5.0/ci-runtime-38882501784/inspection.json) remains recorded with **31 passes, 1 skip and 4 failures**, and all later failed attempts remain in the combined report. [Final correction run 38891431772](https://github.com/basithladdu/healthathon/actions/runs/38891431772) passed its **1 selected case with 0 failures**: after the actual Saved snackbar cleared, the Privacy header expanded and its body was displayed. The original app inputs remain unchanged.
+1. **Family:** tap **Open family care**. See the home, calendar, care circle and the latest doctor-signed Care Note.
+2. **Doctor:** tap **Start a conversation**. The doctor demo opens with a prefilled demo login. Start a goals-of-care conversation, add text or audio, review the draft, and sign.
+3. **Patient:** use the patient entry on the landing page to see the patient's own view.
 
-The first runtime run passed optimized Calendar, Care team and Lab history saves with the actual Android keyboard open and persistence after process restart. [Optimized follow-up 38887001702](output/android/verification/0.5.0/ci-runtime-38887001702/inspection.json) completed doctor preview publication, PDF creation and exit back to Sahara, alongside the local-only recording consent checks. A separate fictional-preview PDF check passed with five pages, all 130 source lines and warning/footer labels preserved. The optimized CI APK used an ephemeral signer; the locally signed store artifact retains the existing upload key. No 0.5.0 physical-device, 16 KB runtime, real speech/provider or clinical validation is claimed. The `src/main` tree remains `b1c5ad0d17f5a0148f7f51241e1b7644b2941471`, identical to signed source `ebffb7b`; test/harness corrections do not change the app. Remaining readiness and draft status are in `android/release/store-draft.json`.
+**Android** ([Google Play](https://play.google.com/store/apps/details?id=in.wedevit.sahara)):
 
-Version 0.4.0 adds the prescription organiser under **Care → Medicines**. It supports choosing prescription pages and medicine packaging, then reviewing and editing extracted medicines before saving. **Patient scanning remains off:** the existing Gemini key uses the free tier, whose terms exclude sensitive input. On 13 October, the deployed Supabase function passed a live extraction check using fictional images; unauthorized calls returned 401. Its secret is deliberately absent from the public website until suitable provider terms and billing are resolved. No secret is included in the APK. Manual medicine entry works offline.
+1. Open the app and choose **Patient & family** or **Doctor workspace**.
+2. Tap **Try a demo account** and pick a role (patient, family member or doctor).
+3. Patient: log a symptom, add a medicine, open **Find care**. Doctor: Patients, then Goals of care, then **Record conversation**.
 
-Optional accounts use Supabase Auth. Signed-in people, daily entries, immutable care-note versions and exact-version confirmations are saved through the API and cached separately per account. Owners can issue one-use, three-day invitations with read or edit permission and remove members. The backend enforces those permissions and rejects conflicting edits. Refresh is available on Today and runs when the app opens. Failed saves keep the form filled. Existing unsigned-in records are not automatically uploaded. Recordings and unfinished conversations are not shared. After verifying a deletion request, support can close Sahara access and remove its owned records through the service-only `healthathon_close_account` function; a shared sign-in and other owners' records remain intact. The closure is enforced for existing tokens. Its rollback regression passed without closing any real account.
+## How it works
 
-Doctor/family views, task recipients and confirmation names are self-entered; identities and credentials are not verified. Recording and dictation need microphone permission and everyone's consent and stop when the app leaves the foreground. Source links require exact words; edited text does not acquire a false citation. Read aloud requires an installed offline voice. Care-team requests are shared records, not dispatched calls or email. Lab graphs show entered values with the printed units/ranges, without clinical interpretation. Care notes are not treatment orders or legal directives.
+```mermaid
+flowchart LR
+  A["Android app<br/>Kotlin + Jetpack Compose"] -->|HTTPS| S
+  W["Web app<br/>Next.js on Vercel"] --> R["Server routes<br/>/api/*"]
+  R --> S[("Supabase<br/>auth, data, edge functions")]
+  R -->|"keys stay on the server"| G["Gemini<br/>transcribe, label speakers,<br/>fill form, sort documents"]
+  S --> G
+  A -. "offline fallback" .-> H["On-device Whisper"]
+```
 
-### Build
+- **Android:** Kotlin and Jetpack Compose, in `android/`. If the network is unavailable, speech falls back to on-device Whisper.
+- **Web:** React and Next.js (App Router), deployed on Vercel, in `prototype/`.
+- **Backend:** Supabase (data and edge functions). Gemini is called only through server routes or edge functions. API keys live in server secrets and never ship in the app or the browser.
+- **Doctor and patient** have separate interfaces over the same signed record.
 
-Requires JDK 21, Android SDK 36 and the checked-in Gradle wrapper:
+## Safety and privacy
 
-```powershell
+- **The AI only records, flags and retrieves. Every clinical decision stays with the doctor.** Sahara does not diagnose, predict prognosis or recommend treatment.
+- The goals-of-care document is **a clinical, not legal, document**. The doctor corrects the draft; doctor and patient or family sign; then it locks. Edits need re-signing and every version is kept.
+- Recording starts only after everyone present has agreed, and the screen says that audio is sent to Google Gemini to transcribe.
+- Anything not discussed stays marked "Not discussed"; the draft does not invent content.
+- Demo accounts use fictional people. Do not enter real patient data into a demo.
+
+## Repo layout
+
+```
+android/     Android app (Kotlin, Jetpack Compose) and its Supabase functions
+prototype/   Web app (Next.js), tests, Supabase functions
+docs/        Docs, releases, research notes, screenshots
+output/      Submission deck, two-page brief, build and verification notes
+scripts/     Data and health-check scripts (e.g. centre geocoding)
+```
+
+Team notes: [TEAM_HANDOFF.md](TEAM_HANDOFF.md), [blockers.md](blockers.md), [PROJECT_CONTEXT_MAP.md](PROJECT_CONTEXT_MAP.md).
+
+## Build from source
+
+**Android** (JDK 17 and the Android SDK needed):
+
+```bash
 cd android
-.\gradlew.bat :app:assembleDebug :app:testDebugUnitTest
-.\gradlew.bat :app:connectedDebugAndroidTest
-.\gradlew.bat :app:bundleRelease --no-daemon
-.\gradlew.bat :app:lintDebug --no-daemon
+./gradlew assembleDebug        # gradlew.bat on Windows
 ```
 
-Use Android Studio to open `android/`, or set `ANDROID_HOME` / an ignored `android/local.properties`. On this computer, build caches and temporary files use F: because C: has little free space. Gradle uses one worker to avoid the observed memory-allocation failure. The manually dispatched Android CI workflow builds unsigned packages without private signing material. The current 0.5.0 packages have completed local signing and static verification.
+**Web** (Node.js 22.13 or later):
 
-The permanent application ID is `in.wedevit.sahara`; debug builds use `in.wedevit.sahara.development`. Release builds read the ignored `android/keystore.properties` file (`storeFile`, `storePassword`, `keyAlias`, `keyPassword`) and require an upload key. Never commit signing credentials. The previous development app remains a separate installation; its records are not migrated or removed by installing Sahara.
-
-The Play title is **Sahara: Palliative Companion**. The existing Devit account shows **Organization**. **0.4.1 (5)** is live in **Closed testing — Alpha**, released on 14 October at **17:49 IST**. An eligible account joined and Google Play displayed **Install**. [Join closed testing](https://play.google.com/apps/testing/in.wedevit.sahara) using an account on the selected tester lists. **0.5.0 (6)** was uploaded once and saved as **Alpha release ID 4**; its track entry shows **Draft**, and it has not been submitted. Invitations to all **59** confirmed addresses were verified in Gmail Sent in separate **57 + 2** batches, with recipients kept private; do not resend them. Tester installations and production approval are not confirmed. The original two publisher-account rejections remain in history. Photo scanning stays off; accurate Medical/health declarations are preserved. See `android/release/store-draft.json` for status and remaining scope.
-
-## Website and submission
-
-On **16 October at 11:00 UTC**, Play's Publishing overview still showed **Production 0.4.1 (5): Changes in review**, for India. That existing review was preserved while saving the 0.5.0 Alpha draft; production approval is not confirmed.
-
-- [Current website](https://sahara.wedevit.in/)
-- [Website checkpoint](https://github.com/basithladdu/healthathon/commit/735149fc4071555268ddfd053743af48f2266e76) — `SHORTLISTED`
-- [Latest saved Round 1 deck](submission/final/Saanthvana_Healthathon_2026-10-03-final.pptx)
-- [Current project context](PROJECT_CONTEXT_MAP.md) and [name shortlist](PRODUCT_NAMING.md)
-- [Website setup](prototype/README.md), [revised form answers](submission/Round_1_Answers_2026-09-24.md), [family-support research](docs/pitch/2026-09-24-family-support-research.md), [proposed impact plan](docs/pitch/2026-09-24-impact-plan.md)
-
-To run the website with Node.js 22.13 or newer:
-
-```powershell
+```bash
 cd prototype
-npm install
-npm run dev:next
+npm i
+npm run dev      # open http://localhost:3000
+npm test
 ```
 
-The web and Android implementations currently have different integration coverage. The website's shared centre-report service is not connected to this native build; its live care-assist readiness endpoint reported `ready: false` on 9 October. The public prescription endpoint intentionally reports `ready: false` pending suitable patient-data processing terms. Its private Supabase/Gemini path passed a synthetic-image test on 13 October; this does not establish real-prescription accuracy or the complete phone upload flow. AI transcription, shared hospital-report uploads and medicine notifications remain Android work. A dedicated reviewer account has confirmed email, API access and a successful Samsung sign-in/load/reopen check. Ordinary tester signup still needs transactional SMTP because Supabase's default mailer sends only to project-team addresses; Zoho setup is paused at the user's request. Recovery has 11 focused passing checks and a deployed, mobile-checked callback page, but the redirect allowlist remains unapproved and end-to-end delivery is pending. Unsigned-in care flows remain available. The shared Supabase project also has leaked-password protection disabled: [configuration guidance](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection). Build results do not establish live service behavior.
+The AI features need server-side secrets (for example `GEMINI_API_KEY`); without them those features stay off. See [prototype/README.md](prototype/README.md).
 
-## Team
+## Team and credits
 
-Dr Sharada Vinod Kutty · Dr Sujay Halkur Shankar · Shaik Abdul Basith · Shaik Muhammad Awaiz · Shirin Ayub
+Built by **WeDevIT Private Limited** ([wedevit.in](https://wedevit.in)) for **Health-a-thon 2026**.
 
-### Backend and map sources
+- **Shaik Abdul Basith**, founder, WeDevIT: product and engineering.
+- **Dr Sujay H S** (IISc), clinical lead: wrote the problem statement and clinical design, and led the goals-of-care approach.
+- **Dr Sharada**, palliative-care physician: clinical review of the goals-of-care form and content.
+- **Shirin Ayub**: medical and caregiver research, including the caregiver-burnout evidence.
 
-- Reproducible schema and row-permission checks: `android/supabase/migrations/` and `android/supabase/tests/care_permissions.sql`. Only the publishable key is included in the client. No service key is shipped.
-- MapLibre Android: https://maplibre.org/maplibre-native/android/examples/getting-started/
-- OpenFreeMap style and attribution: https://openfreemap.org/quick_start/
-- Directory: https://palliumindia.org/clinics/karnataka
-- The private invitation table deliberately has no direct RLS policy; only bounded, authenticated functions can use it. Other existing Supabase tables were left unchanged.
+## Licence
+
+All rights reserved, WeDevIT Private Limited. No licence is granted to copy or reuse the code or content without permission. Data sources are noted in [DATA_LICENSE.md](DATA_LICENSE.md).
