@@ -23,7 +23,9 @@ enum class EmergencySection(val en: String, val hi: String) {
 data class EmergencyMedicine(val name: String, val detail: String = "")
 data class EmergencyContact(val name: String, val relationship: String, val phone: String = "")
 data class EmergencyGoals(val version: Int, val confirmedBy: String, val confirmedAt: Long, val whatMatters: String, val nextSteps: String, val newerUnconfirmedVersion: Int? = null)
-data class EmergencySource(val name: String, val goals: EmergencyGoals?, val contacts: List<EmergencyContact>, val medicines: List<EmergencyMedicine>)
+/** [age], [conditions] and [allergies] come from the patient profile; blank/null means the family has not filled them in. */
+data class EmergencySource(val name: String, val goals: EmergencyGoals?, val contacts: List<EmergencyContact>, val medicines: List<EmergencyMedicine>,
+    val age: Int? = null, val conditions: String = "", val allergies: String = "")
 
 /** [body] is everything except the card number/id/date line, so a changed record can be spotted. */
 data class EmergencyCardText(val text: String, val body: String, val leftOut: List<String>)
@@ -32,7 +34,12 @@ object EmergencyCardRules {
     /** UTF-8 bytes. Keeps the code at QR version 25 or lower (ECC M) so a printed card still scans. */
     const val MAX_BYTES = 800
     val ECC: ErrorCorrectionLevel = ErrorCorrectionLevel.M
-    const val NOT_IN_APP = "age, conditions, allergies"
+    private const val ALLERGIES_MAX = 100
+
+    /** Only the profile details that are really missing; a recorded allergy is printed, never called "not recorded". */
+    fun notRecorded(source: EmergencySource): String = listOfNotNull("age".takeIf { source.age == null }, "conditions".takeIf { source.conditions.isBlank() }, "allergies".takeIf { source.allergies.isBlank() }).joinToString(", ")
+    /** Recorded in the profile but not printed on the card (allergies are printed). */
+    fun recordedNotOnCard(source: EmergencySource): List<String> = listOfNotNull("age (recorded in app)".takeIf { source.age != null }, "conditions (recorded in app)".takeIf { source.conditions.isNotBlank() })
     const val OFFLINE_EN = "This card works without internet; it is not linked to any hospital system."
     const val OFFLINE_HI = "यह कार्ड बिना इंटरनेट के काम करता है; यह किसी अस्पताल के सिस्टम से जुड़ा नहीं है।"
     private const val NAME_MAX = 80
@@ -78,7 +85,10 @@ object EmergencyCardRules {
             if (EmergencySection.GOALS in sections && goals == null) add("no confirmed goals-of-care note")
             if (EmergencySection.CONTACTS in sections && source.contacts.isEmpty()) add("no contacts saved")
             if (EmergencySection.MEDICINES in sections && source.medicines.isEmpty()) add("no current medicines listed")
+            addAll(recordedNotOnCard(source))
         }
+        val notRecorded = notRecorded(source)
+        var allergiesShown = clip(source.allergies, ALLERGIES_MAX)
         fun leftOut() = buildList {
             if (droppedMeds > 0) add("$droppedMeds medicine${if (droppedMeds == 1) "" else "s"} (no room)")
             if (goalsDropped) add("goals-of-care note (no room)") else if (goalsCut) add("rest of the goals-of-care note (no room)")
@@ -95,7 +105,8 @@ object EmergencyCardRules {
             }
             if (contacts.isNotEmpty()) { append("\nCONTACTS:"); contacts.forEach { append("\n- ").append(it) } }
             if (meds.isNotEmpty()) { append("\nMEDICINES (as listed by family):"); meds.forEach { append("\n- ").append(it) } }
-            append("\nNOT RECORDED IN APP: $NOT_IN_APP")
+            if (allergiesShown.isNotEmpty()) append("\nALLERGIES (as listed by family): ").append(allergiesShown)
+            if (notRecorded.isNotEmpty()) append("\nNOT RECORDED IN APP: $notRecorded")
             leftOut().takeIf { it.isNotEmpty() }?.let { append("\nNOT ON THIS CARD: ").append(it.joinToString("; ")) }
         }
         fun fits() = bytes(header + body()) <= maxBytes
@@ -108,6 +119,9 @@ object EmergencyCardRules {
             if (low < 40) { goalsShown = null; goalsDropped = true } else goalsShown = clip(fullGoals, low)
         }
         while (!fits() && contacts.isNotEmpty()) { contacts = contacts.dropLast(1); droppedContacts++ }
+        // Allergies are shortened last and never dropped; the "…" shows the reader there is more.
+        var allergyChars = allergiesShown.codePointCount(0, allergiesShown.length)
+        while (!fits() && allergyChars > 12) { allergyChars--; allergiesShown = clip(source.allergies, allergyChars) }
         val body = body()
         check(bytes(header + body) <= maxBytes) { "The card text is too long." }
         return EmergencyCardText(header + body, body.trimStart('\n'), leftOut())

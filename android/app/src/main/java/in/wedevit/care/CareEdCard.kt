@@ -104,7 +104,7 @@ object EdCardOffline {
         lines += if (interp.kind == EdKind.ACTIVE) p(Bi("Signed emergency care plan", "हस्ताक्षरित आपातकालीन योजना")) else p(interp.banner)
         lines += "${r.patient.name} · UHID ${r.patient.uhid}"
         lines += p(Bi("Diagnosis", "बीमारी")) + ": " + cut(r.clinical.diagnosis, 80).ifBlank { none }
-        lines += p(Bi("Transfer", "अस्पताल ले जाना")) + ": " + p(c.hospitalTransfer?.let { PlanText.transfer(it.kind) } ?: NO_PREFERENCE)
+        lines += p(Bi("Transfer", "अस्पताल ले जाना")) + ": " + p(c.hospitalTransfer?.let(WalletCard::transfer) ?: NO_PREFERENCE)
         lines += "CPR: " + p(c.cpr?.let(PlanText::cpr) ?: NO_PREFERENCE)
         lines += p(Bi("Breathing ceiling", "साँस की सीमा")) + ": " + p(c.respCeiling?.let(PlanText::ceiling) ?: NO_PREFERENCE)
         lines += "ICU: " + p(c.icu?.let { PlanText.icu(it.kind) } ?: NO_PREFERENCE)

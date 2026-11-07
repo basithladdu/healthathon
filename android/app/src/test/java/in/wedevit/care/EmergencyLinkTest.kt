@@ -53,6 +53,17 @@ class EmergencyLinkTest {
         assertTrue(notIncluded.contains("current medicines (family chose not to include)"))
     }
 
+    @Test fun webCopyCarriesRecordedAllergiesAndOnlyTheReallyMissingDetails() {
+        val withAllergy = source.copy(allergies = "Penicillin", age = 64)
+        val record = EmergencyCardRecord.make("p1", withAllergy, EmergencySection.entries.toSet(), null, at, zone, "AB12CD34")
+        val card = EmergencyLinkRules.card(withAllergy, record)
+        assertEquals("Penicillin", card.getString("allergies"))
+        assertEquals("conditions", card.getString("notRecorded"))
+        assertTrue(card.getJSONArray("notIncluded").toString().contains("age (recorded in app)"))
+        val none = EmergencyLinkRules.card(source, EmergencyCardRecord.make("p1", source, EmergencySection.entries.toSet(), null, at, zone, "AB12CD35"))
+        assertFalse(none.has("allergies")); assertEquals("age, conditions, allergies", none.getString("notRecorded"))
+    }
+
     @Test fun hugeMedicineListsStayUnderTheServerLimitAndSaySo() {
         val big = source.copy(medicines = (1..60).map { EmergencyMedicine("दवा नंबर $it ".repeat(10), "दिन में दो बार खाने के बाद ".repeat(15)) })
         val record = EmergencyCardRecord.make("p1", big, EmergencySection.entries.toSet(), null, at, zone, "AB12CD34")

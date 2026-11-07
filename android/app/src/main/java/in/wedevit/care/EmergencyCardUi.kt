@@ -214,11 +214,15 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
     var done by remember(selected) { mutableStateOf<String?>(null) }
     val name = people.firstOrNull { it.id == selected }?.name.orEmpty()
     val source = remember(name, items, versions, acknowledgements, trustedAcks, contacts) {
+        // Same profile the care plan prefills from: the shared entry first, else this phone's older copy.
+        val profile = PatientProfileCodec.latest(items, selected)?.let { PatientProfileCodec.decode(it.detail) }
+            ?: runCatching { CarePatientProfileStore(context, vm.storageNamespace).loadOrNull(selected) }.getOrNull()
         EmergencySource(
             name = name,
             goals = EmergencyCardRules.latestConfirmed(versions.filter { it.personId == selected }, acknowledgements) { vm.cloud == null || it.id in trustedAcks },
             contacts = contacts.filter { it.personId == selected }.sortedBy { it.role != "family" }.map { EmergencyContact(it.name, it.relationship, it.phone) },
             medicines = items.filter { it.kind == "medicine" && it.personId == selected }.map { EmergencyMedicine(it.title, if (CareEntryCodec.isStructured(it.detail)) "" else it.detail) },
+            age = profile?.age, conditions = profile?.illness.orEmpty(), allergies = profile?.allergies.orEmpty(),
         )
     }
     val ready = loadedFor == selected && !contactsLoading

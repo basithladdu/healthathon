@@ -39,6 +39,28 @@ class EmergencyCardTest {
         assertTrue(card.leftOut.isEmpty())
     }
 
+    @Test fun recordedAllergiesArePrintedAndNeverCalledNotRecorded() {
+        val withProfile = source.copy(allergies = "Penicillin (rash)", conditions = "Lung cancer", age = 71)
+        val card = EmergencyCardRules.build(withProfile, all, 1, "AB12CD34", at, zone)
+        assertTrue(card.text.contains("ALLERGIES (as listed by family): Penicillin (rash)"))
+        assertFalse(card.text.contains("NOT RECORDED IN APP"))
+        assertTrue(card.leftOut.contains("age (recorded in app)")); assertTrue(card.leftOut.contains("conditions (recorded in app)"))
+        assertFalse(card.text.contains("Lung cancer"))
+        val onlyAllergies = EmergencyCardRules.build(source.copy(allergies = "Sulfa"), all, 1, "AB12CD34", at, zone)
+        assertTrue(onlyAllergies.text.contains("NOT RECORDED IN APP: age, conditions")); assertFalse(onlyAllergies.text.contains("conditions, allergies"))
+        assertEquals("age, conditions, allergies", EmergencyCardRules.notRecorded(source))
+        // A saved card made before the allergy was added is now out of date.
+        assertTrue(EmergencyCardRecord.make("p", source, all, null, at, zone, id = "A").outOfDate(source.copy(allergies = "Sulfa"), zone))
+    }
+
+    @Test fun aFullCardShortensAllergiesLastAndStillFits() {
+        val big = source.copy(name = "र".repeat(80), medicines = (1..40).map { EmergencyMedicine("दवा $it") }, contacts = (1..12).map { EmergencyContact("मीरा $it", "बहन", "+91 98765 4321$it") },
+            goals = goals.copy(whatMatters = "घर पर रहना ".repeat(80)), allergies = "पेनिसिलिन से चकत्ते ".repeat(20), conditions = "कैंसर", age = 70)
+        val card = EmergencyCardRules.build(big, all, 1, "AB12CD34", at, zone)
+        assertTrue(EmergencyCardRules.bytes(card.text) <= EmergencyCardRules.MAX_BYTES)
+        assertTrue(card.text.contains("ALLERGIES (as listed by family): पेनिसिलिन"))
+    }
+
     @Test fun nothingChosenIsRefused() {
         assertThrows(IllegalArgumentException::class.java) { EmergencyCardRules.build(source, emptySet(), 1, "X", at, zone) }
     }

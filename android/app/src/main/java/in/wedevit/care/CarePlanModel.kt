@@ -705,6 +705,9 @@ object EdView {
 /** Wallet card (Appendix E). The QR carries only the token URL; the printed lines carry the essentials. */
 object WalletCard {
     val TREAT_LINE = Bi("If unclear, or the problem is new and reversible — treat fully and call.", "अगर साफ़ न हो, या समस्या नई है और ठीक हो सकती है — पूरा इलाज करें और फ़ोन करें।")
+    /** "Only for the reasons ticked" names the ticked reasons, as the ED view does, so the card can be read without the app. */
+    fun transfer(t: HospitalTransfer): Bi = if (t.kind != TransferKind.ONLY_FOR) PlanText.transfer(t.kind)
+        else Bi.labeled(PlanText.transfer(t.kind), if (t.reasons.isEmpty()) NOT_RECORDED else Bi.join(", ", t.reasons.map(PlanText::transferReason)))
     fun lines(r: EctprRecord): List<Pair<Bi, Bi>> {
         val c = r.choices
         val callFirst = c.callBeforeAmbulance.firstOrNull { it.isNotBlank() } ?: r.careTeam.palliativePhone24h.ifBlank { r.decisionMakers.primary?.phone24h.orEmpty() }
@@ -714,11 +717,12 @@ object WalletCard {
             Bi("Patient", "मरीज़") to t(r.patient.name), Bi("UHID", "UHID") to t(r.patient.uhid), Bi("Diagnosis", "बीमारी") to t(r.clinical.diagnosis),
             Bi("CPR", "CPR") to (c.cpr?.let(PlanText::cpr) ?: NO_PREFERENCE),
             Bi("Breathing ceiling", "साँस की सीमा") to (c.respCeiling?.let(PlanText::ceiling) ?: NO_PREFERENCE),
-            Bi("Hospital transfer", "अस्पताल ले जाना") to (c.hospitalTransfer?.let { PlanText.transfer(it.kind) } ?: NO_PREFERENCE),
+            Bi("Hospital transfer", "अस्पताल ले जाना") to (c.hospitalTransfer?.let { transfer(it) } ?: NO_PREFERENCE),
             Bi("Call first", "पहले फ़ोन करें") to t(callFirst),
             Bi("Decision-maker", "फ़ैसला लेने वाले") to t(listOfNotNull(r.decisionMakers.primary?.name, r.decisionMakers.primary?.phone24h).filter(String::isNotBlank).joinToString(" · ")),
             Bi("Full record", "पूरा रिकॉर्ड") to Bi("Family's Sahara app; signed copy with the family", "परिवार के फ़ोन में सहारा ऐप; हस्ताक्षरित कॉपी परिवार के पास"),
             Bi("Signed by", "हस्ताक्षर") to t(sign?.let { "${it.name} (reg. ${it.registrationNo}) ${it.signedAt.take(10)}" }.orEmpty()),
+            Bi("Review due", "समीक्षा") to t(r.reviewDue.takeIf(String::isNotBlank)?.let { "$it (v${r.version})" }.orEmpty()),
         )
     }
 }

@@ -54,6 +54,12 @@ export function EmergencyView() {
                   <ul>{card.medicines.map((m, i) => <li key={i}>{m.name}{m.detail && <span className={styles.muted}> · {m.detail}</span>}</li>)}</ul>
                 </section>
               )}
+              {card.allergies && (
+                <section className={styles.section}>
+                  <h2>Allergies (as listed by family) · एलर्जी</h2>
+                  <p className={styles.text}>{card.allergies}</p>
+                </section>
+              )}
               <section className={styles.section}>
                 {card.notRecorded && <p className={styles.muted}>Not recorded in Sahara: {card.notRecorded}.</p>}
                 {card.notIncluded && card.notIncluded.length > 0 && <p className={styles.muted}>Not on this card: {card.notIncluded.join('; ')}.</p>}
