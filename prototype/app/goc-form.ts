@@ -1,6 +1,6 @@
 // The goals-of-care note IS the clinical document: Healthathon_form_Rituparna.docx (legal review, 31 Oct 2026), with Rituparna's tracked
-// additions, in source-materials/team-context/legal-review-2026-10-31/. The form's own wording, headings, numbering (4.1, 4.2, 5.3, 6.1,
-// 6.2, 12.1, Section 19, 19.1 to 19.4), order, tick boxes and tables, filled in like a completed paper form. The screen, print, Word file
+// additions, in source-materials/team-context/legal-review-2026-10-31/. The form's own wording, headings, numbering (group numbers are computed from order, see numberGroups),
+// order, tick boxes and tables, filled in like a completed paper form. The screen, print, Word file
 // and the Android PDF all draw this one document. Line-by-line map: docs/goc-legal-form-coverage.md.
 // Built only from what the doctor confirmed: no spoken quotes, nothing pre-selected (rule V1). A blank nobody filled reads "Not discussed".
 import { careText, type CareLang } from './care-i18n.ts';
@@ -221,16 +221,16 @@ export function buildGocFormDocument(record: EctprRecord, rows: Row[], lang: Car
         { label: t('Existing medical directives', 'पहले के चिकित्सा निर्देश'), value: summary(directiveTicks), open: !firstTick(directiveTicks) },
         { label: t('What the patient knows', 'मरीज़ क्या जानते हैं'), value: summary(knowsTicks), open: !firstTick(knowsTicks) },
       ] },
-      { title: t('4.1  The patient’s capacity, now', '4.1  मरीज़ की अभी की क्षमता'), rows: [boxes('', capacityTicks, nd)] },
-      { title: t('4.2  Existing directives', '4.2  पहले के निर्देश'), rows: [boxes('', directiveTicks, nd)] },
-      { title: t('5.3  What the patient knows', '5.3  मरीज़ क्या जानते हैं'), rows: [boxes('', knowsTicks, `${nd}`)] },
-      { title: t('6.1  In their own words', '6.1  उनके अपने शब्दों में'), rows: [
+      { title: t('The patient’s capacity, now', 'मरीज़ की अभी की क्षमता'), rows: [boxes('', capacityTicks, nd)] },
+      { title: t('Existing directives', 'पहले के निर्देश'), rows: [boxes('', directiveTicks, nd)] },
+      { title: t('What the patient knows', 'मरीज़ क्या जानते हैं'), rows: [boxes('', knowsTicks, `${nd}`)] },
+      { title: t('In their own words', 'उनके अपने शब्दों में'), rows: [
         field(t('The most distressing physical symptom right now is', 'अभी सबसे ज़्यादा तकलीफ़ देने वाला शारीरिक लक्षण है'), ''),
         field(t('What matters most to me / to them is', 'मेरे / उनके लिए सबसे ज़रूरी है'), withoutSoundCaptions(v.ownWords)),
         field(t('What I am most afraid of is', 'मुझे सबसे ज़्यादा डर है'), ''),
         field(t('Unfinished things that matter (people to see, disputes to settle, papers to sign, a place to visit)', 'अधूरे ज़रूरी काम (किससे मिलना है, कौन सा झगड़ा सुलझाना है, कौन से काग़ज़ साइन करने हैं, कहाँ जाना है)'), ''),
       ] },
-      { title: t('6.2  Outcomes that would be unacceptable  (tick any that apply)', '6.2  जो हालत मंज़ूर नहीं  (जो लागू हों उन पर निशान)'), rows: [boxes('', outcomeTicks, nd)] },
+      { title: t('Outcomes that would be unacceptable  (tick any that apply)', 'जो हालत मंज़ूर नहीं  (जो लागू हों उन पर निशान)'), rows: [boxes('', outcomeTicks, nd)] },
     ] },
     { id: 'III', title: t('Section III – Decisive Actions', 'भाग III – निर्णायक फ़ैसले'), groups: [
       { title: t('Home care (if relevant)', 'घर पर देखभाल (अगर लागू हो)'), rows: [
@@ -252,30 +252,30 @@ export function buildGocFormDocument(record: EctprRecord, rows: Row[], lang: Car
         boxes(t('Requirement of ICU?', 'ICU की ज़रूरत?'), icuTicks, status('icu'), icu ? icuLabel(icu, lang) : ''),
       ] },
       { title: t('Vasopressors / inotropes', 'वैसोप्रेसर / इनोट्रोप'), rows: [boxes(t('Vasopressors / inotropes', 'वैसोप्रेसर / इनोट्रोप'), vasoTicks, status('vasopressors'), vp ? vasopressorLabel(vp, lang) : '')] },
-      { title: t('12.1  Feeding', '12.1  खाना'), rows: [
+      { title: t('Feeding', 'खाना'), rows: [
         { label: '', value: '', ticks: [tk(true, 'Comfort feeding by mouth only — careful hand feeding, sips, tastes, favourite foods, no volume target, no forcing. Mouth care given regardless.', 'केवल मुँह से आराम के लिए खाना — ध्यान से हाथ से खिलाना, घूँट, स्वाद, पसंद का खाना, कोई मात्रा लक्ष्य नहीं, कोई ज़बरदस्ती नहीं। मुँह की देखभाल हर हाल में।')] },
         boxes(t('Nasogastric (Ryle’s) tube', 'नाक की नली (राइल्स ट्यूब)'), ngTicks, status('ng'), ng ? ngLabel(ng, lang) : ''),
         boxes(t('Gastrostomy (PEG)', 'पेट की नली (PEG)'), pegTicks, status('peg'), c.feeding.peg ? pegLabel(c.feeding.peg, lang) : ''),
       ] },
       { title: t('Goal of care', 'देखभाल का लक्ष्य'), rows: [boxes(t('A, B or C', 'A, B या C'), goalTicks, status('goalOfCare'), c.goalOfCare ? goalLabel(c.goalOfCare, lang) : '')] },
     ] },
-    { id: 'IV', title: t('Section IV – Signatures and declarations (SECTION 19 — Declarations and signatures)', 'भाग IV – हस्ताक्षर और घोषणाएँ (भाग 19 — घोषणाएँ और हस्ताक्षर)'), groups: [
-      { title: t('19.1  Patient', '19.1  मरीज़'), rows: [], table: { head: [declaration19, t('Signature / thumb impression', 'हस्ताक्षर / अँगूठे का निशान'), t('Name in capitals', 'बड़े अक्षरों में नाम'), t('Date', 'तारीख़')], rows: [
+    { id: 'IV', title: t('Section IV – Signatures and declarations', 'भाग IV – हस्ताक्षर और घोषणाएँ'), groups: [
+      { title: t('Patient', 'मरीज़'), rows: [], table: { head: [declaration19, t('Signature / thumb impression', 'हस्ताक्षर / अँगूठे का निशान'), t('Name in capitals', 'बड़े अक्षरों में नाम'), t('Date', 'तारीख़')], rows: [
         [' ', patient ? how(undefined, patient.thumbImpression) : patientDev ? how(patientDev.method) : '', (patient?.name ?? patientDev?.name ?? '').toUpperCase(), day(patient?.signedAt ?? patientDev?.signedAt)],
       ] } },
-      { title: t('19.2  Surrogate / healthcare proxy (primary and secondary surrogate decision-makers)', '19.2  प्रतिनिधि / हेल्थकेयर प्रॉक्सी (मुख्य और द्वितीय फ़ैसला लेने वाले)'), rows: [], table: {
+      { title: t('Surrogate / healthcare proxy (primary and secondary surrogate decision-makers)', 'प्रतिनिधि / हेल्थकेयर प्रॉक्सी (मुख्य और द्वितीय फ़ैसला लेने वाले)'), rows: [], table: {
         head: [cellBoxes([tk(record.surrogateDeclaration.confirmed, 'I confirm I am conveying what the patient would have wanted, so far as I can judge.', 'मैं पुष्टि करता/करती हूँ कि जितना मैं समझ सकता/सकती हूँ, मैं वही बता रहा/रही हूँ जो मरीज़ चाहते।')]), t('Signature', 'हस्ताक्षर'), t('Name & relationship', 'नाम और रिश्ता'), t('Date', 'तारीख़')],
         rows: [
           [t('Primary', 'मुख्य'), primary ? how(undefined, primary.thumbImpression) : familyDev ? how(familyDev.method) : '', primary?.name ?? (familyDev ? `${familyDev.name}${familyDev.relation ? ` (${familyDev.relation})` : ''}` : ''), day(primary?.signedAt ?? familyDev?.signedAt)],
           [t('Secondary', 'द्वितीय'), secondary ? how(undefined, secondary.thumbImpression) : '', secondary?.name ?? '', day(secondary?.signedAt)],
         ] } },
-      { title: t('19.3  Witnesses  (required where the patient signs by thumb impression, or where literacy is limited – for both home-based and hospital-based evaluation)', '19.3  गवाह  (जब मरीज़ अँगूठा लगाएँ, या पढ़ना-लिखना कम हो, तब ज़रूरी – घर और अस्पताल दोनों जगह की जाँच में)'), rows: [], table: {
+      { title: t('Witnesses  (required where the patient signs by thumb impression, or where literacy is limited – for both home-based and hospital-based evaluation)', 'गवाह  (जब मरीज़ अँगूठा लगाएँ, या पढ़ना-लिखना कम हो, तब ज़रूरी – घर और अस्पताल दोनों जगह की जाँच में)'), rows: [], table: {
         head: [t('Witness — name', 'गवाह — नाम'), t('Address / ID', 'पता / पहचान'), t('Signature', 'हस्ताक्षर'), t('Date', 'तारीख़')],
         rows: [0, 1].map((i) => {
           const s = witnesses[i]; const d = i === 0 && !s ? witnessDev : undefined;
           return [`${t('Witness', 'गवाह')} ${i + 1} — ${s?.name ?? d?.name ?? ''}`, d?.relation ?? '', s ? how(undefined, s.thumbImpression) : d ? how(d.method) : '', day(s?.signedAt ?? d?.signedAt)];
         }) } },
-      { title: t('19.4  Clinicians', '19.4  डॉक्टर और नर्स'), rows: [], table: {
+      { title: t('Clinicians', 'डॉक्टर और नर्स'), rows: [], table: {
         head: [t('ROLE', 'भूमिका'), t('NAME', 'नाम'), t('REGISTRATION NO.', 'रजिस्ट्रेशन नंबर'), t('SIGNATURE', 'हस्ताक्षर'), t('DATE', 'तारीख़')],
         rows: [
           [t('Treating consultant', 'इलाज करने वाले कंसल्टेंट'), ...clinician('TREATING_CONSULTANT', 'DOCTOR')],
@@ -290,7 +290,15 @@ export function buildGocFormDocument(record: EctprRecord, rows: Row[], lang: Car
     `${t('Reviewed by', 'समीक्षा करने वाले')}: ${meta.reviewedBy || nd} · ${meta.reviewedAt.slice(0, 10)}`,
     ...(meta.notDiscussed?.length ? [`${nd}: ${meta.notDiscussed.join('; ')}`] : []),
   ];
-  return { title: t('Emergency care and treatment plan: goals of care', 'आपातकालीन देखभाल और इलाज की योजना: देखभाल के लक्ष्य'), lead, sections };
+  return { title: t('Emergency care and treatment plan: goals of care', 'आपातकालीन देखभाल और इलाज की योजना: देखभाल के लक्ष्य'), lead, sections: numberGroups(sections) };
+}
+
+/** Group numbers come from the actual order (section 1 gives 1.1, 1.2 ...), so removing or moving a group renumbers the rest. Unnamed groups are skipped. Same rule as Android GocForm.numbered(). */
+export function numberGroups(sections: GocFormSection[]): GocFormSection[] {
+  return sections.map((section, si) => {
+    let n = 0;
+    return { ...section, groups: section.groups.map((g) => (g.title ? { ...g, title: `${si + 1}.${++n}  ${g.title}` } : g)) };
+  });
 }
 
 const tickLine = (tick: GocFormTick) => `${box(tick.on)} ${tick.text}${tick.detail ? ` ${tick.detail}` : ''}`;
