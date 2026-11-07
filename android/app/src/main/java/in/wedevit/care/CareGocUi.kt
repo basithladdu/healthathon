@@ -347,6 +347,24 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
     var gemini by remember { mutableStateOf(false) }
     var askDoctor by remember { mutableStateOf(false) }
     var guideTicked by remember { mutableStateOf(setOf<GocGuideItem>()) }
+    // Dr Sujay's doctor-driven topic guide: the doctor taps topics as they are covered; no AI. Start times are seconds from the recording start (-1 = not recording); kept for the session only.
+    var guideMe by rememberSaveable { mutableStateOf(true) }
+    var guideStampText by rememberSaveable(d.id) { mutableStateOf("") }
+    var guideNow by rememberSaveable(d.id) { mutableStateOf(-1) }
+    var guideCur by rememberSaveable(d.id) { mutableStateOf(0) }
+    var guideWarn by rememberSaveable(d.id) { mutableStateOf(-1) }
+    val guideState = GocGuideState(GocTopicGuide.decode(guideStampText), guideNow)
+    val guideRows = GocChecklist.ROWS
+    LaunchedEffect(guideStampText, guideNow) { val done = guideState.discussed; guideTicked = guideTicked + guideRows.filterIndexed { i, _ -> i in done }.flatMap { it.items } }
+    val guideSeconds = if (recorderState.recording) recorderState.seconds else -1
+    fun guideApply(next: GocGuideState) { guideStampText = GocTopicGuide.encode(next.stamps); guideNow = next.now }
+    val guideWarnTitle = guideWarn.takeIf { it in guideRows.indices && GocTopicGuide.outOfOrder(it, guideState.discussed, guideRows.map { r -> r.section }, guideRows.map { r -> r.title.en }) }?.let { guideRows[it].title.pick(hindi) }
+    val guidePanel: @Composable () -> Unit = {
+        GocTopicPanel(guideMe, guideState, guideCur, guideSeconds, guideWarnTitle,
+            onTap = { i -> val next = GocTopicGuide.tap(guideState, i, guideSeconds); guideWarn = if (next.now == i && GocTopicGuide.outOfOrder(i, next.discussed, guideRows.map { r -> r.section }, guideRows.map { r -> r.title.en })) i else -1; guideApply(next) },
+            onDone = { val next = GocTopicGuide.done(guideState, guideCur, guideSeconds); guideApply(next); GocTopicGuide.next(next.discussed, guideCur, guideRows.size)?.let { guideCur = it } },
+            onAllTopics = { guideMe = false }, onDismissWarning = { guideWarn = -1 })
+    }
     val signStore = remember(d.patientId) { GocSignOffStore(context, "goc-" + d.patientId.filter { it.isLetterOrDigit() }.ifBlank { "guest" }) }
 
     val names = RecordingConsentRules.names(participants)
@@ -490,6 +508,7 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
                         if (gemini) Text(t("Audio is sent to Google Gemini to transcribe.", "ऑडियो लिखने के लिए Google Gemini को भेजा जाता है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.padding(start = 12.dp, end = 8.dp, bottom = 10.dp).testTag("goc-gemini-line"))
                     }
                 }
+                if (!recorderState.recording && !busy) { GocRunModePicker(guideMe) { guideMe = it }; guidePanel() }
                 if (busy) GocWorkingCard(operation, progress) { task?.cancel() }
                 else if (recorder != null) {
                     // Step 2: record. A big calm button, the timer above it and the voice level as a soft ring around it.
@@ -509,6 +528,7 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
                         Text(if (recorderState.paused) t("Resume", "फिर शुरू") else t("Pause", "रोकें"), color = RustText, fontSize = 16.sp)
                     }
                     recorderState.error?.let { Text(it.pick(hindi), color = MaterialTheme.colorScheme.error, fontSize = 15.sp, textAlign = TextAlign.Center, modifier = Modifier.announce()) }
+                    if (recorderState.recording) guidePanel()
                 }
                 if (!recorderState.recording && !busy) CareField(participants, { participants = it.take(600) }, t("Who's present", "कौन मौजूद है"))
                 if (!recorderState.recording && !busy) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
