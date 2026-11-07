@@ -62,6 +62,14 @@ class CareChartRangeTest {
         assertEquals(listOf(LocalDate.of(2026, 10, 20) to 5, LocalDate.of(2026, 11, 2) to 7), SymptomDiaryRules.dailyHighs(points))
     }
 
+    @Test fun chartSaysWhenItMixesReporters() {
+        fun p(who: String) = DatedRating(who, "2026-11-02", "09:00", 5, who, "now")
+        assertTrue(!SymptomDiaryRules.mixesReporters(listOf(p("patient"), p("assisted-patient"))))
+        assertTrue(!SymptomDiaryRules.mixesReporters(emptyList()))
+        assertTrue(SymptomDiaryRules.mixesReporters(listOf(p("patient"), p("caregiver"))))
+        assertTrue(SymptomDiaryRules.mixesReporters(listOf(p("caregiver"), p("clinician"))))
+    }
+
     @Test fun painHasGoneIsANewZeroNoteAtTheSameSpotsAndTheTrendEndsAtZero() {
         val old = SymptomNote("Pain", 7, "2026-11-01", "10:00", "now", "patient", "Fictional patient", painBodySites = listOf("head", "neck"), painBodyRatings = mapOf("head" to 7, "neck" to 3))
         val gone = SymptomDiaryRules.painGone(old, LocalDateTime.of(2026, 11, 3, 9, 30))

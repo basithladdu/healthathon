@@ -546,6 +546,7 @@ internal fun symptomTreatmentMarkers(entries: List<CareItem>, personId: String):
             val window = TrendWindow(shownDays.map { (day, v) -> DayValue(day, v) }, lastWeek = false)
             val summary = TrendChartRules.summary(window, shownPoints, hindi, today)
             if (summary.isNotBlank()) Text(summary, fontSize = 15.sp, color = DoctorCardInk, modifier = Modifier.testTag("$tag-summary"))
+            if (SymptomDiaryRules.mixesReporters(shownPoints)) Text(t("These entries were noted by different people. Each point is the day's highest, whoever noted it. The list below says who noted each.", "ये नोट अलग-अलग लोगों ने लिखे हैं। हर बिंदु उस दिन का सबसे ऊँचा अंक है, किसी ने भी लिखा हो। नीचे की सूची में लिखा है कि हर नोट किसने लिखा।"), fontSize = 14.sp, lineHeight = 19.sp, color = DoctorCardSub, modifier = Modifier.testTag("$tag-mixed-reporters"))
             CareTimeLineChart(
                 points = chartPoints, yMin = 0.0, yMax = 10.0, yTicks = listOf(0.0, 5.0, 10.0), yText = { it.toInt().toString() },
                 description = TrendChartRules.description(name, summary, window, hindi, today), tag = tag, height = height,
