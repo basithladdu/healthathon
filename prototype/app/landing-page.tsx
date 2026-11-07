@@ -3,6 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import QRCode from 'qrcode';
 import { IconArrowRight } from './icons';
 import { SaharaLogo } from './sahara-logo';
 
@@ -22,6 +23,103 @@ const STEPS = [
   ['Share during care', 'The receiving doctor records their care relationship and reason for access before opening the summary.'],
   ['Keep a copy', 'Patients and families can listen to the reviewed plan and print a wallet card.'],
 ];
+
+const PLAY_URL = 'https://play.google.com/store/apps/details?id=in.wedevit.sahara';
+const PROMPT_KEY = 'sahara.appPrompt.dismissed';
+const PROMPT_DELAY_MS = 0;
+
+function PlayLink({ className = '' }: { className?: string }): React.JSX.Element {
+  return (
+    <a className={`lp-play-badge ${className}`.trim()} href={PLAY_URL} target="_blank" rel="noopener" aria-label="Get it on Google Play">
+      <svg className="lp-play-icon" width="28" height="30" viewBox="0 0 24 26" aria-hidden="true" focusable="false">
+        <path d="M2 1.2v23.6L13.2 13z" fill="#00d3ff" />
+        <path d="M13.2 13 17 9.2 3.6.6C3 .3 2.4.5 2 1.2z" fill="#00f076" />
+        <path d="M13.2 13 2 24.8c.4.7 1 .9 1.6.6L17 16.8z" fill="#ff3a44" />
+        <path d="M17 9.2 13.2 13 17 16.8l4.4-2.5c1.2-.7 1.2-2 0-2.6z" fill="#ffd400" />
+      </svg>
+      <span className="lp-play-text" aria-hidden="true"><small>GET IT ON</small><strong>Google Play</strong></span>
+    </a>
+  );
+}
+
+function AppDownloadDialog(): React.JSX.Element | null {
+  const [open, setOpen] = React.useState(false);
+  const [qr, setQr] = React.useState('');
+  const dialogRef = React.useRef<HTMLDivElement>(null);
+  const returnFocusRef = React.useRef<HTMLElement | null>(null);
+
+  React.useEffect(() => {
+    try {
+      if (new URLSearchParams(window.location.search).get('app') === '1') return;
+      if (/;\s*wv\)|Sahara-Android/i.test(navigator.userAgent)) return;
+    } catch { /* ignore */ }
+    try {
+      if (window.localStorage.getItem(PROMPT_KEY)) return;
+    } catch { /* storage unavailable: still show once per page view */ }
+    const timer = setTimeout(() => {
+      returnFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      setOpen(true);
+    }, PROMPT_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const close = React.useCallback(() => {
+    try { window.localStorage.setItem(PROMPT_KEY, String(Date.now())); } catch { /* ignore */ }
+    setOpen(false);
+    returnFocusRef.current?.focus?.();
+  }, []);
+
+  React.useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    if (window.matchMedia?.('(min-width: 721px)').matches) {
+      QRCode.toDataURL(PLAY_URL, { errorCorrectionLevel: 'M', margin: 1, width: 160 })
+        .then((url) => { if (!cancelled) setQr(url); })
+        .catch(() => { /* QR is optional */ });
+    }
+    const node = dialogRef.current;
+    const focusables = () => Array.from(node?.querySelectorAll<HTMLElement>('a[href], button:not([disabled])') ?? []);
+    focusables()[0]?.focus();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { event.preventDefault(); close(); return; }
+      if (event.key !== 'Tab') return;
+      const items = focusables();
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      else if (!node?.contains(document.activeElement)) { event.preventDefault(); first.focus(); }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => { cancelled = true; document.removeEventListener('keydown', onKey); };
+  }, [open, close]);
+
+  if (!open) return null;
+  return (
+    <div className="lp-app-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) close(); }}>
+      <div className="lp-app-dialog" role="dialog" aria-modal="true" aria-labelledby="lp-app-title" aria-describedby="lp-app-desc" ref={dialogRef}>
+        <button type="button" className="lp-app-close" onClick={close} aria-label="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" fill="none" /></svg>
+        </button>
+        <SaharaLogo className="lp-app-logo" />
+        <h2 id="lp-app-title">Sahara</h2>
+        <p id="lp-app-desc">Sahara works best as the Android app: symptoms, medicines, goals-of-care recording and the emergency card.</p>
+        <div className="lp-app-actions">
+          <PlayLink />
+          <button type="button" className="lp-account-action" onClick={close}>Continue on the web</button>
+        </div>
+        {qr ? (
+          <div className="lp-app-qr">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={qr} width={120} height={120} alt="QR code for the Sahara app on Google Play" />
+            <span>Scan with your phone</span>
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
 
 export function LandingPage(props: {
   onSignIn: () => void;
@@ -48,6 +146,7 @@ export function LandingPage(props: {
           <span className="lp-brand-copy"><strong>Sahara</strong><small>- A Palliative Care Companion</small></span>
         </div>
         <nav className="lp-nav-actions" aria-label="Account">
+          <a className="lp-nav-btn lp-nav-app" href={PLAY_URL} target="_blank" rel="noopener">Get the app</a>
           <button type="button" className="lp-nav-btn" onClick={onSignIn}>Sign in</button>
           <button type="button" className="lp-nav-btn" onClick={onSignUp}>Create account</button>
         </nav>
@@ -67,11 +166,20 @@ export function LandingPage(props: {
                 Start a conversation
               </button>
             </div>
+            <div className="lp-hero-app"><PlayLink /></div>
             <p className="lp-demo-note">Hospital sign-in is not connected.</p>
           </div>
           <figure className="lp-hero-media">
             <Image src="/care-conversation.png" alt="Illustration of a doctor listening to a patient and family." fill priority sizes="(max-width: 700px) 100vw, 50vw" className="lp-hero-img" />
           </figure>
+        </section>
+
+        <section className="lp-app-band" aria-labelledby="lp-app-band-title">
+          <div>
+            <h2 id="lp-app-band-title">Get the Android app</h2>
+            <p>Symptoms, medicines, goals-of-care recording and the emergency card, all in one place on your phone.</p>
+          </div>
+          <PlayLink />
         </section>
 
         <div className="lp-care-links">
@@ -133,6 +241,7 @@ export function LandingPage(props: {
           </details>
         </div>
       </main>
+      <AppDownloadDialog />
       <footer className="lp-footer"><p>Sahara - A Palliative Care Companion</p></footer>
     </div>
   );

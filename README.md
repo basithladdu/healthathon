@@ -112,7 +112,6 @@ output/      Submission deck, two-page brief, build and verification notes
 scripts/     Data and health-check scripts (e.g. centre geocoding)
 ```
 
-Team notes: [TEAM_HANDOFF.md](TEAM_HANDOFF.md), [blockers.md](blockers.md), [PROJECT_CONTEXT_MAP.md](PROJECT_CONTEXT_MAP.md).
 
 ## Build from source
 
