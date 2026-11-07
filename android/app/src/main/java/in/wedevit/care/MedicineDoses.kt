@@ -4,6 +4,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.UUID
 
 /**
@@ -71,13 +72,40 @@ object MedicineDoses {
         return (1..count).map { MedicineDose("n:$it", it, count, "") }
     }
 
-    /** The "How often" text of a medicine: the form's field, or the free text without its "Times:" line. */
-    fun frequencyText(detail: String): String = MedicineEntryText.parse(detail)?.howOften
-        ?: detail.lineSequence().filterNot { it.startsWith("Times: ") }.joinToString(" ")
+    /** The page list a prescription scan adds ("Page 1: <id> · SHA-256 <hex>"): file names and hashes, never dose text. */
+    private val sourceReference = Regex("^Page \\d+: [^ ]+(?: · SHA-256 [0-9a-f]*)?$")
 
-    /** A medicine's doses: its saved times win; [reminderTimes] (this phone's Reminders) are used only when none are saved. */
+    /**
+     * The "How often" text of a medicine: the form's field, or the free text without its "Times:" line and without the
+     * scan's file references (a hash such as "…3bd9…" must not read as "BD", twice a day).
+     */
+    fun frequencyText(detail: String): String = MedicineEntryText.parse(detail)?.howOften
+        ?: detail.lineSequence().filterNot { it.startsWith("Times: ") || it.startsWith("Original prescription references:") || sourceReference.matches(it.trim()) }.joinToString(" ")
+
+    /** "Weekly", "twice a week", "every 4 weeks", "every 3 days", "alternate days": a schedule that is not every day. */
+    private val weeklyOrLonger = Regex("(?<![A-Za-z])(?:weekly|monthly|(?:once|twice|thrice|\\d+ times?) (?:a|per|each|every) (?:week|month)|every \\d+ (?:days|weeks|months)|every other day|alternate days?)(?![A-Za-z])", RegexOption.IGNORE_CASE)
+    private val everyDay = Regex("(?<![A-Za-z])(?:daily|(?:a|per|each|every) day|od|bd|bid|tds|tid|qid|qds)(?![A-Za-z])", RegexOption.IGNORE_CASE)
+
+    /**
+     * True when the text gives a schedule that is not every day and no daily count ("once weekly", "every 4 weeks").
+     * Such a medicine gets no daily tick and no daily reminder; its directions say when it is due.
+     * A course length ("twice a day for 1 week", "BD for a week") stays daily.
+     */
+    fun notDaily(text: String): Boolean {
+        val clean = text.replace(Regex("\\s+"), " ").trim()
+        return weeklyOrLonger.containsMatchIn(clean) && !everyDay.containsMatchIn(clean) && pattern.find(clean) == null
+    }
+
+    /** True for a medicine whose own "How often" (the form's field, a scan's "Frequency:" line, or else its text) is [notDaily]. */
+    fun notDaily(item: CareItem): Boolean = item.kind == "medicine" && notDaily(
+        detailFrequency(item.detail) ?: frequencyText(item.detail))
+
+    private fun detailFrequency(detail: String): String? = if (MedicineEntryText.parse(detail) != null) null
+        else detail.lineSequence().firstOrNull { it.startsWith("Frequency: ") }?.removePrefix("Frequency: ")
+
+    /** A medicine's doses: its saved times win; [reminderTimes] (this phone's Reminders) are used only when none are saved. None when it is [notDaily]. */
     fun forItem(item: CareItem, reminderTimes: List<String>? = null): List<MedicineDose> {
-        if (item.kind != "medicine") return emptyList()
+        if (item.kind != "medicine" || notDaily(item)) return emptyList()
         val saved = CareReminderRules.printedTimes(item.detail)
         val times = saved.ifEmpty { reminderTimes?.let { runCatching { CareReminderRules.validTimes(it) }.getOrNull() }.orEmpty() }
         return doses(times, perDay(frequencyText(item.detail)))
@@ -128,6 +156,22 @@ object MedicineDoses {
     /** The planned moment of a timed dose on [day], from its saved time. Null for an untimed dose. */
     fun plannedAt(dose: MedicineDose, day: LocalDate, zone: ZoneId): Long? =
         if (!dose.timed) null else day.atTime(LocalTime.parse(dose.time)).atZone(zone).toInstant().toEpochMilli()
+
+    /**
+     * True when marking [dose] at [now] may mean last night's dose, given late after midnight: an evening-side night dose
+     * (DoseSlot.NIGHT, 12:00 or later) marked in the after-midnight part of the night slot, before the dose's time today.
+     * The person is then asked which night it was, instead of the tick silently covering tonight's dose.
+     */
+    fun mayBeLastNight(dose: MedicineDose, now: LocalTime): Boolean {
+        if (!dose.timed) return false
+        val time = LocalTime.parse(dose.time)
+        return MedicineDoseRules.slot(dose.time) == DoseSlot.NIGHT && time.hour >= 12 &&
+            MedicineDoseRules.slot("%02d:%02d".format(now.hour, now.minute)) == DoseSlot.NIGHT && now.hour < 12 && now < time
+    }
+
+    /** [mayBeLastNight], and last night's dose is not already ticked taken: then ask which night it was. */
+    fun askWhichNight(item: CareItem, dose: MedicineDose, events: List<MedicineIntakeEvent>, now: ZonedDateTime): Boolean =
+        mayBeLastNight(dose, now.toLocalTime()) && state(item, dose, events, now.toLocalDate().minusDays(1), now.zone) != MedicineDoseState.TAKEN
 
     fun label(dose: MedicineDose): String = if (dose.timed) "${dose.time} dose" else "Dose ${dose.index} of ${dose.count}"
 

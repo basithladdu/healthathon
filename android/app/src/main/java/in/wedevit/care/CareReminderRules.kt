@@ -58,6 +58,17 @@ object CareReminderRules {
     fun listed(item: CareItem, today: java.time.LocalDate, zone: ZoneId = ZoneId.systemDefault()): Boolean = item.kind == "medicine" ||
         (item.due > 0 && CareEntryCodec.decode(item.detail)?.type != "lab" && Instant.ofEpochMilli(item.due).atZone(zone).toLocalDate() >= today)
 
+    /**
+     * This phone's reminder times for a medicine after its saved dose times may have changed: only times still saved are kept.
+     * When every chosen time is gone (the dose times moved), the medicine's saved times ring instead. Without saved times,
+     * or when every bell was turned off (empty), the choice stays as it is.
+     */
+    fun currentOptionTimes(option: List<String>, saved: List<String>): List<String> {
+        if (saved.isEmpty()) return option
+        val kept = option.filter { it in saved }
+        return if (kept.isEmpty() && option.isNotEmpty()) saved else kept
+    }
+
     fun printedTimes(detail: String): List<String> {
         val line = detail.lineSequence().firstOrNull { it.startsWith("Times: ") }?.removePrefix("Times: ") ?: return emptyList()
         return runCatching { validTimes(line.split(',').map(String::trim)) }.getOrDefault(emptyList())

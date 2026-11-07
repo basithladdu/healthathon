@@ -5147,3 +5147,9 @@ Fix in the full care plan	ಪೂರ್ಣ ಆರೈಕೆ ಯೋಜನೆಯಲ�
 Leave, keep the talk	ಮಾತುಕತೆ ಉಳಿಸಿ ಹೊರಹೋಗಿ
 The shared community is not open yet. Others will see this once it opens; it will be sent then.	ಹಂಚಿಕೊಳ್ಳುವ ಸಮುದಾಯ ಇನ್ನೂ ತೆರೆದಿಲ್ಲ. ಅದು ತೆರೆದ ತಕ್ಷಣ ಇದನ್ನು ಕಳುಹಿಸಲಾಗುತ್ತದೆ, ಇತರರಿಗೆ ಕಾಣುತ್ತದೆ.
 It will be hidden for you. The shared community is not open yet, so the Sahara team won't see this report.	ಇದು ನಿಮಗೆ ಮರೆಯಾಗುತ್ತದೆ. ಹಂಚಿಕೊಳ್ಳುವ ಸಮುದಾಯ ಇನ್ನೂ ತೆರೆದಿಲ್ಲ, ಆದ್ದರಿಂದ Sahara ತಂಡ ಈ ವರದಿಯನ್ನು ನೋಡುವುದಿಲ್ಲ.
+Not a daily medicine. Follow its directions for when to give it.	ಇದು ದಿನವೂ ಕೊಡುವ ಔಷಧಿ ಅಲ್ಲ. ಯಾವಾಗ ಕೊಡಬೇಕು ಎಂದು ಅದರ ಸೂಚನೆಗಳನ್ನು ನೋಡಿ.
+No daily reminder: this is not a daily medicine. Follow its directions.	ದಿನದ ರಿಮೈಂಡರ್ ಇಲ್ಲ: ಇದು ದಿನವೂ ಕೊಡುವ ಔಷಧಿ ಅಲ್ಲ. ಅದರ ಸೂಚನೆಗಳನ್ನು ನೋಡಿ.
+Which night's dose?	ಯಾವ ರಾತ್ರಿಯ ಡೋಸ್?
+It is past midnight. Is this last night's $time dose, given late, or tonight's?	ಮಧ್ಯರಾತ್ರಿ ದಾಟಿದೆ. ಇದು ತಡವಾಗಿ ಕೊಟ್ಟ ನಿನ್ನೆ ರಾತ್ರಿಯ $time ಡೋಸ್ ಆ, ಅಥವಾ ಇಂದು ರಾತ್ರಿಯದಾ?
+Last night's	ನಿನ್ನೆ ರಾತ್ರಿಯದು
+Tonight's	ಇಂದು ರಾತ್ರಿಯದು
