@@ -233,7 +233,7 @@ export async function makeEctprPdf(record: EctprRecord, opts: { lang?: CareLang;
         : record.capacity.status === 'LACKS' ? t('Lacks capacity for these decisions', 'इन निर्णयों की क्षमता नहीं') : notRecorded(lang),
       t('A patient with capacity can change any part of this plan at any time; what they say now overrides it.', 'क्षमता वाला मरीज़ कभी भी योजना बदल सकता है; उसकी अभी की बात ही मान्य है।'),
     ]],
-    [t('Living will (AMD)', 'लिविंग विल (AMD)'), [...edAmdLines(record.existingDirective, record.amdAtIssue, lang).lines, amdCaveat(lang)]],
+    [t('Advance care planning (AMD)', 'अग्रिम देखभाल योजना (AMD)'), [...edAmdLines(record.existingDirective, record.amdAtIssue, lang).lines, amdCaveat(lang)]],
   ];
 
   const guide = capacityGuide(lang);

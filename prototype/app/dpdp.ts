@@ -21,8 +21,8 @@ export function dpdpNotice(scope: DpdpScope): NoticeBlock[] {
     hi: 'ताकि इमरजेंसी डॉक्टर मरीज़ की इच्छाएँ देख और मान सकें, और देखभाल टीम उनकी समीक्षा कर सके।',
   } : {
     titleEn: 'Why', titleHi: 'क्यों',
-    en: 'To make your living will paper, keep track of its versions, and show doctors that it exists.',
-    hi: 'आपकी लिविंग विल का काग़ज़ बनाने, उसके संस्करण सँभालने और डॉक्टरों को यह दिखाने के लिए कि वह मौजूद है।',
+    en: 'To make your advance care plan paper, keep track of its versions, and show doctors that it exists.',
+    hi: 'आपकी अग्रिम देखभाल योजना का काग़ज़ बनाने, उसके संस्करण सँभालने और डॉक्टरों को यह दिखाने के लिए कि वह मौजूद है।',
   };
   const where: NoticeBlock = scope === 'care-plan' ? {
     titleEn: 'Where it is', titleHi: 'यह कहाँ रहता है',
@@ -30,8 +30,8 @@ export function dpdpNotice(scope: DpdpScope): NoticeBlock[] {
     hi: 'इसी डिवाइस पर, इसी ब्राउज़र में। यह सिर्फ़ दो हालात में बाहर जाता है। इमरजेंसी कार्ड जारी होने पर साइन की गई योजना की कॉपी Sahara सर्वर पर जाती है, ताकि QR कोड चले। SMS भेजने पर फ़ोन नंबर SMS कंपनी के पास जाता है।',
   } : {
     titleEn: 'Where it is', titleHi: 'यह कहाँ रहता है',
-    en: 'On this device, in this browser. It is not sent to any server. If an emergency card is issued, the card carries only the living will’s status, date, version and attesting officer. You decide who gets a paper copy.',
-    hi: 'इसी डिवाइस पर, इसी ब्राउज़र में। यह किसी सर्वर पर नहीं भेजा जाता। इमरजेंसी कार्ड जारी होने पर कार्ड में सिर्फ़ लिविंग विल की स्थिति, तारीख़, संस्करण और सत्यापन अधिकारी रहते हैं। काग़ज़ की कॉपी किसे देनी है, यह आप तय करते हैं।',
+    en: 'On this device, in this browser. It is not sent to any server. If an emergency card is issued, the card carries only the advance care plan’s status, date, version and attesting officer. You decide who gets a paper copy.',
+    hi: 'इसी डिवाइस पर, इसी ब्राउज़र में। यह किसी सर्वर पर नहीं भेजा जाता। इमरजेंसी कार्ड जारी होने पर कार्ड में सिर्फ़ अग्रिम देखभाल योजना की स्थिति, तारीख़, संस्करण और सत्यापन अधिकारी रहते हैं। काग़ज़ की कॉपी किसे देनी है, यह आप तय करते हैं।',
   };
   const rights: NoticeBlock = scope === 'care-plan' ? {
     titleEn: 'Your rights', titleHi: 'आपके अधिकार',
@@ -71,7 +71,7 @@ export function buildDataExport(input: DataExportInput, now: Date = new Date()) 
   return { format: 'Sahara personal data export', formatVersion: 1, exportedAt: now.toISOString(), patientId, storedOn: 'This device (browser storage)', ...data };
 }
 
-/** Scan keys held by this person's living will versions and signed plans, so the export can include the files. */
+/** Scan keys held by this person's advance care plan versions and signed plans, so the export can include the files. */
 export function amdScanKeys(amdVersions: Array<Pick<AmdVersion, 'execution' | 'revocation'>>): string[] {
   return [...new Set(amdVersions.flatMap((v) => [v.execution?.scanKey, v.revocation?.scanKey]).filter((key): key is string => Boolean(key)))];
 }

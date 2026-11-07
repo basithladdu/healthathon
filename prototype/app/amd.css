@@ -1,4 +1,4 @@
-/* Living will (AMD) screen. Uses the care palette (care-colors.css) with fallbacks outside the care shell. */
+/* Advance care planning (AMD) screen. Uses the care palette (care-colors.css) with fallbacks outside the care shell. */
 .amd-screen {
   --amd-ink: var(--care-ink, #382e29);
   --amd-muted: var(--care-muted, #76675d);

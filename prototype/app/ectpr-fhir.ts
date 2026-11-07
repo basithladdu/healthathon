@@ -62,8 +62,8 @@ export function ectprFhirBundle(record: EctprRecord, now: Date = new Date()): Ec
     patient: { reference: patientRef },
     dateTime: consultant.signedAt,
     performer: [{ reference: practitionerRef }],
-    // Scope "adr" is what the spec asks for. The text says plainly that this is not a living will.
-    policyRule: { text: `${record.formVersion}, version ${record.version}. A clinician-signed emergency plan, not a living will (AMD). If a valid AMD exists, it governs. A patient with capacity overrides this plan at any time. If unsigned, out of date or ambiguous: standard care.` },
+    // Scope "adr" is what the spec asks for. The text says plainly that this is not an advance care plan.
+    policyRule: { text: `${record.formVersion}, version ${record.version}. A clinician-signed emergency plan, not an advance care plan (AMD). If a valid AMD exists, it governs. A patient with capacity overrides this plan at any time. If unsigned, out of date or ambiguous: standard care.` },
     provision: { type: 'permit', ...(record.reviewDue ? { period: { end: record.reviewDue } } : {}), provision: ectprProvisions(record) },
   };
   const patient: FhirResource = {

@@ -134,7 +134,7 @@
 .goc-undiscussed li:last-child { border-bottom: 0; }
 .goc-next { width: 100%; min-height: 56px; font-size: 17px; }
 
-/* Note: the legal form as a clean official document */
+/* Note: the clinical document as a clean official document */
 .goc-note-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .goc-note-tools .ep-btn { min-height: 44px; padding: 8px 16px; }
 .goc-spacer { flex: 1 1 auto; }

@@ -202,7 +202,7 @@
   .ep-nav, .ep-actions, .ep-steps, .ep-progress { display: none !important; }
 }
 
-/* Read aloud (tech spec §7), used on the care plan, living will and ED pages */
+/* Read aloud (tech spec §7), used on the care plan, advance care plan and ED pages */
 .read-aloud { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
 .read-aloud-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 14px; border: 1px solid #d6c8b9; border-radius: 999px; background: #fffdf9; color: #382e29; font: inherit; font-size: 14px; font-weight: 650; cursor: pointer; }
 .read-aloud-btn:hover { background: #fbf2e7; border-color: #b9472c; }

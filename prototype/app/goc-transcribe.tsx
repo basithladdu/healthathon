@@ -1,6 +1,6 @@
 'use client';
 // Goals-of-care conversation, in as few taps as possible (owner, 3 Nov meeting): one consent tick, one big Record button, then the
-// transcript and the suggested choices appear by themselves; one review screen with "Confirm all suggested"; the note in the legal form's
+// transcript and the suggested choices appear by themselves; one review screen with "Confirm all suggested"; the note in the clinical document's
 // layout; doctor signs, patient or family signs, and it locks. The engine is picked automatically: Google Gemini when the server has it
 // (and everyone agreed on the consent screen), else Whisper on this device (downloads once, with progress), else typing.
 // Rule V1: "Confirm all" applies only choices the conversation stated, never a default, and nothing undiscussed is set.
@@ -305,14 +305,14 @@ export function GocTranscribe({ t, lang, draft, previous, actorName, patientId, 
     link.href = url; link.download = `sahara-goals-of-care-${new Date().toISOString().slice(0, 10)}.docx`;
     document.body.appendChild(link); link.click(); link.remove();
     window.setTimeout(() => URL.revokeObjectURL(url), 10_000);
-    void logAudit({ actor: actorName, action: 'PRINT', recordType: 'ECTPR', recordId: draft.id, patientId, detail: 'Goals-of-care note downloaded as a Word file (legal form layout)' });
+    void logAudit({ actor: actorName, action: 'PRINT', recordType: 'ECTPR', recordId: draft.id, patientId, detail: 'Goals-of-care note downloaded as a Word file (clinical document layout)' });
   }
   function printForm() {
     const page = window.open('', '_blank');
     if (!page) return;
     page.document.open(); page.document.write(gocFormHtml(formDocument(true), careDir(lang))); page.document.close();
     page.focus(); window.setTimeout(() => page.print(), 300);
-    void logAudit({ actor: actorName, action: 'PRINT', recordType: 'ECTPR', recordId: draft.id, patientId, detail: 'Goals-of-care note printed (legal form layout)' });
+    void logAudit({ actor: actorName, action: 'PRINT', recordType: 'ECTPR', recordId: draft.id, patientId, detail: 'Goals-of-care note printed (clinical document layout)' });
   }
 
   /** "You haven't spoken about these things" is shown on the review screen itself; Continue (anyway) makes the note and saves. */

@@ -1,15 +1,15 @@
 // SVK Saanthvana spec, "Won't": AI treatment advice. No AI route may recommend a treatment, a medicine or dose change, or a choice in an
-// emergency care plan (ECTPR) or living will (CPR, ventilation, ICU, feeding, hospital transfer). AI may only find, quote, sort or
+// emergency care plan (ECTPR) or advance care plan (CPR, ventilation, ICU, feeding, hospital transfer). AI may only find, quote, sort or
 // translate what a person or their care team already wrote. These checks run before anything is sent and again on every answer.
 
 export const TREATMENT_ADVICE_CODE = 'treatment_advice_refused';
-export const TREATMENT_ADVICE_MESSAGE = 'Sahara does not give treatment advice or suggest choices for the emergency care plan or living will. '
+export const TREATMENT_ADVICE_MESSAGE = 'Sahara does not give treatment advice or suggest choices for the emergency care plan or advance care plan. '
   + 'Ask the palliative care team or your doctor. Sahara can only find what is already written in your documents.';
 
 /** Added to every generative system prompt. */
 export const NO_TREATMENT_ADVICE_RULE = 'Never give treatment advice: never recommend, suggest or rank a treatment, medicine, dose, test or hospital, '
   + 'and never suggest a choice about CPR, ventilation, ICU, intubation, dialysis, feeding tubes, hospital transfer, an emergency care plan (ECTPR) '
-  + 'or a living will. If asked for any of these, return the "not found" answer.';
+  + 'or an advance care plan. If asked for any of these, return the "not found" answer.';
 
 const CARE_TERMS = String.raw`cpr|resuscitat\w*|dnr|dnar|dni|ventilat\w*|intubat\w*|icu|dialysis|feeding\s+tube|ryles?|peg|chemo\w*|radiation|radiotherapy|surgery|operation|antibiotic\w*|morphine|opioid\w*|fentanyl|medicine\w*|medication\w*|drug\w*|dose\w*|dosage|tablet\w*|injection\w*|treatment\w*|therapy|sedat\w*|oxygen|transfusion|hospital|admi(?:t|ssion)\w*|living\s+will|advance\s+directive|ectpr|care\s+plan|ceiling\s+of\s+care`;
 const ACTIONS = String.raw`give|take|start|stop|continue|increase|decrease|reduce|raise|double|skip|change|switch|choose|opt|refuse|accept|sign|go|use|try|ask\s+for|put|get|do|have`;

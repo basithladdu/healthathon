@@ -1,4 +1,4 @@
-// Sahara living will (AMD) rules: validation L1–L9 and the record lifecycle (tech spec §2, §6).
+// Sahara advance care plan (AMD) rules: validation L1–L9 and the record lifecycle (tech spec §2, §6).
 // Pure functions only, so they run in the browser, in node tests and in the sample-PDF script.
 // Law: Common Cause v Union of India (2018) as modified on 24 Jan 2023 (MA 1699/2019 in WP(C) 215/2005);
 // Harish Rana v Union of India (11 Mar 2026). Template: Vidhi Centre for Legal Policy / ACP India model AMD.
@@ -183,7 +183,7 @@ export function validateAmdContent(content: AmdContent, today: Date): AmdIssue[]
   const age = ageOn(ex.dob, today);
   if (!ex.dob) issues.push(issue('L1_DOB', 'block', 'executant.dob', 'Enter your date of birth.', 'अपनी जन्म तिथि लिखें।'));
   else if (age === null || age < 0) issues.push(issue('L1_DOB', 'block', 'executant.dob', 'Enter a real date of birth.', 'सही जन्म तिथि लिखें।'));
-  else if (age < 18) issues.push(issue('L1_ADULT', 'block', 'executant.dob', 'Only an adult (18 years or older) can make a living will.', 'केवल वयस्क (18 साल या उससे ज़्यादा) ही लिविंग विल बना सकते हैं।'));
+  else if (age < 18) issues.push(issue('L1_ADULT', 'block', 'executant.dob', 'Only an adult (18 years or older) can make an advance care plan.', 'केवल वयस्क (18 साल या उससे ज़्यादा) ही अग्रिम देखभाल योजना बना सकते हैं।'));
   if (!validLast4(ex.idLast4)) issues.push(issue('ID_LAST4', 'block', 'executant.idLast4', 'Enter only the last 4 digits of the ID.', 'पहचान पत्र के केवल आख़िरी 4 अंक लिखें।'));
   if (!ex.permanentAddress.trim()) issues.push(issue('ADDRESS', 'warn', 'executant.permanentAddress', 'Your address is empty. You will need to write it by hand on the paper.', 'आपका पता खाली है। आपको इसे काग़ज़ पर हाथ से लिखना होगा।'));
   const d = content.declarations;
@@ -192,7 +192,7 @@ export function validateAmdContent(content: AmdContent, today: Date): AmdIssue[]
   if (!d.consideredCarefully) issues.push(issue('L1_CONSIDERED', 'block', 'declarations.consideredCarefully', 'Confirm that you have thought about this carefully.', 'पुष्टि करें कि आपने इस पर ध्यान से सोचा है।'));
   if (!d.understandsNotAppliedIfUnclear) issues.push(issue('L7_UNDERSTOOD', 'block', 'declarations.understandsNotAppliedIfUnclear', 'Confirm that you understand it will not be used if the situation is unclear or was not foreseen.', 'पुष्टि करें कि आप समझते हैं कि स्थिति साफ़ न होने या पहले से न सोची गई होने पर इसका उपयोग नहीं होगा।'));
 
-  if (content.conditions.length === 0) issues.push(issue('CONDITIONS', 'block', 'conditions', 'Choose at least one situation when this living will applies.', 'कम से कम एक स्थिति चुनें जब यह लिविंग विल लागू हो।'));
+  if (content.conditions.length === 0) issues.push(issue('CONDITIONS', 'block', 'conditions', 'Choose at least one situation when this advance care plan applies.', 'कम से कम एक स्थिति चुनें जब यह अग्रिम देखभाल योजना लागू हो।'));
   if (!Object.values(content.treatments).some((choice) => choice !== null)) {
     issues.push(issue('NO_TREATMENT_CHOICE', 'warn', 'treatments', 'You have not chosen any specific treatment. The general direction in Section 2 will still apply.', 'आपने कोई ख़ास इलाज नहीं चुना है। खंड 2 का सामान्य निर्देश फिर भी लागू होगा।'));
   }
@@ -200,7 +200,7 @@ export function validateAmdContent(content: AmdContent, today: Date): AmdIssue[]
     issues.push(issue('L9_COMFORT', 'block', 'treatments', 'Comfort care and feeding by mouth always continue. They cannot be refused here.', 'आराम की देखभाल और मुँह से खिलाना हमेशा जारी रहता है। इन्हें यहाँ मना नहीं किया जा सकता।'));
   }
   for (const [field, text] of freeTexts(content)) {
-    if (ENDING_LIFE.test(text)) issues.push(issue('NO_EUTHANASIA', 'block', field, 'A living will cannot ask for anything meant to end life. That is against the law in India. Please change these words.', 'लिविंग विल में जीवन ख़त्म करने के लिए कुछ भी नहीं माँगा जा सकता। यह भारत में क़ानून के ख़िलाफ़ है। कृपया ये शब्द बदलें।'));
+    if (ENDING_LIFE.test(text)) issues.push(issue('NO_EUTHANASIA', 'block', field, 'An advance care plan cannot ask for anything meant to end life. That is against the law in India. Please change these words.', 'अग्रिम देखभाल योजना में जीवन ख़त्म करने के लिए कुछ भी नहीं माँगा जा सकता। यह भारत में क़ानून के ख़िलाफ़ है। कृपया ये शब्द बदलें।'));
   }
 
   // L2: at least one DHR; warn below two; preference order is the array order.
@@ -240,7 +240,7 @@ export function validateExecution(version: AmdVersion, execution: AmdExecution, 
     const field = `execution.witnesses.${index}`;
     if (!witness.name.trim()) { issues.push(issue('L3_WITNESS', 'block', `${field}.name`, `Enter the name of witness ${index + 1}.`, `गवाह ${index + 1} का नाम लिखें।`)); return; }
     const name = normaliseName(witness.name);
-    if (name === executant) issues.push(issue('WITNESS_SELF', 'block', `${field}.name`, 'The person making the living will cannot be their own witness.', 'लिविंग विल बनाने वाला व्यक्ति ख़ुद अपना गवाह नहीं हो सकता।'));
+    if (name === executant) issues.push(issue('WITNESS_SELF', 'block', `${field}.name`, 'The person making the advance care plan cannot be their own witness.', 'अग्रिम देखभाल योजना बनाने वाला व्यक्ति ख़ुद अपना गवाह नहीं हो सकता।'));
     if (dhrNames.includes(name)) issues.push(issue('L3_WITNESS_IS_DHR', 'warn', `${field}.name`, `Witness ${index + 1} is also a named representative. Witnesses should preferably be independent.`, `गवाह ${index + 1} एक नामित प्रतिनिधि भी है। गवाह हो सके तो स्वतंत्र होने चाहिए।`));
     if (!validLast4(witness.idLast4)) issues.push(issue('ID_LAST4', 'block', `${field}.idLast4`, `Witness ${index + 1}: enter only the last 4 digits of the ID.`, `गवाह ${index + 1}: पहचान पत्र के केवल आख़िरी 4 अंक लिखें।`));
   });
@@ -383,8 +383,8 @@ export function updateAbha(versions: AmdVersion[], versionId: string, abha: { ad
 /** Revoke in writing (L6): needs the date of the signed written revocation. Every open version ends. */
 export function revokeAmd(versions: AmdVersion[], revocation: { revokedOn: string; writtenRevocationSigned: boolean; reason: string; scanKey?: string; scanSha256?: string }, now: Date): AmdResult {
   const issues: AmdIssue[] = [];
-  if (!versions.some((v) => v.status === 'EXECUTED' || v.status === 'GENERATED' || v.status === 'DRAFT')) issues.push(issue('NOTHING', 'block', 'status', 'There is no living will to cancel.', 'रद्द करने के लिए कोई लिविंग विल नहीं है।'));
-  if (!revocation.writtenRevocationSigned) issues.push(issue('L6_WRITTEN', 'block', 'revocation.written', 'A living will is cancelled in writing. Tick that the person signed a written cancellation.', 'लिविंग विल लिखित रूप में रद्द होती है। टिक करें कि व्यक्ति ने लिखित रद्दीकरण पर हस्ताक्षर किए हैं।'));
+  if (!versions.some((v) => v.status === 'EXECUTED' || v.status === 'GENERATED' || v.status === 'DRAFT')) issues.push(issue('NOTHING', 'block', 'status', 'There is no advance care plan to cancel.', 'रद्द करने के लिए कोई अग्रिम देखभाल योजना नहीं है।'));
+  if (!revocation.writtenRevocationSigned) issues.push(issue('L6_WRITTEN', 'block', 'revocation.written', 'An advance care plan is cancelled in writing. Tick that the person signed a written cancellation.', 'अग्रिम देखभाल योजना लिखित रूप में रद्द होती है। टिक करें कि व्यक्ति ने लिखित रद्दीकरण पर हस्ताक्षर किए हैं।'));
   if (!revocation.revokedOn) issues.push(issue('REVOKED_ON', 'block', 'revocation.revokedOn', 'Enter the date of the written cancellation.', 'लिखित रद्दीकरण की तारीख़ लिखें।'));
   else if (revocation.revokedOn > amdIsoDay(now)) issues.push(issue('REVOKED_FUTURE', 'block', 'revocation.revokedOn', 'The date cannot be in the future.', 'तारीख़ भविष्य की नहीं हो सकती।'));
   if (issues.length) return { ok: false, versions, issues };

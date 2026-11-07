@@ -24,7 +24,7 @@ Sahara helps patients and families organise documents, visits, daily care and qu
 - The conversation draft organiser is deterministic. Optional AI endpoints, including the medicine-photo organizer, stay disabled until their server-side provider secrets are configured.
 - QR links do not transfer the note to another device. PDF download and the copy log support manual sharing; the app does not send a note, verify receipt or revoke downloaded copies.
 - No hospital system, ABDM service, messaging channel or clinical data source is connected.
-- The prototype documents conversations and organises family support. It does not diagnose, infer urgency or prognosis, recommend treatment, create a DNAR order or execute an Advance Medical Directive.
+- The prototype documents conversations and organises family support. It does not diagnose, infer urgency or prognosis, recommend treatment, create a DNAR order or execute an advance care planning document.
 
 ## Stack
 

@@ -70,7 +70,7 @@ export const INITIAL_TRAJECTORY: TrajectoryPoint[] = [
     role: 'Clinical Lead & Palliative Specialist',
     milestoneTitle: 'Advance Care Planning & Goals of Care Alignment',
     clinicalSummary: 'Symptom burden increasing with malignant pleural effusion. Patient explicitly requested home-based care and avoidance of invasive mechanical ventilation or ICU transfer.',
-    keyInterventions: ['Advance Directive signed with son Rohan Sharma as designated proxy', 'Resuscitation ceiling adjusted to Tier 1 (Comfort care)', 'Therapeutic thoracentesis (1200 mL drained)'],
+    keyInterventions: ['Advance Care Plan signed with son Rohan Sharma as designated proxy', 'Resuscitation ceiling adjusted to Tier 1 (Comfort care)', 'Therapeutic thoracentesis (1200 mL drained)'],
     ceilingTier: 1,
     isKeyMilestone: true,
   },

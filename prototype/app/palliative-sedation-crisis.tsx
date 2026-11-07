@@ -469,7 +469,7 @@ Consulting Physician: Dr Isha Menon · Emergency & Critical Care`;
                 <div className="p-2.5 bg-slate-800 rounded-lg text-xs space-y-1 font-mono text-slate-300 border border-slate-700">
                   <div>Attestation: Dr Sujay (Oncology Palliative Lead)</div>
                   <div>Concurrence: Dr Isha Menon (Emergency Care Lead)</div>
-                  <div className="text-[10px] text-emerald-400">✓ Legally Concordant Advance Directive Active</div>
+                  <div className="text-[10px] text-emerald-400">✓ Legally Concordant Advance Care Plan Active</div>
                 </div>
               </div>
             </div>

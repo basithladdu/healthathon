@@ -1,4 +1,4 @@
-// The goals-of-care note IS the legal form: Healthathon_form_Rituparna.docx (legal review, 31 Oct 2026), with Rituparna's tracked
+// The goals-of-care note IS the clinical document: Healthathon_form_Rituparna.docx (legal review, 31 Oct 2026), with Rituparna's tracked
 // additions, in source-materials/team-context/legal-review-2026-10-31/. The form's own wording, headings, numbering (4.1, 4.2, 5.3, 6.1,
 // 6.2, 12.1, Section 19, 19.1 to 19.4), order, tick boxes and tables, filled in like a completed paper form. The screen, print, Word file
 // and the Android PDF all draw this one document. Line-by-line map: docs/goc-legal-form-coverage.md.
@@ -24,7 +24,7 @@ type Row = { topic: GocTopicId; status: 'DISCUSSED' | 'NOT_DISCUSSED'; verified:
 /** Signatures drawn on the doctor's device for this note (goc-signoff.ts), so Section 19 shows them. */
 export type GocFormDeviceSignature = { role: string; name: string; method: string; signedAt: string; relation?: string | null; registrationNo?: string | null };
 
-/** Where each guide row sits on the legal form. */
+/** Where each guide row sits on the clinical document. */
 export function gocFormSection(topic: GocTopicId): 'I' | 'II' | 'III' | null {
   if (topic === 'consent') return null;
   if (topic === 'patientDetails' || topic === 'decisionMakers') return 'I';
@@ -116,7 +116,7 @@ export function buildGocFormDocument(record: EctprRecord, rows: Row[], lang: Car
   const dir = record.existingDirective;
   const amd = dir?.kind === 'VALID_AMD' ? dir : null;
   const directiveTicks = [
-    tk(Boolean(amd), 'There is a valid written Advance Medical Directive / living will. Executed on ____. Location of original: ____', 'वैध लिखित एडवांस मेडिकल डायरेक्टिव / लिविंग विल है। कब बनी: ____। मूल कहाँ है: ____', amd ? [amd.date, amd.location].filter(Boolean).join(' · ') : ''),
+    tk(Boolean(amd), 'There is a valid written Advance care planning document. Executed on ____. Location of original: ____', 'वैध लिखित अग्रिम देखभाल योजना दस्तावेज़ है। कब बनी: ____। मूल कहाँ है: ____', amd ? [amd.date, amd.location].filter(Boolean).join(' · ') : ''),
     tk(Boolean(amd && /notary/i.test(amd.attestor)), '    Attested by Notary', '    नोटरी ने सत्यापित किया'),
     tk(Boolean(amd && /gazett/i.test(amd.attestor)), '    Attested by Gazetted Officer', '    राजपत्रित अधिकारी ने सत्यापित किया', amd && !/notary|gazett/i.test(amd.attestor) ? amd.attestor : ''),
     tk(false, '    With two witnesses? Yes / No. If yes, this ECTPR must be read as subordinate to it — the directive governs; this record operationalises it.', '    दो गवाहों के साथ? हाँ / नहीं। अगर हाँ, तो यह ECTPR उसके अधीन है — डायरेक्टिव ही मान्य है; यह रिकॉर्ड उसे लागू करता है।'),
@@ -300,7 +300,7 @@ export function buildGocFormDocument(record: EctprRecord, rows: Row[], lang: Car
     ] },
   ];
   const lead = [
-    t('Goals-of-care conversation note, in the order of the legal form', 'देखभाल के लक्ष्यों की बातचीत का नोट, क़ानूनी फ़ॉर्म के क्रम में'),
+    t('Goals-of-care conversation note, in the order of the clinical document', 'देखभाल के लक्ष्यों की बातचीत का नोट, क्लिनिकल दस्तावेज़ के क्रम में'),
     record.status === 'DRAFT' ? t('For the doctor, and the patient or family, to read together and sign below.', 'डॉक्टर और मरीज़ या परिवार साथ पढ़ें और नीचे साइन करें।') : `${t('Version', 'संस्करण')} ${record.version}`,
     `${t('Reviewed by', 'समीक्षा करने वाले')}: ${meta.reviewedBy || nd} · ${meta.reviewedAt.slice(0, 10)}`,
     ...(meta.notDiscussed?.length ? [`${nd}: ${meta.notDiscussed.join('; ')}`] : []),

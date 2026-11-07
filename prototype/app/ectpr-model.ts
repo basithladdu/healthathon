@@ -1,4 +1,4 @@
-// Shared data model for the Sahara emergency care plan (ECTPR) and living will (AMD).
+// Shared data model for the Sahara emergency care plan (ECTPR) and advance care plan (AMD).
 // Source: SVK's tech spec §5 and clinical spec §3 (source-materials/team-context/svk-specs-2026-10-29).
 // Choices are stored as enums, never translated text, so one record prints in any language.
 // null always means "No preference recorded" = standard care (rule V1). Nothing is pre-selected.
@@ -115,7 +115,7 @@ export type EctprRecord = {
   /** Who signed the cancellation (added by ectpr-store). */
   revokedBy?: string;
   supersedes?: string;
-  /** Only on an issued card's snapshot, never on the stored record: the living will status when the card was issued (the AMD itself stays on the issuing device). */
+  /** Only on an issued card's snapshot, never on the stored record: the advance care plan status when the card was issued (the AMD itself stays on the issuing device). */
   amdAtIssue?: AmdStatusSummary | null;
 };
 
@@ -174,7 +174,7 @@ export type EctprDistribution = {
 };
 
 // ════════════════════════════════════════════════════════════════════════════
-// AMD (living will) section — owned by the AMD screen (amd-screen.tsx, amd-rules.ts,
+// AMD (advance care plan) section — owned by the AMD screen (amd-screen.tsx, amd-rules.ts,
 // amd-store.ts, amd-pdf.ts). Append-only; ECTPR types above are edited by other agents.
 // Template: Vidhi Centre for Legal Policy / ACP India model AMD. Law: Common Cause (2018)
 // as modified 24 Jan 2023 (MA 1699/2019 in WP(C) 215/2005); Harish Rana (11 Mar 2026).

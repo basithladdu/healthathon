@@ -36,7 +36,7 @@ export const CARE_SECTIONS: Array<{ view: CareView; en: string; hi: string; art:
     { view: 'visit-questions', en: 'Questions for my doctor', hi: 'डॉक्टर के लिए सवाल', art: 'open-questions' },
     { view: 'prepare-conversation', en: 'What matters to me', hi: 'मेरे लिए क्या ज़रूरी है', art: 'cancer-overview' },
     { view: 'care-plan', en: 'My emergency care plan', hi: 'मेरी इमरजेंसी देखभाल योजना', art: 'doctor-pack' },
-    { view: 'living-will', en: 'My living will', hi: 'मेरी लिविंग विल', art: 'care-story' },
+    { view: 'living-will', en: 'My advance care plan', hi: 'मेरी अग्रिम देखभाल योजना', art: 'care-story' },
   ] },
 ];
 

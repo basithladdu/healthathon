@@ -1,5 +1,5 @@
 'use client';
-// Living will (AMD) screen: guided Vidhi-template questions → preview → Vidhi-format PDF → record the signed,
+// Advance care planning (AMD) screen: guided Vidhi-template questions → preview → Vidhi-format PDF → record the signed,
 // witnessed and attested paper → copies log. Lifecycle DRAFT → GENERATED → EXECUTED (tech spec §6, rules L1–L9).
 // The app never signs or validates an AMD, never offers any act to end life, and has no "withdraw" action.
 
@@ -147,9 +147,9 @@ export function AmdScreen(props: Props) {
 
   return <TextContext.Provider value={t}><section className="amd-screen" aria-labelledby="amd-title">
     <header className="amd-head">
-      <p className="amd-eyebrow">{t('Advance medical directive', 'अग्रिम चिकित्सा निर्देश')}</p>
-      <h1 id="amd-title">{t('Living will', 'लिविंग विल')}</h1>
-      <p className="amd-lede">{t(`A living will lets ${patientName} write down, while able to decide, which treatments they do not want if they become very ill and cannot speak, and who should speak for them.`, `लिविंग विल से ${patientName} तब लिख सकते हैं जब वे ख़ुद निर्णय ले सकें, कि बहुत बीमार होने और बोल न पाने पर उन्हें कौन से इलाज नहीं चाहिए, और उनकी ओर से कौन बोलेगा।`)}</p>
+      <p className="amd-eyebrow">{t('Clinical document', 'क्लिनिकल दस्तावेज़')}</p>
+      <h1 id="amd-title">{t('Advance care planning', 'अग्रिम देखभाल योजना')}</h1>
+      <p className="amd-lede">{t(`An advance care plan lets ${patientName} write down, while able to decide, which treatments they do not want if they become very ill and cannot speak, and who should speak for them.`, `अग्रिम देखभाल योजना से ${patientName} तब लिख सकते हैं जब वे ख़ुद निर्णय ले सकें, कि बहुत बीमार होने और बोल न पाने पर उन्हें कौन से इलाज नहीं चाहिए, और उनकी ओर से कौन बोलेगा।`)}</p>
     </header>
     {error ? <p className="amd-issue amd-issue-block" role="alert">{error}</p> : null}
     {versions === null ? <p role="status">{t('Loading…', 'लोड हो रहा है…')}</p> : <>
@@ -158,13 +158,13 @@ export function AmdScreen(props: Props) {
       {role === 'doctor'
         ? <DoctorView t={t} current={current} latest={latest} />
         : <>
-          {role === 'family' ? <Callout title={t('You are helping', 'आप मदद कर रहे हैं')}><p>{t(`Only ${patientName} can make and sign a living will, in their own words. You can help them fill it in and read it out to them.`, `केवल ${patientName} ही अपने शब्दों में लिविंग विल बना और हस्ताक्षर कर सकते हैं। आप भरने में और पढ़कर सुनाने में मदद कर सकते हैं।`)}</p></Callout> : null}
+          {role === 'family' ? <Callout title={t('You are helping', 'आप मदद कर रहे हैं')}><p>{t(`Only ${patientName} can make and sign an advance care plan, in their own words. You can help them fill it in and read it out to them.`, `केवल ${patientName} ही अपने शब्दों में अग्रिम देखभाल योजना बना और हस्ताक्षर कर सकते हैं। आप भरने में और पढ़कर सुनाने में मदद कर सकते हैं।`)}</p></Callout> : null}
           {working?.status === 'DRAFT' ? <AmdWizard key={working.id} t={t} lang={lang} version={working} patientId={patientId} actor={actor} /> : null}
           {working?.status === 'GENERATED' ? <SignAndRecord key={working.id} t={t} version={working} patientId={patientId} actor={actor} onError={setError} /> : null}
           {current ? <ExecutedPanel key={current.id} t={t} version={current} patientId={patientId} actor={actor} hasWorking={Boolean(working)} onNewVersion={start} /> : null}
           {!working && !current ? <section className="amd-card">
-            {latest?.status === 'REVOKED' ? <Callout tone="danger" title={t('Cancelled', 'रद्द')}><p>{t(`The living will was cancelled in writing on ${formatDay(latest.revocation?.revokedOn)}. It no longer applies.`, `लिविंग विल ${formatDay(latest.revocation?.revokedOn)} को लिखित रूप में रद्द की गई। यह अब लागू नहीं है।`)}</p></Callout> : null}
-            <h2>{latest ? t('Make a new living will', 'नई लिविंग विल बनाएँ') : t('Start a living will', 'लिविंग विल शुरू करें')}</h2>
+            {latest?.status === 'REVOKED' ? <Callout tone="danger" title={t('Cancelled', 'रद्द')}><p>{t(`The advance care plan was cancelled in writing on ${formatDay(latest.revocation?.revokedOn)}. It no longer applies.`, `अग्रिम देखभाल योजना ${formatDay(latest.revocation?.revokedOn)} को लिखित रूप में रद्द की गई। यह अब लागू नहीं है।`)}</p></Callout> : null}
+            <h2>{latest ? t('Make a new advance care plan', 'नई अग्रिम देखभाल योजना बनाएँ') : t('Start an advance care plan', 'अग्रिम देखभाल योजना शुरू करें')}</h2>
             <p>{t('It takes about 20 minutes. Your answers stay on this device until you print them.', 'इसमें लगभग 20 मिनट लगते हैं। प्रिंट करने तक आपके जवाब इसी डिवाइस पर रहते हैं।')}</p>
             <button type="button" className="primary-button amd-primary" onClick={start}>{t('Start', 'शुरू करें')}</button>
           </section> : null}
@@ -183,9 +183,9 @@ function StatusCard({ t, versions, current, working }: { t: T; versions: AmdVers
   const steps: Array<[AmdVersion['status'], string, string]> = [['DRAFT', 'Answer questions', 'सवालों के जवाब'], ['GENERATED', 'Print', 'प्रिंट'], ['EXECUTED', 'Sign, attest, upload', 'हस्ताक्षर, सत्यापन, अपलोड']];
   const focus = working ?? current ?? versions.at(-1)!;
   const reached = focus.status === 'EXECUTED' ? 2 : focus.status === 'GENERATED' ? 1 : 0;
-  return <section className="amd-card amd-status" aria-label={t('Living will status', 'लिविंग विल की स्थिति')}>
+  return <section className="amd-card amd-status" aria-label={t('Advance care planning status', 'अग्रिम देखभाल योजना की स्थिति')}>
     <div className="amd-status-line">
-      <span className={`amd-chip amd-chip-${current ? 'ok' : 'none'}`}>{current ? t(`Current: version ${current.version}, signed ${formatDay(current.execution?.signedOn)}`, `मौजूदा: संस्करण ${current.version}, हस्ताक्षर ${formatDay(current.execution?.signedOn)}`) : t('No signed living will recorded yet', 'अभी कोई हस्ताक्षरित लिविंग विल दर्ज नहीं')}</span>
+      <span className={`amd-chip amd-chip-${current ? 'ok' : 'none'}`}>{current ? t(`Current: version ${current.version}, signed ${formatDay(current.execution?.signedOn)}`, `मौजूदा: संस्करण ${current.version}, हस्ताक्षर ${formatDay(current.execution?.signedOn)}`) : t('No signed advance care plan recorded yet', 'अभी कोई हस्ताक्षरित अग्रिम देखभाल योजना दर्ज नहीं')}</span>
       {working ? <span className="amd-chip amd-chip-work">{`${t(`Version ${working.version}`, `संस्करण ${working.version}`)}: ${t(...STATUS_TEXT[working.status])}`}</span> : null}
     </div>
     {focus.status !== 'REVOKED' && focus.status !== 'SUPERSEDED' ? <ol className="amd-life">{steps.map(([status, en, hi], index) => <li key={status} data-state={index < reached || (index === reached && focus.status === 'EXECUTED') ? 'done' : index === reached ? 'current' : 'next'}>{t(en, hi)}</li>)}</ol> : null}
@@ -267,7 +267,7 @@ function AmdWizard({ t, lang, version, patientId, actor }: { t: T; lang: CareLan
     <div className="amd-step-title"><h2 id={id('step')} tabIndex={-1}>{t(...STEPS[step])}</h2><span>{t(`Step ${step + 1} of ${STEPS.length} · Version ${version.version}`, `चरण ${step + 1} / ${STEPS.length} · संस्करण ${version.version}`)}</span><ReadAloudButton key={step} lang={lang} target={wizard} /></div>
 
     {step === 0 ? <div className="amd-prose">
-      <p>{t('This follows the model living will by the Vidhi Centre for Legal Policy and ACP India, and the Supreme Court’s rules (2018, changed on 24 January 2023).', 'यह विधि सेंटर फ़ॉर लीगल पॉलिसी और ACP इंडिया की मॉडल लिविंग विल, और सुप्रीम कोर्ट के नियमों (2018, 24 जनवरी 2023 को बदले गए) पर आधारित है।')}</p>
+      <p>{t('This follows the model advance care plan by the Vidhi Centre for Legal Policy and ACP India, and the Supreme Court’s rules (2018, changed on 24 January 2023).', 'यह विधि सेंटर फ़ॉर लीगल पॉलिसी और ACP इंडिया की मॉडल अग्रिम देखभाल योजना, और सुप्रीम कोर्ट के नियमों (2018, 24 जनवरी 2023 को बदले गए) पर आधारित है।')}</p>
       <ul>
         <li>{t('You must be 18 or older and able to understand what you are deciding.', 'आपकी उम्र 18 या उससे ज़्यादा होनी चाहिए और आप समझ सकें कि क्या तय कर रहे हैं।')}</li>
         <li>{t('Nobody may pressure you. You can change or cancel it at any time, in writing.', 'कोई आप पर दबाव नहीं डाल सकता। आप इसे कभी भी, लिखित रूप में, बदल या रद्द कर सकते हैं।')}</li>
@@ -386,7 +386,7 @@ function AmdWizard({ t, lang, version, patientId, actor }: { t: T; lang: CareLan
         </div>
         <Field id={id('fpphone')} label={t('Phone', 'फ़ोन')}><TextInput id={id('fpphone')} type="tel" inputMode="tel" maxLength={20} value={content.familyPhysician.phone} onChange={(phone) => set('familyPhysician', { ...content.familyPhysician, phone })} /></Field>
       </fieldset>
-      <Field id={id('cust')} label={t('Local body that keeps living wills (custodian)', 'स्थानीय निकाय जो लिविंग विल रखता है (संरक्षक)')} issue={fieldIssues('custodianBody')} hint={t('For example your municipal corporation or gram panchayat. Maharashtra and Karnataka (rural) have named custodians; Andhra Pradesh has not confirmed one yet. You can still sign and record “custodian pending”.', 'जैसे आपका नगर निगम या ग्राम पंचायत। महाराष्ट्र और कर्नाटक (ग्रामीण) ने संरक्षक तय किए हैं; आंध्र प्रदेश ने अभी पुष्टि नहीं की है। आप फिर भी हस्ताक्षर करके “संरक्षक बाक़ी” दर्ज कर सकते हैं।')}>
+      <Field id={id('cust')} label={t('Local body that keeps advance care plans (custodian)', 'स्थानीय निकाय जो अग्रिम देखभाल योजना रखता है (संरक्षक)')} issue={fieldIssues('custodianBody')} hint={t('For example your municipal corporation or gram panchayat. Maharashtra and Karnataka (rural) have named custodians; Andhra Pradesh has not confirmed one yet. You can still sign and record “custodian pending”.', 'जैसे आपका नगर निगम या ग्राम पंचायत। महाराष्ट्र और कर्नाटक (ग्रामीण) ने संरक्षक तय किए हैं; आंध्र प्रदेश ने अभी पुष्टि नहीं की है। आप फिर भी हस्ताक्षर करके “संरक्षक बाक़ी” दर्ज कर सकते हैं।')}>
         <TextInput id={id('cust')} value={content.custodianBody} list={id('custlist')} onChange={(value) => set('custodianBody', value)} />
         <datalist id={id('custlist')}>{CUSTODIAN_SUGGESTIONS.map((value) => <option key={value} value={value} />)}</datalist>
       </Field>
@@ -584,8 +584,8 @@ function ExecutedPanel({ t, version, patientId, actor, hasWorking, onNewVersion 
   }
 
   return <section className="amd-card" aria-labelledby={`${uid}-h`}>
-    <h2 id={`${uid}-h`}>{t(`Signed living will · version ${version.version}`, `हस्ताक्षरित लिविंग विल · संस्करण ${version.version}`)}</h2>
-    <Callout tone="ok"><p>{t('This is the current living will. Doctors can see that it is signed, witnessed and attested.', 'यह मौजूदा लिविंग विल है। डॉक्टर देख सकते हैं कि यह हस्ताक्षरित, गवाहों के सामने और सत्यापित है।')}</p></Callout>
+    <h2 id={`${uid}-h`}>{t(`Signed advance care plan · version ${version.version}`, `हस्ताक्षरित अग्रिम देखभाल योजना · संस्करण ${version.version}`)}</h2>
+    <Callout tone="ok"><p>{t('This is the current advance care plan. Doctors can see that it is signed, witnessed and attested.', 'यह मौजूदा अग्रिम देखभाल योजना है। डॉक्टर देख सकते हैं कि यह हस्ताक्षरित, गवाहों के सामने और सत्यापित है।')}</p></Callout>
     <ProofList t={t} version={version} />
     <ScanButton t={t} scanKey={version.execution!.scanKey} />
 
@@ -608,9 +608,9 @@ function ExecutedPanel({ t, version, patientId, actor, hasWorking, onNewVersion 
     </> : null}
 
     <details className="amd-details"><summary>{t('Link to ABHA health records (optional)', 'ABHA स्वास्थ्य रिकॉर्ड से जोड़ें (वैकल्पिक)')}</summary>
-      <p className="amd-hint">{t('The Supreme Court allows adding the living will to digital health records. Sahara only notes the ABHA address here; upload the scan in your ABHA app yourself.', 'सुप्रीम कोर्ट लिविंग विल को डिजिटल स्वास्थ्य रिकॉर्ड में जोड़ने की अनुमति देता है। सहारा यहाँ केवल ABHA पता नोट करता है; स्कैन अपने ABHA ऐप में ख़ुद अपलोड करें।')}</p>
+      <p className="amd-hint">{t('The Supreme Court allows adding the advance care plan to digital health records. Sahara only notes the ABHA address here; upload the scan in your ABHA app yourself.', 'सुप्रीम कोर्ट अग्रिम देखभाल योजना को डिजिटल स्वास्थ्य रिकॉर्ड में जोड़ने की अनुमति देता है। सहारा यहाँ केवल ABHA पता नोट करता है; स्कैन अपने ABHA ऐप में ख़ुद अपलोड करें।')}</p>
       <Field id={`${uid}-abha`} label={t('ABHA address or number', 'ABHA पता या नंबर')}><TextInput id={`${uid}-abha`} value={abha.address} placeholder="name@abdm" onChange={(address) => setAbha((p) => ({ ...p, address }))} /></Field>
-      <Check checked={abha.consent} onChange={(consent) => setAbha((p) => ({ ...p, consent }))}>{t('The patient agrees to link the living will with their ABHA records.', 'मरीज़ लिविंग विल को अपने ABHA रिकॉर्ड से जोड़ने के लिए सहमत है।')}</Check>
+      <Check checked={abha.consent} onChange={(consent) => setAbha((p) => ({ ...p, consent }))}>{t('The patient agrees to link the advance care plan with their ABHA records.', 'मरीज़ अग्रिम देखभाल योजना को अपने ABHA रिकॉर्ड से जोड़ने के लिए सहमत है।')}</Check>
       <button type="button" className="secondary-button" onClick={async () => done(await updateAmdAbha(patientId, version.id, abha, actor))}>{t('Save ABHA link', 'ABHA लिंक सहेजें')}</button>
     </details>
 
@@ -624,13 +624,13 @@ function ExecutedPanel({ t, version, patientId, actor, hasWorking, onNewVersion 
       </div>
       <div>
         <h3>{t('Cancel it', 'इसे रद्द करें')}</h3>
-        <p className="amd-hint">{t('A living will is cancelled in writing: the person signs a short note saying they cancel it, the same way it was made. Then give the note to everyone who has a copy.', 'लिविंग विल लिखित रूप में रद्द होती है: व्यक्ति एक छोटे नोट पर हस्ताक्षर करता है कि वह इसे रद्द कर रहा है, उसी तरह जैसे बनाई गई थी। फिर वह नोट हर उस व्यक्ति को दें जिसके पास प्रति है।')}</p>
+        <p className="amd-hint">{t('An advance care plan is cancelled in writing: the person signs a short note saying they cancel it, the same way it was made. Then give the note to everyone who has a copy.', 'अग्रिम देखभाल योजना लिखित रूप में रद्द होती है: व्यक्ति एक छोटे नोट पर हस्ताक्षर करता है कि वह इसे रद्द कर रहा है, उसी तरह जैसे बनाई गई थी। फिर वह नोट हर उस व्यक्ति को दें जिसके पास प्रति है।')}</p>
         {!confirmRevoke ? <button type="button" className="secondary-button amd-danger" onClick={() => setConfirmRevoke(true)}>{t('Record a written cancellation', 'लिखित रद्दीकरण दर्ज करें')}</button> : <div className="amd-revoke">
           <Field id={`${uid}-rev-on`} label={t('Date of the written cancellation', 'लिखित रद्दीकरण की तारीख़')}><TextInput id={`${uid}-rev-on`} type="date" value={revoke.revokedOn} onChange={(revokedOn) => setRevoke((p) => ({ ...p, revokedOn }))} /></Field>
           <Check checked={revoke.writtenRevocationSigned} onChange={(writtenRevocationSigned) => setRevoke((p) => ({ ...p, writtenRevocationSigned }))}>{t('The person signed a written cancellation.', 'व्यक्ति ने लिखित रद्दीकरण पर हस्ताक्षर किए हैं।')}</Check>
           <Field id={`${uid}-rev-why`} label={t('Reason (optional)', 'कारण (वैकल्पिक)')}><TextInput id={`${uid}-rev-why`} value={revoke.reason} onChange={(reason) => setRevoke((p) => ({ ...p, reason }))} /></Field>
           <Field id={`${uid}-rev-scan`} label={t('Photo of the cancellation (optional)', 'रद्दीकरण की फ़ोटो (वैकल्पिक)')}><input id={`${uid}-rev-scan`} type="file" accept="application/pdf,image/*" onChange={async (event) => { const file = event.target.files?.[0]; if (!file) return; const saved = await saveAmdScan(patientId, file, actor, 'REVOCATION'); setRevoke((p) => ({ ...p, scanKey: saved.scanKey, scanSha256: saved.scanSha256 })); }} /></Field>
-          <div className="amd-actions"><button type="button" className="secondary-button" onClick={() => setConfirmRevoke(false)}>{t('Keep it', 'रहने दें')}</button><button type="button" className="primary-button amd-primary amd-danger" onClick={revokeNow}>{t('Cancel the living will', 'लिविंग विल रद्द करें')}</button></div>
+          <div className="amd-actions"><button type="button" className="secondary-button" onClick={() => setConfirmRevoke(false)}>{t('Keep it', 'रहने दें')}</button><button type="button" className="primary-button amd-primary amd-danger" onClick={revokeNow}>{t('Cancel the advance care plan', 'अग्रिम देखभाल योजना रद्द करें')}</button></div>
         </div>}
       </div>
     </div>
@@ -643,17 +643,17 @@ function ExecutedPanel({ t, version, patientId, actor, hasWorking, onNewVersion 
 function DoctorView({ t, current, latest }: { t: T; current: AmdVersion | null; latest: AmdVersion | null }) {
   if (!current) {
     return <section className="amd-card">
-      <h2>{t('Living will for this patient', 'इस मरीज़ की लिविंग विल')}</h2>
+      <h2>{t('Advance care planning for this patient', 'इस मरीज़ की अग्रिम देखभाल योजना')}</h2>
       <Callout tone="warn"><p>{latest?.status === 'REVOKED'
-        ? t(`The living will was cancelled in writing on ${formatDay(latest.revocation?.revokedOn)}. It does not apply.`, `लिविंग विल ${formatDay(latest.revocation?.revokedOn)} को लिखित रूप में रद्द की गई। यह लागू नहीं है।`)
-        : latest ? t('A living will has been started or printed but is not signed and recorded. It is not valid.', 'लिविंग विल शुरू या प्रिंट हुई है पर हस्ताक्षरित और दर्ज नहीं है। यह वैध नहीं है।')
-          : t('No living will is recorded in Sahara. Ask the family if a signed paper exists.', 'सहारा में कोई लिविंग विल दर्ज नहीं है। परिवार से पूछें कि क्या कोई हस्ताक्षरित काग़ज़ है।')}</p></Callout>
+        ? t(`The advance care plan was cancelled in writing on ${formatDay(latest.revocation?.revokedOn)}. It does not apply.`, `अग्रिम देखभाल योजना ${formatDay(latest.revocation?.revokedOn)} को लिखित रूप में रद्द की गई। यह लागू नहीं है।`)
+        : latest ? t('An advance care plan has been started or printed but is not signed and recorded. It is not valid.', 'अग्रिम देखभाल योजना शुरू या प्रिंट हुई है पर हस्ताक्षरित और दर्ज नहीं है। यह वैध नहीं है।')
+          : t('No advance care plan is recorded in Sahara. Ask the family if a signed paper exists.', 'सहारा में कोई अग्रिम देखभाल योजना दर्ज नहीं है। परिवार से पूछें कि क्या कोई हस्ताक्षरित काग़ज़ है।')}</p></Callout>
     </section>;
   }
   const refused = AMD_TREATMENTS.filter((tr) => current.content.treatments[tr] === 'REFUSE');
   const accepted = AMD_TREATMENTS.filter((tr) => current.content.treatments[tr] === 'ACCEPT');
   return <section className="amd-card">
-    <h2>{t(`Signed living will · version ${current.version}`, `हस्ताक्षरित लिविंग विल · संस्करण ${current.version}`)}</h2>
+    <h2>{t(`Signed advance care plan · version ${current.version}`, `हस्ताक्षरित अग्रिम देखभाल योजना · संस्करण ${current.version}`)}</h2>
     <p className="amd-hint">{t('Check the paper copy against the scan and its SHA-256, or with the custodian. Doctors only read this here; nothing in the app starts or stops treatment.', 'काग़ज़ की प्रति को स्कैन और उसके SHA-256 से, या संरक्षक से मिलाएँ। डॉक्टर इसे यहाँ केवल पढ़ते हैं; ऐप में कुछ भी इलाज शुरू या बंद नहीं करता।')}</p>
     <ProofList t={t} version={current} />
     <ScanButton t={t} scanKey={current.execution!.scanKey} />

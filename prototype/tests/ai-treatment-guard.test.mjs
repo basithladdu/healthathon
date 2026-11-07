@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { asksForTreatmentAdvice, containsTreatmentAdvice, isCarePlanAdvicePurpose, TREATMENT_ADVICE_CODE } from '../app/ai-treatment-guard.ts';
 import { createSaharaAssistHandler } from '../app/sahara-assist-server.ts';
 
-// SVK Saanthvana spec, "Won't: AI treatment advice" — for the emergency care plan (ECTPR), the living will, and everything else.
+// SVK Saanthvana spec, "Won't: AI treatment advice" — for the emergency care plan (ECTPR), the advance care plan, and everything else.
 test('questions asking the AI to decide or recommend care are recognised', () => {
   for (const question of [
     'Should we choose CPR in the emergency care plan?',
@@ -12,7 +12,7 @@ test('questions asking the AI to decide or recommend care are recognised', () =>
     'What medicine should I give for the pain?',
     'Which treatment is best for her?',
     'Do you recommend signing the DNR?',
-    'What should I write in the living will about ICU?',
+    'What should I write in the advance care plan about ICU?',
     'How much should I give tonight?',
     'क्या हमें CPR करवाना चाहिए?',
     'कौन सी दवा दें?',

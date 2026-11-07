@@ -17,7 +17,7 @@ function reply(body: unknown, status = 200) {
 /**
  * The rules for reading a goals-of-care transcript onto the emergency care plan (ECTPR) form. Shared by this route and the Android
  * analyze action (goc-analyze-server.ts), so both ask for the same fields and the same JSON.
- * The fields are the decision rows of the legal form (source-materials/team-context/legal-review-2026-10-31): goal of care, CPR,
+ * The fields are the decision rows of the clinical document (source-materials/team-context/legal-review-2026-10-31): goal of care, CPR,
  * hospital transfer, ambulance, the ceiling of breathing support (0 = no support beyond oxygen … 5 = invasive ventilation), ICU,
  * vasopressors, dialysis, NG and PEG feeding, hydration, and section 5.3 (what the patient knows / family asked not to tell).
  */

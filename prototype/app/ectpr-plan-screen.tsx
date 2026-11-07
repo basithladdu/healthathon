@@ -130,9 +130,9 @@ const ABILITIES: Array<{ key: string; en: string; hi: string }> = [
   { key: 'communicate', en: 'Can tell us the decision', hi: 'फ़ैसला बता सकते हैं' },
 ];
 const AUTHORITY_OPTS: Opt<AuthorityBasis>[] = [
-  { value: 'NAMED_IN_AMD', en: 'Named in a signed living will (AMD)', hi: 'हस्ताक्षरित लिविंग विल (AMD) में नाम है', helpEn: 'Recognised by the 2023 Supreme Court order. The medical boards take this person’s consent.', helpHi: '2023 के सुप्रीम कोर्ट आदेश से मान्य। मेडिकल बोर्ड इन्हीं की सहमति लेते हैं।' },
-  { value: 'NAMED_BY_PATIENT', en: 'Named by the patient (no living will)', hi: 'मरीज़ ने नाम दिया (लिविंग विल नहीं)', helpEn: 'A strong sign of the patient’s wish, but not a legal nomination.', helpHi: 'मरीज़ की इच्छा का मज़बूत संकेत, पर क़ानूनी नामांकन नहीं।' },
-  { value: 'NEXT_OF_KIN', en: 'Next of kin, next friend or guardian', hi: 'निकट संबंधी, मित्र या अभिभावक', helpEn: 'The 2023 order’s route when there is no living will.', helpHi: 'लिविंग विल न होने पर 2023 के आदेश का रास्ता।' },
+  { value: 'NAMED_IN_AMD', en: 'Named in a signed advance care plan (AMD)', hi: 'हस्ताक्षरित अग्रिम देखभाल योजना (AMD) में नाम है', helpEn: 'Recognised by the 2023 Supreme Court order. The medical boards take this person’s consent.', helpHi: '2023 के सुप्रीम कोर्ट आदेश से मान्य। मेडिकल बोर्ड इन्हीं की सहमति लेते हैं।' },
+  { value: 'NAMED_BY_PATIENT', en: 'Named by the patient (no advance care plan)', hi: 'मरीज़ ने नाम दिया (अग्रिम देखभाल योजना नहीं)', helpEn: 'A strong sign of the patient’s wish, but not a legal nomination.', helpHi: 'मरीज़ की इच्छा का मज़बूत संकेत, पर क़ानूनी नामांकन नहीं।' },
+  { value: 'NEXT_OF_KIN', en: 'Next of kin, next friend or guardian', hi: 'निकट संबंधी, मित्र या अभिभावक', helpEn: 'The 2023 order’s route when there is no advance care plan.', helpHi: 'अग्रिम देखभाल योजना न होने पर 2023 के आदेश का रास्ता।' },
   { value: 'COURT_APPOINTED', en: 'Guardian appointed by a court', hi: 'अदालत द्वारा नियुक्त अभिभावक' },
 ];
 const ID_OPTS: Array<{ value: IdType; en: string; hi: string }> = [
@@ -142,9 +142,9 @@ const ID_OPTS: Array<{ value: IdType; en: string; hi: string }> = [
 ];
 type DirectiveKind = NonNullable<EctprRecord['existingDirective']>['kind'];
 const DIRECTIVE_OPTS: Opt<DirectiveKind>[] = [
-  { value: 'VALID_AMD', en: 'A signed, attested living will (AMD)', hi: 'हस्ताक्षरित और सत्यापित लिविंग विल (AMD)', helpEn: 'If both exist, the living will governs.', helpHi: 'दोनों हों तो लिविंग विल मान्य होगी।' },
+  { value: 'VALID_AMD', en: 'A signed, attested advance care plan (AMD)', hi: 'हस्ताक्षरित और सत्यापित अग्रिम देखभाल योजना (AMD)', helpEn: 'If both exist, the advance care plan governs.', helpHi: 'दोनों हों तो अग्रिम देखभाल योजना मान्य होगी।' },
   { value: 'PRIOR_WISHES', en: 'Wishes said or written before (not a legal AMD)', hi: 'पहले कही या लिखी इच्छाएँ (क़ानूनी AMD नहीं)' },
-  { value: 'NONE', en: 'No living will', hi: 'कोई लिविंग विल नहीं' },
+  { value: 'NONE', en: 'No advance care plan', hi: 'कोई अग्रिम देखभाल योजना नहीं' },
 ];
 const UNIT_OPTS: Array<{ value: TrialPlan['durationUnit']; en: string; hi: string }> = [
   { value: 'DAYS', en: 'days', hi: 'दिन' }, { value: 'HOURS', en: 'hours', hi: 'घंटे' }, { value: 'SESSIONS', en: 'sessions', hi: 'सत्र' },
@@ -175,7 +175,7 @@ const TRIGGER_HI: Record<ReviewTrigger, string> = {
 const STEPS: Array<{ en: string; hi: string }> = [
   { en: 'Patient', hi: 'मरीज़' },
   { en: 'Decision-makers', hi: 'फ़ैसला लेने वाले' },
-  { en: 'Capacity and living will', hi: 'क्षमता और लिविंग विल' },
+  { en: 'Capacity and advance care plan', hi: 'क्षमता और अग्रिम देखभाल योजना' },
   { en: 'Understanding', hi: 'समझ' },
   { en: 'Values', hi: 'मूल्य' },
   { en: 'Emergency choices', hi: 'इमरजेंसी के फ़ैसले' },
@@ -521,7 +521,7 @@ function describe(t: T, lang: CareLang, record: EctprRecord) {
       [t('Home care', 'घर पर देखभाल'), homeCareLines(record, lang).join('\n') || none],
       [t('Withdrawal or withholding (medical boards)', 'इलाज रोकना या शुरू न करना (मेडिकल बोर्ड)'), withdrawalLines(record, lang).join('\n') || none],
       [t('Ability to decide', 'फ़ैसला लेने की क्षमता'), opt(CAPACITY_OPTS, record.capacity.status)],
-      [t('Living will', 'लिविंग विल'), directive ? opt(DIRECTIVE_OPTS, directive.kind) : none],
+      [t('Advance care planning', 'अग्रिम देखभाल योजना'), directive ? opt(DIRECTIVE_OPTS, directive.kind) : none],
       [t('In the patient’s own words', 'मरीज़ के अपने शब्दों में'), record.values.ownWords.trim() || none],
       [t('Not acceptable to the patient', 'मरीज़ को जो मंज़ूर नहीं'), record.values.unacceptableOutcomes.filter((v) => v.trim()).join('\n') || none],
     ] as Array<[string, string | null]>,
@@ -1123,7 +1123,7 @@ function Wizard({ t, lang, draft, previous, issues, step, busy, error, toast, di
               </div>
             </div>
           </Choices>
-          <Choices t={t} name="ep-directive" legend={t('Does the patient have a living will (AMD)?', 'क्या मरीज़ की लिविंग विल (AMD) है?')} value={draft.existingDirective?.kind ?? null} options={DIRECTIVE_OPTS} noneHint={t('Not asked yet.', 'अभी नहीं पूछा।')}
+          <Choices t={t} name="ep-directive" legend={t('Does the patient have an advance care plan (AMD)?', 'क्या मरीज़ की अग्रिम देखभाल योजना (AMD) है?')} value={draft.existingDirective?.kind ?? null} options={DIRECTIVE_OPTS} noneHint={t('Not asked yet.', 'अभी नहीं पूछा।')}
             onChange={(kind) => edit((r) => {
               r.existingDirective = kind === null ? null : kind === 'VALID_AMD' ? { kind, date: '', location: '', attestor: '' } : kind === 'PRIOR_WISHES' ? { kind, note: '' } : { kind: 'NONE' };
             })}>

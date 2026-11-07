@@ -76,7 +76,7 @@ export function edSpokenText(record: EctprRecord | null, interp: EdInterpretatio
 /**
  * The ED Quick View for one record. `record` null = nothing found. `full` adds the break-glass sections.
  * Unsigned plans never show their choices; out-of-date plans show them greyed as information [Sign-off pending];
- * revoked plans show only "card withdrawn". `amd`: the patient's living will status from amd-store; left out on the public
+ * revoked plans show only "card withdrawn". `amd`: the patient's advance care plan status from amd-store; left out on the public
  * /ed page, where the card's own amdAtIssue is used (the AMD itself stays on the issuing device).
  */
 export function EctprEdView(props: { record: EctprRecord | null; lang?: CareLang; audience?: EdAudience; full?: boolean; now?: Date; amd?: AmdStatusSummary | null; children?: React.ReactNode }) {
@@ -165,7 +165,7 @@ export function EctprEdView(props: { record: EctprRecord | null; lang?: CareLang
                   : record.capacity.status ? t('Has capacity — ask the patient; what they say now comes first', 'क्षमता है — मरीज़ से पूछें; उनकी अभी की बात सबसे पहले')
                   : notRecorded(lang)}
               </Row>
-              <Row label={t('11 · Living will (AMD)', '11 · लिविंग विल (AMD)')} recorded={!!record.existingDirective || !!amdStatus}>
+              <Row label={t('11 · Advance care planning (AMD)', '11 · अग्रिम देखभाल योजना (AMD)')} recorded={!!record.existingDirective || !!amdStatus}>
                 {amdView.lines.map((line, index) => <div key={line} className={amdView.governs && index === amdView.lines.length - 1 ? 'ectpr-ed-alert' : undefined}>{line}</div>)}
                 <div className="ectpr-ed-caveat">{amdCaveat(lang)}</div>
               </Row>

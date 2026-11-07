@@ -1,5 +1,5 @@
 'use client';
-// DPDP notice at the start of the care plan and the living will (tech spec §7, L10), with a working "download my data" and
+// DPDP notice at the start of the care plan and the advance care plan (tech spec §7, L10), with a working "download my data" and
 // "delete my local draft". Signed versions and the audit log cannot be deleted. Family members see the notice only.
 import { useState } from 'react';
 import { careDir, careText, type CareLang } from './care-i18n';

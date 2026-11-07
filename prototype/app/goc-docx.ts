@@ -1,5 +1,5 @@
 // A Word (.docx) file of the goals-of-care form, made in the browser with no library: a stored (uncompressed) zip of three XML parts.
-// Word, LibreOffice and Google Docs open it. Headings and two-column tables follow the legal form's Sections I to IV.
+// Word, LibreOffice and Google Docs open it. Headings and two-column tables follow the clinical document's Sections I to IV.
 import type { GocFormDocument, GocFormRow, GocFormTable } from './goc-form.ts';
 
 const CRC_TABLE = (() => {

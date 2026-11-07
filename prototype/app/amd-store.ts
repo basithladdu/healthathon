@@ -1,4 +1,4 @@
-// Sahara living will (AMD) local-first store. Versions per patient, the signed scan as a local file,
+// Sahara advance care plan (AMD) local-first store. Versions per patient, the signed scan as a local file,
 // and every CREATE / EDIT / PRINT / UPLOAD / SHARE / REVOKE written to the shared append-only audit log.
 // Persists through care-local-store (IndexedDB, localStorage fallback); memory in tests and SSR.
 
@@ -157,7 +157,7 @@ export function deleteAmdDrafts(patientId: string, actor: string): Promise<{ del
     const { kept, removed } = withoutUnsignedAmdVersions(await load(patientId));
     if (removed.length) {
       await save(patientId, kept);
-      for (const v of removed) await audit(patientId, actor, 'DELETE', v.id, `Unsigned living will version ${v.version} deleted from this device at the person's request`);
+      for (const v of removed) await audit(patientId, actor, 'DELETE', v.id, `Unsigned advance care plan version ${v.version} deleted from this device at the person's request`);
       notify();
     }
     return { deleted: removed.length, kept: kept.length };

@@ -1,6 +1,6 @@
 'use client';
 // Parts of the care plan screen for a signed plan: the review SMS (tech spec §8), the signed paper scan with its hash and the copy
-// checklist (§8 "Should", same as the living will has), and the draft FHIR R4 export (§7 stretch).
+// checklist (§8 "Should", same as the advance care plan has), and the draft FHIR R4 export (§7 stretch).
 import { useEffect, useMemo, useState } from 'react';
 import { careLocale, type CareLang } from './care-i18n';
 import { ECTPR_FHIR_DRAFT_NOTE, ectprFhirBundle } from './ectpr-fhir';

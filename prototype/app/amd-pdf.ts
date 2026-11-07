@@ -1,4 +1,4 @@
-// Vidhi-format living will (AMD) PDF. Same sections, order and wording style as the Vidhi Centre for Legal Policy /
+// Vidhi-format advance care plan (AMD) PDF. Same sections, order and wording style as the Vidhi Centre for Legal Policy /
 // ACP India model AMD, filled with the person's answers, with BLANK executor signature, two witness blocks and a
 // notary / gazetted-officer attestation block. Every page carries the version, "page x of y" and the content SHA-256.
 // Pure builder (runs in the browser and in node); downloadAmdPdf() is the browser wrapper.
@@ -14,7 +14,7 @@ export type AmdPdfInput = { version: AmdVersion; lang: AmdPdfLang; contentSha256
 
 /** Section headings in Hindi and Telugu, printed under the English heading. The English text is the operative text. */
 const HEADINGS: Record<string, { hi: string; te: string }> = {
-  'ADVANCE MEDICAL DIRECTIVE': { hi: 'अग्रिम चिकित्सा निर्देश (लिविंग विल)', te: 'ముందస్తు వైద్య నిర్దేశం (లివింగ్ విల్)' },
+  'ADVANCE MEDICAL DIRECTIVE': { hi: 'अग्रिम चिकित्सा निर्देश (अग्रिम देखभाल योजना)', te: 'ముందస్తు వైద్య నిర్దేశం (ముందస్తు సంరక్షణ ప్రణాళిక)' },
   'Section 1: Personal details': { hi: 'खंड 1: व्यक्तिगत विवरण', te: 'విభాగం 1: వ్యక్తిగత వివరాలు' },
   'Section 2: Directions relating to life-sustaining treatment': { hi: 'खंड 2: जीवन-रक्षक उपचार से जुड़े निर्देश', te: 'విభాగం 2: ప్రాణాధార చికిత్సకు సంబంధించిన ఆదేశాలు' },
   'Section 3 (Optional): Wishes or desires during end-of-life care': { hi: 'खंड 3 (वैकल्पिक): जीवन के अंतिम समय की देखभाल में इच्छाएँ', te: 'విభాగం 3 (ఐచ్ఛికం): జీవిత చివరి దశ సంరక్షణలో కోరికలు' },
@@ -99,7 +99,7 @@ export async function buildAmdPdf(input: AmdPdfInput, fonts: AmdPdfFonts): Promi
   const when = new Date(version.generatedAt ?? printedAt.toISOString());
   doc.setTitle(`Advance Medical Directive — ${content.executant.name} — version ${version.version}`);
   doc.setAuthor(content.executant.name || 'Executor');
-  doc.setSubject('Advance medical directive (living will) in the Vidhi Centre / ACP India model format');
+  doc.setSubject('Advance care planning document in the Vidhi Centre / ACP India model format');
   doc.setCreator('Sahara - A Palliative Care Companion');
   doc.setProducer('Sahara (pdf-lib)');
   doc.setKeywords([`version ${version.version}`, version.formVersion, `content-sha256 ${contentSha256}`]);
@@ -478,7 +478,7 @@ export async function buildAmdPdf(input: AmdPdfInput, fonts: AmdPdfFonts): Promi
   const record: Style = { size: 8.5, color: grey };
   paragraph(`Document record — Sahara AMD version ${version.version} · ${version.formVersion} · printed ${formatDate(when.toISOString())}`, record, 0, 2);
   paragraph(`Content SHA-256: ${contentSha256}`, record, 0, 2);
-  paragraph('This paper is valid only when signed by hand by the executor before two witnesses and attested by a notary or gazetted officer. Sahara does not sign, e-sign or validate advance medical directives. If any part of this paper is changed by hand, make a new version instead.', record, 0, 2);
+  paragraph('This paper is valid only when signed by hand by the executor before two witnesses and attested by a notary or gazetted officer. Sahara does not sign, e-sign or validate advance care planning documents. If any part of this paper is changed by hand, make a new version instead.', record, 0, 2);
 
   // ---------------------------------------------------------------------------
   // Header and footer on every page: name, version, page x of y, content hash.

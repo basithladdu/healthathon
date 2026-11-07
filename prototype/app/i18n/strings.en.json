@@ -283,8 +283,8 @@
    "ectpr-ed-view.tsx"
   ]
  },
- "11 · Living will (AMD)": {
-  "hi": "11 · लिविंग विल (AMD)",
+ "11 · Advance care planning (AMD)": {
+  "hi": "11 · अग्रिम देखभाल योजना (AMD)",
   "files": [
    "ectpr-ed-view.tsx"
   ]
@@ -524,26 +524,26 @@
    "family-voice-journal.tsx"
   ]
  },
- "A living will applies only to the situation it describes. If the situation is ambiguous or was not anticipated, it is not applied — give standard care and contact the decision-maker. Where a valid living will exists, it governs over this plan.": {
-  "hi": "लिविंग विल केवल उसी स्थिति पर लागू होती है जिसका उसमें वर्णन है। स्थिति अस्पष्ट हो या पहले से सोची न गई हो, तो वह लागू नहीं होती — सामान्य इलाज दें और निर्णयकर्ता से संपर्क करें। वैध लिविंग विल होने पर वही इस योजना से ऊपर मानी जाएगी।",
+ "An advance care plan applies only to the situation it describes. If the situation is ambiguous or was not anticipated, it is not applied — give standard care and contact the decision-maker. Where a valid advance care plan exists, it governs over this plan.": {
+  "hi": "अग्रिम देखभाल योजना केवल उसी स्थिति पर लागू होती है जिसका उसमें वर्णन है। स्थिति अस्पष्ट हो या पहले से सोची न गई हो, तो वह लागू नहीं होती — सामान्य इलाज दें और निर्णयकर्ता से संपर्क करें। वैध अग्रिम देखभाल योजना होने पर वही इस योजना से ऊपर मानी जाएगी।",
   "files": [
    "ectpr-labels.ts"
   ]
  },
- "A living will has been started or printed but is not signed and recorded. It is not valid.": {
-  "hi": "लिविंग विल शुरू या प्रिंट हुई है पर हस्ताक्षरित और दर्ज नहीं है। यह वैध नहीं है।",
+ "An advance care plan has been started or printed but is not signed and recorded. It is not valid.": {
+  "hi": "अग्रिम देखभाल योजना शुरू या प्रिंट हुई है पर हस्ताक्षरित और दर्ज नहीं है। यह वैध नहीं है।",
   "files": [
    "amd-screen.tsx"
   ]
  },
- "A living will is cancelled in writing: the person signs a short note saying they cancel it, the same way it was made. Then give the note to everyone who has a copy.": {
-  "hi": "लिविंग विल लिखित रूप में रद्द होती है: व्यक्ति एक छोटे नोट पर हस्ताक्षर करता है कि वह इसे रद्द कर रहा है, उसी तरह जैसे बनाई गई थी। फिर वह नोट हर उस व्यक्ति को दें जिसके पास प्रति है।",
+ "An advance care plan is cancelled in writing: the person signs a short note saying they cancel it, the same way it was made. Then give the note to everyone who has a copy.": {
+  "hi": "अग्रिम देखभाल योजना लिखित रूप में रद्द होती है: व्यक्ति एक छोटे नोट पर हस्ताक्षर करता है कि वह इसे रद्द कर रहा है, उसी तरह जैसे बनाई गई थी। फिर वह नोट हर उस व्यक्ति को दें जिसके पास प्रति है।",
   "files": [
    "amd-screen.tsx"
   ]
  },
- "A living will lets {0} write down, while able to decide, which treatments they do not want if they become very ill and cannot speak, and who should speak for them.": {
-  "hi": "लिविंग विल से {0} तब लिख सकते हैं जब वे ख़ुद निर्णय ले सकें, कि बहुत बीमार होने और बोल न पाने पर उन्हें कौन से इलाज नहीं चाहिए, और उनकी ओर से कौन बोलेगा।",
+ "An advance care plan lets {0} write down, while able to decide, which treatments they do not want if they become very ill and cannot speak, and who should speak for them.": {
+  "hi": "अग्रिम देखभाल योजना से {0} तब लिख सकते हैं जब वे ख़ुद निर्णय ले सकें, कि बहुत बीमार होने और बोल न पाने पर उन्हें कौन से इलाज नहीं चाहिए, और उनकी ओर से कौन बोलेगा।",
   "files": [
    "amd-screen.tsx"
   ]
@@ -632,8 +632,8 @@
    "ectpr-plan-screen.tsx"
   ]
  },
- "A signed, attested living will (AMD)": {
-  "hi": "हस्ताक्षरित और सत्यापित लिविंग विल (AMD)",
+ "A signed, attested advance care plan (AMD)": {
+  "hi": "हस्ताक्षरित और सत्यापित अग्रिम देखभाल योजना (AMD)",
   "files": [
    "ectpr-plan-screen.tsx"
   ]
@@ -1311,12 +1311,6 @@
   "hi": "ICU में भर्ती?",
   "files": [
    "ectpr-pilot-log.tsx"
-  ]
- },
- "Advance medical directive": {
-  "hi": "अग्रिम चिकित्सा निर्देश",
-  "files": [
-   "amd-screen.tsx"
   ]
  },
  "Advanced cancer": {
@@ -2366,8 +2360,8 @@
    "care-conversation-request.tsx"
   ]
  },
- "Cancel the living will": {
-  "hi": "लिविंग विल रद्द करें",
+ "Cancel the advance care plan": {
+  "hi": "अग्रिम देखभाल योजना रद्द करें",
   "files": [
    "amd-screen.tsx"
   ]
@@ -2470,8 +2464,8 @@
    "ectpr-pdf.ts"
   ]
  },
- "Capacity and living will": {
-  "hi": "क्षमता और लिविंग विल",
+ "Capacity and advance care plan": {
+  "hi": "क्षमता और अग्रिम देखभाल योजना",
   "files": [
    "ectpr-plan-screen.tsx"
   ]
@@ -4290,8 +4284,8 @@
    "amd-screen.tsx"
   ]
  },
- "Does the patient have a living will (AMD)?": {
-  "hi": "क्या मरीज़ की लिविंग विल (AMD) है?",
+ "Does the patient have an advance care plan (AMD)?": {
+  "hi": "क्या मरीज़ की अग्रिम देखभाल योजना (AMD) है?",
   "files": [
    "ectpr-plan-screen.tsx"
   ]
@@ -5722,8 +5716,8 @@
    "goc-transcribe.tsx"
   ]
  },
- "Goals-of-care conversation note, in the order of the legal form": {
-  "hi": "देखभाल के लक्ष्यों की बातचीत का नोट, क़ानूनी फ़ॉर्म के क्रम में",
+ "Goals-of-care conversation note, in the order of the clinical document": {
+  "hi": "देखभाल के लक्ष्यों की बातचीत का नोट, क्लिनिकल दस्तावेज़ के क्रम में",
   "files": [
    "goc-form.ts"
   ]
@@ -6990,45 +6984,45 @@
    "ectpr.tsx"
   ]
  },
- "Living will": {
-  "hi": "लिविंग विल",
+ "Advance care planning": {
+  "hi": "अग्रिम देखभाल योजना",
   "files": [
    "amd-screen.tsx",
    "ectpr-plan-screen.tsx"
   ]
  },
- "Living will (AMD)": {
-  "hi": "लिविंग विल (AMD)",
+ "Advance care planning (AMD)": {
+  "hi": "अग्रिम देखभाल योजना (AMD)",
   "files": [
    "ectpr-pdf.ts"
   ]
  },
- "Living will (AMD) executed in Sahara": {
-  "hi": "Sahara में निष्पादित लिविंग विल (AMD)",
+ "Advance care planning (AMD) executed in Sahara": {
+  "hi": "Sahara में निष्पादित अग्रिम देखभाल योजना (AMD)",
   "files": [
    "ectpr-labels.ts"
   ]
  },
- "Living will cancelled in writing": {
-  "hi": "लिविंग विल लिखित रूप में रद्द",
+ "Advance care planning cancelled in writing": {
+  "hi": "अग्रिम देखभाल योजना लिखित रूप में रद्द",
   "files": [
    "ectpr-labels.ts"
   ]
  },
- "Living will for this patient": {
-  "hi": "इस मरीज़ की लिविंग विल",
+ "Advance care planning for this patient": {
+  "hi": "इस मरीज़ की अग्रिम देखभाल योजना",
   "files": [
    "amd-screen.tsx"
   ]
  },
- "Living will in Sahara is not signed and attested, so it is not valid": {
-  "hi": "Sahara की लिविंग विल पर हस्ताक्षर और सत्यापन नहीं, इसलिए मान्य नहीं",
+ "Advance care planning in Sahara is not signed and attested, so it is not valid": {
+  "hi": "Sahara की अग्रिम देखभाल योजना पर हस्ताक्षर और सत्यापन नहीं, इसलिए मान्य नहीं",
   "files": [
    "ectpr-labels.ts"
   ]
  },
- "Living will status": {
-  "hi": "लिविंग विल की स्थिति",
+ "Advance care planning status": {
+  "hi": "अग्रिम देखभाल योजना की स्थिति",
   "files": [
    "amd-screen.tsx"
   ]
@@ -7060,8 +7054,8 @@
    "ectpr.tsx"
   ]
  },
- "Local body that keeps living wills (custodian)": {
-  "hi": "स्थानीय निकाय जो लिविंग विल रखता है (संरक्षक)",
+ "Local body that keeps advance care plans (custodian)": {
+  "hi": "स्थानीय निकाय जो अग्रिम देखभाल योजना रखता है (संरक्षक)",
   "files": [
    "amd-screen.tsx"
   ]
@@ -7188,8 +7182,8 @@
    "ectpr-plan-screen.tsx"
   ]
  },
- "Make a new living will": {
-  "hi": "नई लिविंग विल बनाएँ",
+ "Make a new advance care plan": {
+  "hi": "नई अग्रिम देखभाल योजना बनाएँ",
   "files": [
    "amd-screen.tsx"
   ]
@@ -7683,8 +7677,8 @@
    "care-document-search.tsx"
   ]
  },
- "My living will": {
-  "hi": "मेरी लिविंग विल",
+ "My advance care plan": {
+  "hi": "मेरी अग्रिम देखभाल योजना",
   "files": [
    "care-section-pages.tsx"
   ]
@@ -7812,14 +7806,14 @@
    "goc-form.ts"
   ]
  },
- "Named by the patient (no living will)": {
-  "hi": "मरीज़ ने नाम दिया (लिविंग विल नहीं)",
+ "Named by the patient (no advance care plan)": {
+  "hi": "मरीज़ ने नाम दिया (अग्रिम देखभाल योजना नहीं)",
   "files": [
    "ectpr-plan-screen.tsx"
   ]
  },
- "Named in a signed living will (AMD)": {
-  "hi": "हस्ताक्षरित लिविंग विल (AMD) में नाम है",
+ "Named in a signed advance care plan (AMD)": {
+  "hi": "हस्ताक्षरित अग्रिम देखभाल योजना (AMD) में नाम है",
   "files": [
    "ectpr-plan-screen.tsx"
   ]
@@ -7830,8 +7824,8 @@
    "goc-form.ts"
   ]
  },
- "named in living will": {
-  "hi": "लिविंग विल में नामित",
+ "named in advance care plan": {
+  "hi": "अग्रिम देखभाल योजना में नामित",
   "files": [
    "ectpr-labels.ts"
   ]
@@ -8167,20 +8161,20 @@
    "family-home-help-state.ts"
   ]
  },
- "No living will": {
-  "hi": "कोई लिविंग विल नहीं",
+ "No advance care plan": {
+  "hi": "कोई अग्रिम देखभाल योजना नहीं",
   "files": [
    "ectpr-plan-screen.tsx"
   ]
  },
- "No living will (AMD)": {
-  "hi": "कोई लिविंग विल (AMD) नहीं",
+ "No advance care plan (AMD)": {
+  "hi": "कोई अग्रिम देखभाल योजना (AMD) नहीं",
   "files": [
    "ectpr-labels.ts"
   ]
  },
- "No living will is recorded in Sahara. Ask the family if a signed paper exists.": {
-  "hi": "सहारा में कोई लिविंग विल दर्ज नहीं है। परिवार से पूछें कि क्या कोई हस्ताक्षरित काग़ज़ है।",
+ "No advance care plan is recorded in Sahara. Ask the family if a signed paper exists.": {
+  "hi": "सहारा में कोई अग्रिम देखभाल योजना दर्ज नहीं है। परिवार से पूछें कि क्या कोई हस्ताक्षरित काग़ज़ है।",
   "files": [
    "amd-screen.tsx"
   ]
@@ -8363,8 +8357,8 @@
    "family-care-home.tsx"
   ]
  },
- "No signed living will recorded yet": {
-  "hi": "अभी कोई हस्ताक्षरित लिविंग विल दर्ज नहीं",
+ "No signed advance care plan recorded yet": {
+  "hi": "अभी कोई हस्ताक्षरित अग्रिम देखभाल योजना दर्ज नहीं",
   "files": [
    "amd-screen.tsx"
   ]
@@ -8899,8 +8893,8 @@
    "doctor-conversation.tsx"
   ]
  },
- "Only {0} can make and sign a living will, in their own words. You can help them fill it in and read it out to them.": {
-  "hi": "केवल {0} ही अपने शब्दों में लिविंग विल बना और हस्ताक्षर कर सकते हैं। आप भरने में और पढ़कर सुनाने में मदद कर सकते हैं।",
+ "Only {0} can make and sign an advance care plan, in their own words. You can help them fill it in and read it out to them.": {
+  "hi": "केवल {0} ही अपने शब्दों में अग्रिम देखभाल योजना बना और हस्ताक्षर कर सकते हैं। आप भरने में और पढ़कर सुनाने में मदद कर सकते हैं।",
   "files": [
    "amd-screen.tsx"
   ]
@@ -12286,8 +12280,8 @@
    "ectpr-pdf.ts"
   ]
  },
- "Signed living will · version {0}": {
-  "hi": "हस्ताक्षरित लिविंग विल · संस्करण {0}",
+ "Signed advance care plan · version {0}": {
+  "hi": "हस्ताक्षरित अग्रिम देखभाल योजना · संस्करण {0}",
   "files": [
    "amd-screen.tsx"
   ]
@@ -12475,8 +12469,8 @@
    "ectpr-plan-screen.tsx"
   ]
  },
- "Start a living will": {
-  "hi": "लिविंग विल शुरू करें",
+ "Start an advance care plan": {
+  "hi": "अग्रिम देखभाल योजना शुरू करें",
   "files": [
    "amd-screen.tsx"
   ]
@@ -13031,20 +13025,20 @@
    "ed/[token]/ed-card-page.tsx"
   ]
  },
- "The living will has changed since this card was issued, so the card shows an old status. Issue a new card.": {
-  "hi": "यह कार्ड जारी होने के बाद लिविंग विल बदली है, इसलिए कार्ड पुरानी स्थिति दिखाता है। नया कार्ड जारी करें।",
+ "The advance care plan has changed since this card was issued, so the card shows an old status. Issue a new card.": {
+  "hi": "यह कार्ड जारी होने के बाद अग्रिम देखभाल योजना बदली है, इसलिए कार्ड पुरानी स्थिति दिखाता है। नया कार्ड जारी करें।",
   "files": [
    "ectpr.tsx"
   ]
  },
- "The living will was cancelled in writing on {0}. It does not apply.": {
-  "hi": "लिविंग विल {0} को लिखित रूप में रद्द की गई। यह लागू नहीं है।",
+ "The advance care plan was cancelled in writing on {0}. It does not apply.": {
+  "hi": "अग्रिम देखभाल योजना {0} को लिखित रूप में रद्द की गई। यह लागू नहीं है।",
   "files": [
    "amd-screen.tsx"
   ]
  },
- "The living will was cancelled in writing on {0}. It no longer applies.": {
-  "hi": "लिविंग विल {0} को लिखित रूप में रद्द की गई। यह अब लागू नहीं है।",
+ "The advance care plan was cancelled in writing on {0}. It no longer applies.": {
+  "hi": "अग्रिम देखभाल योजना {0} को लिखित रूप में रद्द की गई। यह अब लागू नहीं है।",
   "files": [
    "amd-screen.tsx"
   ]
@@ -13152,8 +13146,8 @@
    "family-care-story.tsx"
   ]
  },
- "The patient agrees to link the living will with their ABHA records.": {
-  "hi": "मरीज़ लिविंग विल को अपने ABHA रिकॉर्ड से जोड़ने के लिए सहमत है।",
+ "The patient agrees to link the advance care plan with their ABHA records.": {
+  "hi": "मरीज़ अग्रिम देखभाल योजना को अपने ABHA रिकॉर्ड से जोड़ने के लिए सहमत है।",
   "files": [
    "amd-screen.tsx"
   ]
@@ -13327,8 +13321,8 @@
    "family-symptom-diary.tsx"
   ]
  },
- "The Supreme Court allows adding the living will to digital health records. Sahara only notes the ABHA address here; upload the scan in your ABHA app yourself.": {
-  "hi": "सुप्रीम कोर्ट लिविंग विल को डिजिटल स्वास्थ्य रिकॉर्ड में जोड़ने की अनुमति देता है। सहारा यहाँ केवल ABHA पता नोट करता है; स्कैन अपने ABHA ऐप में ख़ुद अपलोड करें।",
+ "The Supreme Court allows adding the advance care plan to digital health records. Sahara only notes the ABHA address here; upload the scan in your ABHA app yourself.": {
+  "hi": "सुप्रीम कोर्ट अग्रिम देखभाल योजना को डिजिटल स्वास्थ्य रिकॉर्ड में जोड़ने की अनुमति देता है। सहारा यहाँ केवल ABHA पता नोट करता है; स्कैन अपने ABHA ऐप में ख़ुद अपलोड करें।",
   "files": [
    "amd-screen.tsx"
   ]
@@ -13538,8 +13532,8 @@
    "ectpr-plan-extras.tsx"
   ]
  },
- "This follows the model living will by the Vidhi Centre for Legal Policy and ACP India, and the Supreme Court’s rules (2018, changed on 24 January 2023).": {
-  "hi": "यह विधि सेंटर फ़ॉर लीगल पॉलिसी और ACP इंडिया की मॉडल लिविंग विल, और सुप्रीम कोर्ट के नियमों (2018, 24 जनवरी 2023 को बदले गए) पर आधारित है।",
+ "This follows the model advance care plan by the Vidhi Centre for Legal Policy and ACP India, and the Supreme Court’s rules (2018, changed on 24 January 2023).": {
+  "hi": "यह विधि सेंटर फ़ॉर लीगल पॉलिसी और ACP इंडिया की मॉडल अग्रिम देखभाल योजना, और सुप्रीम कोर्ट के नियमों (2018, 24 जनवरी 2023 को बदले गए) पर आधारित है।",
   "files": [
    "amd-screen.tsx"
   ]
@@ -13556,8 +13550,8 @@
    "ectpr-plan-screen.tsx"
   ]
  },
- "This is the current living will. Doctors can see that it is signed, witnessed and attested.": {
-  "hi": "यह मौजूदा लिविंग विल है। डॉक्टर देख सकते हैं कि यह हस्ताक्षरित, गवाहों के सामने और सत्यापित है।",
+ "This is the current advance care plan. Doctors can see that it is signed, witnessed and attested.": {
+  "hi": "यह मौजूदा अग्रिम देखभाल योजना है। डॉक्टर देख सकते हैं कि यह हस्ताक्षरित, गवाहों के सामने और सत्यापित है।",
   "files": [
    "amd-screen.tsx"
   ]
@@ -14521,8 +14515,8 @@
    "care-community.tsx"
   ]
  },
- "Valid living will (AMD)": {
-  "hi": "वैध लिविंग विल (AMD)",
+ "Valid advance care plan (AMD)": {
+  "hi": "वैध अग्रिम देखभाल योजना (AMD)",
   "files": [
    "ectpr-labels.ts"
   ]

@@ -45,9 +45,9 @@ export function SupportResources(): React.JSX.Element {
         <p>Ask your care team or a listed centre where to fill your prescription. Medicine stock and morphine authorisation have not been checked here.</p>
       </section>
       <section>
-        <h2>Living wills</h2>
+        <h2>Advance care plans</h2>
         <a href="https://palliumindia.org/2024/06/living-will-and-attorney-authorisation" target="_blank" rel="noopener noreferrer">Pallium India and Vidhi resources ↗</a>
-        <p>A care conversation note does not create an advance medical directive.</p>
+        <p>A care conversation note does not create advance care planning.</p>
       </section>
     </div>
   </section>;

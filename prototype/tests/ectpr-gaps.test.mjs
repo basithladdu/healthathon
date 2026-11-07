@@ -109,7 +109,7 @@ test('outcome indicators and checks', () => {
   assert.equal(incidentIsEmpty({ appliedToReversibleIllness: false, familyFeltPushed: true, details: '' }), false);
 });
 
-// Living will on the ED view (tech spec §1, §6)
+// Advance care planning on the ED view (tech spec §1, §6)
 
 const executed = { status: 'EXECUTED', executedOn: '2026-09-01', version: 2, attestor: 'Notary: A. Rao' };
 
@@ -120,7 +120,7 @@ test('an executed AMD shows date, version and attestor, and says the AMD governs
   assert.match(lines[0], /Sept? 2026/);
   assert.match(lines[0], /Notary: A\. Rao/);
   assert.equal(lines.at(-1), 'The AMD governs over this plan.');
-  assert.ok(!lines.some((l) => l.includes('No living will')), 'the form saying NONE must not contradict an executed AMD');
+  assert.ok(!lines.some((l) => l.includes('No advance care plan')), 'the form saying NONE must not contradict an executed AMD');
 });
 
 test('a gazetted officer attestor is labelled, and Hindi is used when asked', () => {
@@ -218,7 +218,7 @@ test('delete removes unsigned drafts only; signed versions, signed drafts and th
   assert.deepEqual(await deleteEctprDrafts('nobody', 'x', NOW), { deleted: 0, kept: 0 });
 });
 
-test('only unsigned living will versions can be removed', () => {
+test('only unsigned advance care plan versions can be removed', () => {
   const versions = ['DRAFT', 'GENERATED', 'EXECUTED', 'SUPERSEDED', 'REVOKED'].map((status) => ({ id: status, status }));
   const { kept, removed } = withoutUnsignedAmdVersions(versions);
   assert.deepEqual(removed.map((v) => v.id), ['DRAFT', 'GENERATED']);
@@ -323,7 +323,7 @@ test('FHIR: a signed plan becomes a Consent with scope adr; a draft exports noth
   assert.equal(consent.category[1].coding[0].code, 'dnr');
   assert.equal(consent.dateTime, signature.signedAt);
   assert.equal(consent.provision.period.end, '2027-01-21');
-  assert.match(consent.policyRule.text, /not a living will/);
+  assert.match(consent.policyRule.text, /not an advance care plan/);
   assert.equal(bundle.entry[0].resource.gender, 'female');
   assert.ok(!JSON.stringify(bundle).includes('ABHA'), 'no invented ABHA');
   for (const ref of [consent.patient.reference, consent.performer[0].reference]) assert.ok(bundle.entry.some((e) => e.fullUrl === ref), `${ref} resolves in the Bundle`);

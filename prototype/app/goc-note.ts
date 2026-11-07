@@ -49,7 +49,7 @@ export function gocTopicName(topic: GocTopicId, lang: CareLang): string {
   }
 }
 
-/** The draft note: the legal form's Sections I to IV as text, for the doctor to edit. It leads into the existing signing step. */
+/** The draft note: the clinical document's Sections I to IV as text, for the doctor to edit. It leads into the existing signing step. */
 export function buildGocNote(record: EctprRecord, rows: GocTopicRow[], lang: CareLang, meta: { reviewedBy: string; reviewedAt: string }): string {
   return gocFormText(buildGocFormDocument(record, rows, lang, { ...meta, notDiscussed: gocUndiscussed(rows).map((row) => gocTopicName(row.topic, lang)) }));
 }

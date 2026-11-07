@@ -1,4 +1,4 @@
-// Builds a sample Vidhi-format living will PDF from synthetic data.
+// Builds a sample Vidhi-format advance care plan PDF from synthetic data.
 // Usage (from prototype/): node --experimental-strip-types scripts/amd-sample-pdf.mjs [en|hi|te] [outDir]
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';

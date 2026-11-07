@@ -178,7 +178,7 @@ export function PalliativePrognosisCalculator({
         color: '#f59e0b',
         fillColor: 'rgba(245, 158, 11, 0.15)',
         strokeColor: '#f59e0b',
-        urgency: 'Clarify advance directives, caregiver respite, breakthrough analgesia',
+        urgency: 'Clarify advance care plans, caregiver respite, breakthrough analgesia',
         recommendedSetting: 'Community Palliative Outreach + District Ward backup',
         decayLambda: 0.024, // ~60% survival at 21 days, ~35% at 42 days
       };

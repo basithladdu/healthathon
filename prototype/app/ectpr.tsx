@@ -116,7 +116,7 @@ export function useEdRecord(patientId: string | null | undefined): { record: Ect
   return state.id === patientId ? { record: state.record, loading: !state.loaded } : { record: null, loading: true };
 }
 
-/** The patient's living will status on this device; undefined until it has loaded. */
+/** The patient's advance care plan status on this device; undefined until it has loaded. */
 function useAmdStatus(patientId: string | null | undefined): AmdStatusSummary | null | undefined {
   const [state, setState] = useState<{ id: string; status: AmdStatusSummary | null } | null>(null);
   useEffect(() => {
@@ -202,7 +202,7 @@ export function EctprPdfActions(props: { record: EctprRecord; lang?: CareLang; a
     setBusy(kind); setError(null);
     try {
       const mod = await import('./ectpr-pdf');
-      // The printed plan carries the living will status as it is now on this device (date, version, attestor, L7 caveat).
+      // The printed plan carries the advance care plan status as it is now on this device (date, version, attestor, L7 caveat).
       const amd = await getCurrentAmdStatus(props.record.patientId).catch(() => props.record.amdAtIssue ?? null);
       const printed: EctprRecord = { ...props.record, amdAtIssue: amd };
       const result = kind === 'plan'
@@ -455,7 +455,7 @@ export function EmergencyCard(props: {
       </div>
       {amdNow !== undefined && (amdNow?.status ?? null) !== (current.snapshot.amdAtIssue?.status ?? null) || amdNow !== undefined && (amdNow?.version ?? null) !== (current.snapshot.amdAtIssue?.version ?? null) ? (
         <div className="ectpr-card-server ectpr-card-server--local-only" role="status">
-          {t('The living will has changed since this card was issued, so the card shows an old status. Issue a new card.', 'यह कार्ड जारी होने के बाद लिविंग विल बदली है, इसलिए कार्ड पुरानी स्थिति दिखाता है। नया कार्ड जारी करें।')}{' '}
+          {t('The advance care plan has changed since this card was issued, so the card shows an old status. Issue a new card.', 'यह कार्ड जारी होने के बाद अग्रिम देखभाल योजना बदली है, इसलिए कार्ड पुरानी स्थिति दिखाता है। नया कार्ड जारी करें।')}{' '}
           <button type="button" className="ectpr-link-button" onClick={issue} disabled={busy !== null}>{t('Issue a new card', 'नया कार्ड जारी करें')}</button>
         </div>
       ) : null}

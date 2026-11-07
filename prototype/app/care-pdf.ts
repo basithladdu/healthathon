@@ -36,7 +36,7 @@ export async function downloadCarePdf({ fileName, title, subtitle, sections, car
       ...(release.priorVersion !== undefined ? [`Started from version ${release.priorVersion}; reviewed for this conversation.`] : []),
       patientReviewed ? 'The patient reviewed this exact version. Changes require a new app version.' : release.signature && release.noteKind ? 'Patient review is pending. A family acknowledgement does not replace it.' : 'No patient signature is recorded.',
       'Typed names recorded in the app. This PDF has no verified digital signature or cryptographic seal.',
-      'Care conversation record. Not a prescription or an advance medical directive.',
+      'Care conversation record. Not a prescription or advance care planning.',
     ] });
   }
   const pdf = await import('pdf-lib');

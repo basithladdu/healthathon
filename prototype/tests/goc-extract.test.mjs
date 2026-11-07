@@ -400,7 +400,7 @@ test('the draft note follows the form, states decisions, keeps no emotion and no
   assert.match(note, /I want to go home/);
   assert.doesNotMatch(note, /scared|crying/);
   const order = ['SECTION I ', 'SECTION II ', 'SECTION III ', 'SECTION IV '].map((h) => note.indexOf(h));
-  assert.ok(order.every((at, i) => at > 0 && (i === 0 || at > order[i - 1])), 'Sections I to IV in the order of the legal form');
+  assert.ok(order.every((at, i) => at > 0 && (i === 0 || at > order[i - 1])), 'Sections I to IV in the order of the clinical document');
   assert.match(note, /Not discussed: [^\n]*Patient details/, 'the note lists what was not discussed');
   assert.equal(gocNoteKind(r), 'DECISION');
   assert.equal(gocNoteKind(draft()), 'DISCUSSION');
@@ -516,7 +516,7 @@ test('the end-of-talk prompt lists only what was neither discussed nor verified 
   assert.ok(open.includes('dialysis') && open.includes('patientDetails'));
 });
 
-test('the note comes out as a printable page and a Word file in the legal form’s Sections I to IV', () => {
+test('the note comes out as a printable page and a Word file in the clinical document’s Sections I to IV', () => {
   const r = draft();
   applyGocDecision(r, 'cpr', 'DNACPR');
   const doc = buildGocFormDocument(r, gocTopicRows(extractGoc('Do not do CPR.').topics, {}), 'en', { reviewedBy: 'Dr Test', reviewedAt: NOW.toISOString() });

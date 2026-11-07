@@ -70,8 +70,8 @@ export function dyingPhasePrompt(lang: CareLang): string {
 export function amdCaveat(lang: CareLang): string {
   return careText(
     lang,
-    'A living will applies only to the situation it describes. If the situation is ambiguous or was not anticipated, it is not applied — give standard care and contact the decision-maker. Where a valid living will exists, it governs over this plan.',
-    'लिविंग विल केवल उसी स्थिति पर लागू होती है जिसका उसमें वर्णन है। स्थिति अस्पष्ट हो या पहले से सोची न गई हो, तो वह लागू नहीं होती — सामान्य इलाज दें और निर्णयकर्ता से संपर्क करें। वैध लिविंग विल होने पर वही इस योजना से ऊपर मानी जाएगी।',
+    'An advance care plan applies only to the situation it describes. If the situation is ambiguous or was not anticipated, it is not applied — give standard care and contact the decision-maker. Where a valid advance care plan exists, it governs over this plan.',
+    'अग्रिम देखभाल योजना केवल उसी स्थिति पर लागू होती है जिसका उसमें वर्णन है। स्थिति अस्पष्ट हो या पहले से सोची न गई हो, तो वह लागू नहीं होती — सामान्य इलाज दें और निर्णयकर्ता से संपर्क करें। वैध अग्रिम देखभाल योजना होने पर वही इस योजना से ऊपर मानी जाएगी।',
   );
 }
 
@@ -294,7 +294,7 @@ export function deviceLabel(record: EctprRecord, lang: CareLang): string {
 
 export function authorityLabel(basis: AuthorityBasis | null, lang: CareLang): string {
   const t = textFor(lang);
-  if (basis === 'NAMED_IN_AMD') return t('named in living will', 'लिविंग विल में नामित');
+  if (basis === 'NAMED_IN_AMD') return t('named in advance care plan', 'अग्रिम देखभाल योजना में नामित');
   if (basis === 'NAMED_BY_PATIENT') return t('named by patient', 'मरीज़ द्वारा नामित');
   if (basis === 'NEXT_OF_KIN') return t('next of kin', 'निकट संबंधी');
   if (basis === 'COURT_APPOINTED') return t('court-appointed', 'अदालत द्वारा नियुक्त');
@@ -304,13 +304,13 @@ export function authorityLabel(basis: AuthorityBasis | null, lang: CareLang): st
 export function amdStatusLabel(directive: ExistingDirective | null, lang: CareLang): string {
   const t = textFor(lang);
   if (!directive) return notRecorded(lang);
-  if (directive.kind === 'NONE') return t('No living will (AMD)', 'कोई लिविंग विल (AMD) नहीं');
+  if (directive.kind === 'NONE') return t('No advance care plan (AMD)', 'कोई अग्रिम देखभाल योजना (AMD) नहीं');
   if (directive.kind === 'PRIOR_WISHES') return `${t('No AMD; earlier wishes noted', 'AMD नहीं; पहले की इच्छाएँ दर्ज')}${directive.note ? `: ${directive.note}` : ''}`;
-  return `${t('Valid living will (AMD)', 'वैध लिविंग विल (AMD)')} · ${formatDay(directive.date, lang)} · ${t('held at', 'रखी है')} ${directive.location || notRecorded(lang)} · ${t('attested by', 'सत्यापित')} ${directive.attestor || notRecorded(lang)}`;
+  return `${t('Valid advance care plan (AMD)', 'वैध अग्रिम देखभाल योजना (AMD)')} · ${formatDay(directive.date, lang)} · ${t('held at', 'रखी है')} ${directive.location || notRecorded(lang)} · ${t('attested by', 'सत्यापित')} ${directive.attestor || notRecorded(lang)}`;
 }
 
 /**
- * Living will lines for the ED view, spoken summary and PDF (tech spec §1, §6). A living will executed in Sahara outranks what
+ * Advance care planning lines for the ED view, spoken summary and PDF (tech spec §1, §6). An advance care plan executed in Sahara outranks what
  * the plan's own form says. Only EXECUTED counts as valid; "if both exist, the AMD governs". `amd` is the patient's status from
  * amd-store, or the card's amdAtIssue. amdCaveat (L7) always goes beside these lines.
  */
@@ -325,7 +325,7 @@ export function edAmdLines(directive: ExistingDirective | null, amd: AmdStatusSu
     return {
       governs: true,
       lines: [
-        `${t('Living will (AMD) executed in Sahara', 'Sahara में निष्पादित लिविंग विल (AMD)')} · ${t('version', 'संस्करण')} ${amd.version} · ${t('signed', 'हस्ताक्षर')} ${amd.executedOn ? formatDay(amd.executedOn, lang) : notRecorded(lang)} · ${attestor}`,
+        `${t('Advance care planning (AMD) executed in Sahara', 'Sahara में निष्पादित अग्रिम देखभाल योजना (AMD)')} · ${t('version', 'संस्करण')} ${amd.version} · ${t('signed', 'हस्ताक्षर')} ${amd.executedOn ? formatDay(amd.executedOn, lang) : notRecorded(lang)} · ${attestor}`,
         ...(formValid ? [`${t('Also on this plan', 'इस योजना में भी')}: ${fromForm}`] : []),
         governs,
       ],
@@ -335,7 +335,7 @@ export function edAmdLines(directive: ExistingDirective | null, amd: AmdStatusSu
     return {
       governs: false,
       lines: [
-        `${t('Living will cancelled in writing', 'लिविंग विल लिखित रूप में रद्द')} · ${t('version', 'संस्करण')} ${amd.version}`,
+        `${t('Advance care planning cancelled in writing', 'अग्रिम देखभाल योजना लिखित रूप में रद्द')} · ${t('version', 'संस्करण')} ${amd.version}`,
         formValid ? `${t('This plan still lists one. Check with the decision-maker', 'यह योजना अब भी एक दिखाती है। निर्णयकर्ता से पूछें')}: ${fromForm}` : fromForm,
       ],
     };
@@ -344,7 +344,7 @@ export function edAmdLines(directive: ExistingDirective | null, amd: AmdStatusSu
     return {
       governs: formValid,
       lines: [
-        `${t('Living will in Sahara is not signed and attested, so it is not valid', 'Sahara की लिविंग विल पर हस्ताक्षर और सत्यापन नहीं, इसलिए मान्य नहीं')} · ${t('version', 'संस्करण')} ${amd.version}`,
+        `${t('Advance care planning in Sahara is not signed and attested, so it is not valid', 'Sahara की अग्रिम देखभाल योजना पर हस्ताक्षर और सत्यापन नहीं, इसलिए मान्य नहीं')} · ${t('version', 'संस्करण')} ${amd.version}`,
         fromForm,
         ...(formValid ? [governs] : []),
       ],

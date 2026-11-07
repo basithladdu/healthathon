@@ -126,7 +126,7 @@ export function LandingPage(props: {
               <li>A guided goals-of-care conversation, review, version history and retrieval.</li>
               <li>A family checklist for practical tasks, upcoming visits and questions to bring to the care team.</li>
               <li>No live transcription, AI model, hospital system, messaging channel or ABDM connection is active.</li>
-              <li>A conversation summary does not create a DNAR order or an advance medical directive. Clinical decisions remain with the treating team.</li>
+              <li>A conversation summary does not create a DNAR order or advance care planning. Clinical decisions remain with the treating team.</li>
               <li>Missing preferences stay unrecorded. A family note does not change a doctor-reviewed summary.</li>
               <li>The clinical tools have not been clinically validated.</li>
             </ul>
