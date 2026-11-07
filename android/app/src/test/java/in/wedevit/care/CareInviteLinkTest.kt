@@ -2,6 +2,7 @@ package `in`.wedevit.care
 
 import org.junit.Assert.*
 import org.junit.Test
+import java.io.File
 
 class CareInviteLinkTest {
     private val code = "0123456789abcdef0123456789abcdef0123456789abcdef"
@@ -98,5 +99,13 @@ class CareInviteLinkTest {
     @Test fun inviteStoreIsPerAccount() {
         val store = CareInviteStore(Memory()); val e = CareInviteEntry("p1", "A", "Son", 1L)
         store.add("acct1", e); assertEquals(listOf(e), store.all("acct1")); assertTrue(store.all("acct2").isEmpty())
+    }
+
+    /** The invite sheet states how long family access lasts, and that length is the one the server grants (make_invite). */
+    @Test fun inviteSheetStatesTheServerAccessLength() {
+        val sql = listOf("supabase/migrations", "android/supabase/migrations", "../supabase/migrations").map(::File).first { it.isDirectory }.resolve("20261019151322_shared_care_clinician_review.sql").readText()
+        assertTrue(sql.contains("""invite_access(p_person,'family',p_edit,'{"careNote":true,"calendar":true,"reports":true,"costs":false}'::jsonb,30)"""))
+        val sheet = listOf("src/main/java/in/wedevit/care", "app/src/main/java/in/wedevit/care", "android/app/src/main/java/in/wedevit/care").map(::File).first { it.isDirectory }.resolve("CareAddFamily.kt").readText()
+        assertTrue(sheet.contains("Invite link made · expires in 3 days") && sheet.contains("Access lasts 30 days. Invite them again to renew it."))
     }
 }
