@@ -57,3 +57,7 @@
 @media (prefers-reduced-motion: reduce) {
   .care-community-card > a { transition: none; }
 }
+/* Tele-MANAS help card, as on Android Community. */
+.care-community-help { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; padding: 14px 16px; border: 1.5px solid #6b527c; border-radius: 16px; background: #eee7f7; }
+.care-community-help p { margin: 0; flex: 1 1 260px; font-size: 14px; line-height: 1.5; }
+.care-community-help a { display: inline-flex; align-items: center; min-height: 48px; padding: 10px 16px; border-radius: 13px; background: #6b527c; color: #fffdf8; font-size: 14px; font-weight: 650; text-decoration: none; }

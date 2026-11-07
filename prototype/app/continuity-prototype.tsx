@@ -57,7 +57,7 @@ import { addCareStoryEntry, type CareStoryEntry } from './family-care-story-stat
 import type { ConfirmedDocumentTreatment } from './care-document-treatment-state';
 import type { HandoverContact } from './family-handover-state';
 import { INITIAL_FAMILY_TASKS, addFamilyTask, editFamilyTask, removeFamilyTask, restoreFamilyTask, setFamilyTaskCompleted, type FamilyTask } from './family-care-state';
-import { ectprQuickViews, EdQuickView, EmergencyCard } from './ectpr';
+import { ectprQuickViews, EdQuickView, EmergencyCard, EmergencyNumbers } from './ectpr';
 import { EctprPlanScreen } from './ectpr-plan-screen';
 import { AmdScreen } from './amd-screen';
 import { applyCareLangToDocument, careText, loadCareDictionary, readSavedCareLang, saveCareLang, type CareLang } from './care-i18n';
@@ -744,7 +744,7 @@ const patientNavItems: Array<{ view: View; label: string; icon: React.FC<{ class
   { view: 'my-timeline', label: 'My care so far', icon: IconHistory },
   { view: 'care-near-me', label: 'Care near me', icon: IconMapPin },
   { view: 'my-doctors', label: 'My doctors', icon: IconUsers },
-  { view: 'emergency-card', label: 'Emergency card', icon: IconIdCard },
+  { view: 'emergency-card', label: 'Pocket emergency card', icon: IconIdCard },
   { view: 'my-details', label: 'My details', icon: IconFileEdit },
   { view: 'consent', label: 'Consent', icon: IconCheck },
 ];
@@ -755,7 +755,7 @@ const familyNavItems: Array<{ view: View; label: string; icon: React.FC<{ classN
   { view: 'prepare-conversation', label: 'Prepare for a conversation', icon: IconFileEdit },
   { view: 'care-near-me', label: 'Care near me', icon: IconMapPin },
   { view: 'my-doctors', label: 'Care team', icon: IconUsers },
-  { view: 'emergency-card', label: 'Emergency card', icon: IconIdCard },
+  { view: 'emergency-card', label: 'Pocket emergency card', icon: IconIdCard },
 ];
 
 type CoverageZone = {
@@ -5733,7 +5733,8 @@ export function ContinuityPrototype() {
       case 'emergency-card':
         return (
           <>
-            {renderPageHeading('Emergency card', 'Keep this with the patient')}
+            {renderPageHeading('Pocket emergency card', careText(lang, 'Pocket emergency card', 'जेब में रखने का आपातकालीन कार्ड'))}
+            <EmergencyNumbers lang={lang} />
             <EmergencyCard
               record={ectprQuickViews[portalPatientId] ?? null}
               patientId={portalPatientId}

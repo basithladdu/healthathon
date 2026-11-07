@@ -631,3 +631,12 @@
   .ed-page-header { position: static; background: #fff; }
   .ectpr-ed-plan.is-information { filter: none; }
 }
+
+/* SOS: tap-to-call national numbers above the pocket emergency card (same list as Android). Hidden when printing the card. */
+.ectpr-sos-numbers { display: grid; gap: 8px; max-width: 420px; margin: 0 0 16px; padding: 14px; border: 1.5px solid var(--care-danger, #a3271f); border-radius: 16px; background: #fdeeec; }
+.ectpr-sos-numbers h2 { margin: 0; font-size: 18px; font-weight: 700; color: var(--care-danger, #a3271f); }
+.ectpr-sos-number { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 8px 14px; border: 1.5px solid var(--care-danger, #a3271f); border-radius: 14px; background: #fff; color: var(--care-ink, #382e29); text-decoration: none; }
+.ectpr-sos-number:focus-visible { outline: 3px solid var(--care-danger, #a3271f); outline-offset: 3px; }
+.ectpr-sos-number strong { min-width: 64px; font-size: 20px; color: var(--care-danger, #a3271f); }
+.ectpr-sos-number span { display: grid; font-weight: 600; line-height: 1.35; }
+.ectpr-sos-number small { font-weight: 400; font-size: 13px; color: var(--care-muted, #6f6056); }

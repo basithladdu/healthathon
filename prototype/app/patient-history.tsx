@@ -35,7 +35,7 @@ const KIND_LABELS: Record<HistoryKind, string> = {
   version: 'Care plan versions',
   retrieval: 'Note viewed',
   consent: 'Consent',
-  card: 'Emergency card',
+  card: 'Pocket emergency card',
   review: 'Review requests',
   details: 'Details updates',
   enrolment: 'Enrolment',
