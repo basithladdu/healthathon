@@ -24,7 +24,7 @@
 .simple-care-nav :is(a, button)[aria-current='page'] { border-bottom-color: #1b513f; color: #123f32; }
 .simple-care-content { padding-block: 24px 10px; }
 .simple-care-app .secondary-button { min-height: 48px; box-shadow: none; color: #382e29; background: #fffdf9; border-color: #cbbcad; }
-.simple-care-app .primary-button { min-height: 48px; background: #b9472c; color: #fffaf5; border-color: #b9472c; }
+.simple-care-app .primary-button { min-height: 48px; background: #3b7562; color: #fffaf5; border-color: #3b7562; }
 .simple-care-app button:disabled { opacity: .55; cursor: not-allowed; }
 .simple-care-footer { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; padding-block: 10px 14px; color: #6f6056; border-top: 1px solid #e6ddd1; font-size: 14px; }
 .simple-care-footer > span { padding-block: 14px; }

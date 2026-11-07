@@ -10,20 +10,20 @@
   --care-surface-2: #f7ede1;
   --care-line: #e6d8cc;
   --care-line-strong: #8d7b70;
-  --care-primary: #d2390b;
-  --care-primary-hover: #a82a05;
-  --care-primary-soft: #ffe1d3;
+  --care-primary: #3b7562;
+  --care-primary-hover: #2c5a4a;
+  --care-primary-soft: #ddebe3;
   --care-on-primary: #ffffff;
-  --care-peach: #ffe1d3;
-  --care-marigold: #ffb300;
-  --care-honey: #ffe6c7;
-  --care-sage: #d7f2d5;
-  --care-sage-ink: #1e6a22;
-  --care-lavender: #fcddf1;
-  --care-lavender-ink: #8e0f67;
+  --care-peach: #ddebe3;
+  --care-marigold: #e6c168;
+  --care-honey: #f8ecd3;
+  --care-sage: #e0eedc;
+  --care-sage-ink: #3a6337;
+  --care-lavender: #f1e4ef;
+  --care-lavender-ink: #6e3f69;
   --care-danger: #d32f2f;
   --care-danger-soft: #fde0e0;
-  --care-focus: #8f4300;
+  --care-focus: #7a5214;
   --care-shadow: 0 0 0 1px rgba(56, 46, 41, .07), 0 1px 2px rgba(56, 46, 41, .08);
   --care-shadow-raised: 0 16px 40px rgba(56, 46, 41, .18);
 
@@ -318,10 +318,10 @@
   margin: 0 0 24px;
 }
 .simple-care-app .family-tool-buttons > :is(a, button) {
-  --tool-tint: #e36d00;
-  --tool-icon: #ffe6c7;
+  --tool-tint: #b07a2e;
+  --tool-icon: #f8ecd3;
   --tool-ink: #fff;
-  --tool-edge: #8f4300;
+  --tool-edge: #7a5214;
   grid-column: span 3;
   display: grid;
   grid-template-columns: 82px minmax(0, 1fr) 18px;
@@ -339,74 +339,74 @@
   line-height: 1.35;
 }
 .simple-care-app .family-tool-buttons > [data-tool='symptom-diary'] {
-  --tool-tint: #d81b60;
-  --tool-icon: #ffdce8;
+  --tool-tint: #a8586f;
+  --tool-icon: #f5e3e8;
   --tool-ink: #fff;
-  --tool-edge: #a3124a;
+  --tool-edge: #8a3f55;
   grid-column: span 3;
 }
 .simple-care-app .family-tool-buttons > [data-tool='care-story'] {
-  --tool-tint: #28842e;
-  --tool-icon: #d7f2d5;
+  --tool-tint: #4f7f4b;
+  --tool-icon: #e0eedc;
   --tool-ink: #fff;
-  --tool-edge: #1e6a22;
+  --tool-edge: #3a6337;
 }
 .simple-care-app .family-tool-buttons > [data-tool='voice-journal'] {
-  --tool-tint: #c2178e;
-  --tool-icon: #fcddf1;
+  --tool-tint: #8c5a86;
+  --tool-icon: #f1e4ef;
   --tool-ink: #fff;
-  --tool-edge: #8e0f67;
+  --tool-edge: #6e3f69;
   grid-column: span 3;
 }
 .simple-care-app .family-tool-buttons > [data-tool='cancer-overview'] {
-  --tool-tint: #00847a;
-  --tool-icon: #cdf3ee;
+  --tool-tint: #3a7d75;
+  --tool-icon: #ddeeea;
   --tool-ink: #fff;
-  --tool-edge: #00675f;
+  --tool-edge: #2c5f59;
   grid-column: span 3;
 }
 .simple-care-app .family-tool-buttons > [data-tool='cost-help'] {
-  --tool-tint: #e36d00;
-  --tool-icon: #ffe6c7;
+  --tool-tint: #b07a2e;
+  --tool-icon: #f8ecd3;
   --tool-ink: #fff;
-  --tool-edge: #8f4300;
+  --tool-edge: #7a5214;
   grid-column: span 4;
 }
 .simple-care-app .family-tool-buttons > [data-tool='doctor-pack'] {
-  --tool-tint: #2447d8;
-  --tool-icon: #dce3ff;
+  --tool-tint: #5a6fa8;
+  --tool-icon: #e4e9f5;
   --tool-ink: #fff;
-  --tool-edge: #1b35a8;
+  --tool-edge: #3f4f85;
   grid-column: span 3;
 }
 .simple-care-app .family-tool-buttons > [data-tool='home-help'] {
-  --tool-tint: #d2390b;
-  --tool-icon: #ffe1d3;
+  --tool-tint: #3b7562;
+  --tool-icon: #ddebe3;
   --tool-ink: #fff;
-  --tool-edge: #a82a05;
+  --tool-edge: #2c5a4a;
   grid-column: span 3;
 }
 .simple-care-app .family-tool-buttons > [data-tool='support-places'] {
-  --tool-tint: #00847a;
-  --tool-icon: #cdf3ee;
+  --tool-tint: #3a7d75;
+  --tool-icon: #ddeeea;
   --tool-ink: #fff;
-  --tool-edge: #00675f;
+  --tool-edge: #2c5f59;
 }
 .simple-care-app .family-tool-buttons > [data-tool='open-questions'] {
-  --tool-tint: #2447d8;
-  --tool-icon: #dce3ff;
+  --tool-tint: #5a6fa8;
+  --tool-icon: #e4e9f5;
   --tool-ink: #fff;
-  --tool-edge: #1b35a8;
+  --tool-edge: #3f4f85;
   grid-column: span 4;
 }
 .simple-care-app .family-tool-buttons > [data-tool='copy-tracker'] {
-  --tool-tint: #c2178e;
-  --tool-icon: #fcddf1;
+  --tool-tint: #8c5a86;
+  --tool-icon: #f1e4ef;
   --tool-ink: #fff;
-  --tool-edge: #8e0f67;
+  --tool-edge: #6e3f69;
   grid-column: span 4;
 }
-.simple-care-app .family-tool-buttons > [data-tool='lab-history'] { --tool-tint: #0277bd; --tool-ink: #fff; --tool-edge: #01579b; }
+.simple-care-app .family-tool-buttons > [data-tool='lab-history'] { --tool-tint: #43709f; --tool-ink: #fff; --tool-edge: #2f5a85; }
 .simple-care-app .family-tool-icon {
   display: grid;
   place-items: center;
@@ -420,10 +420,10 @@
 .simple-care-app .family-tool-label { min-width: 0; font-weight: 750; color: #fff; }
 .simple-care-app .family-tool-arrow { color: var(--tool-ink); display: flex; align-items: center; }
 .simple-care-app .family-tool-arrow svg { width: 18px; height: 18px; }
-.simple-care-app .cancer-overview-story { background: #d7f2d5; }
-.simple-care-app .cancer-overview-symptoms { background: #ffdce8; }
-.simple-care-app .cancer-overview-reports { background: #ffe6c7; }
-.simple-care-app .cancer-overview-note { background: #fcddf1; }
+.simple-care-app .cancer-overview-story { background: #e0eedc; }
+.simple-care-app .cancer-overview-symptoms { background: #f5e3e8; }
+.simple-care-app .cancer-overview-reports { background: #f8ecd3; }
+.simple-care-app .cancer-overview-note { background: #f1e4ef; }
 .simple-care-app .cancer-overview-icon { width: 82px; height: 70px; flex-basis: 82px; background: transparent; box-shadow: none; }
 .simple-care-app .cancer-overview-icon svg { width: 82px; height: 70px; }
 
@@ -437,7 +437,7 @@
   box-shadow: var(--care-shadow);
 }
 .simple-care-app .care-month-heading h2 { font-family: var(--font-inter), sans-serif; font-size: 16px; font-weight: 600; letter-spacing: -.2px; }
-.simple-care-app .care-month-heading { margin: -12px -12px 7px; padding: 9px 12px; background: #2447d8; color: #fff; border-bottom: 0; border-radius: 22px 22px 12px 12px; }
+.simple-care-app .care-month-heading { margin: -12px -12px 7px; padding: 9px 12px; background: #5a6fa8; color: #fff; border-bottom: 0; border-radius: 22px 22px 12px 12px; }
 .simple-care-app .care-month-heading > button { color: #fff; border-radius: 50%; }
 .simple-care-app .care-calendar-weekdays,
 .simple-care-app .care-calendar-key { color: var(--care-muted); }
@@ -450,17 +450,17 @@
   box-shadow: 0 3px 6px #9b573429;
 }
 .simple-care-app .care-calendar-day:hover:not([aria-pressed='true']) { background: #f6ebdf; }
-.simple-care-app .care-calendar i.medicine { background: #c2178e; box-shadow: 0 0 0 2px #c2178e24; }
-.simple-care-app .care-calendar i.visit { background: #2447d8; box-shadow: 0 0 0 2px #2447d824; }
-.simple-care-app .care-calendar i.task { background: #e36d00; box-shadow: 0 0 0 2px #e36d0024; }
+.simple-care-app .care-calendar i.medicine { background: #8c5a86; box-shadow: 0 0 0 2px #8c5a8624; }
+.simple-care-app .care-calendar i.visit { background: #5a6fa8; box-shadow: 0 0 0 2px #5a6fa824; }
+.simple-care-app .care-calendar i.task { background: #b07a2e; box-shadow: 0 0 0 2px #b07a2e24; }
 .simple-care-app .care-calendar-day[aria-pressed='true'] i { box-shadow: 0 0 0 1px #fff7ec; }
 .simple-care-app .care-day-agenda > .family-section-heading { margin-bottom: 12px; }
 .simple-care-app .care-selected-date { color: var(--care-muted); }
 .simple-care-app .care-agenda-list { gap: 10px; }
 .simple-care-app .care-agenda-list > li {
-  --agenda-tint: #ffe6c7;
-  --agenda-time: #e36d00;
-  --agenda-ink: #8f4300;
+  --agenda-tint: #f8ecd3;
+  --agenda-time: #b07a2e;
+  --agenda-ink: #7a5214;
   padding: 14px 16px;
   gap: 14px;
   border: 1px solid #ffc98a;
@@ -469,15 +469,15 @@
   box-shadow: 0 3px 12px #73583d06;
 }
 .simple-care-app .care-agenda-list > li.care-agenda-visit {
-  --agenda-tint: #dce3ff;
-  --agenda-time: #2447d8;
-  --agenda-ink: #1b35a8;
+  --agenda-tint: #e4e9f5;
+  --agenda-time: #5a6fa8;
+  --agenda-ink: #3f4f85;
   border-color: #b9c6ff;
 }
 .simple-care-app .care-agenda-list > li.care-agenda-medicine {
-  --agenda-tint: #fcddf1;
-  --agenda-time: #c2178e;
-  --agenda-ink: #8e0f67;
+  --agenda-tint: #f1e4ef;
+  --agenda-time: #8c5a86;
+  --agenda-ink: #6e3f69;
   border-color: #f4b3dc;
 }
 .simple-care-app .care-agenda-list time,
@@ -502,7 +502,7 @@
   border-color: currentColor;
   border-radius: 12px;
 }
-.simple-care-app .care-check-button[aria-pressed='true'] { background: #188038; border-color: #188038; color: #fff; }
+.simple-care-app .care-check-button[aria-pressed='true'] { background: #3f7a52; border-color: #3f7a52; color: #fff; }
 .simple-care-app .care-agenda-list > li.is-done { background: #f1f1e9; border-color: #e2e2d7; }
 .simple-care-app .care-agenda-list li.is-done strong { color: #7a7b6d; }
 .simple-care-app .care-agenda-actions .care-remove-event { color: #756c61; }
@@ -510,10 +510,10 @@
 .simple-care-app .care-event-form { background: #f7eadf; border-color: #e9d4c4; border-radius: 18px; }
 .simple-care-app .care-report-section { border-color: var(--care-line); margin-top: 20px; padding-top: 18px; }
 .simple-care-app .care-report-section h2 { font-size: 22px; }
-.simple-care-app .care-report-upload { color: #fff; background: #c2178e; border-color: #c2178e; border-radius: 12px; }
+.simple-care-app .care-report-upload { color: #fff; background: #8c5a86; border-color: #8c5a86; border-radius: 12px; }
 .simple-care-app .care-report-upload:focus-within { outline-color: var(--care-primary); }
 .simple-care-app .care-report-list li { border-color: var(--care-line); }
-.simple-care-app :is(.care-report-list a, .family-report-links a) { color: #8e0f67; }
+.simple-care-app :is(.care-report-list a, .family-report-links a) { color: #6e3f69; }
 .simple-care-app :is(.care-calendar-note, .care-report-empty, .care-report-list span, .care-report-section h2 span, .care-event-form p) { color: var(--care-muted); }
 .simple-care-app .family-report-pair > div { padding: 16px; background: var(--care-surface); border: 1px solid var(--care-line); border-radius: 18px; }
 .simple-care-app .family-report-original :is(img, object) { border-radius: 12px; }
@@ -521,25 +521,25 @@
 /* Everyday tasks sit in separate surfaces, without adding another row of labels. */
 .simple-care-app .family-workspace .care-home-grid { border: 0; padding-top: 8px; gap: 20px; }
 .simple-care-app .care-home-section { padding: 20px; background: var(--care-surface); border: 1px solid var(--care-line); border-radius: 20px; }
-.simple-care-app .care-question-panel { background: #dce3ff; border-color: #b9c6ff; }
+.simple-care-app .care-question-panel { background: #e4e9f5; border-color: #b9c6ff; }
 .simple-care-app .family-task-list li { border-color: #e8dfd2; }
 .simple-care-app :is(.family-task-meta, .family-task-list li.is-complete strong, .care-task-options > summary, .care-completed > summary, .family-section-heading > span) { color: var(--care-muted); }
-.simple-care-app .care-next-visit { color: var(--care-ink); background: #dce3ff; border-color: #a9b8ff; border-radius: 20px; }
-.simple-care-app .care-next-visit .care-visit-time { color: #1b35a8; }
+.simple-care-app .care-next-visit { color: var(--care-ink); background: #e4e9f5; border-color: #a9b8ff; border-radius: 20px; }
+.simple-care-app .care-next-visit .care-visit-time { color: #3f4f85; }
 .simple-care-app .family-task-form { background: #fffdf7; border-color: var(--care-line); border-radius: 14px; }
 
 /* A feature keeps the colour of the tool that opened it. */
 .simple-care-app :is(.family-symptom-diary, .family-care-story, .family-handover-pack, .family-home-help, .family-support-places, .family-open-questions, .family-copy-tracker, .family-note-history) {
-  --feature-tint: #ffdce8;
+  --feature-tint: #f5e3e8;
   --feature-line: #f5a3c1;
-  --feature-ink: #a3124a;
+  --feature-ink: #8a3f55;
   color: var(--care-ink);
 }
-.simple-care-app .family-care-story { --feature-tint: #d7f2d5; --feature-line: #9fd89b; --feature-ink: #1e6a22; }
-.simple-care-app :is(.family-handover-pack, .family-copy-tracker, .family-note-history) { --feature-tint: #fcddf1; --feature-line: #f0a8d6; --feature-ink: #8e0f67; }
-.simple-care-app .family-home-help { --feature-tint: #ffe1d3; --feature-line: #f7ae8f; --feature-ink: #a82a05; }
-.simple-care-app .family-support-places { --feature-tint: #cdf3ee; --feature-line: #8edbd1; --feature-ink: #00675f; }
-.simple-care-app .family-open-questions { --feature-tint: #dce3ff; --feature-line: #a9b8ff; --feature-ink: #1b35a8; }
+.simple-care-app .family-care-story { --feature-tint: #e0eedc; --feature-line: #9fd89b; --feature-ink: #3a6337; }
+.simple-care-app :is(.family-handover-pack, .family-copy-tracker, .family-note-history) { --feature-tint: #f1e4ef; --feature-line: #f0a8d6; --feature-ink: #6e3f69; }
+.simple-care-app .family-home-help { --feature-tint: #ddebe3; --feature-line: #a9c9b9; --feature-ink: #2c5a4a; }
+.simple-care-app .family-support-places { --feature-tint: #ddeeea; --feature-line: #8edbd1; --feature-ink: #2c5f59; }
+.simple-care-app .family-open-questions { --feature-tint: #e4e9f5; --feature-line: #a9b8ff; --feature-ink: #3f4f85; }
 .simple-care-app :is(.symptom-diary-form, .care-story-form, .home-help-form, .support-place-picker, .support-place-form, .open-question-form, .copy-tracker-form, .family-note-comparison) {
   background: var(--feature-tint);
   border-color: var(--feature-line);

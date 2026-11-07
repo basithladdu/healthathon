@@ -89,13 +89,13 @@ export function careGreeting(hour: number, lang: CareLang = 'en'): string {
   return careText(lang, 'Good evening', 'शुभ संध्या');
 }
 
-export type CareTodayGreetingProps = { name?: string; role: 'patient' | 'family'; today: string; lang?: CareLang };
+export type CareTodayGreetingProps = { name?: string; /** The signed-in family member's own name (demo: Arjun), greeted as on Android; `name` stays the patient they care for. */ viewerName?: string; role: 'patient' | 'family'; today: string; lang?: CareLang };
 
 /**
  * Optional Today header matching Android: greeting + date, then SOS and the QR (emergency) card one tap away.
  * Not yet placed on the page; family-care-home.tsx can render it above the Care Note card.
  */
-export function CareTodayGreeting({ name = '', role, today, lang = 'en' }: CareTodayGreetingProps) {
+export function CareTodayGreeting({ name = '', viewerName = '', role, today, lang = 'en' }: CareTodayGreetingProps) {
   const t = (en: string, hi: string) => careText(lang, en, hi);
   const [hour, setHour] = useState(9);
   useEffect(() => {
@@ -104,7 +104,8 @@ export function CareTodayGreeting({ name = '', role, today, lang = 'en' }: CareT
   }, []);
   const first = name.trim().split(/\s+/)[0] ?? '';
   const greeting = careGreeting(hour, lang);
-  const line = role === 'patient' && first ? `${greeting}, ${first}` : greeting;
+  const viewerFirst = viewerName.trim().split(/\s+/)[0] ?? '';
+  const line = role === 'patient' && first ? `${greeting}, ${first}` : role === 'family' && viewerFirst ? `${greeting}, ${viewerFirst}` : greeting;
   const date = new Date(`${today}T12:00:00Z`).toLocaleDateString(careLocale(lang, 'en-IN'), { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
   return <div className="care-today-greeting">
     <div className="care-today-greeting-copy"><p className="care-today-hello">{line} <SaharaLottie name="wave" className="sh-lottie-inline" /></p><p className="care-today-date">{date}</p>{role === 'family' && first && <p className="care-today-caring">{t(`Caring for ${first}`, `${first} की देखभाल`)}</p>}</div>

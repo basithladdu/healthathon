@@ -161,7 +161,7 @@
 .care-sign-in-role-family { background: #f8e5d0; }
 .care-sign-in-role-patient { background: #e7edda; }
 .care-sign-in-role-doctor { background: #ede3f4; }
-.care-sign-in-role[aria-pressed='true'] { border-color: var(--care-primary, #b9472c); box-shadow: 0 4px 0 #e3b8a6; transform: translateY(-2px); }
+.care-sign-in-role[aria-pressed='true'] { border-color: var(--care-primary, #3b7562); box-shadow: 0 4px 0 #e3b8a6; transform: translateY(-2px); }
 .care-sign-in-label { display: grid; min-width: 0; gap: 8px; font-size: 14px; font-weight: 600; }
 .care-sign-in-label input {
   width: 100%;
@@ -185,10 +185,10 @@
   justify-content: space-between;
   gap: 12px;
   padding: 13px 18px;
-  border: 1px solid var(--care-primary, #b9472c);
+  border: 1px solid var(--care-primary, #3b7562);
   border-radius: var(--care-radius-control, 14px);
   color: var(--care-on-primary, #fffaf5);
-  background: var(--care-primary, #b9472c);
+  background: var(--care-primary, #3b7562);
   box-shadow: 0 3px 0 #8e4b3530;
   font: 600 17px var(--font-inter), sans-serif;
   cursor: pointer;
@@ -204,7 +204,7 @@
 .care-sign-in button:disabled { opacity: .55; cursor: not-allowed; }
 .care-sign-in .care-sign-in-submit:disabled { opacity: 1; color: #7a6d63; background: #efe7dc; border-color: #e2d7ca; box-shadow: none; }
 .care-sign-in :is(button, input, a, summary, select):focus-visible { outline: 3px solid var(--care-focus, #8a4a26); outline-offset: 3px; }
-.care-sign-in-label input:focus { border-color: var(--care-primary, #b9472c); }
+.care-sign-in-label input:focus { border-color: var(--care-primary, #3b7562); }
 
 @media (hover: hover) {
   .care-sign-in-role:hover { transform: translateY(-3px); box-shadow: 0 5px 0 #c6c4a647; }

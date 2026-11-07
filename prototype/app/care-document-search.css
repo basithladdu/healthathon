@@ -149,7 +149,7 @@
   --doc-muted: var(--care-muted, #76675d);
   --doc-line: var(--care-line, #e6ddd1);
   --doc-surface: var(--care-surface, #fffdf9);
-  --doc-primary: var(--care-primary, #b9472c);
+  --doc-primary: var(--care-primary, #3b7562);
   --doc-primary-hover: var(--care-primary-hover, #923522);
   --doc-purple: var(--care-lavender-ink, #655278);
   --doc-sage-ink: var(--care-sage-ink, #465e45);

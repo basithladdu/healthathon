@@ -69,7 +69,7 @@
 .doctor-transcript-card > textarea::placeholder { color: #667389; }
 .doctor-caption { margin: 0; padding: 9px 12px; border-left: 3px solid #9b8bd6; background: #f0ecfa; color: #6c5a94; font-size: 14px; line-height: 1.6; overflow-wrap: normal; }
 .doctor-note-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: auto; }
-.doctor-conversation .doctor-note-actions .primary-button { min-height: 47px; padding: 11px 18px; border: 1px solid var(--care-primary, #b9472c); border-radius: 11px; background: var(--care-primary, #b9472c); color: #fff; box-shadow: none; font-size: 14px; }
+.doctor-conversation .doctor-note-actions .primary-button { min-height: 47px; padding: 11px 18px; border: 1px solid var(--care-primary, #3b7562); border-radius: 11px; background: var(--care-primary, #3b7562); color: #fff; box-shadow: none; font-size: 14px; }
 .doctor-ai-button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 47px; padding: 11px 15px; border: 1px solid #d7c7ed; border-radius: 11px; background: #eee5fa; color: #6b4798; font: 650 14px var(--font-inter, sans-serif); cursor: pointer; }
 .doctor-ai-button svg { width: 18px; height: 18px; }
 :is(.doctor-conversation, .doctor-note-review, .care-note-reader) button:disabled { opacity: .48; cursor: default; box-shadow: none; }
@@ -123,7 +123,7 @@
 .doctor-note-review .doctor-signed-result h2 { margin: 0 0 6px; color: #285b49; font-size: 20px; }
 .doctor-signed-result p { margin: 0; font-size: 14px; line-height: 1.5; }
 .doctor-signed-result button { min-height: 46px; padding: 10px 14px; font-size: 14px; }
-.simple-care-app .simple-care-content :is(.doctor-conversation, .doctor-note-review) .primary-button { background: var(--care-primary, #b9472c); border-color: var(--care-primary, #b9472c); color: #fff; box-shadow: none; }
+.simple-care-app .simple-care-content :is(.doctor-conversation, .doctor-note-review) .primary-button { background: var(--care-primary, #3b7562); border-color: var(--care-primary, #3b7562); color: #fff; box-shadow: none; }
 .simple-care-app .simple-care-content .doctor-conversation .doctor-record-card .doctor-record-button { background: #f4cf65; border-color: #f6cd65; color: #283664; }
 .simple-care-app .simple-care-content .doctor-conversation .doctor-record-card.is-recording .doctor-record-button { background: #ffd5ca; border-color: #ffc1b0; color: #873d31; }
 .simple-care-app .simple-care-content :is(.doctor-conversation, .doctor-note-review) .doctor-page-heading h1 { color: #233764; font: 600 clamp(27px, 3vw, 36px)/1.15 var(--font-inter, sans-serif); letter-spacing: -1px; }
@@ -220,7 +220,7 @@
 .doctor-home-actions { display: flex; flex-wrap: wrap; gap: 9px; margin: 0 0 18px; }
 .doctor-home-actions :is(.primary-button, .secondary-button) { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 47px; padding: 11px 16px; font-size: 14px; }
 .doctor-home-actions button svg { width: 19px; height: 19px; }
-.simple-care-app .doctor-care-home .doctor-home-actions .primary-button { background: var(--care-primary, #b9472c); border-color: var(--care-primary, #b9472c); color: #fff; box-shadow: none; }
+.simple-care-app .doctor-care-home .doctor-home-actions .primary-button { background: var(--care-primary, #3b7562); border-color: var(--care-primary, #3b7562); color: #fff; box-shadow: none; }
 .simple-care-app .doctor-care-home .doctor-home-actions .secondary-button { background: #eee7fa; border-color: #d5c6ed; color: #644988; }
 .conversation-preparation .doctor-page-heading h1 { margin: 0; font-size: clamp(26px, 3vw, 34px); }
 .preparation-quick-choices { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin: 0 0 14px; }

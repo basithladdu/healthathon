@@ -2,7 +2,7 @@
 .care-impact-panel > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .care-impact-panel h2 { margin: 0; color: inherit; font: 600 18px/1.3 var(--font-inter), sans-serif; }
 .care-impact-panel button { min-height: 44px; padding: 8px 16px; border: 1px solid var(--care-line, var(--border, #e6ddd1)); border-radius: 14px; color: inherit; background: #fff; font: 600 14px var(--font-inter), sans-serif; cursor: pointer; }
-.care-impact-panel button:focus-visible, .care-impact-info summary:focus-visible { outline: 3px solid var(--care-primary, #b9472c); outline-offset: 2px; }
+.care-impact-panel button:focus-visible, .care-impact-info summary:focus-visible { outline: 3px solid var(--care-primary, #3b7562); outline-offset: 2px; }
 .care-impact-panel dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin: 16px 0 0; overflow: hidden; border: 1px solid var(--care-line, var(--border, #e6ddd1)); border-radius: 16px; }
 .care-impact-panel dl > div { min-width: 0; padding: 12px 16px; border-right: 1px solid var(--care-line, var(--border, #e6ddd1)); border-bottom: 1px solid var(--care-line, var(--border, #e6ddd1)); }
 .care-impact-panel dl > div:nth-child(3n) { border-right: 0; }

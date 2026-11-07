@@ -65,13 +65,13 @@
 .care-directory-map-list .care-centre.is-selected { border-color: #17826a; background: #eef7f2; box-shadow: 0 0 0 2px #17826a30; }
 .care-directory-map-list .care-centre h3 { width: 100%; margin: 0 0 4px; }
 .care-centre-select { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; padding: 0; border: 0; background: transparent; text-align: left; color: var(--care-ink, #382e29); font: 650 17px/1.35 var(--font-body, sans-serif); cursor: pointer; }
-.care-centre-select span { color: var(--care-primary, #b9472c); flex-shrink: 0; }
+.care-centre-select span { color: var(--care-primary, #3b7562); flex-shrink: 0; }
 .care-directory-map-list .care-centre address { font-size: 14px; line-height: 1.5; margin-bottom: 8px; color: var(--care-muted, #76675d); }
 .care-directory-map-list .care-centre-city { display: flex; flex-wrap: wrap; align-items: center; font-size: 14px; font-weight: 600; color: var(--care-muted, #76675d); margin: 0 0 4px; }
 .care-directory-map-list .care-centre-services { font-size: 14px; font-weight: 500; color: var(--care-ink, #382e29); margin: 0 0 4px; }
 .care-directory-map-list .care-centre-actions { gap: 4px 16px; font-size: 15px; }
-.care-directory-map-list .care-centre-actions a { color: var(--care-primary, #b9472c); font-weight: 600; text-underline-offset: 3px; }
-.care-centre-route { min-height: 44px; padding: 8px 16px; border: 1px solid var(--care-primary, #b9472c); border-radius: 14px; background: var(--care-surface, #fffdf9); color: var(--care-primary, #b9472c); font: 600 15px var(--font-body, sans-serif); cursor: pointer; }
+.care-directory-map-list .care-centre-actions a { color: var(--care-primary, #3b7562); font-weight: 600; text-underline-offset: 3px; }
+.care-centre-route { min-height: 44px; padding: 8px 16px; border: 1px solid var(--care-primary, #3b7562); border-radius: 14px; background: var(--care-surface, #fffdf9); color: var(--care-primary, #3b7562); font: 600 15px var(--font-body, sans-serif); cursor: pointer; }
 .care-centre-route:hover { background: var(--care-canvas, #fff8ee); }
 .care-directory-map-list .care-directory-note { margin: 0 0 4px; font-size: 14px; color: var(--care-muted, #76675d); }
 .care-support-resources { min-width: 0; color: #4b392b; }

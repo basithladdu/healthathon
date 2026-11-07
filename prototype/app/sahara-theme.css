@@ -7,16 +7,16 @@
 :root {
   /* Palette: the same values as SaharaColors / SaharaTone in the Android app (SaharaPalette.kt).
      Flat fills only; colour comes from one accent per section, never from gradients. */
-  --sh-band: #521a0c;       /* SaharaColors.Band */
-  --sh-band-raised: #74230f;
-  --sh-on-band-sub: #f6d5c8;
+  --sh-band: #335f50;       /* SaharaColors.Band */
+  --sh-band-raised: #447263;
+  --sh-on-band-sub: #dcebe3;
   --sh-line: #e6d8cc;
   --sh-line-strong: #8d7b70; /* control edges, 3:1 on paper */
   --sh-edge: #9c887b;
   --sh-well: #efe7df;
-  --sh-rust: #d2390b;       /* SaharaColors.Primary: buttons, selected state (white text 4.85:1) */
-  --sh-rust-600: #a82a05;   /* PrimaryPressed: rust text on tints, pressed */
-  --sh-rust-50: #ffe1d3;    /* PrimaryWash */
+  --sh-rust: #3b7562;       /* SaharaColors.Primary: buttons, selected state (white text 4.85:1) */
+  --sh-rust-600: #2c5a4a;   /* PrimaryPressed: rust text on tints, pressed */
+  --sh-rust-50: #ddebe3;    /* PrimaryWash */
   --sh-ink: #382e29;
   --sh-ink-sub: #4a3e36;
   --sh-cream: #fff8ee;
@@ -24,25 +24,25 @@
 
   /* Section tones (SaharaTone): bright solid for tiles, bands and chips with bold white text;
      -50 is the wash; -ink is the darker step for small text on the wash, cream or white. */
-  --sh-teal: #00847a;     --sh-teal-50: #cdf3ee;     --sh-teal-ink: #00675f;     /* Today, my space */
-  --sh-indigo: #2447d8;   --sh-indigo-50: #dce3ff;   --sh-indigo-ink: #1b35a8;   /* Doctor, visits */
-  --sh-plum: #c2178e;     --sh-plum-50: #fcddf1;     --sh-plum-ink: #8e0f67;     /* Medicines */
-  --sh-leaf: #28842e;     --sh-leaf-50: #d7f2d5;     --sh-leaf-ink: #1e6a22;     /* Family, support */
-  --sh-marigold: #e36d00; --sh-marigold-50: #ffe6c7; --sh-marigold-ink: #8f4300; /* Documents (bold text only on solid) */
-  --sh-rose: #d81b60;     --sh-rose-50: #ffdce8;     --sh-rose-ink: #a3124a;     /* Feelings, cancer care */
-  --sh-gold: #ffb300;     --sh-gold-50: #fff0c2;     --sh-gold-ink: #7a5300;     /* counts, highlights (dark text on solid) */
+  --sh-teal: #3a7d75;     --sh-teal-50: #ddeeea;     --sh-teal-ink: #2c5f59;     /* Today, my space */
+  --sh-indigo: #5a6fa8;   --sh-indigo-50: #e4e9f5;   --sh-indigo-ink: #3f4f85;   /* Doctor, visits */
+  --sh-plum: #8c5a86;     --sh-plum-50: #f1e4ef;     --sh-plum-ink: #6e3f69;     /* Medicines */
+  --sh-leaf: #4f7f4b;     --sh-leaf-50: #e0eedc;     --sh-leaf-ink: #3a6337;     /* Family, support */
+  --sh-marigold: #b07a2e; --sh-marigold-50: #f8ecd3; --sh-marigold-ink: #7a5214; /* Documents (bold text only on solid) */
+  --sh-rose: #a8586f;     --sh-rose-50: #f5e3e8;     --sh-rose-ink: #8a3f55;     /* Feelings, cancer care */
+  --sh-gold: #e6c168;     --sh-gold-50: #faf0d2;     --sh-gold-ink: #6e5000;     /* counts, highlights (dark text on solid) */
 
   /* Status: one meaning per colour, always with a word. Text on a status wash uses the -ink step. */
-  --sh-ok: #188038;   --sh-ok-50: #d4efdc;   --sh-ok-ink: #146c2e;
-  --sh-warn: #b45309; --sh-warn-50: #fdebc8; --sh-warn-ink: #8a3f06;
+  --sh-ok: #3f7a52;   --sh-ok-50: #ddede2;   --sh-ok-ink: #2f6140;
+  --sh-warn: #9a6420; --sh-warn-50: #f9ebcf; --sh-warn-ink: #7a4a10;
   --sh-bad: #d32f2f;  --sh-bad-50: #fde0e0;  --sh-bad-ink: #b71c1c;
-  --sh-info: #0277bd; --sh-info-50: #d6eefb; --sh-info-ink: #01579b;
+  --sh-info: #43709f; --sh-info-50: #e1ecf6; --sh-info-ink: #2f5a85;
 
   /* Radii, depth, motion (AI-FIR scale) */
   --sh-r-sm: 12px; --sh-r-md: 14px; --sh-r-lg: 16px; --sh-r-hero: 22px; --sh-r-pill: 999px;
   --sh-shadow: 0 0 0 1px rgba(56, 46, 41, .07), 0 1px 2px rgba(56, 46, 41, .08);
   --sh-shadow-up: 0 16px 40px rgba(56, 46, 41, .18);
-  --sh-press: 0 3px 0 #8a2304;
+  --sh-press: 0 3px 0 #1f4a3c;
   --sh-ease: cubic-bezier(.22, 1, .36, 1);
   --sh-fast: 160ms;
   --sh-enter: 260ms;
@@ -71,35 +71,36 @@ body { background: var(--care-canvas); }
   margin: 0;
   padding: 6px max(16px, calc((100% - 1180px) / 2 + 32px)) 9px;
   border: 0;
-  background: var(--sh-band);
-  color: #fff;
-  box-shadow: 0 4px 18px rgba(56, 46, 41, .24);
+  background: var(--care-canvas);
+  color: var(--care-ink);
+  border-bottom: 1px solid var(--sh-line);
+  box-shadow: none;
 }
-:root .simple-care-app .simple-care-brand { color: #fff; font-family: var(--sh-display); letter-spacing: 0; }
-:root .simple-care-app .simple-care-brand-logo { padding: 3px; border-radius: 10px; background: #fff; box-shadow: 0 3px 10px rgba(0, 0, 0, .2); }
-:root .simple-care-app .simple-care-brand-name { font: 800 24px/1 var(--sh-display); letter-spacing: 0; color: #fff; }
-:root .simple-care-app .simple-care-brand-tagline { color: var(--sh-on-band-sub); font: 600 12px/1.25 var(--font-ui); }
+:root .simple-care-app .simple-care-brand { color: var(--care-ink); font-family: var(--sh-display); letter-spacing: 0; }
+:root .simple-care-app .simple-care-brand-logo { padding: 3px; border-radius: 10px; background: #fff; box-shadow: 0 0 0 1px var(--sh-line); }
+:root .simple-care-app .simple-care-brand-name { font: 800 24px/1 var(--sh-display); letter-spacing: 0; color: var(--care-ink); }
+:root .simple-care-app .simple-care-brand-tagline { color: var(--care-muted); font: 600 12px/1.25 var(--font-ui); }
 :root .simple-care-app .simple-care-switches > button,
 :root .simple-care-app .simple-care-role-trigger,
 /* The header select sits on the dark band; :not(#sh-none) outranks the generic field rule in care-colors.css. */
 :root .simple-care-app .simple-care-header .care-language-select > select:not(#sh-none),
 :root .care-sign-in .care-sign-in-header .care-language-select > select:not(#sh-none) {
   min-height: 44px;
-  border: 1px solid rgba(255, 255, 255, .34);
+  border: 1px solid var(--sh-line-strong);
   border-radius: var(--sh-r-sm);
-  background: var(--sh-band-raised);
-  color: #fff;
+  background: var(--care-surface);
+  color: var(--care-ink);
   font: 700 15px/1.2 var(--sh-display);
 }
 :root .simple-care-app .simple-care-header .care-language-select,
-:root .care-sign-in .care-sign-in-header .care-language-select { color: #fff; }
+:root .care-sign-in .care-sign-in-header .care-language-select { color: var(--care-ink); }
 :root .simple-care-app .simple-care-header .care-language-select > select option,
 :root .care-sign-in .care-sign-in-header .care-language-select > select option { color: var(--care-ink); background: #fff; }
 :root .simple-care-app .simple-care-switches > button:hover,
 :root .simple-care-app .simple-care-header .care-language-select > select:not(#sh-none):hover,
-:root .care-sign-in .care-sign-in-header .care-language-select > select:not(#sh-none):hover { background: #8f2c13; border-color: rgba(255, 255, 255, .6); }
+:root .care-sign-in .care-sign-in-header .care-language-select > select:not(#sh-none):hover { background: var(--sh-well); border-color: var(--care-ink); }
 :root .simple-care-app .simple-care-header :is(a, button, select):focus-visible,
-:root .care-sign-in .care-sign-in-header :is(a, button, select):focus-visible { outline: 3px solid #f5c060; outline-offset: 2px; }
+:root .care-sign-in .care-sign-in-header :is(a, button, select):focus-visible { outline: 3px solid var(--care-focus); outline-offset: 2px; }
 
 /* Navigation: AI-FIR tab strip on wide screens. Each destination keeps its own colour. */
 :root .simple-care-app .simple-care-nav { --a: var(--sh-rust); }
@@ -206,7 +207,7 @@ body { background: var(--care-canvas); }
   transition: border-color var(--sh-fast) ease, box-shadow var(--sh-fast) ease;
 }
 :root .simple-care-app .simple-care-content :is(input:not([type='checkbox']):not([type='radio']), select, textarea):hover:not(:disabled):not(:focus) { border-color: var(--care-line-strong); }
-:root .simple-care-app .simple-care-content :is(input:not([type='checkbox']):not([type='radio']), select, textarea):focus { border-color: var(--sh-rust); box-shadow: 0 0 0 4px rgba(210, 57, 11, .18); }
+:root .simple-care-app .simple-care-content :is(input:not([type='checkbox']):not([type='radio']), select, textarea):focus { border-color: var(--sh-rust); box-shadow: 0 0 0 4px rgba(59, 117, 98, .18); }
 :root .simple-care-app .simple-care-content :is(input, textarea)::placeholder { color: #7a6455; }
 :root .simple-care-app label { color: var(--care-ink); font-weight: 600; }
 
@@ -260,12 +261,12 @@ body { background: var(--care-canvas); }
 
 /* ===================================================================== sign-in */
 :root .care-sign-in { background: var(--care-canvas); font-family: var(--font-ui); }
-:root .care-sign-in .care-sign-in-header { position: relative; min-height: 64px; margin-top: -22px; padding-block: 6px 9px; box-shadow: 0 0 0 100vmax var(--sh-band); clip-path: inset(0 -100vmax); background: var(--sh-band); color: #fff; }
+:root .care-sign-in .care-sign-in-header { position: relative; min-height: 64px; margin-top: -22px; padding-block: 6px 9px; box-shadow: 0 0 0 100vmax var(--care-canvas); clip-path: inset(0 -100vmax); background: var(--care-canvas); color: var(--care-ink); border-bottom: 1px solid var(--sh-line); }
 @media (max-width: 760px) { :root .care-sign-in .care-sign-in-header { margin-top: -12px; } }
 :root .care-sign-in .care-sign-in-brand,
-:root .care-sign-in .care-sign-in-brand strong { color: #fff; font-family: var(--sh-display); letter-spacing: 0; }
+:root .care-sign-in .care-sign-in-brand strong { color: var(--care-ink); font-family: var(--sh-display); letter-spacing: 0; }
 :root .care-sign-in .care-sign-in-brand strong { font-weight: 800; }
-:root .care-sign-in .care-sign-in-brand small { color: var(--sh-on-band-sub); }
+:root .care-sign-in .care-sign-in-brand small { color: var(--care-muted); }
 :root .care-sign-in .care-sign-in-logo { padding: 3px; border-radius: 10px; background: #fff; }
 :root .care-sign-in .care-sign-in-card { border: 0; border-radius: var(--sh-r-hero); background: #fff; box-shadow: var(--sh-shadow-up); animation: sh-rise var(--sh-enter) var(--sh-ease) both; }
 :root .care-sign-in .care-sign-in-art { background: var(--sh-marigold-50); }
@@ -279,7 +280,7 @@ body { background: var(--care-canvas); }
 :root .care-sign-in .care-sign-in-role[aria-pressed='true'] svg { filter: drop-shadow(0 2px 0 rgba(255, 255, 255, .6)); }
 :root .care-sign-in .care-sign-in-role:active { transform: scale(.97); }
 :root .care-sign-in input { border: 1.5px solid var(--sh-line-strong); border-radius: var(--sh-r-md); background: #fff; color: var(--care-ink); }
-:root .care-sign-in input:focus { border-color: var(--sh-rust); box-shadow: 0 0 0 4px rgba(210, 57, 11, .18); }
+:root .care-sign-in input:focus { border-color: var(--sh-rust); box-shadow: 0 0 0 4px rgba(59, 117, 98, .18); }
 :root .care-sign-in .care-sign-in-submit { min-height: 52px; font-size: 17px; }
 
 /* A heading that receives focus after navigation shows no ring; real controls keep theirs. */
@@ -323,11 +324,11 @@ body { background: var(--care-canvas); }
 /* Launchpad tiles: a solid fill per section, white title, 5px darker bottom edge (AI-FIR tile grammar). */
 :root .care-home-category,
 :root .care-section-links > a,
-:root .care-home-quick-card { --a: var(--sh-rust); --edge: #8a2304; }
-:root .care-home-category-nav > :nth-child(1) { --a: var(--sh-marigold); --edge: #8f4300; }
-:root .care-home-category-nav > :nth-child(2) { --a: var(--sh-leaf); --edge: #1e5a22; }
-:root .care-home-category-nav > :nth-child(3) { --a: var(--sh-teal); --edge: #00564f; }
-:root .care-home-category-nav > :nth-child(4) { --a: var(--sh-indigo); --edge: #16298a; }
+:root .care-home-quick-card { --a: var(--sh-rust); --edge: #1f4a3c; }
+:root .care-home-category-nav > :nth-child(1) { --a: var(--sh-marigold); --edge: #7a5214; }
+:root .care-home-category-nav > :nth-child(2) { --a: var(--sh-leaf); --edge: #3a6337; }
+:root .care-home-category-nav > :nth-child(3) { --a: var(--sh-teal); --edge: #2c5f59; }
+:root .care-home-category-nav > :nth-child(4) { --a: var(--sh-indigo); --edge: #3f4f85; }
 :root .care-home-category,
 :root .care-home-category.tone-lavender,
 :root .care-home-category.tone-mint,
@@ -388,10 +389,10 @@ body { background: var(--care-canvas); }
 :root .simple-care-app .care-today-empty { border: 0; border-radius: var(--sh-r-lg); background: #fff; box-shadow: var(--sh-shadow); color: var(--care-muted); }
 
 /* ===================================================================== doctor */
-:root .doctor-overview-cards > :is(button, div) { --a: var(--sh-leaf); --edge: #1e5a22; border: 0; border-bottom: 5px solid var(--edge); border-radius: var(--sh-r-lg); background: var(--a); color: #fff; }
-:root .doctor-overview-cards > :nth-child(2) { --a: var(--sh-marigold); --edge: #8f4300; background: var(--a); color: #fff; }
-:root .doctor-overview-cards > :nth-child(3) { --a: var(--sh-indigo); --edge: #16298a; background: var(--a); color: #fff; }
-:root .doctor-overview-cards > :nth-child(4) { --a: var(--sh-teal); --edge: #00564f; background: var(--a); color: #fff; }
+:root .doctor-overview-cards > :is(button, div) { --a: var(--sh-leaf); --edge: #3a6337; border: 0; border-bottom: 5px solid var(--edge); border-radius: var(--sh-r-lg); background: var(--a); color: #fff; }
+:root .doctor-overview-cards > :nth-child(2) { --a: var(--sh-marigold); --edge: #7a5214; background: var(--a); color: #fff; }
+:root .doctor-overview-cards > :nth-child(3) { --a: var(--sh-indigo); --edge: #3f4f85; background: var(--a); color: #fff; }
+:root .doctor-overview-cards > :nth-child(4) { --a: var(--sh-teal); --edge: #2c5f59; background: var(--a); color: #fff; }
 :root .doctor-overview-cards strong { font: 800 34px/1.1 var(--sh-display); font-variant-numeric: tabular-nums; color: #fff; }
 :root .doctor-overview-cards span { color: #fff; font-weight: 650; }
 :root .doctor-overview-cards svg { color: #fff; }
@@ -485,7 +486,7 @@ body { background: var(--care-canvas); }
 
 /* ===================================================================== phones */
 @media (max-width: 700px) {
-  :root .simple-care-app .simple-care-header { min-height: 60px; padding: 6px 12px 9px; border-bottom: 0; flex-wrap: nowrap; }
+  :root .simple-care-app .simple-care-header { min-height: 60px; padding: 6px 12px 9px; border-bottom: 1px solid var(--sh-line); flex-wrap: nowrap; }
   :root .simple-care-app .simple-care-brand-name { font-size: 22px; }
   :root .simple-care-app .simple-care-switches > button { padding-inline: 10px; font-size: 14px; }
   /* Dock: white bar, each destination its own colour; the current one fills. */
@@ -513,13 +514,14 @@ body { background: var(--care-canvas); }
   max-width: none;
   margin: 0 0 20px;
   padding: 12px max(16px, calc((100% - 1160px) / 2));
-  background: var(--sh-band);
-  box-shadow: 0 0 0 100vmax var(--sh-band);
+  background: var(--care-canvas);
+  box-shadow: 0 0 0 100vmax var(--care-canvas);
   clip-path: inset(0 -100vmax);
-  color: #fff;
+  color: var(--care-ink);
+  border-bottom: 1px solid var(--sh-line);
 }
-:root :is(.shared-care, .directory-review) > header :is(a, h1) { color: #fff; font-family: var(--sh-display); letter-spacing: 0; }
-:root :is(.shared-care, .directory-review) > header a:focus-visible { outline: 3px solid #f5c060; outline-offset: 2px; }
+:root :is(.shared-care, .directory-review) > header :is(a, h1) { color: var(--care-ink); font-family: var(--sh-display); letter-spacing: 0; }
+:root :is(.shared-care, .directory-review) > header a:focus-visible { outline: 3px solid var(--care-focus); outline-offset: 2px; }
 :root .directory-review { padding-top: 0; color: var(--sh-ink); }
 :root .directory-review :is(h1, h2) { font-family: var(--sh-display); letter-spacing: 0; }
 :root .directory-review a { color: var(--sh-rust-600); }
@@ -614,7 +616,7 @@ body { background: var(--care-canvas); }
 /* ===================================================================== round 3: motion */
 @keyframes sh-band-in { from { opacity: 0; transform: translateY(-6px) scale(.985); clip-path: inset(0 0 40% 0 round 16px); } to { opacity: 1; transform: none; clip-path: inset(0 0 0 0 round 16px); } }
 @keyframes sh-float { 0%, 100% { translate: 0 0; rotate: 0deg; } 50% { translate: 0 -4px; rotate: -2deg; } }
-@keyframes sh-glow { 0%, 100% { box-shadow: var(--sh-press), 0 0 0 0 rgba(210, 57, 11, .45); } 60% { box-shadow: var(--sh-press), 0 0 0 10px rgba(210, 57, 11, 0); } }
+@keyframes sh-glow { 0%, 100% { box-shadow: var(--sh-press), 0 0 0 0 rgba(59, 117, 98, .45); } 60% { box-shadow: var(--sh-press), 0 0 0 10px rgba(59, 117, 98, 0); } }
 @keyframes sh-count { 0% { opacity: 0; transform: translateY(.45em); filter: blur(3px); } 60% { opacity: 1; filter: none; } 80% { transform: translateY(-.06em); } 100% { opacity: 1; transform: none; } }
 @keyframes sh-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 @keyframes sh-dialog-pop { 0% { opacity: 0; transform: translateY(14px) scale(.94); } 70% { opacity: 1; transform: scale(1.015); } 100% { transform: none; } }
@@ -698,7 +700,7 @@ body { background: var(--care-canvas); }
 }
 
 /* Home: the greeting sits on a teal band with SOS and QR card. */
-:root .simple-care-app .care-home-top { padding: 14px 16px; border-radius: var(--sh-r-hero); background: var(--sh-teal); color: #fff; box-shadow: 0 6px 18px rgba(0, 132, 122, .28); animation: sh-band-in 420ms var(--sh-ease) both; }
+:root .simple-care-app .care-home-top { padding: 14px 16px; border-radius: var(--sh-r-hero); background: var(--sh-teal); color: #fff; box-shadow: 0 6px 18px rgba(58, 125, 117, .28); animation: sh-band-in 420ms var(--sh-ease) both; }
 :root .simple-care-app .care-home-top :is(.care-today-hello, .care-today-date) { color: #fff; }
 :root .simple-care-app .care-home-top :is(.care-today-qr, .care-home-profile) { border-color: #fff; background: #fff; color: var(--sh-teal-ink); box-shadow: 0 3px 0 rgba(0, 0, 0, .22); }
 :root .simple-care-app .care-home-top .care-today-sos { box-shadow: 0 3px 0 #7f1414, 0 0 0 2px #fff; }

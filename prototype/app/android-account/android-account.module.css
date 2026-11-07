@@ -24,7 +24,7 @@
 .page :is(a, button, input):focus-visible { outline: 3px solid #973b25; outline-offset: 4px; }
 
 /* Sahara band header (shared palette with the app) and a short entrance. */
-.header { margin-top: -24px; margin-bottom: 22px; padding: 12px 0; background: #4a1f14; box-shadow: 0 0 0 100vmax #4a1f14; clip-path: inset(0 -100vmax); color: #f3d9cf; }
+.header { margin-top: -24px; margin-bottom: 22px; padding: 12px 0; background: #335f50; box-shadow: 0 0 0 100vmax #335f50; clip-path: inset(0 -100vmax); color: #f3d9cf; }
 .page .header a, .page .header .brand { color: #fff; font-family: var(--font-anek), var(--font-noto), sans-serif; letter-spacing: 0; }
 .page .header a:focus-visible { outline-color: #f5c060; }
 .panel { border: 0; box-shadow: 0 0 0 1px rgba(56, 46, 41, .07), 0 1px 2px rgba(56, 46, 41, .08); animation: account-rise 260ms cubic-bezier(.22, 1, .36, 1) both; }

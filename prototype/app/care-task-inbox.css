@@ -3,7 +3,7 @@
   --inbox-muted: var(--care-muted, #76675d);
   --inbox-line: var(--care-line, #e6ddd1);
   --inbox-surface: var(--care-surface, #fffdf9);
-  --inbox-rust: var(--care-primary, #b9472c);
+  --inbox-rust: var(--care-primary, #3b7562);
   max-width: 960px; min-width: 0; margin-inline: auto; color: var(--inbox-ink); font-family: var(--font-inter), sans-serif;
 }
 .care-task-inbox * { box-sizing: border-box; }

@@ -1,4 +1,4 @@
-.care-online-tools { --coa-ink: var(--care-ink, #382e29); --coa-muted: var(--care-muted, #76675d); --coa-line: var(--care-line, #e6ddd1); --coa-primary: var(--care-primary, #b9472c); --coa-primary-hover: var(--care-primary-hover, #923522); margin: 12px 0; padding: 0 16px; border: 1px solid var(--coa-line); border-radius: 20px; color: var(--coa-ink); background: var(--care-surface, #fffdf9); }
+.care-online-tools { --coa-ink: var(--care-ink, #382e29); --coa-muted: var(--care-muted, #76675d); --coa-line: var(--care-line, #e6ddd1); --coa-primary: var(--care-primary, #3b7562); --coa-primary-hover: var(--care-primary-hover, #923522); margin: 12px 0; padding: 0 16px; border: 1px solid var(--coa-line); border-radius: 20px; color: var(--coa-ink); background: var(--care-surface, #fffdf9); }
 .care-online-tools[open] { padding-bottom: 16px; }
 .care-online-tools summary { display: flex; align-items: center; min-height: 52px; font-size: 16px; font-weight: 650; line-height: 1.4; cursor: pointer; }
 .care-online-tools label { display: grid; gap: 8px; margin: 12px 0; font-size: 14px; font-weight: 600; }

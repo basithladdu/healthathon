@@ -3,7 +3,7 @@
   --visit-muted: var(--care-muted, #76675d);
   --visit-line: var(--care-line, #e6ddd1);
   --visit-surface: var(--care-surface, #fffdf9);
-  --visit-rust: var(--care-primary, #b9472c);
+  --visit-rust: var(--care-primary, #3b7562);
   max-width: 1120px; min-width: 0; margin-inline: auto; color: var(--visit-ink); font-family: var(--font-inter), sans-serif;
 }
 .care-next-visit-page * { box-sizing: border-box; }
