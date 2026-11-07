@@ -15,6 +15,11 @@
 - Doctors: say yes to the 4 community groups. Pick who can hide bad posts (owner OK'd: they use the clinician-review role).
 - Test on a phone: sign in, Practice, Today check-in, take a dose (and Undo), Goals of care, Nearby, community.
 
+**7 Nov: sense-check done**
+- 8 reviews of every part of the app. Fixed what needed no doctor (see Details). The rest is `DOCTOR_QUESTIONS.md`: 67 questions for the doctors (ask the first 10 first) and 12 for Basith.
+- Website survey admin page: the password "0" is gone. Set `ADMIN_SURVEY_PASSWORD` in Vercel (project settings, Environment Variables), then redeploy. Until then the admin page says "not set up".
+- Big open safety items (need doctors): bad scores reach no doctor; SOS has no palliative-team number; anyone can make a "signed" emergency card (app, and website without sign-in); as-needed morphine counted like a daily dose.
+
 **Known small problems**
 - One old test fails (emergency card field names). It also failed before this week.
 - 8 website tests about AI services time out on our test machine. They also failed before this week.
