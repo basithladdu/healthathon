@@ -67,7 +67,7 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
  * the one already saved) through the same save as the full check-in screen; no extra screen, no Save button. Words, the
  * distress question and a symptom note stay one tap away on the full screen. Shown only to people who may edit.
  */
-@Composable fun TodayCheckInBar(vm: CareModel, onOpen: () -> Unit, onSymptom: () -> Unit = {}) {
+@Composable fun TodayCheckInBar(vm: CareModel, onOpen: () -> Unit, onSymptom: () -> Unit = {}, onDistress: (() -> Unit)? = null) {
     val t = careText(); val hindi = careHindi()
     val items by vm.items.collectAsStateWithLifecycle(); val person by vm.selected.collectAsStateWithLifecycle(); val busy by vm.busy.collectAsStateWithLifecycle()
     val dayStart = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
@@ -96,6 +96,8 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
                 TodayBigAction(t("Note a symptom", "तबीयत का नोट लिखें"), Icons.Default.Healing, onSymptom, Modifier.weight(1f).fillMaxHeight().saharaStagger(0).testTag("today-checkin-symptom"))
                 TodayBigAction(if (today?.detail.isNullOrBlank()) t("Add a few words", "कुछ शब्द लिखें") else t("Change the words", "शब्द बदलें"), Icons.Default.Edit, onOpen, Modifier.weight(1f).fillMaxHeight().saharaStagger(1).testTag("today-checkin-words"))
             }
+            // Distress question stays on Today (Dr Sujay: the thermometer must not be buried).
+            if (onDistress != null) DistressQuestion(vm, onYes = onDistress)
             Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 CareDailyFlow.moods.forEachIndexed { index, mood ->
                     TodayMoodButton(checkInMoodLabel(mood, hindi), index / 2f, selected = today?.title == mood, enabled = !busy, ink = band, modifier = Modifier.weight(1f).fillMaxHeight().saharaStagger(index).testTag("today-checkin-$index")) {

@@ -260,6 +260,7 @@ internal object DistressCodec {
                 }
             }
         }
+        DistressSource()
         modelError?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
         Button(onClick = {
             val check = DistressCheck(true, score, DistressRules.problems.filter { it in chosen }, other.trim())

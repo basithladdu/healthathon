@@ -155,8 +155,9 @@ internal fun planStepOf(field: String): Int = when {
             onViewed = { id -> commit { CarePlanBook.viewed(it, AuditRecordType.ECTPR, id, actor, planNow(), ED_VIEW_DETAIL) } })
         "card" -> WalletCardPage(state, selected, online, canEdit, onRetry = ::pushCards, onReissue = { commit { CarePlanBook.reissueCard(it, selected, actor, planNow()) } }, onBack = { page = "home" }, onShare = ::sharePlanPdf,
             onViewed = { id -> commit { CarePlanBook.viewed(it, AuditRecordType.CARD, id, actor, planNow(), CARD_VIEW_DETAIL) } })
-        "amd" -> LivingWillPage(state, person, store, canEdit, clinician, canManageData, actor, onBack = { page = "home" }, commit = ::commit, onShare = { file, id -> share(file, t("Share the living will", "लिविंग विल साझा करें"), AuditRecordType.AMD, id) })
+        "amd" -> LivingWillPage(state, person, store, canEdit, clinician, canManageData, actor, onBack = { page = "home" }, commit = ::commit, onShare = { file, id -> share(file, t("Share the advance care planning", "अग्रिम देखभाल योजना साझा करें"), AuditRecordType.AMD, id) })
         else -> CarePlanHome(state, person, clinician, canEdit, loadProblem, store, canManageData, actor, ::commit, transport.takeIf { online }, onBack = onBack, onPage = { page = it },
+            onGoc = { if (EctprLifecycle.draft(state.ectprs, selected) != null || commit { CarePlanBook.startPlan(it, selected, actor, planNow(), EctprPrefill.patient(person.name, profile()), clinical = EctprPrefill.clinical(profile())).first }) page = "goc" },
             onStart = { inEd -> if (commit { CarePlanBook.startPlan(it, selected, actor, planNow(), EctprPrefill.patient(person.name, profile()), inEd, EctprPrefill.clinical(profile())).first }) page = "wizard" },
             onReview = { trigger -> if (commit { CarePlanBook.requestReview(it, selected, trigger, actor, planNow(), today).first }) page = "wizard" },
             onWithdraw = { id, reason, by -> if (commit { CarePlanBook.withdraw(it, id, reason, by, actor, planNow()) }) vm.message.value = t("Plan withdrawn", "योजना वापस ली गई") },
@@ -261,15 +262,22 @@ internal fun planStepOf(field: String): Int = when {
 
 // ───────────────────────────── Home ─────────────────────────────
 
-@Composable private fun CarePlanHome(state: CarePlanState, person: Person, clinician: Boolean, canEdit: Boolean, loadProblem: Boolean, store: CarePlanStore, canManage: Boolean, actor: String, commit: ((CarePlanState) -> CarePlanState) -> Boolean, transport: EdCardTransport?, onBack: () -> Unit, onPage: (String) -> Unit,
+@Composable private fun CarePlanHome(state: CarePlanState, person: Person, clinician: Boolean, canEdit: Boolean, loadProblem: Boolean, store: CarePlanStore, canManage: Boolean, actor: String, commit: ((CarePlanState) -> CarePlanState) -> Boolean, transport: EdCardTransport?, onBack: () -> Unit, onPage: (String) -> Unit, onGoc: () -> Unit,
     onStart: (Boolean) -> Unit, onReview: (ReviewTrigger) -> Unit, onWithdraw: (String, String, String) -> Unit, onDiscard: (String) -> Unit) {
     val t = careText(); val hindi = careHindi(); val today = LocalDate.now()
     val active = EctprLifecycle.active(state.ectprs, person.id); val draft = EctprLifecycle.draft(state.ectprs, person.id)
     val interp = EdView.forPatient(state.ectprs, person.id, today)
     var dialog by rememberSaveable { mutableStateOf("") }
     LazyColumn(Modifier.fillMaxSize().testTag("care-plan-home"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { PlanHeader(t("Emergency plan & living will", "आपातकालीन योजना और लिविंग विल"), onBack, "care-plan-header") }
+        item { PlanHeader(t("Care planning", "देखभाल योजना"), onBack, "care-plan-header") }
         if (loadProblem) item { Surface(color = Peach, shape = RoundedCornerShape(12.dp)) { Text(t("Couldn't read the saved plan.", "सहेजी योजना पढ़ी नहीं जा सकी।"), Modifier.padding(12.dp)) } }
+        // One family of three clinical documents, each with a one-line plain description.
+        item { Text(t("Goals of care discussion, advance care planning and the emergency care plan belong together. All three are clinical documents.", "देखभाल के लक्ष्यों की चर्चा, अग्रिम देखभाल योजना और आपातकालीन देखभाल योजना साथ चलती हैं। तीनों क्लिनिकल दस्तावेज़ हैं।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub, modifier = Modifier.testTag("care-plan-family-intro")) }
+        item { FamilyTile(t("Goals of care discussion", "देखभाल के लक्ष्यों की चर्चा"), Icons.Default.Forum, FamilyAccent.Indigo, Modifier.testTag("care-plan-goc-tile")) {
+            Text(t("The recorded conversation about what matters most and the care to aim for.", "सबसे ज़रूरी क्या है और किस देखभाल का लक्ष्य रखें, इस पर दर्ज की गई बातचीत।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub)
+            if (clinician) Button(onClick = onGoc, enabled = canEdit, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-goc-entry")) { Text(t("Open", "खोलें")) }
+            else Text(t("Your doctor records this conversation with you.", "आपके डॉक्टर यह बातचीत आपके साथ दर्ज करते हैं।"), style = MaterialTheme.typography.bodySmall)
+        } }
         item { ActionCard(if (interp.kind == EdKind.ACTIVE) Mint else Peach, Modifier.fillMaxWidth().testTag("care-plan-ed-entry"), onClick = { onPage("ed") }) {
             Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.LocalHospital, null, tint = Rust); Spacer(Modifier.width(12.dp))
@@ -283,7 +291,8 @@ internal fun planStepOf(field: String): Int = when {
                 Icon(Icons.AutoMirrored.Filled.ArrowForward, null)
             }
         } }
-        item { FamilyTile(t("Emergency care plan", "आपातकालीन देखभाल योजना"), Icons.Default.LocalHospital, FamilyAccent.Marigold) {
+        item { FamilyTile(t("Emergency care plan & card", "आपातकालीन देखभाल योजना और कार्ड"), Icons.Default.LocalHospital, FamilyAccent.Marigold) {
+            Text(t("The summary for the ambulance or emergency department, with a QR code.", "एम्बुलेंस या आपातकालीन विभाग के लिए सारांश, QR कोड के साथ।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub)
             when {
                 draft != null -> {
                     Button(onClick = { onPage("wizard") }, enabled = canEdit, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-continue")) { Text(t("Continue draft", "मसौदा जारी रखें")) }
@@ -299,7 +308,8 @@ internal fun planStepOf(field: String): Int = when {
             OutlinedButton(onClick = { onPage("card") }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-card-entry")) { Icon(Icons.Default.QrCode, null); Spacer(Modifier.width(8.dp)); Text(t("Pocket emergency card", "जेब में रखने का आपातकालीन कार्ड")) }
         } }
         if (active != null && transport != null && ReviewReminder.due(active, today)) item { ReviewReminderCard(active, canEdit, transport) { status -> commit { CarePlanBook.reminded(it, active.id, actor, planNow(), status) } } }
-        item { FamilyTile(t("Living will", "लिविंग विल"), Icons.Default.Gavel, FamilyAccent.Plum) {
+        item { FamilyTile(t("Advance care planning", "अग्रिम देखभाल योजना"), Icons.Default.Gavel, FamilyAccent.Plum) {
+            Text(t("The person’s own wishes about future care, written down.", "भविष्य की देखभाल के बारे में व्यक्ति की अपनी इच्छाएँ, लिखित रूप में।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub)
             Button(onClick = { onPage("amd") }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-amd-entry")) { Icon(Icons.Default.Gavel, null); Spacer(Modifier.width(8.dp)); Text(t("Open", "खोलें")) }
         } }
         // Versions as a plain register, always visible: version, status, date.
@@ -522,12 +532,12 @@ private fun LazyListScope.capacityStep(d: EctprRecord, update: ((EctprRecord) ->
         }
         if (d.capacity.status == Capacity.FLUCTUATES) PlanDateField(d.capacity.reassessOn, t("Reassess on", "दोबारा जाँच की तारीख़"), { v -> cap { it.copy(reassessOn = v) } })
         val dir = d.existingDirective
-        OptionGroup(t("Existing living will or wishes", "पहले की लिविंग विल या इच्छाएँ"), dir?.kind, DirectiveKind.entries, { when (it) {
-            DirectiveKind.VALID_AMD -> Bi("A signed, attested living will", "हस्ताक्षरित, सत्यापित लिविंग विल"); DirectiveKind.PRIOR_WISHES -> Bi("Wishes said or written before", "पहले कही या लिखी इच्छाएँ"); DirectiveKind.NONE -> Bi("None", "कोई नहीं") } }, tag = "directive") { k ->
+        OptionGroup(t("Existing advance care planning or wishes", "पहले की अग्रिम देखभाल योजना या इच्छाएँ"), dir?.kind, DirectiveKind.entries, { when (it) {
+            DirectiveKind.VALID_AMD -> Bi("Signed, attested advance care planning", "हस्ताक्षरित, सत्यापित अग्रिम देखभाल योजना"); DirectiveKind.PRIOR_WISHES -> Bi("Wishes said or written before", "पहले कही या लिखी इच्छाएँ"); DirectiveKind.NONE -> Bi("None", "कोई नहीं") } }, tag = "directive") { k ->
             update { it.copy(existingDirective = k?.let { kind -> (it.existingDirective ?: ExistingDirective(kind)).copy(kind = kind) }) }
         }
         if (dir?.kind == DirectiveKind.VALID_AMD) {
-            PlanDateField(dir.date, t("Date of the living will", "लिविंग विल की तारीख़"), { v -> update { it.copy(existingDirective = dir.copy(date = v)) } }, latest = LocalDate.now())
+            PlanDateField(dir.date, t("Date of the advance care planning", "अग्रिम देखभाल योजना की तारीख़"), { v -> update { it.copy(existingDirective = dir.copy(date = v)) } }, latest = LocalDate.now())
             CareField(dir.location, { v -> update { it.copy(existingDirective = dir.copy(location = v)) } }, t("Where the original is kept", "मूल कहाँ रखी है"), singleLine = true)
             CareField(dir.attestor, { v -> update { it.copy(existingDirective = dir.copy(attestor = v)) } }, t("Attested by (notary or gazetted officer)", "किसने सत्यापित किया (नोटरी या राजपत्रित अधिकारी)"), singleLine = true)
         }
@@ -891,7 +901,7 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
         } else {
             item { Text(t("Give full standard emergency care.", "पूरा सामान्य आपातकालीन इलाज दें।"), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold) }
             // A living will stands on its own: it is shown whatever state the plan is in.
-            item { EdRowView(EdRow("AMD", Bi("Living will (AMD)", "लिविंग विल (AMD)"), amdLine, flag = AmdLifecycle.governs(state.amds, patientId, r?.existingDirective))) }
+            item { EdRowView(EdRow("AMD", Bi("Advance care planning", "अग्रिम देखभाल योजना"), amdLine, flag = AmdLifecycle.governs(state.amds, patientId, r?.existingDirective))) }
         }
         item { CareContinuesBox() }
         if (r != null) item { Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -971,7 +981,7 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
             } }
             val issuedAmd = runCatching { org.json.JSONObject(token.snapshot).optJSONObject("amdAtIssue") }.getOrNull()
             if (issuedAmd?.optString("status").orEmpty() != amdNow?.status?.name.orEmpty() || (amdNow != null && issuedAmd?.optInt("version") != amdNow.version)) item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().testTag("card-amd-changed")) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(t("Living will changed. Issue a new card.", "लिविंग विल बदली है। नया कार्ड जारी करें।"), style = MaterialTheme.typography.bodyMedium)
+                Text(t("Advance care planning changed. Issue a new card.", "अग्रिम देखभाल योजना बदली है। नया कार्ड जारी करें।"), style = MaterialTheme.typography.bodyMedium)
                 OutlinedButton(onClick = onReissue, enabled = canEdit, modifier = Modifier.heightIn(min = 48.dp).testTag("card-reissue")) { Text(t("New card", "नया कार्ड")) }
             } } }
             item { Button(onClick = onShare, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.Print, null); Spacer(Modifier.width(8.dp)); Text(t("Print or share", "प्रिंट या साझा करें")) } }
@@ -984,7 +994,7 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
     ActionCard(SaharaSoftBlue, Modifier.fillMaxWidth().testTag("care-plan-entry"), onClick = onOpen) {
         Row(Modifier.fillMaxWidth().heightIn(min = 64.dp).padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.LocalHospital, null, tint = Rust); Spacer(Modifier.width(12.dp))
-            Text(t("Emergency plan & living will", "आपातकालीन योजना और लिविंग विल"), Modifier.weight(1f), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text(t("Care planning", "देखभाल योजना"), Modifier.weight(1f), fontWeight = FontWeight.Bold, fontSize = 16.sp)
             Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(19.dp))
         }
     }

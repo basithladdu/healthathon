@@ -61,12 +61,12 @@ import androidx.compose.ui.unit.sp
 
 /** The main colour of each symptom picture, so tints and accents next to the icon match it. */
 internal fun symptomColor(key: String): Color = when (key.trim()) {
-    "Pain" -> Color(0xFFDC2626); "Tiredness" -> Color(0xFFEA580C); "Sleepiness" -> Color(0xFF7C3AED)
-    "Poor appetite" -> Color(0xFF0F766E); "Dry mouth" -> Color(0xFFE11D48); "Breathlessness" -> Color(0xFF0891B2)
-    "Constipation" -> Color(0xFF8B5A35); "Diarrhea" -> Color(0xFFCA8A04); "Nausea" -> Color(0xFF65A30D)
-    "Vomiting" -> Color(0xFF4D7C0F); "Difficulty swallowing" -> Color(0xFF9333EA); "Cough" -> Color(0xFF64748B)
-    "Bowel / bladder incontinence" -> Color(0xFF0284C7); "Mood", "Sadness" -> Color(0xFF3B82F6); "Worry" -> Color(0xFFD97706)
-    "Weight loss" -> Color(0xFFBE185D); "Overall well-being" -> Color(0xFFEAB308); "Sleep difficulty" -> Color(0xFF312E81)
+    "Pain" -> Color(0xFFB5564A); "Tiredness" -> Color(0xFFB8774A); "Sleepiness" -> Color(0xFF7D6AA8)
+    "Poor appetite" -> Color(0xFF3F7F77); "Dry mouth" -> Color(0xFFB06178); "Breathlessness" -> Color(0xFF4A8DA0)
+    "Constipation" -> Color(0xFF8B6A4F); "Diarrhea" -> Color(0xFFB08D3A); "Nausea" -> Color(0xFF7C9A4F)
+    "Vomiting" -> Color(0xFF65804A); "Difficulty swallowing" -> Color(0xFF8F6BA3); "Cough" -> Color(0xFF6F7F90)
+    "Bowel / bladder incontinence" -> Color(0xFF4F83A8); "Mood", "Sadness" -> Color(0xFF6A84B5); "Worry" -> Color(0xFFB98443)
+    "Weight loss" -> Color(0xFFA85F82); "Overall well-being" -> Color(0xFFC4A444); "Sleep difficulty" -> Color(0xFF5A5F96)
     else -> Color(0xFF78716C)
 }
 
@@ -85,7 +85,7 @@ internal fun symptomColor(key: String): Color = when (key.trim()) {
     }
 }
 
-internal fun ratingColor(n: Int): Color = if (n <= 5) lerp(DoctorStatusGood, Color(0xFFB8860B), n / 5f) else lerp(Color(0xFFB8860B), Color(0xFF8E2F1C), (n - 5) / 5f)
+internal fun ratingColor(n: Int): Color = if (n <= 5) lerp(DoctorStatusGood, Color(0xFFB08D3A), n / 5f) else lerp(Color(0xFFB08D3A), Color(0xFF9A5444), (n - 5) / 5f)
 
 /** A rounded section card with a short helper line; [accent] puts a coloured bar beside the title. */
 @Composable internal fun SymptomSection(number: Int?, title: String, helper: String? = null, accent: Color? = null, content: @Composable ColumnScope.() -> Unit) {

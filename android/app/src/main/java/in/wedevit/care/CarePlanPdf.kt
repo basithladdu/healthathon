@@ -158,7 +158,7 @@ internal object CarePlanPdf {
         val h1 = paint(16f, true); val h2 = paint(12f, true); val h3 = paint(10.5f, true, android.graphics.Color.rgb(122, 59, 38))
         val body = paint(9.5f); val head = paint(9f, true); val sand = android.graphics.Color.rgb(246, 236, 225)
         d.text(p(Bi("Emergency care and treatment plan: goals of care", "आपातकालीन देखभाल और इलाज की योजना: देखभाल के लक्ष्य")), h1, 22f)
-        d.text(listOf(r.patient.name, p(Bi("Goals-of-care conversation note, in the order of the legal form", "देखभाल के लक्ष्यों की बातचीत का नोट, क़ानूनी फ़ॉर्म के क्रम में"))).filter(String::isNotBlank).joinToString(" · "), body)
+        d.text(listOf(r.patient.name, p(Bi("Goals-of-care conversation note, in the order of the clinical document", "देखभाल के लक्ष्यों की बातचीत का नोट, क्लिनिकल दस्तावेज़ के क्रम में"))).filter(String::isNotBlank).joinToString(" · "), body)
         if (status.isNotBlank()) d.text(status, paint(9.5f, true))
         GocForm.sections(r, topics, signers).forEach { section ->
             d.space(6f); d.box(sand, "${section.id}   " + p(section.title) to h2)

@@ -4,10 +4,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 
 /**
- * Sahara's colour system (6 Nov 2026, round 2 "vivid"): Sahara's warm family (terracotta, cream, paper) in AI-FIR's
- * multi-colour grammar. Each section owns one bright, saturated SOLID used on tiles, chips, headers and big buttons with
- * bold white text, and a darker INK for small text on light grounds. Solid rust-orange for buttons and the selected
- * state; a dark oxblood header band. Checked in SaharaPaletteTest: white on every solid >= 4.5:1 except Marigold
+ * Sahara's colour system (7 Nov 2026, "calm" pass after the lead doctor's feedback that the vivid palette did not feel calm for
+ * a cancer patient): warm cream and paper grounds, soft sage green for buttons and the selected state, and muted, gentle
+ * section tones (dusty rose, slate blue, mauve, ochre, clay) instead of bright saturated ones. Each section still owns one
+ * SOLID for tiles, chips, headers and buttons with white text, and a darker INK for small text on light grounds. True red is
+ * kept only for SOS, emergency and danger states (Error). A deep sage-green header band for the welcome panel. Checked in SaharaPaletteTest: white on every solid >= 4.5:1 except Marigold
  * (3.25:1, bold or large text only), ink on its wash >= 5:1, body text 4.5:1, icons and control edges 3:1.
  */
 object SaharaColors {
@@ -24,11 +25,11 @@ object SaharaColors {
     val Edge = Color(0xFF9C887B)
     val LineStrong = Color(0xFF8D7B70)
 
-    // Header band (top bar, welcome panel): deep maroon-brown with white text.
-    val Band = Color(0xFF521A0C)
-    val BandRaised = Color(0xFF74230F)
+    // Header band (welcome panel): deep sage green with white text (7:1).
+    val Band = Color(0xFF335F50)
+    val BandRaised = Color(0xFF447263)
     val OnBand = Color.White
-    val OnBandSub = Color(0xFFF6D5C8)
+    val OnBandSub = Color(0xFFDCEBE3)
 
     // Calm header (7 Nov): the screen's own cream ground, dark ink text, a hairline below. Replaces the maroon band on the top bar;
     // [Band] stays for the welcome panel. Ink on Ground is above 7:1.
@@ -38,20 +39,21 @@ object SaharaColors {
     val HeaderRaised = Well
     val HeaderLine = Line
 
-    // Primary: bright terracotta orange-red for buttons, white text (4.85:1, so it is also safe as small text on cream); Pressed is the darker step.
-    val Primary = Color(0xFFD2390B)
-    val PrimaryPressed = Color(0xFFA82A05)
-    val PrimaryWash = Color(0xFFFFE1D3)
+    // Primary: soft sage green for buttons, white text (5.4:1, and 4.9:1 as small text on cream); Pressed is the darker step.
+    val Primary = Color(0xFF3B7562)
+    val PrimaryPressed = Color(0xFF2C5A4A)
+    val PrimaryWash = Color(0xFFDDEBE3)
     val OnPrimary = Color.White
 
     // Status: never reuse a section accent for these.
-    val Success = Color(0xFF188038); val SuccessWash = Color(0xFFD4EFDC)
-    val Warning = Color(0xFFB45309); val WarningWash = Color(0xFFFDEBC8)
+    val Success = Color(0xFF3F7A52); val SuccessWash = Color(0xFFDDEDE2)
+    val Warning = Color(0xFF9A6420); val WarningWash = Color(0xFFF9EBCF)
+    /** True red: SOS, emergency and danger only. */
     val Error = Color(0xFFD32F2F); val ErrorWash = Color(0xFFFDE0E0)
-    val Info = Color(0xFF0277BD); val InfoWash = Color(0xFFD6EEFB)
+    val Info = Color(0xFF43709F); val InfoWash = Color(0xFFE1ECF6)
 
     /** Round 3: the soft warm wash behind Today, so white and tinted cards stand off it (ink keeps >= 7:1). */
-    val GroundWarm = Color(0xFFFFEBD9)
+    val GroundWarm = Color(0xFFFBF1E3)
 }
 
 /**
@@ -60,24 +62,25 @@ object SaharaColors {
  * [wash], cream or white (also the pressed step of a solid button). Pick one tone per section and use it everywhere.
  */
 enum class SaharaTone(val solid: Color, val onSolid: Color, val wash: Color, val ink: Color) {
+    /** The default brand tone (name kept from the old terracotta): now the soft sage green. */
     Rust(SaharaColors.Primary, Color.White, SaharaColors.PrimaryWash, SaharaColors.PrimaryPressed),
-    Teal(Color(0xFF00847A), Color.White, Color(0xFFCDF3EE), Color(0xFF00675F)),
-    Indigo(Color(0xFF2447D8), Color.White, Color(0xFFDCE3FF), Color(0xFF1B35A8)),
-    Plum(Color(0xFFC2178E), Color.White, Color(0xFFFCDDF1), Color(0xFF8E0F67)),
-    Leaf(Color(0xFF28842E), Color.White, Color(0xFFD7F2D5), Color(0xFF1E6A22)),
-    /** The one bright solid under 4.5:1 with white (3.25:1): bold or large text only on it; small text uses [ink]. */
-    Marigold(Color(0xFFE36D00), Color.White, Color(0xFFFFE6C7), Color(0xFF8F4300)),
-    Rose(Color(0xFFD81B60), Color.White, Color(0xFFFFDCE8), Color(0xFFA3124A)),
-    Gold(Color(0xFFFFB300), SaharaColors.Ink, Color(0xFFFFF0C2), Color(0xFF7A5300)),
-    Success(SaharaColors.Success, Color.White, SaharaColors.SuccessWash, Color(0xFF146C2E)),
-    Warning(SaharaColors.Warning, Color.White, SaharaColors.WarningWash, Color(0xFF8A3F06)),
+    Teal(Color(0xFF3A7D75), Color.White, Color(0xFFDDEEEA), Color(0xFF2C5F59)),
+    Indigo(Color(0xFF5A6FA8), Color.White, Color(0xFFE4E9F5), Color(0xFF3F4F85)),
+    Plum(Color(0xFF8C5A86), Color.White, Color(0xFFF1E4EF), Color(0xFF6E3F69)),
+    Leaf(Color(0xFF4F7F4B), Color.White, Color(0xFFE0EEDC), Color(0xFF3A6337)),
+    /** The one muted solid under 4.5:1 with white (3.7:1): bold or large text only on it; small text uses [ink]. */
+    Marigold(Color(0xFFB07A2E), Color.White, Color(0xFFF8ECD3), Color(0xFF7A5214)),
+    Rose(Color(0xFFA8586F), Color.White, Color(0xFFF5E3E8), Color(0xFF8A3F55)),
+    Gold(Color(0xFFE6C168), SaharaColors.Ink, Color(0xFFFAF0D2), Color(0xFF6E5000)),
+    Success(SaharaColors.Success, Color.White, SaharaColors.SuccessWash, Color(0xFF2F6140)),
+    Warning(SaharaColors.Warning, Color.White, SaharaColors.WarningWash, Color(0xFF7A4A10)),
     Error(SaharaColors.Error, Color.White, SaharaColors.ErrorWash, Color(0xFFB71C1C)),
-    Info(SaharaColors.Info, Color.White, SaharaColors.InfoWash, Color(0xFF01579B)),
+    Info(SaharaColors.Info, Color.White, SaharaColors.InfoWash, Color(0xFF2F5A85)),
     Neutral(SaharaColors.InkSub, Color.White, SaharaColors.Well, SaharaColors.Ink),
 }
 
-/** Fill for a section's header band with white text and back arrow: the solid, except Marigold, which steps to a deeper orange so a small white subtitle also keeps 4.5:1. */
-val SaharaTone.band: Color get() = if (this == SaharaTone.Marigold) Color(0xFFB85400) else solid
+/** Fill for a section's header band with white text and back arrow: the solid, except Marigold, which steps to a deeper ochre so a small white subtitle also keeps 4.5:1. */
+val SaharaTone.band: Color get() = if (this == SaharaTone.Marigold) Color(0xFF9A6A25) else solid
 
 /** One colour per section (round 3), used for its header band, cards, list chips and rows everywhere. */
 object SaharaSection {
@@ -86,7 +89,7 @@ object SaharaSection {
     val Emergency = SaharaTone.Error; val GoalsOfCare = SaharaTone.Indigo; val Help = SaharaTone.Teal; val Conversations = SaharaTone.Marigold
 }
 
-// Supporting category colours, now the vivid section washes. Older screens read these names.
+// Supporting category colours, now the soft section washes. Older screens read these names.
 val SaharaSoftBlue = SaharaTone.Indigo.wash
 val SaharaLavender = SaharaTone.Plum.wash
 val SaharaSoftGold = SaharaTone.Gold.wash

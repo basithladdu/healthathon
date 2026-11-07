@@ -8,6 +8,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,6 +21,9 @@ import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Thermostat
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
@@ -63,6 +67,8 @@ import java.time.format.DateTimeFormatter
     // "Note a symptom" on Today opens the form once; coming back to this screen later does not reopen it.
     LaunchedEffect(startAdding) { if (startAdding) { if (canEdit) adding = true; onStartAddingHandled() } }
     var showingPainHistory by rememberSaveable(selected) { mutableStateOf(false) }
+    // The distress thermometer opens straight from this screen: it is its own entry, not tucked behind "More details".
+    var distressOpen by rememberSaveable(selected) { mutableStateOf(false) }
     val person = people.firstOrNull { it.id == selected }
     // Decode each note once for sorting; a decode inside the comparator ran on every comparison.
     val notes = remember(entries, selected) { entries.filter { it.personId == selected && SymptomNoteCodec.isStructured(it.detail) }
@@ -89,13 +95,18 @@ import java.time.format.DateTimeFormatter
                 tiles.chunked(if (largeText) 1 else 2).forEach { row ->
                     Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         row.forEach { (key, label) ->
-                            SymptomTile(false, label, key, if (key == "Other") "symptom-add" else "symptom-quick-$key", Modifier.weight(1f).fillMaxHeight().saharaStagger(tiles.indexOfFirst { it.first == key }), role = androidx.compose.ui.semantics.Role.Button) {
+                            SymptomFitTile(false, label, key, if (key == "Other") "symptom-add" else "symptom-quick-$key", Modifier.weight(1f).fillMaxHeight().saharaStagger(tiles.indexOfFirst { it.first == key }), role = androidx.compose.ui.semantics.Role.Button) {
                                 quickStart = if (key == "Other") "" else key; adding = true
                             }
                         }
                         if (row.size == 1 && !largeText) Spacer(Modifier.weight(1f))
                     }
                 }
+                val dayStart = remember { LocalDate.now().atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli() }
+                val distressToday = DistressRules.today(entries, person.id, dayStart)?.let { DistressCodec.decode(it.detail) }
+                DistressEntryTile(distressToday, hindi) { distressOpen = true }
+                Text(t("Symptom ratings use a 0–10 scale in the style of ESAS-r (Edmonton Symptom Assessment System). This is a personal diary, not a scored ESAS-r.", "लक्षणों के अंक ESAS-r (Edmonton Symptom Assessment System) की तरह 0–10 के पैमाने पर हैं। यह निजी डायरी है, अंकित ESAS-r नहीं।"),
+                    fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint, modifier = Modifier.padding(top = 2.dp).testTag("symptom-scale-source"))
             }
         }
         if (person != null && hasPainHistory) item {
@@ -133,7 +144,59 @@ import java.time.format.DateTimeFormatter
         items(shown, key = { it.id }) { Box(Modifier.animateItem().saharaAppear()) { SymptomNoteCard(it, vm, hindi) } }
     }
     if (adding && person != null) SymptomNoteEditor(vm, hindi, startSymptom = quickStart.ifBlank { null }, onClose = { adding = false; quickStart = "" })
+    if (distressOpen && person != null) androidx.compose.ui.window.Dialog(onDismissRequest = { distressOpen = false },
+        properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
+        Surface(Modifier.fillMaxSize(), color = Cream) { DistressScreen(vm, onClose = { distressOpen = false }) }
+    }
     if (showingPainHistory && person != null) PainBodyHistorySheet(entries, person.id, hindi, onClose = { showingPainHistory = false })
+}
+
+/** The distress thermometer as its own clear entry under the symptom grid: one tap opens it; today's score shows when already answered. */
+@Composable private fun DistressEntryTile(today: DistressCheck?, hindi: Boolean, onClick: () -> Unit) {
+    val t = { en: String, hi: String -> careTr(hindi, en, hi) }
+    val shape = RoundedCornerShape(16.dp); val c = SaharaSection.Symptoms.solid
+    Row(Modifier.fillMaxWidth().heightIn(min = 72.dp).saharaPressBounce().testTag("symptom-distress").clip(shape).background(Paper, shape).border(1.5.dp, c, shape)
+        .clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onClick).padding(horizontal = 14.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Box(Modifier.size(44.dp).clip(RoundedCornerShape(14.dp)).background(lerp(Paper, c, .16f)).border(1.5.dp, c.copy(alpha = .45f), RoundedCornerShape(14.dp)), contentAlignment = Alignment.Center) {
+            Icon(Icons.Default.Thermostat, null, Modifier.size(28.dp), tint = SaharaSection.Symptoms.ink)
+        }
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(t("Distress thermometer", "परेशानी थर्मामीटर"), fontSize = 17.sp, lineHeight = 22.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk, style = SymptomWords)
+            val line = when {
+                today == null -> t("How much distress this past week? 0–10", "इस हफ़्ते कितनी परेशानी? 0–10")
+                today.distress -> t("Today", "आज") + ": ${today.score ?: 0}/10 · " + t("Tap to change", "बदलने के लिए दबाएँ")
+                else -> t("Today: no distress", "आज: कोई परेशानी नहीं") + " · " + t("Tap to change", "बदलने के लिए दबाएँ")
+            }
+            Text(line, fontSize = 14.sp, lineHeight = 19.sp, color = DoctorCardSub, style = SymptomWords)
+            Text("NCCN Distress Thermometer", fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint)
+        }
+        Icon(Icons.Default.ChevronRight, null, Modifier.size(24.dp), tint = SaharaSection.Symptoms.ink)
+    }
+}
+
+/**
+ * Symptom tile for the grid and the "what" step: icon chip on top, the name below it using the whole tile width, and the name's
+ * font shrinks (never breaks mid-word) so "Breathlessness" fits at any text size.
+ */
+@Composable private fun SymptomFitTile(selected: Boolean, label: String, key: String, tag: String, modifier: Modifier = Modifier, role: androidx.compose.ui.semantics.Role = androidx.compose.ui.semantics.Role.RadioButton, onClick: () -> Unit) {
+    val shape = RoundedCornerShape(16.dp); val c = symptomColor(key)
+    val interaction = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+    val ring by androidx.compose.animation.animateColorAsState(if (selected) c else DoctorHairline, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "tile ring")
+    val fill by androidx.compose.animation.animateColorAsState(if (selected) lerp(Paper, c, .12f) else Paper, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "tile fill")
+    Column(modifier.heightIn(min = 64.dp).saharaPressBounce().testTag(tag).clip(shape).background(fill, shape).border(if (selected) 2.dp else 1.dp, ring, shape)
+        .then(if (role == androidx.compose.ui.semantics.Role.RadioButton) Modifier.selectable(selected, interaction, ripple(), role = role, onClick = onClick) else Modifier.clickable(interaction, ripple(), role = role, onClick = onClick))) {
+        Column(Modifier.weight(1f).fillMaxWidth().padding(start = 12.dp, end = 12.dp, top = 10.dp, bottom = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                SymptomIconChip(key, 40.dp)
+                Spacer(Modifier.weight(1f))
+                if (selected) Box(Modifier.size(24.dp).background(c, CircleShape), contentAlignment = Alignment.Center) { Icon(Icons.Default.Check, null, Modifier.size(16.dp), tint = readableOn(c)) }
+            }
+            SaharaFitText(label, Modifier.fillMaxWidth(), style = LocalTextStyle.current.copy(fontSize = 16.sp), color = DoctorCardInk, maxLines = 2, min = 11f,
+                fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold, textAlign = androidx.compose.ui.text.style.TextAlign.Start)
+        }
+        Box(Modifier.fillMaxWidth().height(5.dp).background(c))
+    }
 }
 
 /** Shown on the tracker's quick tiles when the person has fewer than five recent symptoms. */
@@ -275,9 +338,13 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
     val expectedToken by rememberSaveable(initial?.id) { mutableStateOf(initial?.let(SymptomDiaryRules::editToken)) }
     LaunchedEffect(initial?.id) { vm.actionError.value = null }
     LaunchedEffect(selected) { if (selected != capturedPerson) onClose() }
+    // After a family member logs a new note: a kind word for them too (caregiver wellbeing). The check itself is on Today.
+    var youMatter by rememberSaveable(initial?.id) { mutableStateOf(false) }
+    if (youMatter) { CaregiverYouMatter(onDone = onClose, onCheck = onClose); return }
+    val afterSave: () -> Unit = { if (vm.viewRole.value == "Family" && initial == null) youMatter = true else onClose() }
     SymptomNoteForm(personId = capturedPerson, personName = people.firstOrNull { it.id == capturedPerson }?.name.orEmpty(), entries = entries,
         hindi = hindi, initial = initial, followup = followup, busy = busy, canEdit = canEdit && selected == capturedPerson, actionError = actionError, sharedOnline = vm.cloud != null,
-        viewRole = vm.viewRole.value, startSymptom = startSymptom, onSave = { id, value -> vm.saveSymptomNote(capturedPerson, id, value, expectedToken, onClose) }, onClose = onClose)
+        viewRole = vm.viewRole.value, startSymptom = startSymptom, onSave = { id, value -> vm.saveSymptomNote(capturedPerson, id, value, expectedToken, afterSave) }, onClose = onClose)
 }
 
 /** The same native form can be checked with isolated callback fixtures, without touching accounts or real records. */
@@ -400,7 +467,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
                 if (!quick && cur == "what") SymptomSection(null, t("What would you like to note?", "किस बारे में नोट लिखना है?")) {
                     SymptomDiaryRules.symptoms.entries.chunked(if (largeText) 1 else 2).forEach { pair ->
                         Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            pair.forEach { (en, _) -> SymptomTile(if (en == "Other") otherSymptom else !otherSymptom && symptom == en, SymptomDiaryRules.symptomLabel(en, hindi), en, "symptom-choice-$en", Modifier.weight(1f).fillMaxHeight()) {
+                            pair.forEach { (en, _) -> SymptomFitTile(if (en == "Other") otherSymptom else !otherSymptom && symptom == en, SymptomDiaryRules.symptomLabel(en, hindi), en, "symptom-choice-$en", Modifier.weight(1f).fillMaxHeight()) {
                                 otherSymptom = en == "Other"; symptom = if (otherSymptom) "" else en; scale = SymptomDiaryRules.scaleForSymptom(en); if (en != "Pain") { location = ""; triggerValues = ""; bodySites = ""; bodyPoints = "[]"; bodyRatings = "" }; rating = -2; moodLow = -2; moodAnxiety = -2
                                 if (en != "Other") stepKey = if (en == "Pain") "where" else "how"
                             } }
@@ -411,6 +478,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
                 }
                 if (!quick && cur == "where" && symptom == "Pain") Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
                     CarePainBodyMap(value.painBodySites, value.painBodyPoints, ratingNow.takeIf { it >= 0 }, hindi, ratings = spotRatings, onSpotRating = { site, r -> bodyRatings = PainBodyMapRules.ratingsKey(spotRatings + (site to r)) }) { sites, points -> bodySites = sites.joinToString("|"); bodyPoints = PainBodyMapRules.encodePoints(points).toString(); bodyRatings = PainBodyMapRules.ratingsKey(spotRatings.filterKeys { it in sites }) }
+                    Text(t(PainBands.SOURCE_EN, PainBands.SOURCE_HI), fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint, modifier = Modifier.testTag("pain-band-source"))
                     // The typed location is optional (the body map is the main answer): it waits behind "+ Add pain location" unless filled.
                     if (showLocation || location.isNotBlank()) CareField(location, { location = it.take(100) }, t("Pain location (optional)", "दर्द की जगह (वैकल्पिक)"), singleLine = true)
                     else SaharaAddChip(t("Add pain location in words", "दर्द की जगह शब्दों में जोड़ें"), { showLocation = true }, Modifier.testTag("symptom-add-location"))

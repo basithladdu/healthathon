@@ -88,6 +88,14 @@ internal class CaregiverCheckStore(context: Context) {
 
 /** "How are you holding up?": the caregiver's own 0-10 distress check. Not the patient's, and not shared. */
 @Composable fun FamilyCaregiverCheckCard(vm: CareModel, personName: String) {
+    // The family member's own cards: the quick 0-10 distress check, then "Your wellbeing" (ZBI-4 check, trend, help, journal). Patients never see these.
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        FamilyDistressCard(vm, personName)
+        CaregiverWellbeingCard(vm, personName)
+    }
+}
+
+@Composable private fun FamilyDistressCard(vm: CareModel, personName: String) {
     val t = careText(); val hindi = careHindi(); val context = LocalContext.current
     val person by vm.selected.collectAsStateWithLifecycle()
     val store = remember(context) { CaregiverCheckStore(context) }

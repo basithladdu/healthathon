@@ -505,7 +505,7 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
                 onVisit = { v -> if (v == null || v.due == 0L) onCalendar() else onCalendarAt(v.due) }, onAddVisit = if (canEdit) ({ onAdd("visit") }) else null,
                 onGoals = { note -> if (note != null) onRead(note) else onTalk() }, onCarePlan = onCarePlan) }
         }
-        if (family) summary() else if (!clinician && canEdit) item(key = "today-checkin") { TodayCheckInBar(vm, onOpen = onCheckInWords, onSymptom = onSymptomNote) }
+        if (family) summary() else if (!clinician && canEdit) item(key = "today-checkin") { TodayCheckInBar(vm, onOpen = onCheckInWords, onSymptom = onSymptomNote, onDistress = onDistress) }
         val medicineSection: androidx.compose.foundation.lazy.LazyListScope.() -> Unit = {
             // The doses card under the title carries the one "x of y taken" count.
             item(key = "today-doses") { Box(Modifier.saharaStagger(3)) { TodayDosesCard(vm) } }
@@ -1207,7 +1207,7 @@ private class CareToolRow(val label: String, val icon: ImageVector, val tone: Sa
         }
         if (!shortcutsElsewhere) item { MoreGroup(t("Care", "देखभाल")) {
             MoreRow(Icons.Default.FolderOpen, SaharaSection.Documents.solid, t("Documents", "दस्तावेज़"), "", Modifier.saharaStagger(3).testTag("more-documents-entry"), onDocuments)
-            if (onCarePlan != null) MoreRow(Icons.Default.LocalHospital, SaharaSection.Emergency.solid, t("Emergency plan", "आपातकालीन योजना"), t("Plan, pocket emergency card, living will", "योजना, जेब वाला आपातकालीन कार्ड, लिविंग विल"), Modifier.saharaStagger(4).testTag("more-care-plan-entry"), onCarePlan)
+            if (onCarePlan != null) MoreRow(Icons.Default.LocalHospital, SaharaSection.Emergency.solid, t("Emergency plan", "आपातकालीन योजना"), t("Goals of care, advance care planning, emergency card", "देखभाल के लक्ष्यों की चर्चा, अग्रिम देखभाल योजना, आपातकालीन कार्ड"), Modifier.saharaStagger(4).testTag("more-care-plan-entry"), onCarePlan)
             if (onDevices != null && !clinicianView) MoreRow(Icons.Default.Healing, FamilyAccent.Plum, t("Tubes and lines", "नलियाँ और लाइनें"), "", Modifier.saharaStagger(5).testTag("more-devices"), onDevices)
             MoreRow(Icons.Default.CalendarMonth, SaharaSection.Visits.solid, t("Calendar", "कैलेंडर"), "", Modifier.saharaStagger(6).testTag("more-calendar"), onCalendar)
             MoreRow(Icons.Default.Science, SaharaSection.Labs.solid, t("Lab history", "जाँच का इतिहास"), "", Modifier.saharaStagger(7).testTag("more-labs"), onLabs)

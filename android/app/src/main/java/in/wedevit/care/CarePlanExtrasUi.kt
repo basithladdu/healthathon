@@ -300,15 +300,16 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
     val familyReadOnly = canEdit && !AmdRules.canChange(canEdit, clinician, actor)
     @Suppress("NAME_SHADOWING") val canEdit = AmdRules.canChange(canEdit, clinician, actor)
     LazyColumn(Modifier.fillMaxSize().testTag("living-will"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { PlanHeader(t("Living will", "लिविंग विल"), onBack, "amd-header") }
+        item { PlanHeader(t("Advance care planning", "अग्रिम देखभाल योजना"), onBack, "amd-header") }
+        item { Text(t("A clinical document that records the person’s own wishes about future care.", "एक क्लिनिकल दस्तावेज़, जिसमें भविष्य की देखभाल के बारे में व्यक्ति की अपनी इच्छाएँ दर्ज होती हैं।"), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.testTag("amd-clinical-note")) }
         if (familyReadOnly) item { Text(t("Only ${person.name} can change this.", "इसे सिर्फ़ ${person.name} बदल सकते हैं।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub, modifier = Modifier.testTag("amd-family-read-only")) }
         (working ?: current)?.let { a -> item { PlanReadAloud({ PlanSpeech.livingWill(a.content, hindi) }, "amd-${a.id}") } }
         if (latest?.status == AmdStatus.REVOKED) item { val on = latest.revocation?.revokedOn.orEmpty(); Surface(color = DoctorStatusRestBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().testTag("amd-cancelled")) { Text(t("Cancelled on $on", "$on को रद्द"), Modifier.padding(12.dp)) } }
         current?.let { c -> item(key = "executed-" + c.id + c.updatedAt) { ExecutedCard(c, store, person.id, canEdit && !clinician, working == null, clinician, actor, commit) } }
         if (clinician) {
-            if (current == null) item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) { Text(if (latest != null && latest.status != AmdStatus.REVOKED) t("Not signed. Not valid.", "हस्ताक्षर नहीं। वैध नहीं।") else t("No living will", "कोई लिविंग विल नहीं"), Modifier.padding(12.dp)) } }
+            if (current == null) item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) { Text(if (latest != null && latest.status != AmdStatus.REVOKED) t("Not signed. Not valid.", "हस्ताक्षर नहीं। वैध नहीं।") else t("No advance care planning", "कोई अग्रिम देखभाल योजना नहीं"), Modifier.padding(12.dp)) } }
         } else {
-            if (working == null && current == null) item { Button(onClick = { commit { CarePlanBook.startAmd(it, person.id, actor, planNow(), person.name).first } }, enabled = canEdit, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("amd-start")) { Text(if (latest != null) t("New living will", "नई लिविंग विल") else t("Start", "शुरू करें")) } }
+            if (working == null && current == null) item { Button(onClick = { commit { CarePlanBook.startAmd(it, person.id, actor, planNow(), person.name).first } }, enabled = canEdit, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("amd-start")) { Text(if (latest != null) t("New advance care planning", "नई अग्रिम देखभाल योजना") else t("Start", "शुरू करें")) } }
             working?.let { w -> when (w.status) {
                 AmdStatus.DRAFT -> item(key = w.id + w.updatedAt) { AmdEditor(w, canEdit, today, onSave = { c -> commit { CarePlanBook.saveAmd(it, w.id, c, actor, planNow()) } }, onPrint = { c -> if (commit { CarePlanBook.saveAmd(it, w.id, c, actor, planNow()) }) printIt(w.copy(content = c)) }) }
                 else -> item(key = w.id + w.updatedAt) { PrintedCard(w, store, person.id, canEdit, today, actor, commit, onReprint = { printIt(w) }) }
@@ -333,7 +334,7 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
     fun after(change: (AmdAfterDeath) -> AmdAfterDeath) { c = c.copy(afterDeath = change(c.afterDeath)) }
     val issues = AmdRules.validateContent(c, today); val version = record.version; val status = AmdText.status(record.status).pick(hindi)
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        Text(t("Living will v$version · $status", "लिविंग विल v$version · $status"), fontWeight = FontWeight.SemiBold, modifier = Modifier.testTag("amd-status-${record.status.name.lowercase()}"))
+        Text(t("Advance care planning v$version · $status", "अग्रिम देखभाल योजना v$version · $status"), fontWeight = FontWeight.SemiBold, modifier = Modifier.testTag("amd-status-${record.status.name.lowercase()}"))
         PlanCard {
             SectionTitle(t("Section 1: Personal details", "खंड 1: व्यक्तिगत विवरण"))
             CareField(c.executant.name, { v -> ex { it.copy(name = v) } }, t("Full name", "पूरा नाम"), singleLine = true)
@@ -389,7 +390,7 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
             CareField(c.familyPhysician.name, { v -> c = c.copy(familyPhysician = c.familyPhysician.copy(name = v)) }, t("Name", "नाम"), singleLine = true)
             CareField(c.familyPhysician.registrationNo, { v -> c = c.copy(familyPhysician = c.familyPhysician.copy(registrationNo = v)) }, t("Registration number", "पंजीकरण नंबर"), singleLine = true)
             CareField(c.familyPhysician.phone, { v -> c = c.copy(familyPhysician = c.familyPhysician.copy(phone = v)) }, t("Phone", "फ़ोन"), singleLine = true)
-            CareField(c.custodianBody, { v -> c = c.copy(custodianBody = v) }, t("Local body that keeps living wills (custodian)", "स्थानीय निकाय जो लिविंग विल रखता है (संरक्षक)"), singleLine = true, placeholder = t("Municipality or panchayat", "नगरपालिका या पंचायत"))
+            CareField(c.custodianBody, { v -> c = c.copy(custodianBody = v) }, t("Local body that keeps advance care planning records (custodian)", "स्थानीय निकाय जो अग्रिम देखभाल योजना रखता है (संरक्षक)"), singleLine = true, placeholder = t("Municipality or panchayat", "नगरपालिका या पंचायत"))
         }
         PlanCard {
             SectionTitle(t("Section 5 (Optional): Directions to be followed upon my death", "खंड 5 (वैकल्पिक): मेरी मृत्यु के बाद पालन किए जाने वाले निर्देश"))
@@ -486,7 +487,7 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
 @Composable private fun ExecutedCard(c: AmdRecord, store: CarePlanStore, personId: String, canEdit: Boolean, noWorking: Boolean, clinician: Boolean, actor: String, commit: ((CarePlanState) -> CarePlanState) -> Boolean) {
     val t = careText(); val hindi = careHindi(); val context = LocalContext.current; val today = LocalDate.now(); val ex = c.execution; val version = c.version
     PlanCard {
-        SectionTitle(t("Signed living will · version $version", "हस्ताक्षरित लिविंग विल · संस्करण $version"))
+        SectionTitle(t("Signed advance care planning · version $version", "हस्ताक्षरित अग्रिम देखभाल योजना · संस्करण $version"))
         ex?.let { e ->
             Text(t("Signed", "हस्ताक्षर") + ": " + e.signedOn + (if (e.place.isNotBlank()) ", " + e.place else "") + if (e.thumbImpression) " · " + t("thumb impression", "अँगूठे का निशान") else "", style = MaterialTheme.typography.bodyMedium)
             Text(t("Witnesses", "गवाह") + ": " + e.witnesses.joinToString(", ") { it.name }, style = MaterialTheme.typography.bodyMedium)
@@ -523,7 +524,7 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
             InfoDisclosure(t("Link ABHA", "ABHA जोड़ें")) {
                 var address by rememberSaveable(c.id) { mutableStateOf(c.abha?.address.orEmpty()) }; var consent by rememberSaveable(c.id) { mutableStateOf(c.abha?.consent == true) }
                 CareField(address, { address = it }, t("ABHA address or number", "ABHA पता या नंबर"), singleLine = true, placeholder = "name@abdm")
-                CheckLine(consent, { consent = it }, t("The patient agrees to link the living will with their ABHA records.", "मरीज़ लिविंग विल को अपने ABHA रिकॉर्ड से जोड़ने के लिए सहमत है।"))
+                CheckLine(consent, { consent = it }, t("The patient agrees to link the advance care planning with their ABHA records.", "मरीज़ अग्रिम देखभाल योजना को अपने ABHA रिकॉर्ड से जोड़ने के लिए सहमत है।"))
                 val problem = AmdRules.abhaIssue(address, consent)
                 problem?.let { Text(it.text(hindi), color = RustText, style = Small) }
                 OutlinedButton(onClick = { commit { CarePlanBook.amdAbha(it, c.id, address, consent, actor, planNow(), today) } }, enabled = canEdit && problem == null, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("amd-abha-save")) { Text(t("Save ABHA link", "ABHA लिंक सहेजें")) }
@@ -539,7 +540,7 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
 
 @Composable private fun AmdCancelForm(canEdit: Boolean, onRevoke: (String, Boolean, String) -> Unit) { val t = careText(); val today = LocalDate.now()
     var open by rememberSaveable { mutableStateOf(false) }; var on by rememberSaveable { mutableStateOf("") }; var written by rememberSaveable { mutableStateOf(false) }; var reason by rememberSaveable { mutableStateOf("") }
-    if (!open) TextButton(onClick = { open = true }, enabled = canEdit, modifier = Modifier.testTag("amd-cancel")) { Text(t("Cancel the living will", "लिविंग विल रद्द करें"), color = RustText) }
+    if (!open) TextButton(onClick = { open = true }, enabled = canEdit, modifier = Modifier.testTag("amd-cancel")) { Text(t("Cancel the advance care planning", "अग्रिम देखभाल योजना रद्द करें"), color = RustText) }
     else Surface(color = DoctorStatusRestBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         PlanDateField(on, t("Date of the written cancellation", "लिखित रद्दीकरण की तारीख़"), { on = it }, latest = today)
         CheckLine(written, { written = it }, t("The person signed a written cancellation.", "व्यक्ति ने लिखित रद्दीकरण पर हस्ताक्षर किए हैं।"))
@@ -548,7 +549,7 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
         IssueList(issues)
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             OutlinedButton(onClick = { open = false }, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Text(t("Keep it", "रहने दें")) }
-            Button(onClick = { open = false; onRevoke(on, written, reason.trim()) }, enabled = issues.isEmpty(), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("amd-cancel-confirm")) { Text(t("Cancel the living will", "लिविंग विल रद्द करें")) }
+            Button(onClick = { open = false; onRevoke(on, written, reason.trim()) }, enabled = issues.isEmpty(), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("amd-cancel-confirm")) { Text(t("Cancel the advance care planning", "अग्रिम देखभाल योजना रद्द करें")) }
         }
     } }
 }

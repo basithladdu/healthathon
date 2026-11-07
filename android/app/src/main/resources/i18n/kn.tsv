@@ -741,7 +741,7 @@ Reviewed conversation	ಪರಿಶೀಲಿಸಿದ ಮಾತುಕತೆ
 Account draft	ಖಾತೆಯ ಡ್ರಾಫ್ಟ್
 Revision ${draft.revision}	ಪರಿಷ್ಕರಣೆ ${draft.revision}
 Open conversation	ಮಾತುಕತೆ ತೆರೆಯಿರಿ
-Clinical review is a separate step by a verified, invited account. It records a discussion; it does not execute a legal advance directive or authorise treatment.	ಕ್ಲಿನಿಕಲ್ ಪರಿಶೀಲನೆ ದೃಢೀಕರಣವಾದ, ಆಹ್ವಾನಿತ ಖಾತೆಯಿಂದ ನಡೆಯುವ ಪ್ರತ್ಯೇಕ ಹಂತ. ಇದು ಚರ್ಚೆಯನ್ನು ದಾಖಲಿಸುತ್ತದೆ; ಕಾನೂನುಬದ್ಧ ಅಡ್ವಾನ್ಸ್ ಡೈರೆಕ್ಟಿವ್ ಜಾರಿಗೊಳಿಸುವುದಿಲ್ಲ, ಚಿಕಿತ್ಸೆಗೆ ಅನುಮತಿಯನ್ನೂ ಕೊಡುವುದಿಲ್ಲ.
+Clinical review is a separate step by a verified, invited account. It records a discussion; it does not execute advance care planning or authorise treatment.	ಕ್ಲಿನಿಕಲ್ ಪರಿಶೀಲನೆ ದೃಢೀಕರಣವಾದ, ಆಹ್ವಾನಿತ ಖಾತೆಯಿಂದ ನಡೆಯುವ ಪ್ರತ್ಯೇಕ ಹಂತ. ಇದು ಚರ್ಚೆಯನ್ನು ದಾಖಲಿಸುತ್ತದೆ; ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆಯನ್ನು ಜಾರಿಗೊಳಿಸುವುದಿಲ್ಲ, ಚಿಕಿತ್ಸೆಗೆ ಅನುಮತಿಯನ್ನೂ ಕೊಡುವುದಿಲ್ಲ.
 Shared clinician workspace	ಹಂಚಿಕೊಂಡ ಡಾಕ್ಟರ್ ಕಾರ್ಯಸ್ಥಳ
 Review conversation	ಮಾತುಕತೆ ಪರಿಶೀಲಿಸಿ
 Original words	ಮೂಲ ಪದಗಳು
@@ -2713,16 +2713,16 @@ Withholding or withdrawing life-sustaining treatment for a patient who cannot de
 Enter your full name.	ನಿಮ್ಮ ಪೂರ್ಣ ಹೆಸರು ಬರೆಯಿರಿ.
 Enter your date of birth.	ನಿಮ್ಮ ಹುಟ್ಟಿದ ದಿನಾಂಕ ಬರೆಯಿರಿ.
 Enter a real date of birth.	ಸರಿಯಾದ ಹುಟ್ಟಿದ ದಿನಾಂಕ ಬರೆಯಿರಿ.
-Only an adult (18 years or older) can make a living will.	ವಯಸ್ಕರು (18 ವರ್ಷ ಅಥವಾ ಹೆಚ್ಚು) ಮಾತ್ರ ಲಿವಿಂಗ್ ವಿಲ್ ಮಾಡಬಹುದು.
+Only an adult (18 years or older) can complete advance care planning.	ವಯಸ್ಕರು (18 ವರ್ಷ ಅಥವಾ ಹೆಚ್ಚು) ಮಾತ್ರ ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆಯನ್ನು ಪೂರ್ಣಗೊಳಿಸಬಹುದು.
 Enter only the last 4 digits of the ID.	ಗುರುತಿನ ಚೀಟಿಯ ಕೊನೆಯ 4 ಅಂಕೆಗಳನ್ನು ಮಾತ್ರ ಬರೆಯಿರಿ.
 Your address is empty. You will need to write it by hand on the paper.	ನಿಮ್ಮ ವಿಳಾಸ ಖಾಲಿ ಇದೆ. ನೀವು ಅದನ್ನು ಕಾಗದದ ಮೇಲೆ ಕೈಯಿಂದ ಬರೆಯಬೇಕಾಗುತ್ತದೆ.
 Confirm that you understand what this document means.	ಈ ದಾಖಲೆಯ ಅರ್ಥ ನಿಮಗೆ ತಿಳಿದಿದೆ ಎಂದು ದೃಢೀಕರಿಸಿ.
 Confirm that nobody is forcing or pressuring you.	ಯಾರೂ ನಿಮ್ಮ ಮೇಲೆ ಒತ್ತಾಯ ಅಥವಾ ಒತ್ತಡ ಹಾಕುತ್ತಿಲ್ಲ ಎಂದು ದೃಢೀಕರಿಸಿ.
 Confirm that you have thought about this carefully.	ನೀವು ಇದರ ಬಗ್ಗೆ ಎಚ್ಚರಿಕೆಯಿಂದ ಯೋಚಿಸಿದ್ದೀರಿ ಎಂದು ದೃಢೀಕರಿಸಿ.
 Confirm that you understand it will not be used if the situation is unclear or was not foreseen.	ಸ್ಥಿತಿ ಸ್ಪಷ್ಟವಿಲ್ಲದಿದ್ದರೆ ಅಥವಾ ಮೊದಲೇ ಊಹಿಸಿರದಿದ್ದರೆ ಇದನ್ನು ಬಳಸುವುದಿಲ್ಲ ಎಂದು ನಿಮಗೆ ತಿಳಿದಿದೆ ಎಂದು ದೃಢೀಕರಿಸಿ.
-Choose at least one situation when this living will applies.	ಈ ಲಿವಿಂಗ್ ವಿಲ್ ಅನ್ವಯಿಸುವ ಕನಿಷ್ಠ ಒಂದು ಸ್ಥಿತಿಯನ್ನು ಆರಿಸಿ.
+Choose at least one situation when these advance care planning wishes apply.	ಈ ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆಯ ಇಚ್ಛೆಗಳು ಅನ್ವಯಿಸುವ ಕನಿಷ್ಠ ಒಂದು ಸ್ಥಿತಿಯನ್ನು ಆರಿಸಿ.
 You have not chosen any specific treatment. The general direction in Section 2 will still apply.	ನೀವು ಯಾವುದೇ ನಿರ್ದಿಷ್ಟ ಚಿಕಿತ್ಸೆಯನ್ನು ಆರಿಸಿಲ್ಲ. ವಿಭಾಗ 2 ರಲ್ಲಿರುವ ಸಾಮಾನ್ಯ ನಿರ್ದೇಶನ ಆಗಲೂ ಅನ್ವಯಿಸುತ್ತದೆ.
-A living will cannot ask for anything meant to end life. That is against the law in India. Please change these words.	ಲಿವಿಂಗ್ ವಿಲ್‌ನಲ್ಲಿ ಜೀವವನ್ನು ಕೊನೆಗೊಳಿಸುವ ಉದ್ದೇಶದ ಯಾವುದನ್ನೂ ಕೇಳಲು ಸಾಧ್ಯವಿಲ್ಲ. ಅದು ಭಾರತದಲ್ಲಿ ಕಾನೂನಿಗೆ ವಿರುದ್ಧ. ದಯವಿಟ್ಟು ಈ ಪದಗಳನ್ನು ಬದಲಾಯಿಸಿ.
+Advance care planning cannot ask for anything meant to end life. That is against the law in India. Please change these words.	ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆಯಲ್ಲಿ ಜೀವವನ್ನು ಕೊನೆಗೊಳಿಸುವ ಉದ್ದೇಶದ ಯಾವುದನ್ನೂ ಕೇಳಲು ಸಾಧ್ಯವಿಲ್ಲ. ಅದು ಭಾರತದಲ್ಲಿ ಕಾನೂನಿಗೆ ವಿರುದ್ಧ. ದಯವಿಟ್ಟು ಈ ಪದಗಳನ್ನು ಬದಲಾಯಿಸಿ.
 Name at least one person who can speak for you (a representative).	ನಿಮ್ಮ ಪರವಾಗಿ ಮಾತನಾಡಬಲ್ಲ ಕನಿಷ್ಠ ಒಬ್ಬ ವ್ಯಕ್ತಿಯ (ಪ್ರತಿನಿಧಿ) ಹೆಸರು ಬರೆಯಿರಿ.
 It is better to name two representatives, in order of preference, in case the first cannot be reached.	ಮೊದಲನೆಯವರನ್ನು ಸಂಪರ್ಕಿಸಲಾಗದಿದ್ದರೆ ಎಂದು, ಇಬ್ಬರು ಪ್ರತಿನಿಧಿಗಳ ಹೆಸರುಗಳನ್ನು ಆದ್ಯತೆಯ ಕ್ರಮದಲ್ಲಿ ಬರೆಯುವುದು ಉತ್ತಮ.
 Representative $n: enter the full name.	ಪ್ರತಿನಿಧಿ $n: ಪೂರ್ಣ ಹೆಸರು ಬರೆಯಿರಿ.
@@ -2740,7 +2740,7 @@ The signing date cannot be in the future.	ಸಹಿ ಮಾಡಿದ ದಿನಾ
 The signing date is before this version was printed. Check you uploaded the right version.	ಸಹಿ ಮಾಡಿದ ದಿನಾಂಕ ಈ ಆವೃತ್ತಿ ಪ್ರಿಂಟ್ ಆದ ದಿನಕ್ಕಿಂತ ಮೊದಲಿನದು. ನೀವು ಸರಿಯಾದ ಆವೃತ್ತಿಯನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿದ್ದೀರಾ ಎಂದು ನೋಡಿ.
 Upload a photo or scan of the signed and attested paper.	ಸಹಿ ಮಾಡಿ ದೃಢೀಕರಿಸಿದ ಕಾಗದದ ಫೋಟೋ ಅಥವಾ ಸ್ಕ್ಯಾನ್ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.
 Enter the name of witness $n.	ಸಾಕ್ಷಿ $n ಅವರ ಹೆಸರು ಬರೆಯಿರಿ.
-The person making the living will cannot be their own witness.	ಲಿವಿಂಗ್ ವಿಲ್ ಮಾಡುವ ವ್ಯಕ್ತಿ ತಮ್ಮದೇ ಸಾಕ್ಷಿಯಾಗಲು ಸಾಧ್ಯವಿಲ್ಲ.
+The person doing the advance care planning cannot be their own witness.	ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ ಮಾಡುವ ವ್ಯಕ್ತಿ ತಮ್ಮದೇ ಸಾಕ್ಷಿಯಾಗಲು ಸಾಧ್ಯವಿಲ್ಲ.
 Witness $n is also a named representative. Witnesses should preferably be independent.	ಸಾಕ್ಷಿ $n ಹೆಸರಿಸಿದ ಪ್ರತಿನಿಧಿಯೂ ಆಗಿದ್ದಾರೆ. ಸಾಕ್ಷಿಗಳು ಸಾಧ್ಯವಾದರೆ ಸ್ವತಂತ್ರರಾಗಿರಬೇಕು.
 Witness $n: enter only the last 4 digits of the ID.	ಸಾಕ್ಷಿ $n: ಗುರುತಿನ ಚೀಟಿಯ ಕೊನೆಯ 4 ಅಂಕೆಗಳನ್ನು ಮಾತ್ರ ಬರೆಯಿರಿ.
 The two witnesses must be two different people.	ಇಬ್ಬರು ಸಾಕ್ಷಿಗಳು ಬೇರೆ ಬೇರೆ ವ್ಯಕ್ತಿಗಳಾಗಿರಬೇಕು.
@@ -2751,21 +2751,21 @@ Record the custodian: acknowledged, or \"custodian pending\".	ಪಾಲಕರನ
 Enter the custodian officer’s name and the date they acknowledged it.	ಪಾಲಕ ಅಧಿಕಾರಿಯ ಹೆಸರು ಮತ್ತು ಅವರು ಸ್ವೀಕೃತಿ ನೀಡಿದ ದಿನಾಂಕ ಬರೆಯಿರಿ.
 Tick consent before linking to ABHA.	ABHA ಗೆ ಜೋಡಿಸುವ ಮೊದಲು ಒಪ್ಪಿಗೆಗೆ ಟಿಕ್ ಮಾಡಿ.
 Enter an ABHA address like name@abdm, or the 14-digit ABHA number.	name@abdm ಹಾಗೆ ABHA ವಿಳಾಸ, ಅಥವಾ 14 ಅಂಕೆಗಳ ABHA ನಂಬರ್ ಬರೆಯಿರಿ.
-A living will is cancelled in writing. Tick that the person signed a written cancellation.	ಲಿವಿಂಗ್ ವಿಲ್ ಅನ್ನು ಲಿಖಿತವಾಗಿ ರದ್ದುಪಡಿಸಲಾಗುತ್ತದೆ. ವ್ಯಕ್ತಿ ಲಿಖಿತ ರದ್ದತಿಗೆ ಸಹಿ ಮಾಡಿದ್ದಾರೆ ಎಂದು ಟಿಕ್ ಮಾಡಿ.
+Advance care planning is cancelled in writing. Tick that the person signed a written cancellation.	ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆಯನ್ನು ಲಿಖಿತವಾಗಿ ರದ್ದುಪಡಿಸಲಾಗುತ್ತದೆ. ವ್ಯಕ್ತಿ ಲಿಖಿತ ರದ್ದತಿಗೆ ಸಹಿ ಮಾಡಿದ್ದಾರೆ ಎಂದು ಟಿಕ್ ಮಾಡಿ.
 Enter the date of the written cancellation.	ಲಿಖಿತ ರದ್ದತಿಯ ದಿನಾಂಕ ಬರೆಯಿರಿ.
 The date cannot be in the future.	ದಿನಾಂಕ ಭವಿಷ್ಯದ್ದಾಗಿರಲು ಸಾಧ್ಯವಿಲ್ಲ.
-No living will (AMD)	ಲಿವಿಂಗ್ ವಿಲ್ (AMD) ಇಲ್ಲ
+No advance care planning	ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ ಇಲ್ಲ
 No AMD; earlier wishes noted	AMD ಇಲ್ಲ; ಮೊದಲಿನ ಇಚ್ಛೆಗಳನ್ನು ದಾಖಲಿಸಲಾಗಿದೆ
-Valid living will (AMD)	ಮಾನ್ಯ ಲಿವಿಂಗ್ ವಿಲ್ (AMD)
+Valid advance care planning	ಮಾನ್ಯ ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ
 held at	ಇರಿಸಿರುವವರು
 attested by	ದೃಢೀಕರಿಸಿದವರು
-Living will (AMD) executed in Sahara	Sahara ದಲ್ಲಿ ಜಾರಿಗೊಳಿಸಿದ ಲಿವಿಂಗ್ ವಿಲ್ (AMD)
+Advance care planning executed in Sahara	Sahara ದಲ್ಲಿ ಜಾರಿಗೊಳಿಸಿದ ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ
 version $version	ಆವೃತ್ತಿ $version
 signed $signed	ಸಹಿ $signed
 Also on this plan	ಈ ಯೋಜನೆಯಲ್ಲಿಯೂ ಇದೆ
-Living will cancelled in writing	ಲಿವಿಂಗ್ ವಿಲ್ ಅನ್ನು ಲಿಖಿತವಾಗಿ ರದ್ದುಪಡಿಸಲಾಗಿದೆ
+Advance care planning cancelled in writing	ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆಯನ್ನು ಲಿಖಿತವಾಗಿ ರದ್ದುಪಡಿಸಲಾಗಿದೆ
 This plan still lists one. Check with the decision-maker	ಈ ಯೋಜನೆ ಈಗಲೂ ಒಂದನ್ನು ತೋರಿಸುತ್ತದೆ. ನಿರ್ಧಾರ ಕೈಗೊಳ್ಳುವವರನ್ನು ಕೇಳಿ
-Living will in Sahara is not signed and attested, so it is not valid	Sahara ದಲ್ಲಿನ ಲಿವಿಂಗ್ ವಿಲ್‌ಗೆ ಸಹಿ ಮತ್ತು ದೃಢೀಕರಣ ಆಗಿಲ್ಲ, ಆದ್ದರಿಂದ ಅದು ಮಾನ್ಯವಲ್ಲ
+Advance care planning in Sahara is not signed and attested, so it is not valid	Sahara ದಲ್ಲಿನ ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆಗೆ ಸಹಿ ಮತ್ತು ದೃಢೀಕರಣ ಆಗಿಲ್ಲ, ಆದ್ದರಿಂದ ಅದು ಮಾನ್ಯವಲ್ಲ
 Section 1: Personal details	ವಿಭಾಗ 1: ವೈಯಕ್ತಿಕ ವಿವರಗಳು
 Section 2: Directions relating to life-sustaining treatment	ವಿಭಾಗ 2: ಜೀವರಕ್ಷಕ ಚಿಕಿತ್ಸೆಗೆ ಸಂಬಂಧಿಸಿದ ನಿರ್ದೇಶನಗಳು
 Section 3 (Optional): Wishes or desires during end-of-life care	ವಿಭಾಗ 3 (ಐಚ್ಛಿಕ): ಜೀವನದ ಕೊನೆಯ ಆರೈಕೆಯಲ್ಲಿನ ಇಚ್ಛೆಗಳು
@@ -2884,18 +2884,18 @@ Notes	ಟಿಪ್ಪಣಿಗಳು
 Tick a box or write what happened.	ಒಂದು ಬಾಕ್ಸ್ ಆರಿಸಿ ಅಥವಾ ಏನಾಯಿತು ಎಂದು ಬರೆಯಿರಿ.
 Save the incident	ಘಟನೆ ಉಳಿಸಿ
 The PDF could not be made. Try again.	PDF ಮಾಡಲು ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
-Living will	ಲಿವಿಂಗ್ ವಿಲ್
-This follows the model living will by the Vidhi Centre for Legal Policy and ACP India, and the Supreme Court’s rules (2018, changed on 24 January 2023). If both a living will and an emergency plan exist, the living will governs.	ಇದು ವಿಧಿ ಸೆಂಟರ್ ಫಾರ್ ಲೀಗಲ್ ಪಾಲಿಸಿ ಮತ್ತು ACP ಇಂಡಿಯಾದ ಮಾದರಿ ಲಿವಿಂಗ್ ವಿಲ್, ಮತ್ತು ಸುಪ್ರೀಂ ಕೋರ್ಟ್‌ನ ನಿಯಮಗಳನ್ನು (2018, 24 ಜನವರಿ 2023 ರಂದು ಬದಲಾಯಿಸಲಾಗಿದೆ) ಆಧರಿಸಿದೆ. ಲಿವಿಂಗ್ ವಿಲ್ ಮತ್ತು ತುರ್ತು ಯೋಜನೆ ಎರಡೂ ಇದ್ದರೆ, ಲಿವಿಂಗ್ ವಿಲ್ ಮೇಲುಗೈ ಪಡೆಯುತ್ತದೆ.
+Advance care planning	ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ
+This follows the model advance care planning document by the Vidhi Centre for Legal Policy and ACP India, and the Supreme Court’s rules (2018, changed on 24 January 2023). If both advance care planning and an emergency plan exist, the advance care planning governs.	ಇದು ವಿಧಿ ಸೆಂಟರ್ ಫಾರ್ ಲೀಗಲ್ ಪಾಲಿಸಿ ಮತ್ತು ACP ಇಂಡಿಯಾದ ಮಾದರಿ ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ ದಾಖಲೆ, ಮತ್ತು ಸುಪ್ರೀಂ ಕೋರ್ಟ್‌ನ ನಿಯಮಗಳನ್ನು (2018, 24 ಜನವರಿ 2023 ರಂದು ಬದಲಾಯಿಸಲಾಗಿದೆ) ಆಧರಿಸಿದೆ. ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ ಮತ್ತು ತುರ್ತು ಯೋಜನೆ ಎರಡೂ ಇದ್ದರೆ, ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆಗೆ ಮೇಲುಗೈ.
 What happens if treatment is to be held back or stopped (information only)	ಚಿಕಿತ್ಸೆಯನ್ನು ತಡೆಹಿಡಿಯಬೇಕಾದರೆ ಅಥವಾ ನಿಲ್ಲಿಸಬೇಕಾದರೆ ಏನಾಗುತ್ತದೆ (ಮಾಹಿತಿಗಾಗಿ ಮಾತ್ರ)
-The living will was cancelled in writing on $on. It no longer applies.	ಲಿವಿಂಗ್ ವಿಲ್ ಅನ್ನು $on ರಂದು ಲಿಖಿತವಾಗಿ ರದ್ದುಪಡಿಸಲಾಗಿದೆ. ಇದು ಇನ್ನು ಅನ್ವಯಿಸುವುದಿಲ್ಲ.
-A living will has been started or printed but is not signed and recorded. It is not valid.	ಲಿವಿಂಗ್ ವಿಲ್ ಆರಂಭಿಸಲಾಗಿದೆ ಅಥವಾ ಪ್ರಿಂಟ್ ಮಾಡಲಾಗಿದೆ, ಆದರೆ ಸಹಿ ಮಾಡಿ ದಾಖಲಿಸಿಲ್ಲ. ಇದು ಮಾನ್ಯವಲ್ಲ.
-No living will is recorded in Sahara. Ask the family if a signed paper exists.	Sahara ದಲ್ಲಿ ಯಾವ ಲಿವಿಂಗ್ ವಿಲ್ ಕೂಡ ದಾಖಲಾಗಿಲ್ಲ. ಸಹಿ ಮಾಡಿದ ಕಾಗದ ಇದೆಯೇ ಎಂದು ಕುಟುಂಬವನ್ನು ಕೇಳಿ.
-Make a new living will	ಹೊಸ ಲಿವಿಂಗ್ ವಿಲ್ ಮಾಡಿ
-Start a living will	ಲಿವಿಂಗ್ ವಿಲ್ ಆರಂಭಿಸಿ
+The advance care planning was cancelled in writing on $on. It no longer applies.	ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆಯನ್ನು $on ರಂದು ಲಿಖಿತವಾಗಿ ರದ್ದುಪಡಿಸಲಾಗಿದೆ. ಇದು ಇನ್ನು ಅನ್ವಯಿಸುವುದಿಲ್ಲ.
+Advance care planning has been started or printed but is not signed and recorded. It is not valid.	ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ ಆರಂಭಿಸಲಾಗಿದೆ ಅಥವಾ ಪ್ರಿಂಟ್ ಮಾಡಲಾಗಿದೆ, ಆದರೆ ಸಹಿ ಮಾಡಿ ದಾಖಲಿಸಿಲ್ಲ. ಇದು ಮಾನ್ಯವಲ್ಲ.
+No advance care planning is recorded in Sahara. Ask the family if a signed paper exists.	Sahara ದಲ್ಲಿ ಯಾವ ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ ಕೂಡ ದಾಖಲಾಗಿಲ್ಲ. ಸಹಿ ಮಾಡಿದ ಕಾಗದ ಇದೆಯೇ ಎಂದು ಕುಟುಂಬವನ್ನು ಕೇಳಿ.
+Make new advance care planning	ಹೊಸ ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ ಮಾಡಿ
+Start advance care planning	ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ ಆರಂಭಿಸಿ
 ID document	ಗುರುತಿನ ದಾಖಲೆ
 Last 4 digits only	ಕೊನೆಯ 4 ಅಂಕೆಗಳು ಮಾತ್ರ
 Never type the full number here. Write it by hand on the paper.	ಪೂರ್ಣ ನಂಬರ್ ಅನ್ನು ಇಲ್ಲಿ ಎಂದಿಗೂ ಬರೆಯಬೇಡಿ. ಅದನ್ನು ಕಾಗದದ ಮೇಲೆ ಕೈಯಿಂದ ಬರೆಯಿರಿ.
-Living will v$version · $status	ಲಿವಿಂಗ್ ವಿಲ್ v$version · $status
+Advance care planning v$version · $status	ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ v$version · $status
 Full name	ಪೂರ್ಣ ಹೆಸರು
 Gender	ಜೆಂಡರ್
 Date of birth	ಹುಟ್ಟಿದ ದಿನಾಂಕ
@@ -2928,7 +2928,7 @@ Add another representative	ಇನ್ನೊಬ್ಬ ಪ್ರತಿನಿಧಿ�
 They must decide together (instead of in order).	ಅವರು (ಕ್ರಮದ ಬದಲು) ಒಟ್ಟಾಗಿ ನಿರ್ಧರಿಸಬೇಕು.
 Family doctor (optional)	ಕುಟುಂಬದ ಡಾಕ್ಟರ್ (ಐಚ್ಛಿಕ)
 Phone	ಫೋನ್
-Local body that keeps living wills (custodian)	ಲಿವಿಂಗ್ ವಿಲ್‌ಗಳನ್ನು ಇಟ್ಟುಕೊಳ್ಳುವ ಸ್ಥಳೀಯ ಸಂಸ್ಥೆ (ಪಾಲಕರು)
+Local body that keeps advance care planning records (custodian)	ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆಯ ದಾಖಲೆಗಳನ್ನು ಇಟ್ಟುಕೊಳ್ಳುವ ಸ್ಥಳೀಯ ಸಂಸ್ಥೆ (ಪಾಲಕರು)
 For example your municipal corporation or gram panchayat. Maharashtra and Karnataka (rural) have named custodians; Andhra Pradesh has not confirmed one yet. You can still sign and record “custodian pending”.	ಉದಾಹರಣೆಗೆ ನಿಮ್ಮ ನಗರ ಪಾಲಿಕೆ ಅಥವಾ ಗ್ರಾಮ ಪಂಚಾಯಿತಿ. ಮಹಾರಾಷ್ಟ್ರ ಮತ್ತು ಕರ್ನಾಟಕ (ಗ್ರಾಮೀಣ) ಪಾಲಕರನ್ನು ಹೆಸರಿಸಿವೆ; ಆಂಧ್ರ ಪ್ರದೇಶ ಇನ್ನೂ ದೃಢಪಡಿಸಿಲ್ಲ. ನೀವು ಆಗಲೂ ಸಹಿ ಮಾಡಿ “ಪಾಲಕರು ಬಾಕಿ” ಎಂದು ದಾಖಲಿಸಬಹುದು.
 I am a registered organ donor (Form 7, THOTA 1994).	ನಾನು ನೋಂದಾಯಿತ ಅಂಗದಾನಿ (ಫಾರ್ಮ್ 7, THOTA 1994).
 I want to donate my body for medical study.	ನಾನು ವೈದ್ಯಕೀಯ ಅಧ್ಯಯನಕ್ಕಾಗಿ ನನ್ನ ದೇಹವನ್ನು ದಾನ ಮಾಡಲು ಬಯಸುತ್ತೇನೆ.
@@ -2973,9 +2973,9 @@ That file could not be read. Try another.	ಆ ಫೈಲ್ ಓದಲು ಆಗ�
 Record as signed and attested	ಸಹಿ ಮಾಡಿ ದೃಢೀಕರಿಸಿದ್ದು ಎಂದು ದಾಖಲಿಸಿ
 Need to change something? Start a new version. This printed copy must then not be signed.	ಏನಾದರೂ ಬದಲಾಯಿಸಬೇಕೇ? ಹೊಸ ಆವೃತ್ತಿ ಆರಂಭಿಸಿ. ಆಗ ಪ್ರಿಂಟ್ ಮಾಡಿದ ಈ ಪ್ರತಿಗೆ ಸಹಿ ಮಾಡಬಾರದು.
 Start a new version	ಹೊಸ ಆವೃತ್ತಿ ಆರಂಭಿಸಿ
-Signed living will · version $version	ಸಹಿ ಮಾಡಿದ ಲಿವಿಂಗ್ ವಿಲ್ · ಆವೃತ್ತಿ $version
+Signed advance care planning · version $version	ಸಹಿ ಮಾಡಿದ ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ · ಆವೃತ್ತಿ $version
 Check the paper copy against the scan and its SHA-256, or with the custodian. Doctors only read this here; nothing in the app starts or stops treatment.	ಕಾಗದದ ಪ್ರತಿಯನ್ನು ಸ್ಕ್ಯಾನ್ ಮತ್ತು ಅದರ SHA-256 ಜೊತೆ, ಅಥವಾ ಪಾಲಕರ ಜೊತೆ ತಾಳೆ ನೋಡಿ. ಡಾಕ್ಟರ್‌ಗಳು ಇದನ್ನು ಇಲ್ಲಿ ಓದುವುದು ಮಾತ್ರ; ಆ್ಯಪ್‌ನಲ್ಲಿ ಯಾವುದೂ ಚಿಕಿತ್ಸೆಯನ್ನು ಆರಂಭಿಸುವುದಿಲ್ಲ ಅಥವಾ ನಿಲ್ಲಿಸುವುದಿಲ್ಲ.
-This is the current living will. Doctors can see that it is signed, witnessed and attested.	ಇದು ಈಗಿನ ಲಿವಿಂಗ್ ವಿಲ್. ಇದು ಸಹಿ ಮಾಡಲ್ಪಟ್ಟಿದೆ, ಸಾಕ್ಷಿಗಳ ಮುಂದೆ ಆಗಿದೆ ಮತ್ತು ದೃಢೀಕರಿಸಲ್ಪಟ್ಟಿದೆ ಎಂದು ಡಾಕ್ಟರ್‌ಗಳು ನೋಡಬಹುದು.
+This is the current advance care planning. Doctors can see that it is signed, witnessed and attested.	ಇದು ಈಗಿನ ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ. ಇದು ಸಹಿ ಮಾಡಲ್ಪಟ್ಟಿದೆ, ಸಾಕ್ಷಿಗಳ ಮುಂದೆ ಆಗಿದೆ ಮತ್ತು ದೃಢೀಕರಿಸಲ್ಪಟ್ಟಿದೆ ಎಂದು ಡಾಕ್ಟರ್‌ಗಳು ನೋಡಬಹುದು.
 thumb impression	ಹೆಬ್ಬೆರಳಿನ ಗುರುತು
 Witnesses	ಸಾಕ್ಷಿಗಳು
 Acknowledged by $officer on $on	$officer ಅವರು $on ರಂದು ಸ್ವೀಕೃತಿ ನೀಡಿದ್ದಾರೆ
@@ -2996,20 +2996,20 @@ Copy given	ಪ್ರತಿ ನೀಡಲಾಗಿದೆ
 Consent is needed before this copy can be marked as given.	ಈ ಪ್ರತಿಯನ್ನು ನೀಡಲಾಗಿದೆ ಎಂದು ಗುರುತಿಸುವ ಮೊದಲು ಒಪ್ಪಿಗೆ ಬೇಕು.
 Save custodian	ಪಾಲಕರನ್ನು ಉಳಿಸಿ
 Link to ABHA health records (optional)	ABHA ಆರೋಗ್ಯ ದಾಖಲೆಗಳಿಗೆ ಜೋಡಿಸಿ (ಐಚ್ಛಿಕ)
-The Supreme Court allows adding the living will to digital health records. Sahara only notes the ABHA address here; upload the scan in your ABHA app yourself.	ಲಿವಿಂಗ್ ವಿಲ್ ಅನ್ನು ಡಿಜಿಟಲ್ ಆರೋಗ್ಯ ದಾಖಲೆಗಳಿಗೆ ಸೇರಿಸಲು ಸುಪ್ರೀಂ ಕೋರ್ಟ್ ಅನುಮತಿ ನೀಡುತ್ತದೆ. ಸಹಾರಾ ಇಲ್ಲಿ ABHA ವಿಳಾಸವನ್ನು ಮಾತ್ರ ಗುರುತಿಸಿಕೊಳ್ಳುತ್ತದೆ; ಸ್ಕ್ಯಾನ್ ಅನ್ನು ನಿಮ್ಮ ABHA ಆ್ಯಪ್‌ನಲ್ಲಿ ನೀವೇ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.
+The Supreme Court allows adding advance care planning to digital health records. Sahara only notes the ABHA address here; upload the scan in your ABHA app yourself.	ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆಯನ್ನು ಡಿಜಿಟಲ್ ಆರೋಗ್ಯ ದಾಖಲೆಗಳಿಗೆ ಸೇರಿಸಲು ಸುಪ್ರೀಂ ಕೋರ್ಟ್ ಅನುಮತಿ ನೀಡುತ್ತದೆ. ಸಹಾರಾ ಇಲ್ಲಿ ABHA ವಿಳಾಸವನ್ನು ಮಾತ್ರ ಗುರುತಿಸಿಕೊಳ್ಳುತ್ತದೆ; ಸ್ಕ್ಯಾನ್ ಅನ್ನು ನಿಮ್ಮ ABHA ಆ್ಯಪ್‌ನಲ್ಲಿ ನೀವೇ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.
 ABHA address or number	ABHA ವಿಳಾಸ ಅಥವಾ ನಂಬರ್
-The patient agrees to link the living will with their ABHA records.	ಲಿವಿಂಗ್ ವಿಲ್ ಅನ್ನು ತಮ್ಮ ABHA ದಾಖಲೆಗಳಿಗೆ ಜೋಡಿಸಲು ರೋಗಿ ಒಪ್ಪಿದ್ದಾರೆ.
+The patient agrees to link the advance care planning with their ABHA records.	ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆಯನ್ನು ತಮ್ಮ ABHA ದಾಖಲೆಗಳಿಗೆ ಜೋಡಿಸಲು ರೋಗಿ ಒಪ್ಪಿದ್ದಾರೆ.
 Save ABHA link	ABHA ಲಿಂಕ್ ಉಳಿಸಿ
 Linked on $on	$on ರಂದು ಜೋಡಿಸಲಾಗಿದೆ
 Change it	ಇದನ್ನು ಬದಲಾಯಿಸಿ
 Changes make a new version that must be printed, signed and attested again. Version $version stays current until then.	ಬದಲಾವಣೆಗಳಿಂದ ಹೊಸ ಆವೃತ್ತಿ ಆಗುತ್ತದೆ, ಅದನ್ನು ಮತ್ತೆ ಪ್ರಿಂಟ್ ಮಾಡಿ, ಸಹಿ ಮಾಡಿ, ದೃಢೀಕರಿಸಬೇಕು. ಅಲ್ಲಿಯವರೆಗೆ ಆವೃತ್ತಿ $version ಈಗಿನದಾಗಿ ಉಳಿಯುತ್ತದೆ.
 A new version is already in progress below.	ಹೊಸ ಆವೃತ್ತಿ ಕೆಳಗೆ ಈಗಾಗಲೇ ನಡೆಯುತ್ತಿದೆ.
 Cancel it	ಇದನ್ನು ರದ್ದುಪಡಿಸಿ
-A living will is cancelled in writing: the person signs a short note saying they cancel it, the same way it was made. Then give the note to everyone who has a copy.	ಲಿವಿಂಗ್ ವಿಲ್ ಅನ್ನು ಲಿಖಿತವಾಗಿ ರದ್ದುಪಡಿಸಲಾಗುತ್ತದೆ: ಅದನ್ನು ಮಾಡಿದ ರೀತಿಯಲ್ಲೇ, ವ್ಯಕ್ತಿ ತಾನು ಇದನ್ನು ರದ್ದುಪಡಿಸುತ್ತಿದ್ದೇನೆ ಎಂದು ಹೇಳುವ ಚಿಕ್ಕ ಟಿಪ್ಪಣಿಗೆ ಸಹಿ ಮಾಡುತ್ತಾರೆ. ನಂತರ ಆ ಟಿಪ್ಪಣಿಯನ್ನು ಪ್ರತಿ ಹೊಂದಿರುವ ಎಲ್ಲರಿಗೂ ನೀಡಿ.
+Advance care planning is cancelled in writing: the person signs a short note saying they cancel it, the same way it was made. Then give the note to everyone who has a copy.	ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆಯನ್ನು ಲಿಖಿತವಾಗಿ ರದ್ದುಪಡಿಸಲಾಗುತ್ತದೆ: ಅದನ್ನು ಮಾಡಿದ ರೀತಿಯಲ್ಲೇ, ವ್ಯಕ್ತಿ ತಾನು ಇದನ್ನು ರದ್ದುಪಡಿಸುತ್ತಿದ್ದೇನೆ ಎಂದು ಹೇಳುವ ಚಿಕ್ಕ ಟಿಪ್ಪಣಿಗೆ ಸಹಿ ಮಾಡುತ್ತಾರೆ. ನಂತರ ಆ ಟಿಪ್ಪಣಿಯನ್ನು ಪ್ರತಿ ಹೊಂದಿರುವ ಎಲ್ಲರಿಗೂ ನೀಡಿ.
 Record a written cancellation	ಲಿಖಿತ ರದ್ದತಿಯನ್ನು ದಾಖಲಿಸಿ
 Date of the written cancellation	ಲಿಖಿತ ರದ್ದತಿಯ ದಿನಾಂಕ
 The person signed a written cancellation.	ವ್ಯಕ್ತಿ ಲಿಖಿತ ರದ್ದತಿಗೆ ಸಹಿ ಮಾಡಿದ್ದಾರೆ.
-Cancel the living will	ಲಿವಿಂಗ್ ವಿಲ್ ರದ್ದುಪಡಿಸಿ
+Cancel the advance care planning	ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ ರದ್ದುಪಡಿಸಿ
 Sahara plans are for adults. This date of birth is under 18.	ಸಹಾರಾ ಯೋಜನೆಗಳು ವಯಸ್ಕರಿಗಾಗಿ. ಈ ಹುಟ್ಟಿದ ದಿನಾಂಕ 18 ವರ್ಷಕ್ಕಿಂತ ಕಡಿಮೆ.
 Started in the emergency department. A plan made for the first time in the resuscitation bay records panic, not preference; review it when the patient is stable.	ತುರ್ತು ವಿಭಾಗದಲ್ಲಿ ಆರಂಭವಾಯಿತು. ಪುನರುಜ್ಜೀವನ ಕೊಠಡಿಯಲ್ಲಿ ಮೊದಲ ಬಾರಿ ಮಾಡಿದ ಯೋಜನೆ ಭಯವನ್ನು ದಾಖಲಿಸುತ್ತದೆ, ಇಚ್ಛೆಯನ್ನಲ್ಲ; ರೋಗಿಯ ಸ್ಥಿತಿ ಸ್ಥಿರವಾದಾಗ ಇದನ್ನು ಮತ್ತೆ ಪರಿಶೀಲಿಸಿ.
 Keep only the last 4 characters of an ID, never the full number.	ಗುರುತಿನ ಚೀಟಿಯ ಕೊನೆಯ 4 ಅಕ್ಷರ ಅಥವಾ ಅಂಕೆಗಳನ್ನು ಮಾತ್ರ ಇಟ್ಟುಕೊಳ್ಳಿ, ಪೂರ್ಣ ನಂಬರ್ ಎಂದಿಗೂ ಬೇಡ.
@@ -3120,8 +3120,8 @@ Has capacity	ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವ ಸ�
 Has capacity, has asked family to decide	ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವ ಸಾಮರ್ಥ್ಯ ಇದೆ, ಕುಟುಂಬ ನಿರ್ಧರಿಸಲಿ ಎಂದು ಕೇಳಿದ್ದಾರೆ
 Capacity fluctuates — reassess	ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವ ಸಾಮರ್ಥ್ಯ ಏರಿಳಿಯುತ್ತದೆ — ಮರುಪರಿಶೀಲಿಸಿ
 Lacks capacity	ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವ ಸಾಮರ್ಥ್ಯ ಇಲ್ಲ
-Named in a signed living will	ಸಹಿ ಮಾಡಿದ ಲಿವಿಂಗ್ ವಿಲ್‌ನಲ್ಲಿ ಹೆಸರಿಸಲಾಗಿದೆ
-Named by the patient (no living will)	ರೋಗಿ ಹೆಸರಿಸಿದ್ದಾರೆ (ಲಿವಿಂಗ್ ವಿಲ್ ಇಲ್ಲ)
+Named in signed advance care planning	ಸಹಿ ಮಾಡಿದ ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆಯಲ್ಲಿ ಹೆಸರಿಸಲಾಗಿದೆ
+Named by the patient (no advance care planning)	ರೋಗಿ ಹೆಸರಿಸಿದ್ದಾರೆ (ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ ಇಲ್ಲ)
 Next of kin / next friend / guardian	ಹತ್ತಿರದ ಸಂಬಂಧಿ / ಹತ್ತಿರದ ಸ್ನೇಹಿತ / ಪಾಲಕ
 Court-appointed guardian	ನ್ಯಾಯಾಲಯ ನೇಮಿಸಿದ ಪಾಲಕ
 Aadhaar	ಆಧಾರ್
@@ -3178,7 +3178,6 @@ Implanted device	ದೇಹದಲ್ಲಿ ಅಳವಡಿಸಿದ ಸಾಧನ
 Decision-maker (24 h phone)	ನಿರ್ಧಾರ ಕೈಗೊಳ್ಳುವವರು (24 ಗಂಟೆ ಫೋನ್)
 Treating consultant and palliative contact	ಚಿಕಿತ್ಸೆ ನೀಡುವ ಕನ್ಸಲ್ಟೆಂಟ್ ಮತ್ತು ಪ್ಯಾಲಿಯೇಟಿವ್ ಸಂಪರ್ಕ
 Capacity	ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವ ಸಾಮರ್ಥ್ಯ
-Living will (AMD)	ಲಿವಿಂಗ್ ವಿಲ್ (AMD)
 Version, signed, review due	ಆವೃತ್ತಿ, ಸಹಿ, ಪರಿಶೀಲನೆ ಬಾಕಿ
 If unclear, or the problem is new and reversible — treat fully and call.	ಸ್ಪಷ್ಟವಿಲ್ಲದಿದ್ದರೆ, ಅಥವಾ ಸಮಸ್ಯೆ ಹೊಸದು ಮತ್ತು ಗುಣವಾಗಬಹುದಾದದ್ದಾದರೆ — ಪೂರ್ಣ ಚಿಕಿತ್ಸೆ ನೀಡಿ ಮತ್ತು ಫೋನ್ ಮಾಡಿ.
 Full record	ಪೂರ್ಣ ದಾಖಲೆ
@@ -3208,9 +3207,9 @@ Your rights	ನಿಮ್ಮ ಹಕ್ಕುಗಳು
 Name, hospital number, date of birth, address and phone. The people who decide for the patient. Illness details, treatment choices, the patient’s own words and signatures. A log of who opened or changed the plan.	ಹೆಸರು, ಆಸ್ಪತ್ರೆ ನಂಬರ್, ಹುಟ್ಟಿದ ದಿನಾಂಕ, ವಿಳಾಸ ಮತ್ತು ಫೋನ್. ರೋಗಿಯ ಪರವಾಗಿ ನಿರ್ಧರಿಸುವ ಜನರು. ಕಾಯಿಲೆಯ ವಿವರಗಳು, ಚಿಕಿತ್ಸೆಯ ಆಯ್ಕೆಗಳು, ರೋಗಿಯ ಸ್ವಂತ ಮಾತುಗಳು ಮತ್ತು ಸಹಿಗಳು. ಯೋಜನೆಯನ್ನು ಯಾರು ತೆರೆದರು ಅಥವಾ ಬದಲಾಯಿಸಿದರು ಎಂಬ ದಾಖಲೆ.
 Your name, date of birth, address and the last 4 digits of your ID. Your representatives and witnesses. Your treatment wishes. The signed scan and its fingerprint (SHA-256). A log of each change, print and share.	ನಿಮ್ಮ ಹೆಸರು, ಹುಟ್ಟಿದ ದಿನಾಂಕ, ವಿಳಾಸ ಮತ್ತು ಗುರುತಿನ ಚೀಟಿಯ ಕೊನೆಯ 4 ಅಂಕೆಗಳು. ನಿಮ್ಮ ಪ್ರತಿನಿಧಿಗಳು ಮತ್ತು ಸಾಕ್ಷಿಗಳು. ನಿಮ್ಮ ಚಿಕಿತ್ಸೆಯ ಇಚ್ಛೆಗಳು. ಸಹಿ ಮಾಡಿದ ಸ್ಕ್ಯಾನ್ ಮತ್ತು ಅದರ ಫಿಂಗರ್‌ಪ್ರಿಂಟ್ (SHA-256). ಪ್ರತಿ ಬದಲಾವಣೆ, ಪ್ರಿಂಟ್ ಮತ್ತು ಹಂಚಿಕೆಯ ದಾಖಲೆ.
 So that an emergency doctor can find and follow the patient’s wishes, and the care team can review them.	ತುರ್ತು ಡಾಕ್ಟರ್ ರೋಗಿಯ ಇಚ್ಛೆಗಳನ್ನು ಕಂಡು ಅನುಸರಿಸಲು, ಮತ್ತು ಆರೈಕೆ ತಂಡ ಅವನ್ನು ಪರಿಶೀಲಿಸಲು.
-To make your living will paper, keep track of its versions, and show doctors that it exists.	ನಿಮ್ಮ ಲಿವಿಂಗ್ ವಿಲ್ ಕಾಗದವನ್ನು ಮಾಡಲು, ಅದರ ಆವೃತ್ತಿಗಳ ಲೆಕ್ಕ ಇಡಲು, ಮತ್ತು ಅದು ಇದೆ ಎಂದು ಡಾಕ್ಟರ್‌ಗಳಿಗೆ ತೋರಿಸಲು.
+To write down your advance care planning, keep track of its versions, and show doctors that it exists.	ನಿಮ್ಮ ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆಯನ್ನು ಬರೆದಿಡಲು, ಅದರ ಆವೃತ್ತಿಗಳ ಲೆಕ್ಕ ಇಡಲು, ಮತ್ತು ಅದು ಇದೆ ಎಂದು ಡಾಕ್ಟರ್‌ಗಳಿಗೆ ತೋರಿಸಲು.
 On this phone. It leaves this phone only in two cases. When a plan is signed, an emergency card is issued and a copy of the signed plan goes to the Sahara server so the QR code works. If an SMS is sent, the phone number goes to the SMS company.	ಈ ಫೋನ್‌ನಲ್ಲಿ. ಇದು ಎರಡು ಸಂದರ್ಭಗಳಲ್ಲಿ ಮಾತ್ರ ಈ ಫೋನ್ ಬಿಟ್ಟು ಹೋಗುತ್ತದೆ. ಯೋಜನೆಗೆ ಸಹಿ ಮಾಡಿದಾಗ, ತುರ್ತು ಕಾರ್ಡ್ ನೀಡಲಾಗುತ್ತದೆ ಮತ್ತು ಸಹಿ ಮಾಡಿದ ಯೋಜನೆಯ ಪ್ರತಿ Sahara ಸರ್ವರ್‌ಗೆ ಹೋಗುತ್ತದೆ, ಆಗ QR ಕೋಡ್ ಕೆಲಸ ಮಾಡುತ್ತದೆ. SMS ಕಳುಹಿಸಿದರೆ, ಫೋನ್ ನಂಬರ್ SMS ಕಂಪನಿಗೆ ಹೋಗುತ್ತದೆ.
-On this phone. It is not sent to any server. If an emergency card is issued, the card carries only the living will’s status, date, version and attesting officer. You decide who gets a paper copy.	ಈ ಫೋನ್‌ನಲ್ಲಿ. ಇದನ್ನು ಯಾವುದೇ ಸರ್ವರ್‌ಗೆ ಕಳುಹಿಸುವುದಿಲ್ಲ. ತುರ್ತು ಕಾರ್ಡ್ ನೀಡಿದರೆ, ಕಾರ್ಡ್‌ನಲ್ಲಿ ಲಿವಿಂಗ್ ವಿಲ್‌ನ ಸ್ಥಿತಿ, ದಿನಾಂಕ, ಆವೃತ್ತಿ ಮತ್ತು ದೃಢೀಕರಿಸಿದ ಅಧಿಕಾರಿ ಮಾತ್ರ ಇರುತ್ತಾರೆ. ಕಾಗದದ ಪ್ರತಿ ಯಾರಿಗೆ ಸಿಗಬೇಕು ಎಂದು ನೀವೇ ನಿರ್ಧರಿಸುತ್ತೀರಿ.
+On this phone. It is not sent to any server. If an emergency card is issued, the card carries only the status, date, version and attesting officer of your advance care planning. You decide who gets a paper copy.	ಈ ಫೋನ್‌ನಲ್ಲಿ. ಇದನ್ನು ಯಾವುದೇ ಸರ್ವರ್‌ಗೆ ಕಳುಹಿಸುವುದಿಲ್ಲ. ತುರ್ತು ಕಾರ್ಡ್ ನೀಡಿದರೆ, ಕಾರ್ಡ್‌ನಲ್ಲಿ ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆಯ ಸ್ಥಿತಿ, ದಿನಾಂಕ, ಆವೃತ್ತಿ ಮತ್ತು ದೃಢೀಕರಿಸಿದ ಅಧಿಕಾರಿ ಮಾತ್ರ ಇರುತ್ತಾರೆ. ಕಾಗದದ ಪ್ರತಿ ಯಾರಿಗೆ ಸಿಗಬೇಕು ಎಂದು ನೀವೇ ನಿರ್ಧರಿಸುತ್ತೀರಿ.
 See it: download your data below. Correct it: ask for a review, and a new version is made. Withdraw: cancel the plan at any time, and the card stops working. Delete: remove an unsigned draft below. Signed versions and the log cannot be deleted, because they show what was decided and who saw it.	ನೋಡುವುದು: ಕೆಳಗೆ ನಿಮ್ಮ ಡೇಟಾ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ. ಸರಿಪಡಿಸುವುದು: ಪರಿಶೀಲನೆ ಕೇಳಿ, ಹೊಸ ಆವೃತ್ತಿ ಆಗುತ್ತದೆ. ಹಿಂಪಡೆಯುವುದು: ಯೋಜನೆಯನ್ನು ಯಾವಾಗ ಬೇಕಾದರೂ ರದ್ದುಪಡಿಸಿ, ಕಾರ್ಡ್ ಕೆಲಸ ಮಾಡುವುದು ನಿಲ್ಲುತ್ತದೆ. ಅಳಿಸುವುದು: ಸಹಿ ಆಗದ ಡ್ರಾಫ್ಟ್ ಅನ್ನು ಕೆಳಗೆ ತೆಗೆದುಹಾಕಿ. ಸಹಿ ಮಾಡಿದ ಆವೃತ್ತಿಗಳು ಮತ್ತು ಲಾಗ್ ಅನ್ನು ಅಳಿಸಲಾಗುವುದಿಲ್ಲ, ಏಕೆಂದರೆ ಏನು ನಿರ್ಧರಿಸಲಾಯಿತು ಮತ್ತು ಯಾರು ನೋಡಿದರು ಎಂದು ಅವು ತೋರಿಸುತ್ತವೆ.
 See it: download your data below. Correct it: make a new version. Withdraw: cancel it in writing at any time. Delete: remove an unsigned draft below. Signed versions and the log cannot be deleted. Deleting here does not touch any paper you printed, so destroy that yourself.	ನೋಡುವುದು: ಕೆಳಗೆ ನಿಮ್ಮ ಡೇಟಾ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ. ಸರಿಪಡಿಸುವುದು: ಹೊಸ ಆವೃತ್ತಿ ಮಾಡಿ. ಹಿಂಪಡೆಯುವುದು: ಯಾವಾಗ ಬೇಕಾದರೂ ಲಿಖಿತವಾಗಿ ರದ್ದುಪಡಿಸಿ. ಅಳಿಸುವುದು: ಸಹಿ ಆಗದ ಡ್ರಾಫ್ಟ್ ಅನ್ನು ಕೆಳಗೆ ತೆಗೆದುಹಾಕಿ. ಸಹಿ ಮಾಡಿದ ಆವೃತ್ತಿಗಳು ಮತ್ತು ಲಾಗ್ ಅನ್ನು ಅಳಿಸಲಾಗುವುದಿಲ್ಲ. ಇಲ್ಲಿ ಅಳಿಸಿದರೆ ನೀವು ಪ್ರಿಂಟ್ ಮಾಡಿದ ಯಾವ ಕಾಗದಕ್ಕೂ ಏನೂ ಆಗುವುದಿಲ್ಲ, ಅದನ್ನು ನೀವೇ ನಾಶಮಾಡಿ.
 How to ask	ಹೇಗೆ ಕೇಳುವುದು
@@ -3235,9 +3234,9 @@ Applies to	ಯಾರಿಗೆ ಅನ್ವಯ
 Not saved: 	ಉಳಿಸಲಾಗಿಲ್ಲ:
 Couldn't make the PDF. Try again.	PDF ಮಾಡಲು ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
 Share the emergency plan	ತುರ್ತು ಯೋಜನೆಯನ್ನು ಹಂಚಿಕೊಳ್ಳಿ
-Share the living will	ಲಿವಿಂಗ್ ವಿಲ್ ಹಂಚಿಕೊಳ್ಳಿ
+Share the advance care planning	ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ ಹಂಚಿಕೊಳ್ಳಿ
 Plan withdrawn. Its wallet card link is switched off.	ಯೋಜನೆಯನ್ನು ಹಿಂಪಡೆಯಲಾಗಿದೆ. ಅದರ ವಾಲೆಟ್ ಕಾರ್ಡ್ ಲಿಂಕ್ ಸ್ಥಗಿತಗೊಂಡಿದೆ.
-Emergency plan & living will	ತುರ್ತು ಯೋಜನೆ ಮತ್ತು ಲಿವಿಂಗ್ ವಿಲ್
+Care planning	ಆರೈಕೆ ಯೋಜನೆ
 Ambulances and emergency doctors resuscitate by default. A wish counts only if this plan is found and signed. It stays on this phone; only a signed plan's wallet card copy goes to the Sahara server.	ಆಂಬುಲೆನ್ಸ್ ಮತ್ತು ತುರ್ತು ಡಾಕ್ಟರ್‌ಗಳು ಸಾಮಾನ್ಯವಾಗಿ ಪುನರುಜ್ಜೀವನ ಮಾಡುತ್ತಾರೆ. ಈ ಯೋಜನೆ ಸಿಕ್ಕಿ ಅದಕ್ಕೆ ಸಹಿ ಇದ್ದರೆ ಮಾತ್ರ ಇಚ್ಛೆ ಪರಿಗಣನೆಗೆ ಬರುತ್ತದೆ. ಇದು ಈ ಫೋನ್‌ನಲ್ಲಿ ಇರುತ್ತದೆ; ಸಹಿ ಮಾಡಿದ ಯೋಜನೆಯ ವಾಲೆಟ್ ಕಾರ್ಡ್ ಪ್ರತಿ ಮಾತ್ರ Sahara ಸರ್ವರ್‌ಗೆ ಹೋಗುತ್ತದೆ.
 The saved plan on this phone could not be read. Standard care applies until a new plan is signed.	ಈ ಫೋನ್‌ನಲ್ಲಿ ಉಳಿಸಿದ ಯೋಜನೆಯನ್ನು ಓದಲು ಆಗಲಿಲ್ಲ. ಹೊಸ ಯೋಜನೆಗೆ ಸಹಿ ಮಾಡುವವರೆಗೆ ಸಾಮಾನ್ಯ ಚಿಕಿತ್ಸೆ ಅನ್ವಯಿಸುತ್ತದೆ.
 ED Quick View	ED ಕ್ವಿಕ್ ವ್ಯೂ
@@ -3253,7 +3252,7 @@ Withdraw the plan	ಯೋಜನೆಯನ್ನು ಹಿಂಪಡೆಯಿರಿ
 Start a plan	ಯೋಜನೆ ಆರಂಭಿಸಿ
 Wallet card with QR	QR ಇರುವ ವಾಲೆಟ್ ಕಾರ್ಡ್
 Signed and recorded v$v	ಸಹಿ ಮಾಡಿ ದಾಖಲಿಸಲಾಗಿದೆ v$v
-Open living will	ಲಿವಿಂಗ್ ವಿಲ್ ತೆರೆಯಿರಿ
+Open advance care planning	ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ ತೆರೆಯಿರಿ
 Plan versions	ಯೋಜನೆಯ ಆವೃತ್ತಿಗಳು
 Audit log (cannot be changed)	ಆಡಿಟ್ ಲಾಗ್ (ಬದಲಾಯಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ)
 Chain checked: no entry has been changed or removed.	ಸರಣಿ ಪರಿಶೀಲಿಸಲಾಗಿದೆ: ಯಾವುದೇ ನಮೂದನ್ನು ಬದಲಾಯಿಸಿಲ್ಲ ಅಥವಾ ತೆಗೆದಿಲ್ಲ.
@@ -3314,10 +3313,10 @@ Assessed on	ಪರಿಶೀಲಿಸಿದ ದಿನಾಂಕ
 Basis of the assessment	ಪರಿಶೀಲನೆಯ ಆಧಾರ
 Reassess on	ಮರುಪರಿಶೀಲನೆಯ ದಿನಾಂಕ
 A patient with capacity can change or cancel any part of this plan by saying so; their wish now overrides the paper.	ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವ ಸಾಮರ್ಥ್ಯ ಇರುವ ರೋಗಿ ಹೇಳುವ ಮೂಲಕ ಈ ಯೋಜನೆಯ ಯಾವುದೇ ಭಾಗವನ್ನು ಬದಲಾಯಿಸಬಹುದು ಅಥವಾ ರದ್ದುಪಡಿಸಬಹುದು; ಅವರ ಈಗಿನ ಇಚ್ಛೆ ಕಾಗದಕ್ಕಿಂತ ಮೇಲುಗೈ ಹೊಂದಿದೆ.
-Existing living will or wishes	ಈಗಿರುವ ಲಿವಿಂಗ್ ವಿಲ್ ಅಥವಾ ಇಚ್ಛೆಗಳು
-A signed, attested living will	ಸಹಿ ಮಾಡಿದ, ದೃಢೀಕರಿಸಿದ ಲಿವಿಂಗ್ ವಿಲ್
+Existing advance care planning or wishes	ಈಗಿರುವ ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ ಅಥವಾ ಇಚ್ಛೆಗಳು
+Signed, attested advance care planning	ಸಹಿ ಮಾಡಿದ, ದೃಢೀಕರಿಸಿದ ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ
 Wishes said or written before	ಮೊದಲು ಹೇಳಿದ ಅಥವಾ ಬರೆದ ಇಚ್ಛೆಗಳು
-Date of the living will	ಲಿವಿಂಗ್ ವಿಲ್‌ನ ದಿನಾಂಕ
+Date of the advance care planning	ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆಯ ದಿನಾಂಕ
 Where the original is kept	ಮೂಲ ಪ್ರತಿ ಎಲ್ಲಿ ಇದೆ
 Attested by (notary or gazetted officer)	ದೃಢೀಕರಿಸಿದವರು (ನೋಟರಿ ಅಥವಾ ಗೆಜೆಟೆಡ್ ಅಧಿಕಾರಿ)
 What was said or written	ಏನು ಹೇಳಲಾಯಿತು ಅಥವಾ ಬರೆಯಲಾಯಿತು
@@ -3412,13 +3411,13 @@ SAHARA EMERGENCY CARE PLAN	ಸಹಾರಾ ತುರ್ತು ಆರೈಕೆ �
 QR code with a link to this plan	ಈ ಯೋಜನೆಯ ಲಿಂಕ್ ಇರುವ QR ಕೋಡ್
 QR code: offline text summary of this card	QR ಕೋಡ್: ಈ ಕಾರ್ಡ್‌ನ ಆಫ್‌ಲೈನ್ ಪಠ್ಯ ಸಾರಾಂಶ
 Plan v$v · review due $due	ಯೋಜನೆ v$v · ಪರಿಶೀಲನೆ $due
-The living will changed after this card was issued, so the link shows the old status. Issue a new card and tear up the old one.	ಈ ಕಾರ್ಡ್ ನೀಡಿದ ನಂತರ ಲಿವಿಂಗ್ ವಿಲ್ ಬದಲಾಗಿದೆ, ಆದ್ದರಿಂದ ಲಿಂಕ್ ಹಳೆಯ ಸ್ಥಿತಿಯನ್ನು ತೋರಿಸುತ್ತದೆ. ಹೊಸ ಕಾರ್ಡ್ ನೀಡಿ ಮತ್ತು ಹಳೆಯದನ್ನು ಹರಿದುಹಾಕಿ.
+The advance care planning changed after this card was issued, so the link shows the old status. Issue a new card and tear up the old one.	ಈ ಕಾರ್ಡ್ ನೀಡಿದ ನಂತರ ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ ಬದಲಾಗಿದೆ, ಆದ್ದರಿಂದ ಲಿಂಕ್ ಹಳೆಯ ಸ್ಥಿತಿಯನ್ನು ತೋರಿಸುತ್ತದೆ. ಹೊಸ ಕಾರ್ಡ್ ನೀಡಿ ಮತ್ತು ಹಳೆಯದನ್ನು ಹರಿದುಹಾಕಿ.
 Issue a new card	ಹೊಸ ಕಾರ್ಡ್ ನೀಡಿ
 The link QR holds only a random link with no name or medical details. The offline QR holds the summary above as plain text, so anyone who scans it can read it; keep the card with the patient. When the plan is replaced or withdrawn the link is switched off, but the offline QR on old paper still reads — tear up old cards.	ಲಿಂಕ್ QR ನಲ್ಲಿ ಯಾದೃಚ್ಛಿಕ ಲಿಂಕ್ ಮಾತ್ರ ಇದೆ, ಹೆಸರು ಅಥವಾ ವೈದ್ಯಕೀಯ ವಿವರಗಳಿಲ್ಲ. ಆಫ್‌ಲೈನ್ QR ನಲ್ಲಿ ಮೇಲಿನ ಸಾರಾಂಶ ಸರಳ ಪಠ್ಯದಲ್ಲಿದೆ, ಆದ್ದರಿಂದ ಸ್ಕ್ಯಾನ್ ಮಾಡುವ ಯಾರಾದರೂ ಓದಬಹುದು; ಕಾರ್ಡ್ ಅನ್ನು ರೋಗಿಯ ಬಳಿ ಇಡಿ. ಯೋಜನೆಯನ್ನು ಬದಲಾಯಿಸಿದಾಗ ಅಥವಾ ಹಿಂಪಡೆದಾಗ ಲಿಂಕ್ ಸ್ಥಗಿತಗೊಳ್ಳುತ್ತದೆ, ಆದರೆ ಹಳೆಯ ಕಾಗದದ ಮೇಲಿರುವ ಆಫ್‌ಲೈನ್ QR ಈಗಲೂ ಓದಲು ಸಿಗುತ್ತದೆ — ಹಳೆಯ ಕಾರ್ಡ್‌ಗಳನ್ನು ಹರಿದುಹಾಕಿ.
 Print or share the plan and card (PDF)	ಯೋಜನೆ ಮತ್ತು ಕಾರ್ಡ್ ಅನ್ನು ಪ್ರಿಂಟ್ ಮಾಡಿ ಅಥವಾ ಹಂಚಿಕೊಳ್ಳಿ (PDF)
-ED Quick View, wallet card QR and living will	ED ಕ್ವಿಕ್ ವ್ಯೂ, ವಾಲೆಟ್ ಕಾರ್ಡ್ QR ಮತ್ತು ಲಿವಿಂಗ್ ವಿಲ್
+ED Quick View, wallet card QR and advance care planning	ED ಕ್ವಿಕ್ ವ್ಯೂ, ವಾಲೆಟ್ ಕಾರ್ಡ್ QR ಮತ್ತು ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ
 This update does not record $missing. Visit history is separate.	ಈ ಅಪ್‌ಡೇಟ್ $missing ಅನ್ನು ದಾಖಲಿಸುವುದಿಲ್ಲ. ಭೇಟಿಗಳ ಇತಿಹಾಸ ಬೇರೆ.
-ECTPR wizard, ED Quick View, wallet card QR, living will	ECTPR ವಿಝಾರ್ಡ್, ED ಕ್ವಿಕ್ ವ್ಯೂ, ವಾಲೆಟ್ ಕಾರ್ಡ್ QR, ಲಿವಿಂಗ್ ವಿಲ್
+ECTPR wizard, ED Quick View, wallet card QR, advance care planning	ECTPR ವಿಝಾರ್ಡ್, ED ಕ್ವಿಕ್ ವ್ಯೂ, ವಾಲೆಟ್ ಕಾರ್ಡ್ QR, ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ
 , last on $day	, ಕೊನೆಯ ಬಾರಿ $day
 Opened once$last	ಒಮ್ಮೆ ತೆರೆಯಲಾಗಿದೆ$last
 Opened $views times$last	$views ಬಾರಿ ತೆರೆಯಲಾಗಿದೆ$last
@@ -4209,7 +4208,7 @@ If care is at home, ask who visits and how often.	ಆರೈಕೆ ಮನೆಯ�
 Different people said different things. Both are shown. Check with the patient which one stands.	ಬೇರೆ ಬೇರೆ ಜನರು ಬೇರೆ ಬೇರೆ ಹೇಳಿದರು. ಎರಡನ್ನೂ ತೋರಿಸಲಾಗಿದೆ. ಯಾವುದು ಸರಿ ಎಂದು ರೋಗಿಯೊಂದಿಗೆ ಖಚಿತಪಡಿಸಿ.
 Changed during the talk. The latest statement is marked.	ಮಾತುಕತೆಯಲ್ಲಿ ಬದಲಾಯಿತು. ಕೊನೆಯ ಮಾತನ್ನು ಗುರುತಿಸಲಾಗಿದೆ.
 Said earlier, replaced by a later statement	ಮೊದಲು ಹೇಳಿದ್ದು, ನಂತರದ ಮಾತಿನಿಂದ ಬದಲಾಗಿದೆ
-Goals-of-care note, in the order of the legal form	ಆರೈಕೆಯ ಗುರಿಗಳ ಟಿಪ್ಪಣಿ, ಕಾನೂನು ಫಾರಂ ಕ್ರಮದಲ್ಲಿ
+Goals-of-care note, in the order of the clinical document	ಆರೈಕೆಯ ಗುರಿಗಳ ಟಿಪ್ಪಣಿ, ಕ್ಲಿನಿಕಲ್ ದಾಖಲೆ ಕ್ರಮದಲ್ಲಿ
 Signed and locked on the doctor's device	ವೈದ್ಯರ ಸಾಧನದಲ್ಲಿ ಸಹಿ ಮಾಡಿ ಲಾಕ್ ಮಾಡಲಾಗಿದೆ
 Doctor's note	ವೈದ್ಯರ ಟಿಪ್ಪಣಿ
 radiation oncology	ವಿಕಿರಣ ಆಂಕಾಲಜಿ
@@ -4288,7 +4287,7 @@ Functional status – ECOG	ಕಾರ್ಯಕ್ಷಮತೆಯ ಸ್ಥಿತ�
 Gastrostomy (PEG)	ಗ್ಯಾಸ್ಟ್ರೋಸ್ಟೊಮಿ (PEG)
 Getting the speaker pack, first time only	ಮಾತನಾಡುವವರ ಪ್ಯಾಕ್ ಪಡೆಯಲಾಗುತ್ತಿದೆ, ಮೊದಲ ಬಾರಿ ಮಾತ್ರ
 Getting the speech pack, first time only	ಧ್ವನಿ ಪ್ಯಾಕ್ ಪಡೆಯಲಾಗುತ್ತಿದೆ, ಮೊದಲ ಬಾರಿ ಮಾತ್ರ
-Goals-of-care conversation note, in the order of the legal form	ಆರೈಕೆಯ ಗುರಿಗಳ ಮಾತುಕತೆಯ ಟಿಪ್ಪಣಿ, ಕಾನೂನು ನಮೂನೆಯ ಕ್ರಮದಲ್ಲಿ
+Goals-of-care conversation note, in the order of the clinical document	ಆರೈಕೆಯ ಗುರಿಗಳ ಮಾತುಕತೆಯ ಟಿಪ್ಪಣಿ, ಕ್ಲಿನಿಕಲ್ ದಾಖಲೆಯ ಕ್ರಮದಲ್ಲಿ
 Had they been previously admitted to any hospital for the current condition?	ಪ್ರಸ್ತುತ ಸ್ಥಿತಿಗಾಗಿ ಅವರು ಹಿಂದೆ ಯಾವುದೇ ಆಸ್ಪತ್ರೆಗೆ ದಾಖಲಾಗಿದ್ದರೇ?
 High-flow nasal cannula (HFNC)	ಹೈ-ಫ್ಲೋ ನೇಸಲ್ ಕ್ಯಾನುಲಾ (HFNC)
 Higher-concentration oxygen. Tolerable, but the mask can feel confining and interferes with speech.	ಹೆಚ್ಚಿನ ಸಾಂದ್ರತೆಯ ಆಮ್ಲಜನಕ. ಸಹಿಸಬಹುದಾದದ್ದು, ಆದರೆ ಮಾಸ್ಕ್ ಬಂಧಿಸಿದಂತೆ ಅನಿಸಬಹುದು ಮತ್ತು ಮಾತಿಗೆ ಅಡ್ಡಿಯಾಗುತ್ತದೆ.
@@ -4546,12 +4545,11 @@ Incident	ಘಟನೆ
 Link ABHA	ABHA ಜೋಡಿಸಿ
 Make PDF	PDF ಮಾಡಿ
 Mark as signed	ಸಹಿ ಮಾಡಲಾಗಿದೆ ಎಂದು ದಾಖಲಿಸಿ
-New living will	ಹೊಸ ಲಿವಿಂಗ್ ವಿಲ್
+New advance care planning	ಹೊಸ ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ
 New version	ಹೊಸ ಆವೃತ್ತಿ
 No ED access after this time.	ಈ ಸಮಯದ ನಂತರ ED ಪ್ರವೇಶ ಇಲ್ಲ.
 No connection. Please phone them.	ಸಂಪರ್ಕ ಇಲ್ಲ. ದಯವಿಟ್ಟು ಅವರಿಗೆ ಫೋನ್ ಮಾಡಿ.
 No draft to delete.	ಅಳಿಸಲು ಯಾವುದೇ ಡ್ರಾಫ್ಟ್ ಇಲ್ಲ.
-No living will	ಲಿವಿಂಗ್ ವಿಲ್ ಇಲ್ಲ
 No mobile number.	ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ಇಲ್ಲ.
 No signed plan at this time.	ಆ ಸಮಯದಲ್ಲಿ ಸಹಿ ಮಾಡಿದ ಯೋಜನೆ ಇರಲಿಲ್ಲ.
 None yet.	ಇನ್ನೂ ಏನೂ ಇಲ್ಲ.
@@ -4656,7 +4654,7 @@ Not uploaded yet	ಇನ್ನೂ ಅಪ್‌ಲೋಡ್ ಆಗಿಲ್ಲ
 Old QR may still open until the phone is online.	ಫೋನ್ ಆನ್‌ಲೈನ್ ಆಗುವವರೆಗೆ ಹಳೆಯ QR ಇನ್ನೂ ತೆರೆಯಬಹುದು.
 Online QR	ಆನ್‌ಲೈನ್ QR
 Offline QR	ಆಫ್‌ಲೈನ್ QR
-Living will changed. Issue a new card.	ಲಿವಿಂಗ್ ವಿಲ್ ಬದಲಾಗಿದೆ. ಹೊಸ ಕಾರ್ಡ್ ನೀಡಿ.
+Advance care planning changed. Issue a new card.	ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ ಬದಲಾಗಿದೆ. ಹೊಸ ಕಾರ್ಡ್ ನೀಡಿ.
 New card	ಹೊಸ ಕಾರ್ಡ್
 Print or share	ಮುದ್ರಿಸಿ ಅಥವಾ ಹಂಚಿಕೊಳ್ಳಿ
 All doctors	ಎಲ್ಲಾ ವೈದ್ಯರು
@@ -4982,7 +4980,7 @@ Entries	ದಾಖಲೆಗಳು
 Account and sharing	ಖಾತೆ ಮತ್ತು ಹಂಚಿಕೆ
 Share care with family	ಕುಟುಂಬದೊಂದಿಗೆ ಆರೈಕೆ ಹಂಚಿಕೊಳ್ಳಿ
 Send a link on WhatsApp	WhatsApp ನಲ್ಲಿ ಲಿಂಕ್ ಕಳುಹಿಸಿ
-Plan, wallet card, living will	ಯೋಜನೆ, ವಾಲೆಟ್ ಕಾರ್ಡ್, ಲಿವಿಂಗ್ ವಿಲ್
+Goals of care, advance care planning, emergency card	ಆರೈಕೆಯ ಗುರಿಗಳ ಚರ್ಚೆ, ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ, ತುರ್ತು ಕಾರ್ಡ್
 Settings	ಸೆಟ್ಟಿಂಗ್ಸ್
 Notifications	ನೋಟಿಫಿಕೇಶನ್‌ಗಳು
 Privacy and data	ಗೌಪ್ಯತೆ ಮತ್ತು ಡೇಟಾ
@@ -5072,7 +5070,6 @@ A one-page summary hospital staff can read fast	ಆಸ್ಪತ್ರೆ ಸಿ�
 All 10 parts of the emergency care plan, from patient details to signatures	ತುರ್ತು ಆರೈಕೆ ಯೋಜನೆಯ ಎಲ್ಲಾ 10 ಭಾಗಗಳು, ರೋಗಿಯ ವಿವರಗಳಿಂದ ಸಹಿಗಳವರೆಗೆ
 For the emergency room	ತುರ್ತು ವಿಭಾಗಕ್ಕಾಗಿ
 Make the full care plan	ಪೂರ್ಣ ಆರೈಕೆ ಯೋಜನೆ ಮಾಡಿ
-Plan, pocket emergency card, living will	ಯೋಜನೆ, ಜೇಬಿನಲ್ಲಿಡುವ ತುರ್ತು ಕಾರ್ಡ್, ಲಿವಿಂಗ್ ವಿಲ್
 Pocket emergency card	ಜೇಬಿನಲ್ಲಿಡುವ ತುರ್ತು ಕಾರ್ಡ್
 Step ${step + 1} · $name	ಹಂತ ${step + 1} · $name
 Card file	ಕಾರ್ಡ್ ಫೈಲ್
@@ -5169,3 +5166,57 @@ Add a few words (optional)	ಕೆಲವು ಮಾತು ಸೇರಿಸಿ (ಐ�
 Fewer details	ಕಡಿಮೆ ವಿವರ
 Medicine name *	ಔಷಧದ ಹೆಸರು *
 Region	ಪ್ರದೇಶ
+
+Goals of care discussion, advance care planning and the emergency care plan belong together. All three are clinical documents.	ಆರೈಕೆಯ ಗುರಿಗಳ ಚರ್ಚೆ, ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ ಮತ್ತು ತುರ್ತು ಆರೈಕೆ ಯೋಜನೆ ಒಟ್ಟಿಗೆ ಕೆಲಸ ಮಾಡುತ್ತವೆ. ಈ ಮೂರೂ ಕ್ಲಿನಿಕಲ್ ದಾಖಲೆಗಳು.
+Goals of care discussion	ಆರೈಕೆಯ ಗುರಿಗಳ ಚರ್ಚೆ
+The recorded conversation about what matters most and the care to aim for.	ಯಾವುದು ಅತ್ಯಂತ ಮುಖ್ಯ ಮತ್ತು ಯಾವ ಆರೈಕೆಯನ್ನು ಗುರಿಯಾಗಿ ಇಟ್ಟುಕೊಳ್ಳಬೇಕು ಎಂಬ ಬಗ್ಗೆ ದಾಖಲಿಸಿದ ಮಾತುಕತೆ.
+Your doctor records this conversation with you.	ನಿಮ್ಮ ಡಾಕ್ಟರ್ ಈ ಮಾತುಕತೆಯನ್ನು ನಿಮ್ಮೊಂದಿಗೆ ದಾಖಲಿಸುತ್ತಾರೆ.
+Emergency care plan & card	ತುರ್ತು ಆರೈಕೆ ಯೋಜನೆ ಮತ್ತು ಕಾರ್ಡ್
+The summary for the ambulance or emergency department, with a QR code.	ಆಂಬ್ಯುಲೆನ್ಸ್ ಅಥವಾ ತುರ್ತು ವಿಭಾಗಕ್ಕೆ ಸಾರಾಂಶ, QR ಕೋಡ್ ಜೊತೆಗೆ.
+The person’s own wishes about future care, written down.	ಭವಿಷ್ಯದ ಆರೈಕೆಯ ಬಗ್ಗೆ ವ್ಯಕ್ತಿಯ ಸ್ವಂತ ಇಚ್ಛೆಗಳು, ಬರೆದಿಟ್ಟಿದ್ದು.
+A clinical document that records the person’s own wishes about future care.	ಭವಿಷ್ಯದ ಆರೈಕೆಯ ಬಗ್ಗೆ ವ್ಯಕ್ತಿಯ ಸ್ವಂತ ಇಚ್ಛೆಗಳನ್ನು ದಾಖಲಿಸುವ ಕ್ಲಿನಿಕಲ್ ದಾಖಲೆ.
+Your wellbeing	ನಿಮ್ಮ ಯೋಗಕ್ಷೇಮ
+Kept on this phone only. Not shared.	ಈ ಫೋನ್‌ನಲ್ಲಿ ಮಾತ್ರ ಇರುತ್ತದೆ. ಹಂಚಿಕೊಳ್ಳಲಾಗುವುದಿಲ್ಲ.
+Caring is hard work. A one-minute check helps you notice when you need support.	ಆರೈಕೆ ಕಷ್ಟದ ಕೆಲಸ. ಒಂದು ನಿಮಿಷದ ತಪಾಸಣೆ ನಿಮಗೆ ಯಾವಾಗ ಬೆಂಬಲ ಬೇಕು ಎಂದು ತಿಳಿಯಲು ಸಹಾಯ ಮಾಡುತ್ತದೆ.
+A lot to carry	ತುಂಬಾ ಭಾರ
+Manageable	ನಿಭಾಯಿಸಬಹುದಾದದ್ದು
+In the past month, how often have you felt this way?	ಕಳೆದ ತಿಂಗಳಲ್ಲಿ, ನಿಮಗೆ ಹೀಗೆ ಎಷ್ಟು ಬಾರಿ ಅನಿಸಿತು?
+Never	ಎಂದಿಗೂ ಇಲ್ಲ
+Rarely	ಅಪರೂಪಕ್ಕೆ
+Sometimes	ಕೆಲವೊಮ್ಮೆ
+Quite often	ಆಗಾಗ್ಗೆ
+Nearly always	ಬಹುತೇಕ ಯಾವಾಗಲೂ
+Answer all four to save.	ಉಳಿಸಲು ನಾಲ್ಕಕ್ಕೂ ಉತ್ತರಿಸಿ.
+Take the 1-minute check	1 ನಿಮಿಷದ ತಪಾಸಣೆ ಮಾಡಿ
+Write a few words. Only you can see this.	ಕೆಲವು ಮಾತುಗಳನ್ನು ಬರೆಯಿರಿ. ಇದನ್ನು ನೀವು ಮಾತ್ರ ನೋಡಬಹುದು.
+Write in my journal	ನನ್ನ ದಿನಚರಿಯಲ್ಲಿ ಬರೆಯಿರಿ
+Only you can see these, on this phone.	ಇವುಗಳನ್ನು ನೀವು ಮಾತ್ರ, ಈ ಫೋನ್‌ನಲ್ಲಿ ನೋಡಬಹುದು.
+Higher than your last check	ನಿಮ್ಮ ಹಿಂದಿನ ತಪಾಸಣೆಗಿಂತ ಹೆಚ್ಚು
+Lower than your last check	ನಿಮ್ಮ ಹಿಂದಿನ ತಪಾಸಣೆಗಿಂತ ಕಡಿಮೆ
+About the same as your last check	ನಿಮ್ಮ ಹಿಂದಿನ ತಪಾಸಣೆಯಷ್ಟೇ
+You're carrying a lot	ನೀವು ತುಂಬಾ ಹೊರೆ ಹೊತ್ತಿದ್ದೀರಿ
+Many family caregivers feel this way. It is not a failing, and help is there. This check is a screening, not a diagnosis.	ಅನೇಕ ಕುಟುಂಬ ಆರೈಕೆದಾರರಿಗೆ ಹೀಗೇ ಅನಿಸುತ್ತದೆ. ಇದು ಕೊರತೆಯಲ್ಲ, ಸಹಾಯ ಲಭ್ಯವಿದೆ. ಈ ತಪಾಸಣೆ ಆರಂಭಿಕ ಸೂಚನೆ ಮಾತ್ರ, ರೋಗನಿರ್ಣಯವಲ್ಲ.
+Talk to a counsellor	ಸಲಹೆಗಾರರೊಂದಿಗೆ ಮಾತನಾಡಿ
+Tele-MANAS is free, day and night.	ಟೆಲಿ-ಮನಸ್ ಉಚಿತ, ಹಗಲು ರಾತ್ರಿ.
+Find a counsellor nearby	ಹತ್ತಿರದ ಸಲಹೆಗಾರರನ್ನು ಹುಡುಕಿ
+Respite care	ತಾತ್ಕಾಲಿಕ ವಿಶ್ರಾಂತಿ ಆರೈಕೆ
+Your palliative care team can arrange temporary nursing or day-care support, so you can rest. Ask them at your next call or visit.	ನೀವು ವಿಶ್ರಾಂತಿ ಪಡೆಯುವಂತೆ, ನಿಮ್ಮ ಪ್ಯಾಲಿಯೇಟಿವ್ ಕೇರ್ ತಂಡ ತಾತ್ಕಾಲಿಕ ನರ್ಸಿಂಗ್ ಅಥವಾ ಡೇ-ಕೇರ್ ಸಹಾಯ ಏರ್ಪಡಿಸಬಹುದು. ಮುಂದಿನ ಕರೆ ಅಥವಾ ಭೇಟಿಯಲ್ಲಿ ಅವರನ್ನು ಕೇಳಿ.
+Caregiver support groups	ಆರೈಕೆದಾರರ ಬೆಂಬಲ ಗುಂಪುಗಳು
+Swayam Foundation caregiver support	ಸ್ವಯಂ ಫೌಂಡೇಶನ್ ಆರೈಕೆದಾರರ ಬೆಂಬಲ
+SoulUp caregiving support group	ಸೋಲ್‌ಅಪ್ ಆರೈಕೆ ಬೆಂಬಲ ಗುಂಪು
+These open in your browser. In an emergency, call 112.	ಇವು ನಿಮ್ಮ ಬ್ರೌಸರ್‌ನಲ್ಲಿ ತೆರೆಯುತ್ತವೆ. ತುರ್ತು ಸಂದರ್ಭದಲ್ಲಿ 112 ಗೆ ಕರೆ ಮಾಡಿ.
+You matter, and your health matters too.	ನೀವು ಮುಖ್ಯ, ನಿಮ್ಮ ಆರೋಗ್ಯವೂ ಮುಖ್ಯ.
+Thank you for caring so well. Have you had some water, something to eat, and a moment to sit down today? Looking after yourself is part of looking after them.	ಇಷ್ಟು ಚೆನ್ನಾಗಿ ನೋಡಿಕೊಳ್ಳುತ್ತಿರುವುದಕ್ಕೆ ಧನ್ಯವಾದಗಳು. ಇಂದು ನೀರು ಕುಡಿದಿರಾ, ಏನಾದರೂ ತಿಂದಿರಾ, ಸ್ವಲ್ಪ ಹೊತ್ತು ಕುಳಿತಿರಾ? ನಿಮ್ಮನ್ನು ನೀವು ನೋಡಿಕೊಳ್ಳುವುದೂ ಅವರನ್ನು ನೋಡಿಕೊಳ್ಳುವುದರ ಭಾಗ.
+Check how I am (1 minute)	ನನ್ನ ಸ್ಥಿತಿ ಪರೀಕ್ಷಿಸಿ (1 ನಿಮಿಷ)
+Distress thermometer	ಸಂಕಟ ಥರ್ಮಾಮೀಟರ್
+How much distress this past week? 0–10	ಈ ವಾರ ಎಷ್ಟು ಸಂಕಟ ಇತ್ತು? 0–10
+Today: no distress	ಇಂದು: ಸಂಕಟ ಇಲ್ಲ
+Tap to change	ಬದಲಿಸಲು ಒತ್ತಿ
+Symptom ratings use a 0–10 scale in the style of ESAS-r (Edmonton Symptom Assessment System). This is a personal diary, not a scored ESAS-r.	ಲಕ್ಷಣಗಳ ಅಂಕಗಳು ESAS-r (Edmonton Symptom Assessment System) ಮಾದರಿಯಲ್ಲಿ 0–10 ಮಾಪಕದಲ್ಲಿವೆ. ಇದು ವೈಯಕ್ತಿಕ ಡೈರಿ, ಅಂಕ ನೀಡಿದ ESAS-r ಅಲ್ಲ.
+Last check: ${latest.score}/${CaregiverWellbeingRules.MAX_SCORE} · $band	ಕೊನೆಯ ಪರಿಶೀಲನೆ: ${latest.score}/${CaregiverWellbeingRules.MAX_SCORE} · $band
+Stressed, between caring for $name and meeting your other responsibilities?	$name ಅವರ ಆರೈಕೆ ಮತ್ತು ನಿಮ್ಮ ಇತರ ಜವಾಬ್ದಾರಿಗಳ ನಡುವೆ ಒತ್ತಡವಾಗುತ್ತದೆಯೇ?
+Strained when you are around $name?	$name ಅವರ ಜೊತೆ ಇರುವಾಗ ಒತ್ತಡವೆನಿಸುತ್ತದೆಯೇ?
+That your own health has suffered because of caring for $name?	$name ಅವರ ಆರೈಕೆಯಿಂದ ನಿಮ್ಮ ಆರೋಗ್ಯ ಹಾಳಾಗಿದೆಯೇ?
+That you don't have enough time for yourself because of caring for $name?	$name ಅವರ ಆರೈಕೆಯಿಂದ ನಿಮಗಾಗಿ ಸಮಯ ಸಿಗುತ್ತಿಲ್ಲವೇ?
+How are you feeling about caring for $personName?	$personName ಅವರ ಆರೈಕೆಯ ಬಗ್ಗೆ ನಿಮಗೆ ಹೇಗನಿಸುತ್ತಿದೆ?
+Past checks, oldest first: $summary out of ${CaregiverWellbeingRules.MAX_SCORE}	ಹಿಂದಿನ ಪರಿಶೀಲನೆಗಳು, ಹಳೆಯದು ಮೊದಲು: ${CaregiverWellbeingRules.MAX_SCORE} ರಲ್ಲಿ $summary

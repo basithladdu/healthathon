@@ -1,12 +1,12 @@
 <resources>
-    <!-- Same as values-v29, plus the Android 12+ splash: the Sahara logo on a Rust circle over Cream. The system hides it at the first frame, so there is no extra wait. -->
+    <!-- Same as values-v29, plus the Android 12+ splash: the Sahara logo on a cream circle over Cream. The system hides it at the first frame, so there is no extra wait. -->
     <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
         <item name="android:fontFamily">sans</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowBackground">@color/launcher_background</item>
         <item name="android:windowLightNavigationBar">true</item>
         <item name="android:windowActionModeOverlay">true</item>
-        <item name="android:colorAccent">#D2390B</item>
+        <item name="android:colorAccent">#3B7562</item>
         <item name="android:forceDarkAllowed">false</item>
         <item name="android:windowSplashScreenBackground">@color/launcher_background</item>
         <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>

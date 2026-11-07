@@ -114,7 +114,7 @@ object CarePlanBook {
         return s.copy(amds = records).log(now, actor, AuditAction.CREATE, AuditRecordType.AMD, d.id, "v${d.version}") to d
     }
     fun saveAmd(s: CarePlanState, id: String, content: AmdContent, actor: String, now: String): CarePlanState =
-        s.withAmd(AmdLifecycle.update(s.amds.firstOrNull { it.id == id } ?: error("Living will not found."), content, now)).log(now, actor, AuditAction.EDIT, AuditRecordType.AMD, id)
+        s.withAmd(AmdLifecycle.update(s.amds.firstOrNull { it.id == id } ?: error("Advance care planning not found."), content, now)).log(now, actor, AuditAction.EDIT, AuditRecordType.AMD, id)
     fun generateAmd(s: CarePlanState, id: String, pdfSha256: String, lang: String, actor: String, now: String, today: LocalDate): CarePlanState =
         s.withAmd(AmdLifecycle.markGenerated(s.amds.first { it.id == id }, pdfSha256, lang, now, today)).log(now, actor, AuditAction.PRINT, AuditRecordType.AMD, id, "document printed, pdf sha256 $pdfSha256")
     fun executeAmd(s: CarePlanState, id: String, execution: AmdExecution, custodian: AmdCustodian?, actor: String, now: String, today: LocalDate): CarePlanState =

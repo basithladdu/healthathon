@@ -83,7 +83,7 @@ internal object DoctorGocDiscussions {
 
     /** The lines the PDF prints, in order: title, status, Sections I to IV, then the doctor's note. Kept here so it can be tested. */
     fun pdfLines(d: DoctorGocDiscussion, hindi: Boolean, status: String): List<Pair<String, Int>> = buildList {
-        add(Bi("Goals-of-care note, in the order of the legal form", "देखभाल के लक्ष्यों का नोट, क़ानूनी फ़ॉर्म के क्रम में").pick(hindi) to 0)
+        add(Bi("Goals-of-care note, in the order of the clinical document", "देखभाल के लक्ष्यों का नोट, क्लिनिकल दस्तावेज़ के क्रम में").pick(hindi) to 0)
         add(listOf(d.record.patient.name, d.at.take(16).replace('T', ' '), status).filter(String::isNotBlank).joinToString(" · ") to 2)
         d.sections().forEach { s -> add(s.title.pick(hindi) to 1); s.rows.forEach { add(it.pick(hindi) to 2) } }
         if (d.note.isNotBlank()) { add(Bi("Doctor's note", "डॉक्टर का नोट").pick(hindi) to 1); add(d.note to 2) }

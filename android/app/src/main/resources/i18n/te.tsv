@@ -741,7 +741,7 @@ Reviewed conversation	సమీక్షించిన సంభాషణ
 Account draft	ఖాతా డ్రాఫ్ట్
 Revision ${draft.revision}	సవరణ ${draft.revision}
 Open conversation	సంభాషణ తెరవండి
-Clinical review is a separate step by a verified, invited account. It records a discussion; it does not execute a legal advance directive or authorise treatment.	క్లినికల్ సమీక్ష అనేది ధృవీకరించబడిన, ఆహ్వానించబడిన ఖాతా చేసే వేరే దశ. ఇది చర్చను నమోదు చేస్తుంది; ఇది చట్టపరమైన అడ్వాన్స్ డైరెక్టివ్‌ను అమలు చేయదు, చికిత్సకు అనుమతి ఇవ్వదు.
+Clinical review is a separate step by a verified, invited account. It records a discussion; it does not execute advance care planning or authorise treatment.	క్లినికల్ సమీక్ష అనేది ధృవీకరించబడిన, ఆహ్వానించబడిన ఖాతా చేసే వేరే దశ. ఇది చర్చను నమోదు చేస్తుంది; ముందస్తు సంరక్షణ ప్రణాళికను అమలు చేయదు, చికిత్సకు అనుమతి ఇవ్వదు.
 Shared clinician workspace	పంచుకున్న డాక్టర్ వర్క్‌స్పేస్
 Review conversation	సంభాషణ సమీక్షించండి
 Original words	అసలు మాటలు
@@ -2713,16 +2713,16 @@ Withholding or withdrawing life-sustaining treatment for a patient who cannot de
 Enter your full name.	మీ పూర్తి పేరు రాయండి.
 Enter your date of birth.	మీ పుట్టిన తేదీ రాయండి.
 Enter a real date of birth.	సరైన పుట్టిన తేదీ రాయండి.
-Only an adult (18 years or older) can make a living will.	పెద్దవారు (18 సంవత్సరాలు లేదా అంతకంటే ఎక్కువ) మాత్రమే లివింగ్ విల్ చేయవచ్చు.
+Only an adult (18 years or older) can complete advance care planning.	పెద్దవారు (18 సంవత్సరాలు లేదా అంతకంటే ఎక్కువ) మాత్రమే ముందస్తు సంరక్షణ ప్రణాళికను పూర్తి చేయవచ్చు.
 Enter only the last 4 digits of the ID.	ID చివరి 4 అంకెలు మాత్రమే రాయండి.
 Your address is empty. You will need to write it by hand on the paper.	మీ చిరునామా ఖాళీగా ఉంది. మీరు కాగితంపై చేత్తో రాయాల్సి ఉంటుంది.
 Confirm that you understand what this document means.	ఈ పత్రం అర్థం ఏమిటో మీకు అర్థమైందని నిర్ధారించండి.
 Confirm that nobody is forcing or pressuring you.	ఎవరూ మిమ్మల్ని బలవంతం చేయడం లేదా ఒత్తిడి చేయడం లేదని నిర్ధారించండి.
 Confirm that you have thought about this carefully.	మీరు దీని గురించి జాగ్రత్తగా ఆలోచించారని నిర్ధారించండి.
 Confirm that you understand it will not be used if the situation is unclear or was not foreseen.	పరిస్థితి స్పష్టంగా లేకపోతే లేదా ముందుగా ఊహించకపోతే దీన్ని ఉపయోగించరని మీకు అర్థమైందని నిర్ధారించండి.
-Choose at least one situation when this living will applies.	ఈ లివింగ్ విల్ వర్తించే కనీసం ఒక పరిస్థితిని ఎంచుకోండి.
+Choose at least one situation when these advance care planning wishes apply.	ఈ ముందస్తు సంరక్షణ ప్రణాళిక కోరికలు వర్తించే కనీసం ఒక పరిస్థితిని ఎంచుకోండి.
 You have not chosen any specific treatment. The general direction in Section 2 will still apply.	మీరు ఏ నిర్దిష్ట చికిత్సనూ ఎంచుకోలేదు. 2వ విభాగంలోని సాధారణ నిర్దేశం ఇప్పటికీ వర్తిస్తుంది.
-A living will cannot ask for anything meant to end life. That is against the law in India. Please change these words.	లివింగ్ విల్‌లో ప్రాణం తీయడానికి ఉద్దేశించిన దేన్నీ కోరకూడదు. భారతదేశంలో అది చట్ట విరుద్ధం. దయచేసి ఈ మాటలను మార్చండి.
+Advance care planning cannot ask for anything meant to end life. That is against the law in India. Please change these words.	ముందస్తు సంరక్షణ ప్రణాళికలో ప్రాణం తీయడానికి ఉద్దేశించిన దేన్నీ కోరకూడదు. భారతదేశంలో అది చట్ట విరుద్ధం. దయచేసి ఈ మాటలను మార్చండి.
 Name at least one person who can speak for you (a representative).	మీ తరఫున మాట్లాడగల కనీసం ఒక వ్యక్తి (ప్రతినిధి) పేరు రాయండి.
 It is better to name two representatives, in order of preference, in case the first cannot be reached.	మొదటివారిని సంప్రదించలేకపోతే అనే ఉద్దేశంతో, ఇద్దరు ప్రతినిధుల పేర్లను ప్రాధాన్యతా క్రమంలో రాయడం మంచిది.
 Representative $n: enter the full name.	ప్రతినిధి $n: పూర్తి పేరు రాయండి.
@@ -2740,7 +2740,7 @@ The signing date cannot be in the future.	సంతకం తేదీ భవి
 The signing date is before this version was printed. Check you uploaded the right version.	సంతకం తేదీ ఈ వెర్షన్ ప్రింట్ అయిన తేదీ కంటే ముందు ఉంది. సరైన వెర్షన్ అప్‌లోడ్ చేశారో చూడండి.
 Upload a photo or scan of the signed and attested paper.	సంతకం చేసి ధృవీకరించిన కాగితం ఫోటో లేదా స్కాన్ అప్‌లోడ్ చేయండి.
 Enter the name of witness $n.	సాక్షి $n పేరు రాయండి.
-The person making the living will cannot be their own witness.	లివింగ్ విల్ చేసే వ్యక్తి తనకు తానే సాక్షి కాకూడదు.
+The person doing the advance care planning cannot be their own witness.	ముందస్తు సంరక్షణ ప్రణాళిక చేసే వ్యక్తి తనకు తానే సాక్షి కాకూడదు.
 Witness $n is also a named representative. Witnesses should preferably be independent.	సాక్షి $n కూడా పేరు పెట్టిన ప్రతినిధి. సాక్షులు వీలైతే స్వతంత్రులై ఉండాలి.
 Witness $n: enter only the last 4 digits of the ID.	సాక్షి $n: ID చివరి 4 అంకెలు మాత్రమే రాయండి.
 The two witnesses must be two different people.	ఇద్దరు సాక్షులు వేర్వేరు వ్యక్తులై ఉండాలి.
@@ -2751,21 +2751,21 @@ Record the custodian: acknowledged, or \"custodian pending\".	సంరక్ష
 Enter the custodian officer’s name and the date they acknowledged it.	సంరక్షక అధికారి పేరు, వారు రసీదు ఇచ్చిన తేదీ రాయండి.
 Tick consent before linking to ABHA.	ABHA కు లింక్ చేయడానికి ముందు అంగీకారంపై టిక్ చేయండి.
 Enter an ABHA address like name@abdm, or the 14-digit ABHA number.	name@abdm వంటి ABHA చిరునామా, లేదా 14 అంకెల ABHA నంబర్ రాయండి.
-A living will is cancelled in writing. Tick that the person signed a written cancellation.	లివింగ్ విల్ లిఖితపూర్వకంగా రద్దవుతుంది. ఆ వ్యక్తి లిఖిత రద్దుపై సంతకం చేశారని టిక్ చేయండి.
+Advance care planning is cancelled in writing. Tick that the person signed a written cancellation.	ముందస్తు సంరక్షణ ప్రణాళిక లిఖితపూర్వకంగా రద్దవుతుంది. ఆ వ్యక్తి లిఖిత రద్దుపై సంతకం చేశారని టిక్ చేయండి.
 Enter the date of the written cancellation.	లిఖిత రద్దు తేదీ రాయండి.
 The date cannot be in the future.	తేదీ భవిష్యత్తులో ఉండకూడదు.
-No living will (AMD)	లివింగ్ విల్ (AMD) లేదు
+No advance care planning	ముందస్తు సంరక్షణ ప్రణాళిక లేదు
 No AMD; earlier wishes noted	AMD లేదు; మునుపటి కోరికలు నమోదయ్యాయి
-Valid living will (AMD)	చెల్లుబాటయ్యే లివింగ్ విల్ (AMD)
+Valid advance care planning	చెల్లుబాటయ్యే ముందస్తు సంరక్షణ ప్రణాళిక
 held at	ఉన్న చోటు
 attested by	ధృవీకరించినవారు
-Living will (AMD) executed in Sahara	Sahara లో అమలు చేసిన లివింగ్ విల్ (AMD)
+Advance care planning executed in Sahara	Sahara లో అమలు చేసిన ముందస్తు సంరక్షణ ప్రణాళిక
 version $version	వెర్షన్ $version
 signed $signed	సంతకం $signed
 Also on this plan	ఈ ప్రణాళికలో కూడా
-Living will cancelled in writing	లివింగ్ విల్ లిఖితపూర్వకంగా రద్దయింది
+Advance care planning cancelled in writing	ముందస్తు సంరక్షణ ప్రణాళిక లిఖితపూర్వకంగా రద్దయింది
 This plan still lists one. Check with the decision-maker	ఈ ప్రణాళిక ఇప్పటికీ ఒకదాన్ని చూపిస్తోంది. నిర్ణయం తీసుకునేవారిని అడగండి
-Living will in Sahara is not signed and attested, so it is not valid	Sahara లోని లివింగ్ విల్‌పై సంతకం, ధృవీకరణ లేవు, కాబట్టి అది చెల్లదు
+Advance care planning in Sahara is not signed and attested, so it is not valid	Sahara లోని ముందస్తు సంరక్షణ ప్రణాళికపై సంతకం, ధృవీకరణ లేవు, కాబట్టి అది చెల్లదు
 Section 1: Personal details	విభాగం 1: వ్యక్తిగత వివరాలు
 Section 2: Directions relating to life-sustaining treatment	విభాగం 2: ప్రాణాధార చికిత్సకు సంబంధించిన నిర్దేశాలు
 Section 3 (Optional): Wishes or desires during end-of-life care	విభాగం 3 (ఐచ్ఛికం): జీవిత చివరి సంరక్షణలో కోరికలు
@@ -2884,18 +2884,18 @@ Notes	నోట్లు
 Tick a box or write what happened.	ఒక బాక్స్ టిక్ చేయండి లేదా ఏం జరిగిందో రాయండి.
 Save the incident	సంఘటనను సేవ్ చేయండి
 The PDF could not be made. Try again.	PDF తయారు కాలేదు. మళ్లీ ప్రయత్నించండి.
-Living will	లివింగ్ విల్
-This follows the model living will by the Vidhi Centre for Legal Policy and ACP India, and the Supreme Court’s rules (2018, changed on 24 January 2023). If both a living will and an emergency plan exist, the living will governs.	ఇది విధి సెంటర్ ఫర్ లీగల్ పాలసీ, ACP ఇండియా రూపొందించిన నమూనా లివింగ్ విల్‌ను, సుప్రీం కోర్టు నియమాలను (2018, 2023 జనవరి 24న మార్చినవి) అనుసరిస్తుంది. లివింగ్ విల్, అత్యవసర ప్రణాళిక రెండూ ఉంటే, లివింగ్ విల్‌కే ప్రాధాన్యం.
+Advance care planning	ముందస్తు సంరక్షణ ప్రణాళిక
+This follows the model advance care planning document by the Vidhi Centre for Legal Policy and ACP India, and the Supreme Court’s rules (2018, changed on 24 January 2023). If both advance care planning and an emergency plan exist, the advance care planning governs.	ఇది విధి సెంటర్ ఫర్ లీగల్ పాలసీ, ACP ఇండియా రూపొందించిన నమూనా ముందస్తు సంరక్షణ ప్రణాళిక పత్రాన్ని, సుప్రీం కోర్టు నియమాలను (2018, 2023 జనవరి 24న మార్చినవి) అనుసరిస్తుంది. ముందస్తు సంరక్షణ ప్రణాళిక, అత్యవసర ప్రణాళిక రెండూ ఉంటే, ముందస్తు సంరక్షణ ప్రణాళికకే ప్రాధాన్యం.
 What happens if treatment is to be held back or stopped (information only)	చికిత్సను ప్రారంభించకపోతే లేదా ఆపితే ఏమవుతుంది (సమాచారం కోసం మాత్రమే)
-The living will was cancelled in writing on $on. It no longer applies.	లివింగ్ విల్‌ను $on న లిఖితపూర్వకంగా రద్దు చేశారు. ఇది ఇకపై వర్తించదు.
-A living will has been started or printed but is not signed and recorded. It is not valid.	లివింగ్ విల్ ప్రారంభించారు లేదా ప్రింట్ చేశారు కానీ సంతకం చేసి నమోదు చేయలేదు. ఇది చెల్లదు.
-No living will is recorded in Sahara. Ask the family if a signed paper exists.	Sahara లో ఏ లివింగ్ విల్ నమోదు కాలేదు. సంతకం చేసిన కాగితం ఉందేమో కుటుంబాన్ని అడగండి.
-Make a new living will	కొత్త లివింగ్ విల్ చేయండి
-Start a living will	లివింగ్ విల్ ప్రారంభించండి
+The advance care planning was cancelled in writing on $on. It no longer applies.	ముందస్తు సంరక్షణ ప్రణాళికను $on న లిఖితపూర్వకంగా రద్దు చేశారు. ఇది ఇకపై వర్తించదు.
+Advance care planning has been started or printed but is not signed and recorded. It is not valid.	ముందస్తు సంరక్షణ ప్రణాళిక ప్రారంభించారు లేదా ప్రింట్ చేశారు కానీ సంతకం చేసి నమోదు చేయలేదు. ఇది చెల్లదు.
+No advance care planning is recorded in Sahara. Ask the family if a signed paper exists.	Sahara లో ఏ ముందస్తు సంరక్షణ ప్రణాళిక నమోదు కాలేదు. సంతకం చేసిన కాగితం ఉందేమో కుటుంబాన్ని అడగండి.
+Make new advance care planning	కొత్త ముందస్తు సంరక్షణ ప్రణాళిక చేయండి
+Start advance care planning	ముందస్తు సంరక్షణ ప్రణాళికను ప్రారంభించండి
 ID document	గుర్తింపు పత్రం
 Last 4 digits only	చివరి 4 అంకెలు మాత్రమే
 Never type the full number here. Write it by hand on the paper.	పూర్తి నంబర్‌ను ఇక్కడ ఎప్పుడూ టైప్ చేయకండి. కాగితంపై చేత్తో రాయండి.
-Living will v$version · $status	లివింగ్ విల్ v$version · $status
+Advance care planning v$version · $status	ముందస్తు సంరక్షణ ప్రణాళిక v$version · $status
 Full name	పూర్తి పేరు
 Gender	జెండర్
 Date of birth	పుట్టిన తేదీ
@@ -2928,7 +2928,7 @@ Add another representative	మరో ప్రతినిధిని జోడ
 They must decide together (instead of in order).	వారు కలిసి నిర్ణయించాలి (క్రమంలో కాకుండా).
 Family doctor (optional)	కుటుంబ డాక్టర్ (ఐచ్ఛికం)
 Phone	ఫోన్
-Local body that keeps living wills (custodian)	లివింగ్ విల్‌లను ఉంచే స్థానిక సంస్థ (సంరక్షకుడు)
+Local body that keeps advance care planning records (custodian)	ముందస్తు సంరక్షణ ప్రణాళిక రికార్డులను ఉంచే స్థానిక సంస్థ (సంరక్షకుడు)
 For example your municipal corporation or gram panchayat. Maharashtra and Karnataka (rural) have named custodians; Andhra Pradesh has not confirmed one yet. You can still sign and record “custodian pending”.	ఉదాహరణకు మీ మున్సిపల్ కార్పొరేషన్ లేదా గ్రామ పంచాయతీ. మహారాష్ట్ర, కర్ణాటక (గ్రామీణ) సంరక్షకులను పేర్కొన్నాయి; ఆంధ్రప్రదేశ్ ఇంకా నిర్ధారించలేదు. మీరు ఇప్పటికీ సంతకం చేసి “సంరక్షకుడు మిగిలి ఉంది” అని నమోదు చేయవచ్చు.
 I am a registered organ donor (Form 7, THOTA 1994).	నేను నమోదైన అవయవ దాతను (ఫారం 7, THOTA 1994).
 I want to donate my body for medical study.	వైద్య అధ్యయనం కోసం నా శరీరాన్ని దానం చేయాలని కోరుకుంటున్నాను.
@@ -2973,9 +2973,9 @@ That file could not be read. Try another.	ఆ ఫైల్ చదవడం స�
 Record as signed and attested	సంతకం చేసి ధృవీకరించినట్లు నమోదు చేయండి
 Need to change something? Start a new version. This printed copy must then not be signed.	ఏదైనా మార్చాలా? కొత్త వెర్షన్ ప్రారంభించండి. అప్పుడు ఈ ప్రింట్ చేసిన కాపీపై సంతకం చేయకూడదు.
 Start a new version	కొత్త వెర్షన్ ప్రారంభించండి
-Signed living will · version $version	సంతకం చేసిన లివింగ్ విల్ · వెర్షన్ $version
+Signed advance care planning · version $version	సంతకం చేసిన ముందస్తు సంరక్షణ ప్రణాళిక · వెర్షన్ $version
 Check the paper copy against the scan and its SHA-256, or with the custodian. Doctors only read this here; nothing in the app starts or stops treatment.	కాగితం కాపీని స్కాన్, దాని SHA-256 తో లేదా సంరక్షకుడితో సరిచూడండి. డాక్టర్లు దీన్ని ఇక్కడ చదవడం మాత్రమే చేస్తారు; యాప్‌లో ఏదీ చికిత్సను ప్రారంభించదు, ఆపదు.
-This is the current living will. Doctors can see that it is signed, witnessed and attested.	ఇది ప్రస్తుత లివింగ్ విల్. ఇది సంతకం చేయబడి, సాక్షుల ముందు చేసి, ధృవీకరించబడిందని డాక్టర్లు చూడవచ్చు.
+This is the current advance care planning. Doctors can see that it is signed, witnessed and attested.	ఇది ప్రస్తుత ముందస్తు సంరక్షణ ప్రణాళిక. ఇది సంతకం చేయబడి, సాక్షుల ముందు చేసి, ధృవీకరించబడిందని డాక్టర్లు చూడవచ్చు.
 thumb impression	వేలిముద్ర
 Witnesses	సాక్షులు
 Acknowledged by $officer on $on	$on న $officer రసీదు ఇచ్చారు
@@ -2996,20 +2996,20 @@ Copy given	కాపీ ఇచ్చారు
 Consent is needed before this copy can be marked as given.	ఈ కాపీని ఇచ్చినట్లు గుర్తించే ముందు అంగీకారం అవసరం.
 Save custodian	సంరక్షకుడిని సేవ్ చేయండి
 Link to ABHA health records (optional)	ABHA ఆరోగ్య రికార్డులకు లింక్ చేయండి (ఐచ్ఛికం)
-The Supreme Court allows adding the living will to digital health records. Sahara only notes the ABHA address here; upload the scan in your ABHA app yourself.	లివింగ్ విల్‌ను డిజిటల్ ఆరోగ్య రికార్డులకు జోడించడానికి సుప్రీం కోర్టు అనుమతిస్తుంది. సహారా ఇక్కడ ABHA చిరునామాను మాత్రమే నోట్ చేస్తుంది; స్కాన్‌ను మీ ABHA యాప్‌లో మీరే అప్‌లోడ్ చేయండి.
+The Supreme Court allows adding advance care planning to digital health records. Sahara only notes the ABHA address here; upload the scan in your ABHA app yourself.	ముందస్తు సంరక్షణ ప్రణాళికను డిజిటల్ ఆరోగ్య రికార్డులకు జోడించడానికి సుప్రీం కోర్టు అనుమతిస్తుంది. సహారా ఇక్కడ ABHA చిరునామాను మాత్రమే నోట్ చేస్తుంది; స్కాన్‌ను మీ ABHA యాప్‌లో మీరే అప్‌లోడ్ చేయండి.
 ABHA address or number	ABHA చిరునామా లేదా నంబర్
-The patient agrees to link the living will with their ABHA records.	లివింగ్ విల్‌ను తన ABHA రికార్డులకు లింక్ చేయడానికి రోగి అంగీకరిస్తున్నారు.
+The patient agrees to link the advance care planning with their ABHA records.	ముందస్తు సంరక్షణ ప్రణాళికను తన ABHA రికార్డులకు లింక్ చేయడానికి రోగి అంగీకరిస్తున్నారు.
 Save ABHA link	ABHA లింక్ సేవ్ చేయండి
 Linked on $on	$on న లింక్ చేశారు
 Change it	మార్చండి
 Changes make a new version that must be printed, signed and attested again. Version $version stays current until then.	మార్పులు చేస్తే కొత్త వెర్షన్ తయారవుతుంది, దాన్ని మళ్లీ ప్రింట్ చేసి, సంతకం చేసి, ధృవీకరించాలి. అప్పటి వరకు వెర్షన్ $version ప్రస్తుతంగా ఉంటుంది.
 A new version is already in progress below.	కొత్త వెర్షన్ ఇప్పటికే కింద కొనసాగుతోంది.
 Cancel it	రద్దు చేయండి
-A living will is cancelled in writing: the person signs a short note saying they cancel it, the same way it was made. Then give the note to everyone who has a copy.	లివింగ్ విల్ లిఖితపూర్వకంగా రద్దవుతుంది: ఆ వ్యక్తి దాన్ని ఎలా చేశారో అలాగే, దాన్ని రద్దు చేస్తున్నట్లు ఒక చిన్న నోట్‌పై సంతకం చేస్తారు. ఆ తర్వాత ఆ నోట్‌ను కాపీ ఉన్న అందరికీ ఇవ్వండి.
+Advance care planning is cancelled in writing: the person signs a short note saying they cancel it, the same way it was made. Then give the note to everyone who has a copy.	ముందస్తు సంరక్షణ ప్రణాళిక లిఖితపూర్వకంగా రద్దవుతుంది: ఆ వ్యక్తి దాన్ని ఎలా చేశారో అలాగే, దాన్ని రద్దు చేస్తున్నట్లు ఒక చిన్న నోట్‌పై సంతకం చేస్తారు. ఆ తర్వాత ఆ నోట్‌ను కాపీ ఉన్న అందరికీ ఇవ్వండి.
 Record a written cancellation	లిఖిత రద్దును నమోదు చేయండి
 Date of the written cancellation	లిఖిత రద్దు తేదీ
 The person signed a written cancellation.	ఆ వ్యక్తి లిఖిత రద్దుపై సంతకం చేశారు.
-Cancel the living will	లివింగ్ విల్ రద్దు చేయండి
+Cancel the advance care planning	ముందస్తు సంరక్షణ ప్రణాళిక రద్దు చేయండి
 Sahara plans are for adults. This date of birth is under 18.	సహారా ప్రణాళికలు పెద్దవారి కోసం. ఈ పుట్టిన తేదీ 18 ఏళ్ల కంటే తక్కువ.
 Started in the emergency department. A plan made for the first time in the resuscitation bay records panic, not preference; review it when the patient is stable.	అత్యవసర విభాగంలో ప్రారంభించారు. రీసస్సిటేషన్ బేలో మొదటిసారి చేసిన ప్రణాళిక కంగారును నమోదు చేస్తుంది, ఇష్టాన్ని కాదు; రోగి స్థిరపడిన తర్వాత దీన్ని మళ్లీ చూడండి.
 Keep only the last 4 characters of an ID, never the full number.	ID యొక్క చివరి 4 అక్షరాలు మాత్రమే ఉంచండి, పూర్తి నంబర్‌ను ఎప్పుడూ కాదు.
@@ -3120,8 +3120,8 @@ Has capacity	నిర్ణయించే సామర్థ్యం ఉం�
 Has capacity, has asked family to decide	నిర్ణయించే సామర్థ్యం ఉంది, నిర్ణయించమని కుటుంబాన్ని కోరారు
 Capacity fluctuates — reassess	నిర్ణయించే సామర్థ్యం మారుతూ ఉంటుంది — మళ్లీ పరీక్షించండి
 Lacks capacity	నిర్ణయించే సామర్థ్యం లేదు
-Named in a signed living will	సంతకం చేసిన లివింగ్ విల్‌లో పేర్కొన్నవారు
-Named by the patient (no living will)	రోగి పేర్కొన్నవారు (లివింగ్ విల్ లేదు)
+Named in signed advance care planning	సంతకం చేసిన ముందస్తు సంరక్షణ ప్రణాళికలో పేర్కొన్నవారు
+Named by the patient (no advance care planning)	రోగి పేర్కొన్నవారు (ముందస్తు సంరక్షణ ప్రణాళిక లేదు)
 Next of kin / next friend / guardian	దగ్గరి బంధువు / సన్నిహిత మిత్రుడు / సంరక్షకుడు
 Court-appointed guardian	కోర్టు నియమించిన సంరక్షకుడు
 Aadhaar	ఆధార్
@@ -3178,7 +3178,6 @@ Implanted device	శరీరంలో అమర్చిన పరికరం
 Decision-maker (24 h phone)	నిర్ణయం తీసుకునేవారు (24 గంటల ఫోన్)
 Treating consultant and palliative contact	చికిత్స చేస్తున్న కన్సల్టెంట్, పాలియేటివ్ సంప్రదింపు
 Capacity	నిర్ణయించే సామర్థ్యం
-Living will (AMD)	లివింగ్ విల్ (AMD)
 Version, signed, review due	వెర్షన్, సంతకం, సమీక్ష తేదీ
 If unclear, or the problem is new and reversible — treat fully and call.	స్పష్టత లేకపోతే, లేదా సమస్య కొత్తది, నయం కాగలది అయితే — పూర్తి చికిత్స చేసి ఫోన్ చేయండి.
 Full record	పూర్తి రికార్డ్
@@ -3208,9 +3207,9 @@ Your rights	మీ హక్కులు
 Name, hospital number, date of birth, address and phone. The people who decide for the patient. Illness details, treatment choices, the patient’s own words and signatures. A log of who opened or changed the plan.	పేరు, ఆసుపత్రి నంబర్, పుట్టిన తేదీ, చిరునామా, ఫోన్. రోగి తరఫున నిర్ణయించేవారు. వ్యాధి వివరాలు, చికిత్స ఎంపికలు, రోగి స్వంత మాటలు, సంతకాలు. ప్రణాళికను ఎవరు తెరిచారో లేదా మార్చారో తెలిపే లాగ్.
 Your name, date of birth, address and the last 4 digits of your ID. Your representatives and witnesses. Your treatment wishes. The signed scan and its fingerprint (SHA-256). A log of each change, print and share.	మీ పేరు, పుట్టిన తేదీ, చిరునామా, ID చివరి 4 అంకెలు. మీ ప్రతినిధులు, సాక్షులు. మీ చికిత్స కోరికలు. సంతకం చేసిన స్కాన్, దాని వేలిముద్ర (SHA-256). ప్రతి మార్పు, ప్రింట్, షేర్ యొక్క లాగ్.
 So that an emergency doctor can find and follow the patient’s wishes, and the care team can review them.	అత్యవసర డాక్టర్ రోగి కోరికలను కనుగొని పాటించడానికి, సంరక్షణ బృందం వాటిని సమీక్షించడానికి.
-To make your living will paper, keep track of its versions, and show doctors that it exists.	మీ లివింగ్ విల్ కాగితం తయారు చేయడానికి, దాని వెర్షన్లను ట్రాక్ చేయడానికి, అది ఉందని డాక్టర్లకు చూపించడానికి.
+To write down your advance care planning, keep track of its versions, and show doctors that it exists.	మీ ముందస్తు సంరక్షణ ప్రణాళికను రాసుకోవడానికి, దాని వెర్షన్లను ట్రాక్ చేయడానికి, అది ఉందని డాక్టర్లకు చూపించడానికి.
 On this phone. It leaves this phone only in two cases. When a plan is signed, an emergency card is issued and a copy of the signed plan goes to the Sahara server so the QR code works. If an SMS is sent, the phone number goes to the SMS company.	ఈ ఫోన్‌లో. ఇది రెండు సందర్భాల్లో మాత్రమే ఈ ఫోన్ దాటి వెళ్తుంది. ప్రణాళికపై సంతకం చేసినప్పుడు, అత్యవసర కార్డ్ జారీ అవుతుంది, QR కోడ్ పనిచేయడానికి సంతకం చేసిన ప్రణాళిక కాపీ Sahara సర్వర్‌కు వెళ్తుంది. SMS పంపితే, ఫోన్ నంబర్ SMS కంపెనీకి వెళ్తుంది.
-On this phone. It is not sent to any server. If an emergency card is issued, the card carries only the living will’s status, date, version and attesting officer. You decide who gets a paper copy.	ఈ ఫోన్‌లో. ఇది ఏ సర్వర్‌కూ పంపబడదు. అత్యవసర కార్డ్ జారీ చేస్తే, కార్డ్‌లో లివింగ్ విల్ స్థితి, తేదీ, వెర్షన్, ధృవీకరించిన అధికారి మాత్రమే ఉంటాయి. కాగితం కాపీ ఎవరికి ఇవ్వాలో మీరే నిర్ణయిస్తారు.
+On this phone. It is not sent to any server. If an emergency card is issued, the card carries only the status, date, version and attesting officer of your advance care planning. You decide who gets a paper copy.	ఈ ఫోన్‌లో. ఇది ఏ సర్వర్‌కూ పంపబడదు. అత్యవసర కార్డ్ జారీ చేస్తే, కార్డ్‌లో ముందస్తు సంరక్షణ ప్రణాళిక స్థితి, తేదీ, వెర్షన్, ధృవీకరించిన అధికారి మాత్రమే ఉంటాయి. కాగితం కాపీ ఎవరికి ఇవ్వాలో మీరే నిర్ణయిస్తారు.
 See it: download your data below. Correct it: ask for a review, and a new version is made. Withdraw: cancel the plan at any time, and the card stops working. Delete: remove an unsigned draft below. Signed versions and the log cannot be deleted, because they show what was decided and who saw it.	చూడటం: కింద మీ డేటా డౌన్‌లోడ్ చేయండి. సరిదిద్దడం: సమీక్ష కోరండి, కొత్త వెర్షన్ తయారవుతుంది. ఉపసంహరణ: ఎప్పుడైనా ప్రణాళికను రద్దు చేయండి, కార్డ్ పనిచేయడం ఆగిపోతుంది. తొలగింపు: సంతకం లేని డ్రాఫ్ట్‌ను కింద నుండి తొలగించండి. సంతకం చేసిన వెర్షన్లు, లాగ్ తొలగించలేరు, ఎందుకంటే అవి ఏం నిర్ణయించారో, ఎవరు చూశారో చూపిస్తాయి.
 See it: download your data below. Correct it: make a new version. Withdraw: cancel it in writing at any time. Delete: remove an unsigned draft below. Signed versions and the log cannot be deleted. Deleting here does not touch any paper you printed, so destroy that yourself.	చూడటం: కింద మీ డేటా డౌన్‌లోడ్ చేయండి. సరిదిద్దడం: కొత్త వెర్షన్ చేయండి. ఉపసంహరణ: ఎప్పుడైనా లిఖితపూర్వకంగా రద్దు చేయండి. తొలగింపు: సంతకం లేని డ్రాఫ్ట్‌ను కింద నుండి తొలగించండి. సంతకం చేసిన వెర్షన్లు, లాగ్ తొలగించలేరు. ఇక్కడ తొలగిస్తే మీరు ప్రింట్ చేసిన కాగితం పోదు, దాన్ని మీరే నాశనం చేయండి.
 How to ask	ఎలా అడగాలి
@@ -3235,9 +3234,9 @@ Applies to	వర్తించేది
 Not saved: 	సేవ్ కాలేదు:
 Couldn't make the PDF. Try again.	PDF తయారు చేయలేకపోయాం. మళ్లీ ప్రయత్నించండి.
 Share the emergency plan	అత్యవసర ప్రణాళికను షేర్ చేయండి
-Share the living will	లివింగ్ విల్‌ను షేర్ చేయండి
+Share the advance care planning	ముందస్తు సంరక్షణ ప్రణాళికను షేర్ చేయండి
 Plan withdrawn. Its wallet card link is switched off.	ప్రణాళిక ఉపసంహరించారు. దాని వాలెట్ కార్డ్ లింక్ ఆపివేయబడింది.
-Emergency plan & living will	అత్యవసర ప్రణాళిక, లివింగ్ విల్
+Care planning	సంరక్షణ ప్రణాళిక
 Ambulances and emergency doctors resuscitate by default. A wish counts only if this plan is found and signed. It stays on this phone; only a signed plan's wallet card copy goes to the Sahara server.	అంబులెన్స్‌లు, అత్యవసర డాక్టర్లు డిఫాల్ట్‌గా పూర్తి చికిత్స చేస్తారు. ఈ ప్రణాళిక దొరికి, సంతకం చేసి ఉంటేనే కోరిక పరిగణనలోకి వస్తుంది. ఇది ఈ ఫోన్‌లోనే ఉంటుంది; సంతకం చేసిన ప్రణాళిక వాలెట్ కార్డ్ కాపీ మాత్రమే Sahara సర్వర్‌కు వెళ్తుంది.
 The saved plan on this phone could not be read. Standard care applies until a new plan is signed.	ఈ ఫోన్‌లో సేవ్ చేసిన ప్రణాళికను చదవలేకపోయాం. కొత్త ప్రణాళికపై సంతకం చేసే వరకు సాధారణ చికిత్స వర్తిస్తుంది.
 ED Quick View	ED క్విక్ వ్యూ
@@ -3253,7 +3252,7 @@ Withdraw the plan	ప్రణాళికను ఉపసంహరించం�
 Start a plan	ప్రణాళిక ప్రారంభించండి
 Wallet card with QR	QR తో వాలెట్ కార్డ్
 Signed and recorded v$v	సంతకం చేసి నమోదు చేశారు v$v
-Open living will	లివింగ్ విల్ తెరవండి
+Open advance care planning	ముందస్తు సంరక్షణ ప్రణాళిక తెరవండి
 Plan versions	ప్రణాళిక వెర్షన్లు
 Audit log (cannot be changed)	ఆడిట్ లాగ్ (మార్చలేరు)
 Chain checked: no entry has been changed or removed.	తనిఖీ పూర్తయింది: ఏ ఎంట్రీ మార్చబడలేదు లేదా తొలగించబడలేదు.
@@ -3314,10 +3313,10 @@ Assessed on	పరీక్షించిన తేదీ
 Basis of the assessment	పరీక్షకు ఆధారం
 Reassess on	మళ్లీ పరీక్షించే తేదీ
 A patient with capacity can change or cancel any part of this plan by saying so; their wish now overrides the paper.	నిర్ణయించే సామర్థ్యం ఉన్న రోగి, చెప్పడం ద్వారా ఈ ప్రణాళికలోని ఏ భాగాన్నైనా మార్చవచ్చు లేదా రద్దు చేయవచ్చు; వారి ప్రస్తుత కోరిక కాగితం కంటే ఎక్కువ.
-Existing living will or wishes	ఇప్పటికే ఉన్న లివింగ్ విల్ లేదా కోరికలు
-A signed, attested living will	సంతకం చేసి, ధృవీకరించిన లివింగ్ విల్
+Existing advance care planning or wishes	ఇప్పటికే ఉన్న ముందస్తు సంరక్షణ ప్రణాళిక లేదా కోరికలు
+Signed, attested advance care planning	సంతకం చేసి, ధృవీకరించిన ముందస్తు సంరక్షణ ప్రణాళిక
 Wishes said or written before	ముందు చెప్పిన లేదా రాసిన కోరికలు
-Date of the living will	లివింగ్ విల్ తేదీ
+Date of the advance care planning	ముందస్తు సంరక్షణ ప్రణాళిక తేదీ
 Where the original is kept	అసలు ఎక్కడ ఉంచారు
 Attested by (notary or gazetted officer)	ధృవీకరించినవారు (నోటరీ లేదా గెజిటెడ్ అధికారి)
 What was said or written	ఏం చెప్పారు లేదా రాశారు
@@ -3412,13 +3411,13 @@ SAHARA EMERGENCY CARE PLAN	సహారా అత్యవసర సంరక్
 QR code with a link to this plan	ఈ ప్రణాళిక లింక్ ఉన్న QR కోడ్
 QR code: offline text summary of this card	QR కోడ్: ఈ కార్డ్ ఆఫ్‌లైన్ సారాంశం
 Plan v$v · review due $due	ప్రణాళిక v$v · సమీక్ష $due
-The living will changed after this card was issued, so the link shows the old status. Issue a new card and tear up the old one.	ఈ కార్డ్ జారీ అయిన తర్వాత లివింగ్ విల్ మారింది, కాబట్టి లింక్ పాత స్థితిని చూపిస్తుంది. కొత్త కార్డ్ జారీ చేసి, పాతదాన్ని చింపేయండి.
+The advance care planning changed after this card was issued, so the link shows the old status. Issue a new card and tear up the old one.	ఈ కార్డ్ జారీ అయిన తర్వాత ముందస్తు సంరక్షణ ప్రణాళిక మారింది, కాబట్టి లింక్ పాత స్థితిని చూపిస్తుంది. కొత్త కార్డ్ జారీ చేసి, పాతదాన్ని చింపేయండి.
 Issue a new card	కొత్త కార్డ్ జారీ చేయండి
 The link QR holds only a random link with no name or medical details. The offline QR holds the summary above as plain text, so anyone who scans it can read it; keep the card with the patient. When the plan is replaced or withdrawn the link is switched off, but the offline QR on old paper still reads — tear up old cards.	లింక్ QR లో పేరు, వైద్య వివరాలు లేని యాదృచ్ఛిక లింక్ మాత్రమే ఉంటుంది. ఆఫ్‌లైన్ QR లో పై సారాంశం సాదా టెక్స్ట్‌గా ఉంటుంది, కాబట్టి స్కాన్ చేసిన ఎవరైనా చదవగలరు; కార్డ్‌ను రోగి వద్దే ఉంచండి. ప్రణాళికను భర్తీ చేసినా లేదా ఉపసంహరించినా లింక్ ఆగిపోతుంది, కానీ పాత కాగితంపై ఉన్న ఆఫ్‌లైన్ QR ఇంకా చదవబడుతుంది — పాత కార్డ్‌లను చింపేయండి.
 Print or share the plan and card (PDF)	ప్రణాళిక, కార్డ్‌ను ప్రింట్ చేయండి లేదా షేర్ చేయండి (PDF)
-ED Quick View, wallet card QR and living will	ED క్విక్ వ్యూ, వాలెట్ కార్డ్ QR, లివింగ్ విల్
+ED Quick View, wallet card QR and advance care planning	ED క్విక్ వ్యూ, వాలెట్ కార్డ్ QR, ముందస్తు సంరక్షణ ప్రణాళిక
 This update does not record $missing. Visit history is separate.	ఈ అప్‌డేట్ $missing ను నమోదు చేయదు. సందర్శనల చరిత్ర వేరుగా ఉంటుంది.
-ECTPR wizard, ED Quick View, wallet card QR, living will	ECTPR విజార్డ్, ED క్విక్ వ్యూ, వాలెట్ కార్డ్ QR, లివింగ్ విల్
+ECTPR wizard, ED Quick View, wallet card QR, advance care planning	ECTPR విజార్డ్, ED క్విక్ వ్యూ, వాలెట్ కార్డ్ QR, ముందస్తు సంరక్షణ ప్రణాళిక
 , last on $day	, చివరిసారి $day
 Opened once$last	ఒకసారి తెరిచారు$last
 Opened $views times$last	$views సార్లు తెరిచారు$last
@@ -4209,7 +4208,7 @@ If care is at home, ask who visits and how often.	సంరక్షణ ఇం�
 Different people said different things. Both are shown. Check with the patient which one stands.	వేర్వేరు వ్యక్తులు వేర్వేరు మాటలు చెప్పారు. రెండూ చూపబడ్డాయి. ఏది సరైనదో రోగితో నిర్ధారించండి.
 Changed during the talk. The latest statement is marked.	సంభాషణలో మారింది. చివరి మాట గుర్తించబడింది.
 Said earlier, replaced by a later statement	ముందు చెప్పినది, తర్వాతి మాటతో మారింది
-Goals-of-care note, in the order of the legal form	సంరక్షణ లక్ష్యాల నోట్, చట్టపరమైన ఫారం క్రమంలో
+Goals-of-care note, in the order of the clinical document	సంరక్షణ లక్ష్యాల నోట్, క్లినికల్ పత్రం క్రమంలో
 Signed and locked on the doctor's device	డాక్టర్ పరికరంలో సంతకం చేసి లాక్ చేయబడింది
 Doctor's note	డాక్టర్ నోట్
 radiation oncology	రేడియేషన్ ఆంకాలజీ
@@ -4288,7 +4287,7 @@ Functional status – ECOG	క్రియాత్మక స్థితి –
 Gastrostomy (PEG)	గ్యాస్ట్రోస్టమీ (PEG)
 Getting the speaker pack, first time only	మాట్లాడేవారి ప్యాక్ పొందుతోంది, మొదటిసారి మాత్రమే
 Getting the speech pack, first time only	స్పీచ్ ప్యాక్ పొందుతోంది, మొదటిసారి మాత్రమే
-Goals-of-care conversation note, in the order of the legal form	సంరక్షణ లక్ష్యాల సంభాషణ నోట్, చట్టపరమైన ఫారం క్రమంలో
+Goals-of-care conversation note, in the order of the clinical document	సంరక్షణ లక్ష్యాల సంభాషణ నోట్, క్లినికల్ పత్రం క్రమంలో
 Had they been previously admitted to any hospital for the current condition?	ప్రస్తుత పరిస్థితి కోసం వారు ఇంతకు ముందు ఏదైనా ఆసుపత్రిలో చేరారా?
 High-flow nasal cannula (HFNC)	హై-ఫ్లో నాసల్ కాన్యులా (HFNC)
 Higher-concentration oxygen. Tolerable, but the mask can feel confining and interferes with speech.	అధిక గాఢత గల ఆక్సిజన్. తట్టుకోగలిగేది, కానీ మాస్క్ బంధించినట్లు అనిపించవచ్చు మరియు మాట్లాడటానికి అడ్డుపడుతుంది.
@@ -4546,12 +4545,11 @@ Incident	సంఘటన
 Link ABHA	ABHA లింక్ చేయండి
 Make PDF	PDF తయారు చేయండి
 Mark as signed	సంతకం చేసినట్లు నమోదు చేయండి
-New living will	కొత్త లివింగ్ విల్
+New advance care planning	కొత్త ముందస్తు సంరక్షణ ప్రణాళిక
 New version	కొత్త వెర్షన్
 No ED access after this time.	ఈ సమయం తర్వాత ED యాక్సెస్ లేదు.
 No connection. Please phone them.	కనెక్షన్ లేదు. దయచేసి వారికి ఫోన్ చేయండి.
 No draft to delete.	తొలగించడానికి డ్రాఫ్ట్ లేదు.
-No living will	లివింగ్ విల్ లేదు
 No mobile number.	మొబైల్ నంబర్ లేదు.
 No signed plan at this time.	ఆ సమయంలో సంతకం చేసిన ప్రణాళిక లేదు.
 None yet.	ఇంకా ఏమీ లేదు.
@@ -4656,7 +4654,7 @@ Not uploaded yet	ఇంకా అప్‌లోడ్ కాలేదు
 Old QR may still open until the phone is online.	ఫోన్ ఆన్‌లైన్ అయ్యే వరకు పాత QR ఇంకా తెరుచుకోవచ్చు.
 Online QR	ఆన్‌లైన్ QR
 Offline QR	ఆఫ్‌లైన్ QR
-Living will changed. Issue a new card.	లివింగ్ విల్ మారింది. కొత్త కార్డ్ జారీ చేయండి.
+Advance care planning changed. Issue a new card.	ముందస్తు సంరక్షణ ప్రణాళిక మారింది. కొత్త కార్డ్ జారీ చేయండి.
 New card	కొత్త కార్డ్
 Print or share	ప్రింట్ లేదా షేర్ చేయండి
 All doctors	అందరు డాక్టర్లు
@@ -4982,7 +4980,7 @@ Entries	నమోదులు
 Account and sharing	ఖాతా, పంచుకోవడం
 Share care with family	కుటుంబంతో సంరక్షణ పంచుకోండి
 Send a link on WhatsApp	WhatsApp లో లింక్ పంపండి
-Plan, wallet card, living will	ప్లాన్, వాలెట్ కార్డ్, లివింగ్ విల్
+Goals of care, advance care planning, emergency card	సంరక్షణ లక్ష్యాల చర్చ, ముందస్తు సంరక్షణ ప్రణాళిక, అత్యవసర కార్డ్
 Settings	సెట్టింగ్‌లు
 Notifications	నోటిఫికేషన్లు
 Privacy and data	గోప్యత, డేటా
@@ -5072,7 +5070,6 @@ A one-page summary hospital staff can read fast	ఆసుపత్రి సి�
 All 10 parts of the emergency care plan, from patient details to signatures	అత్యవసర సంరక్షణ ప్రణాళికలోని మొత్తం 10 భాగాలు, రోగి వివరాల నుండి సంతకాల వరకు
 For the emergency room	అత్యవసర విభాగం కోసం
 Make the full care plan	పూర్తి సంరక్షణ ప్రణాళిక తయారు చేయండి
-Plan, pocket emergency card, living will	ప్రణాళిక, జేబులో ఉంచే అత్యవసర కార్డ్, లివింగ్ విల్
 Pocket emergency card	జేబులో ఉంచే అత్యవసర కార్డ్
 Step ${step + 1} · $name	దశ ${step + 1} · $name
 Card file	కార్డ్ ఫైల్
@@ -5169,3 +5166,57 @@ Add a few words (optional)	కొన్ని మాటలు రాయండి
 Fewer details	తక్కువ వివరాలు
 Medicine name *	మందు పేరు *
 Region	ప్రాంతం
+
+Goals of care discussion, advance care planning and the emergency care plan belong together. All three are clinical documents.	సంరక్షణ లక్ష్యాల చర్చ, ముందస్తు సంరక్షణ ప్రణాళిక, అత్యవసర సంరక్షణ ప్రణాళిక కలిసి పనిచేస్తాయి. ఈ మూడూ క్లినికల్ పత్రాలు.
+Goals of care discussion	సంరక్షణ లక్ష్యాల చర్చ
+The recorded conversation about what matters most and the care to aim for.	అత్యంత ముఖ్యమైనది ఏమిటి, ఎలాంటి సంరక్షణ లక్ష్యంగా పెట్టుకోవాలి అనే దానిపై నమోదు చేసిన సంభాషణ.
+Your doctor records this conversation with you.	మీ డాక్టర్ ఈ సంభాషణను మీతో కలిసి నమోదు చేస్తారు.
+Emergency care plan & card	అత్యవసర సంరక్షణ ప్రణాళిక, కార్డ్
+The summary for the ambulance or emergency department, with a QR code.	అంబులెన్స్ లేదా అత్యవసర విభాగం కోసం సారాంశం, QR కోడ్‌తో.
+The person’s own wishes about future care, written down.	భవిష్యత్ సంరక్షణ గురించి వ్యక్తి సొంత కోరికలు, రాసి పెట్టినవి.
+A clinical document that records the person’s own wishes about future care.	భవిష్యత్ సంరక్షణ గురించి వ్యక్తి సొంత కోరికలను నమోదు చేసే క్లినికల్ పత్రం.
+Your wellbeing	మీ శ్రేయస్సు
+Kept on this phone only. Not shared.	ఈ ఫోన్‌లో మాత్రమే ఉంటుంది. ఎవరితో పంచుకోబడదు.
+Caring is hard work. A one-minute check helps you notice when you need support.	సంరక్షణ కష్టమైన పని. ఒక నిమిషం పరీక్ష మీకు ఎప్పుడు సహాయం అవసరమో తెలుసుకోవడానికి తోడ్పడుతుంది.
+A lot to carry	చాలా భారం
+Manageable	నిభాయించగలిగేది
+In the past month, how often have you felt this way?	గత నెలలో, మీకు ఇలా ఎంత తరచుగా అనిపించింది?
+Never	ఎప్పుడూ కాదు
+Rarely	అరుదుగా
+Sometimes	కొన్నిసార్లు
+Quite often	తరచుగా
+Nearly always	దాదాపు ఎల్లప్పుడూ
+Answer all four to save.	సేవ్ చేయడానికి నాలుగింటికీ జవాబు ఇవ్వండి.
+Take the 1-minute check	1 నిమిషం పరీక్ష చేయండి
+Write a few words. Only you can see this.	కొన్ని మాటలు రాయండి. దీన్ని మీరు మాత్రమే చూడగలరు.
+Write in my journal	నా డైరీలో రాయండి
+Only you can see these, on this phone.	వీటిని మీరు మాత్రమే, ఈ ఫోన్‌లో చూడగలరు.
+Higher than your last check	మీ గత పరీక్ష కంటే ఎక్కువ
+Lower than your last check	మీ గత పరీక్ష కంటే తక్కువ
+About the same as your last check	మీ గత పరీక్షతో సమానంగా
+You're carrying a lot	మీరు చాలా భారం మోస్తున్నారు
+Many family caregivers feel this way. It is not a failing, and help is there. This check is a screening, not a diagnosis.	చాలా మంది కుటుంబ సంరక్షకులకు ఇలాగే అనిపిస్తుంది. ఇది లోపం కాదు, సహాయం అందుబాటులో ఉంది. ఈ పరీక్ష ఒక ప్రాథమిక సూచన మాత్రమే, నిర్ధారణ కాదు.
+Talk to a counsellor	కౌన్సెలర్‌తో మాట్లాడండి
+Tele-MANAS is free, day and night.	టెలి-మనస్ ఉచితం, పగలూ రాత్రీ.
+Find a counsellor nearby	దగ్గరలో కౌన్సెలర్‌ను వెతకండి
+Respite care	తాత్కాలిక విశ్రాంతి సంరక్షణ
+Your palliative care team can arrange temporary nursing or day-care support, so you can rest. Ask them at your next call or visit.	మీరు విశ్రాంతి తీసుకునేలా, మీ పాలియేటివ్ కేర్ బృందం తాత్కాలిక నర్సింగ్ లేదా డే-కేర్ సహాయం ఏర్పాటు చేయగలదు. తదుపరి కాల్ లేదా సందర్శనలో వారిని అడగండి.
+Caregiver support groups	సంరక్షకుల సహాయ బృందాలు
+Swayam Foundation caregiver support	స్వయం ఫౌండేషన్ సంరక్షకుల సహాయం
+SoulUp caregiving support group	సోల్‌అప్ సంరక్షణ సహాయ బృందం
+These open in your browser. In an emergency, call 112.	ఇవి మీ బ్రౌజర్‌లో తెరుచుకుంటాయి. అత్యవసరంలో 112కు కాల్ చేయండి.
+You matter, and your health matters too.	మీరు ముఖ్యం, మీ ఆరోగ్యం కూడా ముఖ్యం.
+Thank you for caring so well. Have you had some water, something to eat, and a moment to sit down today? Looking after yourself is part of looking after them.	ఇంత బాగా చూసుకుంటున్నందుకు ధన్యవాదాలు. ఈ రోజు నీళ్లు తాగారా, ఏదైనా తిన్నారా, కాసేపు కూర్చున్నారా? మిమ్మల్ని మీరు చూసుకోవడం కూడా వారిని చూసుకోవడంలో భాగమే.
+Check how I am (1 minute)	నా పరిస్థితి చూసుకోండి (1 నిమిషం)
+Distress thermometer	బాధ థర్మామీటర్
+How much distress this past week? 0–10	ఈ వారం ఎంత బాధ ఉంది? 0–10
+Today: no distress	ఈ రోజు: బాధ లేదు
+Tap to change	మార్చడానికి నొక్కండి
+Symptom ratings use a 0–10 scale in the style of ESAS-r (Edmonton Symptom Assessment System). This is a personal diary, not a scored ESAS-r.	లక్షణాల అంకెలు ESAS-r (Edmonton Symptom Assessment System) తరహాలో 0–10 స్కేలులో ఉంటాయి. ఇది వ్యక్తిగత డైరీ, స్కోరు చేసిన ESAS-r కాదు.
+Last check: ${latest.score}/${CaregiverWellbeingRules.MAX_SCORE} · $band	చివరి తనిఖీ: ${latest.score}/${CaregiverWellbeingRules.MAX_SCORE} · $band
+Stressed, between caring for $name and meeting your other responsibilities?	$name సంరక్షణ మరియు మీ ఇతర బాధ్యతల మధ్య ఒత్తిడిగా ఉందా?
+Strained when you are around $name?	$name దగ్గర ఉన్నప్పుడు ఒత్తిడిగా అనిపిస్తుందా?
+That your own health has suffered because of caring for $name?	$name సంరక్షణ వల్ల మీ ఆరోగ్యం దెబ్బతిన్నదా?
+That you don't have enough time for yourself because of caring for $name?	$name సంరక్షణ వల్ల మీకోసం సమయం సరిపోవడం లేదా?
+How are you feeling about caring for $personName?	$personName సంరక్షణ గురించి మీకు ఎలా అనిపిస్తోంది?
+Past checks, oldest first: $summary out of ${CaregiverWellbeingRules.MAX_SCORE}	హిందటి తనిఖీలు, పాతవి ముందు: ${CaregiverWellbeingRules.MAX_SCORE} లో $summary

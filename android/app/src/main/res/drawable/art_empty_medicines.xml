@@ -8,7 +8,7 @@
     <path android:fillColor="#B9C3EE" android:pathData="M61.6,78L88.4,78L86,112L64,112z"/>
     <path android:strokeColor="#2447D8" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M60,58L90,58L86,112L64,112z"/>
     <path android:fillColor="#C2178E" android:pathData="M159,56h22a9,9 0 0 1 9,9v42a9,9 0 0 1 -9,9h-22a9,9 0 0 1 -9,-9v-42a9,9 0 0 1 9,-9z"/>
-    <path android:fillColor="#D2390B" android:pathData="M158,42h24a4,4 0 0 1 4,4v8a4,4 0 0 1 -4,4h-24a4,4 0 0 1 -4,-4v-8a4,4 0 0 1 4,-4z"/>
+    <path android:fillColor="#3B7562" android:pathData="M158,42h24a4,4 0 0 1 4,4v8a4,4 0 0 1 -4,4h-24a4,4 0 0 1 -4,-4v-8a4,4 0 0 1 4,-4z"/>
     <path android:fillColor="#FFFDF9" android:pathData="M159,74h22a3,3 0 0 1 3,3v18a3,3 0 0 1 -3,3h-22a3,3 0 0 1 -3,-3v-18a3,3 0 0 1 3,-3z"/>
     <path android:strokeColor="#C2178E" android:strokeWidth="2.4" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M161,82H179M161,90H173"/>
     <path android:fillColor="#5E5249" android:fillAlpha="0.18" android:pathData="M58,108h124a10,10 0 0 1 10,10v24a10,10 0 0 1 -10,10h-124a10,10 0 0 1 -10,-10v-24a10,10 0 0 1 10,-10z"/>

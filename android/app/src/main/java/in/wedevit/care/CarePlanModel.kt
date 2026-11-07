@@ -402,8 +402,8 @@ object PlanText {
         Capacity.FLUCTUATES -> Bi("Capacity fluctuates — reassess", "निर्णय-क्षमता घटती-बढ़ती है — दोबारा जाँचें"); Capacity.LACKS -> Bi("Lacks capacity", "निर्णय नहीं ले सकते")
     }
     fun authority(a: AuthorityBasis) = when (a) {
-        AuthorityBasis.NAMED_IN_AMD -> Bi("Named in a signed living will", "हस्ताक्षरित लिविंग विल में नामित")
-        AuthorityBasis.NAMED_BY_PATIENT -> Bi("Named by the patient (no living will)", "मरीज़ ने नाम दिया (लिविंग विल नहीं)")
+        AuthorityBasis.NAMED_IN_AMD -> Bi("Named in signed advance care planning", "हस्ताक्षरित अग्रिम देखभाल योजना में नामित")
+        AuthorityBasis.NAMED_BY_PATIENT -> Bi("Named by the patient (no advance care planning)", "मरीज़ ने नाम दिया (अग्रिम देखभाल योजना नहीं)")
         AuthorityBasis.NEXT_OF_KIN -> Bi("Next of kin / next friend / guardian", "निकट संबंधी / मित्र / अभिभावक")
         AuthorityBasis.COURT_APPOINTED -> Bi("Court-appointed guardian", "अदालत द्वारा नियुक्त अभिभावक")
     }
@@ -696,7 +696,7 @@ object EdView {
             homeCare.takeIf { it.isNotEmpty() }?.let { EdRow("HOME_CARE", Bi("Home care", "घर पर देखभाल"), Bi.join("\n", it)) },
             withdrawal.takeIf { it.isNotEmpty() }?.let { EdRow("WITHDRAWAL", Bi("Withdrawal or withholding (medical boards)", "इलाज रोकना या शुरू न करना (मेडिकल बोर्ड)"), Bi.join("\n", it)) },
             EdRow("CAPACITY", Bi("Capacity", "निर्णय-क्षमता"), capacity ?: NOT_RECORDED, flag = r.capacity.status == Capacity.FLUCTUATES),
-            EdRow("AMD", Bi("Living will (AMD)", "लिविंग विल (AMD)"), amd, flag = amdGoverns),
+            EdRow("AMD", Bi("Advance care planning", "अग्रिम देखभाल योजना"), amd, flag = amdGoverns),
             EdRow("VERSION", Bi("Version, signed, review due", "संस्करण, हस्ताक्षर, समीक्षा"), version),
         )
     }

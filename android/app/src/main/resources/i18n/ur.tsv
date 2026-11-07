@@ -741,7 +741,7 @@ Reviewed conversation	جانچی ہوئی بات چیت
 Account draft	اکاؤنٹ کا ڈرافٹ
 Revision ${draft.revision}	نظرثانی ${draft.revision}
 Open conversation	بات چیت کھولیں
-Clinical review is a separate step by a verified, invited account. It records a discussion; it does not execute a legal advance directive or authorise treatment.	طبی جانچ تصدیق شدہ اور بلائے گئے اکاؤنٹ کا الگ قدم ہے۔ یہ بات چیت کو درج کرتی ہے؛ اس سے نہ کوئی قانونی ایڈوانس ڈائریکٹو بنتا ہے، نہ علاج کی اجازت ملتی ہے۔
+Clinical review is a separate step by a verified, invited account. It records a discussion; it does not execute advance care planning or authorise treatment.	طبی جانچ تصدیق شدہ اور بلائے گئے اکاؤنٹ کا الگ قدم ہے۔ یہ بات چیت کو درج کرتی ہے؛ اس سے نہ پیشگی نگہداشت کی منصوبہ بندی عمل میں آتی ہے، نہ علاج کی اجازت ملتی ہے۔
 Shared clinician workspace	ڈاکٹر کا شیئر کیا ہوا ورک اسپیس
 Review conversation	بات چیت جانچیں
 Original words	اصل الفاظ
@@ -2713,16 +2713,16 @@ Withholding or withdrawing life-sustaining treatment for a patient who cannot de
 Enter your full name.	اپنا پورا نام لکھیں۔
 Enter your date of birth.	اپنی تاریخِ پیدائش لکھیں۔
 Enter a real date of birth.	صحیح تاریخِ پیدائش لکھیں۔
-Only an adult (18 years or older) can make a living will.	صرف بالغ (18 سال یا اس سے زیادہ) ہی لیونگ ول بنا سکتے ہیں۔
+Only an adult (18 years or older) can complete advance care planning.	صرف بالغ (18 سال یا اس سے زیادہ) ہی پیشگی نگہداشت کی منصوبہ بندی مکمل کر سکتے ہیں۔
 Enter only the last 4 digits of the ID.	شناختی کارڈ کے صرف آخری 4 ہندسے لکھیں۔
 Your address is empty. You will need to write it by hand on the paper.	آپ کا پتہ خالی ہے۔ آپ کو اسے کاغذ پر ہاتھ سے لکھنا ہوگا۔
 Confirm that you understand what this document means.	تصدیق کریں کہ آپ سمجھتے ہیں کہ اس دستاویز کا کیا مطلب ہے۔
 Confirm that nobody is forcing or pressuring you.	تصدیق کریں کہ کوئی آپ پر زبردستی یا دباؤ نہیں ڈال رہا۔
 Confirm that you have thought about this carefully.	تصدیق کریں کہ آپ نے اس پر غور سے سوچا ہے۔
 Confirm that you understand it will not be used if the situation is unclear or was not foreseen.	تصدیق کریں کہ آپ سمجھتے ہیں کہ صورتحال واضح نہ ہو یا پہلے سے سوچی نہ گئی ہو تو اسے استعمال نہیں کیا جائے گا۔
-Choose at least one situation when this living will applies.	کم از کم ایک صورت چنیں جب یہ لیونگ ول لاگو ہو۔
+Choose at least one situation when these advance care planning wishes apply.	کم از کم ایک صورت چنیں جب پیشگی نگہداشت کی منصوبہ بندی کی یہ خواہشات لاگو ہوں۔
 You have not chosen any specific treatment. The general direction in Section 2 will still apply.	آپ نے کوئی خاص علاج نہیں چنا ہے۔ حصہ 2 کی عمومی ہدایت پھر بھی لاگو ہوگی۔
-A living will cannot ask for anything meant to end life. That is against the law in India. Please change these words.	لیونگ ول میں زندگی ختم کرنے کے لیے کچھ بھی نہیں مانگا جا سکتا۔ یہ بھارت میں قانون کے خلاف ہے۔ براہ کرم یہ الفاظ بدلیں۔
+Advance care planning cannot ask for anything meant to end life. That is against the law in India. Please change these words.	پیشگی نگہداشت کی منصوبہ بندی میں زندگی ختم کرنے کے لیے کچھ بھی نہیں مانگا جا سکتا۔ یہ بھارت میں قانون کے خلاف ہے۔ براہ کرم یہ الفاظ بدلیں۔
 Name at least one person who can speak for you (a representative).	کم از کم ایک ایسے شخص کا نام لکھیں جو آپ کی طرف سے بول سکے (نمائندہ)۔
 It is better to name two representatives, in order of preference, in case the first cannot be reached.	دو نمائندوں کے نام، پسند کی ترتیب میں، لکھنا بہتر ہے، تاکہ پہلے سے رابطہ نہ ہو سکے تو دوسرا ہو۔
 Representative $n: enter the full name.	نمائندہ $n: پورا نام لکھیں۔
@@ -2740,7 +2740,7 @@ The signing date cannot be in the future.	دستخط کی تاریخ مستقب�
 The signing date is before this version was printed. Check you uploaded the right version.	دستخط کی تاریخ اس ورژن کے پرنٹ سے پہلے کی ہے۔ دیکھیں کہ صحیح ورژن اپ لوڈ کیا ہے۔
 Upload a photo or scan of the signed and attested paper.	دستخط شدہ اور تصدیق شدہ کاغذ کی تصویر یا اسکین اپ لوڈ کریں۔
 Enter the name of witness $n.	گواہ $n کا نام لکھیں۔
-The person making the living will cannot be their own witness.	لیونگ ول بنانے والا شخص خود اپنا گواہ نہیں ہو سکتا۔
+The person doing the advance care planning cannot be their own witness.	پیشگی نگہداشت کی منصوبہ بندی کرنے والا شخص خود اپنا گواہ نہیں ہو سکتا۔
 Witness $n is also a named representative. Witnesses should preferably be independent.	گواہ $n ایک نامزد نمائندہ بھی ہے۔ گواہ ہو سکے تو آزاد ہونے چاہییں۔
 Witness $n: enter only the last 4 digits of the ID.	گواہ $n: شناختی کارڈ کے صرف آخری 4 ہندسے لکھیں۔
 The two witnesses must be two different people.	دونوں گواہ الگ الگ شخص ہونے چاہییں۔
@@ -2751,21 +2751,21 @@ Record the custodian: acknowledged, or \"custodian pending\".	نگران درج 
 Enter the custodian officer’s name and the date they acknowledged it.	نگران افسر کا نام اور رسید کی تاریخ لکھیں۔
 Tick consent before linking to ABHA.	ABHA سے جوڑنے سے پہلے رضامندی پر ٹک کریں۔
 Enter an ABHA address like name@abdm, or the 14-digit ABHA number.	name@abdm جیسا ABHA پتہ، یا 14 ہندسوں کا ABHA نمبر لکھیں۔
-A living will is cancelled in writing. Tick that the person signed a written cancellation.	لیونگ ول تحریری طور پر منسوخ ہوتی ہے۔ ٹک کریں کہ شخص نے تحریری منسوخی پر دستخط کیے ہیں۔
+Advance care planning is cancelled in writing. Tick that the person signed a written cancellation.	پیشگی نگہداشت کی منصوبہ بندی تحریری طور پر منسوخ ہوتی ہے۔ ٹک کریں کہ شخص نے تحریری منسوخی پر دستخط کیے ہیں۔
 Enter the date of the written cancellation.	تحریری منسوخی کی تاریخ لکھیں۔
 The date cannot be in the future.	تاریخ مستقبل کی نہیں ہو سکتی۔
-No living will (AMD)	کوئی لیونگ ول (AMD) نہیں
+No advance care planning	کوئی پیشگی نگہداشت کی منصوبہ بندی نہیں
 No AMD; earlier wishes noted	AMD نہیں؛ پہلے کی خواہشات درج
-Valid living will (AMD)	معتبر لیونگ ول (AMD)
+Valid advance care planning	معتبر پیشگی نگہداشت کی منصوبہ بندی
 held at	رکھی ہے
 attested by	تصدیق کنندہ
-Living will (AMD) executed in Sahara	Sahara میں تیار کی گئی لیونگ ول (AMD)
+Advance care planning executed in Sahara	Sahara میں تیار کی گئی پیشگی نگہداشت کی منصوبہ بندی
 version $version	ورژن $version
 signed $signed	دستخط $signed
 Also on this plan	اس منصوبے میں یہ بھی
-Living will cancelled in writing	لیونگ ول تحریری طور پر منسوخ
+Advance care planning cancelled in writing	پیشگی نگہداشت کی منصوبہ بندی تحریری طور پر منسوخ
 This plan still lists one. Check with the decision-maker	یہ منصوبہ اب بھی ایک دکھاتا ہے۔ فیصلہ لینے والے سے پوچھیں
-Living will in Sahara is not signed and attested, so it is not valid	Sahara کی لیونگ ول پر دستخط اور تصدیق نہیں، اس لیے معتبر نہیں
+Advance care planning in Sahara is not signed and attested, so it is not valid	Sahara کی پیشگی نگہداشت کی منصوبہ بندی پر دستخط اور تصدیق نہیں، اس لیے معتبر نہیں
 Section 1: Personal details	حصہ 1: ذاتی تفصیل
 Section 2: Directions relating to life-sustaining treatment	حصہ 2: زندگی بچانے والے علاج سے متعلق ہدایات
 Section 3 (Optional): Wishes or desires during end-of-life care	حصہ 3 (اختیاری): زندگی کے آخری وقت کی دیکھ بھال میں خواہشات
@@ -2884,18 +2884,18 @@ Notes	نوٹ
 Tick a box or write what happened.	کوئی باکس چنیں یا لکھیں کہ کیا ہوا۔
 Save the incident	واقعہ محفوظ کریں
 The PDF could not be made. Try again.	PDF نہیں بن سکا۔ دوبارہ کوشش کریں۔
-Living will	لیونگ ول
-This follows the model living will by the Vidhi Centre for Legal Policy and ACP India, and the Supreme Court’s rules (2018, changed on 24 January 2023). If both a living will and an emergency plan exist, the living will governs.	یہ ودھی سینٹر فار لیگل پالیسی اور ACP انڈیا کی ماڈل لیونگ ول، اور سپریم کورٹ کے قواعد (2018، 24 جنوری 2023 کو بدلے گئے) پر مبنی ہے۔ اگر لیونگ ول اور ہنگامی منصوبہ دونوں ہوں، تو لیونگ ول مانی جاتی ہے۔
+Advance care planning	پیشگی نگہداشت کی منصوبہ بندی
+This follows the model advance care planning document by the Vidhi Centre for Legal Policy and ACP India, and the Supreme Court’s rules (2018, changed on 24 January 2023). If both advance care planning and an emergency plan exist, the advance care planning governs.	یہ ودھی سینٹر فار لیگل پالیسی اور ACP انڈیا کے ماڈل پیشگی نگہداشت کی منصوبہ بندی کے دستاویز، اور سپریم کورٹ کے قواعد (2018، 24 جنوری 2023 کو بدلے گئے) پر مبنی ہے۔ اگر پیشگی نگہداشت کی منصوبہ بندی اور ہنگامی منصوبہ دونوں ہوں، تو پیشگی نگہداشت کی منصوبہ بندی مانی جاتی ہے۔
 What happens if treatment is to be held back or stopped (information only)	اگر علاج روکنا یا شروع نہ کرنا ہو تو کیا ہوتا ہے (صرف معلومات)
-The living will was cancelled in writing on $on. It no longer applies.	لیونگ ول $on کو تحریری طور پر منسوخ کی گئی۔ یہ اب لاگو نہیں ہے۔
-A living will has been started or printed but is not signed and recorded. It is not valid.	لیونگ ول شروع یا پرنٹ ہوئی ہے مگر دستخط شدہ اور درج نہیں ہے۔ یہ معتبر نہیں ہے۔
-No living will is recorded in Sahara. Ask the family if a signed paper exists.	سہارا میں کوئی لیونگ ول درج نہیں ہے۔ خاندان سے پوچھیں کہ کیا کوئی دستخط شدہ کاغذ ہے۔
-Make a new living will	نئی لیونگ ول بنائیں
-Start a living will	لیونگ ول شروع کریں
+The advance care planning was cancelled in writing on $on. It no longer applies.	پیشگی نگہداشت کی منصوبہ بندی $on کو تحریری طور پر منسوخ کی گئی۔ یہ اب لاگو نہیں ہے۔
+Advance care planning has been started or printed but is not signed and recorded. It is not valid.	پیشگی نگہداشت کی منصوبہ بندی شروع یا پرنٹ ہوئی ہے مگر دستخط شدہ اور درج نہیں ہے۔ یہ معتبر نہیں ہے۔
+No advance care planning is recorded in Sahara. Ask the family if a signed paper exists.	سہارا میں کوئی پیشگی نگہداشت کی منصوبہ بندی درج نہیں ہے۔ خاندان سے پوچھیں کہ کیا کوئی دستخط شدہ کاغذ ہے۔
+Make new advance care planning	نئی پیشگی نگہداشت کی منصوبہ بندی بنائیں
+Start advance care planning	پیشگی نگہداشت کی منصوبہ بندی شروع کریں
 ID document	شناختی کارڈ
 Last 4 digits only	صرف آخری 4 ہندسے
 Never type the full number here. Write it by hand on the paper.	پورا نمبر یہاں کبھی نہ لکھیں۔ اسے کاغذ پر ہاتھ سے لکھیں۔
-Living will v$version · $status	لیونگ ول v$version · $status
+Advance care planning v$version · $status	پیشگی نگہداشت کی منصوبہ بندی v$version · $status
 Full name	پورا نام
 Gender	جینڈر
 Date of birth	تاریخِ پیدائش
@@ -2928,7 +2928,7 @@ Add another representative	ایک اور نمائندہ شامل کریں
 They must decide together (instead of in order).	انہیں مل کر فیصلہ کرنا ہوگا (ترتیب کے بجائے)۔
 Family doctor (optional)	خاندانی ڈاکٹر (اختیاری)
 Phone	فون
-Local body that keeps living wills (custodian)	مقامی ادارہ جو لیونگ ول رکھتا ہے (نگران)
+Local body that keeps advance care planning records (custodian)	وہ مقامی ادارہ جو پیشگی نگہداشت کی منصوبہ بندی کا ریکارڈ رکھتا ہے (نگران)
 For example your municipal corporation or gram panchayat. Maharashtra and Karnataka (rural) have named custodians; Andhra Pradesh has not confirmed one yet. You can still sign and record “custodian pending”.	مثلاً آپ کی میونسپل کارپوریشن یا گرام پنچایت۔ مہاراشٹر اور کرناٹک (دیہی) نے نگران طے کیے ہیں؛ آندھرا پردیش نے ابھی تصدیق نہیں کی۔ آپ پھر بھی دستخط کر کے “نگران باقی” درج کر سکتے ہیں۔
 I am a registered organ donor (Form 7, THOTA 1994).	میں رجسٹرڈ اعضا عطیہ کرنے والا/والی ہوں (فارم 7، THOTA 1994)۔
 I want to donate my body for medical study.	میں طبی مطالعے کے لیے اپنا جسم عطیہ کرنا چاہتا/چاہتی ہوں۔
@@ -2973,9 +2973,9 @@ That file could not be read. Try another.	وہ فائل پڑھی نہیں جا �
 Record as signed and attested	دستخط شدہ اور تصدیق شدہ کے طور پر درج کریں
 Need to change something? Start a new version. This printed copy must then not be signed.	کچھ بدلنا ہے؟ نیا ورژن شروع کریں۔ تب اس پرنٹ کی گئی کاپی پر دستخط نہیں کرنے چاہییں۔
 Start a new version	نیا ورژن شروع کریں
-Signed living will · version $version	دستخط شدہ لیونگ ول · ورژن $version
+Signed advance care planning · version $version	دستخط شدہ پیشگی نگہداشت کی منصوبہ بندی · ورژن $version
 Check the paper copy against the scan and its SHA-256, or with the custodian. Doctors only read this here; nothing in the app starts or stops treatment.	کاغذی کاپی کو اسکین اور اس کے SHA-256 سے، یا نگران سے ملائیں۔ ڈاکٹر اسے یہاں صرف پڑھتے ہیں؛ ایپ میں کچھ بھی علاج شروع یا بند نہیں کرتا۔
-This is the current living will. Doctors can see that it is signed, witnessed and attested.	یہ موجودہ لیونگ ول ہے۔ ڈاکٹر دیکھ سکتے ہیں کہ یہ دستخط شدہ، گواہوں کے سامنے اور تصدیق شدہ ہے۔
+This is the current advance care planning. Doctors can see that it is signed, witnessed and attested.	یہ موجودہ پیشگی نگہداشت کی منصوبہ بندی ہے۔ ڈاکٹر دیکھ سکتے ہیں کہ یہ دستخط شدہ، گواہوں کے سامنے اور تصدیق شدہ ہے۔
 thumb impression	انگوٹھے کا نشان
 Witnesses	گواہ
 Acknowledged by $officer on $on	$officer کی طرف سے $on کو رسید
@@ -2996,20 +2996,20 @@ Copy given	کاپی دی گئی
 Consent is needed before this copy can be marked as given.	کاپی دی گئی کا نشان لگانے سے پہلے رضامندی ضروری ہے۔
 Save custodian	نگران محفوظ کریں
 Link to ABHA health records (optional)	ABHA صحت ریکارڈ سے جوڑیں (اختیاری)
-The Supreme Court allows adding the living will to digital health records. Sahara only notes the ABHA address here; upload the scan in your ABHA app yourself.	سپریم کورٹ لیونگ ول کو ڈیجیٹل صحت ریکارڈ میں شامل کرنے کی اجازت دیتی ہے۔ سہارا یہاں صرف ABHA پتہ نوٹ کرتا ہے؛ اسکین اپنے ABHA ایپ میں خود اپ لوڈ کریں۔
+The Supreme Court allows adding advance care planning to digital health records. Sahara only notes the ABHA address here; upload the scan in your ABHA app yourself.	سپریم کورٹ پیشگی نگہداشت کی منصوبہ بندی کو ڈیجیٹل صحت ریکارڈ میں شامل کرنے کی اجازت دیتی ہے۔ سہارا یہاں صرف ABHA پتہ نوٹ کرتا ہے؛ اسکین اپنے ABHA ایپ میں خود اپ لوڈ کریں۔
 ABHA address or number	ABHA پتہ یا نمبر
-The patient agrees to link the living will with their ABHA records.	مریض لیونگ ول کو اپنے ABHA ریکارڈ سے جوڑنے پر متفق ہے۔
+The patient agrees to link the advance care planning with their ABHA records.	مریض پیشگی نگہداشت کی منصوبہ بندی کو اپنے ABHA ریکارڈ سے جوڑنے پر متفق ہے۔
 Save ABHA link	ABHA لنک محفوظ کریں
 Linked on $on	$on کو جوڑا گیا
 Change it	اسے بدلیں
 Changes make a new version that must be printed, signed and attested again. Version $version stays current until then.	تبدیلی سے نیا ورژن بنتا ہے جسے دوبارہ پرنٹ، دستخط اور تصدیق کرنا ہوگا۔ تب تک ورژن $version موجودہ رہے گا۔
 A new version is already in progress below.	ایک نیا ورژن نیچے پہلے سے چل رہا ہے۔
 Cancel it	اسے منسوخ کریں
-A living will is cancelled in writing: the person signs a short note saying they cancel it, the same way it was made. Then give the note to everyone who has a copy.	لیونگ ول تحریری طور پر منسوخ ہوتی ہے: شخص ایک چھوٹے نوٹ پر دستخط کرتا ہے کہ وہ اسے منسوخ کر رہا ہے، اسی طرح جیسے یہ بنائی گئی تھی۔ پھر وہ نوٹ ان سب کو دیں جن کے پاس کاپی ہے۔
+Advance care planning is cancelled in writing: the person signs a short note saying they cancel it, the same way it was made. Then give the note to everyone who has a copy.	پیشگی نگہداشت کی منصوبہ بندی تحریری طور پر منسوخ ہوتی ہے: شخص ایک چھوٹے نوٹ پر دستخط کرتا ہے کہ وہ اسے منسوخ کر رہا ہے، اسی طرح جیسے یہ بنائی گئی تھی۔ پھر وہ نوٹ ان سب کو دیں جن کے پاس کاپی ہے۔
 Record a written cancellation	تحریری منسوخی درج کریں
 Date of the written cancellation	تحریری منسوخی کی تاریخ
 The person signed a written cancellation.	شخص نے تحریری منسوخی پر دستخط کیے ہیں۔
-Cancel the living will	لیونگ ول منسوخ کریں
+Cancel the advance care planning	پیشگی نگہداشت کی منصوبہ بندی منسوخ کریں
 Sahara plans are for adults. This date of birth is under 18.	سہارا کے منصوبے بالغوں کے لیے ہیں۔ یہ تاریخِ پیدائش 18 سال سے کم کی ہے۔
 Started in the emergency department. A plan made for the first time in the resuscitation bay records panic, not preference; review it when the patient is stable.	یہ ہنگامی شعبے میں شروع ہوا۔ پہلی بار ایمرجنسی میں بنایا گیا منصوبہ گھبراہٹ درج کرتا ہے، پسند نہیں؛ مریض کی حالت مستحکم ہونے پر اسے دوبارہ دیکھیں۔
 Keep only the last 4 characters of an ID, never the full number.	شناختی کارڈ کے صرف آخری 4 حروف/ہندسے رکھیں، پورا نمبر کبھی نہیں۔
@@ -3120,8 +3120,8 @@ Has capacity	فیصلہ کر سکتے ہیں
 Has capacity, has asked family to decide	فیصلہ کر سکتے ہیں، خاندان کو سونپا ہے
 Capacity fluctuates — reassess	فیصلہ کرنے کی صلاحیت گھٹتی بڑھتی ہے — دوبارہ جانچیں
 Lacks capacity	فیصلہ نہیں کر سکتے
-Named in a signed living will	دستخط شدہ لیونگ ول میں نامزد
-Named by the patient (no living will)	مریض نے نام دیا (لیونگ ول نہیں)
+Named in signed advance care planning	دستخط شدہ پیشگی نگہداشت کی منصوبہ بندی میں نامزد
+Named by the patient (no advance care planning)	مریض نے نام دیا (پیشگی نگہداشت کی منصوبہ بندی نہیں)
 Next of kin / next friend / guardian	قریبی رشتہ دار / دوست / سرپرست
 Court-appointed guardian	عدالت کا مقرر کردہ سرپرست
 Aadhaar	آدھار
@@ -3178,7 +3178,6 @@ Implanted device	جسم میں لگا آلہ
 Decision-maker (24 h phone)	فیصلہ لینے والے (24 گھنٹے فون)
 Treating consultant and palliative contact	علاج کرنے والے کنسلٹنٹ اور پیلیٹیو رابطہ
 Capacity	فیصلہ کرنے کی صلاحیت
-Living will (AMD)	لیونگ ول (AMD)
 Version, signed, review due	ورژن، دستخط، جائزہ
 If unclear, or the problem is new and reversible — treat fully and call.	اگر واضح نہ ہو، یا مسئلہ نیا ہے اور ٹھیک ہو سکتا ہے — پورا علاج کریں اور فون کریں۔
 Full record	پورا ریکارڈ
@@ -3208,9 +3207,9 @@ Your rights	آپ کے حقوق
 Name, hospital number, date of birth, address and phone. The people who decide for the patient. Illness details, treatment choices, the patient’s own words and signatures. A log of who opened or changed the plan.	نام، اسپتال نمبر، تاریخِ پیدائش، پتہ اور فون۔ مریض کی طرف سے فیصلہ لینے والے لوگ۔ بیماری کی تفصیل، علاج کے فیصلے، مریض کے اپنے الفاظ اور دستخط۔ یہ ریکارڈ کہ کس نے منصوبہ کھولا یا بدلا۔
 Your name, date of birth, address and the last 4 digits of your ID. Your representatives and witnesses. Your treatment wishes. The signed scan and its fingerprint (SHA-256). A log of each change, print and share.	آپ کا نام، تاریخِ پیدائش، پتہ اور شناختی کارڈ کے آخری 4 ہندسے۔ آپ کے نمائندے اور گواہ۔ علاج کے بارے میں آپ کی خواہشات۔ دستخط والا اسکین اور اس کی پہچان (SHA-256)۔ ہر تبدیلی، پرنٹ اور شیئر کرنے کا ریکارڈ۔
 So that an emergency doctor can find and follow the patient’s wishes, and the care team can review them.	تاکہ ایمرجنسی ڈاکٹر مریض کی خواہشات دیکھ اور مان سکے، اور دیکھ بھال کی ٹیم ان کا جائزہ لے سکے۔
-To make your living will paper, keep track of its versions, and show doctors that it exists.	آپ کی لیونگ ول کا کاغذ بنانے، اس کے ورژن سنبھالنے اور ڈاکٹروں کو یہ دکھانے کے لیے کہ وہ موجود ہے۔
+To write down your advance care planning, keep track of its versions, and show doctors that it exists.	آپ کی پیشگی نگہداشت کی منصوبہ بندی لکھنے، اس کے ورژن سنبھالنے اور ڈاکٹروں کو یہ دکھانے کے لیے کہ وہ موجود ہے۔
 On this phone. It leaves this phone only in two cases. When a plan is signed, an emergency card is issued and a copy of the signed plan goes to the Sahara server so the QR code works. If an SMS is sent, the phone number goes to the SMS company.	اسی فون پر۔ یہ صرف دو صورتوں میں باہر جاتا ہے۔ منصوبے پر دستخط ہونے پر ایمرجنسی کارڈ جاری ہوتا ہے اور دستخط شدہ منصوبے کی کاپی Sahara سرور پر جاتی ہے، تاکہ QR کوڈ کام کرے۔ SMS بھیجنے پر فون نمبر SMS کمپنی کے پاس جاتا ہے۔
-On this phone. It is not sent to any server. If an emergency card is issued, the card carries only the living will’s status, date, version and attesting officer. You decide who gets a paper copy.	اسی فون پر۔ یہ کسی سرور کو نہیں بھیجا جاتا۔ ایمرجنسی کارڈ جاری ہونے پر کارڈ میں صرف لیونگ ول کی حالت، تاریخ، ورژن اور تصدیق کرنے والا افسر ہوتے ہیں۔ کاغذی کاپی کس کو دینی ہے، یہ آپ طے کرتے ہیں۔
+On this phone. It is not sent to any server. If an emergency card is issued, the card carries only the status, date, version and attesting officer of your advance care planning. You decide who gets a paper copy.	اسی فون پر۔ یہ کسی سرور کو نہیں بھیجا جاتا۔ ایمرجنسی کارڈ جاری ہونے پر کارڈ میں صرف پیشگی نگہداشت کی منصوبہ بندی کی حالت، تاریخ، ورژن اور تصدیق کرنے والا افسر ہوتے ہیں۔ کاغذی کاپی کس کو دینی ہے، یہ آپ طے کرتے ہیں۔
 See it: download your data below. Correct it: ask for a review, and a new version is made. Withdraw: cancel the plan at any time, and the card stops working. Delete: remove an unsigned draft below. Signed versions and the log cannot be deleted, because they show what was decided and who saw it.	دیکھنا: نیچے اپنا ڈیٹا ڈاؤن لوڈ کریں۔ درست کرنا: جائزہ مانگیں، نیا ورژن بنے گا۔ واپس لینا: منصوبہ کبھی بھی منسوخ کریں، کارڈ کام کرنا بند کر دے گا۔ مٹانا: بغیر دستخط کا ڈرافٹ نیچے سے ہٹائیں۔ دستخط شدہ ورژن اور ریکارڈ نہیں مٹتے، کیونکہ ان سے پتہ چلتا ہے کہ کیا طے ہوا اور کس نے دیکھا۔
 See it: download your data below. Correct it: make a new version. Withdraw: cancel it in writing at any time. Delete: remove an unsigned draft below. Signed versions and the log cannot be deleted. Deleting here does not touch any paper you printed, so destroy that yourself.	دیکھنا: نیچے اپنا ڈیٹا ڈاؤن لوڈ کریں۔ درست کرنا: نیا ورژن بنائیں۔ واپس لینا: کبھی بھی تحریری طور پر منسوخ کریں۔ مٹانا: بغیر دستخط کا ڈرافٹ نیچے سے ہٹائیں۔ دستخط شدہ ورژن اور ریکارڈ نہیں مٹتے۔ یہاں مٹانے سے چھپا ہوا کاغذ نہیں مٹتا، اسے آپ خود تلف کریں۔
 How to ask	کیسے کہیں
@@ -3235,9 +3234,9 @@ Applies to	لاگو ہوگا
 Not saved: 	محفوظ نہیں ہوا: 
 Couldn't make the PDF. Try again.	PDF نہیں بنا۔ دوبارہ کوشش کریں۔
 Share the emergency plan	ہنگامی منصوبہ شیئر کریں
-Share the living will	لیونگ ول شیئر کریں
+Share the advance care planning	پیشگی نگہداشت کی منصوبہ بندی شیئر کریں
 Plan withdrawn. Its wallet card link is switched off.	منصوبہ واپس لیا گیا۔ اس کے والٹ کارڈ کا لنک بند ہو گیا۔
-Emergency plan & living will	ہنگامی منصوبہ اور لیونگ ول
+Care planning	نگہداشت کی منصوبہ بندی
 Ambulances and emergency doctors resuscitate by default. A wish counts only if this plan is found and signed. It stays on this phone; only a signed plan's wallet card copy goes to the Sahara server.	ایمبولینس اور ایمرجنسی ڈاکٹر خود بخود پورا علاج کرتے ہیں۔ خواہش تبھی مانی جاتی ہے جب یہ منصوبہ ملے اور اس پر دستخط ہوں۔ یہ اسی فون پر رہتا ہے؛ صرف دستخط شدہ منصوبے کے والٹ کارڈ کی کاپی Sahara سرور پر جاتی ہے۔
 The saved plan on this phone could not be read. Standard care applies until a new plan is signed.	اس فون پر محفوظ منصوبہ پڑھا نہیں جا سکا۔ نئے منصوبے پر دستخط ہونے تک معیاری علاج لاگو ہے۔
 ED Quick View	ED کوئیک ویو
@@ -3253,7 +3252,7 @@ Withdraw the plan	منصوبہ واپس لیں
 Start a plan	منصوبہ شروع کریں
 Wallet card with QR	QR والا والٹ کارڈ
 Signed and recorded v$v	دستخط شدہ اور درج v$v
-Open living will	لیونگ ول کھولیں
+Open advance care planning	پیشگی نگہداشت کی منصوبہ بندی کھولیں
 Plan versions	منصوبے کے ورژن
 Audit log (cannot be changed)	آڈٹ لاگ (بدلا نہیں جا سکتا)
 Chain checked: no entry has been changed or removed.	جانچ ہو گئی: کوئی اندراج بدلا یا ہٹایا نہیں گیا۔
@@ -3314,10 +3313,10 @@ Assessed on	جانچ کی تاریخ
 Basis of the assessment	جانچ کی بنیاد
 Reassess on	دوبارہ جانچ کی تاریخ
 A patient with capacity can change or cancel any part of this plan by saying so; their wish now overrides the paper.	فیصلہ کر سکنے والا مریض بول کر منصوبے کا کوئی بھی حصہ بدل یا منسوخ کر سکتا ہے؛ اس کی ابھی کی خواہش کاغذ سے بالاتر ہے۔
-Existing living will or wishes	پہلے کی لیونگ ول یا خواہشات
-A signed, attested living will	دستخط شدہ، تصدیق شدہ لیونگ ول
+Existing advance care planning or wishes	پہلے کی پیشگی نگہداشت کی منصوبہ بندی یا خواہشات
+Signed, attested advance care planning	دستخط شدہ، تصدیق شدہ پیشگی نگہداشت کی منصوبہ بندی
 Wishes said or written before	پہلے کہی یا لکھی خواہشات
-Date of the living will	لیونگ ول کی تاریخ
+Date of the advance care planning	پیشگی نگہداشت کی منصوبہ بندی کی تاریخ
 Where the original is kept	اصل کہاں رکھی ہے
 Attested by (notary or gazetted officer)	کس نے تصدیق کی (نوٹری یا گزٹڈ افسر)
 What was said or written	کیا کہا یا لکھا گیا تھا
@@ -3412,13 +3411,13 @@ SAHARA EMERGENCY CARE PLAN	سہارا ہنگامی دیکھ بھال کا منص
 QR code with a link to this plan	اس منصوبے کے لنک والا QR کوڈ
 QR code: offline text summary of this card	QR کوڈ: اس کارڈ کا آف لائن خلاصہ
 Plan v$v · review due $due	منصوبہ v$v · جائزہ $due
-The living will changed after this card was issued, so the link shows the old status. Issue a new card and tear up the old one.	یہ کارڈ جاری ہونے کے بعد لیونگ ول بدلی ہے، اس لیے لنک پرانی حالت دکھاتا ہے۔ نیا کارڈ جاری کریں اور پرانا پھاڑ دیں۔
+The advance care planning changed after this card was issued, so the link shows the old status. Issue a new card and tear up the old one.	یہ کارڈ جاری ہونے کے بعد پیشگی نگہداشت کی منصوبہ بندی بدلی ہے، اس لیے لنک پرانی حالت دکھاتا ہے۔ نیا کارڈ جاری کریں اور پرانا پھاڑ دیں۔
 Issue a new card	نیا کارڈ جاری کریں
 The link QR holds only a random link with no name or medical details. The offline QR holds the summary above as plain text, so anyone who scans it can read it; keep the card with the patient. When the plan is replaced or withdrawn the link is switched off, but the offline QR on old paper still reads — tear up old cards.	لنک QR میں صرف ایک رینڈم لنک ہے، نام یا علاج کی تفصیل نہیں۔ آف لائن QR میں اوپر کا خلاصہ سادہ تحریر میں ہے، اس لیے جو بھی اسکین کرے وہ پڑھ سکتا ہے؛ کارڈ مریض کے پاس رکھیں۔ منصوبہ بدلنے یا واپس لینے پر لنک بند ہو جاتا ہے، مگر پرانے کاغذ کا آف لائن QR پھر بھی پڑھا جا سکتا ہے — پرانے کارڈ پھاڑ دیں۔
 Print or share the plan and card (PDF)	منصوبہ اور کارڈ پرنٹ یا شیئر کریں (PDF)
-ED Quick View, wallet card QR and living will	ED کوئیک ویو، والٹ کارڈ QR اور لیونگ ول
+ED Quick View, wallet card QR and advance care planning	ED کوئیک ویو، والٹ کارڈ QR اور پیشگی نگہداشت کی منصوبہ بندی
 This update does not record $missing. Visit history is separate.	اس اپ ڈیٹ میں $missing درج نہیں۔ وزٹ کی تاریخ الگ ہے۔
-ECTPR wizard, ED Quick View, wallet card QR, living will	ECTPR فارم، ED کوئیک ویو، والٹ کارڈ QR، لیونگ ول
+ECTPR wizard, ED Quick View, wallet card QR, advance care planning	ECTPR فارم، ED کوئیک ویو، والٹ کارڈ QR، پیشگی نگہداشت کی منصوبہ بندی
 , last on $day	, آخری بار $day
 Opened once$last	ایک بار کھولا گیا$last
 Opened $views times$last	$views بار کھولا گیا$last
@@ -4209,7 +4208,7 @@ If care is at home, ask who visits and how often.	اگر دیکھ بھال گھ�
 Different people said different things. Both are shown. Check with the patient which one stands.	مختلف لوگوں نے مختلف باتیں کہیں۔ دونوں دکھائی گئی ہیں۔ مریض سے پوچھیں کہ کون سی بات درست ہے۔
 Changed during the talk. The latest statement is marked.	گفتگو کے دوران بدلا۔ آخری بات پر نشان ہے۔
 Said earlier, replaced by a later statement	پہلے کہا، بعد کی بات سے بدلا
-Goals-of-care note, in the order of the legal form	دیکھ بھال کے مقاصد کا نوٹ، قانونی فارم کی ترتیب میں
+Goals-of-care note, in the order of the clinical document	دیکھ بھال کے مقاصد کا نوٹ، کلینیکل دستاویز کی ترتیب میں
 Signed and locked on the doctor's device	ڈاکٹر کے آلے پر دستخط ہو کر بند
 Doctor's note	ڈاکٹر کا نوٹ
 radiation oncology	ریڈی ایشن آنکولوجی
@@ -4288,7 +4287,7 @@ Functional status – ECOG	فعالی حالت – ECOG
 Gastrostomy (PEG)	گیسٹروسٹومی (PEG)
 Getting the speaker pack, first time only	بولنے والوں کا پیک حاصل کیا جا رہا ہے، صرف پہلی بار
 Getting the speech pack, first time only	اسپیچ پیک حاصل کیا جا رہا ہے، صرف پہلی بار
-Goals-of-care conversation note, in the order of the legal form	دیکھ بھال کے مقاصد پر گفتگو کا نوٹ، قانونی فارم کی ترتیب میں
+Goals-of-care conversation note, in the order of the clinical document	دیکھ بھال کے مقاصد پر گفتگو کا نوٹ، کلینیکل دستاویز کی ترتیب میں
 Had they been previously admitted to any hospital for the current condition?	کیا وہ موجودہ بیماری کے لیے پہلے کسی اسپتال میں داخل ہوئے تھے؟
 High-flow nasal cannula (HFNC)	ہائی فلو نیزل کینولا (HFNC)
 Higher-concentration oxygen. Tolerable, but the mask can feel confining and interferes with speech.	زیادہ مقدار والی آکسیجن۔ قابلِ برداشت، لیکن ماسک گھٹن والا محسوس ہو سکتا ہے اور بولنے میں رکاوٹ ڈالتا ہے۔
@@ -4546,12 +4545,11 @@ Incident	واقعہ
 Link ABHA	ABHA جوڑیں
 Make PDF	PDF بنائیں
 Mark as signed	دستخط شدہ درج کریں
-New living will	نئی لیونگ وِل
+New advance care planning	نئی پیشگی نگہداشت کی منصوبہ بندی
 New version	نیا ورژن
 No ED access after this time.	اس وقت کے بعد ED کی کوئی رسائی نہیں۔
 No connection. Please phone them.	کنکشن نہیں ہے۔ براہ کرم انہیں فون کریں۔
 No draft to delete.	مٹانے کے لیے کوئی ڈرافٹ نہیں۔
-No living will	کوئی لیونگ وِل نہیں
 No mobile number.	کوئی موبائل نمبر نہیں۔
 No signed plan at this time.	اس وقت کوئی دستخط شدہ منصوبہ نہیں تھا۔
 None yet.	ابھی کچھ نہیں۔
@@ -4656,7 +4654,7 @@ Not uploaded yet	ابھی اپ لوڈ نہیں ہوا
 Old QR may still open until the phone is online.	فون آن لائن ہونے تک پرانا QR کھل سکتا ہے۔
 Online QR	آن لائن QR
 Offline QR	آف لائن QR
-Living will changed. Issue a new card.	لیونگ وِل بدل گئی ہے۔ نیا کارڈ جاری کریں۔
+Advance care planning changed. Issue a new card.	پیشگی نگہداشت کی منصوبہ بندی بدل گئی ہے۔ نیا کارڈ جاری کریں۔
 New card	نیا کارڈ
 Print or share	پرنٹ یا شیئر کریں
 All doctors	تمام ڈاکٹر
@@ -4982,7 +4980,7 @@ Entries	اندراجات
 Account and sharing	اکاؤنٹ اور شیئرنگ
 Share care with family	گھر والوں کے ساتھ دیکھ بھال شیئر کریں
 Send a link on WhatsApp	WhatsApp پر لنک بھیجیں
-Plan, wallet card, living will	پلان، والٹ کارڈ، لیونگ ول
+Goals of care, advance care planning, emergency card	دیکھ بھال کے مقاصد پر گفتگو، پیشگی نگہداشت کی منصوبہ بندی، ہنگامی کارڈ
 Settings	سیٹنگز
 Notifications	نوٹیفکیشن
 Privacy and data	پرائیویسی اور ڈیٹا
@@ -5072,7 +5070,6 @@ A one-page summary hospital staff can read fast	ایک صفحے کا خلاصہ 
 All 10 parts of the emergency care plan, from patient details to signatures	ہنگامی دیکھ بھال کے منصوبے کے تمام 10 حصے، مریض کی تفصیلات سے دستخط تک
 For the emergency room	ایمرجنسی روم کے لیے
 Make the full care plan	دیکھ بھال کا پورا منصوبہ بنائیں
-Plan, pocket emergency card, living will	منصوبہ، جیب میں رکھنے کا ہنگامی کارڈ، لِوِنگ وِل
 Pocket emergency card	جیب میں رکھنے کا ہنگامی کارڈ
 Step ${step + 1} · $name	مرحلہ ${step + 1} · $name
 Card file	کارڈ کی فائل
@@ -5169,3 +5166,57 @@ Add a few words (optional)	کچھ الفاظ لکھیں (اختیاری)
 Fewer details	کم تفصیل
 Medicine name *	دوا کا نام *
 Region	علاقہ
+
+Goals of care discussion, advance care planning and the emergency care plan belong together. All three are clinical documents.	دیکھ بھال کے مقاصد پر گفتگو، پیشگی نگہداشت کی منصوبہ بندی اور ہنگامی نگہداشت کا منصوبہ ایک ساتھ چلتے ہیں۔ تینوں کلینیکل دستاویز ہیں۔
+Goals of care discussion	دیکھ بھال کے مقاصد پر گفتگو
+The recorded conversation about what matters most and the care to aim for.	اس بارے میں درج کی گئی بات چیت کہ سب سے اہم کیا ہے اور کس طرح کی نگہداشت کو مقصد بنایا جائے۔
+Your doctor records this conversation with you.	آپ کے ڈاکٹر یہ بات چیت آپ کے ساتھ درج کرتے ہیں۔
+Emergency care plan & card	ہنگامی نگہداشت کا منصوبہ اور کارڈ
+The summary for the ambulance or emergency department, with a QR code.	ایمبولینس یا ایمرجنسی ڈپارٹمنٹ کے لیے خلاصہ، QR کوڈ کے ساتھ۔
+The person’s own wishes about future care, written down.	مستقبل کی نگہداشت کے بارے میں شخص کی اپنی خواہشات، لکھی ہوئی۔
+A clinical document that records the person’s own wishes about future care.	ایک کلینیکل دستاویز جو مستقبل کی نگہداشت کے بارے میں شخص کی اپنی خواہشات درج کرتی ہے۔
+Your wellbeing	آپ کی صحت و بہبود
+Kept on this phone only. Not shared.	صرف اسی فون پر رہتا ہے۔ شیئر نہیں ہوتا۔
+Caring is hard work. A one-minute check helps you notice when you need support.	دیکھ بھال مشکل کام ہے۔ ایک منٹ کی جانچ سے پتا چلتا ہے کہ آپ کو کب سہارے کی ضرورت ہے۔
+A lot to carry	بہت بوجھ
+Manageable	سنبھلنے کے قابل
+In the past month, how often have you felt this way?	پچھلے ایک مہینے میں، آپ نے کتنی بار ایسا محسوس کیا؟
+Never	کبھی نہیں
+Rarely	شاذ و نادر
+Sometimes	کبھی کبھی
+Quite often	اکثر
+Nearly always	تقریباً ہمیشہ
+Answer all four to save.	محفوظ کرنے کے لیے چاروں کے جواب دیں۔
+Take the 1-minute check	1 منٹ کی جانچ کریں
+Write a few words. Only you can see this.	چند الفاظ لکھیں۔ اسے صرف آپ دیکھ سکتے ہیں۔
+Write in my journal	میری ڈائری میں لکھیں
+Only you can see these, on this phone.	انہیں صرف آپ، اسی فون پر دیکھ سکتے ہیں۔
+Higher than your last check	آپ کی پچھلی جانچ سے زیادہ
+Lower than your last check	آپ کی پچھلی جانچ سے کم
+About the same as your last check	آپ کی پچھلی جانچ کے برابر
+You're carrying a lot	آپ بہت کچھ اٹھا رہے ہیں
+Many family caregivers feel this way. It is not a failing, and help is there. This check is a screening, not a diagnosis.	بہت سے خاندانی نگہداشت کرنے والے ایسا ہی محسوس کرتے ہیں۔ یہ کوئی کمی نہیں، اور مدد موجود ہے۔ یہ جانچ صرف ابتدائی اشارہ ہے، تشخیص نہیں۔
+Talk to a counsellor	کاؤنسلر سے بات کریں
+Tele-MANAS is free, day and night.	ٹیلی مانس مفت ہے، دن رات۔
+Find a counsellor nearby	قریب میں کاؤنسلر تلاش کریں
+Respite care	عارضی آرام کی نگہداشت (ریسپائٹ کیئر)
+Your palliative care team can arrange temporary nursing or day-care support, so you can rest. Ask them at your next call or visit.	آپ کی پیلیایٹو کیئر ٹیم عارضی نرسنگ یا ڈے کیئر مدد کا انتظام کر سکتی ہے تاکہ آپ آرام کر سکیں۔ اگلی کال یا ملاقات میں ان سے پوچھیں۔
+Caregiver support groups	نگہداشت کرنے والوں کے سپورٹ گروپ
+Swayam Foundation caregiver support	سویم فاؤنڈیشن نگہداشت کنندہ سپورٹ
+SoulUp caregiving support group	سول اپ نگہداشت سپورٹ گروپ
+These open in your browser. In an emergency, call 112.	یہ آپ کے براؤزر میں کھلتے ہیں۔ ایمرجنسی میں 112 پر کال کریں۔
+You matter, and your health matters too.	آپ اہم ہیں، اور آپ کی صحت بھی اہم ہے۔
+Thank you for caring so well. Have you had some water, something to eat, and a moment to sit down today? Looking after yourself is part of looking after them.	اتنی اچھی دیکھ بھال کے لیے شکریہ۔ کیا آج آپ نے پانی پیا، کچھ کھایا، اور ذرا بیٹھ کر آرام کیا؟ اپنا خیال رکھنا بھی ان کی دیکھ بھال کا حصہ ہے۔
+Check how I am (1 minute)	اپنا حال جانچیں (1 منٹ)
+Distress thermometer	پریشانی تھرمامیٹر
+How much distress this past week? 0–10	اس ہفتے کتنی پریشانی رہی؟ 0–10
+Today: no distress	آج: کوئی پریشانی نہیں
+Tap to change	بدلنے کے لیے دبائیں
+Symptom ratings use a 0–10 scale in the style of ESAS-r (Edmonton Symptom Assessment System). This is a personal diary, not a scored ESAS-r.	علامات کے نمبر ESAS-r (Edmonton Symptom Assessment System) کے انداز میں 0–10 کے پیمانے پر ہیں۔ یہ ذاتی ڈائری ہے، اسکور کیا گیا ESAS-r نہیں۔
+Last check: ${latest.score}/${CaregiverWellbeingRules.MAX_SCORE} · $band	آخری جانچ: ${latest.score}/${CaregiverWellbeingRules.MAX_SCORE} · $band
+Stressed, between caring for $name and meeting your other responsibilities?	$name کی دیکھ بھال اور اپنی دوسری ذمہ داریوں کے بیچ دباؤ محسوس ہوتا ہے؟
+Strained when you are around $name?	$name کے پاس ہوتے ہوئے تناؤ محسوس ہوتا ہے؟
+That your own health has suffered because of caring for $name?	$name کی دیکھ بھال کی وجہ سے آپ کی اپنی صحت متاثر ہوئی ہے؟
+That you don't have enough time for yourself because of caring for $name?	$name کی دیکھ بھال کی وجہ سے اپنے لیے وقت نہیں ملتا؟
+How are you feeling about caring for $personName?	$personName کی دیکھ بھال کے بارے میں آپ کیسا محسوس کر رہے ہیں؟
+Past checks, oldest first: $summary out of ${CaregiverWellbeingRules.MAX_SCORE}	پچھلی جانچیں، پرانی پہلے: ${CaregiverWellbeingRules.MAX_SCORE} میں سے $summary

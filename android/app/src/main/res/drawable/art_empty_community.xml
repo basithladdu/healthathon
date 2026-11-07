@@ -46,6 +46,6 @@
         <path android:fillColor="#382E29" android:pathData="M114,87.7a1.5,1.5 0 1,0 3,0a1.5,1.5 0 1,0 -3,0z"/>
         <path android:fillColor="#382E29" android:pathData="M123.1,87.7a1.5,1.5 0 1,0 3,0a1.5,1.5 0 1,0 -3,0z"/>
         <path android:strokeColor="#84522F" android:strokeWidth="1.5" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M116,93.4Q120,96.5 124,93.4"/>
-        <path android:fillColor="#D2390B" android:pathData="M118.7,81.9a1.3,1.3 0 1,0 2.5,0a1.3,1.3 0 1,0 -2.5,0z"/>
+        <path android:fillColor="#3B7562" android:pathData="M118.7,81.9a1.3,1.3 0 1,0 2.5,0a1.3,1.3 0 1,0 -2.5,0z"/>
     </group>
 </vector>

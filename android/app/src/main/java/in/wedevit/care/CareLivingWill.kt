@@ -153,7 +153,7 @@ object AmdRules {
         val age = PlanDates.age(ex.dob, today)
         if (ex.dob.isBlank()) add(issue("L1_DOB", IssueSeverity.BLOCK, "executant.dob", "Enter your date of birth.", "अपनी जन्म तिथि लिखें।"))
         else if (age == null) add(issue("L1_DOB", IssueSeverity.BLOCK, "executant.dob", "Enter a real date of birth.", "सही जन्म तिथि लिखें।"))
-        else if (age < 18) add(issue("L1_ADULT", IssueSeverity.BLOCK, "executant.dob", "Only an adult (18 years or older) can make a living will.", "केवल वयस्क (18 साल या उससे ज़्यादा) ही लिविंग विल बना सकते हैं।"))
+        else if (age < 18) add(issue("L1_ADULT", IssueSeverity.BLOCK, "executant.dob", "Only an adult (18 years or older) can complete advance care planning.", "केवल वयस्क (18 साल या उससे ज़्यादा) ही अग्रिम देखभाल योजना बना सकते हैं।"))
         if (!AmdIds.valid(ex.idLast4)) add(issue("ID_LAST4", IssueSeverity.BLOCK, "executant.idLast4", "Enter only the last 4 digits of the ID.", "पहचान पत्र के केवल आख़िरी 4 अंक लिखें।"))
         if (ex.permanentAddress.isBlank()) add(issue("ADDRESS", IssueSeverity.WARN, "executant.permanentAddress", "Address is empty. Write it by hand on the paper.", "पता खाली है। काग़ज़ पर हाथ से लिखें।"))
         val d = content.declarations
@@ -161,10 +161,10 @@ object AmdRules {
         if (!d.voluntary) add(issue("L1_VOLUNTARY", IssueSeverity.BLOCK, "declarations.voluntary", "Confirm that nobody is forcing or pressuring you.", "पुष्टि करें कि कोई आप पर दबाव नहीं डाल रहा है।"))
         if (!d.consideredCarefully) add(issue("L1_CONSIDERED", IssueSeverity.BLOCK, "declarations.consideredCarefully", "Confirm that you have thought about this carefully.", "पुष्टि करें कि आपने इस पर ध्यान से सोचा है।"))
         if (!d.understandsNotAppliedIfUnclear) add(issue("L7_UNDERSTOOD", IssueSeverity.BLOCK, "declarations.understandsNotAppliedIfUnclear", "Confirm that you understand it will not be used if the situation is unclear or was not foreseen.", "पुष्टि करें कि आप समझते हैं कि स्थिति साफ़ न होने या पहले से न सोची गई होने पर इसका उपयोग नहीं होगा।"))
-        if (content.conditions.isEmpty()) add(issue("CONDITIONS", IssueSeverity.BLOCK, "conditions", "Choose at least one situation when this living will applies.", "कम से कम एक स्थिति चुनें जब यह लिविंग विल लागू हो।"))
+        if (content.conditions.isEmpty()) add(issue("CONDITIONS", IssueSeverity.BLOCK, "conditions", "Choose at least one situation when these advance care planning wishes apply.", "कम से कम एक स्थिति चुनें जब ये अग्रिम देखभाल योजना की इच्छाएँ लागू हों।"))
         if (content.treatments.isEmpty()) add(issue("NO_TREATMENT_CHOICE", IssueSeverity.WARN, "treatments", "No treatment chosen. The general direction still applies.", "कोई इलाज नहीं चुना। सामान्य निर्देश फिर भी लागू होगा।"))
         listOf("values" to content.values, "anticipatedConditions" to content.anticipatedConditions, "wishes.focus" to content.wishes.focus, "afterDeath.lastRites" to content.afterDeath.lastRites).forEach { (field, text) ->
-            if (ENDING_LIFE.containsMatchIn(text)) add(issue("NO_EUTHANASIA", IssueSeverity.BLOCK, field, "A living will cannot ask for anything meant to end life. That is against the law in India. Please change these words.", "लिविंग विल में जीवन ख़त्म करने के लिए कुछ भी नहीं माँगा जा सकता। यह भारत में क़ानून के ख़िलाफ़ है। कृपया ये शब्द बदलें।"))
+            if (ENDING_LIFE.containsMatchIn(text)) add(issue("NO_EUTHANASIA", IssueSeverity.BLOCK, field, "Advance care planning cannot ask for anything meant to end life. That is against the law in India. Please change these words.", "अग्रिम देखभाल योजना में जीवन ख़त्म करने के लिए कुछ भी नहीं माँगा जा सकता। यह भारत में क़ानून के ख़िलाफ़ है। कृपया ये शब्द बदलें।"))
         }
         val named = content.dhrs.filter { it.name.isNotBlank() }
         if (named.isEmpty()) add(issue("L2_DHR_REQUIRED", IssueSeverity.BLOCK, "dhrs", "Name at least one person who can speak for you (a representative).", "कम से कम एक व्यक्ति का नाम लिखें जो आपकी ओर से बोल सके (प्रतिनिधि)।"))
@@ -200,7 +200,7 @@ object AmdRules {
             val n = index + 1; val field = "execution.witnesses.$index"
             if (w.name.isBlank()) { add(issue("L3_WITNESS", IssueSeverity.BLOCK, "$field.name", "Enter the name of witness $n.", "गवाह $n का नाम लिखें।")); return@forEachIndexed }
             val name = normaliseName(w.name)
-            if (name == executant) add(issue("WITNESS_SELF", IssueSeverity.BLOCK, "$field.name", "The person making the living will cannot be their own witness.", "लिविंग विल बनाने वाला व्यक्ति ख़ुद अपना गवाह नहीं हो सकता।"))
+            if (name == executant) add(issue("WITNESS_SELF", IssueSeverity.BLOCK, "$field.name", "The person doing the advance care planning cannot be their own witness.", "अग्रिम देखभाल योजना बनाने वाला व्यक्ति ख़ुद अपना गवाह नहीं हो सकता।"))
             if (name in dhrNames) add(issue("L3_WITNESS_IS_DHR", IssueSeverity.WARN, "$field.name", "Witness $n is also a representative.", "गवाह $n एक प्रतिनिधि भी है।"))
             if (!AmdIds.valid(w.idLast4)) add(issue("ID_LAST4", IssueSeverity.BLOCK, "$field.idLast4", "Witness $n: enter only the last 4 digits of the ID.", "गवाह $n: पहचान पत्र के केवल आख़िरी 4 अंक लिखें।"))
         }
@@ -225,7 +225,7 @@ object AmdRules {
     }
 
     fun revocationIssues(revokedOn: String, writtenSigned: Boolean, today: LocalDate): List<RuleIssue> = buildList {
-        if (!writtenSigned) add(issue("L6_WRITTEN", IssueSeverity.BLOCK, "revocation.written", "A living will is cancelled in writing. Tick that the person signed a written cancellation.", "लिविंग विल लिखित रूप में रद्द होती है। टिक करें कि व्यक्ति ने लिखित रद्दीकरण पर हस्ताक्षर किए हैं।"))
+        if (!writtenSigned) add(issue("L6_WRITTEN", IssueSeverity.BLOCK, "revocation.written", "Advance care planning is cancelled in writing. Tick that the person signed a written cancellation.", "अग्रिम देखभाल योजना लिखित रूप में रद्द होती है। टिक करें कि व्यक्ति ने लिखित रद्दीकरण पर हस्ताक्षर किए हैं।"))
         val day = PlanDates.day(revokedOn)
         if (day == null) add(issue("REVOKED_ON", IssueSeverity.BLOCK, "revocation.revokedOn", "Enter the date of the written cancellation.", "लिखित रद्दीकरण की तारीख़ लिखें।"))
         else if (day.isAfter(today)) add(issue("REVOKED_FUTURE", IssueSeverity.BLOCK, "revocation.revokedOn", "The date cannot be in the future.", "तारीख़ भविष्य की नहीं हो सकती।"))
@@ -282,7 +282,7 @@ object AmdLifecycle {
 
     /** GENERATED → EXECUTED only with the signed scan, two witnesses and the attestor (L3) and a custodian state (L5). Each executed version needs its own copies. */
     fun execute(records: List<AmdRecord>, id: String, execution: AmdExecution, custodian: AmdCustodian?, now: String, today: LocalDate): List<AmdRecord> {
-        val r = records.firstOrNull { it.id == id } ?: error("Living will not found.")
+        val r = records.firstOrNull { it.id == id } ?: error("Advance care planning not found.")
         AmdRules.require(AmdRules.validateExecution(r, execution, custodian, today))
         return records.map {
             when {
@@ -323,7 +323,7 @@ object AmdLifecycle {
 
     /** Revoke in writing (L6): needs the date of the signed written cancellation. Every open version ends. */
     fun revoke(records: List<AmdRecord>, patientId: String, revokedOn: String, writtenSigned: Boolean, reason: String, now: String, today: LocalDate, scanKey: String? = null, scanSha256: String? = null): List<AmdRecord> {
-        check(records.any { it.patientId == patientId && it.status in setOf(AmdStatus.EXECUTED, AmdStatus.GENERATED, AmdStatus.DRAFT) }) { "There is no living will to cancel." }
+        check(records.any { it.patientId == patientId && it.status in setOf(AmdStatus.EXECUTED, AmdStatus.GENERATED, AmdStatus.DRAFT) }) { "There is no advance care planning to cancel." }
         AmdRules.require(AmdRules.revocationIssues(revokedOn, writtenSigned, today))
         val revocation = AmdRevocation(revokedOn, reason.trim(), now, scanKey, scanSha256)
         return records.map { if (it.patientId == patientId && it.status in setOf(AmdStatus.EXECUTED, AmdStatus.GENERATED, AmdStatus.DRAFT)) it.copy(status = AmdStatus.REVOKED, revocation = revocation, updatedAt = now) else it }
@@ -342,9 +342,9 @@ object AmdLifecycle {
     private fun label(d: ExistingDirective?): Bi {
         if (d == null) return NOT_RECORDED
         return when (d.kind) {
-            DirectiveKind.NONE -> Bi("No living will (AMD)", "कोई लिविंग विल (AMD) नहीं")
+            DirectiveKind.NONE -> Bi("No advance care planning", "कोई अग्रिम देखभाल योजना नहीं")
             DirectiveKind.PRIOR_WISHES -> { val note = d.note; if (note.isBlank()) Bi("No AMD; earlier wishes noted", "AMD नहीं; पहले की इच्छाएँ दर्ज") else Bi.labeled(Bi("No AMD; earlier wishes noted", "AMD नहीं; पहले की इच्छाएँ दर्ज"), Bi.plain(note)) }
-            DirectiveKind.VALID_AMD -> Bi.join(" · ", listOf(Bi("Valid living will (AMD)", "वैध लिविंग विल (AMD)"), Bi.plain(d.date), Bi.join(" ", listOf(Bi("held at", "रखी है"), if (d.location.isBlank()) NOT_RECORDED else Bi.plain(d.location))), Bi.join(" ", listOf(Bi("attested by", "सत्यापित"), if (d.attestor.isBlank()) NOT_RECORDED else Bi.plain(d.attestor)))))
+            DirectiveKind.VALID_AMD -> Bi.join(" · ", listOf(Bi("Valid advance care planning", "वैध अग्रिम देखभाल योजना"), Bi.plain(d.date), Bi.join(" ", listOf(Bi("held at", "रखी है"), if (d.location.isBlank()) NOT_RECORDED else Bi.plain(d.location))), Bi.join(" ", listOf(Bi("attested by", "सत्यापित"), if (d.attestor.isBlank()) NOT_RECORDED else Bi.plain(d.attestor)))))
         }
     }
 
@@ -356,14 +356,14 @@ object AmdLifecycle {
                 val parts = amd.attestor.orEmpty().split(Regex(":\\s*"), 2)
                 val attestor = if (amd.attestor == null) NOT_RECORDED else Bi.labeled(if (parts[0] == "Notary") Bi("Notary", "नोटरी") else Bi("Gazetted officer", "राजपत्रित अधिकारी"), Bi.plain(parts.getOrElse(1) { "" }))
                 val version = amd.version; val signed = amd.executedOn ?: "—"
-                listOfNotNull(Bi.join(" · ", listOf(Bi("Living will (AMD) executed in Sahara", "Sahara में निष्पादित लिविंग विल (AMD)"), Bi("version $version", "संस्करण $version"), Bi("signed $signed", "हस्ताक्षर $signed"), attestor)),
+                listOfNotNull(Bi.join(" · ", listOf(Bi("Advance care planning executed in Sahara", "Sahara में निष्पादित अग्रिम देखभाल योजना"), Bi("version $version", "संस्करण $version"), Bi("signed $signed", "हस्ताक्षर $signed"), attestor)),
                     if (formValid) Bi.labeled(Bi("Also on this plan", "इस योजना में भी"), fromForm) else null, AmdText.GOVERNS) to true
             }
             amd?.status == AmdStatus.REVOKED -> { val version = amd.version
-                listOf(Bi.join(" · ", listOf(Bi("Living will cancelled in writing", "लिविंग विल लिखित रूप में रद्द"), Bi("version $version", "संस्करण $version"))),
+                listOf(Bi.join(" · ", listOf(Bi("Advance care planning cancelled in writing", "अग्रिम देखभाल योजना लिखित रूप में रद्द"), Bi("version $version", "संस्करण $version"))),
                     if (formValid) Bi.labeled(Bi("This plan still lists one. Check with the decision-maker", "यह योजना अब भी एक दिखाती है। निर्णयकर्ता से पूछें"), fromForm) else fromForm) to false }
             amd != null -> { val version = amd.version
-                listOfNotNull(Bi.join(" · ", listOf(Bi("Living will in Sahara is not signed and attested, so it is not valid", "Sahara की लिविंग विल पर हस्ताक्षर और सत्यापन नहीं, इसलिए मान्य नहीं"), Bi("version $version", "संस्करण $version"))),
+                listOfNotNull(Bi.join(" · ", listOf(Bi("Advance care planning in Sahara is not signed and attested, so it is not valid", "Sahara की अग्रिम देखभाल योजना पर हस्ताक्षर और सत्यापन नहीं, इसलिए मान्य नहीं"), Bi("version $version", "संस्करण $version"))),
                     fromForm, if (formValid) AmdText.GOVERNS else null) to formValid }
             else -> listOfNotNull(fromForm, if (formValid) AmdText.GOVERNS else null) to formValid
         }
