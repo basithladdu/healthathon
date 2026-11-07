@@ -27,7 +27,7 @@ export type GocFormDeviceSignature = { role: string; name: string; method: strin
 /** Where each guide row sits on the clinical document. */
 export function gocFormSection(topic: GocTopicId): 'I' | 'II' | 'III' | null {
   if (topic === 'consent') return null;
-  if (topic === 'patientDetails' || topic === 'decisionMakers') return 'I';
+  if (topic === 'patientDetails' || topic === 'decisionMakers' || topic === 'capacity' || topic === 'directives') return 'I';
   if (topic === 'understanding' || topic === 'patientKnows' || topic === 'familyAskedNotToTell' || topic === 'values') return 'II';
   return 'III';
 }

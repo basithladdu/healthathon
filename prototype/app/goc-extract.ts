@@ -32,7 +32,7 @@ export type GocQuote = { quote: string };
 export type GocHomeCareHint = { field: 'assessmentFrequency' | 'coordinator' | 'ngoContact' | 'previousAdmission'; quote: string };
 export type GocPersonHint = { relation: string; name: string; quote: string };
 export type GocTopicId =
-  | 'consent' | 'patientDetails'
+  | 'consent' | 'patientDetails' | 'capacity' | 'directives'
   | 'icu' | 'respCeiling' | 'dialysis' | 'vasopressors' | 'ng' | 'peg' | 'hydration' | 'cpr' | 'hospitalTransfer' | 'ambulance' | 'goalOfCare'
   | 'understanding' | 'patientKnows' | 'familyAskedNotToTell' | 'values' | 'decisionMakers' | 'homeCare';
 export type GocTopicCoverage = { topic: GocTopicId; discussed: boolean; quote: string };
@@ -45,7 +45,7 @@ export type GocExtraction = {
  * family details, emergency contact, and fourth is CPR, dialysis and all that". Then the rest of the form: Section II, then home care.
  * 'decisionMakers' is the family details, decision-makers and emergency contact row.
  */
-export const GOC_TOPIC_ORDER: readonly GocTopicId[] = ['consent', 'patientDetails', 'decisionMakers', 'cpr', 'dialysis', 'respCeiling', 'icu', 'vasopressors', 'ng', 'peg', 'hydration', 'hospitalTransfer', 'ambulance', 'goalOfCare', 'understanding', 'patientKnows', 'familyAskedNotToTell', 'values', 'homeCare'];
+export const GOC_TOPIC_ORDER: readonly GocTopicId[] = ['consent', 'patientDetails', 'decisionMakers', 'cpr', 'dialysis', 'respCeiling', 'icu', 'vasopressors', 'ng', 'peg', 'hydration', 'hospitalTransfer', 'ambulance', 'goalOfCare', 'understanding', 'patientKnows', 'familyAskedNotToTell', 'values', 'homeCare', 'capacity', 'directives'];
 export const GOC_DECISION_FIELDS: readonly GocDecisionField[] = ['cpr', 'dialysis', 'respCeiling', 'icu', 'vasopressors', 'ng', 'peg', 'hydration', 'hospitalTransfer', 'ambulance', 'goalOfCare', 'patientKnows', 'familyAskedNotToTell'];
 
 // ---------------------------------------------------------------------------
@@ -181,6 +181,11 @@ const T_PATIENT_DETAILS = rx(["(?:your|his|her|the patient's|full) name", 'how o
   ['आपका नाम', 'उनका नाम', 'पूरा नाम', 'उम्र', 'आयु', 'साल के', 'साल की', 'कहाँ रहते', 'घर का पता', 'آپ کا نام', 'ان کا نام', 'پورا نام', 'عمر', 'سال کے', 'سال کی', 'کہاں رہتے', 'گھر کا پتہ', 'పేరు', 'వయస్సు', 'వయసు', 'చిరునామా', 'ಹೆಸರು', 'ವಯಸ್ಸು', 'ವಿಳಾಸ']);
 const T_FAMILY_CONTACT = rx(['emergency contact', 'in an emergency', 'who should we call', 'whom (?:should|do) we call', 'who do we call', 'phone number', 'mobile number', 'contact number', 'reachable', 'next of kin', 'family members?', 'kisko phone', 'kise phone'],
   ['आपातकाल', 'इमरजेंसी', 'किसे फ़ोन', 'किसको फ़ोन', 'किसे फोन', 'किसको फोन', 'फ़ोन नंबर', 'फोन नंबर', 'मोबाइल नंबर', 'परिवार के सदस्य', 'ایمرجنسی', 'کسے فون', 'کس کو فون', 'فون نمبر', 'خاندان کے افراد', 'ఎమర్జెన్సీ', 'అత్యవసర', 'ఎవరికి ఫోన్', 'ఫోన్ నంబర్', 'కుటుంబ సభ్యులు', 'ಎಮರ್ಜೆನ್ಸಿ', 'ತುರ್ತು', 'ಯಾರಿಗೆ ಫೋನ್', 'ಫೋನ್ ನಂಬರ್', 'ಕುಟುಂಬದ ಸದಸ್ಯರು']);
+// Dr Sujay's checklist rows 3 and 4 (7 Nov 2026), twins of GocGuide TERMS CAPACITY and DIRECTIVES on Android. Only for ticking, never a choice.
+const T_CAPACITY = rx(['capacity', 'able to decide', 'decide for yourself', 'make decisions', 'make this decision', 'understand what', 'conscious', 'confused', 'alert', 'oriented', 'samajh'],
+  ['निर्णय-क्षमता', 'होश', 'समझ पा', 'फ़ैसला ले सक', 'صلاحیت', 'ہوش', 'سمجھ', 'సామర్థ్య', 'స్పృహ', 'అర్థం చేసుకో', 'ಸಾಮರ್ಥ್ಯ', 'ಪ್ರಜ್ಞೆ', 'ಅರ್ಥ']);
+const T_DIRECTIVES = rx(['directives?', 'living will', 'advance care plan\\w*', 'advance medical', 'power of attorney', 'written wishes', 'wishes written', 'any documents?', 'earlier plan', 'previous plan', 'wasiyat'],
+  ['वसीयत', 'निर्देश', 'दस्तावेज़', 'पहले की योजना', 'وصیت', 'دستاویز', 'ہدایت', 'వీలునామా', 'పత్రం', 'ఆదేశ', 'ಉಯಿಲು', 'ದಾಖಲೆ', 'ನಿರ್ದೇಶನ']);
 const T_PHONE_WORD = rx(['phone', 'mobile', 'number', 'call'], ['फ़ोन', 'फोन', 'नंबर', 'فون', 'نمبر', 'ఫోన్', 'నంబర్', 'ಫೋನ್', 'ನಂಬರ್']);
 
 const REASON_TERMS: Array<[TransferReason, RegExp]> = [
@@ -196,7 +201,7 @@ const REASON_TERMS: Array<[TransferReason, RegExp]> = [
 ];
 
 const TOPIC_TERMS: Record<GocTopicId, RegExp[]> = {
-  consent: [T_CONSENT], patientDetails: [T_PATIENT_DETAILS],
+  consent: [T_CONSENT], patientDetails: [T_PATIENT_DETAILS], capacity: [T_CAPACITY], directives: [T_DIRECTIVES],
   icu: [T_ICU], respCeiling: [T_VENT, T_NIV, T_HFNC, T_MASK2, T_O2], dialysis: [T_DIALYSIS], vasopressors: [T_VASO], ng: [T_NG, T_FEEDTUBE], peg: [T_PEG, T_FEEDTUBE], hydration: [T_FLUIDS],
   cpr: [T_CPR, T_DNR], hospitalTransfer: [T_HOSPITAL, T_STAY_HOME], ambulance: [T_AMBULANCE], goalOfCare: [T_GOAL_LIFE, T_GOAL_LIMITS, T_GOAL_COMFORT], understanding: [T_UNDERSTANDING],
   patientKnows: [T_ILLNESS], familyAskedNotToTell: [NOT_TO_TELL], values: [T_UNACCEPTABLE], decisionMakers: [T_FAMILY_CONTACT], homeCare: [T_HOME_CARE, T_NGO, T_COORDINATOR],

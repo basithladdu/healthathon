@@ -1,7 +1,8 @@
 // The checklist rows and the draft note for a goals-of-care conversation. Built only from the form's own labels and what the doctor
 // confirmed, so it says what was said and decided and carries no emotion. The verbatim transcript is kept apart, for review.
 import { careText, type CareLang } from './care-i18n.ts';
-import { GOC_TOPIC_ORDER, gocUndiscussed, type GocTopicCoverage, type GocTopicId } from './goc-extract.ts';
+import { GOC_TOPIC_ORDER, type GocTopicCoverage, type GocTopicId } from './goc-extract.ts';
+import { gocChecklist, gocChecklistOpen, gocChecklistTitle } from './goc-checklist.ts';
 import { buildGocFormDocument, gocFormText } from './goc-form.ts';
 import type { EctprRecord, GocTopicMark } from './ectpr-model.ts';
 
@@ -29,6 +30,8 @@ export function gocTopicName(topic: GocTopicId, lang: CareLang): string {
   switch (topic) {
     case 'consent': return t('Consent for this conversation', 'इस बातचीत के लिए सहमति');
     case 'patientDetails': return t('Patient details', 'मरीज़ की जानकारी');
+    case 'capacity': return t('Patient capacity', 'मरीज़ की निर्णय-क्षमता');
+    case 'directives': return t('Existing medical directives', 'पहले से मौजूद चिकित्सा निर्देश');
     case 'icu': return t('Intensive care (ICU)', 'गहन चिकित्सा (ICU)');
     case 'respCeiling': return t('Ventilator and breathing support', 'वेंटिलेटर और साँस की मदद');
     case 'dialysis': return t('Dialysis (kidney machine)', 'डायलिसिस (गुर्दे की मशीन)');
@@ -50,6 +53,12 @@ export function gocTopicName(topic: GocTopicId, lang: CareLang): string {
 }
 
 /** The draft note: the clinical document's Sections I to IV as text, for the doctor to edit. It leads into the existing signing step. */
-export function buildGocNote(record: EctprRecord, rows: GocTopicRow[], lang: CareLang, meta: { reviewedBy: string; reviewedAt: string }): string {
-  return gocFormText(buildGocFormDocument(record, rows, lang, { ...meta, notDiscussed: gocUndiscussed(rows).map((row) => gocTopicName(row.topic, lang)) }));
+export function buildGocNote(record: EctprRecord, rows: GocTopicRow[], lang: CareLang, meta: { reviewedBy: string; reviewedAt: string; tapped?: number[] }): string {
+  const { tapped, ...rest } = meta;
+  return gocFormText(buildGocFormDocument(record, rows, lang, { ...rest, notDiscussed: gocNotDiscussedTitles(rows, lang, tapped) }));
+}
+
+/** The "Not discussed" list is made of Dr Sujay's 13 checklist rows, not of the finer topics. [tapped]: rows the doctor ticked in the topic guide. */
+export function gocNotDiscussedTitles(rows: GocTopicRow[], lang: CareLang, tapped: Iterable<number> = []): string[] {
+  return gocChecklistOpen(gocChecklist(rows, tapped)).map((row) => gocChecklistTitle(row, lang));
 }

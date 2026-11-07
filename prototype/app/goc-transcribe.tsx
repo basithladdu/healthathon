@@ -8,10 +8,14 @@ import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, ty
 import { careDir, careText, type CareLang } from './care-i18n';
 import { logAudit } from './ectpr-store';
 import {
-  applyGocDecision, applyGocPerson, applyGocQuote, extractGoc, gocCarryForward, gocFieldLock, gocLinesFromText, gocMarksFor, gocNeedsSpeakers, gocSuggestedValue, gocUndiscussed,
+  applyGocDecision, applyGocPerson, applyGocQuote, extractGoc, gocCarryForward, gocFieldLock, gocLinesFromText, gocMarksFor, gocNeedsSpeakers, gocSuggestedValue,
   GOC_DECISION_FIELDS, type GocDecisionField, type GocLine, type GocSpeaker, type GocSuggestion,
 } from './goc-extract';
-import { buildGocNote, gocTopicName, gocTopicRows } from './goc-note';
+import { buildGocNote, gocNotDiscussedTitles, gocTopicName, gocTopicRows } from './goc-note';
+import { gocChecklist, gocChecklistDone, gocChecklistOpen, gocChecklistTitle } from './goc-checklist';
+import { GOC_ROW_SECTIONS, GOC_ROW_TITLES, gocGuideDecode, gocGuideDiscussed, gocGuideDone, gocGuideEncode, gocGuideNext, gocGuideOutOfOrder, gocGuideTap, type GocGuideState } from './goc-guide';
+import { GocRunModePicker, GocTopicPanel } from './goc-guide-panel';
+import { gocNoteSuffix, gocStartNewVersion, gocTalkVersion, type GocTalk } from './goc-version';
 import { buildGocFormDocument, gocFormBodyHtml, gocFormHtml, gocFormSection, GOC_FORM_CSS } from './goc-form';
 import { gocFormDocx } from './goc-docx';
 import { GOC_MODELS, GocSpeechError, decodeToSamples, gocDefaultModel, transcribeSamples, type GocProgress } from './goc-transcribe-model';
@@ -109,6 +113,12 @@ export function GocTranscribe({ t, lang, draft, previous, actorName, patientId, 
   const [transcribedBy, setTranscribedBy] = useState(saved?.model ?? '');
   const [signedOff, setSignedOff] = useState<GocSignOffSummary | null>(savedSignOff);
   const [editSigned, setEditSigned] = useState(false);
+  const talk = draft.gocTranscript as GocTalk | undefined;
+  const talkVersion = gocTalkVersion(talk);
+  const [guideMe, setGuideMe] = useState(true);
+  const [guide, setGuide] = useState<GocGuideState>(() => ({ stamps: gocGuideDecode((saved as GocTalk | undefined)?.guide ?? ''), now: -1 }));
+  const [guideCur, setGuideCur] = useState(0);
+  const [guideWarn, setGuideWarn] = useState<string | null>(null);
   const recorder = useRef<MediaRecorder | null>(null);
   const stream = useRef<MediaStream | null>(null);
   const cancel = useRef<AbortController | null>(null);
@@ -128,11 +138,41 @@ export function GocTranscribe({ t, lang, draft, previous, actorName, patientId, 
   const deferredLines = useDeferredValue(lines);
   const found = useMemo(() => extractGoc(deferredLines.filter((line) => line.text.trim())), [deferredLines]);
   const rows = useMemo(() => gocTopicRows(found.topics, marks, { consented }), [found, marks, consented]);
-  const undiscussed = gocUndiscussed(rows);
+  const tapped = useMemo(() => Object.keys(guide.stamps).map(Number), [guide]);
+  const checklist = useMemo(() => gocChecklist(rows, tapped), [rows, tapped]);
+  const undiscussed = gocChecklistOpen(checklist);
   const allSuggestions = useMemo(() => [...found.suggestions, ...aiSuggestions], [found, aiSuggestions]);
   const carried = useMemo(() => (previous ? gocCarryForward(previous, draft) : []), [previous, draft]);
   const noteLocked = signedOff?.status === 'LOCKED' && !editSigned;
   const optionName = (field: GocDecisionField, value: string | null) => { const option = options[field].find((item) => item.value === value); return option ? t(option.en, option.hi) : t('No preference recorded', 'कोई पसंद दर्ज नहीं'); };
+
+  // ---- Topic guide: the doctor's taps tick the checklist, no AI ---------------------------------------------------
+
+  const guideSeconds = recording ? seconds : -1;
+  function guideTap(index: number) {
+    const started = index !== guide.now;
+    const next = gocGuideTap(guide, index, guideSeconds);
+    setGuide(next);
+    if (started && gocGuideOutOfOrder(index, gocGuideDiscussed(next), GOC_ROW_SECTIONS, GOC_ROW_TITLES)) setGuideWarn(gocChecklistTitle(checklist[index], lang));
+    else if (started) setGuideWarn(null);
+  }
+  function guideDone() {
+    const next = gocGuideDone(guide, guideCur, guideSeconds);
+    setGuide(next);
+    const after = gocGuideNext(gocGuideDiscussed(next), guideCur, checklist.length);
+    if (after !== null) setGuideCur(after);
+  }
+
+  /** Signed and locked: the note stays locked in history, and a new version starts from it (earlier choices stay in the plan, to be confirmed again). */
+  function startNewVersion() {
+    const next = gocStartNewVersion(talk);
+    if (!next) return;
+    edit((record) => { record.gocTranscript = next as GocTranscript; });
+    setLines([]); setAccepted([]); setMarks({}); setDoneQuotes({}); setNote(''); setSignedOff(null); setEditSigned(false);
+    setConsentAt(''); setAudio(null); setAudioKept(false); setMachineDraft(false); setSource('TYPED'); setTranscribedBy('');
+    setGuide({ stamps: {}, now: -1 }); setGuideCur(0); setGuideWarn(null); setTyping(false); setStage('capture');
+    void logAudit({ actor: actorName, action: 'CREATE', recordType: 'ECTPR', recordId: draft.id, patientId, detail: `New goals-of-care version ${gocTalkVersion(next)} started; version ${talkVersion} stays locked in history` });
+  }
 
   // ---- Capture --------------------------------------------------------------------------------------------------
 
@@ -242,8 +282,8 @@ export function GocTranscribe({ t, lang, draft, previous, actorName, patientId, 
 
   const quoteItems = [
     // Words already shown as a choice (for example "I do not want CPR.") are not offered again as the patient's own words.
-    ...found.ownWords.filter((q) => !found.suggestions.some((s) => s.quote.includes(q.quote.trim()) || q.quote.includes(s.quote.trim()))).map((q) => ({ key: `own:${q.quote}`, quote: q.quote, section: 'II' as const, title: t('6.1 In their own words', '6.1 उनके अपने शब्दों में'), apply: (r: EctprRecord) => applyGocQuote(r, 'ownWords', q.quote) })),
-    ...found.unacceptableOutcomes.map((q) => ({ key: `un:${q.quote}`, quote: q.quote, section: 'II' as const, title: t('6.2 Outcomes that would be unacceptable', '6.2 जो हालत मंज़ूर नहीं'), apply: (r: EctprRecord) => applyGocQuote(r, 'unacceptableOutcomes', q.quote) })),
+    ...found.ownWords.filter((q) => !found.suggestions.some((s) => s.quote.includes(q.quote.trim()) || q.quote.includes(s.quote.trim()))).map((q) => ({ key: `own:${q.quote}`, quote: q.quote, section: 'II' as const, title: t('2.4 In their own words', '2.4 उनके अपने शब्दों में'), apply: (r: EctprRecord) => applyGocQuote(r, 'ownWords', q.quote) })),
+    ...found.unacceptableOutcomes.map((q) => ({ key: `un:${q.quote}`, quote: q.quote, section: 'II' as const, title: t('2.5 Outcomes that would be unacceptable', '2.5 जो हालत मंज़ूर नहीं'), apply: (r: EctprRecord) => applyGocQuote(r, 'unacceptableOutcomes', q.quote) })),
     ...found.homeCare.map((q) => ({ key: `home:${q.quote}`, quote: q.quote, section: 'III' as const, title: t('Home care (if relevant)', 'घर पर देखभाल (अगर लागू हो)'), apply: (r: EctprRecord) => applyGocQuote(r, q.field, q.quote) })),
   ];
   const quotesLocked = draft.surrogateDeclaration.answeringAsSurrogate && !draft.surrogateDeclaration.confirmed;
@@ -294,7 +334,7 @@ export function GocTranscribe({ t, lang, draft, previous, actorName, patientId, 
   // ---- Note and sign-off ----------------------------------------------------------------------------------------
 
   const formDocument = (withSignatures: boolean) => buildGocFormDocument(draft, rows, lang, {
-    reviewedBy: actorName, reviewedAt: saved?.reviewedAt || new Date().toISOString(), notDiscussed: undiscussed.map((row) => gocTopicName(row.topic, lang)),
+    reviewedBy: actorName, reviewedAt: saved?.reviewedAt || new Date().toISOString(), notDiscussed: gocNotDiscussedTitles(rows, lang, tapped),
     deviceSignatures: withSignatures ? signedOff?.signers : undefined,
   });
 
@@ -318,17 +358,18 @@ export function GocTranscribe({ t, lang, draft, previous, actorName, patientId, 
   /** "You haven't spoken about these things" is shown on the review screen itself; Continue (anyway) makes the note and saves. */
   function continueToNote() {
     const at = new Date().toISOString();
-    const text = buildGocNote(draft, rows, lang, { reviewedBy: actorName, reviewedAt: at });
-    const transcript: GocTranscript = {
+    const text = buildGocNote(draft, rows, lang, { reviewedBy: actorName, reviewedAt: at, tapped });
+    const transcript: GocTalk = {
       lines: lines.filter((line) => line.text.trim()), language, source, machineDraft, ...(machineDraft ? { model: transcribedBy } : {}),
       consentAt, reviewedBy: actorName, reviewedAt: at, audioKept, accepted, topics: marks, note: text,
+      guide: gocGuideEncode(guide.stamps), version: talkVersion, ...(talk?.history ? { history: talk.history } : {}), ...(talk?.carriedNote ? { carriedNote: talk.carriedNote } : {}),
     };
     edit((record) => { record.gocTranscript = transcript; });
     if (!audioKept) setAudio(null);
     setNote(text); setEditSigned(false); setStage('note');
     void logAudit({
       actor: actorName, action: 'REVIEW', recordType: 'ECTPR', recordId: draft.id, patientId,
-      detail: `Conversation transcript reviewed and saved: ${transcript.lines.length} lines, ${undiscussed.length ? `not discussed: ${undiscussed.map((row) => row.topic).join(', ')}; ` : ''}${accepted.length} choices confirmed, audio ${audioKept ? 'kept by the doctor' : audio ? 'deleted' : 'none'}`,
+      detail: `Conversation transcript reviewed and saved: ${transcript.lines.length} lines, ${undiscussed.length ? `not discussed: ${undiscussed.map((row) => row.id).join(', ')}; ` : ''}${accepted.length} choices confirmed, audio ${audioKept ? 'kept by the doctor' : audio ? 'deleted' : 'none'}`,
     });
   }
 
@@ -370,6 +411,13 @@ export function GocTranscribe({ t, lang, draft, previous, actorName, patientId, 
         <span><strong>{t('Everyone present agrees to this conversation being recorded and written down', 'मौजूद सभी लोग इस बातचीत को रिकॉर्ड करने और लिखने के लिए राज़ी हैं')}</strong>
           {gemini ? <small>{t('Audio is sent to Google Gemini to transcribe.', 'ऑडियो लिखने के लिए Google Gemini को भेजा जाता है।')}</small> : null}</span>
       </label>
+      {talkVersion > 1 || talk?.history?.length ? <details className="goc-carry">
+        <summary>{t(`Version ${talkVersion} of this conversation`, `इस बातचीत का संस्करण ${talkVersion}`)}</summary>
+        <ul className="goc-history">{(talk?.history ?? []).map((item) => <li key={item.version}>{t(`Version ${item.version}: signed and locked`, `संस्करण ${item.version}: साइन होकर बंद`)}</li>)}</ul>
+      </details> : null}
+      <GocRunModePicker t={t} guideMe={guideMe} onChange={setGuideMe} />
+      <GocTopicPanel t={t} lang={lang} guideMe={guideMe} state={guide} cur={guideCur} warnTitle={guideWarn} onTap={guideTap} onDone={guideDone}
+        onAllTopics={() => setGuideMe(false)} onDismissWarning={() => setGuideWarn(null)} />
       {!recording && !running ? <div className="goc-names">
         <label htmlFor="goc-people">{t('Who is present (optional)', 'कौन मौजूद है (वैकल्पिक)')}</label>
         <input id="goc-people" value={people} placeholder={t('e.g. Lakshmi (patient), Priya (daughter)', 'जैसे लक्ष्मी (मरीज़), प्रिया (बेटी)')} onChange={(event) => setPeople(event.target.value)} disabled={consented} />
@@ -409,10 +457,10 @@ export function GocTranscribe({ t, lang, draft, previous, actorName, patientId, 
 
     {stage === 'review' ? <div className="goc-stage goc-review">
       <div className="goc-checklist" aria-label={t('Checklist', 'सूची')}>
-        <h3>{t('Checklist', 'सूची')} <span className="goc-count">{t(`${rows.length - undiscussed.length} of ${rows.length}`, `${rows.length} में से ${rows.length - undiscussed.length}`)}</span></h3>
-        <ol>{rows.map((row) => <li key={row.topic} data-status={row.status} data-verified={row.verified || undefined}>
-          <span className="goc-tick" aria-hidden="true">{row.status === 'DISCUSSED' ? '✓' : ''}</span>
-          <span>{gocFormSection(row.topic) ? <span className="goc-sec">{gocFormSection(row.topic)}</span> : null}{gocTopicName(row.topic, lang)}</span>
+        <h3>{t('Checklist', 'सूची')} <span className="goc-count">{t(`${gocChecklistDone(checklist)} of ${checklist.length}`, `${checklist.length} में से ${gocChecklistDone(checklist)}`)}</span></h3>
+        <ol>{checklist.map((row) => <li key={row.id} data-status={row.discussed ? 'DISCUSSED' : 'NOT_DISCUSSED'} data-verified={row.verified || undefined}>
+          <span className="goc-tick" aria-hidden="true">{row.discussed ? '✓' : ''}</span>
+          <span><span className="goc-sec">{row.section}</span>{gocChecklistTitle(row, lang)}</span>
         </li>)}</ol>
       </div>
 
@@ -482,8 +530,8 @@ export function GocTranscribe({ t, lang, draft, previous, actorName, patientId, 
 
       {undiscussed.length ? <div className="goc-undiscussed" role="status">
         <h3>{t('You haven’t spoken about these things', 'इन बातों पर बात नहीं हुई')}</h3>
-        <ul>{undiscussed.map((row) => <li key={row.topic}><span>{gocTopicName(row.topic, lang)}</span>
-          <button type="button" className="goc-link" onClick={() => markTopic(row.topic, 'DISCUSSED')}>{t('It was discussed', 'इस पर बात हुई')}</button></li>)}</ul>
+        <ul>{undiscussed.map((row) => <li key={row.id}><span>{gocChecklistTitle(row, lang)}</span>
+          <button type="button" className="goc-link" onClick={() => setGuide((state) => gocGuideDone(state, row.index, -1))}>{t('It was discussed', 'इस पर बात हुई')}</button></li>)}</ul>
         <p className="goc-muted">{t('They stay No preference recorded, and the note says Not discussed.', 'ये “कोई पसंद दर्ज नहीं” रहेंगे, और नोट में “बात नहीं हुई” लिखा जाएगा।')}</p>
       </div> : null}
       <button type="button" className="ep-btn goc-next" disabled={!lines.some((line) => line.text.trim())} onClick={continueToNote}>{undiscussed.length ? t('Continue anyway', 'फिर भी आगे बढ़ें') : t('Continue', 'आगे बढ़ें')}</button>
@@ -504,7 +552,7 @@ export function GocTranscribe({ t, lang, draft, previous, actorName, patientId, 
       </div>
       {noteLocked ? <p className="ep-notice ep-info" role="status">{t('Signed and locked.', 'साइन होकर बंद।')} <button type="button" className="ep-link" onClick={() => setEditSigned(true)}>{t('Change the note', 'नोट बदलें')}</button></p> : null}
       {editSigned ? <p className="ep-notice ep-warn">{t('Changing the note clears the signatures, and everyone signs again.', 'नोट बदलने पर हस्ताक्षर हट जाते हैं, और सबको फिर साइन करना होगा।')} <button type="button" className="ep-link" onClick={() => setStage('review')}>{t('Back to review', 'जाँच पर वापस')}</button></p> : null}
-      {note.trim() ? <GocSignOff t={t} noteId={`${draft.id}:v${draft.version}:goc`} noteText={note} doctorName={actorName} signerName={draft.patient.name} showNote={false}
+      {note.trim() ? <GocSignOff t={t} noteId={`${draft.id}:v${draft.version}:goc${gocNoteSuffix(talkVersion)}`} noteText={note} doctorName={actorName} signerName={draft.patient.name} showNote={false}
         onComplete={(record) => {
           const summary = signOffSummary(record);
           setSignedOff(summary); setEditSigned(false);
@@ -519,6 +567,10 @@ export function GocTranscribe({ t, lang, draft, previous, actorName, patientId, 
         <p role="status">✓ {t(`Signed and locked: ${signedOff.signers.map((s) => s.name).join(', ')}`, `हस्ताक्षर हुए और बंद: ${signedOff.signers.map((s) => s.name).join(', ')}`)}</p>
         <button type="button" className="ep-btn" onClick={onClose}>{t('Done', 'हो गया')}</button>
         <button type="button" className="goc-link" onClick={onGoToSign}>{t('Plan signatures', 'योजना के हस्ताक्षर')}</button>
+        <div className="goc-new-version">
+          <button type="button" className="ep-btn ep-quiet" data-testid="goc-new-version" onClick={startNewVersion}>{t('Start a new version', 'नया संस्करण शुरू करें')}</button>
+          <small className="goc-muted">{t('This signed note stays locked. The new version starts from it, and the choices are confirmed again in the new talk.', 'यह साइन किया नोट बंद रहेगा। नया संस्करण इसी से शुरू होगा, और नई बातचीत में फ़ैसले फिर पक्के किए जाएँगे।')}</small>
+        </div>
       </div> : null}
     </div> : null}
   </section>;
