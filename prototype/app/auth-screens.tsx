@@ -51,10 +51,10 @@ const FAMILY_BRAND = {
 const PATIENT_BRAND = {
   kicker: 'Patient view',
   headline: 'Your care plan, close at hand.',
-  lede: 'Open the summary, emergency card, and nearby care.',
+  lede: 'Open the summary, pocket emergency card, and nearby care.',
   features: [
     { num: '01', title: 'My care plan', body: 'The summary your doctor verified.' },
-    { num: '02', title: 'Emergency card', body: 'A wallet card for the ambulance crew.' },
+    { num: '02', title: 'Pocket emergency card', body: 'A card to keep with you for the ambulance crew.' },
     { num: '03', title: 'Care near me', body: 'Palliative care centres, hospitals and clinics on a map.' },
   ],
 };

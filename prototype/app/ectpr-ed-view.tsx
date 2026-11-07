@@ -94,7 +94,7 @@ export function EctprEdView(props: { record: EctprRecord | null; lang?: CareLang
   return (
     <div className="ectpr-container" dir={careDir(lang)} lang={lang}>
       <div className={`ectpr-card ectpr-quickview ectpr-ed ectpr-ed--${state.toLowerCase()}`}>
-        <div className="ectpr-eyebrow">{t('Emergency care and treatment plan · ED Quick View', 'आपातकालीन देखभाल और इलाज योजना · ED त्वरित दृश्य')}</div>
+        <div className="ectpr-eyebrow">{t('Emergency care and treatment plan · For the emergency room', 'आपातकालीन देखभाल और इलाज योजना · आपातकालीन कक्ष के लिए')}</div>
         {record && (
           <h2 className="ectpr-heading">{record.patient.name || notRecorded(lang)} <span className="ectpr-ed-uhid">UHID {record.patient.uhid || notRecorded(lang)}</span></h2>
         )}

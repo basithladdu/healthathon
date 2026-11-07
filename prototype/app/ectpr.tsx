@@ -224,7 +224,7 @@ export function EctprPdfActions(props: { record: EctprRecord; lang?: CareLang; a
         </button>
         {props.showCard !== false && (
           <button type="button" className="ectpr-button ectpr-button--secondary" onClick={() => make('card')} disabled={busy !== null}>
-            {busy === 'card' ? t('Making PDF…', 'PDF बन रही है…') : t('Download wallet card (PDF)', 'वॉलेट कार्ड डाउनलोड (PDF)')}
+            {busy === 'card' ? t('Making PDF…', 'PDF बन रही है…') : t('Download pocket emergency card (PDF)', 'जेब में रखने का आपातकालीन कार्ड डाउनलोड करें (PDF)')}
           </button>
         )}
       </div>
@@ -298,6 +298,29 @@ function useQr(text: string | null): string | null {
     return () => { live = false; };
   }, [text]);
   return state && state.text === text ? state.url : null;
+}
+
+// The national numbers Android lists in NearbyHelp.emergency (sources there). Tapping opens the dialler; nothing calls by itself.
+const EMERGENCY_NUMBERS = [
+  { number: '112', label: ['Emergency: police, fire, ambulance', 'आपातकाल: पुलिस, आग, एम्बुलेंस'], note: null },
+  { number: '108', label: ['Ambulance', 'एम्बुलेंस'], note: ['Run by your state', 'राज्य सरकार की सेवा'] },
+  { number: '14567', label: ['Elderline for older people', 'बुज़ुर्गों के लिए एल्डरलाइन'], note: ['8 am – 8 pm', 'सुबह 8 – रात 8 बजे'] },
+] as const;
+
+/** Tap-to-call emergency numbers, shown above the card so SOS is never a dead end. */
+export function EmergencyNumbers(props: { lang?: CareLang }): React.JSX.Element {
+  const t = textFor(props.lang ?? 'en');
+  return (
+    <section className="ectpr-sos-numbers" aria-label={t('Emergency', 'आपातकाल')}>
+      <h2>{t('Emergency', 'आपातकाल')}</h2>
+      {EMERGENCY_NUMBERS.map((e) => (
+        <a key={e.number} href={`tel:${e.number}`} className="ectpr-sos-number">
+          <strong>{e.number}</strong>
+          <span>{t(e.label[0], e.label[1])}{e.note && <small>{t(e.note[0], e.note[1])}</small>}</span>
+        </a>
+      ))}
+    </section>
+  );
 }
 
 export function EmergencyCard(props: {
@@ -412,7 +435,7 @@ export function EmergencyCard(props: {
       <div className="ectpr-container">
         <CardFace record={record} lang={lang} watermark />
         <button type="button" className="ectpr-button ectpr-button--primary" onClick={issue} disabled={busy !== null}>
-          {busy === 'issue' ? t('Issuing…', 'जारी हो रहा है…') : t('Issue my emergency card', 'मेरा आपातकालीन कार्ड जारी करें')}
+          {busy === 'issue' ? t('Issuing…', 'जारी हो रहा है…') : t('Issue my pocket emergency card', 'जेब में रखने का मेरा आपातकालीन कार्ड जारी करें')}
         </button>
         <p className="ectpr-issue-help">
           {t('Issuing makes a new private link for the QR code (no name or number in the link) and withdraws any older card. Keep one copy at home, one with the family member who travels with you, and one inside the front door for the ambulance crew.', 'जारी करने पर QR के लिए नया निजी लिंक बनता है (लिंक में नाम या नंबर नहीं) और पुराना कार्ड वापस हो जाता है। एक कॉपी घर पर, एक साथ जाने वाले परिजन के पास, और एक दरवाज़े के अंदर एम्बुलेंस टीम के लिए रखें।')}

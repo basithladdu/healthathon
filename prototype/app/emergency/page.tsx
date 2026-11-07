@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { EmergencyView } from './emergency-view';
 
 export const metadata: Metadata = {
-  title: 'Emergency card · Sahara',
+  title: 'Pocket emergency card · Sahara',
   description: 'Read-only emergency card shared by a Sahara family.',
   robots: { index: false, follow: false },
   referrer: 'no-referrer',

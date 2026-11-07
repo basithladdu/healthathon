@@ -21,7 +21,7 @@ export function EmergencyView() {
       <div className={styles.content}>
         <header className={styles.header}>
           <span className={styles.brand}>Sahara</span>
-          <span className={styles.tag}>Emergency card · आपातकालीन कार्ड</span>
+          <span className={styles.tag}>Pocket emergency card · जेब में रखने का आपातकालीन कार्ड</span>
         </header>
         {!result && <p className={`${styles.muted} ${styles.loading}`} role="status">Loading the card… · कार्ड लोड हो रहा है…</p>}
         {result && result.status !== 'live' && (

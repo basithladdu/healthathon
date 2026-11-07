@@ -109,6 +109,11 @@ export function CareCommunity({ lang }: CareCommunityProps) {
 
   return <section className="care-community" aria-labelledby={`${id}-title`}>
     <header className="care-community-heading"><h1 id={`${id}-title`}>{t('Find your people', 'अपना साथ ढूँढें')}</h1></header>
+    {/* Same help card as Android Community: Tele-MANAS (MoHFW, telemanas.mohfw.gov.in), free and 24-hour; 112 for an emergency. */}
+    <aside className="care-community-help">
+      <p><strong>{t('Need to talk to someone now?', 'अभी किसी से बात करनी है?')}</strong> {t('Tele-MANAS is free, day and night. In an emergency, call 112.', 'टेली-मानस मुफ़्त है, दिन-रात। आपात स्थिति में 112 पर कॉल करें।')}</p>
+      <a href="tel:14416">{t('Call Tele-MANAS 14416', 'टेली-मानस 14416 पर कॉल करें')}</a>
+    </aside>
     <fieldset className="care-community-choices care-community-audiences" disabled={saveStatus === 'loading'}>
       <legend>{t('Support for', 'किसके लिए साथ चाहिए?')}</legend>
       <div>{audiences.map(([value, en, hi]) => <label key={value}>

@@ -457,6 +457,12 @@
    "ectpr-ed-view.tsx"
   ]
  },
+ "8 am – 8 pm": {
+  "hi": "सुबह 8 – रात 8 बजे",
+  "files": [
+   "ectpr.tsx"
+  ]
+ },
  "9 · Treating consultant · palliative care": {
   "hi": "9 · मुख्य डॉक्टर · पैलिएटिव केयर",
   "files": [
@@ -1551,6 +1557,12 @@
    "amd-screen.tsx"
   ]
  },
+ "Ambulance": {
+  "hi": "एम्बुलेंस",
+  "files": [
+   "ectpr.tsx"
+  ]
+ },
  "Ambulance crew": {
   "hi": "एम्बुलेंस टीम",
   "files": [
@@ -2263,6 +2275,12 @@
   "hi": "कॉल का नोट हटा दिया।",
   "files": [
    "family-support-places.tsx"
+  ]
+ },
+ "Call Tele-MANAS 14416": {
+  "hi": "टेली-मानस 14416 पर कॉल करें",
+  "files": [
+   "care-community.tsx"
   ]
  },
  "Camera view": {
@@ -4374,6 +4392,12 @@
    "family-handover-pack.tsx"
   ]
  },
+ "Download pocket emergency card (PDF)": {
+  "hi": "जेब में रखने का आपातकालीन कार्ड डाउनलोड करें (PDF)",
+  "files": [
+   "ectpr.tsx"
+  ]
+ },
  "Download results": {
   "hi": "नतीजे डाउनलोड करें",
   "files": [
@@ -4396,12 +4420,6 @@
   "hi": "ये अंश डाउनलोड करें",
   "files": [
    "care-document-search.tsx"
-  ]
- },
- "Download wallet card (PDF)": {
-  "hi": "वॉलेट कार्ड डाउनलोड (PDF)",
-  "files": [
-   "ectpr.tsx"
   ]
  },
  "Draft": {
@@ -4668,6 +4686,12 @@
    "family-symptom-diary.tsx"
   ]
  },
+ "Elderline for older people": {
+  "hi": "बुज़ुर्गों के लिए एल्डरलाइन",
+  "files": [
+   "ectpr.tsx"
+  ]
+ },
  "Electrolytes": {
   "hi": "इलेक्ट्रोलाइट्स",
   "files": [
@@ -4678,6 +4702,12 @@
   "hi": "ईमेल (वैकल्पिक)",
   "files": [
    "amd-screen.tsx"
+  ]
+ },
+ "Emergency": {
+  "hi": "आपातकाल",
+  "files": [
+   "ectpr.tsx"
   ]
  },
  "Emergency access": {
@@ -4692,8 +4722,8 @@
    "offline-qr-scanner-modal.tsx"
   ]
  },
- "Emergency care and treatment plan · ED Quick View": {
-  "hi": "आपातकालीन देखभाल और इलाज योजना · ED त्वरित दृश्य",
+ "Emergency care and treatment plan · For the emergency room": {
+  "hi": "आपातकालीन देखभाल और इलाज योजना · आपातकालीन कक्ष के लिए",
   "files": [
    "ectpr-ed-view.tsx"
   ]
@@ -4728,6 +4758,12 @@
   "hi": "इमरजेंसी के फ़ैसले",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Emergency: police, fire, ambulance": {
+  "hi": "आपातकाल: पुलिस, आग, एम्बुलेंस",
+  "files": [
+   "ectpr.tsx"
   ]
  },
  "Empty text": {
@@ -6503,8 +6539,8 @@
    "ectpr.tsx"
   ]
  },
- "Issue my emergency card": {
-  "hi": "मेरा आपातकालीन कार्ड जारी करें",
+ "Issue my pocket emergency card": {
+  "hi": "जेब में रखने का मेरा आपातकालीन कार्ड जारी करें",
   "files": [
    "ectpr.tsx"
   ]
@@ -7829,6 +7865,12 @@
   "hi": "कुछ बदलना है? नीचे से नया संस्करण शुरू करें। तब इस प्रिंट की गई प्रति पर हस्ताक्षर नहीं करने चाहिए।",
   "files": [
    "amd-screen.tsx"
+  ]
+ },
+ "Need to talk to someone now?": {
+  "hi": "अभी किसी से बात करनी है?",
+  "files": [
+   "care-community.tsx"
   ]
  },
  "Needed when the patient signs by thumb impression or has limited literacy, for both home-based and hospital-based evaluation. Preferably people who are not decision-makers.": {
@@ -9878,6 +9920,12 @@
    "amd-screen.tsx"
   ]
  },
+ "Pocket emergency card": {
+  "hi": "जेब में रखने का आपातकालीन कार्ड",
+  "files": [
+   "continuity-prototype.tsx"
+  ]
+ },
  "Point the camera at the QR code on the card…": {
   "hi": "कैमरा को कार्ड के QR कोड पर रखें…",
   "files": [
@@ -11337,6 +11385,12 @@
    "goc-signature-pad.tsx"
   ]
  },
+ "Run by your state": {
+  "hi": "राज्य सरकार की सेवा",
+  "files": [
+   "ectpr.tsx"
+  ]
+ },
  "Sahara": {
   "hi": "सहारा",
   "files": [
@@ -12743,6 +12797,12 @@
   "hi": "मेरे लिए काम",
   "files": [
    "care-task-inbox.tsx"
+  ]
+ },
+ "Tele-MANAS is free, day and night. In an emergency, call 112.": {
+  "hi": "टेली-मानस मुफ़्त है, दिन-रात। आपात स्थिति में 112 पर कॉल करें।",
+  "files": [
+   "care-community.tsx"
   ]
  },
  "Telling the patient": {
