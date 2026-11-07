@@ -61,7 +61,7 @@ class CareHeaderUiTest {
         ui.onNodeWithTag("walkthrough-switch-rahul").assertIsSelected()
         ui.onNodeWithTag("leave-walkthrough").assertIsDisplayed()
         ui.onNodeWithTag("walkthrough-switch-arjun").performClick()
-        ui.onNodeWithContentDescription("Practice user, currently Arjun, Family").assertIsDisplayed()
+        ui.onNodeWithContentDescription("Demo user, currently Arjun, Family").assertIsDisplayed()
         ui.runOnIdle { assertEquals("second", selected.value); assertEquals(1, additions); assertEquals(1, invites); assertEquals("arjun", user.value.key); assertEquals(0, left) }
     }
 

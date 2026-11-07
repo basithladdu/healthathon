@@ -41,9 +41,9 @@ internal object CareTodayRules {
     }
 
     /** Patient: "Good morning, Rahul". Family and others: the greeting alone (the family's own name is not in the record). */
-    fun greetingLine(hour: Int, hindi: Boolean, name: String, patient: Boolean): String {
-        val first = name.trim().substringBefore(' ')
-        return if (patient && first.isNotBlank()) "${greeting(hour, hindi)}, $first" else greeting(hour, hindi)
+    fun greetingLine(hour: Int, hindi: Boolean, name: String, patient: Boolean, viewerName: String = ""): String {
+        val first = (if (patient) name else viewerName).trim().substringBefore(' ')
+        return if (first.isNotBlank()) "${greeting(hour, hindi)}, $first" else greeting(hour, hindi)
     }
 
     /** "0 of 3": medicines ticked today out of today's medicines. No "not yet" count (3 Nov meeting). */

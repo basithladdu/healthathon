@@ -268,7 +268,7 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
             else SaharaScreenHost(person.id to tab, Modifier.fillMaxSize(), label = "Care tab", direction = { from, _ -> if (from.first == person.id) tabDirection else SaharaMotion.Direction.Switch }) { (shownId, shownTab) -> screens.SaveableStateProvider("$shownId:$shownTab") {
                 Box(Modifier.fillMaxSize()) { when (shownTab) {
                     0 -> Today(vm, clinician, onTalk = { go(1) }, onCare = { careFilter = it; go(2) }, onNearby = { go(3) }, onAdd = { if (canEdit) dialog = it else vm.message.value = askOwner }, onRead = { reading = it }, onCalendar = { openCalendar() }, onWorkflow = { go(7) }, onLabs = { go(8) }, onSharedWorkspace = { go(7) }, onSymptoms = { go(9) }, onInviteFamily = { inviteFamilyOpen = true }, onCalendarAt = ::openCalendar,
-                        onCheckInWords = { if (canEdit) dialog = "checkin" else vm.message.value = askOwner }, onDistress = { if (canEdit) dialog = "distress" else vm.message.value = askOwner }, onSymptomNote = { symptomAddPending = true; go(9) }, onCarePlan = { go(10) },
+                        onCheckInWords = { if (canEdit) dialog = "checkin" else vm.message.value = askOwner }, onDistress = { if (canEdit) dialog = "distress" else vm.message.value = askOwner }, onSymptomNote = { symptomAddPending = true; go(9) }, onCarePlan = { go(10) }, viewerName = walkthrough?.takeIf { it.role == "Family" }?.name.orEmpty(),
                         onCarePlanFromSos = { go(10, reopen = "sos") }, sosReopen = sosReopen, onSosReopened = { sosReopen = false }, onCommunity = { go(11) })
                     1 -> Talk(vm, clinician && canEdit, onRead = { reading = it }, onRequestConversation = { go(7) }, onLeave = { back() })
                     2 -> CareList(vm, initialFilter = careFilter, onReadNote = { reading = it }, onCalendar = { openCalendar() }, onCalendarAt = ::openCalendar, onWorkflow = { go(7) }, onLabs = { go(8) }, onSymptoms = { go(9) }, onCommunity = { go(11) }, onDevices = { go(12) }, onExit = { back() },
@@ -392,7 +392,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                                     SaharaSecondaryButton(t("Sign in", "साइन इन"), onClick = { if (accountContent == null) onAccount() else select("account") }, enabled = !entryBusy, icon = Icons.Default.AccountCircle,
                                         modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("welcome-account"))
                                     Spacer(Modifier.height(4.dp))
-                                    SaharaPracticeEntry(t("Practice", "अभ्यास करें"), t("Look around with a ready-made record. No account needed.", "तैयार रिकॉर्ड के साथ ऐप देखें। खाते की ज़रूरत नहीं।"),
+                                    SaharaPracticeEntry(t("Try a demo account", "डेमो खाता आज़माएँ"), t("Log in to a demo account", "डेमो खाते में लॉग इन करें"),
                                         enabled = !entryBusy, onClick = { walkthroughChooser = true }, modifier = Modifier.testTag("patient-walkthrough-entry"))
                                 }
                                 "person" -> addPersonContent?.invoke(close, role == "patient")
@@ -405,7 +405,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                                     }
                                     // Practice stays in view below the sign-in form, whatever the form's length.
                                     HorizontalDivider(color = SaharaColors.Line)
-                                    SaharaPracticeEntry(t("Practice", "अभ्यास करें"), t("Open Dr Meera's practice workspace. No account needed.", "डॉ. मीरा का अभ्यास वर्कस्पेस खोलें। खाते की ज़रूरत नहीं।"),
+                                    SaharaPracticeEntry(t("Try a demo account", "डेमो खाता आज़माएँ"), t("Log in to a demo account", "डेमो खाते में लॉग इन करें"),
                                         enabled = !formBusy && !entryBusy, onClick = onDoctorDemo, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp).testTag("doctor-demo-entry"))
                                 }
                                 else -> accountContent?.invoke(close) { formBusy = it }
@@ -451,7 +451,7 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
  * own caregiver check, the to-do list and caregiver tips; the patient's own check-in stays with the patient.
  */
 @Composable fun Today(vm: CareModel, clinician: Boolean, onTalk: () -> Unit, onCare: (String) -> Unit, onNearby: () -> Unit, onAdd: (String) -> Unit, onRead: (CareVersion) -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}, onSharedWorkspace: () -> Unit = {}, onSymptoms: () -> Unit = {}, onInviteFamily: () -> Unit = {}, onCalendarAt: (Long) -> Unit = { onCalendar() }, onCheckInWords: () -> Unit = {}, onSymptomNote: () -> Unit = onSymptoms, onDistress: () -> Unit = {}, onCarePlan: () -> Unit = {},
-    onCarePlanFromSos: () -> Unit = onCarePlan, sosReopen: Boolean = false, onSosReopened: () -> Unit = {}, onCommunity: () -> Unit = {}) {
+    onCarePlanFromSos: () -> Unit = onCarePlan, sosReopen: Boolean = false, onSosReopened: () -> Unit = {}, onCommunity: () -> Unit = {}, viewerName: String = "") {
     val todayPeople by vm.people.collectAsStateWithLifecycle(); val role by vm.viewRole.collectAsStateWithLifecycle()
     val items by vm.items.collectAsStateWithLifecycle(); val versions by vm.versions.collectAsStateWithLifecycle()
     val selectedPerson by vm.selected.collectAsStateWithLifecycle(); val loadedFor by vm.itemsLoadedFor.collectAsStateWithLifecycle()
@@ -485,7 +485,7 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
     LazyColumn(Modifier.fillMaxSize().background(SaharaColors.GroundWarm).saharaScreenEnter().testTag("today-list"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item(key = "today-header") { Row(Modifier.fillMaxWidth().saharaStagger(0), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Text(CareTodayRules.greetingLine(hour, hindi, personName, patient = !family && !clinician), Modifier.a11yHeading().testTag("today-greeting"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 22.sp, lineHeight = 28.sp, color = DoctorCardInk)
+                Text(CareTodayRules.greetingLine(hour, hindi, personName, patient = !family && !clinician, viewerName = if (family) viewerName else ""), Modifier.a11yHeading().testTag("today-greeting"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 22.sp, lineHeight = 28.sp, color = DoctorCardInk)
                 Text(today.format(careDateFormat("EEEE, d MMMM", hindi)), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub, modifier = Modifier.padding(top = 2.dp).testTag("today-date"))
                 // Family only: who they are caring for, as a soft chip under the date.
                 if (family && personName.isNotBlank()) Surface(shape = RoundedCornerShape(50), color = SaharaApricot, modifier = Modifier.padding(top = 8.dp)) {
@@ -1070,8 +1070,7 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
         },
         CareModuleTile("Medicines", t("Medicines", "दवाइयाँ"), "", SaharaSoftBlue, R.drawable.care_medicines_art, currentMeds.size + pastMeds.size) {
                 if (currentMeds.isEmpty() && pastMeds.isEmpty()) { SaharaLottie(SaharaLottieKind.Pill, Modifier.fillMaxWidth()); QuietLine(t("No medicines yet.", "अभी कोई दवा नहीं।")) } else {
-                    CareModuleList("medicines-current", currentMeds, t("No current medicines.", "अभी कोई दवा नहीं चल रही।"), t("Current", "अभी चल रही"), { it.id }) { CareRow(it, vm) }
-                    CareModuleList("medicines-past", pastMeds, t("No past medicines yet.", "पहले की कोई दवा नहीं।"), t("Past", "पहले की"), { it.id }) { CareRow(it, vm) }
+                    MedicineModuleList(vm, currentMeds, pastMeds)
                 }
                 MedicineScanAction(onScanPrescription) { onAdd("medicine") }
                 SideEffectsToRaiseCard(vm)

@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -120,15 +121,18 @@ internal class CaregiverCheckStore(context: Context) {
             // Picking and the saved score crossfade in place; the chosen circle fills as it is tapped.
             SaharaStateSwitch(saved == null || picking, Modifier.fillMaxWidth()) { choosing -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) { if (choosing) {
                 Text(t("Distress this past week, including today", "पिछले हफ़्ते, आज समेत, परेशानी"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
-                FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                // All eleven numbers on one row so "None" (0) and "Extreme" (10) sit at its two ends; each cell is at least 48dp tall to tap.
+                Row(Modifier.fillMaxWidth().selectableGroup(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
                     CareFamilyRules.scores.forEach { score ->
                         val chosen = saved == score
                         val fill = CareFamilyRules.colour(score)
                         val shown by animateColorAsState(if (chosen) fill else Paper, SaharaMotion.tween(SaharaMotion.SELECT_MS))
-                        Box(Modifier.size(48.dp).clip(CircleShape).background(shown).border(2.dp, fill, CircleShape)
+                        Box(Modifier.weight(1f).heightIn(min = 48.dp)
                             .clickable(role = Role.RadioButton) { store.save(key, today, score); saved = score; picking = false }
                             .semantics { contentDescription = "$score/10"; selected = chosen }.testTag("family-check-$score"), contentAlignment = Alignment.Center) {
-                            Text("$score", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = if (chosen) Color.White else DoctorCardInk)
+                            Box(Modifier.fillMaxWidth().aspectRatio(1f).clip(CircleShape).background(shown).border(2.dp, fill, CircleShape), contentAlignment = Alignment.Center) {
+                                Text("$score", fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1, softWrap = false, color = if (chosen) Color.White else DoctorCardInk)
+                            }
                         }
                     }
                 }

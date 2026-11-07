@@ -78,7 +78,7 @@ import androidx.compose.ui.unit.sp
 @Composable fun WalkthroughUserMenu(user: PatientWalkthrough.User, onSwitch: (String) -> Unit, onLeave: () -> Unit) { val t = careText();
     var expanded by remember { mutableStateOf(false) }
     Box {
-        TextButton(onClick = { expanded = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("walkthrough-user-menu").semantics { contentDescription = t("Practice user, currently ${user.name}, ${user.role}", "अभ्यास उपयोगकर्ता, अभी ${user.name}, ${user.role}") },
+        TextButton(onClick = { expanded = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("walkthrough-user-menu").semantics { contentDescription = t("Demo user, currently ${user.name}, ${user.role}", "डेमो उपयोगकर्ता, अभी ${user.name}, ${user.role}") },
             shape = RoundedCornerShape(SaharaRadius.Pill), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp), colors = ButtonDefaults.textButtonColors(containerColor = SaharaColors.HeaderRaised, contentColor = SaharaColors.OnHeader)) {
             Text("${user.name} · " + (if (user.role == "Family") t("Family", "परिवार") else t("Patient", "मरीज़")), fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1)
             Spacer(Modifier.width(4.dp)); Icon(Icons.Default.ExpandMore, null, Modifier.size(18.dp))
@@ -91,7 +91,7 @@ import androidx.compose.ui.unit.sp
                     onClick = { expanded = false; onSwitch(option.key) })
             }
             HorizontalDivider()
-            DropdownMenuItem(text = { Text(t("Leave Practice", "अभ्यास से बाहर जाएँ")) }, modifier = Modifier.testTag("leave-walkthrough"), onClick = { expanded = false; onLeave() })
+            DropdownMenuItem(text = { Text(t("Leave demo", "डेमो से बाहर जाएँ")) }, modifier = Modifier.testTag("leave-walkthrough"), onClick = { expanded = false; onLeave() })
         }
     }
 }

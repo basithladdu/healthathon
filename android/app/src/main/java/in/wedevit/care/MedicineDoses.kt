@@ -49,6 +49,9 @@ object MedicineDoses {
         Regex("(?<![A-Za-z])(?:od|qd|once|daily|each morning|every morning|each night|every night|at night|at bedtime|each evening|every evening)(?![A-Za-z])", RegexOption.IGNORE_CASE) to 1,
     )
 
+    /** True when [text] says the medicine is taken only when needed ("SOS", "as needed", "PRN"). */
+    fun isAsNeeded(text: String): Boolean = asNeeded.containsMatchIn(text)
+
     /** Doses a day written in [text], or null when it says "as needed", is not daily, or gives no clear count. Never more than [MAX_PER_DAY]. */
     fun perDay(text: String): Int? {
         val clean = text.replace(Regex("\\s+"), " ").trim()

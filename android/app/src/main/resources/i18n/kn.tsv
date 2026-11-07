@@ -5332,3 +5332,39 @@ Support for you	ನಿಮಗಾಗಿ ಸಹಾಯ
 Psychiatrists and counsellors, respite care and caregiver support groups.	ಮನೋವೈದ್ಯರು ಮತ್ತು ಸಲಹೆಗಾರರು, ವಿಶ್ರಾಂತಿ ಆರೈಕೆ ಮತ್ತು ಆರೈಕೆದಾರರ ಬೆಂಬಲ ಗುಂಪುಗಳು.
 Find a psychiatrist or counsellor nearby	ಹತ್ತಿರದ ಮನೋವೈದ್ಯರು ಅಥವಾ ಸಲಹೆಗಾರರನ್ನು ಹುಡುಕಿ
 Talk to a psychiatrist or counsellor	ಮನೋವೈದ್ಯರು ಅಥವಾ ಸಲಹೆಗಾರರೊಂದಿಗೆ ಮಾತನಾಡಿ
+Try a demo account	ಡೆಮೊ ಖಾತೆಯನ್ನು ಪ್ರಯತ್ನಿಸಿ
+Log in to a demo account	ಡೆಮೊ ಖಾತೆಗೆ ಲಾಗಿನ್ ಆಗಿ
+Based on the 4-item Zarit Burden Interview screening (Bédard et al., The Gerontologist, 2001). A screening, not a diagnosis.	ನಾಲ್ಕು ಪ್ರಶ್ನೆಗಳ ಝರಿಟ್ ಬರ್ಡನ್ ಇಂಟರ್‌ವ್ಯೂ ಸ್ಕ್ರೀನಿಂಗ್ ಆಧಾರಿತ (Bédard et al., The Gerontologist, 2001). ಇದು ಸ್ಕ್ರೀನಿಂಗ್ ಮಾತ್ರ, ರೋಗನಿರ್ಣಯವಲ್ಲ.
+Feeding	ಆಹಾರ ನೀಡುವಿಕೆ
+Surrogate / healthcare proxy (primary and secondary surrogate decision-makers)	ಪರ್ಯಾಯ ನಿರ್ಧಾರಕರು / ಆರೋಗ್ಯ ಆರೈಕೆ ಪ್ರತಿನಿಧಿ (ಪ್ರಾಥಮಿಕ ಮತ್ತು ದ್ವಿತೀಯ ಪರ್ಯಾಯ ನಿರ್ಧಾರಕರು)
+Witnesses  (required where the patient signs by thumb impression, or where literacy is limited – for both home-based and hospital-based evaluation)	ಸಾಕ್ಷಿಗಳು  (ರೋಗಿ ಹೆಬ್ಬೆರಳಿನ ಗುರುತಿನಿಂದ ಸಹಿ ಮಾಡಿದಾಗ, ಅಥವಾ ಸಾಕ್ಷರತೆ ಸೀಮಿತವಾಗಿದ್ದಾಗ ಅಗತ್ಯ – ಮನೆಯಲ್ಲಿ ಮತ್ತು ಆಸ್ಪತ್ರೆಯಲ್ಲಿ ನಡೆಯುವ ಎರಡೂ ಮೌಲ್ಯಮಾಪನಗಳಿಗೆ)
+Clinicians	ವೈದ್ಯಕೀಯ ತಜ್ಞರು
+The patient’s capacity, now	ಈಗ ರೋಗಿಯ ನಿರ್ಧಾರ ಸಾಮರ್ಥ್ಯ
+In their own words	ಅವರ ಸ್ವಂತ ಮಾತುಗಳಲ್ಲಿ
+Outcomes that would be unacceptable  (tick any that apply)	ಸ್ವೀಕಾರಾರ್ಹವಲ್ಲದ ಫಲಿತಾಂಶಗಳು  (ಅನ್ವಯಿಸುವವುಗಳನ್ನು ಗುರುತಿಸಿ)
+Start a new version?	ಹೊಸ ಆವೃತ್ತಿ ಪ್ರಾರಂಭಿಸಬೇಕೇ?
+The signed note stays locked and can still be opened from the history. The new version starts from the patient's details and the earlier choices, which are confirmed again in the new talk.	ಸಹಿ ಮಾಡಿದ ನೋಟ್ ಲಾಕ್ ಆಗಿಯೇ ಇರುತ್ತದೆ ಮತ್ತು ಇತಿಹಾಸದಿಂದ ಇನ್ನೂ ತೆರೆಯಬಹುದು. ಹೊಸ ಆವೃತ್ತಿ ರೋಗಿಯ ವಿವರಗಳು ಮತ್ತು ಹಿಂದಿನ ಆಯ್ಕೆಗಳಿಂದ ಆರಂಭವಾಗುತ್ತದೆ; ಅವುಗಳನ್ನು ಹೊಸ ಮಾತುಕತೆಯಲ್ಲಿ ಮತ್ತೆ ದೃಢೀಕರಿಸಲಾಗುತ್ತದೆ.
+Signed and locked (version ${gocRecord?.version}). A new talk makes a new version; this one stays in the history.	ಸಹಿ ಮಾಡಿ ಲಾಕ್ ಆಗಿದೆ (ಆವೃತ್ತಿ ${gocRecord?.version}). ಹೊಸ ಮಾತುಕತೆ ಹೊಸ ಆವೃತ್ತಿಯನ್ನು ಮಾಡುತ್ತದೆ; ಇದು ಇತಿಹಾಸದಲ್ಲಿ ಉಳಿಯುತ್ತದೆ.
+Search medicines	ಔಷಧಗಳನ್ನು ಹುಡುಕಿ
+No medicine matches that name.	ಆ ಹೆಸರಿನ ಯಾವ ಔಷಧವೂ ಇಲ್ಲ.
+As needed	ಅಗತ್ಯವಿದ್ದಾಗ
+Hide past medicines	ಹಿಂದಿನ ಔಷಧಗಳನ್ನು ಮರೆಮಾಡಿ
+Show past medicines	ಹಿಂದಿನ ಔಷಧಗಳನ್ನು ತೋರಿಸಿ
+Pick all that apply, then tap Next.	ಅನ್ವಯಿಸುವ ಎಲ್ಲವನ್ನೂ ಆರಿಸಿ, ನಂತರ ಮುಂದೆ ಒತ್ತಿ.
+selected	ಆಯ್ಕೆಯಾದವು
+Anything else to note?	ಇನ್ನೇನಾದರೂ ಬರೆಯಬೇಕೇ?
+Add another symptom	ಇನ್ನೊಂದು ಲಕ್ಷಣ ಸೇರಿಸಿ
+Skip this one	ಇದನ್ನು ಬಿಡಿ
+Same time and same person noting as the first symptom.	ಮೊದಲ ಲಕ್ಷಣದಂತೆಯೇ ಅದೇ ಸಮಯ ಮತ್ತು ಬರೆಯುವವರು.
+Demo user, currently ${user.name}, ${user.role}	ಡೆಮೊ ಬಳಕೆದಾರ, ಪ್ರಸ್ತುತ ${user.name}, ${user.role}
+Leave demo	ಡೆಮೊದಿಂದ ಹೊರಬನ್ನಿ
+Demo account as	ಡೆಮೊ ಖಾತೆ, ಯಾರಾಗಿ
+Couldn't open the demo.	ಡೆಮೊ ತೆರೆಯಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.
+Leaving demo…	ಡೆಮೊದಿಂದ ಹೊರಹೋಗುತ್ತಿದ್ದೇವೆ…
+Not available in the demo	ಡೆಮೊದಲ್ಲಿ ಲಭ್ಯವಿಲ್ಲ
+Leave the demo to sign in or use an account.	ಸೈನ್ ಇನ್ ಮಾಡಲು ಅಥವಾ ಖಾತೆ ಬಳಸಲು ಡೆಮೊದಿಂದ ಹೊರಬನ್ನಿ.
+Earlier demo care	ಹಿಂದಿನ ಡೆಮೊ ಆರೈಕೆ
+Earlier demo workspace	ಹಿಂದಿನ ಡೆಮೊ ವರ್ಕ್‌ಸ್ಪೇಸ್
+Sahara Demo Hospital	ಸಹಾರಾ ಡೆಮೊ ಆಸ್ಪತ್ರೆ
+Demo records	ಡೆಮೊ ದಾಖಲೆಗಳು
+Demo draft · not from your recording	ಡೆಮೊ ಡ್ರಾಫ್ಟ್ · ನಿಮ್ಮ ರೆಕಾರ್ಡಿಂಗ್‌ನಿಂದಲ್ಲ

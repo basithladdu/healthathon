@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Thermostat
@@ -340,38 +341,68 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
     LaunchedEffect(selected) { if (selected != capturedPerson) onClose() }
     // After a family member logs a new note: a kind word for them too (caregiver wellbeing). The check itself is on Today.
     var youMatter by rememberSaveable(initial?.id) { mutableStateOf(false) }
+    val multi = initial == null && followup == null && startSymptom == null
+    var saveTick by rememberSaveable { mutableIntStateOf(0) }
     if (youMatter) { CaregiverYouMatter(onDone = onClose, onCheck = onClose); return }
-    val afterSave: () -> Unit = { if (vm.viewRole.value == "Family" && initial == null) youMatter = true else onClose() }
+    // A brand-new note from "Note a symptom" is one session: several symptoms, then "Add another symptom" or "Done". The family kind word shows once, at Done.
+    val afterSave: () -> Unit = { if (multi) saveTick += 1 else if (vm.viewRole.value == "Family" && initial == null) youMatter = true else onClose() }
+    val finishSession: (Int) -> Unit = { saved -> if (saved > 0 && vm.viewRole.value == "Family") youMatter = true else onClose() }
     SymptomNoteForm(personId = capturedPerson, personName = people.firstOrNull { it.id == capturedPerson }?.name.orEmpty(), entries = entries,
         hindi = hindi, initial = initial, followup = followup, busy = busy, canEdit = canEdit && selected == capturedPerson, actionError = actionError, sharedOnline = vm.cloud != null,
-        viewRole = vm.viewRole.value, startSymptom = startSymptom, onSave = { id, value -> vm.saveSymptomNote(capturedPerson, id, value, expectedToken, afterSave) }, onClose = onClose)
+        viewRole = vm.viewRole.value, startSymptom = startSymptom, onSave = { id, value -> vm.saveSymptomNote(capturedPerson, id, value, expectedToken, afterSave) }, onClose = onClose,
+        multiSelect = multi, saveTick = saveTick, onFinish = finishSession)
 }
 
 /** The same native form can be checked with isolated callback fixtures, without touching accounts or real records. */
 @Composable fun SymptomNoteForm(personId: String, personName: String, entries: List<CareItem>, hindi: Boolean,
     initial: CareItem? = null, busy: Boolean = false, canEdit: Boolean = true, actionError: String? = null,
-    followup: CareItem? = null, sharedOnline: Boolean = false, viewRole: String = "", startSymptom: String? = null, onSave: (String, SymptomNote) -> Unit, onClose: () -> Unit) {
+    followup: CareItem? = null, sharedOnline: Boolean = false, viewRole: String = "", startSymptom: String? = null, onSave: (String, SymptomNote) -> Unit, onClose: () -> Unit,
+    multiSelect: Boolean = false, saveTick: Int = 0, onFinish: ((Int) -> Unit)? = null) {
     val original = remember(initial?.id) { initial?.let { SymptomNoteCodec.decode(it.detail) } }
     val largeText = LocalDensity.current.fontScale > 1.15f
     val prior = remember(followup?.id) { followup?.let { SymptomNoteCodec.decode(it.detail) } }
     val seed = remember(initial?.id, followup?.id) { original ?: prior?.let(SymptomDiaryRules::followUp) }
-    val id = rememberSaveable { initial?.id ?: newId() }
+    var noteId by rememberSaveable { mutableStateOf(initial?.id ?: newId()) }
+    val id = noteId
     val capturedPerson = rememberSaveable(id) { initial?.personId ?: personId }
     val context = LocalContext.current
     val t = { en: String, hi: String -> careTr(hindi, en, hi) }
+    // One session = several symptoms picked on step 1, each rated in turn and saved as its own note. Only brand-new notes from "Note a symptom" (multiSelect).
+    val multi = multiSelect && initial == null && followup == null && startSymptom == null
+    var picked by rememberSaveable { mutableStateOf("") }
+    var otherName by rememberSaveable { mutableStateOf("") }
+    var sesQueue by rememberSaveable { mutableStateOf("") }
+    var sesIdx by rememberSaveable { mutableIntStateOf(0) }
+    var sesStarted by rememberSaveable { mutableStateOf(false) }
+    var sesFinished by rememberSaveable { mutableStateOf(false) }
+    var sesSaved by rememberSaveable { mutableStateOf("") }
+    var handledTick by rememberSaveable { mutableIntStateOf(saveTick) }
+    // Shared by every symptom in the session: when, and who noted it (asked once, on the first symptom).
+    var sDate by rememberSaveable { mutableStateOf("") }
+    var sTime by rememberSaveable { mutableStateOf("") }
+    var sRecall by rememberSaveable { mutableStateOf("") }
+    var sResp by rememberSaveable { mutableStateOf("") }
+    var sAuthor by rememberSaveable { mutableStateOf("") }
+    val queueList = remember(sesQueue) { sesQueue.split('|').filter(String::isNotBlank) }
+    val queued = if (multi && sesStarted) queueList.getOrNull(sesIdx) else null
+    val inSession = multi && sesStarted && !sesFinished && queued != null
+    val picking = multi && !sesStarted && !sesFinished
+    val savedCount = sesSaved.split('|').count(String::isNotBlank)
+    val finish: (Int) -> Unit = { n -> if (onFinish != null) onFinish(n) else onClose() }
     var fullDetails by rememberSaveable(id) { mutableStateOf(prior == null || original != null) }
     // A tile on the tracker may already have chosen the symptom; only a brand-new note takes it.
     val started = startSymptom?.takeIf { initial == null && followup == null && it in SymptomDiaryRules.symptoms && it != "Other" }
-    var symptom by rememberSaveable(id) { mutableStateOf(seed?.symptom ?: started.orEmpty()) }
-    var otherSymptom by rememberSaveable(id) { mutableStateOf(seed?.symptom?.let { it !in SymptomDiaryRules.symptoms } ?: false) }
-    var scale by rememberSaveable(id) { mutableStateOf(seed?.scale ?: started?.let(SymptomDiaryRules::scaleForSymptom) ?: SymptomDiaryRules.PERSONAL_SCALE) }
+    val startKey = started ?: queued
+    var symptom by rememberSaveable(id) { mutableStateOf(seed?.symptom ?: startKey.orEmpty()) }
+    var otherSymptom by rememberSaveable(id) { mutableStateOf(seed?.symptom?.let { it !in SymptomDiaryRules.symptoms } ?: startKey?.let { it !in SymptomDiaryRules.symptoms } ?: false) }
+    var scale by rememberSaveable(id) { mutableStateOf(seed?.scale ?: startKey?.let { SymptomDiaryRules.scaleForSymptom(if (it in SymptomDiaryRules.symptoms) it else "Other") } ?: SymptomDiaryRules.PERSONAL_SCALE) }
     var rating by rememberSaveable(id) { mutableIntStateOf(if (original == null) -2 else original.rating ?: -1) }
     // Mood: two separate scales; -2 = not answered yet, -1 = Not rated. Answering either one is enough to go on.
     var moodLow by rememberSaveable(id) { mutableIntStateOf(if (original == null) -2 else original.moodRatings["low-mood"] ?: -1) }
     var moodAnxiety by rememberSaveable(id) { mutableIntStateOf(if (original == null) -2 else original.moodRatings["anxiety"] ?: -1) }
-    var observedDate by rememberSaveable(id) { mutableStateOf(seed?.observedDate ?: LocalDate.now().toString()) }
-    var observedTime by rememberSaveable(id) { mutableStateOf(seed?.observedTime ?: LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))) }
-    var recall by rememberSaveable(id) { mutableStateOf(seed?.recall ?: "now") }
+    var observedDate by rememberSaveable(id) { mutableStateOf(seed?.observedDate ?: sDate.ifBlank { null } ?: LocalDate.now().toString()) }
+    var observedTime by rememberSaveable(id) { mutableStateOf(seed?.observedTime ?: sTime.ifBlank { null } ?: LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))) }
+    var recall by rememberSaveable(id) { mutableStateOf(seed?.recall ?: sRecall.ifBlank { null } ?: "now") }
     // A brand-new note starts with who answered last time for this person (shown on the "About this note" step, changeable).
     // An invited family member (viewRole "Family") starts on "Seen by family or carer" instead.
     // Nobody is asked who reported it: a signed-in patient is "patient", an invited family member or carer is "caregiver".
@@ -383,8 +414,8 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
             else -> SymptomDiaryRules.defaultReporter(viewRole, last).let { if (it.first.isBlank()) "patient" to "" else it }
         }
     } else null }
-    var respondent by rememberSaveable(id) { mutableStateOf(seed?.respondent ?: lastWho?.first.orEmpty()) }
-    var author by rememberSaveable(id) { mutableStateOf(seed?.author ?: lastWho?.second.orEmpty()) }
+    var respondent by rememberSaveable(id) { mutableStateOf(seed?.respondent ?: sResp.ifBlank { null } ?: lastWho?.first.orEmpty()) }
+    var author by rememberSaveable(id) { mutableStateOf(seed?.author ?: sAuthor.ifBlank { null } ?: lastWho?.second.orEmpty()) }
     var startedOn by rememberSaveable(id) { mutableStateOf(seed?.startedOn.orEmpty()) }
     var note by rememberSaveable(id) { mutableStateOf(original?.note.orEmpty()) }
     var location by rememberSaveable(id) { mutableStateOf(seed?.painLocation.orEmpty()) }
@@ -417,8 +448,13 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
     LaunchedEffect(personId) { if (personId != capturedPerson) onClose() }
     // Steps: what -> (where, Pain only) -> how (one page, with the optional extras and Save). Quick follow-ups stay on a single short page.
     val quick = prior != null && initial == null && !fullDetails
-    val steps = if (symptom == "Pain") listOf("what", "where", "how") else listOf("what", "how")
-    var stepKey by rememberSaveable(id) { mutableStateOf(if (initial != null || prior != null) "how" else if (started != null) { if (started == "Pain") "where" else "how" } else "what") }
+    val steps = when {
+        inSession -> if (symptom == "Pain") listOf("where", "how") else listOf("how")
+        picking -> listOf("what")
+        symptom == "Pain" -> listOf("what", "where", "how")
+        else -> listOf("what", "how")
+    }
+    var stepKey by rememberSaveable(id) { mutableStateOf(if (initial != null || prior != null) "how" else if (startKey != null) { if (startKey == "Pain") "where" else "how" } else "what") }
     val cur = if (stepKey in steps) stepKey else if (stepKey == "where" || stepKey == "more") "how" else steps.first()
     val pos = steps.indexOf(cur)
     val ratingMissing = ratingNow == -2
@@ -431,22 +467,56 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
     }
     // Pain: once a spot is rated and who/when are already known (remembered from last time), Save sits on the body step; "More" still opens the details step.
     val saveFromWhere = !quick && cur == "where" && spotsDrive && howValid
-    val goBack: () -> Unit = { if (quick || pos <= 0) onClose() else stepKey = steps[pos - 1] }
+    // Move on to the next chosen symptom (after a save or a skip), or finish the session. Date, time and who noted it carry over.
+    val advance: () -> Unit = {
+        sDate = observedDate; sTime = observedTime; sRecall = recall; sResp = respondent; sAuthor = author
+        if (sesIdx + 1 < queueList.size) { sesIdx += 1; noteId = newId() } else if (savedCount == 0) finish(0) else sesFinished = true
+    }
+    LaunchedEffect(saveTick) {
+        if (multi && saveTick > handledTick) { handledTick = saveTick; sesSaved = (sesSaved.split('|').filter(String::isNotBlank) + symptom.replace("|", " ")).joinToString("|"); advance() }
+    }
+    val pickedList = picked.split('|').filter(String::isNotBlank)
+    val pickValid = pickedList.isNotEmpty() && ("Other" !in pickedList || otherName.isNotBlank())
+    val startSession: () -> Unit = {
+        val names = pickedList.map { if (it == "Other") otherName.trim().replace("|", " ") else it }.filter(String::isNotBlank).distinct()
+        if (names.isNotEmpty()) { sesQueue = names.joinToString("|"); sesIdx = 0; sesStarted = true; noteId = newId() }
+    }
+    val goBack: () -> Unit = {
+        if (sesFinished) finish(savedCount)
+        else if (inSession && pos <= 0) { if (sesIdx > 0) advance() else { sesStarted = false; sesQueue = ""; sesIdx = 0; noteId = newId() } }
+        else if (quick || pos <= 0) onClose() else stepKey = steps[pos - 1]
+    }
     val scroll = rememberScrollState()
     LaunchedEffect(cur) { scroll.scrollTo(0) }
     // System back steps back through the form; a swipe down or scrim tap only closes it before anything is chosen, so answers are never dropped by accident (Cancel always closes).
-    val gestureCloses by rememberUpdatedState(initial == null && prior == null && pos == 0 && symptom.isBlank())
-    SaharaScreenSheet(onDismissRequest = onClose, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true, confirmValueChange = { it != SheetValue.Hidden || gestureCloses }), containerColor = Cream,
+    val gestureCloses by rememberUpdatedState(sesFinished || (initial == null && prior == null && pos == 0 && symptom.isBlank()))
+    SaharaScreenSheet(onDismissRequest = { if (sesFinished) finish(savedCount) else onClose() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true, confirmValueChange = { it != SheetValue.Hidden || gestureCloses }), containerColor = Cream,
         properties = ModalBottomSheetProperties(shouldDismissOnBackPress = false)) {
         // Inside the sheet: the sheet is its own window, so a back handler outside it never hears system back.
         BackHandler(onBack = goBack)
-        Column(Modifier.fillMaxWidth().imePadding()) {
+        if (sesFinished) Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 8.dp, bottom = 24.dp).testTag("symptom-session-finished"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Heading(t("Saved", "सहेजा गया"), 26)
+            Text(personName, color = DoctorCardSub, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+            SurfaceCard(Mint) {
+                sesSaved.split('|').filter(String::isNotBlank).forEach { n ->
+                    Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Check, null, Modifier.size(18.dp), tint = DoctorAccent); Spacer(Modifier.width(8.dp)); Text(SymptomDiaryRules.symptomLabel(n, hindi), color = DoctorCardInk, fontSize = 16.sp, fontWeight = FontWeight.SemiBold) }
+                }
+            }
+            Text(t("Anything else to note?", "कुछ और लिखना है?"), color = DoctorCardSub, fontSize = 15.sp)
+            OutlinedButton(onClick = { picked = ""; otherName = ""; sesQueue = ""; sesIdx = 0; sesStarted = false; sesFinished = false; noteId = newId() }, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, DoctorAccent), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("symptom-add-another")) {
+                Icon(Icons.Default.Add, null, Modifier.size(20.dp), tint = RustText); Spacer(Modifier.width(6.dp)); Text(t("Add another symptom", "एक और लक्षण जोड़ें"), color = RustText, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+            }
+            Button(onClick = { finish(savedCount) }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = Color.White), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("symptom-session-done")) {
+                Text(t("Done", "हो गया"), fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
+            }
+        } else Column(Modifier.fillMaxWidth().imePadding()) {
             Column(Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Heading(t(if (prior != null && initial == null) "Update rating" else if (initial == null) "Log a symptom" else "Edit symptom note", if (prior != null && initial == null) "नया अंक लिखें" else if (initial == null) "लक्षण दर्ज करें" else "तबीयत का नोट बदलें"), 26)
                 Text(personName, color = DoctorCardSub, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-                if (!quick) {
-                    Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) { steps.forEachIndexed { i, _ -> val bar by androidx.compose.animation.animateColorAsState(if (i <= pos) DoctorAccent else DoctorHairline, SaharaMotion.tween(SaharaMotion.ENTER_MS), label = "step-bar"); Box(Modifier.weight(1f).height(6.dp).clip(RoundedCornerShape(3.dp)).background(bar)) } }
-                    Text("${pos + 1} ${t("of", "/")} ${steps.size}", color = DoctorCardSub, fontSize = 14.sp, modifier = Modifier.testTag("symptom-step-indicator"))
+                if (!quick && !picking) {
+                    if (steps.size > 1) Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) { steps.forEachIndexed { i, _ -> val bar by androidx.compose.animation.animateColorAsState(if (i <= pos) DoctorAccent else DoctorHairline, SaharaMotion.tween(SaharaMotion.ENTER_MS), label = "step-bar"); Box(Modifier.weight(1f).height(6.dp).clip(RoundedCornerShape(3.dp)).background(bar)) } }
+                    if (inSession && queueList.size > 1) Text("${SymptomDiaryRules.symptomLabel(symptom, hindi)} · ${sesIdx + 1} ${t("of", "/")} ${queueList.size}", color = DoctorCardSub, fontSize = 14.sp, modifier = Modifier.testTag("symptom-step-indicator"))
+                    else if (steps.size > 1) Text("${pos + 1} ${t("of", "/")} ${steps.size}", color = DoctorCardSub, fontSize = 14.sp, modifier = Modifier.testTag("symptom-step-indicator"))
                 }
             }
             Column(Modifier.weight(1f, fill = false).verticalScroll(scroll).padding(horizontal = 16.dp, vertical = 12.dp)) {
@@ -465,16 +535,22 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
                     }
                 }
                 if (!quick && cur == "what") SymptomSection(null, t("What would you like to note?", "किस बारे में नोट लिखना है?")) {
+                    if (multi) Text(t("Pick all that apply, then tap Next.", "जो भी लागू हों सब चुनें, फिर आगे दबाएँ।"), color = DoctorCardSub, fontSize = 15.sp, modifier = Modifier.testTag("symptom-multi-hint"))
                     SymptomDiaryRules.symptoms.entries.chunked(if (largeText) 1 else 2).forEach { pair ->
                         Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            pair.forEach { (en, _) -> SymptomFitTile(if (en == "Other") otherSymptom else !otherSymptom && symptom == en, SymptomDiaryRules.symptomLabel(en, hindi), en, "symptom-choice-$en", Modifier.weight(1f).fillMaxHeight()) {
+                            pair.forEach { (en, _) -> if (multi) SymptomFitTile(en in pickedList, SymptomDiaryRules.symptomLabel(en, hindi), en, "symptom-choice-$en", Modifier.weight(1f).fillMaxHeight(), role = androidx.compose.ui.semantics.Role.Checkbox) {
+                                picked = (if (en in pickedList) pickedList - en else pickedList + en).joinToString("|")
+                            } else SymptomFitTile(if (en == "Other") otherSymptom else !otherSymptom && symptom == en, SymptomDiaryRules.symptomLabel(en, hindi), en, "symptom-choice-$en", Modifier.weight(1f).fillMaxHeight()) {
                                 otherSymptom = en == "Other"; symptom = if (otherSymptom) "" else en; scale = SymptomDiaryRules.scaleForSymptom(en); if (en != "Pain") { location = ""; triggerValues = ""; bodySites = ""; bodyPoints = "[]"; bodyRatings = "" }; rating = -2; moodLow = -2; moodAnxiety = -2
                                 if (en != "Other") stepKey = if (en == "Pain") "where" else "how"
                             } }
                             if (pair.size == 1 && !largeText) Spacer(Modifier.weight(1f))
                         }
                     }
-                    if (otherSymptom) CareField(symptom, { symptom = it.take(80) }, t("Symptom name", "परेशानी का नाम"), singleLine = true)
+                    if (multi) {
+                        if (pickedList.isNotEmpty()) Text("${pickedList.size} ${t("selected", "चुने गए")}", color = DoctorCardInk, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.testTag("symptom-multi-count"))
+                        if ("Other" in pickedList) CareField(otherName, { otherName = it.take(80) }, t("Symptom name", "परेशानी का नाम"), singleLine = true)
+                    } else if (otherSymptom) CareField(symptom, { symptom = it.take(80) }, t("Symptom name", "परेशानी का नाम"), singleLine = true)
                 }
                 if (!quick && cur == "where" && symptom == "Pain") Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
                     CarePainBodyMap(value.painBodySites, value.painBodyPoints, ratingNow.takeIf { it >= 0 }, hindi, ratings = spotRatings, onSpotRating = { site, r -> bodyRatings = PainBodyMapRules.ratingsKey(spotRatings + (site to r)) }) { sites, points -> bodySites = sites.joinToString("|"); bodyPoints = PainBodyMapRules.encodePoints(points).toString(); bodyRatings = PainBodyMapRules.ratingsKey(spotRatings.filterKeys { it in sites }) }
@@ -532,7 +608,8 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
                     if (startedOn.isNotBlank()) TextButton(onClick = { startedOn = "" }) { Text(t("Clear start date", "शुरू होने की तारीख हटाएँ")) }
                     } }
                 }
-                if (quick || cur == "how") SymptomSection(null, t("When was this?", "यह कब हुआ?")) {
+                if (inSession && sesIdx > 0 && cur == "how") Text(t("Same time and same person noting as the first symptom.", "पहले लक्षण जैसा ही समय और लिखने वाला।"), color = DoctorCardSub, fontSize = 14.sp, modifier = Modifier.testTag("symptom-session-shared"))
+                else if (quick || cur == "how") SymptomSection(null, t("When was this?", "यह कब हुआ?")) {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedButton(onClick = { val d = LocalDate.parse(observedDate); DatePickerDialog(context, { _, y, m, day -> observedDate = LocalDate.of(y, m + 1, day).toString() }, d.year, d.monthValue - 1, d.dayOfMonth).apply { datePicker.maxDate = System.currentTimeMillis() }.show() }, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Icon(Icons.Default.CalendarMonth, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(observedDate, color = DoctorCardInk) }
                         OutlinedButton(onClick = { val time = LocalTime.parse(observedTime); TimePickerDialog(context, { _, h, m -> observedTime = "%02d:%02d".format(h, m) }, time.hour, time.minute, true).show() }, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Icon(Icons.Default.Schedule, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(observedTime, color = DoctorCardInk) }
@@ -559,19 +636,23 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
                     if (localError.isBlank()) onSave(id, saved)
                 }
                 (localError.takeIf { it.isNotBlank() } ?: actionError)?.let { Text(if (hindi && it == SymptomDiaryRules.SAVE_CONFLICT) "यह नोट बदल गया है या हटा दिया गया है। आपके जवाब यहीं हैं। सहेजने से पहले यह फ़ॉर्म बंद करके मौजूदा नोट फिर खोलें।" else if (hindi) "नोट सहेजा नहीं गया। जवाब यहीं हैं। तारीख, नाम और चुने हुए जवाब जाँचें।" else careTr(false, it, it), color = MaterialTheme.colorScheme.error, fontSize = 15.sp, fontWeight = FontWeight.SemiBold) }
-                val back: @Composable (Modifier) -> Unit = { m -> OutlinedButton(onClick = goBack, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, DoctorCardSub.copy(alpha = .5f)), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp), modifier = m.heightIn(min = 56.dp).testTag("symptom-step-back")) { Text(if (quick || pos <= 0) t("Cancel", "रद्द करें") else t("Back", "पीछे"), color = DoctorCardInk, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, style = SymptomWords) } }
+                val back: @Composable (Modifier) -> Unit = { m -> OutlinedButton(onClick = goBack, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, DoctorCardSub.copy(alpha = .5f)), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp), modifier = m.heightIn(min = 56.dp).testTag("symptom-step-back")) { Text(if (inSession && pos <= 0 && sesIdx > 0) t("Skip this one", "इसे छोड़ें") else if (inSession && pos <= 0) t("Back", "पीछे") else if (quick || pos <= 0) t("Cancel", "रद्द करें") else t("Back", "पीछे"), color = DoctorCardInk, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, style = SymptomWords) } }
                 val save: @Composable (Modifier) -> Unit = { m -> Button(onClick = saveNow, enabled = !busy && canEdit && personId == capturedPerson && (quick || saveFromWhere || stepValid), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = Color.White), elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp, pressedElevation = 0.dp), modifier = m.heightIn(min = 56.dp).testTag("symptom-save")) {
                     // Saving shows a small spinner in the button itself; the sheet closes when the note is stored.
                     AnimatedContent(busy, transitionSpec = { SaharaMotion.crossfade() }, label = "save-state") { saving ->
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             if (saving) { CircularProgressIndicator(Modifier.size(18.dp), color = Color.White, strokeWidth = 2.dp); Spacer(Modifier.width(8.dp)) }
-                            Text(if (saving) t("Saving…", "सहेज रहे हैं…") else t("Save note", "नोट सहेजें"), fontSize = 17.sp, fontWeight = FontWeight.SemiBold, style = SymptomWords)
+                            Text(if (saving) t("Saving…", "सहेज रहे हैं…") else if (inSession && sesIdx < queueList.size - 1) t("Save and next", "सहेजें और आगे") else t("Save note", "नोट सहेजें"), fontSize = 17.sp, fontWeight = FontWeight.SemiBold, style = SymptomWords)
                         }
                     }
                 } }
                 val next: @Composable (Modifier, Boolean) -> Unit = { m, primary -> if (primary) Button(onClick = { stepKey = steps[pos + 1] }, enabled = stepValid, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = Color.White), elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp, pressedElevation = 0.dp), modifier = m.heightIn(min = 56.dp).testTag("symptom-step-next")) { Text(t("Next", "आगे"), fontSize = 17.sp, fontWeight = FontWeight.SemiBold) }
                     else OutlinedButton(onClick = { stepKey = steps[pos + 1] }, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, DoctorAccent), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp), modifier = m.heightIn(min = 56.dp).testTag("symptom-step-next")) { Text(t("More", "और"), color = RustText, fontSize = 16.sp, fontWeight = FontWeight.SemiBold) } }
-                if (largeText) Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                val pickNext: @Composable (Modifier) -> Unit = { m -> Button(onClick = startSession, enabled = pickValid, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = Color.White), elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp, pressedElevation = 0.dp), modifier = m.heightIn(min = 56.dp).testTag("symptom-pick-next")) { Text(t("Next", "आगे"), fontSize = 17.sp, fontWeight = FontWeight.SemiBold) } }
+                if (picking) {
+                    if (largeText) Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { pickNext(Modifier.fillMaxWidth()); back(Modifier.fillMaxWidth()) }
+                    else Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) { back(Modifier.weight(1f)); pickNext(Modifier.weight(2f)) }
+                } else if (largeText) Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     if (quick || pos == steps.lastIndex || saveFromWhere) save(Modifier.fillMaxWidth())
                     if (saveFromWhere) next(Modifier.fillMaxWidth(), false) else if (!(quick || pos == steps.lastIndex)) next(Modifier.fillMaxWidth(), true)
                     back(Modifier.fillMaxWidth())

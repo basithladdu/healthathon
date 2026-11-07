@@ -5332,3 +5332,39 @@ Support for you	آپ کے لیے مدد
 Psychiatrists and counsellors, respite care and caregiver support groups.	ماہرِ نفسیات اور کونسلر، آرام کے لیے دیکھ بھال اور نگہداشت کرنے والوں کے سپورٹ گروپ۔
 Find a psychiatrist or counsellor nearby	قریب کوئی ماہرِ نفسیات یا کونسلر تلاش کریں
 Talk to a psychiatrist or counsellor	ماہرِ نفسیات یا کونسلر سے بات کریں
+Try a demo account	ڈیمو اکاؤنٹ آزمائیں
+Log in to a demo account	ڈیمو اکاؤنٹ میں لاگ ان کریں
+Based on the 4-item Zarit Burden Interview screening (Bédard et al., The Gerontologist, 2001). A screening, not a diagnosis.	چار سوالوں کے زارِت برڈن انٹرویو اسکریننگ پر مبنی (Bédard et al., The Gerontologist, 2001)۔ یہ صرف اسکریننگ ہے، تشخیص نہیں۔
+Feeding	غذا دینا
+Surrogate / healthcare proxy (primary and secondary surrogate decision-makers)	متبادل فیصلہ ساز / صحت کی دیکھ بھال کا نمائندہ (بنیادی اور ثانوی متبادل فیصلہ ساز)
+Witnesses  (required where the patient signs by thumb impression, or where literacy is limited – for both home-based and hospital-based evaluation)	گواہ  (جب مریض انگوٹھے کے نشان سے دستخط کرے، یا جہاں خواندگی محدود ہو تو ضروری – گھر پر اور اسپتال میں ہونے والے دونوں جائزوں کے لیے)
+Clinicians	معالجین
+The patient’s capacity, now	مریض کی فیصلہ کرنے کی اہلیت، اس وقت
+In their own words	ان کے اپنے الفاظ میں
+Outcomes that would be unacceptable  (tick any that apply)	ناقابلِ قبول نتائج  (جو لاگو ہوں ان پر نشان لگائیں)
+Start a new version?	کیا نیا ورژن شروع کریں؟
+The signed note stays locked and can still be opened from the history. The new version starts from the patient's details and the earlier choices, which are confirmed again in the new talk.	دستخط شدہ نوٹ مقفل رہے گا اور تاریخ میں اب بھی کھولا جا سکے گا۔ نیا ورژن مریض کی تفصیلات اور پچھلے انتخابات سے شروع ہوگا، جنہیں نئی گفتگو میں دوبارہ تصدیق کیا جائے گا۔
+Signed and locked (version ${gocRecord?.version}). A new talk makes a new version; this one stays in the history.	دستخط ہو کر مقفل (ورژن ${gocRecord?.version})۔ نئی گفتگو سے نیا ورژن بنے گا؛ یہ تاریخ میں رہے گا۔
+Search medicines	دوائیں تلاش کریں
+No medicine matches that name.	اس نام کی کوئی دوا نہیں۔
+As needed	ضرورت کے وقت
+Hide past medicines	پرانی دوائیں چھپائیں
+Show past medicines	پرانی دوائیں دکھائیں
+Pick all that apply, then tap Next.	جو بھی لاگو ہوں سب چنیں، پھر آگے دبائیں۔
+selected	منتخب
+Anything else to note?	کیا اور کچھ لکھنا ہے؟
+Add another symptom	ایک اور علامت شامل کریں
+Skip this one	اسے چھوڑ دیں
+Same time and same person noting as the first symptom.	پہلی علامت کی طرح وہی وقت اور وہی لکھنے والا۔
+Demo user, currently ${user.name}, ${user.role}	ڈیمو صارف، اس وقت ${user.name}، ${user.role}
+Leave demo	ڈیمو سے باہر نکلیں
+Demo account as	ڈیمو اکاؤنٹ، کس کے طور پر
+Couldn't open the demo.	ڈیمو نہیں کھل سکا۔
+Leaving demo…	ڈیمو سے باہر جا رہے ہیں…
+Not available in the demo	ڈیمو میں دستیاب نہیں
+Leave the demo to sign in or use an account.	سائن ان کرنے یا اکاؤنٹ استعمال کرنے کے لیے ڈیمو سے باہر نکلیں۔
+Earlier demo care	پہلے کی ڈیمو دیکھ بھال
+Earlier demo workspace	پہلے کا ڈیمو ورک اسپیس
+Sahara Demo Hospital	سہارا ڈیمو ہسپتال
+Demo records	ڈیمو ریکارڈ
+Demo draft · not from your recording	ڈیمو ڈرافٹ · آپ کی ریکارڈنگ سے نہیں

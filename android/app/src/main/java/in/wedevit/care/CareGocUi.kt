@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Checklist
@@ -164,7 +165,7 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
  * The doctor's Goals of care tab: the talk as its own page (Record, Review, Sign), titled with the patient's name,
  * not as step 6 of the plan. Leaving saves the draft as the plan wizard does; [onFullPlan] opens the 10-step plan.
  */
-@Composable internal fun GocTabFlow(record: EctprRecord, canEdit: Boolean, onSave: (EctprRecord) -> Boolean, onClose: () -> Unit, onFullPlan: (EctprRecord?) -> Unit) {
+@Composable internal fun GocTabFlow(record: EctprRecord, canEdit: Boolean, onSave: (EctprRecord) -> Boolean, onClose: () -> Unit, onFullPlan: (EctprRecord?) -> Unit, onNewVersion: (() -> Unit)? = null) {
     val t = careText(); val hindi = careHindi()
     val mic = rememberSaharaPermission(SaharaPermission.Microphone)
     var d by remember(record.id) { mutableStateOf(record) }
@@ -177,7 +178,10 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
     // The full plan opens with this talk's unsaved choices, so the rules that block them can be fixed there.
     fun fullPlan() { if (samePlan(d, record)) onFullPlan(null) else if (blockers.isEmpty()) { if (onSave(d)) onFullPlan(null) } else if (keepTalk()) onFullPlan(d) }
     androidx.activity.compose.BackHandler { leave(onClose) }
-    GocConversationPage(d, { change -> d = change(d) }, LocalGocFolder.current, mic::request, onClose = { leave(onClose) }, onFullPlan = if (canEdit) { { fullPlan() } } else null)
+    // A new version is a different record, so everything on the page starts over for it (the old one stays locked in history).
+    androidx.compose.runtime.key(record.id) {
+        GocConversationPage(d, { change -> d = change(d) }, LocalGocFolder.current, mic::request, onClose = { leave(onClose) }, onFullPlan = if (canEdit) { { fullPlan() } } else null, onNewVersion = if (canEdit) onNewVersion else null)
+    }
     leaving?.let { then -> androidx.compose.material3.AlertDialog(onDismissRequest = { leaving = null }, title = { Text(t("Can't save yet", "अभी सहेजा नहीं जा सकता")) },
         text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             blockers.forEach { Text("• " + it.text(hindi), style = MaterialTheme.typography.bodySmall) }
@@ -185,6 +189,18 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
         } },
         confirmButton = { TextButton(onClick = { leaving = null; if (canEdit) fullPlan() }) { Text(if (canEdit) t("Fix in the full care plan", "पूरी देखभाल योजना में ठीक करें") else t("Fix them", "ठीक करें")) } },
         dismissButton = { TextButton(onClick = { leaving = null; if (keepTalk()) then() }) { Text(t("Leave, keep the talk", "बातचीत सहेजकर बाहर जाएँ"), color = RustText) } }) }
+}
+
+/** On a locked note: talk again without touching it. Asks first, because the new version has to be confirmed and signed again. */
+@Composable internal fun GocNewVersionButton(onConfirm: () -> Unit, modifier: Modifier = Modifier) { val t = careText()
+    var asking by rememberSaveable { mutableStateOf(false) }
+    OutlinedButton(onClick = { asking = true }, shape = RoundedCornerShape(14.dp), modifier = modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("goc-new-version")) {
+        Icon(Icons.Default.Add, null, tint = RustText); Spacer(Modifier.width(8.dp)); Text(t("Start a new version", "नया संस्करण शुरू करें"), color = RustText, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+    }
+    if (asking) androidx.compose.material3.AlertDialog(onDismissRequest = { asking = false }, title = { Text(t("Start a new version?", "नया संस्करण शुरू करें?")) },
+        text = { Text(t("The signed note stays locked and can still be opened from the history. The new version starts from the patient's details and the earlier choices, which are confirmed again in the new talk.", "साइन किया हुआ नोट बंद रहेगा और इतिहास में खोला जा सकेगा। नया संस्करण मरीज़ की जानकारी और पहले के फ़ैसलों से शुरू होगा, जिन्हें नई बातचीत में फिर पक्का किया जाएगा।")) },
+        confirmButton = { TextButton(onClick = { asking = false; onConfirm() }, modifier = Modifier.testTag("goc-new-version-confirm")) { Text(t("Start", "शुरू करें"), color = RustText) } },
+        dismissButton = { TextButton(onClick = { asking = false }) { Text(t("Cancel", "रद्द करें")) } })
 }
 
 /** The way from the talk into the 10-step plan, named for what it is. */
@@ -315,7 +331,7 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
     }
 }
 
-@Composable private fun GocConversationPage(d: EctprRecord, update: ((EctprRecord) -> EctprRecord) -> Unit, folder: File?, withMic: (() -> Unit) -> Unit, agreedAt: Long = 0L, startRecording: Boolean = false, onClose: () -> Unit, onFullPlan: (() -> Unit)? = null) {
+@Composable private fun GocConversationPage(d: EctprRecord, update: ((EctprRecord) -> EctprRecord) -> Unit, folder: File?, withMic: (() -> Unit) -> Unit, agreedAt: Long = 0L, startRecording: Boolean = false, onClose: () -> Unit, onFullPlan: (() -> Unit)? = null, onNewVersion: (() -> Unit)? = null) {
     val t = careText(); val hindi = careHindi(); val context = LocalContext.current; val scope = rememberCoroutineScope(); val owner = LocalLifecycleOwner.current; val view = LocalView.current
     val recorder = remember(folder, d.patientId) { folder?.let { GocRecorder(context, it, d.patientId, scope) } }
     val engine = remember { GocSpeechEngine(context) }
@@ -658,6 +674,7 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
                             }
                         }
                         Button(onClick = onClose, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust, contentColor = Color.White), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("goc-done")) { Text(t("Done", "हो गया"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold) }
+                        if (onNewVersion != null) GocNewVersionButton(onNewVersion)
                     }
                 }
             }

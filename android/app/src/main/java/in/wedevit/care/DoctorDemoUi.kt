@@ -223,7 +223,7 @@ private val DoctorMist = Peach
                 else if (patient != null) IconButton(onClick = ::backPatient,modifier=Modifier.testTag("demo-patient-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, if(reportId!=null) t("Back to reports", "रिपोर्टों पर वापस") else if(progressReportId!=null) t("Back to progress", "प्रगति पर वापस") else if(recordTab=="Hub") t("Back to patients", "मरीज़ों की सूची पर वापस") else t("Back to patient profile", "मरीज़ की प्रोफ़ाइल पर वापस")) }
                 else { Image(saharaImage(R.drawable.sahara_professional_logo, 34.dp), null, Modifier.size(36.dp).clip(CircleShape).background(SaharaColors.Surface).padding(3.dp)); Spacer(Modifier.width(8.dp)) }
                 Column(Modifier.weight(1f)) {
-                    Text(if(sampleCareOpen) DoctorTestProfiles.profiles.firstOrNull {DoctorTestProfiles.personId(it)==testCarePerson}?.name ?: t("Earlier practice care", "पहले की अभ्यास देखभाल") else if (carePersonId != null) carePerson?.name ?: t("Care profile unavailable", "देखभाल प्रोफ़ाइल उपलब्ध नहीं") else if (patient != null) patient.displayName() else "Sahara", fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 20.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(if(sampleCareOpen) DoctorTestProfiles.profiles.firstOrNull {DoctorTestProfiles.personId(it)==testCarePerson}?.name ?: t("Earlier demo care", "पहले की डेमो देखभाल") else if (carePersonId != null) carePerson?.name ?: t("Care profile unavailable", "देखभाल प्रोफ़ाइल उपलब्ध नहीं") else if (patient != null) patient.displayName() else "Sahara", fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 20.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
                 CareLanguageMenu(compact = true)
                 Spacer(Modifier.width(10.dp))
@@ -245,7 +245,7 @@ private val DoctorMist = Peach
                 Text(message, Modifier.weight(1f).announce(), style = MaterialTheme.typography.bodyMedium, color = DoctorInk)
                 IconButton(onClick = { notice = null }) { Icon(Icons.Default.Close, t("Dismiss status", "सूचना हटाएँ")) }
             } }
-            if(earlierWorkspace && !sampleCareOpen && patientId==null && carePersonId==null) Row(Modifier.fillMaxWidth().padding(horizontal=20.dp),verticalAlignment=Alignment.CenterVertically){Text(t("Earlier practice workspace", "पहले का अभ्यास वर्कस्पेस"),Modifier.weight(1f));TextButton(onClick={earlierWorkspace=false;workflowRoute=null;tab=0}){Text(t("Return to current workspace", "मौजूदा वर्कस्पेस पर लौटें"))}}
+            if(earlierWorkspace && !sampleCareOpen && patientId==null && carePersonId==null) Row(Modifier.fillMaxWidth().padding(horizontal=20.dp),verticalAlignment=Alignment.CenterVertically){Text(t("Earlier demo workspace", "पहले का डेमो वर्कस्पेस"),Modifier.weight(1f));TextButton(onClick={earlierWorkspace=false;workflowRoute=null;tab=0}){Text(t("Return to current workspace", "मौजूदा वर्कस्पेस पर लौटें"))}}
             if(sampleCareOpen) DoctorCareDemoHost(onExit={sampleCareOpen=false;tab=1;testInitialSection="Hub"},onNavigationBlockedChange={careNavigationBlocked=it},onHeaderBackChange={sampleCareBack=it},initialPersonId=testCarePerson,initialSection=testInitialSection)
             else if (carePersonId != null && careModel != null) {
                 if (carePerson == null) Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) { Text(t("This care profile is unavailable", "यह देखभाल प्रोफ़ाइल उपलब्ध नहीं है"), style = MaterialTheme.typography.titleLarge); TextButton(onClick = { carePersonId = null }) { Text(t("Back to patients", "मरीज़ों की सूची पर वापस")) } }
@@ -623,7 +623,7 @@ private val DoctorMist = Peach
             Surface(shape = RoundedCornerShape(14.dp), color = Cream, modifier = Modifier.fillMaxWidth()) {
                 Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.LocalHospital, null, Modifier.size(20.dp), tint = DoctorAccent); Spacer(Modifier.width(10.dp))
-                    Column { Text(t("Sahara Practice Hospital", "सहारा अभ्यास अस्पताल"), fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = DoctorCardInk); Text(t("Palliative care unit · Hyderabad", "पैलिएटिव केयर यूनिट · हैदराबाद"), fontSize = 14.sp, color = DoctorCardSub) }
+                    Column { Text(t("Sahara Demo Hospital", "सहारा डेमो अस्पताल"), fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = DoctorCardInk); Text(t("Palliative care unit · Hyderabad", "पैलिएटिव केयर यूनिट · हैदराबाद"), fontSize = 14.sp, color = DoctorCardSub) }
                 }
             }
             Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {

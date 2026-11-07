@@ -75,7 +75,7 @@ object PatientWalkthrough {
 @Composable fun PatientWalkthroughChooser(onPick: (String) -> Unit, onDismiss: () -> Unit) { val t = careText();
     AlertDialog(onDismissRequest = onDismiss, modifier = Modifier.testTag("patient-walkthrough-chooser"), shape = RoundedCornerShape(SaharaRadius.Hero), containerColor = SaharaColors.Surface,
         icon = { SaharaIconChip(Icons.Default.School, SaharaTone.Marigold, size = 48) },
-        title = { Text(t("Practice as", "किसके रूप में अभ्यास करें"), Modifier.a11yHeading(), style = MaterialTheme.typography.titleLarge, color = SaharaColors.Ink, textAlign = TextAlign.Center) },
+        title = { Text(t("Demo account as", "डेमो खाता, किसके रूप में"), Modifier.a11yHeading(), style = MaterialTheme.typography.titleLarge, color = SaharaColors.Ink, textAlign = TextAlign.Center) },
         text = { Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             PatientWalkthrough.users.forEach { user ->
                 val patient = user.role == "Patient"
@@ -133,7 +133,7 @@ object PatientWalkthrough {
     DisposableEffect(vm) { onDispose { vm.closeDoctorDemo() } }
     LaunchedEffect(vm, attempt) {
         try { PatientWalkthrough.seed(vm, context); vm.select(PatientWalkthrough.personId); vm.refreshCareContacts(); vm.refreshMedicineHistory(); ready = true }
-        catch (e: Exception) { if (e is CancellationException) throw e; android.util.Log.e("SaharaSeed", "patient walkthrough load failed", e); error = t("Couldn't open Practice.", "अभ्यास नहीं खुल सका।") }
+        catch (e: Exception) { if (e is CancellationException) throw e; android.util.Log.e("SaharaSeed", "patient walkthrough load failed", e); error = t("Couldn't open the demo.", "डेमो नहीं खुल सका।") }
     }
     val person = PatientWalkthrough.visiblePeople(people).firstOrNull()
     val state = when {
@@ -146,12 +146,12 @@ object PatientWalkthrough {
     // Back while the walkthrough is still opening, failed or removed leaves it; back while leaving waits.
     BackHandler(state != "open") { leave() }
     SaharaScreenHost(state, Modifier.fillMaxSize().background(Cream), label = "Patient walkthrough") { shown -> when (shown) {
-        "closing" -> SaharaLoading(t("Leaving Practice…", "अभ्यास से बाहर जा रहे हैं…"))
-        "error" -> Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.Center) { SaharaEmpty(error ?: "", icon = Icons.Default.ErrorOutline, actionLabel = t("Retry", "फिर कोशिश करें"), onAction = { error = null; attempt++ }, secondaryLabel = t("Leave Practice", "अभ्यास से बाहर जाएँ"), onSecondary = ::leave) }
-        "removed" -> Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.Center) { SaharaEmpty(t("Practice record removed.", "अभ्यास रिकॉर्ड हटा दिया गया।"), secondaryLabel = t("Leave Practice", "अभ्यास से बाहर जाएँ"), onSecondary = ::leave) }
+        "closing" -> SaharaLoading(t("Leaving demo…", "डेमो से बाहर जा रहे हैं…"))
+        "error" -> Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.Center) { SaharaEmpty(error ?: "", icon = Icons.Default.ErrorOutline, actionLabel = t("Retry", "फिर कोशिश करें"), onAction = { error = null; attempt++ }, secondaryLabel = t("Leave demo", "डेमो से बाहर जाएँ"), onSecondary = ::leave) }
+        "removed" -> Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.Center) { SaharaEmpty(t("Demo record removed.", "डेमो रिकॉर्ड हटा दिया गया।"), secondaryLabel = t("Leave demo", "डेमो से बाहर जाएँ"), onSecondary = ::leave) }
         "opening" -> SaharaLoading(t("Opening care records…", "देखभाल रिकॉर्ड खुल रहे हैं…"))
         else -> CareApp(vm, onAccount = { accountUnavailable = true }, walkthrough = user, onLeaveWalkthrough = ::leave, onSwitchWalkthrough = ::switchTo)
     } }
-    if (accountUnavailable) SaharaDialog(t("Not available in Practice", "अभ्यास में उपलब्ध नहीं"), onDismiss = { accountUnavailable = false },
-        text = t("Leave Practice to sign in or use an account.", "साइन इन या खाते के लिए अभ्यास से बाहर जाएँ।"), confirmLabel = t("OK", "ठीक है"))
+    if (accountUnavailable) SaharaDialog(t("Not available in the demo", "डेमो में उपलब्ध नहीं"), onDismiss = { accountUnavailable = false },
+        text = t("Leave the demo to sign in or use an account.", "साइन इन या खाते के लिए डेमो से बाहर जाएँ।"), confirmLabel = t("OK", "ठीक है"))
 }

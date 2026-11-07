@@ -89,7 +89,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                 Column(Modifier.weight(1f)) {
                     Text(name, fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     val line = listOf(sex, illness).filter(String::isNotBlank).joinToString(" · ")
-                    if (line.isNotBlank()) Text(line, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    if (line.isNotBlank()) Text(line, fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.testTag("$tag-diagnosis"))
                 }
                 if (editable) OutlinedButton(onClick = onEdit, shape = RoundedCornerShape(50), contentPadding = PaddingValues(horizontal = 12.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.heightIn(min = 48.dp).testTag("patient-profile-edit")) {
                     Icon(Icons.Default.Edit, null, Modifier.size(18.dp), tint = DoctorAccent); Spacer(Modifier.width(4.dp)); Text(t("Edit", "बदलें"), color = DoctorAccent, fontWeight = FontWeight.SemiBold)
@@ -153,14 +153,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 /** A tiny line of the last few weights, scaled to their own range (no axis: the history dialog has the numbers). */
 @Composable private fun ProfileWeightSparkline(points: List<CareWeightEntry>, modifier: Modifier) {
-    val line = DoctorAccent
+    val line = Rust
     Canvas(modifier) {
         val low = points.minOf { it.kg }; val high = points.maxOf { it.kg }; val span = (high - low).takeIf { it > 0.0 } ?: 1.0
-        val step = size.width / (points.size - 1).coerceAtLeast(1)
-        val dots = points.mapIndexed { i, p -> Offset(i * step, (size.height - 4f) - ((p.kg - low) / span).toFloat() * (size.height - 8f)) }
-        dots.zipWithNext().forEach { (a, b) -> drawLine(line, a, b, strokeWidth = 2.dp.toPx(), cap = StrokeCap.Round) }
-        drawCircle(line.copy(alpha = .35f), radius = 2.5.dp.toPx(), center = dots.first())
-        drawCircle(line, radius = 3.5.dp.toPx(), center = dots.last())
+        val pad = 6.dp.toPx()
+        val dots = points.mapIndexed { i, p -> Offset(pad + i * ((size.width - 2 * pad) / (points.size - 1).coerceAtLeast(1)), (size.height - pad) - ((p.kg - low) / span).toFloat() * (size.height - 2 * pad)) }
+        // Same look as the distress and symptom charts: a rounded rust line, white-ringed dots, and a ring on the latest.
+        dots.zipWithNext().forEach { (a, b) -> drawLine(line, a, b, strokeWidth = 2.5.dp.toPx(), cap = StrokeCap.Round) }
+        dots.forEach { drawCircle(Color.White, 4.dp.toPx(), it); drawCircle(line, 3.dp.toPx(), it) }
+        dots.last().let { drawCircle(Color.White, 6.dp.toPx(), it); drawCircle(line, 6.dp.toPx(), it, style = androidx.compose.ui.graphics.drawscope.Stroke(1.5.dp.toPx())); drawCircle(line, 3.5.dp.toPx(), it) }
     }
 }
 
@@ -171,7 +172,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
     AlertDialog(onDismissRequest = onDismiss, title = { Text(t("Weight history", "वज़न का इतिहास")) }, text = {
         Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState()).testTag("patient-profile-weight-history"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             // The trend at a glance before the list of numbers.
-            CareWeightHistory.recent(sorted).takeIf { it.size >= 2 }?.let { points -> Surface(shape = RoundedCornerShape(12.dp), color = SaharaSoftGold, modifier = Modifier.fillMaxWidth()) { ProfileWeightSparkline(points, Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 12.dp, vertical = 8.dp)) } }
+            sorted.takeIf { it.size >= 2 }?.let { all ->
+                val lo = kotlin.math.floor(all.minOf { it.kg } - 1.0); val hi = kotlin.math.ceil(all.maxOf { it.kg } + 1.0)
+                val pts = all.map { ChartPoint(careEpoch(it.day).toDouble(), it.kg) }
+                val kgUnit = t("kg", "किलो")
+                CareTimeLineChart(points = pts, yMin = lo, yMax = hi, yTicks = listOf(lo, (lo + hi) / 2.0, hi), yText = { it.toInt().toString() },
+                    description = all.joinToString("; ") { it.day.format(format) + ": " + CarePatientProfileRules.weightText(it.kg) + " " + kgUnit },
+                    tag = "patient-profile-weight", height = 170.dp, pointText = { CarePatientProfileRules.weightText(it) },
+                    latestText = { CarePatientProfileRules.weightText(it) + " " + kgUnit },
+                    bands = listOf(ChartBand(lo, hi, Rust, 0.05f)))
+            }
             CareWeightHistory.changeSinceFirst(sorted)?.let { total ->
                 val sign = if (total > 0) "+" else if (total < 0) "−" else ""
                 Text(t("Since first", "पहली बार से") + ": $sign${CareWeightHistory.amountText(total)} ${t("kg", "किलो")}", fontWeight = FontWeight.SemiBold, color = DoctorAccent)

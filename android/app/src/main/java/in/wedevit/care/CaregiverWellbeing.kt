@@ -153,6 +153,7 @@ private val zbiAnswerHi = listOf("कभी नहीं", "शायद ही 
                     Modifier.fillMaxWidth().testTag("wellbeing-start"), tone = SaharaTone.Teal)
             }
 
+            Text(t("Based on the 4-item Zarit Burden Interview screening (Bédard et al., The Gerontologist, 2001). A screening, not a diagnosis.", "ज़ारिट बर्डन इंटरव्यू की 4-प्रश्न स्क्रीनिंग पर आधारित (Bédard et al., The Gerontologist, 2001)। यह जाँच है, निदान नहीं।"), fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardSub, modifier = Modifier.testTag("wellbeing-source"))
             if (!checking) CaregiverSupportCard(hindi = hindi, flagged = flagged)
 
             // Private journal

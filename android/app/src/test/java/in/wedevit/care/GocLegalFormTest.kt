@@ -17,18 +17,17 @@ class GocLegalFormTest {
             "Additional space for the team", "Additional option to add a local physician", "Family/Friend details", "Members present for discussion", "Language preferred",
             "|  | PRIMARY | SECONDARY |", "Phone (must be reachable 24 h)", "Basis for authority", "Named by patient", "Court-appointed",
             "Family members who must be informed before any major decision", "attempted to be contacted",
-            "Section II – Preliminary medical information and patient values", "Primary diagnosis and stage", "Functional status – ECOG", "4.1  The patient’s capacity, now",
-            "Capacity fluctuates", "4.2  Existing directives", "Attested by Notary", "with two witnesses", "5.3  What the patient knows", "will not be lied to", "6.1  In their own words",
-            "The most distressing physical symptom right now is", "What I am most afraid of is: Not discussed", "Unfinished things that matter", "6.2  Outcomes that would be unacceptable",
+            "Section II – Preliminary medical information and patient values", "Primary diagnosis and stage", "Functional status – ECOG", "2.1  The patient’s capacity, now",
+            "Capacity fluctuates", "2.2  Existing directives", "Attested by Notary", "with two witnesses", "2.3  What the patient knows", "will not be lied to", "2.4  In their own words",
+            "The most distressing physical symptom right now is", "What I am most afraid of is: Not discussed", "Unfinished things that matter", "2.5  Outcomes that would be unacceptable",
             "Exhausting the family’s savings", "Section III – Decisive Actions", "Home care (if relevant)", "Should the patient be brought to the hospital?", "☑ ONLY FOR THE FOLLOWING",
             "☑     Pain that cannot be controlled at home", "Caregiver unable to cope — respite admission", "NO — the patient is to be cared for where they are.", "frequency of assessments",
             "non-governmental organisation", "previously admitted", "Should CPR be performed?", "ATTEMPT CPR.", "DO NOT ATTEMPT CPR (DNACPR).", "Reason recorded (clinical futility",
             "Discussed with (patient / surrogate / both)", "| LEVEL | WHAT IT MEANS FOR THE PATIENT | CEILING |", "Low-flow oxygen up to 2 L/min", "Other parameters", "Dialysis or CRRT",
-            "Only if the renal failure is judged reversible", "Others", "Requirement of ICU?", "Common Cause v Union of India, 2018 and 2023", "Composition of the Boards",
-            "Final decision about withdrawal/withholding", "Protocol for withdrawal/withholding", "Vasopressors / inotropes", "no escalation beyond ____ agents", "12.1  Feeding",
+            "Only if the renal failure is judged reversible", "Others", "Requirement of ICU?", "Vasopressors / inotropes", "no escalation beyond ____ agents", "3.6  Feeding",
             "☑ Comfort feeding by mouth only", "Nasogastric (Ryle’s) tube", "Gastrostomy (PEG)", "A. PRIORITISE LIFE", "B. BALANCED / CEILING OF CARE", "C. PRIORITISE COMFORT",
-            "SECTION 19 — Declarations and signatures", "19.1  Patient", "I have made these choices myself.", "Name in capitals", "19.2  Surrogate / healthcare proxy",
-            "so far as I can judge", "19.3  Witnesses", "Address / ID", "19.4  Clinicians", "| ROLE | NAME | REGISTRATION NO. | SIGNATURE | DATE |", "| Treating consultant | Dr Sample | REG-1 | Signed |",
+            "Section IV – Signatures and declarations", "4.1  Patient", "I have made these choices myself.", "Name in capitals", "4.2  Surrogate / healthcare proxy",
+            "so far as I can judge", "4.3  Witnesses", "Address / ID", "4.4  Clinicians", "| ROLE | NAME | REGISTRATION NO. | SIGNATURE | DATE |", "| Treating consultant | Dr Sample | REG-1 | Signed |",
             "Nurse involved in the discussion")
         var at = 0
         form.forEach { words ->
@@ -37,6 +36,21 @@ class GocLegalFormTest {
             if (!words.startsWith("|") && !words.startsWith("☑")) at = found
         }
         assertTrue("The ceiling box is ticked in the oxygen table", Regex("""\| 1 \| [^|]* \| ☑ \|""").containsMatchIn(note))
+    }
+
+    @Test fun theWithdrawalSectionIsNotInTheNote() {
+        val r = r0.copy(withdrawal = EctprWithdrawal(applicable = true, finalDecision = WithdrawalFinal.TO_BE_PERFORMED, protocol = "Stepwise"))
+        val note = text(r).lowercase()
+        listOf("common cause", "withdrawal", "withholding", "composition of the boards", "stepwise").forEach { assertTrue(it, it !in note) }
+    }
+
+    @Test fun numberingFollowsTheOrderOfTheFormWithNoGaps() {
+        val sections = GocForm.sections(r0, emptyMap())
+        sections.forEachIndexed { si, section ->
+            val numbers = section.groups.mapNotNull { g -> Regex("""^(\d+)\.(\d+)  """).find(g.title.en)?.let { it.groupValues[1].toInt() to it.groupValues[2].toInt() } }
+            assertEquals("Section ${section.id}: sub-items count up from 1 with no gaps", (1..numbers.size).map { (si + 1) to it }, numbers)
+            assertEquals("Every titled group is numbered", section.groups.count { it.title.en.isNotBlank() }, numbers.size)
+        }
     }
 
     @Test fun confirmAllAppliesOnlyWhatWasSaidAndNeverADefault() {
