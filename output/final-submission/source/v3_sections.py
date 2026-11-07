@@ -51,7 +51,7 @@ for i, (f, n, role, c) in enumerate(members):
         [R(c, size=12.5, color=MUTED)]], align=PP_ALIGN.CENTER)
 card(team, 0.55, 5.55, 12.2, 1.45, fill=BG['mint'])
 icon(team, 11, 0.8, 5.72, 0.45); text(team, 1.35, 5.65, 5.3, 0.65, [[R('Our doctors ', size=14, bold=True), R('chose this problem from their own clinics and check every version.', size=14)]], anchor=MSO_ANCHOR.MIDDLE)
-icon(team, 28, 6.85, 5.72, 0.45); text(team, 7.4, 5.65, 5.3, 0.65, [[R('Rituparna P, a lawyer, ', size=14, bold=True), R('checked our form against India’s legal living-will format.', size=14)]], anchor=MSO_ANCHOR.MIDDLE)
+icon(team, 28, 6.85, 5.72, 0.45); text(team, 7.4, 5.65, 5.3, 0.65, [[R('Rituparna P, a lawyer, ', size=14, bold=True), R('reviewed our goals-of-care format: consistent with India’s living-will framework.', size=14)]], anchor=MSO_ANCHOR.MIDDLE)
 text(team, 0.8, 6.42, 11.8, 0.45, [[R('An independent team. The app is on Google Play under the name WeDevit.', size=13, color=MUTED)]])
 notes(team, 'Doctor background from Dr Sujay (team chat, 25 Aug 2026): pulmonary specialists who have worked extensively with lung cancer; Dr Sujay has palliative-medicine exposure.')
 '''
@@ -170,7 +170,7 @@ stack = [('android', 'Android', 'the phone app'), ('kotlin', 'Kotlin + Compose',
          ('supabase', 'Supabase', 'server, sign-in, storage'), ('postgresql', 'PostgreSQL', 'database; each family sees only its own'),
          ('googlegemini', 'Google Gemini', 'AI: speech to text, fills the form'), ('openai', 'OpenAI Whisper', 'speech to text with no internet'),
          ('googletranslate', 'Google ML Kit', '5 languages and read-aloud on the phone'), ('openstreetmap', 'OpenStreetMap', 'free map of nearby centres'),
-         (None, 'Legal form', 'India’s living will, checked by our lawyer'), (None, 'FHIR', 'standard format hospital software can read')]
+         (None, 'Legal form', 'fits India’s living-will framework (lawyer reviewed)'), (None, 'FHIR', 'standard format hospital software can read')]
 for i, (lg, h, d) in enumerate(stack):
     x = 0.55 + (i % 6) * 2.05; y = 4.45 + (i // 6) * 1.27
     card(tech, x, y, 1.93, 1.15, fill='FFFFFF', radius=0.12)
@@ -270,7 +270,7 @@ text(evals, 0.55, 3.5, 12.2, 0.38, [[R('2. What experts told us, and what we cha
 fb = [(11, 'Dr Sujay Halkur Shankar', 'doctor, used the whole app on 3 Nov',
        'Is there a guide telling the doctor what to talk about next? And a medicine taken 4 times a day needs 4 ticks.',
        'Checklist in the doctors’ order with a “not yet discussed” prompt; one tick per dose. Team chat: tubes-and-drains tracker, darker text.'),
-      (28, 'Rituparna P', 'lawyer, checked the form on 31 Oct',
+      (28, 'Rituparna P', 'lawyer, reviewed the format on 31 Oct',
        'Use the exact wording of India’s living-will form.',
        'Form copied word for word; signing locks it.'),
       (23, 'Dr Sharada Vinod Kutty', 'doctor, wrote our medical rules on 29 Oct',
