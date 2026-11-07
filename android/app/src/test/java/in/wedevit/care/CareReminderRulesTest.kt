@@ -83,4 +83,12 @@ class CareReminderRulesTest {
         assertFalse(CareReminderRules.listed(item("task", 0), today, zone))
         assertFalse(CareReminderRules.listed(item("task", start + 1, CareEntryCodec.encode(CareEntry("lab", value = "1", unit = "g"))), today, zone))
     }
+    @Test fun changedDoseTimesNeverKeepRingingAtTheOldTime() {
+        assertEquals(listOf("09:00", "21:00"), CareReminderRules.currentOptionTimes(listOf("08:00", "20:00"), listOf("09:00", "21:00")))
+        assertEquals(listOf("08:00"), CareReminderRules.currentOptionTimes(listOf("08:00", "20:00"), listOf("08:00", "21:00")))
+        assertEquals(listOf("08:00"), CareReminderRules.currentOptionTimes(listOf("08:00"), listOf("08:00", "20:00")))
+        // Every bell turned off stays off; no saved times keeps this phone's own choice.
+        assertEquals(emptyList<String>(), CareReminderRules.currentOptionTimes(emptyList(), listOf("09:00")))
+        assertEquals(listOf("13:00"), CareReminderRules.currentOptionTimes(listOf("13:00"), emptyList()))
+    }
 }

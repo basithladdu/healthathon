@@ -5138,3 +5138,9 @@ Add city / address	شہر / پتہ شامل کریں
 Add centre	اسپتال شامل کریں
 Add pain location in words	درد کی جگہ لفظوں میں شامل کریں
 Add why care differed	علاج الگ کیوں ہوا، شامل کریں
+Not a daily medicine. Follow its directions for when to give it.	یہ روز کی دوا نہیں ہے۔ کب دینی ہے، اس کی ہدایات دیکھیں۔
+No daily reminder: this is not a daily medicine. Follow its directions.	روز کا ریمائنڈر نہیں: یہ روز کی دوا نہیں ہے۔ اس کی ہدایات دیکھیں۔
+Which night's dose?	کس رات کی خوراک؟
+It is past midnight. Is this last night's $time dose, given late, or tonight's?	آدھی رات گزر چکی ہے۔ کیا یہ کل رات کی $time والی خوراک ہے جو دیر سے دی گئی، یا آج رات کی؟
+Last night's	کل رات کی
+Tonight's	آج رات کی

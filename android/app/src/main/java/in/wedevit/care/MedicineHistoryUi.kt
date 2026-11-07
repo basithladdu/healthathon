@@ -59,6 +59,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 /**
@@ -132,15 +133,16 @@ import java.time.format.DateTimeFormatter
  * Saves one dose tap: the dose's report (and, when a whole-day tick is being split, the doses it covered), then the
  * whole-day tick when it changes. Returns false when nothing could be saved.
  */
-internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: CareItem, doses: List<MedicineDose>, dose: MedicineDose, taken: Boolean): Boolean {
+internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: CareItem, doses: List<MedicineDose>, dose: MedicineDose, taken: Boolean, day: LocalDate = LocalDate.now(ZoneId.systemDefault())): Boolean {
     val zone = ZoneId.systemDefault(); val today = LocalDate.now(zone)
     val current = vm.allItems.value.firstOrNull { it.id == item.id } ?: item
-    val plan = MedicineDoses.plan(current, doses, vm.medicineEvents.value, dose, taken, today, zone, System.currentTimeMillis(), MedicineDoses.reporter(vm.viewRole.value))
+    val plan = MedicineDoses.plan(current, doses, vm.medicineEvents.value, dose, taken, day, zone, System.currentTimeMillis(), MedicineDoses.reporter(vm.viewRole.value))
     val repo = MedicineHistoryRepo(context.applicationContext, vm.cloud, vm.storageNamespace)
     var snapshot: MedicineHistorySnapshot? = null
     plan.events.forEach { snapshot = repo.append(current.personId, it) }
     snapshot?.let { if (vm.selected.value == current.personId) vm.medicineEvents.value = it.events }
-    if ((current.doneOn == today.toString()) != (plan.doneOn == today.toString())) { vm.busy.first { !it }; vm.toggle(current) }
+    // The whole-day tick is only ever today's, so a dose saved for last night leaves it as it is.
+    if (day == today && (current.doneOn == today.toString()) != (plan.doneOn == today.toString())) { vm.busy.first { !it }; vm.toggle(current) }
     return true
 }
 
@@ -148,12 +150,26 @@ internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: C
  * Saves one dose tap. A one-tap Taken ([quick]) is held for a few seconds with "Marked taken · Undo" ([DoseUndoWindow]);
  * Undo then writes nothing. A choice from the Taken / Missed menu is written at once, after any held tick.
  */
-internal suspend fun markMedicineDose(context: Context, vm: CareModel, item: CareItem, doses: List<MedicineDose>, dose: MedicineDose, taken: Boolean, quick: Boolean, label: String) {
+internal suspend fun markMedicineDose(context: Context, vm: CareModel, item: CareItem, doses: List<MedicineDose>, dose: MedicineDose, taken: Boolean, quick: Boolean, label: String,
+                                      day: LocalDate = LocalDate.now(ZoneId.systemDefault())) {
     val window = DoseUndoWindow.app
-    if (!(quick && taken)) { window.flush(); recordMedicineDose(context, vm, item, doses, dose, taken); return }
+    if (!(quick && taken)) { window.flush(); recordMedicineDose(context, vm, item, doses, dose, taken, day); return }
     val zone = ZoneId.systemDefault(); val app = context.applicationContext
-    val shown = MedicineDoses.report(item, dose, true, LocalDate.now(zone), zone, System.currentTimeMillis(), MedicineDoses.reporter(vm.viewRole.value))
-    window.hold(DoseUndoWindow.Pending(item.personId, item.id, dose.key, item.title, label, shown) { recordMedicineDose(app, vm, item, doses, dose, true) })
+    val shown = MedicineDoses.report(item, dose, true, day, zone, System.currentTimeMillis(), MedicineDoses.reporter(vm.viewRole.value))
+    window.hold(DoseUndoWindow.Pending(item.personId, item.id, dose.key, item.title, label, shown) { recordMedicineDose(app, vm, item, doses, dose, true, day) })
+}
+
+/**
+ * A night dose marked after midnight ([MedicineDoses.askWhichNight]): was it last night's, given late, or tonight's?
+ * [ask] is the dose time and what to save for the chosen day. Closing the dialog saves nothing.
+ */
+@Composable internal fun WhichNightDialog(ask: Pair<String, (LocalDate) -> Unit>?, onDismiss: () -> Unit) {
+    val t = careText(); val (time, save) = ask ?: return
+    val today = LocalDate.now(ZoneId.systemDefault())
+    AlertDialog(onDismissRequest = onDismiss, title = { Text(t("Which night's dose?", "किस रात की खुराक?")) },
+        text = { Text(t("It is past midnight. Is this last night's $time dose, given late, or tonight's?", "आधी रात बीत चुकी है। क्या यह कल रात की $time वाली खुराक है, जो देर से दी गई, या आज रात की?")) },
+        confirmButton = { TextButton(onClick = { onDismiss(); save(today.minusDays(1)) }, modifier = Modifier.heightIn(min = 48.dp).testTag("dose-which-night-last")) { Text(t("Last night's", "कल रात की"), fontWeight = FontWeight.SemiBold) } },
+        dismissButton = { TextButton(onClick = { onDismiss(); save(today) }, modifier = Modifier.heightIn(min = 48.dp).testTag("dose-which-night-tonight")) { Text(t("Tonight's", "आज रात की")) } })
 }
 
 /**
@@ -217,25 +233,30 @@ internal suspend fun markMedicineDose(context: Context, vm: CareModel, item: Car
     var problem by remember(item.id) { mutableStateOf("") }
     val capturedAccount = remember(item.id) { vm.accountNamespace }
     val doses = medicineDosesFor(item, vm)
+    var whichNight by remember(item.id) { mutableStateOf<Pair<String, (LocalDate) -> Unit>?>(null) }
     val zone = ZoneId.systemDefault(); val today = LocalDate.now(zone)
     val states = MedicineDoses.states(item, doses, events, today, zone)
     val editable = canEdit && current.any { it.id == item.id }
     val failed = t("Couldn't save. Please try again.", "सहेजा नहीं जा सका। कृपया फिर कोशिश करें।")
     // Dose chips wrap, so every dose of the day is visible without sideways scrolling.
+    // A weekly, monthly or every-few-days medicine has no daily tick: its directions say when it is due.
+    if (doses.isEmpty() && MedicineDoses.notDaily(item)) Text(t("Not a daily medicine. Follow its directions for when to give it.", "यह रोज़ की दवा नहीं है। कब देनी है, इसके निर्देश देखें।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.padding(top = 8.dp).testTag("medicine-not-daily-${item.id}"))
     FlowRow(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         doses.forEach { dose ->
             val label = medicineDoseLabel(dose)
             MedicineDoseChip(item, dose, states[dose.key] ?: MedicineDoseState.PENDING, enabled = editable && !busy && !working) { taken, quick ->
-                if (canEditCareContext(vm, item.personId, capturedAccount)) { working = true; problem = ""; scope.launch {
-                    try { markMedicineDose(context, vm, item, doses, dose, taken, quick, label) }
+                val save: (LocalDate) -> Unit = { day -> if (canEditCareContext(vm, item.personId, capturedAccount)) { working = true; problem = ""; scope.launch {
+                    try { markMedicineDose(context, vm, item, doses, dose, taken, quick, label, day) }
                     catch (e: Exception) { if (e is CancellationException) throw e; problem = if (e is IllegalArgumentException) e.message ?: failed else failed }
                     finally { working = false }
-                } }
+                } } }
+                if (MedicineDoses.askWhichNight(item, dose, events, ZonedDateTime.now(zone))) whichNight = dose.time to save else save(LocalDate.now(zone))
             }
         }
         if (showHistory) DoseChip(Icons.Default.History, t("History", "इतिहास"), "care-medicine-history-${item.id}", true) { history = true }
     }
     DoseUndoRow(item.personId, item.id)
+    WhichNightDialog(whichNight) { whichNight = null }
     if (problem.isNotBlank()) SaharaDialog(t("Not saved", "सहेजा नहीं गया"), onDismiss = { problem = "" }, text = problem, tone = SaharaTone.Error)
     if (history) MedicineHistorySheet(item, vm) { history = false }
 }

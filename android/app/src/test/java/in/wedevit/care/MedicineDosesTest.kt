@@ -131,4 +131,44 @@ class MedicineDosesTest {
         assertEquals("", MedicineCardText.purpose("Oral, at night."))
         assertEquals("dissolve in water", MedicineCardText.purpose(MedicineEntryText.detail(MedicineEntry(strength = "5 mg", directions = "dissolve in water"))))
     }
+    @Test fun aScanFileHashNeverCountsAsADose() {
+        // A scanned medicine with no clear frequency and a page reference whose id and hash contain "3bd9" (read as "BD" before).
+        val scanned = medicine("Dose: 5 mg · tablet\nDirections: as advised\nOriginal prescription references:\nPage 1: 1b2c3bd9-0000-4000-8000-000000000001 · SHA-256 03bd9aa1")
+        assertEquals(listOf("n:1"), MedicineDoses.forItem(scanned).map { it.key })
+        assertEquals(2, MedicineDoses.forItem(medicine("Dose: 5 mg\nFrequency: BD\nOriginal prescription references:\nPage 1: 1b2c3bd9 · SHA-256 03bd9aa1")).size)
+    }
+
+    @Test fun weeklyMonthlyAndEveryFewDaysMedicinesGetNoDailyTick() {
+        assertTrue(MedicineDoses.notDaily("Methotrexate 15 mg once weekly"))
+        assertTrue(MedicineDoses.notDaily("twice a week"))
+        assertTrue(MedicineDoses.notDaily("every 4 weeks"))
+        assertTrue(MedicineDoses.notDaily("Change the patch every 3 days"))
+        assertTrue(MedicineDoses.notDaily("on alternate days"))
+        // A course length or a daily count stays daily.
+        assertFalse(MedicineDoses.notDaily("1 tablet twice a day for 1 week"))
+        assertFalse(MedicineDoses.notDaily("BD for a week"))
+        assertFalse(MedicineDoses.notDaily("1-0-1, weekly review"))
+        assertFalse(MedicineDoses.notDaily("every 4 hours as needed"))
+        assertEquals(emptyList<MedicineDose>(), MedicineDoses.forItem(medicine(MedicineEntryText.detail(MedicineEntry(howOften = "once weekly", times = listOf("08:00"))))))
+        assertEquals(emptyList<MedicineDose>(), MedicineDoses.forItem(medicine("Dose: 120 mg\nFrequency: every 4 weeks\nDirections: injection")))
+        // A daily form medicine whose directions mention a weekly check keeps its ticks (only "How often" is read).
+        assertEquals(2, MedicineDoses.forItem(medicine(MedicineEntryText.detail(MedicineEntry(howOften = "twice a day", directions = "weekly blood test")))).size)
+    }
+
+    @Test fun aNightDoseMarkedAfterMidnightAsksWhichNight() {
+        val item = medicine("Times: 08:00, 22:00")
+        val (morning, night) = MedicineDoses.forItem(item)
+        val afterMidnight = day.atTime(0, 20).atZone(zone)
+        assertTrue(MedicineDoses.askWhichNight(item, night, emptyList(), afterMidnight))
+        assertFalse(MedicineDoses.askWhichNight(item, morning, emptyList(), afterMidnight))
+        assertFalse(MedicineDoses.askWhichNight(item, night, emptyList(), day.atTime(21, 30).atZone(zone)))
+        assertFalse(MedicineDoses.askWhichNight(item, night, emptyList(), day.atTime(9, 0).atZone(zone)))
+        // Last night's dose already ticked: nothing to ask.
+        val lastNight = MedicineDoses.plan(item, MedicineDoses.forItem(item), emptyList(), night, true, day.minusDays(1), zone, at(0, 10), "Family report", ::id)
+        assertFalse(MedicineDoses.askWhichNight(item, night, lastNight.events, afterMidnight))
+        // Saved for last night, the tick does not cover tonight's dose.
+        assertEquals(day.minusDays(1).atTime(22, 0).atZone(zone).toInstant().toEpochMilli(), lastNight.events.single().plannedAt)
+        assertEquals(MedicineDoseState.PENDING, MedicineDoses.state(item, night, lastNight.events, day, zone))
+        assertEquals(MedicineDoseState.TAKEN, MedicineDoses.state(item, night, lastNight.events, day.minusDays(1), zone))
+    }
 }

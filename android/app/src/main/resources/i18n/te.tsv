@@ -5138,3 +5138,9 @@ Add city / address	నగరం / చిరునామా జోడించం
 Add centre	ఆసుపత్రి జోడించండి
 Add pain location in words	నొప్పి ఉన్న చోటును మాటల్లో జోడించండి
 Add why care differed	చికిత్స ఎందుకు వేరుగా జరిగిందో జోడించండి
+Not a daily medicine. Follow its directions for when to give it.	ఇది రోజూ వేసుకునే మందు కాదు. ఎప్పుడు ఇవ్వాలో దాని సూచనలు చూడండి.
+No daily reminder: this is not a daily medicine. Follow its directions.	రోజువారీ రిమైండర్ లేదు: ఇది రోజూ వేసుకునే మందు కాదు. దాని సూచనలు చూడండి.
+Which night's dose?	ఏ రాత్రి మోతాదు?
+It is past midnight. Is this last night's $time dose, given late, or tonight's?	అర్ధరాత్రి దాటింది. ఇది ఆలస్యంగా ఇచ్చిన నిన్న రాత్రి $time మోతాదా, లేక ఈ రాత్రిదా?
+Last night's	నిన్న రాత్రిది
+Tonight's	ఈ రాత్రిది

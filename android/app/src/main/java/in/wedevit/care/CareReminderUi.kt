@@ -123,7 +123,9 @@ import java.time.ZoneId
             dateOnly -> careDateFormat("dd MMM yyyy", careHindi()).withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(item.due)) + " · " + option?.times.orEmpty().joinToString(", ").ifBlank { t("No alert time chosen", "सूचना का समय नहीं चुना") }
             item.due > 0 -> careDateFormat("dd MMM yyyy · HH:mm z", careHindi()).withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(item.due)); else -> t("No time chosen", "समय नहीं चुना") }, fontSize = 14.sp, color = if (option?.muted == true) DoctorStatusWarn else DoctorCardSub, modifier = Modifier.testTag("reminder-when-${item.id}")) }
             Switch(checked = option?.muted != true, onCheckedChange = { enabled -> scheduler.configure(item.id, (option ?: ReminderOption(CareReminderRules.printedTimes(item.detail))).copy(muted = !enabled)); changed() }) }
-        if (item.kind == "medicine") {
+        // Reminders here repeat every day, so a weekly, monthly or every-few-days medicine gets none (CareReminderScheduler.reconcile).
+        if (MedicineDoses.notDaily(item)) Text(t("No daily reminder: this is not a daily medicine. Follow its directions.", "रोज़ का रिमाइंडर नहीं: यह रोज़ की दवा नहीं है। इसके निर्देश देखें।"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.padding(top = 12.dp).testTag("reminder-not-daily-${item.id}"))
+        else if (item.kind == "medicine") {
             val doseTimes = CareReminderRules.printedTimes(item.detail)
             var dates by rememberSaveable(item.id) { mutableStateOf(starts.isNotBlank() || ends.isNotBlank()) }
             Column(Modifier.saharaContentSize().padding(top = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {

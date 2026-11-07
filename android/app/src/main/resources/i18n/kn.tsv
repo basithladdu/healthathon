@@ -5138,3 +5138,9 @@ Add city / address	ನಗರ / ವಿಳಾಸ ಸೇರಿಸಿ
 Add centre	ಆಸ್ಪತ್ರೆ ಸೇರಿಸಿ
 Add pain location in words	ನೋವಿನ ಜಾಗವನ್ನು ಪದಗಳಲ್ಲಿ ಸೇರಿಸಿ
 Add why care differed	ಚಿಕಿತ್ಸೆ ಏಕೆ ಬೇರೆಯಾಯಿತು ಎಂದು ಸೇರಿಸಿ
+Not a daily medicine. Follow its directions for when to give it.	ಇದು ದಿನವೂ ಕೊಡುವ ಔಷಧಿ ಅಲ್ಲ. ಯಾವಾಗ ಕೊಡಬೇಕು ಎಂದು ಅದರ ಸೂಚನೆಗಳನ್ನು ನೋಡಿ.
+No daily reminder: this is not a daily medicine. Follow its directions.	ದಿನದ ರಿಮೈಂಡರ್ ಇಲ್ಲ: ಇದು ದಿನವೂ ಕೊಡುವ ಔಷಧಿ ಅಲ್ಲ. ಅದರ ಸೂಚನೆಗಳನ್ನು ನೋಡಿ.
+Which night's dose?	ಯಾವ ರಾತ್ರಿಯ ಡೋಸ್?
+It is past midnight. Is this last night's $time dose, given late, or tonight's?	ಮಧ್ಯರಾತ್ರಿ ದಾಟಿದೆ. ಇದು ತಡವಾಗಿ ಕೊಟ್ಟ ನಿನ್ನೆ ರಾತ್ರಿಯ $time ಡೋಸ್ ಆ, ಅಥವಾ ಇಂದು ರಾತ್ರಿಯದಾ?
+Last night's	ನಿನ್ನೆ ರಾತ್ರಿಯದು
+Tonight's	ಇಂದು ರಾತ್ರಿಯದು

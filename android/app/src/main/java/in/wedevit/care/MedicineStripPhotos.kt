@@ -60,6 +60,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.UUID
 import kotlin.math.roundToInt
 
@@ -324,6 +325,7 @@ class MedicineStripPhotos(context: Context, storage: String) {
     val photos = remember(medicines, photoRevision) { medicines.associate { it.id to runCatching { store.first(it.personId, it.id) }.getOrNull() } }
     var working by remember { mutableStateOf(false) }
     var problem by remember { mutableStateOf("") }
+    var whichNight by remember { mutableStateOf<Pair<String, (LocalDate) -> Unit>?>(null) }
     if (groups.isEmpty() && untimed.isEmpty()) return
     val zone = ZoneId.systemDefault(); val today = LocalDate.now(zone)
     val byId = medicines.associateBy { it.id }
@@ -331,11 +333,13 @@ class MedicineStripPhotos(context: Context, storage: String) {
     val taken = medicines.sumOf { m -> MedicineDoses.takenCount(MedicineDoses.states(m, doses[m.id].orEmpty(), events, today, zone)) }
     val failed = t("Couldn't save. Please try again.", "सहेजा नहीं जा सका। कृपया फिर कोशिश करें।")
     val mark: (CareItem, MedicineDose, Boolean, Boolean, String) -> Unit = { item, dose, yes, quick, label ->
-        if (canEditCareContext(vm, item.personId, vm.accountNamespace)) { working = true; problem = ""; scope.launch {
-            try { markMedicineDose(context, vm, item, doses[item.id].orEmpty(), dose, yes, quick, label) }
+        val save: (LocalDate) -> Unit = { day -> if (canEditCareContext(vm, item.personId, vm.accountNamespace)) { working = true; problem = ""; scope.launch {
+            try { markMedicineDose(context, vm, item, doses[item.id].orEmpty(), dose, yes, quick, label, day) }
             catch (e: Exception) { if (e is CancellationException) throw e; problem = if (e is IllegalArgumentException) e.message ?: failed else failed }
             finally { working = false }
-        } }
+        } } }
+        // A late night dose marked after midnight asks which night it was, so it does not cover tonight's dose.
+        if (MedicineDoses.askWhichNight(item, dose, events, ZonedDateTime.now(zone))) whichNight = dose.time to save else save(LocalDate.now(zone))
     }
     // Medicines plum: the card sits on the plum wash with a solid plum edge; the white pillboxes stand out on it.
     Surface(shape = RoundedCornerShape(20.dp), color = SaharaSection.Medicines.wash, border = BorderStroke(1.5.dp, SaharaSection.Medicines.solid), modifier = Modifier.fillMaxWidth().testTag("today-doses")) {
@@ -390,6 +394,7 @@ class MedicineStripPhotos(context: Context, storage: String) {
             }
         }
     }
+    WhichNightDialog(whichNight) { whichNight = null }
     if (problem.isNotBlank()) SaharaDialog(t("Not saved", "सहेजा नहीं गया"), onDismiss = { problem = "" }, text = problem, tone = SaharaTone.Error)
 }
 

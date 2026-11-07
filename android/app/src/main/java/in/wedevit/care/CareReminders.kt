@@ -52,7 +52,8 @@ class CareReminderScheduler(private val context: Context, private val account: S
         items.forEach { item ->
             if (item.kind != "medicine" && item.due <= 0) return@forEach
             val entry = CareEntryCodec.decode(item.detail)
-            val complete = entry?.status in setOf("completed", "cancelled") || (item.kind != "medicine" && item.doneOn.isNotBlank())
+            // A weekly, monthly or every-few-days medicine gets no daily reminder (it has no daily tick either).
+            val complete = entry?.status in setOf("completed", "cancelled") || (item.kind != "medicine" && item.doneOn.isNotBlank()) || MedicineDoses.notDaily(item)
             snapshots.put(JSONObject().put("id", item.id).put("person", item.personId).put("kind", item.kind).put("title", if (item.kind == "medicine") item.title else "")
                 .put("due", item.due).put("dateOnly", CareReminderRules.dateOnly(item)).put("times", JSONArray(CareReminderRules.printedTimes(item.detail)))
                 .put("doneOn", item.doneOn).put("finished", complete))
@@ -60,6 +61,12 @@ class CareReminderScheduler(private val context: Context, private val account: S
         check(prefs.edit().putString("items", snapshots.toString()).commit())
         val ids = items.map { it.id }.toSet()
         prefs.edit().also { editor -> prefs.all.keys.filter { it.startsWith("option:") && it.removePrefix("option:") !in ids }.forEach(editor::remove) }.commit()
+        // This phone's bell choices keep only times the medicine still has, so a changed dose time never rings at the old time.
+        items.filter { it.kind == "medicine" }.forEach { item ->
+            val option = option(item.id) ?: return@forEach
+            val times = CareReminderRules.currentOptionTimes(option.times, CareReminderRules.printedTimes(item.detail))
+            if (times != option.times) prefs.edit().putString("option:${item.id}", JSONObject().put("times", JSONArray(times)).put("starts", option.starts).put("ends", option.ends).put("muted", option.muted).toString()).commit()
+        }
         reschedule()
     }
     private fun plans(): List<CareReminderPlan> = runCatching {
