@@ -5220,3 +5220,13 @@ That your own health has suffered because of caring for $name?	$name کی دیک
 That you don't have enough time for yourself because of caring for $name?	$name کی دیکھ بھال کی وجہ سے اپنے لیے وقت نہیں ملتا؟
 How are you feeling about caring for $personName?	$personName کی دیکھ بھال کے بارے میں آپ کیسا محسوس کر رہے ہیں؟
 Past checks, oldest first: $summary out of ${CaregiverWellbeingRules.MAX_SCORE}	پچھلی جانچیں، پرانی پہلے: ${CaregiverWellbeingRules.MAX_SCORE} میں سے $summary
+Patient capacity	مریض کی فیصلے کی صلاحیت
+Caregiver details	دیکھ بھال کرنے والے کی تفصیل
+Patient's understanding of disease	بیماری کے بارے میں مریض کی سمجھ
+Patient values	مریض کی اقدار
+Home care vs hospital transfer	گھر پر دیکھ بھال یا ہسپتال منتقلی
+CPR preference	CPR کی ترجیح
+ICU care	ICU دیکھ بھال
+Ventilatory support	سانس کی مشین کی مدد
+Dialysis preference	ڈائیلاسس کی ترجیح
+Nutritional support	غذائی مدد

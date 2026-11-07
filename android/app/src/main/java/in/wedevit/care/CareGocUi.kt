@@ -463,7 +463,7 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
     /** Rule V1: only what the conversation stated, one clear option each; never a default, nothing undiscussed. */
     fun confirmAll() { suggestions.forEach { (dd, id, quotes) -> confirm(dd, id, quotes) } }
     fun continueToNote() {
-        note = GocNote.draft(d, topics, names.joinToString("\n"), hindi, GocGuide.undiscussed(extraction, covered, guideTicked, topics, consentAt > 0).map(GocGuide::title))
+        note = GocNote.draft(d, topics, names.joinToString("\n"), hindi, GocChecklist.open(GocGuide.undiscussed(extraction, covered, guideTicked, topics, consentAt > 0)).map { it.title })
         update { it.copy(gocTranscript = build(planNow())) }
         stage = GocStage.NOTE
     }
@@ -540,24 +540,26 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
         if (shown == GocStage.REVIEW) {
             item(key = "checklist") {
                 PlanCard {
-                    val doneCount = GocGuide.ORDER.size - undiscussed.size
+                    val rows = GocChecklist.ROWS
+                    val doneCount = rows.count { GocChecklist.done(it, undiscussed) }
+                    val allDone = doneCount == rows.size
                     Row(Modifier.semantics(mergeDescendants = true) {}.testTag("goc-guide-title"), verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.Checklist, null, tint = RustText); Spacer(Modifier.width(8.dp))
                         Text(t("Checklist", "सूची"), fontWeight = FontWeight.Bold, fontSize = 17.sp, modifier = Modifier.weight(1f).a11yHeading())
-                        Surface(color = if (undiscussed.isEmpty()) DoctorStatusGoodBg else GocSand, shape = CircleShape) {
-                            Text("$doneCount / ${GocGuide.ORDER.size}", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = if (undiscussed.isEmpty()) DoctorStatusGood else DoctorCardInk, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
+                        Surface(color = if (allDone) DoctorStatusGoodBg else GocSand, shape = CircleShape) {
+                            Text("$doneCount / ${rows.size}", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = if (allDone) DoctorStatusGood else DoctorCardInk, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
                         }
                     }
-                    LinearProgressIndicator(progress = { doneCount.toFloat() / GocGuide.ORDER.size.coerceAtLeast(1) }, modifier = Modifier.fillMaxWidth().height(6.dp).clip(CircleShape), color = DoctorStatusGood, trackColor = GocSand)
+                    LinearProgressIndicator(progress = { doneCount.toFloat() / rows.size.coerceAtLeast(1) }, modifier = Modifier.fillMaxWidth().height(6.dp).clip(CircleShape), color = DoctorStatusGood, trackColor = GocSand)
                     Column {
-                        GocGuide.ORDER.forEachIndexed { index, item ->
-                            val on = item !in undiscussed
+                        rows.forEachIndexed { index, item ->
+                            val on = GocChecklist.done(item, undiscussed)
                             if (index > 0) HorizontalDivider(color = DoctorHairline)
                             Row(Modifier.fillMaxWidth().heightIn(min = 40.dp).padding(vertical = 6.dp).semantics(mergeDescendants = true) {}, verticalAlignment = Alignment.CenterVertically) {
                                 Icon(if (on) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked, null, tint = if (on) DoctorStatusGood else DoctorCardFaint, modifier = Modifier.size(22.dp))
                                 Spacer(Modifier.width(12.dp))
-                                Text(GocGuide.title(item).pick(hindi), fontSize = 15.sp, lineHeight = 20.sp, fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal, color = if (on) DoctorCardInk else DoctorCardSub, modifier = Modifier.weight(1f))
-                                GocGuide.section(item)?.let { sec -> Surface(color = GocSand, shape = CircleShape) { Text(sec, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = RustText, modifier = Modifier.padding(horizontal = 10.dp, vertical = 2.dp)) } }
+                                Text(item.title.pick(hindi), fontSize = 15.sp, lineHeight = 20.sp, fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal, color = if (on) DoctorCardInk else DoctorCardSub, modifier = Modifier.weight(1f))
+                                item.section.let { sec -> Surface(color = GocSand, shape = CircleShape) { Text(sec, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = RustText, modifier = Modifier.padding(horizontal = 10.dp, vertical = 2.dp)) } }
                             }
                         }
                     }
@@ -596,17 +598,18 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
             }
             item(key = "finish") {
                 Column(Modifier.padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    if (undiscussed.isNotEmpty()) Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().testTag("goc-not-discussed")) {
+                    val openRows = GocChecklist.open(undiscussed)
+                    if (openRows.isNotEmpty()) Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().testTag("goc-not-discussed")) {
                         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(Icons.Default.Info, null, tint = DoctorStatusWarn, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(8.dp))
                                 Text(t("Not discussed", "बात नहीं हुई"), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = DoctorCardInk)
                             }
-                            undiscussed.forEachIndexed { index, item ->
+                            openRows.forEachIndexed { index, item ->
                                 if (index > 0) HorizontalDivider(color = DoctorStatusWarn.copy(alpha = .2f))
                                 Row(Modifier.heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
-                                    Text(GocGuide.title(item).pick(hindi), Modifier.weight(1f), fontSize = 15.sp, color = DoctorCardInk)
-                                    TextButton(onClick = { guideTicked = guideTicked + item }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Discussed", "बात हुई"), color = RustText, fontSize = 14.sp, fontWeight = FontWeight.SemiBold) }
+                                    Text(item.title.pick(hindi), Modifier.weight(1f), fontSize = 15.sp, color = DoctorCardInk)
+                                    TextButton(onClick = { guideTicked = guideTicked + item.items }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Discussed", "बात हुई"), color = RustText, fontSize = 14.sp, fontWeight = FontWeight.SemiBold) }
                                 }
                             }
                         }
@@ -614,7 +617,7 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
                     // One tap confirms the suggestions shown above (each still has Change) and opens the form to sign.
                     Button(onClick = { confirmAll(); continueToNote() }, enabled = !busy && text.isNotBlank(), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust, contentColor = Color.White), elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp, pressedElevation = 0.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag(if (suggestions.isNotEmpty()) "goc-confirm-all" else if (undiscussed.isNotEmpty()) "goc-continue-anyway" else "goc-finish")) {
                         if (suggestions.isNotEmpty()) { Icon(Icons.Default.DoneAll, null); Spacer(Modifier.width(8.dp)) }
-                        Text(if (suggestions.isNotEmpty()) t("Confirm ${suggestions.size} and continue", "${suggestions.size} पक्के करें, आगे बढ़ें") else if (undiscussed.isNotEmpty()) t("Continue anyway", "फिर भी आगे बढ़ें") else t("Continue", "आगे बढ़ें"), fontSize = 17.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, modifier = Modifier.weight(1f, fill = false))
+                        Text(if (suggestions.isNotEmpty()) t("Confirm ${suggestions.size} and continue", "${suggestions.size} पक्के करें, आगे बढ़ें") else if (openRows.isNotEmpty()) t("Continue anyway", "फिर भी आगे बढ़ें") else t("Continue", "आगे बढ़ें"), fontSize = 17.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, modifier = Modifier.weight(1f, fill = false))
                         Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null)
                     }
                 }

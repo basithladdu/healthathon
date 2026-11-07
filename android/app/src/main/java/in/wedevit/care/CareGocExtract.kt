@@ -1008,6 +1008,8 @@ enum class GocGuideItem(val decision: GocDecision?) {
     CPR(GocDecision.CPR), DIALYSIS(GocDecision.DIALYSIS), BREATHING(GocDecision.BREATHING), ICU(GocDecision.ICU), VASOPRESSORS(GocDecision.VASOPRESSORS),
     FEEDING_NG(GocDecision.FEEDING_NG), FEEDING_PEG(GocDecision.FEEDING_PEG), HYDRATION(GocDecision.HYDRATION), TRANSFER(GocDecision.TRANSFER),
     AMBULANCE(GocDecision.AMBULANCE), GOAL(GocDecision.GOAL), UNDERSTANDING(null), VALUES(GocDecision.VALUES), HOME_CARE(null),
+    // Added for Dr Sujay's 13-item checklist (7 Nov 2026).
+    CAPACITY(null), DIRECTIVES(null),
 }
 
 object GocGuide {
@@ -1019,13 +1021,15 @@ object GocGuide {
         GocGuideItem.PATIENT_DETAILS to Lex(en("your name", "full name", "his name", "her name", "how old", "age", "years old", "date of birth", "address", "where do you live", "naam", "umar", "umr", "saal"), hi("नाम", "उम्र", "आयु", "साल"), te("పేరు*", "వయస్సు*", "వయసు*", "చిరునామా*"), ur("نام", "عمر", "سال"), kn("ಹೆಸರು*", "ವಯಸ್ಸು*", "ವಿಳಾಸ*")),
         GocGuideItem.FAMILY_CONTACT to Lex(en("emergency*", "phone*", "mobile*", "contact*", "next of kin", "decide*", "decision*", "speak for"), hi("इमरजेंसी", "आपातकाल*", "फ़ोन", "नंबर", "फ़ैसला", "निर्णय"), te("అత్యవసర*", "ఎమర్జెన్సీ*", "ఫోన్*", "నిర్ణయ*"), ur("ایمرجنسی", "فون", "فیصلہ"), kn("ತುರ್ತು*", "ಎಮರ್ಜೆನ್ಸಿ*", "ಫೋನ್*", "ನಿರ್ಧಾರ*")),
         GocGuideItem.UNDERSTANDING to Lex(en("cannot be cured", "cant be cured", "not curable", "incurable", "no cure", "prognosis", "illness", "cancer"), hi("लाइलाज", "ठीक नहीं हो", "बीमारी", "कैंसर"), te("నయం*", "జబ్బు*", "వ్యాధి*", "క్యాన్సర్*"), ur("لاعلاج", "بیماری", "کینسر"), kn("ಗುಣ*", "ಕಾಯಿಲೆ*", "ಕ್ಯಾನ್ಸರ್*")),
+        GocGuideItem.CAPACITY to Lex(en("capacity", "able to decide", "decide for yourself", "make decisions", "make this decision", "understand what", "conscious", "confused", "alert", "oriented", "samajh"), hi("निर्णय-क्षमता", "होश", "समझ पा", "फ़ैसला ले सक"), te("సామర్థ్య*", "స్పృహ*", "అర్థం చేసుకో*"), ur("صلاحیت", "ہوش", "سمجھ"), kn("ಸಾಮರ್ಥ್ಯ*", "ಪ್ರಜ್ಞೆ*", "ಅರ್ಥ*")),
+        GocGuideItem.DIRECTIVES to Lex(en("directive*", "living will", "advance care plan*", "advance medical", "power of attorney", "written wishes", "wishes written", "any document*", "earlier plan", "previous plan", "wasiyat"), hi("वसीयत", "निर्देश", "दस्तावेज़", "पहले की योजना"), te("వీలునామా*", "పత్రం*", "ఆదేశ*"), ur("وصیت", "دستاویز", "ہدایت"), kn("ಉಯಿಲು*", "ದಾಖಲೆ*", "ನಿರ್ದೇಶನ*")),
         GocGuideItem.HOME_CARE to Lex(en("home care", "home nurse", "home visit*", "hospice", "ngo", "coordinator"), hi("घर पर देखभाल", "नर्स", "एनजीओ"), te("ఇంటి వద్ద*", "నర్సు*"), ur("گھر پر دیکھ بھال", "نرس"), kn("ಮನೆ ಆರೈಕೆ*", "ನರ್ಸ್*")),
     )
 
     /** Which form section the item belongs to, shown as a small tag ("I", "II", "III"). Consent comes before the form. */
     fun section(item: GocGuideItem): String? = when (item) {
         GocGuideItem.CONSENT -> null
-        GocGuideItem.PATIENT_DETAILS, GocGuideItem.FAMILY_CONTACT -> "I"
+        GocGuideItem.PATIENT_DETAILS, GocGuideItem.FAMILY_CONTACT, GocGuideItem.CAPACITY, GocGuideItem.DIRECTIVES -> "I"
         GocGuideItem.UNDERSTANDING, GocGuideItem.VALUES -> "II"
         else -> "III"
     }
@@ -1035,6 +1039,8 @@ object GocGuide {
         GocGuideItem.PATIENT_DETAILS -> Bi("Patient details", "मरीज़ की जानकारी")
         GocGuideItem.FAMILY_CONTACT -> Bi("Family details and emergency contact", "परिवार और इमरजेंसी संपर्क")
         GocGuideItem.UNDERSTANDING -> Bi("Understanding the illness", "बीमारी की समझ")
+        GocGuideItem.CAPACITY -> Bi("Patient capacity", "मरीज़ की निर्णय-क्षमता")
+        GocGuideItem.DIRECTIVES -> Bi("Existing medical directives", "पहले से मौजूद चिकित्सा निर्देश")
         else -> Bi("Home care (if relevant)", "घर पर देखभाल (अगर लागू हो)")
     }
 
@@ -1061,6 +1067,30 @@ object GocGuide {
 
     fun next(extraction: GocExtraction, covered: Set<GocGuideItem>, ticked: Set<GocGuideItem>, topics: Map<GocDecision, GocTopicRecord>, consented: Boolean): GocGuideItem? =
         undiscussed(extraction, covered, ticked, topics, consented).firstOrNull()
+}
+
+/** Dr Sujay's checklist (7 Nov 2026): 13 rows in his order, each ticked when any of its guide items came up. Consent is taken before recording, so it is not a row. */
+data class GocChecklistRow(val title: Bi, val items: List<GocGuideItem>, val section: String)
+
+object GocChecklist {
+    private fun row(en: String, hi: String, sec: String, vararg items: GocGuideItem) = GocChecklistRow(Bi(en, hi), items.toList(), sec)
+    val ROWS: List<GocChecklistRow> = listOf(
+        row("Patient details", "मरीज़ की जानकारी", "I", GocGuideItem.PATIENT_DETAILS),
+        row("Caregiver details", "देखभाल करने वाले की जानकारी", "I", GocGuideItem.FAMILY_CONTACT),
+        row("Patient capacity", "मरीज़ की निर्णय-क्षमता", "I", GocGuideItem.CAPACITY),
+        row("Existing medical directives", "पहले से मौजूद चिकित्सा निर्देश", "I", GocGuideItem.DIRECTIVES),
+        row("Patient's understanding of disease", "बीमारी के बारे में मरीज़ की समझ", "II", GocGuideItem.UNDERSTANDING),
+        row("Patient values", "मरीज़ के मूल्य", "II", GocGuideItem.VALUES),
+        row("Goals of care", "देखभाल के लक्ष्य", "III", GocGuideItem.GOAL),
+        row("Home care vs hospital transfer", "घर पर देखभाल या अस्पताल ले जाना", "III", GocGuideItem.HOME_CARE, GocGuideItem.TRANSFER, GocGuideItem.AMBULANCE),
+        row("CPR preference", "CPR की पसंद", "III", GocGuideItem.CPR),
+        row("ICU care", "ICU देखभाल", "III", GocGuideItem.ICU, GocGuideItem.VASOPRESSORS),
+        row("Ventilatory support", "साँस की मशीन की मदद", "III", GocGuideItem.BREATHING),
+        row("Dialysis preference", "डायलिसिस की पसंद", "III", GocGuideItem.DIALYSIS),
+        row("Nutritional support", "पोषण की मदद", "III", GocGuideItem.FEEDING_NG, GocGuideItem.FEEDING_PEG, GocGuideItem.HYDRATION),
+    )
+    fun done(row: GocChecklistRow, undiscussed: Collection<GocGuideItem>): Boolean = row.items.any { it !in undiscussed }
+    fun open(undiscussed: Collection<GocGuideItem>): List<GocChecklistRow> = ROWS.filterNot { done(it, undiscussed) }
 }
 
 // ── Latest statement wins, per person. Twin of gocStanding in prototype/app/goc-extract.ts. ──

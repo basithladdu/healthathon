@@ -5220,3 +5220,13 @@ That your own health has suffered because of caring for $name?	$name ಅವರ �
 That you don't have enough time for yourself because of caring for $name?	$name ಅವರ ಆರೈಕೆಯಿಂದ ನಿಮಗಾಗಿ ಸಮಯ ಸಿಗುತ್ತಿಲ್ಲವೇ?
 How are you feeling about caring for $personName?	$personName ಅವರ ಆರೈಕೆಯ ಬಗ್ಗೆ ನಿಮಗೆ ಹೇಗನಿಸುತ್ತಿದೆ?
 Past checks, oldest first: $summary out of ${CaregiverWellbeingRules.MAX_SCORE}	ಹಿಂದಿನ ಪರಿಶೀಲನೆಗಳು, ಹಳೆಯದು ಮೊದಲು: ${CaregiverWellbeingRules.MAX_SCORE} ರಲ್ಲಿ $summary
+Patient capacity	ರೋಗಿಯ ನಿರ್ಧಾರ ಸಾಮರ್ಥ್ಯ
+Caregiver details	ಆರೈಕೆದಾರರ ವಿವರಗಳು
+Patient's understanding of disease	ಕಾಯಿಲೆಯ ಬಗ್ಗೆ ರೋಗಿಯ ತಿಳುವಳಿಕೆ
+Patient values	ರೋಗಿಯ ಮೌಲ್ಯಗಳು
+Home care vs hospital transfer	ಮನೆ ಆರೈಕೆ ಅಥವಾ ಆಸ್ಪತ್ರೆಗೆ ಸ್ಥಳಾಂತರ
+CPR preference	CPR ಆಯ್ಕೆ
+ICU care	ICU ಆರೈಕೆ
+Ventilatory support	ಉಸಿರಾಟ ಯಂತ್ರದ ಸಹಾಯ
+Dialysis preference	ಡಯಾಲಿಸಿಸ್ ಆಯ್ಕೆ
+Nutritional support	ಪೋಷಣೆ ಸಹಾಯ

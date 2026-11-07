@@ -5220,3 +5220,13 @@ That your own health has suffered because of caring for $name?	$name సంర�
 That you don't have enough time for yourself because of caring for $name?	$name సంరక్షణ వల్ల మీకోసం సమయం సరిపోవడం లేదా?
 How are you feeling about caring for $personName?	$personName సంరక్షణ గురించి మీకు ఎలా అనిపిస్తోంది?
 Past checks, oldest first: $summary out of ${CaregiverWellbeingRules.MAX_SCORE}	హిందటి తనిఖీలు, పాతవి ముందు: ${CaregiverWellbeingRules.MAX_SCORE} లో $summary
+Patient capacity	రోగి నిర్ణయ సామర్థ్యం
+Caregiver details	సంరక్షకుల వివరాలు
+Patient's understanding of disease	వ్యాధి గురించి రోగి అవగాహన
+Patient values	రోగి విలువలు
+Home care vs hospital transfer	ఇంటి వద్ద సంరక్షణ లేదా ఆసుపత్రికి తరలింపు
+CPR preference	CPR ఎంపిక
+ICU care	ICU సంరక్షణ
+Ventilatory support	శ్వాస యంత్రం సహాయం
+Dialysis preference	డయాలసిస్ ఎంపిక
+Nutritional support	పోషణ సహాయం
