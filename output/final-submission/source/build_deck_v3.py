@@ -142,7 +142,7 @@ sh[3].text_frame.paragraphs[0].runs[0].text = 'Sahara'
 for r in sh[3].text_frame.paragraphs[0].runs[1:]: r.text = ''
 style_runs(sh[3], font='Georgia', size=44, bold=True, color=GREEN)
 sh[4].text_frame.paragraphs[0].runs[0].text = ('A phone app for people with a serious illness, like advanced cancer, and their families. '
-    'Their doctor asks what care they want near the end of life; Sahara writes it on the legal form, '
+    'Their doctor asks what care they want near the end of life; Sahara writes it on a clinical document (goals of care), '
     'and an emergency doctor can read it in one scan.')
 for r in sh[4].text_frame.paragraphs[0].runs[1:]: r.text = ''
 sh[4].text_frame.word_wrap = True
@@ -170,7 +170,7 @@ members = [
     ('awaiz', 'Shaik Muhammad Awaiz', 'Engineer', 'Built the Android app and the server; tests every version'),
     ('sharada', 'Dr Sharada Vinod Kutty', 'Doctor', 'Lung specialist. Wrote the medical rules the app follows'),
     ('sujay', 'Dr Sujay Halkur Shankar', 'Doctor', 'Lung specialist who treats patients near the end of life. Set the order of questions'),
-    ('shirin', 'Shirin Ayub', 'Medical student', 'Designed how patients log their symptoms'),
+    ('shirin', 'Shirin Ayub', 'Medical student', 'Designed how patients log their symptoms; researched caregiver stress'),
 ]
 for i, (f, n, role, c) in enumerate(members):
     x = 0.55 + i * 2.48
@@ -182,8 +182,8 @@ for i, (f, n, role, c) in enumerate(members):
         [R(c, size=12.5, color=MUTED)]], align=PP_ALIGN.CENTER)
 card(team, 0.55, 5.55, 12.2, 1.45, fill=BG['mint'])
 icon(team, 11, 0.8, 5.72, 0.45); text(team, 1.35, 5.65, 5.3, 0.65, [[R('Our doctors ', size=14, bold=True), R('chose this problem from their own clinics and check every version.', size=14)]], anchor=MSO_ANCHOR.MIDDLE)
-icon(team, 28, 6.85, 5.72, 0.45); text(team, 7.4, 5.65, 5.3, 0.65, [[R('Rituparna P, a lawyer, ', size=14, bold=True), R('reviewed our goals-of-care format: consistent with India’s living-will framework.', size=14)]], anchor=MSO_ANCHOR.MIDDLE)
-text(team, 0.8, 6.42, 11.8, 0.45, [[R('An independent team. The app is on Google Play under the name WeDevit.', size=13, color=MUTED)]])
+icon(team, 28, 6.85, 5.72, 0.45); text(team, 7.4, 5.65, 5.3, 0.65, [[R('Legal advice was sought: ', size=14, bold=True), R('inputs and refining the goals-of-care wording and format.', size=14)]], anchor=MSO_ANCHOR.MIDDLE)
+text(team, 0.8, 6.42, 11.8, 0.45, [[R('Built by WeDevIT, the team’s company. The app is on Google Play under WeDevIT.', size=13, color=MUTED)]])
 notes(team, 'Doctor background from Dr Sujay (team chat, 25 Aug 2026): pulmonary specialists who have worked extensively with lung cancer; Dr Sujay has palliative-medicine exposure.')
 
 # ---------------------------------------------------------------- 3 problem
@@ -200,7 +200,7 @@ for i, (ic, a, b) in enumerate(story):
 stats = [(7, '15.6 lakh', RUST, 'new cancer cases in India in 2024.', 'IARC, GLOBOCAN 2024', 'https://gco.iarc.who.int/media/globocan/factsheets/populations/356-india-fact-sheet.pdf'),
          (8, '98%', TEAL, 'of patients whose cancer had spread did not get the comfort care (palliative care) they needed.', 'Patil et al., 2024', 'https://doi.org/10.1136/spcare-2024-004978'),
          (9, '88%', PURPLE, 'of surveyed city patients wanted to choose their own end-of-life treatment.', 'IndiaSpend, 2019', 'https://scroll.in/article/925875/73-urban-indians-do-not-know-about-their-right-to-make-a-living-will-finds-a-survey'),
-         (10, '11.5%', BLUE, 'of doctors (45 of 391) in one hospital were trained in advance directives (recording these wishes).', 'Jacob et al., 2026', 'https://doi.org/10.25259/NMJI_817_2023')]
+         (10, '11.5%', BLUE, 'of doctors (45 of 391) in one hospital were trained in advance care planning (recording these wishes).', 'Jacob et al., 2026', 'https://doi.org/10.25259/NMJI_817_2023')]
 for i, (ic, big, col, desc, src, url) in enumerate(stats):
     x = 6.55 + (i % 2) * 3.15; y = 1.2 + (i // 2) * 1.85
     icon(prob, ic, x, y + 0.08, 0.45)
@@ -209,7 +209,7 @@ for i, (ic, big, col, desc, src, url) in enumerate(stats):
 card(prob, 6.55, 5.0, 6.2, 1.95, fill='FFFFFF')
 text(prob, 6.75, 5.08, 5.85, 1.85, [
     [R('What has to change', size=15, bold=True, color=RUST)],
-    [R('Her wishes written on the legal form, signed, and found in seconds in an emergency.', size=16, bold=True)],
+    [R('Her goals of care written on a clinical document, signed, and found in seconds in an emergency.', size=16, bold=True)],
     [R('Numbers are from studies of different groups, not from Sahara.', size=10, color=MUTED, italic=True)]])
 
 # ---------------------------------------------------------------- 4 users
@@ -217,7 +217,7 @@ section(users, 'Target Users and Use Case', 'peach')
 phone(users, '01-doctor-signin', 0.65, 1.2, 5.6)
 rows = [(6, 'Patient', 'at home', 'logs how they feel; says what care they want'),
         (13, 'Family', 'at home', 'sees the same record; reads what the patient said'),
-        (11, 'Their doctor', 'clinic', 'leads the conversation; checks and signs the form'),
+        (11, 'Their doctor', 'clinic', 'leads the conversation; checks and signs the document'),
         (10, 'Emergency doctor', 'minutes to decide', 'scans the patient’s QR code to see their wishes')]
 for i, (ic, who, where, need) in enumerate(rows):
     y = 1.2 + i * 0.98
@@ -230,7 +230,7 @@ card(users, 3.5, 5.18, 9.25, 1.8, fill=BG['cream'], line='E6CDB8')
 text(users, 3.7, 5.22, 8.9, 0.35, [[R('Words used in this deck', size=13, bold=True, color=RUST)]])
 gl = [('Palliative care: ', 'care that eases pain and distress in a serious illness.'),
       ('Goals of care: ', 'what treatment a patient wants, or refuses, near the end of life (CPR, ventilator, ICU).'),
-      ('Living will: ', 'the legal paper in India that records those wishes.'),
+      ('Goals-of-care document: ', 'the clinical document, signed by doctor and patient or family, that records those wishes.'),
       ('QR code: ', 'a square barcode on the patient’s phone or card; a phone camera scan opens their wishes.')]
 for i, (a, b) in enumerate(gl):
     x = 3.7 + (i % 2) * 4.5; y = 5.55 + (i // 2) * 0.7
@@ -243,8 +243,8 @@ text(sol1, 0.55, 1.0, 12.2, 0.7, [
     [R('The doctor asks the patient and family what care they want (a “goals-of-care” talk). Today this is often never written down.', size=13.5, color=MUTED)]])
 steps = [('08-goc-open', '1. Patient agrees, tap Record', 'Google’s Gemini AI types out who said what'),
          ('09-goc-checklist', '2. A checklist ticks itself', 'Shows any topic the doctor has not asked yet'),
-         ('10g-note', '3. Answers fill the legal form', 'India’s living-will form, word for word. Doctor checks it'),
-         ('11-qr', '4. Everyone signs on the phone', 'The form locks and opens from a QR code in an emergency')]
+         ('10g-note', '3. Answers fill the clinical document', 'The goals-of-care document, word for word. Doctor checks it'),
+         ('11-qr', '4. Everyone signs on the phone', 'The document locks and opens from a QR code in an emergency')]
 for i, (n, h, d) in enumerate(steps):
     x = 0.85 + i * 3.1
     phone(sol1, n, x, 1.85, 3.9)
@@ -257,16 +257,17 @@ section(sol2, 'Solution Overview, Key Features & Impact (2/2)', 'lilac')
 text(sol2, 0.55, 1.05, 12.2, 0.45, [[R('At home, between visits: ', size=18, bold=True, color=RUST), R('patients and families log how things are going; their doctor sees it.', size=15, color=MUTED)]])
 for i, n in enumerate(['10-patient-home', '20-feel', '06-doc-care']):
     phone(sol2, n, 0.65 + i * 2.05, 1.7, 3.95)
-feats = [(17, 'How I feel: ', 'symptoms, a 0–10 “how upset am I” scale and a body map to mark pain; the doctor sees charts.'),
+feats = [(17, 'Symptoms: ', '0–10 diary covering the ESAS-r symptoms (pain, tiredness, breathlessness, mood…) and a pain body map; the doctor sees charts.'),
+         (27, 'Distress: ', 'NCCN Distress Thermometer and Problem List (NCCN permission being sought).'),
+         (8, 'Caregiver check (new): ', 'family rate their own stress; if it worsens, counselling, Tele-MANAS 14416, respite care, support groups.'),
          (12, 'Medicines: ', 'tick each dose; reminders; photograph a prescription to add it.'),
          (23, 'Reports: ', 'ask a question about a hospital report and get the answer with the line it came from.'),
-         (29, 'Emergency: ', 'an SOS button and a QR code with wishes, contacts and medicines.'),
-         (14, 'Help nearby: ', 'a map of palliative-care centres, ambulances and support groups.'),
-         (9, 'Family: ', 'invited relatives see and add to the same record.')]
+         (29, 'Emergency: ', 'SOS button and a QR code with goals of care, contacts and medicines.'),
+         (14, 'Help nearby and family: ', 'palliative-care centres, ambulances, support groups; invited relatives share the record.')]
 for i, (ic, a, b) in enumerate(feats):
-    y = 1.7 + i * 0.66
-    icon(sol2, ic, 6.95, y, 0.4)
-    text(sol2, 7.5, y - 0.03, 5.3, 0.66, [[R(a, size=13, bold=True), R(b, size=13)]])
+    y = 1.62 + i * 0.6
+    icon(sol2, ic, 6.95, y, 0.38)
+    text(sol2, 7.45, y - 0.05, 5.4, 0.6, [[R(a, size=12, bold=True), R(b, size=12)]])
 card(sol2, 0.55, 5.85, 12.2, 1.15, fill='FFFFFF')
 text(sol2, 0.75, 5.92, 11.8, 1.05, [
     [R('What we expect to change (to be measured in a pilot): ', size=14, bold=True, color=PURPLE)],
@@ -275,12 +276,12 @@ text(sol2, 0.75, 5.92, 11.8, 1.05, [
 # ---------------------------------------------------------------- 7 technology
 section(tech, 'Technology, Tools and AI Approach', 'mint')
 LG = B / 'assets/logos'
-text(tech, 0.55, 0.98, 12.2, 0.4, [[R('How a conversation becomes a signed form', size=16, bold=True, color=RUST)]])
+text(tech, 0.55, 0.98, 12.2, 0.4, [[R('How a conversation becomes a signed clinical document', size=16, bold=True, color=RUST)]])
 flow = [(LG / 'android.png', 'Doctor’s phone', 'records only after the patient agrees'),
         (LG / 'supabase.png', 'Our server', 'keeps the AI password; the phone never has it'),
-        (LG / 'googlegemini.png', 'Google Gemini AI', 'types out the talk and fills in the form'),
+        (LG / 'googlegemini.png', 'Google Gemini AI', 'types out the talk and fills in the clinical document'),
         (IC / 'image11.png', 'Doctor', 'reads it, corrects it, signs'),
-        (IC / 'image29.png', 'Locked form', 'PDF + QR code; any later change cancels the signatures')]
+        (IC / 'image29.png', 'Locked document', 'PDF + QR code; any later change cancels the signatures')]
 for i, (lg, h, d) in enumerate(flow):
     x = 0.55 + i * 2.5
     card(tech, x, 1.42, 2.15, 1.7, fill='FFFFFF', line='C9DDD2')
@@ -294,14 +295,14 @@ text(tech, 0.55, 4.02, 12.2, 0.38, [[R('Built with', size=16, bold=True, color=R
 stack = [('android', 'Android', 'the phone app'), ('kotlin', 'Kotlin + Compose', 'language and screens of the app'),
          ('nextdotjs', 'Next.js', 'the website'), ('vercel', 'Vercel', 'puts the website online'),
          ('supabase', 'Supabase', 'server, sign-in, storage'), ('postgresql', 'PostgreSQL', 'database; each family sees only its own'),
-         ('googlegemini', 'Google Gemini', 'AI: speech to text, fills the form'), ('openai', 'OpenAI Whisper', 'speech to text with no internet'),
+         ('googlegemini', 'Google Gemini', 'AI: speech to text, fills the document'), ('openai', 'OpenAI Whisper', 'speech to text with no internet'),
          ('googletranslate', 'Google ML Kit', '5 languages and read-aloud on the phone'), ('openstreetmap', 'OpenStreetMap', 'free map of nearby centres'),
-         (None, 'Legal form', 'fits India’s living-will framework (lawyer reviewed)'), (None, 'FHIR', 'standard format hospital software can read')]
+         (None, 'Clinical document', 'goals-of-care format, refined with legal advice'), (None, 'FHIR', 'standard format hospital software can read')]
 for i, (lg, h, d) in enumerate(stack):
     x = 0.55 + (i % 6) * 2.05; y = 4.45 + (i // 6) * 1.27
     card(tech, x, y, 1.93, 1.15, fill='FFFFFF', radius=0.12)
     if lg: pic(tech, LG / f'{lg}.png', x + 0.12, y + 0.14, 0.42, 0.42)
-    else: icon(tech, 28 if h == 'Legal form' else 23, x + 0.12, y + 0.14, 0.42)
+    else: icon(tech, 28 if h == 'Clinical document' else 23, x + 0.12, y + 0.14, 0.42)
     text(tech, x + 0.62, y + 0.1, 1.27, 0.5, [[R(h, size=11.5, bold=True)]], anchor=MSO_ANCHOR.MIDDLE)
     text(tech, x + 0.12, y + 0.62, 1.75, 0.5, [[R(d, size=10, color=MUTED)]])
 notes(tech, 'Logos from the simple-icons set (CC0), used only to name the tools we use. Gemini models: 3.1 Flash-Lite first, then other Flash models when busy; on-device Whisper; typing.')
@@ -311,7 +312,7 @@ section(sprint, 'Build Sprint Journey and Progress', 'sand')
 import datetime as _dt
 GC_TODAY = '1A73E8'
 text(sprint, 0.55, 0.98, 6.0, 0.36, [[R('October – November 2026', size=16, bold=True, color=GREEN)]])
-leg = [('Built', TEAL), ('Doctor / lawyer feedback', PURPLE), ('Milestone', RUST)]
+leg = [('Built', TEAL), ('Doctor / legal feedback', PURPLE), ('Milestone', RUST)]
 lx = 4.6
 for lbl, col in leg:
     card(sprint, lx, 1.07, 0.2, 0.2, fill=col, radius=0.5)
@@ -336,12 +337,12 @@ ev = {  # (day, month): [(label, colour)]
     (27, 10): [('Hospital survey live', RUST)],
     (28, 10): [('Team meeting: 9 changes', PURPLE), ('Ask your reports', TEAL)],
     (29, 10): [('Dr Sharada’s medical rules', PURPLE)],
-    (30, 10): [('Living will + QR code', TEAL), ('Telugu, Urdu, Kannada', TEAL)],
-    (31, 10): [('Lawyer checks the form', PURPLE)],
+    (30, 10): [('Goals of care + QR code', TEAL), ('Telugu, Urdu, Kannada', TEAL)],
+    (31, 10): [('Legal advice on format', PURPLE)],
     (1, 11): [('Recording → text', TEAL)],
     (2, 11): [('Doctor schedule', TEAL)],
     (3, 11): [('Dr Sujay tests the whole app', PURPLE)],
-    (4, 11): [('Legal form word for word', TEAL), ('8 practice talks pass', TEAL)],
+    (4, 11): [('Clinical document word for word', TEAL), ('8 practice talks pass', TEAL)],
     (5, 11): [('Gemini AI + backups', TEAL), ('Final polish', RUST)],
 }
 start = _dt.date(2026, 10, 5) if _dt.date(2026, 10, 5).weekday() == 0 else _dt.date(2026, 10, 6)
@@ -368,21 +369,21 @@ for w in range(5):
             chip = card(sprint, x + 0.04, cy, cw - 0.08, 0.34, fill=col, radius=0.18)
             text(sprint, x + 0.07, cy, cw - 0.14, 0.34, [[R(lab, size=8, bold=True, color='FFFFFF')]], anchor=MSO_ANCHOR.MIDDLE, align=PP_ALIGN.CENTER)
 text(sprint, gx0, top + 5 * rh + 0.02, 7 * cw, 0.28, [[R('Blue circle: 5 Nov, the day of this submission. Grey days are outside the 4-week build sprint.', size=9.5, color=MUTED, italic=True)]])
-boxes = [('✓  Working now', TEAL, 'Patient and family app · doctor’s view · recording → signed form · QR code · website live'),
+boxes = [('✓  Working now', TEAL, 'Patient and family app · doctor’s view · recording → signed clinical document · QR code · website live'),
          ('↻  Changed on the way', PURPLE, 'Website first, then a real Android app. The AI used to write the note; now the doctor leads and the AI only writes it down.'),
-         ('⚠  Problems we solved', RUST, 'Google’s AI was often busy → automatic backups. Legal wording → copied exactly.'),
+         ('⚠  Problems we solved', RUST, 'Google’s AI was often busy → automatic backups. Exact goals-of-care wording → copied.'),
          ('…  Still to do', BLUE, 'Test on many real phones · record a real practice talk with Dr Sharada')]
 for i, (h, col, body) in enumerate(boxes):
     y = 1.0 + i * 1.48
     card(sprint, 9.55, y, 3.2, 1.38, fill='FFFFFF')
     text(sprint, 9.7, y + 0.06, 2.95, 1.3, [([R(h, size=13, bold=True, color=col)], {'after': 3}), [R(body, size=11, color=GREEN)]])
-notes(sprint, 'Dates from the git history and team chat: shortlisted 9 Oct; native Android 9 Oct; Play testing 13-14 Oct; Play submission 19 Oct; survey feedback 23 Oct; survey live 27 Oct; team meeting 28 Oct; clinical spec 29 Oct; legal review 31 Oct; Dr Sujay walkthrough 3 Nov; legal form word for word 4 Nov; Gemini fallback 5 Nov.')
+notes(sprint, 'Dates from the git history and team chat: shortlisted 9 Oct; native Android 9 Oct; Play testing 13-14 Oct; Play submission 19 Oct; survey feedback 23 Oct; survey live 27 Oct; team meeting 28 Oct; clinical spec 29 Oct; legal review 31 Oct; Dr Sujay walkthrough 3 Nov; clinical document word for word 4 Nov; Gemini fallback 5 Nov.')
 
 # ---------------------------------------------------------------- 9 evaluation
 section(evals, 'Evaluation and User Validation', 'blue')
 text(evals, 0.55, 0.98, 12.2, 0.38, [[R('1. Does it work? Our own tests', size=16, bold=True, color=RUST)]])
 tiles = [('877', 'automatic checks on the Android app: all pass', TEAL), ('594 / 594', 'automatic checks on the website: all pass', BLUE),
-         ('8 / 8', 'practice doctor–patient talks in 6 languages: every answer landed in the right place on the form', RUST),
+         ('8 / 8', 'practice doctor–patient talks in 6 languages: every answer landed in the right place on the document', RUST),
          ('4 / 4', 'questions about a sample hospital report answered correctly', PURPLE)]
 for i, (big, lbl, col) in enumerate(tiles):
     x = 0.55 + i * 3.08
@@ -394,12 +395,12 @@ text(evals, 0.55, 3.5, 12.2, 0.38, [[R('2. What experts told us, and what we cha
 fb = [(11, 'Dr Sujay Halkur Shankar', 'doctor, used the whole app on 3 Nov',
        'Is there a guide telling the doctor what to talk about next? And a medicine taken 4 times a day needs 4 ticks.',
        'Checklist in the doctors’ order with a “not yet discussed” prompt; one tick per dose. Team chat: tubes-and-drains tracker, darker text.'),
-      (28, 'Rituparna P', 'lawyer, reviewed the format on 31 Oct',
-       'Use the exact wording of India’s living-will form.',
-       'Form copied word for word; signing locks it.'),
+      (28, 'Legal advice', 'sought on 31 Oct',
+       'Refine the goals-of-care wording and format.',
+       'Document copied word for word; signing locks it.'),
       (23, 'Dr Sharada Vinod Kutty', 'doctor, wrote our medical rules on 29 Oct',
        'Comfort care must always continue, whatever treatment a patient refuses.',
-       'The app shows this on every signed form.')]
+       'The app shows this on every signed document.')]
 for i, (ic, who, role, said, did) in enumerate(fb):
     x = 0.55 + i * 4.12
     card(evals, x, 3.92, 3.95, 2.0, fill='FFFFFF')
@@ -429,7 +430,7 @@ for i, (ic, h, col, items) in enumerate(quads):
 # ---------------------------------------------------------------- 11 deployment
 section(deploy, 'Deployment, Cost and Sustainability Plan', 'peach')
 steps_ = [(11, 'Pilot', 'Start in 1 clinic with our own doctors. Patients give consent as India’s data-protection law (DPDP Act) requires.'),
-          (23, 'Fitting in', 'Works on its own; no hospital software needed. Later it can send records in FHIR, a format hospital software reads.'),
+          (23, 'Fitting in', 'Today it records on the doctor’s phone. Next: ambient listening, with room or lapel microphones in clinics. Later, FHIR export for hospital software.'),
           (18, 'Who pays', 'Clinics or charities pay a monthly fee. Free for patients and families.'),
           (9, 'Growing', 'Grants first, then palliative-care networks across India.')]
 for i, (ic, h, d) in enumerate(steps_):
@@ -462,9 +463,9 @@ notes(deploy, 'COST FIGURES ARE TEAM ESTIMATES from public list prices and an as
 
 # ---------------------------------------------------------------- 12 what next
 section(nxt, 'What Next? Plans to take initiative forward (if any)', 'lilac')
-plan = [('1', 'Prove it works', 'Test on many real phones. Record a real practice talk with Dr Sharada.', TEAL),
+plan = [('1', 'Prove it works', 'Test on many real phones; try room and lapel microphones (ambient listening). Record a real practice talk with Dr Sharada.', TEAL),
         ('2', 'Pilot, 60–90 days', 'One clinic. Count how many talks get signed and how fast wishes are found.', RUST),
-        ('3', 'Legal rules', 'What to do when a patient cannot decide, who may sign for them, and how to cancel a living will.', PURPLE),
+        ('3', 'Legal rules', 'What to do when a patient cannot decide, who may sign for them, and how a patient changes their goals of care.', PURPLE),
         ('4', 'Fund and grow', 'Grants, palliative-care networks, then link with hospital software.', BLUE)]
 for i, (n, h, d, col) in enumerate(plan):
     x = 0.55 + i * 3.08
