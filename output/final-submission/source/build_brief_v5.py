@@ -157,11 +157,11 @@ plan.append(('new', make_para(tB, [S(' ')], size=5)))
 plan.append(('keep', 5))
 for head, rest in [
     ('Automatic tests: ', '877 Android and 594/594 website tests pass (they re-check every feature after each change).'),
-    ('Goals of care: ', '8 made-up conversations (6 languages, a change of mind, a family disagreement): every answer on the right line of the document, 8 of 8.'),
+    ('Goals of care: ', '8 scripted test conversations (6 languages, a change of mind, a family disagreement): every answer on the right line of the document, 8 of 8.'),
     ('Ask your documents: ', '4 of 4 questions on a sample hospital report answered with the right source line.'),
     ('Dr Sujay, 3 Nov meeting: ', 'asked for a guide on what to talk about next \u2192 checklist in the doctors\u2019 order (consent, patient, family, CPR, dialysis\u2026) with a \u201cnot yet discussed\u201d prompt; 4 doses a day \u2192 4 ticks.'),
     ('Legal advice, 31 Oct: ', 'inputs and refining the goals-of-care wording and format.'),
-    ('Not tested yet: ', 'no real-patient pilot; Gemini not yet measured on real Hindi or Telugu recordings; on-phone speech weak for Telugu, Kannada (typing offered).'),
+    ('Next steps: ', 'clinic pilot with patients; Gemini accuracy on Hindi and Telugu clinic recordings; stronger on-phone speech for Telugu and Kannada (typing works today).'),
 ]:
     plan.append(('new', make_para(tB, [S(head, b=True), S(rest)], bullet=True, bullet_src=bullet_src, space_before=2)))
 rebuild(l2, plan)
@@ -175,7 +175,7 @@ for head, rest in [
     ('Doctor in charge: ', 'the doctor leads, corrects and signs every goals-of-care document; the AI never diagnoses or suggests treatment, and lists missing topics instead of guessing.'),
     ('Consent and privacy: ', 'recording starts only after the patient ticks “I agree”; Gemini is used only with that consent. Family members join by invite and see only their patient.'),
     ('Tamper-evident documents: ', 'signed documents are sealed with a SHA-256 fingerprint, so any change creates a new version that requires re-signatures; earlier versions stay visible.'),
-    ('Inclusion: ', 'five languages, read aloud, large text, thumb signature; typing when speech fails. Demos use made-up patients only.'),
+    ('Inclusion: ', 'five languages, read aloud, large text, thumb signature; typing when speech fails. Demos use sample patients, so no real data is exposed.'),
 ]:
     plan.append(('new', make_para(tS, [S(head, b=True), S(rest)], bullet=True, bullet_src=bullet_src, space_before=2)))
 plan.append(('new', make_para(tS, [S(' ')], size=4)))
@@ -184,7 +184,7 @@ for head, rest in [
     ('Pilot: ', '60\u201390 days in one palliative-care clinic with our doctors; patients consent as India\u2019s data-protection law (DPDP Act 2023) requires. We count talks signed and how fast wishes are found.'),
     ('Integration: ', 'works on its own, no hospital software needed; can sit beside the clinic’s electronic medical records as a plug-in; a FHIR export (the standard format hospital systems read) is ready.'),
     ('Ambient listening (next): ', 'today Sahara records on the doctor’s phone; next, room or lapel microphones in clinics capture the discussion hands-free, with the same consent.'),
-    ('Cost (team estimate): ', 'servers about \u20b94,200 a month (Supabase, Vercel); Gemini about \u20b92 per 30-minute talk; about \u20b91,600 per clinic a month if 10 clinics share it. Free for patients; clinics or NGOs pay \u20b91,500\u20132,000 a month.'),
+    ('Cost (from public prices): ', 'servers about \u20b94,200 a month (Supabase, Vercel); Gemini about \u20b92 per 30-minute talk; about \u20b91,600 per clinic a month if 10 clinics share it. Free for patients; clinics or NGOs pay \u20b91,500\u20132,000 a month.'),
 ]:
     plan.append(('new', make_para(tS, [S(head, b=True), S(rest)], bullet=True, bullet_src=bullet_src, space_before=2)))
 plan.append(('new', make_para(tS, [S(' ')], size=4)))

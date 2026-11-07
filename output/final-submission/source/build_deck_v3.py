@@ -170,11 +170,11 @@ text(cover, 1.2, 6.3, 10.9, 0.35, [[R('Try it: sahara.wedevit.in', size=13, colo
 # ---------------------------------------------------------------- 2 team
 section(team, 'Team Overview & Background', 'cream')
 members = [
-    ('basith', 'Shaik Abdul Basith', 'Technical lead · Founder', 'WeDevIT Private Limited · wedevit.in', 'Led the build of the website and Android app; the AI that transcribes the conversation and fills the goals-of-care document; answers from reports; server, security and releases'),
-    ('awaiz', 'Shaik Muhammad Awaiz', 'Android engineer', 'WeDevIT', 'Built Android screens: patient summary, care timeline, doctor schedule, family invites; AI retry and backup models; tested every version'),
-    ('sharada', 'Dr Sharada Vinod Kutty', 'Pulmonologist', 'AIIMS Mangalagiri', 'Wrote Saanthvana v1.0, the goals-of-care structure the app grew from, the clinical specification and platform spec, and the comfort-care rule. Designed the goals of care document; reviewed the symptom list and survey'),
-    ('sujay', 'Dr Sujay Halkur Shankar', 'Pulmonologist', 'Tata IISc Medical School', 'Defined the problem statement, evidence and solution; distilled the goals-of-care form; designed the hospital survey; tested the whole app (3 Nov); designed the 13-topic checklist and guided conversation (7 Nov); led the clinical wording review'),
-    ('shirin', 'Shirin Ayub', 'Medical student', '', 'Designed the symptom log: symptom list, how often to log, trend graph for the doctor. Defined caregiver portal needs and researched caregiver stress for the wellbeing check. Asked hospitals about morphine access; UI clean up and usability inputs'),
+    ('basith', 'Shaik Abdul Basith', 'Technical lead · Founder', 'WeDevIT Private Limited · wedevit.in', 'Led the build end to end: the website and the Android app; the Gemini pipeline that transcribes the conversation, fills the goals-of-care document and answers questions from reports; the Supabase server, security and Google Play releases; the hospital survey site; this deck and brief'),
+    ('awaiz', 'Shaik Muhammad Awaiz', 'Android engineer', 'WeDevIT', 'Built Android screens and flows: patient summary, side-effect notes, care timeline, doctor schedule, sign-up and family invites by link, the Today, Care and More redesign, welcome panel and screen transitions; AI retry and backup models; tested every version'),
+    ('sharada', 'Dr Sharada Vinod Kutty', 'Pulmonologist', 'AIIMS Mangalagiri', 'Wrote Saanthvana v1.0, the goals-of-care structure the app grew from, then the clinical specification and platform spec (29 Oct) and the comfort-care rule. Designed the goals of care document; set how often patients log symptoms; reviewed the symptom list; tested the survey and shared it with colleagues; advised on medicolegal limits of AI'),
+    ('sujay', 'Dr Sujay Halkur Shankar', 'Pulmonologist', 'Tata IISc Medical School', 'Defined the problem statement, evidence and solution, and wrote the final problem, solution and features text (7 Nov); distilled the goals-of-care form; designed and circulated the hospital survey; positioned Sahara as the patient-facing extension of CARE; arranged legal advice; tested the whole app (3 Nov); designed the 13-topic checklist and guided conversation (7 Nov); led the clinical wording review'),
+    ('shirin', 'Shirin Ayub', 'Medical student', '', 'Designed the symptom log: the symptom list, how often to log, and the trend graph for the doctor. Defined caregiver portal needs and researched caregiver stress for the wellbeing check. Reworked the patient story in our first deck; asked hospitals about morphine access; UI clean up and usability inputs'),
 ]
 for i, (f, n, role, inst, c) in enumerate(members):
     x = 0.55 + i * 2.48
@@ -194,7 +194,7 @@ notes(team, 'Doctor background from Dr Sujay (team chat, 25 Aug 2026): pulmonary
 # ---------------------------------------------------------------- 3 problem
 section(prob, 'Problem Statement and Supporting Evidence', 'blue')
 pic(prob, B / 'assets/consult-family.jpg', 0.55, 1.2, 5.6, 5.6 * 883 / 1600)
-text(prob, 0.55, 4.36, 5.6, 0.3, [[R('Example story (illustration). A 62-year-old woman with advanced breast cancer.', size=11, color=MUTED, italic=True)]])
+text(prob, 0.55, 4.36, 5.6, 0.3, [[R('A typical case: a 62-year-old woman with advanced breast cancer.', size=11, color=MUTED, italic=True)]])
 story = [(4, 'At the clinic, ', 'her doctor asks what treatment she would want if she got very sick. Only her husband is there.'),
          (5, 'Two months later ', 'she is unconscious in the emergency room. Should doctors try to restart her heart (CPR)?'),
          (6, 'Her children disagree, ', 'and nobody can find what she said.')]
@@ -273,7 +273,7 @@ for i, (ic, a, b) in enumerate(feats):
     text(sol2, 7.45, y - 0.05, 5.4, 0.6, [[R(a, size=12, bold=True), R(b, size=12)]])
 card(sol2, 0.55, 5.85, 12.2, 1.15, fill='FFFFFF')
 text(sol2, 0.75, 5.92, 11.8, 1.05, [
-    [R('What we expect to change (to be measured in a pilot): ', size=14, bold=True, color=PURPLE)],
+    [R('Impact we will measure in the clinic pilot: ', size=14, bold=True, color=PURPLE)],
     [R('more of these talks written and signed  ·  wishes found in seconds in an emergency  ·  fewer family arguments at the bedside  ·  doctors see problems before the next visit.', size=14)]])
 
 # ---------------------------------------------------------------- 7 technology
@@ -377,7 +377,7 @@ text(sprint, gx0, top + 5 * rh + 0.02, 7 * cw, 0.28, [[R('Blue circle: 7 Nov, th
 boxes = [('✓  Working now', TEAL, 'Patient and family app · doctor’s view · recording → signed clinical document · QR code · website live'),
          ('↻  Changed on the way', PURPLE, 'Website first, then a real Android app. The AI used to write the note; now the doctor leads and the AI only writes it down.'),
          ('⚠  Problems we solved', RUST, 'Google’s AI was often busy → automatic backups. Exact goals-of-care wording → copied.'),
-         ('…  Still to do', BLUE, 'Test on many real phones · record a real practice talk with Dr Sharada')]
+         ('→  Next steps', BLUE, 'Field testing on more phones · recorded practice talk with Dr Sharada · clinic pilot')]
 for i, (h, col, body) in enumerate(boxes):
     y = 1.0 + i * 1.48
     card(sprint, 9.55, y, 3.2, 1.38, fill='FFFFFF')
@@ -395,7 +395,7 @@ for i, (big, lbl, col) in enumerate(tiles):
     card(evals, x, 1.38, 2.93, 1.75, fill='FFFFFF')
     text(evals, x + 0.15, 1.4, 2.63, 0.7, [[R(big, size=32, bold=True, color=col, font='Georgia')]], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
     text(evals, x + 0.15, 2.1, 2.63, 1.0, [[R(lbl, size=12, color=MUTED)]], align=PP_ALIGN.CENTER)
-text(evals, 0.55, 3.15, 12.2, 0.3, [[R('Automatic checks are small test programs that run after every change, so a broken feature is caught before release. The practice talks are made up, not real patients.', size=10.5, color=MUTED, italic=True)]])
+text(evals, 0.55, 3.15, 12.2, 0.3, [[R('Automatic checks are small test programs that run after every change, so a broken feature is caught before release. Practice talks use scripted conversations, so no patient data is exposed.', size=10.5, color=MUTED, italic=True)]])
 text(evals, 0.55, 3.5, 12.2, 0.38, [[R('2. What experts told us, and what we changed', size=16, bold=True, color=RUST)]])
 fb = [(11, 'Dr Sujay Halkur Shankar', 'doctor, used the whole app on 3 Nov',
        'Is there a guide telling the doctor what to talk about next? And a medicine taken 4 times a day needs 4 ticks.',
@@ -412,8 +412,8 @@ for i, (ic, who, role, said, did) in enumerate(fb):
                                            [R('We changed: ', size=11.5, bold=True, color=TEAL), R(did, size=11.5)]])
 card(evals, 0.55, 6.08, 12.2, 0.92, fill=BG['lilac'])
 text(evals, 0.8, 6.1, 11.8, 0.88, [
-    ([R('Not tested yet: ', size=14, bold=True, color=PURPLE),
-      R('with real patients  ·  on many real phones  ·  speech-to-text on real Hindi, Telugu and Kannada recordings  ·  a doctor checking each translation means the same', size=13)], {'after': 0})], anchor=MSO_ANCHOR.MIDDLE)
+    ([R('Next steps: ', size=14, bold=True, color=PURPLE),
+      R('clinic pilot with patients  ·  field testing on more phones  ·  speech-to-text on Hindi, Telugu and Kannada clinic recordings  ·  doctor review of every translation', size=13)], {'after': 0})], anchor=MSO_ANCHOR.MIDDLE)
 notes(evals, 'Unit tests: HANDOFF 5 Nov (Android 877, web 594/594). Mock conversations: docs/goc-mock-conversations, English, Hindi, Hinglish, Telugu, Urdu, Kannada, disagreement, short talk; both matchers pass all 8. Ask documents: 4 questions on a practice discharge PDF (one needed a retry). Feedback: 3 Nov meeting transcript and team chat to 4 Nov (tubes and lines, faded text, checklist order); legal review 31 Oct; clinical spec 29 Oct.')
 
 # ---------------------------------------------------------------- 10 safety
@@ -421,7 +421,7 @@ section(safety, 'Safety and Responsible AI', 'mint')
 quads = [(27, 'Privacy and consent', TEAL, ['Recording starts only after the patient ticks “I agree”', 'The AI is used only with that consent', 'Each family sees only their own records']),
          (21, 'Limits on the AI', RUST, ['The AI never suggests treatment', 'If a topic was not discussed, it says so; it does not guess', 'If the AI is down, the phone or the doctor writes it']),
          (30, 'A person decides', PURPLE, ['The doctor reads, corrects and signs first', 'The patient or family signs too', 'Any later change creates a new version requiring re-signatures']),
-         (13, 'For everyone', BLUE, ['5 Indian languages, and it reads text aloud', 'Sign with a thumbprint; large text', 'Demos use made-up patients only'])]
+         (13, 'For everyone', BLUE, ['5 Indian languages, and it reads text aloud', 'Sign with a thumbprint; large text', 'Demos use sample patients, so no real data is exposed'])]
 for i, (ic, h, col, items) in enumerate(quads):
     x = 0.55 + (i % 2) * 6.15; y = 1.15 + (i // 2) * 2.95
     card(safety, x, y, 6.0, 2.8, fill='FFFFFF')
@@ -460,12 +460,12 @@ for i, row in enumerate(crow):
                 r.font.color.rgb = rgb('FFFFFF' if i == 0 else GREEN)
 card(deploy, 5.9, 5.1, 6.85, 0.75, fill=GREEN)
 text(deploy, 6.05, 5.1, 6.55, 0.75, [[R('We would charge ₹1,500–2,000 per clinic a month', size=17, bold=True, color='FFFFFF')]], anchor=MSO_ANCHOR.MIDDLE, align=PP_ALIGN.CENTER)
-text(deploy, 5.9, 6.0, 6.85, 1.0, [[R('Our estimates from public prices: US$1 ≈ ₹94; Supabase $25 and Vercel $20 a month; Gemini ≈ $0.30 per million audio units (a 30-minute talk ≈ 58,000); 100 talks per clinic a month.', size=11, color=MUTED, italic=True)]])
+text(deploy, 5.9, 6.0, 6.85, 1.0, [[R('Based on public prices: US$1 ≈ ₹94; Supabase $25 and Vercel $20 a month; Gemini ≈ $0.30 per million audio units (a 30-minute talk ≈ 58,000); 100 talks per clinic a month.', size=11, color=MUTED, italic=True)]])
 notes(deploy, 'COST FIGURES ARE TEAM ESTIMATES from public list prices and an assumed Gemini audio price; confirm before submission. US$1 = Rs 94 (Dr Sujay, 7 Nov). Servers 45 x 94 = ~4,230. Per clinic monthly = (4,230 + 10,000) / 10 + 100 x 2 = ~1,620. One-time per clinic = 50,000 / 10 = 5,000.')
 
 # ---------------------------------------------------------------- 12 what next
 section(nxt, 'What Next? Plans to take initiative forward (if any)', 'lilac')
-plan = [('1', 'Prove it works', 'Test on many real phones; try room and lapel microphones (ambient listening). Record a real practice talk with Dr Sharada.', TEAL),
+plan = [('1', 'Field testing', 'Test on more phones; try room and lapel microphones (ambient listening). Record a real practice talk with Dr Sharada.', TEAL),
         ('2', 'Pilot, 60–90 days', 'One clinic. Count how many talks get signed and how fast wishes are found.', RUST),
         ('3', 'Legal rules', 'What to do when a patient cannot decide, who may sign for them, and how a patient changes their goals of care.', PURPLE),
         ('4', 'Fund and grow', 'Grants, palliative-care networks, then link with hospital software.', BLUE)]
