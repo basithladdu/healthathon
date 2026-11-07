@@ -261,7 +261,7 @@ text(sol2, 0.55, 0.98, 12.2, 0.62, [([R('At home, between visits: ', size=17, bo
 for i, n in enumerate(['21-feel-scale', '23-answer', '22-findcare']):
     phone(sol2, n, 0.65 + i * 2.05, 1.7, 3.95)
 feats = [(17, 'How I feel: ', 'symptoms (ESAS-r), a 0–10 distress scale (NCCN thermometer) and a pain body map; trends for the doctor.'),
-         (8, 'Caregiver wellbeing (new): ', 'ZBI-4 check and a private journal; flagged when it worsens, with Tele-MANAS 14416, counsellors, respite care, support groups.'),
+         (8, 'Caregiver wellbeing (new): ', 'a short check for family; flagged with Tele-MANAS 14416 and support.'),
          (12, 'Medicines: ', 'pill tracker from prescription photos; tag pictures of your medicine strips for easy identification; dose ticks, reminders.'),
          (23, 'Documents: ', 'uploads sorted into prescriptions, bills, reports; questions answered with the line it came from.'),
          (29, 'Emergency: ', 'SOS button and a QR code with goals of care, contacts and medicines.'),

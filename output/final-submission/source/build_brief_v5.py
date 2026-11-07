@@ -135,7 +135,7 @@ SUJ_FEAT = [
 ]
 EXTRA_FEAT = [
     ('Conversation guide (new): ', 'Dr Sujay’s 13-topic checklist (capacity, existing directives, values, CPR, ICU, ventilatory support, dialysis, nutritional support and more); in “Guide me” or “Free flow” the doctor taps topics while recording.'),
-    ('Caregiver wellbeing (new): ', 'ZBI-4 burden check and a private journal; flagged when it worsens, with Tele-MANAS (14416), counsellors, respite care and support groups. About 38% of family caregivers report high stress and about 1 in 5 has clinical burnout (Cleveland Clinic and others).'),
+    ('Caregiver wellbeing (new): ', 'a short check for family caregivers, flagged with Tele-MANAS (14416) and support groups when stress rises; about 1 in 5 caregivers has burnout (Cleveland Clinic and other surveys).'),
 ]
 for head, rest in SUJ_FEAT + EXTRA_FEAT:
     plan.append(('new', make_para(tBody, [S(head, b=True), S(rest)], bullet=True, bullet_src=bullet_src, space_before=1, size=P1)))
