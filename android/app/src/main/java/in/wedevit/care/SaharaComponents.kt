@@ -93,18 +93,19 @@ internal fun splitsWord(text: String, lineEnds: List<Int>): Boolean {
  */
 @Composable fun SaharaTopBand(title: String, modifier: Modifier = Modifier, subtitle: String? = null,
     navigation: (@Composable () -> Unit)? = null, actions: @Composable RowScope.() -> Unit = {}) {
-    SaharaStatusBarIcons(lightIcons = true)
-    Surface(color = SaharaColors.Band, contentColor = SaharaColors.OnBand, modifier = modifier.fillMaxWidth()) {
+    SaharaStatusBarIcons(lightIcons = false)
+    Surface(color = SaharaColors.Header, contentColor = SaharaColors.OnHeader, modifier = modifier.fillMaxWidth()) { Column {
         Row(Modifier.statusBarsPadding().heightIn(min = 60.dp).padding(start = if (navigation == null) 16.dp else 4.dp, end = 8.dp, top = 4.dp, bottom = 4.dp),
             verticalAlignment = Alignment.CenterVertically) {
             if (navigation != null) { navigation(); Spacer(Modifier.width(4.dp)) }
             Column(Modifier.weight(1f)) {
-                Text(title, Modifier.a11yHeading(), style = MaterialTheme.typography.titleLarge, fontSize = 21.sp, lineHeight = 26.sp, color = SaharaColors.OnBand, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                if (subtitle != null) Text(subtitle, style = MaterialTheme.typography.bodySmall, color = SaharaColors.OnBandSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(title, Modifier.a11yHeading(), style = MaterialTheme.typography.titleLarge, fontSize = 21.sp, lineHeight = 26.sp, color = SaharaColors.OnHeader, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                if (subtitle != null) Text(subtitle, style = MaterialTheme.typography.bodySmall, color = SaharaColors.OnHeaderSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             actions()
         }
-    }
+        HorizontalDivider(color = SaharaColors.HeaderLine)
+    } }
 }
 
 /** A coloured icon chip: the section's bright solid with its white icon. Decorative; the label beside it carries the meaning. [breathe]: a slow idle swell for the one main card on a screen. */
@@ -177,7 +178,7 @@ internal fun splitsWord(text: String, lineEnds: List<Int>): Boolean {
  * takes that section's wash, a 1.5 dp border in its solid and a solid accent bar down the leading edge.
  */
 @Composable fun SaharaRegister(modifier: Modifier = Modifier, tone: SaharaTone? = null, content: @Composable ColumnScope.() -> Unit) {
-    Surface(modifier.fillMaxWidth().saharaAppear(), shape = RoundedCornerShape(SaharaRadius.Lg), color = tone?.wash ?: SaharaColors.Surface,
+    Surface(modifier.fillMaxWidth().saharaAppear().saharaContentSize(), shape = RoundedCornerShape(SaharaRadius.Lg), color = tone?.wash ?: SaharaColors.Surface,
         border = BorderStroke(if (tone != null) 1.5.dp else 1.dp, tone?.solid ?: SaharaColors.Edge)) {
         Column(Modifier.then(if (tone != null) Modifier.saharaAccentBar(tone) else Modifier).padding(vertical = 4.dp), content = content)
     }
@@ -198,7 +199,7 @@ fun Modifier.saharaAccentBar(tone: SaharaTone): Modifier = drawWithContent {
 @Composable fun SaharaSectionBand(title: String, tone: SaharaTone, modifier: Modifier = Modifier, onBack: (() -> Unit)? = null, subtitle: String? = null,
     backTag: String? = null, trailing: (@Composable RowScope.() -> Unit)? = null) {
     val t = careText()
-    Surface(modifier.fillMaxWidth(), shape = RoundedCornerShape(SaharaRadius.Lg + 4.dp), color = tone.band, contentColor = tone.onSolid, shadowElevation = 3.dp) {
+    Surface(modifier.fillMaxWidth().saharaAppear(), shape = RoundedCornerShape(SaharaRadius.Lg + 4.dp), color = tone.band, contentColor = tone.onSolid, shadowElevation = 3.dp) {
         Row(Modifier.heightIn(min = 72.dp).padding(start = if (onBack != null) 4.dp else 18.dp, end = 12.dp, top = 10.dp, bottom = 10.dp), verticalAlignment = Alignment.CenterVertically) {
             if (onBack != null) IconButton(onClick = onBack, modifier = Modifier.size(48.dp).then(if (backTag != null) Modifier.testTag(backTag) else Modifier)) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस"), tint = tone.onSolid)
@@ -301,7 +302,7 @@ fun Modifier.saharaAccentBar(tone: SaharaTone): Modifier = drawWithContent {
 
 /** Error state: a bright icon, what went wrong in one line, and the one thing to do (usually Try again) as a real button. */
 @Composable fun SaharaErrorState(title: String, modifier: Modifier = Modifier, detail: String? = null, actionLabel: String? = null, onAction: (() -> Unit)? = null) {
-    Surface(modifier.fillMaxWidth().saharaAppear(), shape = RoundedCornerShape(SaharaRadius.Lg), color = SaharaColors.ErrorWash, border = BorderStroke(1.dp, SaharaColors.Error)) {
+    Surface(modifier.fillMaxWidth().saharaAppear().saharaContentSize(), shape = RoundedCornerShape(SaharaRadius.Lg), color = SaharaColors.ErrorWash, border = BorderStroke(1.dp, SaharaColors.Error)) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(Modifier.announce(), verticalAlignment = Alignment.CenterVertically) {
                 SaharaIconChip(Icons.Default.ErrorOutline, SaharaTone.Error, size = 40)

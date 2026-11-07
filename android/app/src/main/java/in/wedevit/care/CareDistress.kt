@@ -6,6 +6,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -218,6 +219,14 @@ internal object DistressCodec {
             CareLanguageMenu(compact = true)
         }
         Text(t("How much distress have you felt in the past week, including today?", "पिछले एक हफ़्ते में, आज समेत, आपको कितनी परेशानी रही है?"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk)
+        // The chosen number, large, with a plain instruction: nobody should have to guess that the thermometer slides.
+        Row(Modifier.fillMaxWidth().animateContentSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text(if (score in 0..10) "$score" else "–", fontFamily = SaharaTitleFont, fontSize = 56.sp, lineHeight = 60.sp, fontWeight = FontWeight.Bold, color = if (score in 0..10) distressBandText(score) else DoctorCardSub, modifier = Modifier.testTag("distress-big-number"))
+            Column {
+                Text("/10", fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub)
+                Text(if (score in 0..10) t("Slide to change", "बदलने के लिए सरकाएँ") else t("Slide to rate", "अंक देने के लिए सरकाएँ"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorAccent, maxLines = 1, softWrap = false, modifier = Modifier.testTag("distress-slide-hint"))
+            }
+        }
         // The thermometer on the left, the six concern groups beside it, so the whole check fits one screen.
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             DistressThermometer(score, Modifier.width(112.dp)) { score = it }
@@ -299,6 +308,15 @@ private val DistressRowHeight = 24.dp
     val pick by rememberUpdatedState(onPick)
     val picked = score in 0..10
     val empty = Color(0xFFEDE4D8)
+    // A gentle one-time nudge on first show: a ghost fill rises and falls so people see the tube moves.
+    val hint = remember { androidx.compose.animation.core.Animatable(0f) }
+    var nudged by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        if (!nudged && score !in 0..10) {
+            hint.animateTo(6f, androidx.compose.animation.core.tween(800)); hint.animateTo(0f, androidx.compose.animation.core.tween(800))
+        }
+        nudged = true
+    }
     Column(modifier.testTag("distress-thermometer"), horizontalAlignment = Alignment.Start) {
         Text(t("Extreme distress", "बहुत ज़्यादा परेशानी"), fontSize = 13.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub, modifier = Modifier.padding(bottom = 4.dp))
         Column(Modifier.selectableGroup().pointerInput(Unit) {
@@ -308,13 +326,14 @@ private val DistressRowHeight = 24.dp
             (10 downTo 0).forEach { n ->
                 val on = score == n
                 val filled = picked && n in 1..score
+                val ghost = !picked && n in 1..hint.value.toInt()
                 val anchor = when (n) { 0 -> t("No distress", "कोई परेशानी नहीं"); 10 -> t("Extreme distress", "बहुत ज़्यादा परेशानी"); else -> "" }
                 val description = if (anchor.isEmpty()) "$n" else "$n, $anchor"
                 Row(Modifier.fillMaxWidth().height(DistressRowHeight).selectable(selected = on, role = Role.RadioButton, onClick = { onPick(n) }).semantics { contentDescription = description }.testTag("distress-score-$n"), verticalAlignment = Alignment.CenterVertically) {
                     Text("$n", fontSize = if (on) 17.sp else 14.sp, fontWeight = if (on) FontWeight.Bold else FontWeight.Medium, color = if (on) distressBandText(n) else DoctorCardSub, textAlign = TextAlign.End, modifier = Modifier.width(26.dp))
                     Spacer(Modifier.width(8.dp))
                     val shape = if (n == 10) RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp) else RoundedCornerShape(0.dp)
-                    Box(Modifier.width(24.dp).fillMaxHeight().background(if (filled) distressBand(n) else empty, shape)) {
+                    Box(Modifier.width(24.dp).fillMaxHeight().background(if (filled) distressBand(n) else if (ghost) distressBand(n).copy(alpha = .45f) else empty, shape)) {
                         if (n in 1..9) Box(Modifier.align(Alignment.TopEnd).width(8.dp).height(1.dp).background(Paper))
                     }
                     if (on) Text("◀", fontSize = 13.sp, color = distressBandText(n), modifier = Modifier.padding(start = 6.dp))

@@ -156,7 +156,7 @@ internal object DoctorTones {
     fun forName(name: String): DoctorTone = cycle[Math.floorMod(name.trim().lowercase().hashCode(), cycle.size)]
 }
 /** The dark header band. */
-internal val DoctorBand get() = SaharaColors.Band
+internal val DoctorBand get() = SaharaColors.Header
 
 /** Status pill: the tone's solid (its band step, so small white text keeps 4.5:1) with bold white text; never colour alone (it always carries a word). */
 @Composable internal fun DoctorPill(text: String, tone: DoctorTone, modifier: Modifier = Modifier) {

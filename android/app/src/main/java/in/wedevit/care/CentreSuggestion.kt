@@ -116,7 +116,7 @@ internal suspend fun CareCloud.myCentreSuggestions(account: String): List<Centre
     var result by rememberSaveable { mutableStateOf("") }
     var more by rememberSaveable { mutableStateOf(false) }
     val sending by vm.centreSuggestionSending.collectAsState()
-    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Cream) {
+    SaharaScreenSheet(onDismissRequest = onDismiss, containerColor = Cream) {
         val fieldShape = RoundedCornerShape(12.dp)
         val fieldColors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper, focusedBorderColor = Rust, focusedLabelColor = RustText, cursorColor = Rust)
         Column(Modifier.padding(horizontal = 16.dp).padding(bottom = 32.dp).imePadding().verticalScroll(rememberScrollState()).saharaScreenEnter().testTag("centre-suggestion-sheet"), verticalArrangement = Arrangement.spacedBy(12.dp)) {

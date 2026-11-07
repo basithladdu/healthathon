@@ -228,9 +228,9 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
     BackHandler(careTabBackEnabled(person != null, medicineScanner, tab, activeRecording)) { if (activeRecording) vm.stopRecording() else back() }
     BackHandler(walkthrough != null && !medicineScanner && tab == 0 && !activeRecording) { onLeaveWalkthrough() }
     Scaffold(containerColor = Cream, snackbarHost = { CareToastHost(snackbar) }, topBar = {
-        // Inside a person's care the top bar is the dark header band (white text); on the welcome screen it stays on the cream ground.
-        if (!medicineScanner) Surface(color = if (person != null) SaharaColors.Band else Color.Transparent, contentColor = if (person != null) SaharaColors.OnBand else Ink) { Column {
-        if (person != null) SaharaStatusBarIcons(lightIcons = true)
+        // Inside a person's care the top bar is the calm cream header (ink text, hairline below); the welcome screen keeps its own ground.
+        if (!medicineScanner) Surface(color = if (person != null) SaharaColors.Header else Color.Transparent, contentColor = if (person != null) SaharaColors.OnHeader else Ink) { Column {
+        if (person != null) SaharaStatusBarIcons(lightIcons = false)
         Row(Modifier.statusBarsPadding().fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             Image(saharaImage(R.drawable.sahara_professional_logo, 44.dp), null, Modifier.size(44.dp).then(if (person != null) Modifier.clip(CircleShape).background(SaharaColors.Surface).padding(3.dp) else Modifier), contentScale = ContentScale.Fit)
             Spacer(Modifier.width(4.dp))
@@ -249,6 +249,7 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
                 onInvite = { inviteFamilyOpen = true }, canInvite = !clinician && isOwnerTop,
                 inviteLabel = if (vm.cloud == null) t("Add family", "परिवार जोड़ें") else t("Invite family", "परिवार को बुलाएँ"))
         }
+        if (person != null) HorizontalDivider(color = SaharaColors.HeaderLine, thickness = 1.dp)
         }
         }
     }, bottomBar = {
@@ -268,7 +269,7 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
                     0 -> Today(vm, clinician, onTalk = { go(1) }, onCare = { careFilter = it; go(2) }, onNearby = { go(3) }, onAdd = { if (canEdit) dialog = it else vm.message.value = askOwner }, onRead = { reading = it }, onCalendar = { openCalendar() }, onWorkflow = { go(7) }, onLabs = { go(8) }, onSharedWorkspace = { go(7) }, onSymptoms = { go(9) }, onInviteFamily = { inviteFamilyOpen = true }, onCalendarAt = ::openCalendar,
                         onCheckInWords = { if (canEdit) dialog = "checkin" else vm.message.value = askOwner }, onDistress = { if (canEdit) dialog = "distress" else vm.message.value = askOwner }, onSymptomNote = { symptomAddPending = true; go(9) }, onCarePlan = { go(10) },
                         onCarePlanFromSos = { go(10, reopen = "sos") }, sosReopen = sosReopen, onSosReopened = { sosReopen = false }, onCommunity = { go(11) })
-                    1 -> Talk(vm, clinician && canEdit, onRead = { reading = it }, onRequestConversation = { go(7) })
+                    1 -> Talk(vm, clinician && canEdit, onRead = { reading = it }, onRequestConversation = { go(7) }, onLeave = { back() })
                     2 -> CareList(vm, initialFilter = careFilter, onReadNote = { reading = it }, onCalendar = { openCalendar() }, onCalendarAt = ::openCalendar, onWorkflow = { go(7) }, onLabs = { go(8) }, onSymptoms = { go(9) }, onCommunity = { go(11) }, onDevices = { go(12) }, onExit = { back() },
                         onDocuments = { go(5) }, onCarePlan = { go(10) }, title = t("All care tools", "देखभाल के सभी साधन"),
                         onAdd = { if (canEdit) dialog = it else vm.message.value = askOwner },
@@ -464,7 +465,7 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
     var sosOpen by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(sosReopen) { if (sosReopen) { sosOpen = true; onSosReopened() } }
     val showSummary = !clinician && selectedPerson.isNotBlank()
-    if (sosOpen) ModalBottomSheet(onDismissRequest = { sosOpen = false }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Paper) {
+    if (sosOpen) SaharaScreenSheet(onDismissRequest = { sosOpen = false }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Paper) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 16.dp, end = 16.dp, bottom = 32.dp)) {
             EmergencyNumbersCard()
             Spacer(Modifier.height(12.dp))
@@ -570,7 +571,7 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
     }
 }
 
-@Composable fun Talk(vm: CareModel, clinician: Boolean, onRead: (CareVersion) -> Unit, onRequestConversation: (() -> Unit)? = null, onInteractionActiveChange: (Boolean) -> Unit = {}, doctorPresentation: Boolean = false, onDoctorBack: (() -> Unit)? = null, onDoctorStartNew: (() -> Unit)? = null, onDoctorCaptureChange: (Boolean) -> Unit = {}) { val t = careText();
+@Composable fun Talk(vm: CareModel, clinician: Boolean, onRead: (CareVersion) -> Unit, onRequestConversation: (() -> Unit)? = null, onInteractionActiveChange: (Boolean) -> Unit = {}, doctorPresentation: Boolean = false, onDoctorBack: (() -> Unit)? = null, onDoctorStartNew: (() -> Unit)? = null, onDoctorCaptureChange: (Boolean) -> Unit = {}, onLeave: () -> Unit = {}) { val t = careText();
     val draft by vm.draft.collectAsStateWithLifecycle(); val versions by vm.versions.collectAsStateWithLifecycle()
     val recording by vm.recording.collectAsStateWithLifecycle(); val seconds by vm.recordingSeconds.collectAsStateWithLifecycle(); val level by vm.amplitude.collectAsStateWithLifecycle()
     val recordingSaving by vm.recordingSaving.collectAsStateWithLifecycle()
@@ -714,6 +715,25 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
                 savedAudioPicked.forEach { path -> runCatching { vm.attachDoctorRecording(path, doctorConversationIdentity(vm.accountNamespace, draft)) } }
                 nextStep(2)
             })
+    } else if (!clinician && !doctorPresentation) {
+        // Patient and family: the Goals of care tab opens the real goals-of-care page straight away; saved notes sit under it.
+        var notesOpen by rememberSaveable { mutableStateOf(false) }
+        Column(Modifier.fillMaxSize().testTag("goc-direct")) {
+            Box(Modifier.weight(1f).fillMaxWidth()) { CarePlanScreen(vm, clinician = false, onBack = onLeave, startAt = "goc") }
+            if (versions.isNotEmpty()) Surface(color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().animateContentSize()) {
+                Column {
+                    Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable { notesOpen = !notesOpen }.padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text(t("Saved notes", "सहेजे नोट") + " (${versions.size})", fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                        Icon(if (notesOpen) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp, null)
+                    }
+                    if (notesOpen) Column(Modifier.heightIn(max = 280.dp).verticalScroll(rememberScrollState()).padding(start = 16.dp, end = 16.dp, bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        versions.forEach { note -> Card(onClick = { onRead(note) }, colors = CardDefaults.cardColors(containerColor = Cream), shape = RoundedCornerShape(14.dp)) {
+                            Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Description, null, tint = Rust); Spacer(Modifier.width(12.dp)); Column(Modifier.weight(1f)) { Text(t("Version ${note.version}", "संस्करण ${note.version}") + if (note.id == versions.first().id) t(" · Latest", " · नया") else t(" · Earlier", " · पुराना"), fontWeight = FontWeight.Bold); Text("${date(note.published)} · ${note.doctor}", style = MaterialTheme.typography.bodySmall) } }
+                        } }
+                    }
+                }
+            }
+        }
     } else LazyColumn(Modifier.fillMaxSize().background(if (doctorPresentation) Color.White else MaterialTheme.colorScheme.background).imePadding().testTag("conversation-list"), state = scroll, contentPadding = if (doctorCapture) PaddingValues(bottom = 20.dp) else PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         if (!doctorCapture) item { Heading(if (clinician) t("Conversation", "बातचीत") else t("Care notes", "देखभाल नोट")) }
         if (doctorPresentation && !doctorCapture && onDoctorBack != null) item { TextButton(onClick = onDoctorBack, enabled = !recordingSaving && recordingSaveError == null && !recording && !dictating && !audienceBusy) { Text(t("Back", "वापस")) } }
@@ -985,7 +1005,7 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
             } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; vm.message.value = t("Couldn't save the copy. Your care note is still here. Try again.", "कॉपी सहेजी नहीं जा सकी। आपका देखभाल नोट यहीं है। फिर कोशिश करें।") }
         }
     }
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
+    SaharaScreenSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         LazyColumn(Modifier.fillMaxWidth().imePadding(), contentPadding = PaddingValues(start = 22.dp, end = 22.dp, bottom = 40.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             item { Heading(if (note.hashScheme == DoctorConversationContext.HASH_SCHEME) t("Conversation notes", "बातचीत के नोट") else t("Goals of care", "देखभाल के लक्ष्य")); Text("${note.personName} · " + t("Version ${note.version}", "संस्करण ${note.version}")); Text(t("Reviewer: ${note.doctor} · ${date(note.published)}", "जाँचने वाले: ${note.doctor} · ${date(note.published)}"), style = MaterialTheme.typography.bodySmall); Text(ReviewWorkflow.label(note, note.id in verifiedReviews), style = MaterialTheme.typography.labelMedium, color = Rust) }
             if(note.hashScheme==DoctorConversationContext.HASH_SCHEME) item { DoctorNoteReaderBody(vm, note) }
@@ -1285,7 +1305,7 @@ private class CareToolRow(val label: String, val icon: ImageVector, val tone: Sa
     val busy by vm.busy.collectAsStateWithLifecycle(); val context = LocalContext.current
     val hindi = careHindi(); val t = careText()
     val headings = mapOf("medicine" to t("Add a medicine", "दवा जोड़ें"), "visit" to t("Add a visit", "मुलाक़ात जोड़ें"), "task" to t("Add a task", "काम जोड़ें"), "checkin" to t("How is today?", "आज कैसा है?"), "journal" to t("Write a note", "नोट लिखें"))
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
+    SaharaScreenSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 16.dp, end = 16.dp, bottom = 32.dp).saharaContentSize(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Heading(if (initial != null && kind != "checkin") when (kind) { "medicine" -> t("Edit medicine", "दवा बदलें"); "visit" -> t("Edit visit", "मुलाक़ात बदलें"); "task" -> t("Edit task", "काम बदलें"); else -> t("Edit note", "नोट बदलें") } else headings[kind] ?: t("Add an entry", "जानकारी जोड़ें"), 28)
             if (kind == "checkin") {

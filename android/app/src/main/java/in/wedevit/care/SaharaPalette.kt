@@ -30,6 +30,14 @@ object SaharaColors {
     val OnBand = Color.White
     val OnBandSub = Color(0xFFF6D5C8)
 
+    // Calm header (7 Nov): the screen's own cream ground, dark ink text, a hairline below. Replaces the maroon band on the top bar;
+    // [Band] stays for the welcome panel. Ink on Ground is above 7:1.
+    val Header = Ground
+    val OnHeader = Ink
+    val OnHeaderSub = InkSub
+    val HeaderRaised = Well
+    val HeaderLine = Line
+
     // Primary: bright terracotta orange-red for buttons, white text (4.85:1, so it is also safe as small text on cream); Pressed is the darker step.
     val Primary = Color(0xFFD2390B)
     val PrimaryPressed = Color(0xFFA82A05)

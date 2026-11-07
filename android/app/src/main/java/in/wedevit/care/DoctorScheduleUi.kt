@@ -161,7 +161,7 @@ private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone
 @Composable private fun PatientPickerSheet(patients: List<DoctorSchedulePatient>, onDismiss: () -> Unit, onPick: (String) -> Unit) { val t = careText()
     var query by remember { mutableStateOf("") }
     val shown = patients.filter { it.name.contains(query.trim(), ignoreCase = true) }
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
+    SaharaScreenSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().imePadding().padding(horizontal = 20.dp).padding(bottom = 20.dp).testTag("doctor-schedule-picker"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(t("Choose a patient", "मरीज़ चुनें"), Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
             OutlinedTextField(query, { query = it.take(80) }, Modifier.fillMaxWidth().testTag("doctor-schedule-search"), singleLine = true, shape = RoundedCornerShape(14.dp),

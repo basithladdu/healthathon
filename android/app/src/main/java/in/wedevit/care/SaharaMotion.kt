@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Brush
@@ -255,12 +256,19 @@ class SaharaStagger(private val enabled: Boolean = SaharaMotion.enabled, private
 /** Each hosted screen gets a fresh stagger, so its cards rise in gently once, when it first opens. */
 val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
 
-/** Gentle first-load appearance: fade in and rise 8 dp, staggered by position. Draw-only, so layout and tests are unaffected. */
+/**
+ * Gentle first-composition appearance: fade in and rise 8 dp, once per item. Staggered by position while the screen is still
+ * opening (first [SaharaMotion.STAGGER_WINDOW_MS]); items composed later (scrolled in, loaded after a fetch) still animate,
+ * without delay. The flag survives rotation and tab switches, so a card never replays. Draw-only; nothing when motion is off.
+ */
 @Composable fun Modifier.saharaAppear(): Modifier {
-    val stagger = LocalSaharaStagger.current ?: return this
-    val delay = remember { stagger.claim() } ?: return this
+    if (!SaharaMotion.enabled) return this
+    val stagger = LocalSaharaStagger.current
+    var played by rememberSaveable { mutableStateOf(false) }
+    if (played) return this
+    val delay = remember { stagger?.claim() ?: 0 }
     val progress = remember { Animatable(0f) }
-    LaunchedEffect(Unit) { progress.animateTo(1f, SaharaMotion.tween(SaharaMotion.LIST_ITEM_MS, delay, LinearOutSlowInEasing)) }
+    LaunchedEffect(Unit) { progress.animateTo(1f, SaharaMotion.tween(SaharaMotion.LIST_ITEM_MS, delay, LinearOutSlowInEasing)); played = true }
     return graphicsLayer { val p = progress.value; alpha = p; translationY = (1f - p) * 8.dp.toPx() }
 }
 

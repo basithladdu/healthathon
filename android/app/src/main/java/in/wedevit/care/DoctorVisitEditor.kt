@@ -61,7 +61,7 @@ fun DoctorVisitEditor(vm: CareModel, personId: String, onDismiss: () -> Unit, in
     LaunchedEffect(selected) { if (selected != personId && !busy) onDismiss() }
     LaunchedEffect(accountMatches, busy) { if (!accountMatches && !busy) onDismiss() }
     val chosen = Instant.ofEpochMilli(startsAt).atZone(ZoneId.systemDefault())
-    ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
+    SaharaScreenSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         DoctorVisitForm(doctor, { doctor = it.take(120) }, location, { location = it.take(160) }, note, { note = it.take(1600) }, chosen.format(DateTimeFormatter.ofPattern("EEE, d MMM yyyy")), chosen.format(DateTimeFormatter.ofPattern("h:mm a")), chosen.zone.id, vm.cloud == null, busy, accountMatches && selected == personId && canEdit, error,
             onDate = { DatePickerDialog(context, { _, year, month, day -> startsAt = java.time.LocalDate.of(year, month + 1, day).atTime(chosen.toLocalTime()).atZone(chosen.zone).toInstant().toEpochMilli() }, chosen.year, chosen.monthValue - 1, chosen.dayOfMonth).show() },
             onTime = { TimePickerDialog(context, { _, hour, minute -> startsAt = chosen.withHour(hour).withMinute(minute).withSecond(0).withNano(0).toInstant().toEpochMilli() }, chosen.hour, chosen.minute, false).show() },

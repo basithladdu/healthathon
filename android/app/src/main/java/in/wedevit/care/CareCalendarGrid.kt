@@ -1,5 +1,15 @@
 package `in`.wedevit.care
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -127,7 +137,7 @@ private const val PAGER_YEARS = 10L
     val first = weekStart(day)
     // One surface for the whole grid: switch, month name, weekdays, days and legend.
     Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
-    Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 12.dp).testTag("calendar-grid"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 12.dp).animateContentSize().testTag("calendar-grid"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
             SegmentedButton(selected = !week, onClick = { onWeek(false) }, shape = SegmentedButtonDefaults.itemShape(0, 2), modifier = Modifier.heightIn(min = 48.dp).testTag("calendar-month-toggle")) { Text(t("Month", "महीना")) }
             SegmentedButton(selected = week, onClick = { onWeek(true) }, shape = SegmentedButtonDefaults.itemShape(1, 2), modifier = Modifier.heightIn(min = 48.dp).testTag("calendar-week-toggle")) { Text(t("Week", "सप्ताह")) }
@@ -135,7 +145,15 @@ private const val PAGER_YEARS = 10L
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = { onDay(if (week) day.minusWeeks(1) else day.minusMonths(1)) }, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.ChevronLeft, if (week) t("Previous week", "पिछला सप्ताह") else t("Previous month", "पिछला महीना"), tint = Rust) }
             val title = if (week) "${first.format(careDateFormat("d MMM", hindi))} – ${first.plusDays(6).format(careDateFormat("d MMM yyyy", hindi))}" else day.format(careDateFormat("MMMM yyyy", hindi))
-            Text(title, Modifier.weight(1f), textAlign = TextAlign.Center, fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 1)
+            // The month (or week) name slides in from the side the user is moving towards.
+            val period = if (week) first else day.withDayOfMonth(1)
+            AnimatedContent(targetState = title to period, modifier = Modifier.weight(1f), label = "calendar-title", transitionSpec = {
+                if (!SaharaMotion.enabled) EnterTransition.None togetherWith ExitTransition.None else {
+                    val forward = targetState.second >= initialState.second
+                    (slideInHorizontally(tween(SaharaMotion.ENTER_MS, easing = SaharaMotion.Emphasized)) { w -> if (forward) w / 2 else -w / 2 } + fadeIn(tween(SaharaMotion.ENTER_MS))) togetherWith
+                        (slideOutHorizontally(tween(SaharaMotion.EXIT_MS)) { w -> if (forward) -w / 2 else w / 2 } + fadeOut(tween(SaharaMotion.EXIT_MS)))
+                }
+            }) { shown -> Text(shown.first, Modifier.fillMaxWidth(), textAlign = TextAlign.Center, fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 1) }
             IconButton(onClick = { onDay(if (week) day.plusWeeks(1) else day.plusMonths(1)) }, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.ChevronRight, if (week) t("Next week", "अगला सप्ताह") else t("Next month", "अगला महीना"), tint = Rust) }
         }
         Row(Modifier.fillMaxWidth()) {

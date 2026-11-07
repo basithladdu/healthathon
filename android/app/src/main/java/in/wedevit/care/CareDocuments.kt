@@ -142,7 +142,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
 
     var addSheet by rememberSaveable { mutableStateOf(false) }
     // Two ways in: photograph a paper report, or pick a file that is already on the phone.
-    if (addSheet) ModalBottomSheet(onDismissRequest = { addSheet = false }, containerColor = Cream) {
+    if (addSheet) SaharaScreenSheet(onDismissRequest = { addSheet = false }, containerColor = Cream) {
         Column(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(t("Add document", "कागज़ जोड़ें"), Modifier.a11yHeading().padding(bottom = 4.dp), fontFamily = SaharaTitleFont, fontSize = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
             AddDocOption(t("Scan with camera", "कैमरे से स्कैन करें"), Icons.Default.PhotoCamera, Peach, Modifier.testTag("document-scan")) { addSheet = false; scanReport() }

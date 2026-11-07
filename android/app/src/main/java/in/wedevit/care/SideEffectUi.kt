@@ -36,7 +36,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
     var stopped by rememberSaveable(medicine.id) { mutableStateOf(false) }
     var problem by remember(medicine.id) { mutableStateOf<String?>(null) }
     val capturedAccount = remember(medicine.id) { vm.accountNamespace }
-    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Cream) {
+    SaharaScreenSheet(onDismissRequest = onDismiss, containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 16.dp, end = 16.dp, bottom = 32.dp).saharaContentSize().testTag("side-effect-sheet"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Heading(t("Side effect?", "कोई दुष्प्रभाव?"), 24)
             // Which medicine, as one pill under the title.
@@ -53,8 +53,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                 CareField(other, { other = it.take(SideEffectRules.MAX_OTHER) }, t("Details (optional)", "विवरण (चाहें तो)"), minLines = 2)
             }
             SideEffectStep(2, t("How bad was it?", "कितना ज़्यादा था?")) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SideEffectRules.severities.keys.forEachIndexed { i, key -> PickChip(severity == key, SideEffectRules.severityLabel(key, hindi), SeverityTints.getOrElse(i) { DoctorAccent }, Modifier.weight(1f).testTag("side-effect-severity-$key")) { severity = key } }
+                FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    SideEffectRules.severities.keys.forEachIndexed { i, key -> PickChip(severity == key, SideEffectRules.severityLabel(key, hindi), SeverityTints.getOrElse(i) { DoctorAccent }, Modifier.testTag("side-effect-severity-$key")) { severity = key } }
                 }
             }
             SideEffectStep(3, t("When?", "कब?")) {
@@ -103,7 +103,7 @@ private val SeverityTints = listOf(ChartBands.Mild, ChartBands.Moderate, ChartBa
 /** A choice chip: strong outline when free, a solid fill with white text and a tick when picked, so it reads as a button. */
 @Composable private fun PickChip(selected: Boolean, label: String, tint: androidx.compose.ui.graphics.Color, modifier: Modifier, onClick: () -> Unit) {
     val ink = readableOn(tint)
-    FilterChip(selected = selected, onClick = onClick, label = { Text(label, fontWeight = FontWeight.SemiBold, maxLines = 2, style = SymptomWords) },
+    FilterChip(selected = selected, onClick = onClick, label = { Text(label, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false, style = SymptomWords) },
         leadingIcon = if (selected) { { Icon(Icons.Default.Check, null, Modifier.size(16.dp)) } } else null, shape = RoundedCornerShape(50),
         border = FilterChipDefaults.filterChipBorder(enabled = true, selected = selected, borderColor = DoctorCardSub.copy(alpha = .5f), selectedBorderColor = tint, borderWidth = 1.5.dp, selectedBorderWidth = 1.5.dp),
         colors = FilterChipDefaults.filterChipColors(containerColor = Paper, labelColor = DoctorCardInk, selectedContainerColor = tint, selectedLabelColor = ink, selectedLeadingIconColor = ink),

@@ -211,9 +211,8 @@ else CameraUpdateFactory.newLatLngBounds(LatLngBounds.Builder().includes(centres
 
 /** The person and the closest few centres in view, so the first screen answers "what is near me". */
 private fun centreMapAround(user: Pair<Double, Double>, centres: List<Centre>): org.maplibre.android.camera.CameraUpdate {
-    val near = NearbyHelp.nearest(centres, user.first, user.second)
-    if (near.isEmpty()) return CameraUpdateFactory.newLatLngZoom(LatLng(user.first, user.second), 11.0)
-    return CameraUpdateFactory.newLatLngBounds(LatLngBounds.Builder().includes(near.map { LatLng(it.latitude!!, it.longitude!!) } + LatLng(user.first, user.second)).build(), 64)
+    // The person sits dead centre (framing them with the nearest centres pushed them off to one side); the list shows distances.
+    return CameraUpdateFactory.newLatLngZoom(LatLng(user.first, user.second), 12.0)
 }
 
 private fun centreMapMe(user: Pair<Double, Double>?): FeatureCollection =

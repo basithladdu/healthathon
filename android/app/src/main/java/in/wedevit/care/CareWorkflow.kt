@@ -2,7 +2,6 @@
 package `in`.wedevit.care
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -169,6 +168,7 @@ object CareLabRules {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable fun CareWorkflows(vm: CareModel, onTalk: () -> Unit = {}) { val t = careText();
     val entries by vm.items.collectAsStateWithLifecycle()
     val person by vm.selected.collectAsStateWithLifecycle()
@@ -187,11 +187,10 @@ object CareLabRules {
             Button(onClick = { adding = "conversation" }, modifier = Modifier.weight(1f).heightIn(min = 48.dp), shape = RoundedCornerShape(14.dp)) { Icon(Icons.Default.Forum, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Ask to talk", "बात करने को कहें"), fontWeight = FontWeight.SemiBold) }
             OutlinedButton(onClick = { adding = "task" }, modifier = Modifier.weight(1f).heightIn(min = 48.dp), shape = RoundedCornerShape(14.dp)) { Icon(Icons.Default.AddTask, null, Modifier.size(18.dp), tint = RustText); Spacer(Modifier.width(8.dp)); Text(t("Add task", "काम जोड़ें"), color = RustText) }
         } }
-        // Filters and "include finished" share one scrolling row of pills.
-        item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-            listOf("All", "Conversations", "Tasks").forEach { label -> FilterChip(filter == label, { filter = label }, label = { Text(when (label) { "Conversations" -> t("Conversations", "बातचीत"); "Tasks" -> t("Tasks", "काम"); else -> t("All", "सभी") }) }, shape = RoundedCornerShape(50), colors = workflowChipColors(), modifier = Modifier.heightIn(min = 48.dp)) }
-            Box(Modifier.height(24.dp).width(1.dp).background(DoctorHairline))
-            FilterChip(showFinished, { showFinished = !showFinished }, label = { Text(t("Include finished", "पूरे हुए भी दिखाएँ")) }, leadingIcon = { Icon(Icons.Default.CheckCircleOutline, null, Modifier.size(18.dp)) }, shape = RoundedCornerShape(50), colors = workflowChipColors(), modifier = Modifier.heightIn(min = 48.dp))
+        // Filters and "include finished" wrap onto a second line instead of scrolling sideways.
+        item { FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            listOf("All", "Conversations", "Tasks").forEach { label -> FilterChip(filter == label, { filter = label }, label = { Text(when (label) { "Conversations" -> t("Conversations", "बातचीत"); "Tasks" -> t("Tasks", "काम"); else -> t("All", "सभी") }, maxLines = 1, softWrap = false) }, shape = RoundedCornerShape(50), colors = workflowChipColors(), modifier = Modifier.heightIn(min = 48.dp)) }
+            FilterChip(showFinished, { showFinished = !showFinished }, label = { Text(t("Include finished", "पूरे हुए भी दिखाएँ"), maxLines = 1, softWrap = false) }, leadingIcon = { Icon(Icons.Default.CheckCircleOutline, null, Modifier.size(18.dp)) }, shape = RoundedCornerShape(50), colors = workflowChipColors(), modifier = Modifier.heightIn(min = 48.dp))
         } }
         // Empty state: icon, one line, one action.
         if (visible.isEmpty()) item { SurfaceCard { Column(Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -266,6 +265,7 @@ object CareLabRules {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable private fun CareWorkflowEditor(vm: CareModel, type: String, initial: CareItem? = null, existing: CareEntry? = null, onDismiss: () -> Unit) { val t = careText();
     val person by vm.selected.collectAsStateWithLifecycle()
     val busy by vm.busy.collectAsStateWithLifecycle()
@@ -282,14 +282,14 @@ object CareLabRules {
     var error by remember { mutableStateOf("") }
     LaunchedEffect(entryId) { vm.actionError.value = null }
     LaunchedEffect(person) { if (person != capturedPerson) onDismiss() }
-    ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
+    SaharaScreenSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         val fieldShape = RoundedCornerShape(14.dp)
         val fieldColors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper, focusedBorderColor = Rust, focusedLabelColor = RustText, cursorColor = Rust)
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 16.dp, end = 16.dp, bottom = 32.dp).testTag("workflow-editor"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Heading(if (initial != null) (if (type == "conversation") t("Edit request", "अनुरोध बदलें") else t("Edit task", "काम बदलें")) else if (type == "conversation") t("Ask to talk", "बात करने को कहें") else t("Ask for help", "मदद माँगें"), 26)
             OutlinedTextField(title, { title = it; error = "" }, label = { Text(if (type == "conversation") t("What would you like to discuss?", "आप किस बारे में बात करना चाहते हैं?") else t("What needs doing?", "क्या करना है?")) }, shape = fieldShape, colors = fieldColors, modifier = Modifier.fillMaxWidth(), maxLines = 3)
-            if (title.isEmpty()) Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                (if (type == "conversation") listOf(t("Goals of care", "देखभाल के लक्ष्य"), t("Comfort and symptoms", "आराम और लक्षण"), t("Care at home", "घर पर देखभाल")) else listOf(t("Collect medicines", "दवाएँ लाना"), t("Arrange transport", "आने-जाने का इंतज़ाम"), t("Bring reports", "रिपोर्टें साथ लाना"))).forEach { suggestion -> SuggestionChip(onClick = { title = suggestion }, label = { Text(suggestion) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp)) }
+            if (title.isEmpty()) FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                (if (type == "conversation") listOf(t("Goals of care", "देखभाल के लक्ष्य"), t("Comfort and symptoms", "आराम और लक्षण"), t("Care at home", "घर पर देखभाल")) else listOf(t("Collect medicines", "दवाएँ लाना"), t("Arrange transport", "आने-जाने का इंतज़ाम"), t("Bring reports", "रिपोर्टें साथ लाना"))).forEach { suggestion -> SuggestionChip(onClick = { title = suggestion }, label = { Text(suggestion, maxLines = 1, softWrap = false) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp)) }
             }
             OutlinedTextField(recipient, { recipient = it; error = "" }, label = { Text(if (type == "conversation") t("Doctor or care team", "डॉक्टर या देखभाल टीम") else t("Who is this for?", "यह किसके लिए है?")) }, shape = fieldShape, colors = fieldColors, modifier = Modifier.fillMaxWidth(), singleLine = true)
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {

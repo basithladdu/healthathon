@@ -57,7 +57,7 @@ object TreatmentDayRules {
     val t = careText()
     LaunchedEffect(entryId) { vm.actionError.value = null }
     LaunchedEffect(selected) { if (selected != captured) onDismiss() }
-    ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
+    SaharaScreenSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 16.dp, end = 16.dp, bottom = 24.dp).testTag("treatment-day-editor"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             // One title; what a treatment day does sits behind the "i" button.
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {

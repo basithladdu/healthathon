@@ -135,7 +135,7 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
     var email by rememberSaveable { mutableStateOf("") };var password by remember { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) };var error by remember { mutableStateOf<String?>(null) }
     val t = careText()
-    ModalBottomSheet(onDismissRequest={if(!busy)onDismiss()},sheetState=rememberModalBottomSheetState(skipPartiallyExpanded=true),containerColor=Cream) {
+    SaharaScreenSheet(onDismissRequest={if(!busy)onDismiss()},sheetState=rememberModalBottomSheetState(skipPartiallyExpanded=true),containerColor=Cream) {
         Column(Modifier.fillMaxWidth().imePadding().verticalScroll(rememberScrollState()).padding(22.dp),verticalArrangement=Arrangement.spacedBy(16.dp)) {
             Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) { CareLanguageMenu() }
             Heading(t("Sign in", "साइन इन करें"),26)
@@ -166,7 +166,7 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
             }) { padding -> Box(Modifier.padding(padding).padding(top = 8.dp)) { AccountContent(cloud, vm, onDismiss, heading = "", onBusyChange = { busy = it }, banner = banner, onInvite = onInvite, onDeleted = onDeleted) } }
         }
     }
-    else ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
+    else SaharaScreenSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         // The sheet covers the app header, so the language dropdown comes along to the sign-in form.
         Box(Modifier.fillMaxWidth().padding(horizontal = 12.dp), contentAlignment = Alignment.CenterEnd) { CareLanguageMenu() }
         AccountContent(cloud, vm, onDismiss, onBusyChange = { busy = it }, banner = banner, onInvite = onInvite, onDeleted = onDeleted)
@@ -361,7 +361,7 @@ private fun clipboardText(context: android.content.Context): String? = (context.
     // Results and errors come as a short dialog, signed in or out, so they are never missed below the fold or the keyboard.
     error?.let { SaharaDialog(it, onDismiss = { error = null }, tone = SaharaTone.Error) }
     if (error == null) notice?.let { SaharaDialog(it, onDismiss = { notice = null }, tone = if (session == null) SaharaTone.Info else SaharaTone.Success) }
-    if (inviteDoctor && session != null && owner && selected.isNotBlank()) ModalBottomSheet(onDismissRequest = { if (!busy) { inviteDoctor = false; invite = "" } }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
+    if (inviteDoctor && session != null && owner && selected.isNotBlank()) SaharaScreenSheet(onDismissRequest = { if (!busy) { inviteDoctor = false; invite = "" } }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         // Invite a doctor: what they may see and for how long, then one button; the link to share replaces the button when it is made.
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 24.dp).saharaScreenEnter().testTag("account-doctor-sheet"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {

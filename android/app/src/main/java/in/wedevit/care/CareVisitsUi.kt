@@ -1,6 +1,8 @@
 @file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 package `in`.wedevit.care
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -214,7 +216,7 @@ private fun visitStatusTone(status: String): SaharaTone = if (status == "complet
     var editing by remember { mutableStateOf(false) }; var removing by remember { mutableStateOf(false) }
     val whenText = if (visit.due <= 0) t("Date not recorded", "तारीख़ दर्ज नहीं") else Instant.ofEpochMilli(visit.due).atZone(ZoneId.systemDefault())
         .format(if (info.timed) careDateFormat("EEE, d MMM yyyy · h:mm a", hindi) else careDateFormat("EEE, d MMM yyyy", hindi))
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
+    SaharaScreenSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 20.dp, end = 20.dp, bottom = 28.dp).testTag("care-visit-day"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Surface(shape = RoundedCornerShape(20.dp), color = tone.wash, border = BorderStroke(1.5.dp, tone.solid), modifier = Modifier.fillMaxWidth()) {
                 Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -300,7 +302,7 @@ private fun visitStatusTone(status: String): SaharaTone = if (status == "complet
     val detail = item.detail.takeIf { !CareEntryCodec.isStructured(it) }?.trim().orEmpty()
     Surface(onClick = { if (detail.isNotBlank()) expanded = !expanded }, shape = RoundedCornerShape(16.dp), color = if (done) SaharaSection.ToDo.wash else Paper, border = BorderStroke(1.5.dp, SaharaSection.ToDo.solid),
         modifier = Modifier.fillMaxWidth().saharaAppear().heightIn(min = 56.dp).testTag("care-task-${item.id}")) {
-        Column(Modifier.padding(end = 4.dp)) {
+        Column(Modifier.padding(end = 4.dp).animateContentSize()) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(checked = done, onCheckedChange = { if (!busy && canEditCareContext(vm, item.personId, capturedAccount)) vm.toggle(item) }, enabled = canEdit,
                     modifier = Modifier.semantics { contentDescription = "${t("Done", "हो गया")}: ${item.title}" })
@@ -315,7 +317,7 @@ private fun visitStatusTone(status: String): SaharaTone = if (status == "complet
                     }
                 } else Spacer(Modifier.width(8.dp))
             }
-            if (expanded && detail.isNotBlank()) Text(detail, Modifier.padding(start = 48.dp, end = 12.dp, bottom = 10.dp), fontSize = 14.sp, color = DoctorCardSub)
+            AnimatedVisibility(expanded && detail.isNotBlank()) { Text(detail, Modifier.padding(start = 48.dp, end = 12.dp, bottom = 10.dp), fontSize = 14.sp, color = DoctorCardSub) }
         }
     }
     if (removing) AlertDialog(onDismissRequest = { removing = false }, title = { Text(t("Remove this entry?", "यह जानकारी हटाएँ?")) }, text = { Text(item.title) },

@@ -214,8 +214,9 @@ private val DoctorMist = Peach
         return
     }
     Scaffold(containerColor = DoctorBackground, topBar = {
-        // The header band: dark maroon-brown with white title and icons, as on the family side.
-        Surface(color = SaharaColors.Band, contentColor = SaharaColors.OnBand) { Column(Modifier.statusBarsPadding()) {
+        // The calm header: cream ground, ink title and icons, a hairline below (as on the family side).
+        SaharaStatusBarIcons(lightIcons = false)
+        Surface(color = SaharaColors.Header, contentColor = SaharaColors.OnHeader) { Column(Modifier.statusBarsPadding()) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 if(sampleCareOpen) IconButton(onClick={sampleCareBack?.invoke() ?: run {sampleCareOpen=false}},enabled=!careNavigationBlocked){Icon(Icons.AutoMirrored.Filled.ArrowBack,t("Back to patient care", "मरीज़ की देखभाल पर वापस"))}
                 else if (carePersonId != null) IconButton(onClick = { if (careNestedBack != null) careNestedBack?.invoke() else navigateCare { if (careSection == "Hub") carePersonId = null else careSection = "Hub" } }, enabled = !careNavigationBlocked) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back to patient care", "मरीज़ की देखभाल पर वापस")) }
@@ -228,6 +229,7 @@ private val DoctorMist = Peach
                 Spacer(Modifier.width(10.dp))
                 if (!sampleCareOpen && patient == null && carePersonId == null) DoctorAvatar("Meera", 34)
             }
+            HorizontalDivider(color = SaharaColors.HeaderLine)
         } }
     }, bottomBar = {
         NavigationBar(Modifier.saharaNavIndicator(if (sampleCareOpen || patientId != null || carePersonId != null) 1 else tab, 4, gap = 8.dp), containerColor = Paper, tonalElevation = 0.dp) {
@@ -313,7 +315,7 @@ private val DoctorMist = Peach
     }
     val latestCareBusy by rememberUpdatedState(careBusy)
     val addCareSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true, confirmValueChange = { !latestCareBusy })
-    if (addingCarePerson && careModel != null && careModel.cloud == null) ModalBottomSheet(onDismissRequest = { if (!careBusy) addingCarePerson = false }, sheetState = addCareSheetState, containerColor = Cream) {
+    if (addingCarePerson && careModel != null && careModel.cloud == null) SaharaScreenSheet(onDismissRequest = { if (!careBusy) addingCarePerson = false }, sheetState = addCareSheetState, containerColor = Cream) {
         AddPersonContent(busy = careBusy, error = careError, onDismiss = { if (!careBusy) addingCarePerson = false }, onSave = { name ->
             if (!careBusy) careModel.addPerson(name) { addingCarePerson = false; pendingCreatedProfileId = careModel.selected.value }
         })
@@ -531,7 +533,7 @@ private val DoctorMist = Peach
     var note by rememberSaveable { mutableStateOf(existing?.note.orEmpty()) }
     var error by rememberSaveable { mutableStateOf<String?>(null) }
     var patientMenuOpen by remember { mutableStateOf(false) }
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = DoctorBackground) {
+    SaharaScreenSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = DoctorBackground) {
         Column(Modifier.fillMaxWidth().imePadding().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Box(Modifier.size(48.dp).background(Peach, RoundedCornerShape(16.dp)), contentAlignment = Alignment.Center) { Icon(Icons.Default.EventAvailable, null, tint = Rust) }

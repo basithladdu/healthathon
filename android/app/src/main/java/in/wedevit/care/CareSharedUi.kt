@@ -129,7 +129,7 @@ internal fun clinicianResubmitNeedsWarning(status: String?) = status == "approve
     else Scaffold(containerColor = Cream, topBar = { TopAppBar(title = { Text(t("Clinical review", "क्लिनिकल समीक्षा")) }, navigationIcon = { IconButton(onClick = onClose, enabled = !busy) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) } }, actions = { CareLanguageMenu(compact = true) }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Cream)) }, content = content)
     reading?.let { draft ->
         var confirmed by remember(draft.id, draft.revision) { mutableStateOf(false) }
-        ModalBottomSheet(onDismissRequest = { if (!busy) reading = null }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
+        SaharaScreenSheet(onDismissRequest = { if (!busy) reading = null }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
             LazyColumn(Modifier.imePadding().fillMaxWidth(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 item { Heading(t("Review conversation", "बातचीत की समीक्षा"), 26) }
                 item { SurfaceCard(Gold) { Text(t("Original words", "मूल शब्द"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont); SelectionContainerText(draft.conversation.source) } }

@@ -5153,3 +5153,19 @@ Which night's dose?	ಯಾವ ರಾತ್ರಿಯ ಡೋಸ್?
 It is past midnight. Is this last night's $time dose, given late, or tonight's?	ಮಧ್ಯರಾತ್ರಿ ದಾಟಿದೆ. ಇದು ತಡವಾಗಿ ಕೊಟ್ಟ ನಿನ್ನೆ ರಾತ್ರಿಯ $time ಡೋಸ್ ಆ, ಅಥವಾ ಇಂದು ರಾತ್ರಿಯದಾ?
 Last night's	ನಿನ್ನೆ ರಾತ್ರಿಯದು
 Tonight's	ಇಂದು ರಾತ್ರಿಯದು
+Slide to change	ಬದಲಿಸಲು ಸರಿಸಿ
+Slide to rate	ರೇಟ್ ಮಾಡಲು ಸರಿಸಿ
+rate 0–10	0–10 ರೇಟ್ ಮಾಡಿ
+Rate pain 0–10 *	ನೋವನ್ನು 0–10 ರೇಟ್ ಮಾಡಿ *
+Rate pain 0–10	ನೋವನ್ನು 0–10 ರೇಟ್ ಮಾಡಿ
+Rate 0–10	0–10 ರೇಟ್ ಮಾಡಿ
+Day *	ದಿನ *
+Time *	ಸಮಯ *
+Doctor or hospital (optional)	ವೈದ್ಯರು ಅಥವಾ ಆಸ್ಪತ್ರೆ (ಐಚ್ಛಿಕ)
+Place or note (optional)	ಸ್ಥಳ ಅಥವಾ ಟಿಪ್ಪಣಿ (ಐಚ್ಛಿಕ)
+Doctor visit	ವೈದ್ಯರ ಭೇಟಿ
+Skip rating	ರೇಟಿಂಗ್ ಬಿಡಿ
+Add a few words (optional)	ಕೆಲವು ಮಾತು ಸೇರಿಸಿ (ಐಚ್ಛಿಕ)
+Fewer details	ಕಡಿಮೆ ವಿವರ
+Medicine name *	ಔಷಧದ ಹೆಸರು *
+Region	ಪ್ರದೇಶ

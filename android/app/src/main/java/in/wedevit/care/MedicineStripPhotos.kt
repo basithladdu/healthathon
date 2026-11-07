@@ -27,6 +27,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PhotoLibrary
@@ -235,12 +237,12 @@ class MedicineStripPhotos(context: Context, storage: String) {
     var other by remember { mutableStateOf(times.filter { it !in MedicineDoseRules.commonTimes }.joinToString(", ")) }
     var error by remember { mutableStateOf(false) }
     Text(t("Dose times", "दवा का समय"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         MedicineDoseRules.commonTimes.forEach { time ->
             val slot = MedicineDoseRules.slot(time); val on = time in times
             // Time chip: the clock time in bold, the part of day beside it; a tick once chosen.
             FilterChip(selected = on, enabled = enabled, onClick = { onChange(if (on) times - time else (times + time).sorted()) },
-                label = { Text("${careTr(hindi, slot.english, slot.hindi)} $time", fontSize = 15.sp, fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal) },
+                label = { Text("${careTr(hindi, slot.english, slot.hindi)} $time", fontSize = 15.sp, maxLines = 1, softWrap = false, fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal) },
                 leadingIcon = if (on) { { Icon(Icons.Default.Check, null, Modifier.size(18.dp)) } } else null, shape = RoundedCornerShape(50),
                 colors = FilterChipDefaults.filterChipColors(containerColor = Paper, labelColor = DoctorCardInk, selectedContainerColor = DoctorStatusGoodBg, selectedLabelColor = DoctorCardInk, selectedLeadingIconColor = DoctorStatusGood),
                 modifier = Modifier.heightIn(min = 48.dp).testTag("dose-time-$time"))
@@ -259,35 +261,46 @@ class MedicineStripPhotos(context: Context, storage: String) {
         supporting = if (error) t("Use HH:mm, such as 08:30.", "HH:mm लिखें, जैसे 08:30।") else null)
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 /** The hand-entered parts of a medicine, each label with an example. Nothing here is ever filled from a photo except via [MedicinePhotoFields]. */
 @Composable fun MedicineEntryForm(name: String, onName: (String) -> Unit, detail: String, onDetail: (String) -> Unit, storage: String, personId: String, itemId: String, busy: Boolean) {
     val t = careText(); val hindi = careHindi()
     val entry = MedicineEntryText.parse(detail) ?: MedicineEntry()
     fun change(next: MedicineEntry) = onDetail(MedicineEntryText.detail(next))
-    StripPhotoRow(storage, personId, itemId, enabled = !busy) { reading ->
-        if (name.isBlank() && reading.name.isNotBlank()) onName(reading.name.take(200))
-        val filled = entry.copy(strength = entry.strength.ifBlank { reading.strength }, form = entry.form.ifBlank { reading.form })
-        if (filled != entry) change(filled)
-    }
-    CareField(name, onName, t("Medicine name", "दवा का नाम"), singleLine = true, placeholder = t("e.g. Paracetamol", "जैसे Paracetamol"))
+    // A brand-new medicine starts as a tablet at 08:00 (both visible and easy to change). An existing or restored one is never touched.
+    LaunchedEffect(itemId) { if (detail.isBlank() && name.isBlank()) change(MedicineEntry(form = "Tablet", times = listOf(MedicineDoseRules.commonTimes.first()))) }
+    CareField(name, onName, t("Medicine name *", "दवा का नाम *"), singleLine = true, placeholder = t("e.g. Paracetamol", "जैसे Paracetamol"))
     MedicineNameSuggestions(name, enabled = !busy) { onName(it) }
-    CareField(entry.strength, { change(entry.copy(strength = it.take(80))) }, t("Strength", "ताक़त"), singleLine = true, placeholder = t("e.g. 500 mg, 5 mg/5 ml", "जैसे 500 mg, 5 mg/5 ml"))
     Text(t("Form", "रूप"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         MedicinePhotoFields.forms.forEach { (english, hindiName) ->
             FilterChip(selected = entry.form.equals(english, true), enabled = !busy, onClick = { change(entry.copy(form = if (entry.form.equals(english, true)) "" else english)) },
-                label = { Text(careTr(hindi, english, hindiName), fontSize = 15.sp) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp))
+                label = { Text(careTr(hindi, english, hindiName), fontSize = 15.sp, maxLines = 1, softWrap = false) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp))
         }
     }
-    // What the strip shows comes first (the photo above can fill it); how to take it is always typed by hand.
+    // What the strip shows can be filled from a photo (under More details); how to take it is always typed by hand.
     Text(t("How to take it", "कैसे लेनी है"), Modifier.padding(top = 8.dp).a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
     CareField(entry.howMuch, { change(entry.copy(howMuch = it.take(80))) }, t("How much each time", "हर बार कितनी"), singleLine = true, placeholder = t("e.g. 1 tablet, 1½ tablets, 5 ml", "जैसे 1 गोली, 1½ गोली, 5 ml"))
-    CareField(entry.howOften, { change(entry.copy(howOften = it.take(120))) }, t("How often", "कितनी बार"), singleLine = true, placeholder = t("e.g. twice a day, only when needed", "जैसे दिन में दो बार, ज़रूरत होने पर ही"))
     DoseTimesField(entry.times, { change(entry.copy(times = it)) }, enabled = !busy)
+    // Everything else is optional and waits behind one button; it opens by itself when something in it is already filled.
+    var more by rememberSaveable(itemId) { mutableStateOf(entry.strength.isNotBlank() || entry.howOften.isNotBlank() || entry.food != MedicineMealTiming.NOT_STATED || entry.days != null || entry.directions.isNotBlank()) }
+    Column(Modifier.fillMaxWidth().saharaContentSize(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        TextButton(onClick = { more = !more }, modifier = Modifier.heightIn(min = 48.dp).testTag("medicine-more-details")) {
+            Text(if (more) t("Fewer details", "कम जानकारी") else t("More details", "और जानकारी"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = SaharaSection.Medicines.ink)
+            Spacer(Modifier.width(4.dp)); Icon(if (more) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, Modifier.size(20.dp), tint = SaharaSection.Medicines.ink)
+        }
+        if (more) {
+            StripPhotoRow(storage, personId, itemId, enabled = !busy) { reading ->
+                if (name.isBlank() && reading.name.isNotBlank()) onName(reading.name.take(200))
+                val filled = entry.copy(strength = entry.strength.ifBlank { reading.strength }, form = entry.form.ifBlank { reading.form })
+                if (filled != entry) change(filled)
+            }
+            CareField(entry.strength, { change(entry.copy(strength = it.take(80))) }, t("Strength", "ताक़त"), singleLine = true, placeholder = t("e.g. 500 mg, 5 mg/5 ml", "जैसे 500 mg, 5 mg/5 ml"))
+    CareField(entry.howOften, { change(entry.copy(howOften = it.take(120))) }, t("How often", "कितनी बार"), singleLine = true, placeholder = t("e.g. twice a day, only when needed", "जैसे दिन में दो बार, ज़रूरत होने पर ही"))
     Text(t("Food", "खाना"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         listOf(MedicineMealTiming.BEFORE_FOOD to ("Before food" to "खाने से पहले"), MedicineMealTiming.WITH_FOOD to ("With food" to "खाने के साथ"), MedicineMealTiming.AFTER_FOOD to ("After food" to "खाने के बाद")).forEach { (timing, label) ->
-            FilterChip(selected = entry.food == timing, enabled = !busy, onClick = { change(entry.copy(food = if (entry.food == timing) MedicineMealTiming.NOT_STATED else timing)) }, label = { Text(t(label.first, label.second), fontSize = 15.sp) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp))
+            FilterChip(selected = entry.food == timing, enabled = !busy, onClick = { change(entry.copy(food = if (entry.food == timing) MedicineMealTiming.NOT_STATED else timing)) }, label = { Text(t(label.first, label.second), fontSize = 15.sp, maxLines = 1, softWrap = false) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp))
         }
     }
     // Days and directions are often left empty: each waits behind a "+ Add" chip unless it already holds something.
@@ -300,6 +313,8 @@ class MedicineStripPhotos(context: Context, storage: String) {
         (t("Add number of days", "कितने दिन, यह जोड़ें") to { showDays = true }).takeIf { !showDays && entry.days == null },
         (t("Add directions", "तरीक़ा जोड़ें") to { showDirections = true }).takeIf { !showDirections && entry.directions.isBlank() },
     ), Modifier.testTag("medicine-add-more"), tone = SaharaTone.Plum)
+        }
+    }
 }
 
 /**

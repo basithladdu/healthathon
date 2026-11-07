@@ -236,7 +236,7 @@ internal fun doctorLabRange(data: CareEntry): Pair<Double?, Double?> {
             Icon(Icons.Outlined.GridView, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Sections", "हिस्से"), fontWeight = FontWeight.SemiBold, softWrap = false)
         }
     }
-    if (open) ModalBottomSheet(onDismissRequest = { open = false }, containerColor = Cream) {
+    if (open) SaharaScreenSheet(onDismissRequest = { open = false }, containerColor = Cream) {
         Column(Modifier.fillMaxWidth().navigationBarsPadding().padding(start = 16.dp, end = 16.dp, bottom = 16.dp).testTag("doctor-sections-sheet"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(t("Sections", "हिस्से"), Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 22.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
             Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {

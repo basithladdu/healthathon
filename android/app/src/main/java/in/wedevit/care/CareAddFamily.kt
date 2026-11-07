@@ -84,7 +84,7 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
     }
     val focus = remember { FocusRequester() }
     val canSend = !busy && name.isNotBlank()
-    ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
+    SaharaScreenSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().imePadding().padding(horizontal = 16.dp).padding(bottom = 16.dp).saharaScreenEnter().testTag("invite-family-sheet")) {
             // Title row: the section chip, the task and close. Nothing above the form.
             Row(verticalAlignment = Alignment.CenterVertically) {

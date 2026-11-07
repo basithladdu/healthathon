@@ -126,12 +126,16 @@ internal val SymptomWords = TextStyle(lineBreak = LineBreak.Paragraph, hyphens =
     val fill by animateColorAsState(if (selected) lerp(Paper, c, .12f) else Paper, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "tile fill")
     Column(modifier.heightIn(min = 64.dp).saharaPressBounce().testTag(tag).clip(shape).background(fill, shape).border(if (selected) 2.dp else 1.dp, ring, shape)
         .then(if (role == Role.RadioButton) Modifier.selectable(selected, interaction, ripple(), role = role, onClick = onClick) else Modifier.clickable(interaction, ripple(), role = role, onClick = onClick))) {
-        Row(Modifier.weight(1f).fillMaxWidth().padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            SymptomIconChip(key)
-            Text(label, Modifier.weight(1f), color = DoctorCardInk, fontSize = 16.sp, lineHeight = 20.sp, fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold, style = SymptomWords)
-            AnimatedVisibility(selected, enter = scaleIn(SaharaMotion.tween(SaharaMotion.SELECT_MS)) + fadeIn(SaharaMotion.tween(SaharaMotion.SELECT_MS)), exit = fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS))) {
-                Box(Modifier.size(24.dp).background(c, CircleShape), contentAlignment = Alignment.Center) { Icon(Icons.Default.Check, null, Modifier.size(16.dp), tint = readableOn(c)) }
+        // Icon above the name, so a long word such as "Breathlessness" gets the whole tile width and never breaks mid-word.
+        Column(Modifier.weight(1f).fillMaxWidth().padding(start = 12.dp, end = 12.dp, top = 10.dp, bottom = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                SymptomIconChip(key)
+                Spacer(Modifier.weight(1f))
+                AnimatedVisibility(selected, enter = scaleIn(SaharaMotion.tween(SaharaMotion.SELECT_MS)) + fadeIn(SaharaMotion.tween(SaharaMotion.SELECT_MS)), exit = fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS))) {
+                    Box(Modifier.size(24.dp).background(c, CircleShape), contentAlignment = Alignment.Center) { Icon(Icons.Default.Check, null, Modifier.size(16.dp), tint = readableOn(c)) }
+                }
             }
+            Text(label, Modifier.fillMaxWidth(), color = DoctorCardInk, fontSize = 16.sp, lineHeight = 20.sp, fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold, style = SymptomWords)
         }
         Box(Modifier.fillMaxWidth().height(5.dp).background(c))
     }

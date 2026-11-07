@@ -1,10 +1,11 @@
-@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 package `in`.wedevit.care
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -26,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -84,7 +86,7 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
             Box(Modifier.weight(1f)) { CareDateButton(careEpoch(day), "", { dayString = careDay(it).toString() }) }
             if (day != LocalDate.now()) TextButton(onClick = { dayString = LocalDate.now().toString() }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Back to today", "आज पर वापस")) }
         } }
-        item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("All", "Medicine", "Visit", "Test", "Follow-up", "Procedure", "Chemotherapy", "Radiotherapy", "Task", "Conversation").forEach { category -> FilterChip(filter == category, { filter = category }, label = { Text(if (category in TreatmentDayRules.categories) TreatmentDayRules.label(category) else careCategoryLabel(category, hindi)) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp), leadingIcon = if (filter == category) { { Icon(Icons.Default.Check, null, Modifier.size(16.dp)) } } else null) } } }
+        item { FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { listOf("All", "Medicine", "Visit", "Test", "Follow-up", "Procedure", "Chemotherapy", "Radiotherapy", "Task", "Conversation").forEach { category -> FilterChip(filter == category, { filter = category }, label = { Text(if (category in TreatmentDayRules.categories) TreatmentDayRules.label(category) else careCategoryLabel(category, hindi), maxLines = 1, softWrap = false) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp), leadingIcon = if (filter == category) { { Icon(Icons.Default.Check, null, Modifier.size(16.dp)) } } else null) } } }
         if (visible.isEmpty()) item { SurfaceCard {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Surface(shape = androidx.compose.foundation.shape.CircleShape, color = SaharaSoftBlue) { Icon(Icons.Default.EventAvailable, null, Modifier.padding(8.dp).size(20.dp), tint = DoctorAccent) }
@@ -156,37 +158,44 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
     var title by rememberSaveable { mutableStateOf(initial?.title.orEmpty()) }
     var detail by rememberSaveable { mutableStateOf(existing?.detail ?: initial?.detail.orEmpty()) }
     var location by rememberSaveable { mutableStateOf(existing?.location.orEmpty()) }
-    var due by rememberSaveable { mutableLongStateOf(initial?.due?.takeIf { it > 0 } ?: defaultDate) }
-    var timed by rememberSaveable { mutableStateOf(existing?.timed ?: false) }
+    // A new entry opens on the tapped day (or today) at the current time, so nothing has to be typed for when.
+    var due by rememberSaveable { mutableLongStateOf(initial?.due?.takeIf { it > 0 } ?: (if (defaultDate > 0) careDay(defaultDate) else LocalDate.now()).atTime(LocalTime.now().withSecond(0).withNano(0)).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()) }
+    var timed by rememberSaveable { mutableStateOf(existing?.timed ?: (initial == null)) }
     var error by remember { mutableStateOf("") }
     var remove by remember { mutableStateOf(false) }
     var extra by rememberSaveable { mutableStateOf(detail.isNotBlank() || location.isNotBlank()) }
     LaunchedEffect(entryId) { vm.actionError.value = null }
     LaunchedEffect(selected) { if (selected != capturedPerson) onDismiss() }
-    ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
-        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 16.dp, end = 16.dp, bottom = 32.dp).testTag("schedule-editor"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    SaharaScreenSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
+        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 16.dp, end = 16.dp, bottom = 32.dp).animateContentSize().testTag("schedule-editor"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Heading(if (initial == null) t("Plan care", "देखभाल की योजना") else t("Edit ${category.lowercase()}", "${careCategoryLabel(category, true)} बदलें"), 26)
-            if (!legacy) Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) { (listOf("Visit", "Test", "Follow-up", "Procedure") + TreatmentDayRules.categories).forEach { choice -> FilterChip(category == choice, { category = choice }, label = { Text(if (choice in TreatmentDayRules.categories) TreatmentDayRules.label(choice) else careCategoryLabel(choice, hindi)) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp), leadingIcon = if (category == choice) { { Icon(Icons.Default.Check, null, Modifier.size(16.dp)) } } else null) } }
-            OutlinedTextField(title, { title = it; error = "" }, label = { Text(if (category == "Medicine") t("Medicine", "दवा") else t("What is planned?", "क्या तय है?")) }, modifier = Modifier.fillMaxWidth(), maxLines = 2, shape = RoundedCornerShape(14.dp))
-            CareDateButton(due, t("Date", "तारीख़"), { due = it; timed = false })
+            if (!legacy) FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { (listOf("Visit", "Test", "Follow-up", "Procedure") + TreatmentDayRules.categories).forEach { choice -> FilterChip(category == choice, { category = choice }, label = { Text(if (choice in TreatmentDayRules.categories) TreatmentDayRules.label(choice) else careCategoryLabel(choice, hindi), maxLines = 1, softWrap = false) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp), leadingIcon = if (category == choice) { { Icon(Icons.Default.Check, null, Modifier.size(16.dp)) } } else null) } }
+            OutlinedTextField(title, { title = it; error = "" }, label = { Text((if (category == "Medicine") t("Medicine", "दवा") else t("What is planned?", "क्या तय है?")) + " *") }, modifier = Modifier.fillMaxWidth(), maxLines = 2, shape = RoundedCornerShape(14.dp))
+            CareDateButton(due, t("Date", "तारीख़") + " *", { picked ->
+                val tm = if (timed) Instant.ofEpochMilli(due).atZone(ZoneId.systemDefault()).toLocalTime() else LocalTime.MIDNIGHT
+                due = careDay(picked).atTime(tm).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+            })
             if (category != "Medicine") Row(verticalAlignment = Alignment.CenterVertically) {
-                TextButton(onClick = {
+                OutlinedButton(onClick = {
                     val current = Instant.ofEpochMilli(due).atZone(ZoneId.systemDefault())
                     TimePickerDialog(context, { _, h, m -> due = careDay(due).atTime(h, m).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(); timed = true }, current.hour, current.minute, false).show()
-                }) { Icon(Icons.Default.Schedule, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(if (timed) Instant.ofEpochMilli(due).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("h:mm a")) else t("Add a time", "समय जोड़ें")) }
-                if (timed) TextButton(onClick = { due = careEpoch(careDay(due)); timed = false }) { Text(t("No time", "समय नहीं")) }
+                }, modifier = Modifier.heightIn(min = 48.dp), shape = RoundedCornerShape(14.dp)) { Icon(Icons.Default.Schedule, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(if (timed) Instant.ofEpochMilli(due).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("h:mm a")) else t("Add a time", "समय जोड़ें"), maxLines = 1, softWrap = false) }
+                if (timed) TextButton(onClick = { due = careEpoch(careDay(due)); timed = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("No time", "समय नहीं"), maxLines = 1, softWrap = false) }
             }
-            if (!extra) TextButton(onClick = { extra = true }, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Add place or details", "जगह या जानकारी जोड़ें")) }
-            if (extra) {
-                if (!legacy) OutlinedTextField(location, { location = it }, label = { Text(t("Place or clinician (optional)", "जगह या डॉक्टर (चाहें तो)")) }, modifier = Modifier.fillMaxWidth(), singleLine = true, shape = RoundedCornerShape(14.dp))
-                OutlinedTextField(detail, { detail = it }, label = { Text(if (category == "Medicine") t("Prescribed dose and instructions", "लिखी गई ख़ुराक और तरीक़ा") else t("Details (optional)", "जानकारी (चाहें तो)")) }, modifier = Modifier.fillMaxWidth(), maxLines = 4, shape = RoundedCornerShape(14.dp))
+            // Place, clinician and notes are optional: one tap away, not in the way.
+            TextButton(onClick = { extra = !extra }, modifier = Modifier.heightIn(min = 48.dp)) { Icon(if (extra) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("More details", "और जानकारी")) }
+            AnimatedVisibility(extra) {
+                Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    if (!legacy) OutlinedTextField(location, { location = it }, label = { Text(t("Place or clinician (optional)", "जगह या डॉक्टर (चाहें तो)")) }, modifier = Modifier.fillMaxWidth(), singleLine = true, shape = RoundedCornerShape(14.dp))
+                    OutlinedTextField(detail, { detail = it }, label = { Text(if (category == "Medicine") t("Prescribed dose and instructions", "लिखी गई ख़ुराक और तरीक़ा") else t("Details (optional)", "जानकारी (चाहें तो)")) }, modifier = Modifier.fillMaxWidth(), maxLines = 4, shape = RoundedCornerShape(14.dp))
+                }
             }
             (error.ifBlank { saveError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
             Button(onClick = { runCatching {
                 require(canEditCareContext(vm, capturedPerson, capturedAccount)) { t("Choose the right person before saving.", "सहेजने से पहले सही व्यक्ति चुनें।") }
                 require(title.trim().length in 1..200 && due > 0) { t("Add a title and date.", "नाम और तारीख़ लिखें।") }
                 require(detail.length <= 1600 && location.length <= 160) { t("Shorten the details before saving.", "सहेजने से पहले जानकारी छोटी करें।") }
-                val text = if (initial?.kind == "medicine") detail else CareEntryCodec.encode(CareEntry(type = "schedule", category = category, detail = detail.trim(), location = location.trim(), timed = timed))
+                val text = if (initial?.kind == "medicine") detail else CareEntryCodec.encode(CareEntry(type = "schedule", category = category, detail = detail.trim(), location = location.trim(), timed = timed && category != "Medicine"))
                 if (initial == null) vm.saveItem("task", title, text, due, done = onDismiss, id = entryId)
                 else vm.updateItem(initial.copy(title = title, detail = text, due = due), onDismiss)
             }.onFailure { error = it.message.orEmpty() } }, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp), shape = RoundedCornerShape(14.dp), enabled = !busy && canEdit && title.isNotBlank()) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Save to calendar", "कैलेंडर में सहेजें")) }

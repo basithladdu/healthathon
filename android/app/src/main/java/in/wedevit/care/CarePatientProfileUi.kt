@@ -1,5 +1,6 @@
 package `in`.wedevit.care
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -24,6 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -79,7 +81,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
     val weights = CareWeightHistory.forCard(profile)
     // Kept short on purpose: the Account tab pins this card above its list, so the screen should fit without scrolling.
     Surface(shape = RoundedCornerShape(12.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = modifier.fillMaxWidth().testTag(tag)) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.padding(16.dp).animateContentSize(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 // A plain initial on a soft colour: no photo is stored.
                 Surface(shape = CircleShape, color = SaharaApricot, modifier = Modifier.size(48.dp)) { Box(contentAlignment = Alignment.Center) { Text(name.take(1).uppercase(), fontFamily = SaharaTitleFont, fontSize = 22.sp, fontWeight = FontWeight.Medium, color = DoctorAccent) } }
@@ -190,9 +192,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable private fun ProfileTile(label: String, value: String, color: Color, modifier: Modifier) {
     Surface(shape = RoundedCornerShape(12.dp), color = color, modifier = modifier) {
-        Column(Modifier.padding(horizontal = 8.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-            Text(label, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(value, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Column(Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+            // No fixed height and no ellipsis: a long label wraps at its space and the tile grows, so nothing is clipped.
+            Text(label, fontSize = 14.sp, color = DoctorCardSub, textAlign = TextAlign.Center)
+            Text(value, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk, textAlign = TextAlign.Center)
         }
     }
 }
@@ -212,7 +215,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
     var error by remember { mutableStateOf<ProfileError?>(null) }
     var showAllergies by remember { mutableStateOf(false) }; var showPhone by remember { mutableStateOf(false) }; var showAddress by remember { mutableStateOf(false) }
     fun sexLabel(v: String) = when (v) { "Female" -> t("Female", "महिला"); "Male" -> t("Male", "पुरुष"); else -> t("Other", "अन्य") }
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
+    SaharaScreenSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         // The fields scroll; Save stays pinned at the bottom above the keyboard, so it is never a scroll away.
         Column(Modifier.fillMaxWidth().imePadding().padding(horizontal = 16.dp).padding(bottom = 16.dp).saharaScreenEnter()) {
           Text(t("Edit profile", "प्रोफ़ाइल बदलें"), Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)

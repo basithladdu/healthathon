@@ -328,7 +328,7 @@ internal suspend fun markMedicineDose(context: Context, vm: CareModel, item: Car
     val allItems by vm.allItems.collectAsStateWithLifecycle()
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     var sideEffect by rememberSaveable(item.id) { mutableStateOf(false) }
-    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Cream) {
+    SaharaScreenSheet(onDismissRequest = onDismiss, containerColor = Cream) {
         val zone = ZoneId.systemDefault()
         val mine = events.filter { it.medicineId == item.id }.let { all -> all.filterNot { MedicineDoses.redundantCheckoff(it, all, zone) } }
         val now = System.currentTimeMillis()

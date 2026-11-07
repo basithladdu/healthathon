@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.sp
 @Composable fun ActionCard(color: Color, modifier: Modifier = Modifier, onClick: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
     val interaction = remember { MutableInteractionSource() }
     // A tappable card carries a 3:1 edge so it reads as one control on the cream ground.
-    Card(onClick = onClick, interactionSource = interaction, modifier = modifier.saharaAppear().saharaPress(interaction), shape = RoundedCornerShape(SaharaRadius.Lg),
+    Card(onClick = onClick, interactionSource = interaction, modifier = modifier.saharaAppear().saharaContentSize().saharaPress(interaction), shape = RoundedCornerShape(SaharaRadius.Lg),
         colors = CardDefaults.cardColors(containerColor = color), border = BorderStroke(1.dp, SaharaColors.Edge), content = content)
 }
 
@@ -79,7 +79,7 @@ import androidx.compose.ui.unit.sp
     var expanded by remember { mutableStateOf(false) }
     Box {
         TextButton(onClick = { expanded = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("walkthrough-user-menu").semantics { contentDescription = t("Practice user, currently ${user.name}, ${user.role}", "अभ्यास उपयोगकर्ता, अभी ${user.name}, ${user.role}") },
-            shape = RoundedCornerShape(SaharaRadius.Pill), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp), colors = ButtonDefaults.textButtonColors(containerColor = SaharaColors.BandRaised, contentColor = SaharaColors.OnBand)) {
+            shape = RoundedCornerShape(SaharaRadius.Pill), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp), colors = ButtonDefaults.textButtonColors(containerColor = SaharaColors.HeaderRaised, contentColor = SaharaColors.OnHeader)) {
             Text("${user.name} · " + (if (user.role == "Family") t("Family", "परिवार") else t("Patient", "मरीज़")), fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1)
             Spacer(Modifier.width(4.dp)); Icon(Icons.Default.ExpandMore, null, Modifier.size(18.dp))
         }
@@ -152,7 +152,7 @@ import androidx.compose.ui.unit.sp
     Box {
         TextButton(onClick = { expanded = true }, enabled = enabled, modifier = Modifier.heightIn(min = 48.dp).widthIn(max = 130.dp).testTag("selected-care-profile").semantics { contentDescription = t("Switch care profile, $name", "देखभाल प्रोफ़ाइल बदलें, $name") },
             shape = RoundedCornerShape(50), contentPadding = PaddingValues(start = 6.dp, end = 10.dp, top = 6.dp, bottom = 6.dp),
-            colors = ButtonDefaults.textButtonColors(containerColor = SaharaColors.BandRaised, contentColor = SaharaColors.OnBand, disabledContainerColor = SaharaColors.BandRaised.copy(alpha = .6f), disabledContentColor = SaharaColors.OnBandSub)) {
+            colors = ButtonDefaults.textButtonColors(containerColor = SaharaColors.HeaderRaised, contentColor = SaharaColors.OnHeader, disabledContainerColor = SaharaColors.HeaderRaised.copy(alpha = .6f), disabledContentColor = SaharaColors.OnHeaderSub)) {
             Box(Modifier.size(28.dp).clip(CircleShape).background(SaharaColors.Primary), contentAlignment = Alignment.Center) {
                 Text(name.trim().take(1).uppercase(), fontFamily = SaharaTitleFont, fontSize = 15.sp, fontWeight = FontWeight.Medium, color = SaharaColors.OnPrimary)
             }
@@ -252,7 +252,9 @@ fun careIcon(kind: String): ImageVector = when (kind) {
     }
     if (open) AlertDialog(onDismissRequest = { open = false }, title = { Text(title, fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium) },
         text = { Text(text, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk) },
-        confirmButton = { TextButton(onClick = { open = false }, modifier = Modifier.testTag("care-help-close")) { Text(t("Got it", "समझ गए")) } }, containerColor = Paper)
+        confirmButton = { Button(onClick = { open = false }, modifier = Modifier.heightIn(min = 48.dp).testTag("care-help-close"), shape = RoundedCornerShape(SaharaRadius.Pill),
+            colors = ButtonDefaults.buttonColors(containerColor = SaharaColors.Primary, contentColor = SaharaColors.OnPrimary)) { Text(t("Got it", "समझ गए"), fontWeight = FontWeight.Bold) } },
+        shape = RoundedCornerShape(SaharaRadius.Lg), containerColor = Paper)
 }
 
 private val SosRed = SaharaColors.Error

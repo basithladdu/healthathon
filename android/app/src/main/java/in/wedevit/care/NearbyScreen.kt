@@ -96,17 +96,23 @@ internal const val NEARBY_PAGE = 10
                     }
                 }
         } }
-        item(key = "nearby-call") { NearbyCallBar() }
+        item(key = "nearby-call") {
+            // One slim row: the 112 chip and a small region chip. The state list opens from the chip; district and service stay under Filters.
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                NearbyCallBar()
+                NearbyPicker(t("Region", "क्षेत्र"), state, listOf(NearbyHelp.ALL_INDIA) + states, optionLabel, "nearby-region-chip", Modifier.weight(1f), onSelect = { if (state != it) district = ""; state = it }, compact = true)
+            }
+        }
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            OutlinedTextField(value = search, onValueChange = { search = it }, placeholder = { Text(t("Name, place or PIN", "नाम, जगह या पिन")) }, leadingIcon = { Icon(Icons.Default.Search, null) }, trailingIcon = { if (search.isNotEmpty()) IconButton(onClick = { search = "" }) { Icon(Icons.Default.Close, t("Clear search", "खोज मिटाएँ")) } }, shape = RoundedCornerShape(12.dp), modifier = Modifier.weight(1f).heightIn(min = 56.dp), singleLine = true,
+            OutlinedTextField(value = search, onValueChange = { search = it }, placeholder = { Text(t("Name, place or PIN", "नाम, जगह या पिन"), maxLines = 1, overflow = TextOverflow.Ellipsis) }, leadingIcon = { Icon(Icons.Default.Search, null) }, trailingIcon = { if (search.isNotEmpty()) IconButton(onClick = { search = "" }) { Icon(Icons.Default.Close, t("Clear search", "खोज मिटाएँ")) } }, shape = RoundedCornerShape(12.dp), modifier = Modifier.weight(1f).heightIn(min = 52.dp), singleLine = true, textStyle = LocalTextStyle.current.copy(fontSize = 15.sp),
                 colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper, focusedBorderColor = Rust, cursorColor = Rust),
                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Search), keyboardActions = androidx.compose.foundation.text.KeyboardActions(onSearch = { focus.clearFocus() }))
             Spacer(Modifier.width(8.dp))
             // State, district, service and the two layers: one named button, with how many are on.
             val filterPress = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
             Surface(onClick = { focus.clearFocus(); filtersOpen = true }, shape = RoundedCornerShape(12.dp), color = if (filterCount > 0) SaharaTone.Indigo.solid else Paper, contentColor = if (filterCount > 0) Color.White else SaharaTone.Indigo.ink,
-                border = androidx.compose.foundation.BorderStroke(2.dp, SaharaTone.Indigo.solid), interactionSource = filterPress, modifier = Modifier.heightIn(min = 56.dp).saharaPress(filterPress).testTag("nearby-filters")) {
-                Row(Modifier.padding(horizontal = 14.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+                border = androidx.compose.foundation.BorderStroke(2.dp, SaharaTone.Indigo.solid), interactionSource = filterPress, modifier = Modifier.heightIn(min = 52.dp).saharaPress(filterPress).testTag("nearby-filters")) {
+                Row(Modifier.fillMaxHeight().padding(horizontal = 14.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Tune, null, Modifier.size(20.dp)); Spacer(Modifier.width(6.dp))
                     Text(if (filterCount > 0) t("Filters · $filterCount", "चुनाव · $filterCount") else t("Filters", "चुनाव"), fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
                 }
@@ -136,7 +142,7 @@ internal const val NEARBY_PAGE = 10
         }
         if (suggestions.isNotEmpty()) item { CentreSuggestionList(suggestions) }
     }
-    if (chosen.isNotEmpty()) ModalBottomSheet(onDismissRequest = { chosen = emptyList() }, containerColor = Cream) {
+    if (chosen.isNotEmpty()) SaharaScreenSheet(onDismissRequest = { chosen = emptyList() }, containerColor = Cream) {
         // Several centres can share one approximate area pin; the sheet lists all of them.
         LazyColumn(Modifier.padding(start = 16.dp, end = 16.dp), contentPadding = PaddingValues(bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             if (chosen.size > 1) item { Text(t("${chosen.size} centres here", "यहाँ ${chosen.size} केंद्र"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading()) }
@@ -154,7 +160,7 @@ internal const val NEARBY_PAGE = 10
 @Composable fun NearbyFilterSheet(state: String, district: String, service: String, layers: Set<String>, states: List<String>, districts: List<String>, optionLabel: (String) -> String,
     count: Int, filtersOn: Boolean, onState: (String) -> Unit, onDistrict: (String) -> Unit, onService: (String) -> Unit, onLayer: (String) -> Unit, onClear: () -> Unit, onDismiss: () -> Unit) {
     val t = careText()
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
+    SaharaScreenSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(bottom = 24.dp).testTag("nearby-filter-sheet"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(t("Filters", "चुनाव"), Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 22.sp, color = DoctorCardInk)
@@ -197,17 +203,17 @@ internal const val NEARBY_PAGE = 10
     } }
 }
 
-/** One slim bar: tapping it opens the phone's dialler with 112 filled in (ACTION_DIAL). The person presses call; the app never calls. */
+/** One slim chip: tapping it opens the phone's dialler with 112 filled in (ACTION_DIAL). The person presses call; the app never calls. */
 @Composable fun NearbyCallBar() {
     val t = careText(); val context = LocalContext.current
-    Surface(onClick = { open(context, Intent(Intent.ACTION_DIAL, Uri.parse(NearbyHelp.dialUri(NearbyHelp.EMERGENCY_CALL)))) }, shape = RoundedCornerShape(12.dp), color = Peach,
-        modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("emergency-112")) {
-        Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Surface(shape = CircleShape, color = Rust, contentColor = Color.White, modifier = Modifier.size(36.dp)) {
-                Box(contentAlignment = Alignment.Center) { Icon(Icons.Default.Call, null, Modifier.size(20.dp)) }
+    Surface(onClick = { open(context, Intent(Intent.ACTION_DIAL, Uri.parse(NearbyHelp.dialUri(NearbyHelp.EMERGENCY_CALL)))) }, shape = RoundedCornerShape(50), color = Peach,
+        modifier = Modifier.height(44.dp).testTag("emergency-112")) {
+        Row(Modifier.padding(start = 6.dp, end = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+            Surface(shape = CircleShape, color = Rust, contentColor = Color.White, modifier = Modifier.size(32.dp)) {
+                Box(contentAlignment = Alignment.Center) { Icon(Icons.Default.Call, null, Modifier.size(18.dp)) }
             }
-            Spacer(Modifier.width(12.dp))
-            Text(t("Call 112", "112 पर फ़ोन करें"), fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Ink, modifier = Modifier.weight(1f))
+            Spacer(Modifier.width(8.dp))
+            Text(t("Call 112", "112 पर फ़ोन करें"), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Ink, maxLines = 1, softWrap = false)
         }
     }
 }
@@ -223,12 +229,13 @@ internal const val NEARBY_PAGE = 10
 
 /** A field that opens a searchable list in a bottom sheet: a long list of states fits without sideways scrolling. */
 @OptIn(ExperimentalMaterial3Api::class)
-@Composable fun NearbyPicker(label: String, selected: String, options: List<String>, optionLabel: (String) -> String, tag: String, modifier: Modifier = Modifier, onSelect: (String) -> Unit) {
+@Composable fun NearbyPicker(label: String, selected: String, options: List<String>, optionLabel: (String) -> String, tag: String, modifier: Modifier = Modifier, onSelect: (String) -> Unit, compact: Boolean = false) {
     val t = careText(); var open by rememberSaveable(tag) { mutableStateOf(false) }
-    Surface(onClick = { open = true }, shape = RoundedCornerShape(12.dp), color = Paper, border = androidx.compose.foundation.BorderStroke(1.dp, DoctorHairline),
-        modifier = modifier.heightIn(min = 56.dp).testTag(tag).semantics { contentDescription = "$label: ${optionLabel(selected)}" }) {
-        Row(Modifier.padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
+    Surface(onClick = { open = true }, shape = RoundedCornerShape(if (compact) 50 else 12), color = Paper, border = androidx.compose.foundation.BorderStroke(1.dp, DoctorHairline),
+        modifier = modifier.then(if (compact) Modifier.height(44.dp) else Modifier.heightIn(min = 56.dp)).testTag(tag).semantics { contentDescription = "$label: ${optionLabel(selected)}" }) {
+        Row(Modifier.padding(start = if (compact) 14.dp else 16.dp, end = 8.dp, top = if (compact) 0.dp else 8.dp, bottom = if (compact) 0.dp else 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            if (compact) Text(optionLabel(selected), Modifier.weight(1f), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            else Column(Modifier.weight(1f)) {
                 Text(label, style = MaterialTheme.typography.labelMedium, color = DoctorCardSub)
                 Text(optionLabel(selected), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
@@ -238,7 +245,7 @@ internal const val NEARBY_PAGE = 10
     if (open) {
         var query by rememberSaveable(tag + "-query") { mutableStateOf("") }
         val shown = remember(options, query, optionLabel) { NearbyHelp.pick(options.map { it to optionLabel(it) }, query) }
-        ModalBottomSheet(onDismissRequest = { open = false; query = "" }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
+        SaharaScreenSheet(onDismissRequest = { open = false; query = "" }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
             Column(Modifier.padding(horizontal = 16.dp).testTag("$tag-sheet")) {
                 Text(label, fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 20.sp, color = DoctorCardInk, modifier = Modifier.a11yHeading())
                 Spacer(Modifier.height(12.dp))
@@ -303,12 +310,11 @@ internal const val NEARBY_PAGE = 10
         Spacer(Modifier.height(12.dp))
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { tags.forEach { NearbyTag(it, optionLabel(it)) } }
         Spacer(Modifier.height(12.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             if (c.phone.any(Char::isDigit)) Button(onClick = { open(context, Intent(Intent.ACTION_DIAL, Uri.parse(NearbyHelp.dialUri(c.phone)))) }, colors = ButtonDefaults.buttonColors(containerColor = DoctorStatusGood, contentColor = Color.White),
                 shape = RoundedCornerShape(12.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("centre-call-${c.id}")) { Icon(Icons.Default.Call, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Call", "फ़ोन करें"), fontWeight = FontWeight.SemiBold) }
             OutlinedButton(onClick = { nearbyOpenDirections(context, c) }, colors = ButtonDefaults.outlinedButtonColors(containerColor = Paper, contentColor = Ink), border = androidx.compose.foundation.BorderStroke(1.5.dp, Ink),
                 shape = RoundedCornerShape(12.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("centre-directions-${c.id}")) { Icon(Icons.Default.Directions, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Directions", "रास्ता"), fontWeight = FontWeight.SemiBold) }
-            Spacer(Modifier.weight(1f))
             IconButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, NearbyHelp.shareText(c)), t("Share centre", "केंद्र भेजें"))) },
                 modifier = Modifier.size(48.dp).testTag("centre-share-${c.id}")) { Icon(Icons.Default.Share, t("Share", "भेजें"), tint = DoctorCardSub) }
         }

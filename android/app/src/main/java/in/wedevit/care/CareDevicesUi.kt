@@ -167,7 +167,7 @@ import java.time.LocalDate
     var error by remember { mutableStateOf<CareDeviceError?>(null) }
     var confirmRemove by remember { mutableStateOf(false) }; var showCentre by remember { mutableStateOf(false) }
     fun pick(start: LocalDate?, set: (LocalDate) -> Unit) { val d = start ?: LocalDate.now(); DatePickerDialog(context, { _, y, m, day -> set(LocalDate.of(y, m + 1, day)) }, d.year, d.monthValue - 1, d.dayOfMonth).show() }
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
+    SaharaScreenSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = 16.dp).padding(bottom = 32.dp).saharaContentSize().testTag("device-edit-sheet"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(if (existing) t("Edit tube or line", "नली या लाइन बदलें") else t("Add tube or line", "नली या लाइन जोड़ें"), fontFamily = SaharaTitleFont, fontSize = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
             Text(t("Type", "प्रकार"), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub)

@@ -1,10 +1,11 @@
-@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 package `in`.wedevit.care
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.animation.animateContentSize
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.foundation.shape.CircleShape
@@ -42,7 +43,7 @@ object PainHistoryRules {
 }
 
 @Composable fun PainBodyHistorySheet(entries: List<CareItem>, personId: String, hindi: Boolean, initialId: String = "", onClose: () -> Unit) {
-    ModalBottomSheet(onDismissRequest = onClose, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
+    SaharaScreenSheet(onDismissRequest = onClose, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         PainBodyHistoryContent(entries, personId, hindi, initialId, onClose)
     }
 }
@@ -60,8 +61,8 @@ object PainHistoryRules {
         Heading(t("Past pain on the body", "पहले का दर्द शरीर पर"), 27)
         if (index < 0) ChartEmpty(hindi, "pain-history") else {
             val note = history[index].second
-            LazyRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(history, key = { it.first.id }) { (item, value) ->
+            FlowRow(Modifier.fillMaxWidth().animateContentSize(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                history.forEach { (item, value) ->
                     FilterChip(selected == item.id, { preferred = item.id }, label = { Text("${friendlyWhen(value.observedDate, value.observedTime, hindi)} · ${SymptomDiaryRules.ratingLabel(value.rating, hindi)}", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false) }, shape = CircleShape,
                         leadingIcon = if (value.rating != null) { { Box(Modifier.size(12.dp).background(ChartBands.color(value.rating), CircleShape)) } } else null,
                         border = FilterChipDefaults.filterChipBorder(enabled = true, selected = selected == item.id, borderColor = DoctorCardSub.copy(alpha = .45f), selectedBorderColor = DoctorAccent, borderWidth = 1.5.dp, selectedBorderWidth = 2.dp),

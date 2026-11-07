@@ -23,6 +23,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Healing
 import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.WbSunny
@@ -89,6 +91,11 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
                     }
                 }
             }
+            // The two most-used actions come first and are big: note a symptom, add a few words.
+            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                TodayBigAction(t("Note a symptom", "तबीयत का नोट लिखें"), Icons.Default.Healing, onSymptom, Modifier.weight(1f).fillMaxHeight().saharaStagger(0).testTag("today-checkin-symptom"))
+                TodayBigAction(if (today?.detail.isNullOrBlank()) t("Add a few words", "कुछ शब्द लिखें") else t("Change the words", "शब्द बदलें"), Icons.Default.Edit, onOpen, Modifier.weight(1f).fillMaxHeight().saharaStagger(1).testTag("today-checkin-words"))
+            }
             Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 CareDailyFlow.moods.forEachIndexed { index, mood ->
                     TodayMoodButton(checkInMoodLabel(mood, hindi), index / 2f, selected = today?.title == mood, enabled = !busy, ink = band, modifier = Modifier.weight(1f).fillMaxHeight().saharaStagger(index).testTag("today-checkin-$index")) {
@@ -98,17 +105,17 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
                 }
             }
             today?.detail?.takeIf { it.isNotBlank() }?.let { Text(it, fontSize = 15.sp, lineHeight = 20.sp, color = Color.White, maxLines = 2, overflow = TextOverflow.Ellipsis) }
-            // Secondary links: words (and the distress question) on the full check-in screen, and a symptom note.
-            FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                TextButton(onClick = onOpen, colors = ButtonDefaults.textButtonColors(contentColor = Color.White), contentPadding = PaddingValues(horizontal = 4.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("today-checkin-words")) {
-                    Text(if (today?.detail.isNullOrBlank()) t("Add a few words", "कुछ शब्द लिखें") else t("Change the words", "शब्द बदलें"), fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-                    Icon(Icons.Default.ChevronRight, null, Modifier.size(20.dp))
-                }
-                TextButton(onClick = onSymptom, colors = ButtonDefaults.textButtonColors(contentColor = Color.White), contentPadding = PaddingValues(horizontal = 4.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("today-checkin-symptom")) {
-                    Text(t("Note a symptom", "तबीयत का नोट लिखें"), fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-                    Icon(Icons.Default.ChevronRight, null, Modifier.size(20.dp))
-                }
-            }
+        }
+    }
+}
+
+/** A large white action on the Today hero: icon over a short label that wraps between words, never inside one. */
+@Composable private fun TodayBigAction(label: String, icon: ImageVector, onClick: () -> Unit, modifier: Modifier) {
+    val press = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+    Surface(onClick = onClick, shape = RoundedCornerShape(TodayHero.buttonRadius), color = Color.White, contentColor = TodayHero.dueBand, interactionSource = press, modifier = modifier.heightIn(min = 84.dp).saharaPress(press)) {
+        Column(Modifier.padding(horizontal = 8.dp, vertical = 12.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+            Icon(icon, null, Modifier.size(30.dp)); Spacer(Modifier.height(6.dp))
+            SaharaFitText(label, style = LocalTextStyle.current.copy(fontSize = 17.sp, lineHeight = 21.sp), color = TodayHero.dueBand, maxLines = 2, min = 12f, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
         }
     }
 }

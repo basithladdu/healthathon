@@ -160,7 +160,7 @@ object TrendChartRules {
 @Composable fun SymptomTrendSheet(entries: List<CareItem>, current: CareItem, value: SymptomNote, hindi: Boolean, onClose: () -> Unit) {
     val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     val name = SymptomDiaryRules.symptomLabel(value.symptom, hindi)
-    ModalBottomSheet(onDismissRequest = onClose, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
+    SaharaScreenSheet(onDismissRequest = onClose, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Heading(name, 27)
             ChartLegend(hindi)
@@ -187,8 +187,8 @@ object TrendChartRules {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         HorizontalDivider(color = DoctorHairline)
         Text(t("Pain in one body part", "शरीर के एक हिस्से का दर्द"), fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = DoctorCardInk)
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(parts) { id -> FilterChip(id == part, { chosen = id }, label = { Text(PainBodyMapRules.label(id, hindi)) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-part-chip-$id")) }
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            parts.forEach { id -> FilterChip(id == part, { chosen = id }, label = { Text(PainBodyMapRules.label(id, hindi), maxLines = 1, softWrap = false) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-part-chip-$id")) }
         }
         PainPartTrend(entries, personId, part, hindi)
     }

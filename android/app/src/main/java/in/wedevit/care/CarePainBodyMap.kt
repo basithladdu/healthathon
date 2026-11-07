@@ -57,6 +57,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.webkit.WebViewAssetLoader
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.webkit.WebViewClientCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
@@ -91,8 +92,11 @@ import java.io.ByteArrayInputStream
             if (!readOnly && selected.isNotEmpty()) TextButton(onClick = { active = null; onChange(emptyList(), emptyList()) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-clear")) { Text(t("Clear", "हटाएँ"), color = Rust, fontWeight = FontWeight.SemiBold) }
         }
         LocalPainBodyViewer(selected, points, viewerRatings, hindi, back, readOnly, focus, focusNonce, change)
-        if (!readOnly && onSpotRating != null && activeSite != null) Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Box(Modifier.padding(16.dp)) { PainStrengthSlider(ratings[activeSite], PainBodyMapRules.label(activeSite, hindi), hindi) { onSpotRating(activeSite, it) } } }
-        Text(if (selected.any { spotRating(it) != null }) "${t("Pain by spot", "जगह के अनुसार दर्द")}: ${selected.joinToString(" · ") { id -> "${PainBodyMapRules.label(id, hindi)} ${spotRating(id)?.let { "$it/10" } ?: t("not rated", "अंक नहीं")}" }}" else if (selected.isEmpty() && rating != null) "${t("Pain", "दर्द")}: $rating/10" else t("Not rated", "अंक नहीं बताया"), color = DoctorCardSub, fontSize = 14.sp, lineHeight = 19.sp, modifier = Modifier.testTag("pain-spot-summary").semantics { liveRegion = LiveRegionMode.Polite; if (selected.isNotEmpty()) contentDescription = PainBodyMapRules.spokenSummary(selected, selected.mapNotNull { id -> spotRating(id)?.let { id to it } }.toMap(), hindi) })
+        // When a spot is marked, the strength card appears below the model: scroll it into view so nobody misses it.
+        val strengthCard = remember { androidx.compose.foundation.relocation.BringIntoViewRequester() }
+        LaunchedEffect(activeSite) { if (activeSite != null && !readOnly) { kotlinx.coroutines.delay(350); runCatching { strengthCard.bringIntoView() } } }
+        AnimatedVisibility(!readOnly && onSpotRating != null && activeSite != null, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) { if (onSpotRating != null && activeSite != null) Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, Rust), modifier = Modifier.fillMaxWidth().bringIntoViewRequester(strengthCard)) { Box(Modifier.padding(16.dp)) { PainStrengthSlider(ratings[activeSite], PainBodyMapRules.label(activeSite, hindi), hindi) { onSpotRating(activeSite, it) } } } }
+        Text(if (selected.any { spotRating(it) != null }) "${t("Pain by spot", "जगह के अनुसार दर्द")}: ${selected.joinToString(" · ") { id -> "${PainBodyMapRules.label(id, hindi)} ${spotRating(id)?.let { "$it/10" } ?: t("rate 0–10", "0–10 अंक दें")}" }}" else if (selected.isEmpty() && rating != null) "${t("Pain", "दर्द")}: $rating/10" else t("Rate pain 0–10 *", "दर्द को 0–10 अंक दें *"), color = Rust, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, lineHeight = 19.sp, modifier = Modifier.testTag("pain-spot-summary").semantics { liveRegion = LiveRegionMode.Polite; if (selected.isNotEmpty()) contentDescription = PainBodyMapRules.spokenSummary(selected, selected.mapNotNull { id -> spotRating(id)?.let { id to it } }.toMap(), hindi) })
         Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(DoctorHairline).padding(4.dp).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             PainSideOption(!back, t("Front", "सामने"), Icons.Default.AccessibilityNew, "pain-body-front", Modifier.weight(1f)) { if (back) { back = false; focus = null; focusNonce++ } }
             PainSideOption(back, t("Back", "पीछे"), Icons.Default.RotateRight, "pain-body-back", Modifier.weight(1f)) { if (!back) { back = true; focus = null; focusNonce++ } }
@@ -161,8 +165,8 @@ import java.io.ByteArrayInputStream
         // The chosen number and its word, big, on a pill in its own heat colour; it rolls up or down as the slider moves.
         val heat by animateColorAsState(if (rating == null) DoctorHairline else Color(PainBodyMapRules.heatColor(rating)), SaharaMotion.tween(SaharaMotion.VALUE_MS), label = "strength colour")
         AnimatedContent(rating, transitionSpec = { SaharaMotion.valueChange((targetState ?: -1) > (initialState ?: -1)) }, label = "strength value") { r ->
-            Text(if (r == null) t("Not rated", "अंक नहीं बताया") else "$r/10 · ${PainBodyMapRules.strengthWord(r, hindi)}", fontSize = if (r == null) 17.sp else 24.sp, lineHeight = 30.sp, fontWeight = FontWeight.Bold,
-                color = if (r == null) DoctorCardSub else if (r == 0) DoctorCardInk else readableOn(Color(PainBodyMapRules.heatColor(r))),
+            Text(if (r == null) t("Rate pain 0–10 *", "दर्द को 0–10 अंक दें *") else "$r/10 · ${PainBodyMapRules.strengthWord(r, hindi)}", fontSize = if (r == null) 19.sp else 24.sp, lineHeight = 30.sp, fontWeight = FontWeight.Bold,
+                color = if (r == null) Rust else if (r == 0) DoctorCardInk else readableOn(Color(PainBodyMapRules.heatColor(r))),
                 modifier = Modifier.padding(vertical = 4.dp).background(if (r == null || r == 0) Color.Transparent else heat, RoundedCornerShape(50)).padding(horizontal = if (r == null || r == 0) 0.dp else 14.dp, vertical = 4.dp).testTag("pain-strength-value"))
         }
         Box(Modifier.fillMaxWidth()) { // the overlay takes touches so an up/down page scroll never changes the score; keyboard and TalkBack still adjust the Slider
