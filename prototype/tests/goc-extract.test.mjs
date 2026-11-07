@@ -553,8 +553,7 @@ test('every heading, field, box and table of Rituparna’s form is in the note, 
     'Section III – Decisive Actions', 'Home care (if relevant)', 'Should the patient be brought to the hospital?', 'YES — for any significant deterioration.', '☑ ONLY FOR THE FOLLOWING', '☑     Pain that cannot be controlled at home',
     'Caregiver unable to cope — respite admission', 'NO — the patient is to be cared for where they are.', 'frequency of assessments', 'non-governmental organisation', 'previously admitted', 'Should CPR be performed?', 'ATTEMPT CPR.', 'DO NOT ATTEMPT CPR (DNACPR).', 'Reason recorded (clinical futility / patient refusal / burden outweighs benefit)',
     'Discussed with (patient / surrogate / both)', 'What is the level of oxygen/ventilatory support', '| LEVEL | WHAT IT MEANS FOR THE PATIENT | CEILING |', 'Low-flow oxygen up to 2 L/min', '| 1 | Nasal prongs / simple face mask',
-    'Intubation and invasive mechanical ventilation', 'Other parameters', 'Dialysis or CRRT', 'Only if the renal failure is judged reversible', 'Others', 'Requirement of ICU?', 'Common Cause v Union of India, 2018 and 2023',
-    'Dates of constitution of the Primary and Secondary Boards', 'Composition of the Boards', 'Decision of the Boards', 'Final decision about withdrawal/withholding', 'Protocol for withdrawal/withholding',
+    'Intubation and invasive mechanical ventilation', 'Other parameters', 'Dialysis or CRRT', 'Only if the renal failure is judged reversible', 'Others', 'Requirement of ICU?',
     'Vasopressors / inotropes', 'Short trial only, up to ______ hours', 'no escalation beyond ____ agents', '12.1  Feeding',
     '☑ Comfort feeding by mouth only', 'Nasogastric (Ryle’s) tube', 'up to ______ days, then review', 'Gastrostomy (PEG)', 'Only after discussion with the palliative care team',
     'A. PRIORITISE LIFE', 'B. BALANCED / CEILING OF CARE', 'C. PRIORITISE COMFORT', 'SECTION 19 — Declarations and signatures', '19.1  Patient', 'I have made these choices myself.',
@@ -569,6 +568,7 @@ test('every heading, field, box and table of Rituparna’s form is in the note, 
     if (!words.startsWith('|') && !words.startsWith('☑')) at = found;
   }
   assert.match(note, /\| 1 \| [^|]* \| ☑ \|/, 'the ceiling box is ticked in the oxygen table');
+  for (const gone of ['Common Cause', 'withholding', 'Primary and Secondary Boards', 'Composition of the Boards']) assert.ok(!lower.includes(gone.toLowerCase()), `removed section must not print: ${gone}`);
 });
 
 import { gocNeedsSpeakers, gocSuggestedValue, GOC_DECISION_FIELDS } from '../app/goc-extract.ts';

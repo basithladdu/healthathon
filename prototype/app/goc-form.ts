@@ -91,7 +91,7 @@ export function buildGocFormDocument(record: EctprRecord, rows: Row[], lang: Car
   /** A row of boxes: the answer is in the boxes; when none is ticked the row also says why. */
   const boxes = (label: string, ticks: GocFormTick[], unticked: string, filled = ''): GocFormRow =>
     (ticks.some((x) => x.on) ? { label, value: filled, ticks } : { label, value: unticked, open: true, ticks });
-  const p = record.patient; const c = record.choices; const v = record.values; const h = record.homeCare; const w = record.withdrawal; const cap = record.capacity;
+  const p = record.patient; const c = record.choices; const v = record.values; const h = record.homeCare; const cap = record.capacity;
   const device = meta.deviceSignatures ?? [];
   const cellBoxes = (ticks: GocFormTick[]) => ticks.map((x) => `${box(x.on)} ${x.text}${x.detail ? ` ${x.detail}` : ''}`).join('\n');
 
@@ -169,14 +169,6 @@ export function buildGocFormDocument(record: EctprRecord, rows: Row[], lang: Car
     tk(c.goalOfCare === 'A_LIFE', 'A. PRIORITISE LIFE — All medically effective treatment, including ICU and ventilation.', 'A. जीवन को प्राथमिकता — ICU और वेंटिलेटर सहित हर असरदार इलाज।'),
     tk(c.goalOfCare === 'B_CEILING', 'B. BALANCED / CEILING OF CARE — Treat reversible problems, but with the specific limits and as a time-limited trial.', 'B. संतुलित / इलाज की सीमा — ठीक होने वाली समस्याओं का इलाज, तय सीमाओं में और समय-सीमित ट्रायल के रूप में।'),
     tk(c.goalOfCare === 'C_COMFORT', 'C. PRIORITISE COMFORT — Symptom control is the goal. Hospital transfer only if comfort cannot be achieved where the patient is.', 'C. आराम को प्राथमिकता — लक्षणों पर नियंत्रण ही लक्ष्य। अस्पताल तभी जब वहाँ आराम न मिल सके।'),
-  ];
-  const withdrawn = Boolean(w?.applicable);
-  const wField = (label: string, value: string | undefined) => (withdrawn ? field(label, value) : { label, value: nd, open: true });
-  const finalTicks = [
-    tk(withdrawn && w?.finalDecision === 'TO_BE_PERFORMED', 'withdrawal/withholding to be performed', 'इलाज रोका जाएगा / शुरू नहीं होगा'),
-    tk(withdrawn && w?.finalDecision === 'FAMILY_REFUSED', 'Family has refused consent (if patient has lost decision-making capacity)', 'परिवार ने सहमति नहीं दी (अगर मरीज़ निर्णय क्षमता खो चुके हों)'),
-    tk(withdrawn && w?.finalDecision === 'BOARD_REFUSED', 'Primary/Secondary Board has refused permission', 'प्राथमिक/द्वितीय बोर्ड ने अनुमति नहीं दी'),
-    tk(withdrawn && w?.finalDecision === 'PHYSICIAN_REVOKED', 'Treating physician has revoked their decision to support withdrawal/withholding', 'इलाज करने वाले डॉक्टर ने इलाज रोकने/शुरू न करने का समर्थन वापस लिया'),
   ];
 
   // Section 19: the plan's signatures, then those drawn on this device for this note.
@@ -258,13 +250,6 @@ export function buildGocFormDocument(record: EctprRecord, rows: Row[], lang: Car
         boxes(t('Dialysis or CRRT', 'डायलिसिस या CRRT'), dialysisTicks, status('dialysis'), dy ? dialysisLabel(dy, lang) : ''),
         field(t('Others', 'अन्य'), ''),
         boxes(t('Requirement of ICU?', 'ICU की ज़रूरत?'), icuTicks, status('icu'), icu ? icuLabel(icu, lang) : ''),
-      ] },
-      { title: t('If withdrawal and withholding of treatment has been decided (as per Common Cause v Union of India, 2018 and 2023)', 'अगर इलाज रोकने और शुरू न करने का फ़ैसला हुआ है (कॉमन कॉज़ बनाम भारत संघ, 2018 और 2023 के अनुसार)'), rows: [
-        wField(t('Dates of constitution of the Primary and Secondary Boards', 'प्राथमिक और द्वितीय बोर्ड बनने की तारीख़ें'), [w?.primaryBoardDate, w?.secondaryBoardDate].filter(Boolean).join(' · ')),
-        wField(t('Composition of the Boards', 'बोर्ड के सदस्य'), [w?.primaryBoardMembers, w?.secondaryBoardMembers].filter(Boolean).join(' · ')),
-        wField(t('Decision of the Boards', 'बोर्ड का फ़ैसला'), w?.boardDecision),
-        boxes(t('Final decision about withdrawal/withholding', 'इलाज रोकने/शुरू न करने का अंतिम फ़ैसला'), finalTicks, nd),
-        wField(t('Protocol for withdrawal/withholding', 'इलाज रोकने/शुरू न करने का तरीका'), w?.protocol),
       ] },
       { title: t('Vasopressors / inotropes', 'वैसोप्रेसर / इनोट्रोप'), rows: [boxes(t('Vasopressors / inotropes', 'वैसोप्रेसर / इनोट्रोप'), vasoTicks, status('vasopressors'), vp ? vasopressorLabel(vp, lang) : '')] },
       { title: t('12.1  Feeding', '12.1  खाना'), rows: [
