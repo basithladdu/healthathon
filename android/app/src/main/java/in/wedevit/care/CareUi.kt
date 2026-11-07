@@ -2,6 +2,7 @@
 package `in`.wedevit.care
 
 import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
@@ -300,9 +301,9 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
     if (dialog == "person") AddPerson(onDismiss = { dialog = "" }, busy = busy || refreshing, error = actionError, onSave = { vm.addPerson(it) { dialog = "" } })
     if (dialog in listOf("medicine", "visit", "task", "journal")) AddCareItem(dialog, vm, onDismiss = { dialog = "" })
     if (dialog == "delete") AlertDialog(onDismissRequest = { dialog = "" }, title = { Text(t("Remove ${person?.name}'s records?", "${person?.name} के रिकॉर्ड हटाएँ?")) },
-        text = { Text(if (vm.cloud != null) t("It will be removed for everyone. This can't be undone.", "यह सबके लिए हट जाएगा। इसे वापस नहीं लाया जा सकता।") else t("This can't be undone.", "इसे वापस नहीं किया जा सकता।")) },
-        confirmButton = { TextButton(onClick = { val removedId = person?.id; vm.removePerson { (0..12).forEach { screens.removeState("$removedId:$it") }; dialog = "" } }, enabled = !busy, colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Text(t("Remove records", "रिकॉर्ड हटाएँ"), fontWeight = FontWeight.Bold) } },
-        dismissButton = { TextButton(onClick = { dialog = "" }) { Text(t("Keep records", "रिकॉर्ड रखें")) } })
+        text = { Text(if (vm.cloud != null) t("This removes them for everyone and can't be undone.", "यह सबके लिए हट जाएगा। इसे वापस नहीं लाया जा सकता।") else t("This can't be undone.", "इसे वापस नहीं किया जा सकता।")) },
+        confirmButton = { Button(onClick = { val removedId = person?.id; vm.removePerson { (0..12).forEach { screens.removeState("$removedId:$it") }; dialog = "" } }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error, contentColor = MaterialTheme.colorScheme.onError)) { Text(t("Remove records", "रिकॉर्ड हटाएँ"), fontWeight = FontWeight.Bold) } },
+        dismissButton = { TextButton(onClick = { dialog = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Keep records", "रिकॉर्ड रखें")) } })
     reading?.let { note -> NoteReader(vm, note, onDismiss = { reading = null }) }
     }
     } }
@@ -932,8 +933,8 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
             }
         }
     }, confirmButton = {
-        TextButton(onClick = { if (vm.canEdit.value && vm.localAudioRecordingAllowed && !vm.recordingSaving.value && vm.recordingSaveError.value == null) { if (quickConsent) { purposeAccepted = true; storageAccepted = true; accessAccepted = true }; permissionDialog = false; mic.request(startConsentedRecording) } }, enabled = recordingCanEdit && recordingSaveError == null && !recordingSaving && vm.localAudioRecordingAllowed && allParticipantsAgreed && (quickConsent || (purposeAccepted && storageAccepted && accessAccepted)), modifier = Modifier.testTag("start-recording-confirm")) { Text(t("Start recording", "रिकॉर्डिंग शुरू करें")) }
-    }, dismissButton = { TextButton(onClick = { permissionDialog = false }) { Text(t("Cancel", "रद्द करें")) } })
+        Button(onClick = { if (vm.canEdit.value && vm.localAudioRecordingAllowed && !vm.recordingSaving.value && vm.recordingSaveError.value == null) { if (quickConsent) { purposeAccepted = true; storageAccepted = true; accessAccepted = true }; permissionDialog = false; mic.request(startConsentedRecording) } }, enabled = recordingCanEdit && recordingSaveError == null && !recordingSaving && vm.localAudioRecordingAllowed && allParticipantsAgreed && (quickConsent || (purposeAccepted && storageAccepted && accessAccepted)), modifier = Modifier.heightIn(min = 48.dp).testTag("start-recording-confirm")) { Text(t("Start recording", "रिकॉर्डिंग शुरू करें")) }
+    }, dismissButton = { TextButton(onClick = { permissionDialog = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें")) } })
 }
 
 @Composable fun AudioPlayback(path: String, consent: RecordingConsent?, transcribing: Boolean, canTranscribe: Boolean, onTranscribe: () -> Unit, onDelete: () -> Unit) {
@@ -975,8 +976,8 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
         }
     }
     if (confirmDelete) AlertDialog(onDismissRequest = { confirmDelete = false }, title = { Text(t("Delete this recording?", "यह रिकॉर्डिंग मिटाएँ?")) },
-        confirmButton = { TextButton(onClick = { player?.release(); player = null; playing = false; confirmDelete = false; onDelete() }) { Text(t("Delete recording", "रिकॉर्डिंग मिटाएँ")) } },
-        dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text(t("Keep recording", "रिकॉर्डिंग रखें")) } })
+        confirmButton = { Button(onClick = { player?.release(); player = null; playing = false; confirmDelete = false; onDelete() }, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error, contentColor = MaterialTheme.colorScheme.onError)) { Text(t("Delete recording", "रिकॉर्डिंग मिटाएँ")) } },
+        dismissButton = { TextButton(onClick = { confirmDelete = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Keep recording", "रिकॉर्डिंग रखें")) } })
 }
 
 @Composable fun NoteReader(vm: CareModel, note: CareVersion, onDismiss: () -> Unit) {
@@ -1177,7 +1178,7 @@ private class CareToolRow(val label: String, val icon: ImageVector, val tone: Sa
     }
         if (item.kind == "medicine" && !compact) MedicineDoseActions(item, vm)
     }
-    if (delete) AlertDialog(onDismissRequest = { delete = false }, title = { Text(t("Remove this entry?", "यह जानकारी हटाएँ?")) }, text = { Text(item.title) }, confirmButton = { TextButton(onClick = { if (canEditCareContext(vm, item.personId, capturedAccount)) vm.remove(item); delete = false }, enabled = !busy && canEdit) { Text(t("Remove", "हटाएँ")) } }, dismissButton = { TextButton(onClick = { delete = false }) { Text(t("Keep", "रखें")) } })
+    if (delete) AlertDialog(onDismissRequest = { delete = false }, title = { Text(t("Remove this entry?", "यह जानकारी हटाएँ?")) }, text = { Text(item.title) }, confirmButton = { Button(onClick = { if (canEditCareContext(vm, item.personId, capturedAccount)) vm.remove(item); delete = false }, enabled = !busy && canEdit, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error, contentColor = MaterialTheme.colorScheme.onError)) { Text(t("Remove", "हटाएँ")) } }, dismissButton = { TextButton(onClick = { delete = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Keep", "रखें")) } })
     if (editing) AddCareItem(item.kind, vm, onDismiss = { editing = false }, initial = item)
 }
 
@@ -1272,8 +1273,8 @@ private class CareToolRow(val label: String, val icon: ImageVector, val tone: Sa
 
 @Composable fun AddPerson(onDismiss: () -> Unit, busy: Boolean, error: String?, onSave: (String) -> Unit) {
     var name by rememberSaveable { mutableStateOf("") }; val t = careText()
-    AlertDialog(onDismissRequest = { if (!busy) onDismiss() }, title = { Text(t("Who is this care for?", "यह देखभाल किसके लिए है?")) }, text = { Column { CareField(value = name, onValueChange = { name = it.take(100) }, label = t("Name", "नाम"), singleLine = true); error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) } } },
-        confirmButton = { TextButton(onClick = { onSave(name.trim()) }, enabled = name.isNotBlank() && !busy) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Continue", "आगे बढ़ें")) } }, dismissButton = { TextButton(onClick = onDismiss, enabled = !busy) { Text(t("Cancel", "रद्द करें")) } })
+    AlertDialog(onDismissRequest = { if (!busy) onDismiss() }, title = { Text(t("Who is this care for?", "यह देखभाल किसके लिए है?")) }, text = { Column { CareField(value = name, onValueChange = { name = it.take(100) }, label = t("Name *", "नाम *"), singleLine = true); error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) } } },
+        confirmButton = { Button(onClick = { onSave(name.trim()) }, enabled = name.isNotBlank() && !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Continue", "आगे बढ़ें")) } }, dismissButton = { TextButton(onClick = onDismiss, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें")) } })
 }
 
 @Composable fun AddPersonContent(onDismiss: () -> Unit, busy: Boolean, error: String?, patient: Boolean = false, onSave: (String) -> Unit) {
@@ -1297,13 +1298,15 @@ private class CareToolRow(val label: String, val icon: ImageVector, val tone: Sa
     LaunchedEffect(selected) { if (selected != capturedPerson) onDismiss() }
     val draftKey = if (initial == null) "$capturedAccount:$capturedPerson:$kind" else null
     val draft = remember(draftKey) { draftKey?.let(CareAddDrafts::get) }
-    var title by rememberSaveable { mutableStateOf(initial?.title ?: draft?.title ?: "") }; var detail by rememberSaveable { mutableStateOf(initial?.detail ?: draft?.detail ?: "") }; var due by rememberSaveable { mutableLongStateOf(initial?.due ?: draft?.due ?: 0) }
+    var title by rememberSaveable { mutableStateOf(initial?.title ?: draft?.title ?: "") }; var detail by rememberSaveable { mutableStateOf(initial?.detail ?: draft?.detail ?: "") }; var due by rememberSaveable { mutableLongStateOf(initial?.due ?: draft?.due ?: if (kind == "visit") LocalDate.now().plusDays(1).atTime(10, 0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() else 0) }
+    var moreOpen by rememberSaveable { mutableStateOf(initial != null && initial.detail.isNotBlank()) }
     var saved by remember { mutableStateOf(false) }
     DisposableEffect(draftKey) { onDispose { if (draftKey != null) { if (saved) CareAddDrafts.clear(draftKey) else CareAddDrafts.keep(draftKey, CareAddDrafts.Draft(title, detail, due)) } } }
     // The save can finish after the sheet was swiped away (it waits for a refresh), so it clears the draft itself instead of leaving the saved text to come back.
     val savedAndClose = { saved = true; draftKey?.let(CareAddDrafts::clear); onDismiss() }
     val busy by vm.busy.collectAsStateWithLifecycle(); val context = LocalContext.current
     val hindi = careHindi(); val t = careText()
+    val saveTitle = if (kind == "visit" && title.isBlank()) t("Doctor visit", "डॉक्टर से मुलाक़ात") else title
     val headings = mapOf("medicine" to t("Add a medicine", "दवा जोड़ें"), "visit" to t("Add a visit", "मुलाक़ात जोड़ें"), "task" to t("Add a task", "काम जोड़ें"), "checkin" to t("How is today?", "आज कैसा है?"), "journal" to t("Write a note", "नोट लिखें"))
     SaharaScreenSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 16.dp, end = 16.dp, bottom = 32.dp).saharaContentSize(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -1317,19 +1320,27 @@ private class CareToolRow(val label: String, val icon: ImageVector, val tone: Sa
             } else if (kind == "journal" && initial == null) {
                 CareField(value = detail, onValueChange = { detail = it.take(4000); title = it.lineSequence().firstOrNull { line -> line.isNotBlank() }.orEmpty().take(80) }, label = t("Your note", "आपका नोट"), minLines = 4)
             } else {
-                CareField(value = title, onValueChange = { title = it.take(200) }, label = when (kind) { "medicine" -> t("Medicine name", "दवा का नाम"); "visit" -> t("Doctor or hospital", "डॉक्टर या अस्पताल"); "task" -> t("What needs doing?", "क्या करना है?"); else -> t("Title", "शीर्षक") }, singleLine = kind != "task")
+                CareField(value = title, onValueChange = { title = it.take(200) }, label = when (kind) { "medicine" -> t("Medicine name *", "दवा का नाम *"); "visit" -> t("Doctor or hospital (optional)", "डॉक्टर या अस्पताल (ज़रूरी नहीं)"); "task" -> t("What needs doing? *", "क्या करना है? *"); else -> t("Title", "शीर्षक") }, singleLine = kind != "task")
                 if (kind == "medicine") MedicineNameSuggestions(title, enabled = !busy) { title = it }
                 // A task's details are optional, so they start as one "Add a note" line that grows when used.
                 if (kind == "task") CareNoteField(detail, { detail = it.take(4000) }, t("Details (optional)", "और जानकारी (ज़रूरी नहीं)"), lines = 2)
-                else CareField(value = detail, onValueChange = { detail = it.take(4000) }, label = when (kind) { "medicine" -> t("Dose and times", "खुराक और समय"); "visit" -> t("Time and place", "समय और जगह"); else -> t("Your note", "आपका नोट") }, minLines = if (kind == "journal") 4 else 2)
+                else if (kind == "visit") {
+                    val zone = ZoneId.systemDefault(); val dueAt = if (due > 0) Instant.ofEpochMilli(due).atZone(zone) else null
+                    Text(t("Day *", "दिन *"), fontWeight = FontWeight.SemiBold)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        listOf(t("Today", "आज") to 0L, t("Tomorrow", "कल") to 1L).forEach { (label, days) -> val day = LocalDate.now().plusDays(days); FilterChip(selected = dueAt?.toLocalDate() == day, onClick = { due = day.atTime(dueAt?.toLocalTime() ?: LocalTime.of(10, 0)).atZone(zone).toInstant().toEpochMilli() }, label = { Text(label) }, modifier = Modifier.heightIn(min = 48.dp)) }
+                    }
+                    OutlinedButton(onClick = { val chosen = dueAt?.toLocalDate() ?: LocalDate.now(); DatePickerDialog(context, { _, y, m, d -> due = LocalDate.of(y, m + 1, d).atTime(dueAt?.toLocalTime() ?: LocalTime.of(10, 0)).atZone(zone).toInstant().toEpochMilli() }, chosen.year, chosen.monthValue - 1, chosen.dayOfMonth).show() }, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.CalendarMonth, null); Spacer(Modifier.width(8.dp)); Text(if (due == 0L) t("Choose date", "तारीख़ चुनें") else date(due)) }
+                    Text(t("Time *", "समय *"), fontWeight = FontWeight.SemiBold)
+                    OutlinedButton(onClick = { val base = dueAt ?: LocalDate.now().plusDays(1).atTime(10, 0).atZone(zone); TimePickerDialog(context, { _, h, mi -> due = base.toLocalDate().atTime(h, mi).atZone(zone).toInstant().toEpochMilli() }, base.hour, base.minute, false).show() }, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Schedule, null); Spacer(Modifier.width(8.dp)); Text(dueAt?.format(DateTimeFormatter.ofPattern("h:mm a")) ?: t("Choose time", "समय चुनें")) }
+                    TextButton(onClick = { moreOpen = !moreOpen }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("More details", "और जानकारी")); Icon(if (moreOpen) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null) }
+                    AnimatedVisibility(moreOpen, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) { CareField(value = detail, onValueChange = { detail = it.take(4000) }, label = t("Place or note (optional)", "जगह या नोट (ज़रूरी नहीं)"), minLines = 2) }
+                }
+                else CareField(value = detail, onValueChange = { detail = it.take(4000) }, label = when (kind) { "medicine" -> t("Dose and times *", "खुराक और समय *"); else -> t("Your note", "आपका नोट") }, minLines = if (kind == "journal") 4 else 2)
                 if (kind == "medicine") StripPhotoRow(vm.storageNamespace, capturedPerson, entryId, enabled = !busy)
             }
-            if (kind == "visit") Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf(t("Today", "आज") to 0L, t("Tomorrow", "कल") to 1L).forEach { (label, days) -> val day = LocalDate.now().plusDays(days).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli(); FilterChip(selected = due == day, onClick = { due = day }, label = { Text(label) }, modifier = Modifier.heightIn(min = 48.dp)) }
-            }
-            if (kind == "visit") OutlinedButton(onClick = { val chosen = if (due > 0) Instant.ofEpochMilli(due).atZone(ZoneId.systemDefault()).toLocalDate() else LocalDate.now(); DatePickerDialog(context, { _, y, m, d -> due = LocalDate.of(y, m + 1, d).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() }, chosen.year, chosen.monthValue - 1, chosen.dayOfMonth).show() }, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.CalendarMonth, null); Spacer(Modifier.width(8.dp)); Text(if (due == 0L) t("Choose date", "तारीख़ चुनें") else date(due)) }
             error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
-            Button(onClick = { if (!canEditCareContext(vm, capturedPerson, capturedAccount)) { vm.message.value = t("Care access changed. Reopen this person's records before saving.", "देखभाल की अनुमति बदल गई है। सहेजने से पहले इस व्यक्ति के रिकॉर्ड फिर से खोलें।"); onDismiss() } else if (initial == null) vm.saveItem(kind, title, detail, due, savedAndClose, entryId) else vm.updateItem(initial.copy(title = title, detail = detail, due = due), onDismiss) }, enabled = selected == capturedPerson && title.isNotBlank() && !busy && (kind != "visit" || due > 0) && (kind != "medicine" || detail.isNotBlank()), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp)) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Save", "सहेजें"), fontSize = 16.sp) }
+            Button(onClick = { if (!canEditCareContext(vm, capturedPerson, capturedAccount)) { vm.message.value = t("Care access changed. Reopen this person's records before saving.", "देखभाल की अनुमति बदल गई है। सहेजने से पहले इस व्यक्ति के रिकॉर्ड फिर से खोलें।"); onDismiss() } else if (initial == null) vm.saveItem(kind, saveTitle, detail, due, savedAndClose, entryId) else vm.updateItem(initial.copy(title = saveTitle, detail = detail, due = due), onDismiss) }, enabled = selected == capturedPerson && (kind == "visit" || title.isNotBlank()) && !busy && (kind != "visit" || due > 0) && (kind != "medicine" || detail.isNotBlank()), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp)) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Save", "सहेजें"), fontSize = 16.sp) }
         }
     }
 }
