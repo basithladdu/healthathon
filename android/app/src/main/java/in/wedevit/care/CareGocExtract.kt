@@ -973,6 +973,33 @@ object GocCarry {
     fun startingNote(r: EctprRecord): String = previous(r)?.note.orEmpty()
 }
 
+/**
+ * Keeping the talk when the plan cannot be saved yet. The talk page has no control for the plan's own rules (V4 understanding, V5 declaration,
+ * DNACPR reason and decided-by), so a confirmed treatment choice can block the plan's save. The talk itself (words, topics, note, sign-off) is kept anyway.
+ */
+object GocKeep {
+    /** What can be saved now: the stored plan with this talk and its "What matters" words, never the treatment choices the plan's rules still block. */
+    fun talkOnly(stored: EctprRecord, working: EctprRecord, today: java.time.LocalDate): EctprRecord {
+        val talk = stored.copy(gocTranscript = working.gocTranscript)
+        val withValues = talk.copy(values = working.values)
+        return if (EctprRules.saveBlockers(withValues, today).isEmpty()) withValues else talk
+    }
+
+    /**
+     * Confirmed choices of this talk that the plan does not hold (the app was closed before the plan was saved, or the talk was kept while the plan's rules blocked it)
+     * are put back, so the form shows them again and the plan's rules ask for what they need. A choice is put back only when the plan has none for that topic,
+     * or when it was confirmed after the plan was last saved, so a choice made since in the full plan is never overwritten.
+     */
+    fun restore(r: EctprRecord, topics: Collection<GocTopicRecord>): EctprRecord = topics.filter { it.status == GocTopicStatus.CONFIRMED && it.optionId != null }.fold(r) { acc, tp ->
+        val after = after(tp.at, r.updatedAt)
+        val missing = if (tp.decision == GocDecision.VALUES) after && tp.quote.isNotBlank() && tp.quote.trim() !in (acc.values.ownWords.lines() + acc.values.unacceptableOutcomes).map(String::trim)
+            else GocPlan.current(acc, tp.decision) != tp.optionId && (GocPlan.current(acc, tp.decision) == null || after)
+        if (missing) runCatching { GocPlan.apply(acc, tp.decision, tp.optionId, listOf(tp.quote).filter(String::isNotBlank)) }.getOrDefault(acc) else acc
+    }
+
+    private fun after(a: String, b: String): Boolean = runCatching { Instant.parse(a).isAfter(Instant.parse(b)) }.getOrDefault(false)
+}
+
 // ── The guide for the talk, in the order the doctors asked for on 3 Nov 2026: consent, patient details, family and emergency contact,
 // then CPR, dialysis and the other decisions, then the rest of the form. Items tick themselves when the words come up. ──
 

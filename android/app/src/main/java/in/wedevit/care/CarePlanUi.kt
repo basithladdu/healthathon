@@ -84,6 +84,8 @@ internal fun planStepOf(field: String): Int = when {
     var loadProblem by remember(selected) { mutableStateOf(false) }
     var state by remember(selected) { mutableStateOf(runCatching { store.load(selected) }.getOrElse { loadProblem = true; CarePlanState() }) }
     var page by rememberSaveable(selected) { mutableStateOf("home") }
+    // The talk's choices that the plan's rules blocked from saving: the full plan opens with them, so they can be fixed there.
+    var gocPending by remember(selected) { mutableStateOf<EctprRecord?>(null) }
     // startAt "goc": the goals-of-care talk as its own page (a draft is opened if none is); the full plan is one named tap away.
     val actor = remember(clinician) { if (clinician) "Doctor" else vm.viewRole.value }
     val signedInDoctor = rememberSignedInDoctor(vm, clinician)
@@ -138,15 +140,15 @@ internal fun planStepOf(field: String): Int = when {
             if (draft == null) { LaunchedEffect(Unit) { page = "home" }; return@SaharaScreenHost }
             CompositionLocalProvider(LocalGocFolder provides runCatching { store.folder(selected) }.getOrNull()) { GocTabFlow(draft, canEdit,
                 onSave = { r -> commit { CarePlanBook.saveDraft(it, r, actor, planNow(), today) } },
-                onClose = { if (startAt == "goc") onBack() else page = "home" }, onFullPlan = { page = "wizard" }) }
+                onClose = { if (startAt == "goc") onBack() else page = "home" }, onFullPlan = { pending -> gocPending = pending; page = "wizard" }) }
         }
         "wizard" -> {
             val draft = EctprLifecycle.draft(state.ectprs, selected)
             if (draft == null) { LaunchedEffect(Unit) { page = "home" }; return@SaharaScreenHost }
-            CompositionLocalProvider(LocalGocFolder provides runCatching { store.folder(selected) }.getOrNull()) { EctprWizard(draft, clinician, canEdit, familyReadOnly = actor == "Family" && !clinician, personName = person.name,
+            CompositionLocalProvider(LocalGocFolder provides runCatching { store.folder(selected) }.getOrNull()) { EctprWizard(draft, clinician, canEdit, start = gocPending?.takeIf { it.id == draft.id } ?: draft, familyReadOnly = actor == "Family" && !clinician, personName = person.name,
                 onSave = { r -> commit { CarePlanBook.saveDraft(it, r, actor, planNow(), today) } },
                 onSign = { r -> commit { CarePlanBook.sign(CarePlanBook.saveDraft(it, r, actor, planNow(), today), r.id, actor, planNow(), today) }.also { ok -> if (ok) page = "ed" } },
-                onClose = { page = wizardBack }) }
+                onClose = { gocPending = null; page = wizardBack }) }
         }
         "pilot" -> PilotLogPage(state, selected, actor, ED_VIEW_DETAIL, onBack = { page = "home" }, commit = ::commit)
         "ed" -> EdQuickViewPage(state, selected, onBack = { page = "home" }, onCard = { page = "card" }, onShare = ::sharePlanPdf,
@@ -341,9 +343,9 @@ internal fun planStepOf(field: String): Int = when {
 
 // ───────────────────────────── Wizard ─────────────────────────────
 
-@Composable private fun EctprWizard(record: EctprRecord, clinician: Boolean, canEdit: Boolean, familyReadOnly: Boolean = false, personName: String = "", onSave: (EctprRecord) -> Boolean, onSign: (EctprRecord) -> Unit, onClose: () -> Unit) {
+@Composable private fun EctprWizard(record: EctprRecord, clinician: Boolean, canEdit: Boolean, start: EctprRecord = record, familyReadOnly: Boolean = false, personName: String = "", onSave: (EctprRecord) -> Boolean, onSign: (EctprRecord) -> Unit, onClose: () -> Unit) {
     val t = careText(); val hindi = careHindi(); val today = LocalDate.now()
-    var d by remember(record.id) { mutableStateOf(record) }
+    var d by remember(record.id) { mutableStateOf(start) }
     var step by rememberSaveable(record.id) { mutableIntStateOf(0) }
     var shown by remember { mutableStateOf<List<RuleIssue>>(emptyList()) }
     var leaving by remember { mutableStateOf(false) }
