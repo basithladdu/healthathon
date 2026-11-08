@@ -39,7 +39,7 @@ text(cover, 1.2, 6.3, 10.9, 0.35, [[R('Try it: sahara.wedevit.in', size=13, colo
 S[2] = r'''
 section(team, 'Team Overview & Background', 'cream')
 members = [
-    ('basith', 'Shaik Abdul Basith', 'Technical lead · Founder', 'WeDevIT Private Limited · wedevit.in', 'Led the build end to end: the website and the Android app; the Gemini pipeline that transcribes the conversation, fills the goals-of-care document and answers questions from reports; the Supabase server, security and Google Play releases; the hospital survey site; this deck and brief'),
+    ('basith', 'Shaik Abdul Basith', 'Technical lead · Founder', 'WeDevIT Private Limited · wedevit.in', 'Led the build end to end: the website and the Android app; the Sarvam AI pipeline that transcribes the conversation, fills the goals-of-care document and answers questions from reports; the Supabase server, security and Google Play releases; the hospital survey site; this deck and brief'),
     ('awaiz', 'Shaik Muhammad Awaiz', 'Android engineer', 'WeDevIT', 'Built Android screens and flows: patient summary, side-effect notes, care timeline, doctor schedule, sign-up and family invites by link, the Today, Care and More redesign, welcome panel and screen transitions; AI retry and backup models; tested every version'),
     ('sharada', 'Dr Sharada Vinod Kutty', 'Pulmonologist', 'AIIMS Mangalagiri', 'Wrote Saanthvana v1.0, the goals-of-care structure the app grew from, then the clinical specification and platform spec (29 Oct) and the comfort-care rule. Designed the goals of care document; set how often patients log symptoms; reviewed the symptom list; tested the survey and shared it with colleagues; advised on medicolegal limits of AI'),
     ('sujay', 'Dr Sujay Halkur Shankar', 'Pulmonologist', 'Tata IISc Medical School', 'Defined the problem statement, evidence and solution, and wrote the final problem, solution and features text (7 Nov); distilled the goals-of-care form; designed and circulated the hospital survey; positioned Sahara as the patient-facing extension of CARE; arranged legal advice; tested the whole app (3 Nov); designed the 13-topic checklist and guided conversation (7 Nov); led the clinical wording review'),
@@ -116,7 +116,7 @@ section(sol1, 'Solution Overview, Key Features & Impact (1/2)', 'cream')
 text(sol1, 0.55, 1.0, 12.2, 0.7, [
     ([R('In the clinic: the doctor talks, Sahara listens and writes. ', size=17, bold=True, color=RUST)], {'after': 0}),
     [R('After consent, the doctor leads the goals-of-care conversation and records it on the doctor portal. Today this is rarely documented.', size=13.5, color=MUTED)]])
-steps = [('08-goc-open', '1. Patient agrees, tap Record', 'Google’s Gemini AI types out who said what'),
+steps = [('08-goc-open', '1. Patient agrees, tap Record', 'Sarvam AI types out who said what'),
          ('09-goc-checklist', '2. A checklist ticks itself', 'Missed topics are flagged. Android: Dr Sujay’s 13 topics, with “Guide me” or “Free flow” taps'),
          ('10g-note', '3. Answers fill the structured clinical document', 'Doctor checks the transcription and summary'),
          ('11-qr', '4. Everyone signs on the phone', 'Doctor and patient or family sign; it locks and opens from a QR code in an emergency')]
@@ -156,13 +156,14 @@ LG = B / 'assets/logos'
 text(tech, 0.55, 0.98, 12.2, 0.4, [[R('How a conversation becomes a signed clinical document', size=16, bold=True, color=RUST)]])
 flow = [(LG / 'android.png', 'Doctor’s phone', 'records only after patient consent'),
         (LG / 'supabase.png', 'Our server', 'keeps the AI password; the phone never has it'),
-        (LG / 'googlegemini.png', 'Gemini + Sarvam AI', 'type out the talk, in Indian languages too, and fill the clinical document'),
+        (LG / 'sarvam.png', 'Sarvam AI', 'types out the talk, in Indian languages too, and fills the clinical document'),
         (IC / 'image11.png', 'Doctor', 'reads it, corrects it, signs; the patient or caregiver also signs'),
         (IC / 'image29.png', 'Locked document', 'PDF + QR code; any later change creates a new version that requires re-signatures')]
 for i, (lg, h, d) in enumerate(flow):
     x = 0.55 + i * 2.5
     card(tech, x, 1.42, 2.15, 1.7, fill='FFFFFF', line='C9DDD2')
-    pic(tech, lg, x + 0.8, 1.55, 0.55, 0.55)
+    if lg.name == 'sarvam.png': pic(tech, lg, x + 0.4, 1.68, 1.35, 1.35 * 207 / 1114)
+    else: pic(tech, lg, x + 0.8, 1.55, 0.55, 0.55)
     text(tech, x + 0.08, 2.15, 1.99, 1.2, [([R(h, size=14, bold=True)], {'after': 2}), [R(d, size=11.5, color=MUTED)]], align=PP_ALIGN.CENTER)
     if i < 4: arrow(tech, x + 2.17, 2.25, 0.3, 0.24)
 pic(tech, LG / 'openai.png', 0.75, 3.52, 0.34, 0.34)
@@ -172,7 +173,7 @@ text(tech, 0.55, 4.02, 12.2, 0.38, [[R('Built with', size=16, bold=True, color=R
 stack = [('android', 'Android', 'the phone app'), ('kotlin', 'Kotlin + Compose', 'language and screens of the app'),
          ('nextdotjs', 'Next.js', 'the website'), ('vercel', 'Vercel', 'puts the website online'),
          ('supabase', 'Supabase', 'server, sign-in, storage'), ('postgresql', 'PostgreSQL', 'database; each family sees only its own'),
-         ('googlegemini', 'Google Gemini', 'AI: speech to text, fills the document'), ('sarvam', 'Sarvam AI', 'Indian-language speech to text and translation'), ('openai', 'OpenAI Whisper', 'speech to text with no internet'),
+         ('sarvam', 'Sarvam AI', 'Indian-language speech to text and translation'), ('openai', 'OpenAI Whisper', 'speech to text with no internet'),
          ('googletranslate', 'Google ML Kit', '5 languages and read-aloud on the phone'), ('openstreetmap', 'OpenStreetMap', 'free map of nearby centres'),
          (None, 'Clinical tools', 'ESAS-r, NCCN Distress Thermometer, ZBI-4'), (None, 'FHIR', 'standard format hospital software can read')]
 for i, (lg, h, d) in enumerate(stack):
@@ -183,7 +184,7 @@ for i, (lg, h, d) in enumerate(stack):
     else: icon(tech, {'Clinical tools': 27}.get(h, 23), x + 0.12, y + 0.14, 0.42)
     if lg != 'sarvam': text(tech, x + 0.6, y + 0.1, 1.04, 0.5, [[R(h, size=11, bold=True)]], anchor=MSO_ANCHOR.MIDDLE)
     text(tech, x + 0.1, y + 0.6, 1.5, 0.55, [[R(d, size=9.5, color=MUTED)]])
-notes(tech, 'Logos from the simple-icons set (CC0), used only to name the tools we use. Gemini models: 3.1 Flash-Lite first, then other Flash models when busy; on-device Whisper; typing.')
+notes(tech, 'Logos from the simple-icons set (CC0), used only to name the tools we use. AI: Sarvam AI speech to text with speaker labels and translation; on-device Whisper when offline; typing.')
 '''
 
 S[8] = r'''
@@ -226,7 +227,7 @@ ev = {  # (day, month): [(label, colour)] - from the git history and team chat
     (2, 11): [('Doctor schedule', TEAL), ('Patient profile', TEAL)],
     (3, 11): [('Dr Sujay tests whole app', PURPLE)],
     (4, 11): [('Clinical document', TEAL), ('8 practice talks pass', TEAL)],
-    (5, 11): [('Gemini AI + backups', TEAL), ('Whisper + Gemini', TEAL)],
+    (5, 11): [('AI + backup models', TEAL), ('Offline Whisper', TEAL)],
     (6, 11): [('Community groups', TEAL), ('910 tests pass', TEAL)],
     (7, 11): [('Dr Sujay’s 13 topics', PURPLE), ('Caregiver wellbeing', TEAL)],
 }
@@ -262,7 +263,7 @@ for i, (h, col, body) in enumerate(boxes):
     y = 1.0 + i * 1.48
     card(sprint, 9.55, y, 3.2, 1.38, fill='FFFFFF')
     text(sprint, 9.7, y + 0.06, 2.95, 1.3, [([R(h, size=13, bold=True, color=col)], {'after': 3}), [R(body, size=11, color=GREEN)]])
-notes(sprint, 'Dates from the git history and team chat: shortlisted 9 Oct; native Android 9 Oct; Play testing 13-14 Oct; Play submission 19 Oct; survey feedback 23 Oct; survey live 27 Oct; team meeting 28 Oct; clinical spec 29 Oct; legal review 31 Oct; Dr Sujay walkthrough 3 Nov; clinical document word for word 4 Nov; Gemini fallback 5 Nov.')
+notes(sprint, 'Dates from the git history and team chat: shortlisted 9 Oct; native Android 9 Oct; Play testing 13-14 Oct; Play submission 19 Oct; survey feedback 23 Oct; survey live 27 Oct; team meeting 28 Oct; clinical spec 29 Oct; legal review 31 Oct; Dr Sujay walkthrough 3 Nov; clinical document word for word 4 Nov; AI fallback 5 Nov.')
 '''
 
 S[9] = r'''
@@ -325,11 +326,11 @@ for i, (ic, h, d) in enumerate(steps_):
     text(deploy, 1.5, y + 0.06, 4.1, 1.2, [([R(h, size=15, bold=True, color=RUST)], {'after': 1}), [R(d, size=12, color=GREEN)]], anchor=MSO_ANCHOR.MIDDLE)
 crow = [('What it costs', 'Once', 'Every month'),
         ('Servers and website (Supabase + Vercel)', '–', '₹4,200'),
-        ('Google Gemini AI, per 30-minute talk', '–', '≈ ₹2 a talk'),
+        ('Sarvam AI, per 30-minute talk', '–', '≈ ₹23 a talk'),
         ('Setting up and training clinic staff', '₹25,000', '–'),
         ('Consent forms and legal check', '₹25,000', '–'),
         ('Support from our team', '–', '₹10,000'),
-        ('Cost per clinic, if 10 clinics share it', '₹5,000', '≈ ₹1,600')]
+        ('Cost per clinic, if 10 clinics share it', '₹5,000', '≈ ₹3,700')]
 t2 = deploy.shapes.add_table(len(crow), 3, Inches(5.9), Inches(1.2), Inches(6.85), Inches(3.6)).table
 for j, wdt in enumerate([3.85, 1.25, 1.75]): t2.columns[j].width = Inches(wdt)
 for i, row in enumerate(crow):
@@ -343,8 +344,8 @@ for i, row in enumerate(crow):
                 r.font.color.rgb = rgb('FFFFFF' if i == 0 else GREEN)
 card(deploy, 5.9, 5.1, 6.85, 0.75, fill=GREEN)
 text(deploy, 6.05, 5.1, 6.55, 0.75, [[R('We would charge ₹1,500–2,000 per clinic a month', size=17, bold=True, color='FFFFFF')]], anchor=MSO_ANCHOR.MIDDLE, align=PP_ALIGN.CENTER)
-text(deploy, 5.9, 6.0, 6.85, 1.0, [[R('Based on public prices: US$1 ≈ ₹94; Supabase $25 and Vercel $20 a month; Gemini ≈ $0.30 per million audio units (a 30-minute talk ≈ 58,000); 100 talks per clinic a month.', size=11, color=MUTED, italic=True)]])
-notes(deploy, 'COST FIGURES ARE TEAM ESTIMATES from public list prices and an assumed Gemini audio price; confirm before submission. US$1 = Rs 94 (Dr Sujay, 7 Nov). Servers 45 x 94 = ~4,230. Per clinic monthly = (4,230 + 10,000) / 10 + 100 x 2 = ~1,620. One-time per clinic = 50,000 / 10 = 5,000.')
+text(deploy, 5.9, 6.0, 6.85, 1.0, [[R('Based on public prices: US$1 ≈ ₹94; Supabase $25 and Vercel $20 a month; Sarvam AI ₹45 per audio hour with speaker labels; 100 talks per clinic a month.', size=11, color=MUTED, italic=True)]])
+notes(deploy, 'COST FIGURES ARE TEAM ESTIMATES from public list prices and Sarvam AI price (Rs 45 per hour, speech to text with diarization, docs.sarvam.ai). US$1 = Rs 94 (Dr Sujay, 7 Nov). Servers 45 x 94 = ~4,230. Per clinic monthly = (4,230 + 10,000) / 10 + 100 x 22.5 = ~3,670. One-time per clinic = 50,000 / 10 = 5,000.')
 '''
 
 S[12] = r'''

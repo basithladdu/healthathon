@@ -114,8 +114,8 @@ bullet_src = list(slide2.shapes[2].text_frame._txBody.findall(qn('a:p')))[2]  # 
 plan = [('keep', 0)]
 SUJ_AI = [
     [S('Sahara is a palliative-care companion (Android and web) with separate patient and doctor interfaces.')],
-    [S('Goals of care: ', b=True), S('After the patient and/or caregivers consent, the doctor leads the conversation and records it on the doctor portal. Gemini AI transcribes the audio, labels who said what, and fills Sahara’s advance care planning form (a clinical, not legal, document). A checklist ticks off topics as covered and flags any missed. The doctor corrects the draft; doctor and patient or family sign on the phone. It then locks; edits require re-signing, and all versions are stored. The signed wishes open from the patient’s emergency QR code.')],
-    [S('Symptoms and reports: ', b=True), S('Patients log symptoms, distress and pain at home, shown on the doctor portal as trends. Patients can upload documents that Gemini categorizes (as prescriptions, bills, reports) and answers questions from (“When is my next follow-up?”). Tablet strip photos and prescriptions are converted to an easily usable pill tracker.')],
+    [S('Goals of care: ', b=True), S('After the patient and/or caregivers consent, the doctor leads the conversation and records it on the doctor portal. Sarvam AI transcribes the audio, labels who said what, and fills Sahara’s advance care planning form (a clinical, not legal, document). A checklist ticks off topics as covered and flags any missed. The doctor corrects the draft; doctor and patient or family sign on the phone. It then locks; edits require re-signing, and all versions are stored. The signed wishes open from the patient’s emergency QR code.')],
+    [S('Symptoms and reports: ', b=True), S('Patients log symptoms, distress and pain at home, shown on the doctor portal as trends. Patients can upload documents that Sarvam AI categorizes (as prescriptions, bills, reports) and answers questions from (“When is my next follow-up?”). Tablet strip photos and prescriptions are converted to an easily usable pill tracker.')],
     [S('Pain relief and help: ', b=True), S('Sahara finds the nearest palliative centre, morphine-dispensing hospital, emergency hospital and support groups.')],
     [S('The AI only records, flags and retrieves; every clinical decision stays with the doctor.')],
 ]
@@ -123,7 +123,7 @@ for segs in SUJ_AI:
     plan.append(('new', make_para(tBody, segs, space_before=2, size=P1)))
 plan.append(('new', make_para(tBody, [S(' ')], size=3)))
 plan.append(('keep', 6))
-plan.append(('new', make_para(tBody, [S('Android (Kotlin, Compose) and web (Next.js, Vercel); '), S('Supabase', b=True), S(' with row-level security (each family sees only its own records); '), S('Google Gemini', b=True), S(' with backup models; '), S('Sarvam AI', b=True), S(': speech-to-text and translation for Indian languages (Hindi, Telugu, Kannada, Urdu), so patients and families can speak in their own language; '), S('OpenAI Whisper', b=True), S(' offline on the phone; Google ML Kit for 5 languages.')], space_before=2, size=P1)))
+plan.append(('new', make_para(tBody, [S('Android (Kotlin, Compose) and web (Next.js, Vercel); '), S('Supabase', b=True), S(' with row-level security (each family sees only its own records); '), S('Sarvam AI', b=True), S(': speech-to-text, speaker labels and translation for Indian languages (Hindi, Telugu, Kannada, Urdu), so patients and families can speak in their own language; '), S('OpenAI Whisper', b=True), S(' offline on the phone; Google ML Kit for 5 languages.')], space_before=2, size=P1)))
 plan.append(('new', make_para(tBody, [S(' ')], size=3)))
 plan.append(('keep', 14))
 SUJ_FEAT = [
@@ -149,7 +149,7 @@ plan = [('keep', 0)]
 for head, rest in [
     ('Weeks 1\u20132 (9\u201322 Oct): ', 'shortlisted 9 Oct; native Android app, on Google Play closed testing from 14 Oct; map of nearby palliative centres; medicine organiser with prescription photo; symptom tracker.'),
     ('Week 3 (23\u201329 Oct): ', 'pain body map; hospital survey live 27 Oct; 28 Oct team meeting (9 decisions); \u201cAsk your documents\u201d; Dr Sharada\u2019s clinical specification on 29 Oct.'),
-    ('Week 4 (30 Oct–5 Nov): ', 'advance care planning (goals of care) and emergency QR code; Telugu, Urdu, Kannada; legal advice 31 Oct; Dr Sujay tested the whole app 3 Nov; goals-of-care recording with Gemini onto the clinical document; signed, locked PDF.'),
+    ('Week 4 (30 Oct–5 Nov): ', 'advance care planning (goals of care) and emergency QR code; Telugu, Urdu, Kannada; legal advice 31 Oct; Dr Sujay tested the whole app 3 Nov; goals-of-care recording with Sarvam AI onto the clinical document; signed, locked PDF.'),
     ('How it changed: ', 'in Round 1 the AI drafted a “Care Note”; our doctors asked that the doctor lead and the AI only write it down, on the clinical document. 6\u20137 Nov: Dr Sujay\u2019s 13-topic checklist, Guide me / Free flow, caregiver wellbeing (ZBI-4).'),
 ]:
     plan.append(('new', make_para(tB, [S(head, b=True), S(rest)], bullet=True, bullet_src=bullet_src, space_before=2)))
@@ -161,7 +161,7 @@ for head, rest in [
     ('Ask your documents: ', '4 of 4 questions on a sample hospital report answered with the right source line.'),
     ('Dr Sujay, 3 Nov meeting: ', 'asked for a guide on what to talk about next \u2192 checklist in the doctors\u2019 order (consent, patient, family, CPR, dialysis\u2026) with a \u201cnot yet discussed\u201d prompt; 4 doses a day \u2192 4 ticks.'),
     ('Legal advice, 31 Oct: ', 'inputs and refining the goals-of-care wording and format.'),
-    ('Next steps: ', 'clinic pilot with patients; Gemini accuracy on Hindi and Telugu clinic recordings; stronger on-phone speech for Telugu and Kannada (typing works today).'),
+    ('Next steps: ', 'clinic pilot with patients; Sarvam AI accuracy on Hindi and Telugu clinic recordings; stronger on-phone speech for Telugu and Kannada (typing works today).'),
 ]:
     plan.append(('new', make_para(tB, [S(head, b=True), S(rest)], bullet=True, bullet_src=bullet_src, space_before=2)))
 rebuild(l2, plan)
@@ -173,7 +173,7 @@ tS = olds[2]
 plan = [('keep', 0)]
 for head, rest in [
     ('Doctor in charge: ', 'the doctor leads, corrects and signs every goals-of-care document; the AI never diagnoses or suggests treatment, and lists missing topics instead of guessing.'),
-    ('Consent and privacy: ', 'recording starts only after the patient ticks “I agree”; Gemini is used only with that consent. Family members join by invite and see only their patient.'),
+    ('Consent and privacy: ', 'recording starts only after the patient ticks “I agree”; Sarvam AI is used only with that consent. Family members join by invite and see only their patient.'),
     ('Tamper-evident documents: ', 'signed documents are sealed with a SHA-256 fingerprint, so any change creates a new version that requires re-signatures; earlier versions stay visible.'),
     ('Inclusion: ', 'five languages, read aloud, large text, thumb signature; typing when speech fails. Demos use sample patients, so no real data is exposed.'),
 ]:
@@ -184,7 +184,7 @@ for head, rest in [
     ('Pilot: ', '60\u201390 days in one palliative-care clinic with our doctors; patients consent as India\u2019s data-protection law (DPDP Act 2023) requires. We count talks signed and how fast wishes are found.'),
     ('Integration: ', 'works on its own, no hospital software needed; can sit beside the clinic’s electronic medical records as a plug-in; a FHIR export (the standard format hospital systems read) is ready.'),
     ('Ambient listening (next): ', 'today Sahara records on the doctor’s phone; next, room or lapel microphones in clinics capture the discussion hands-free, with the same consent.'),
-    ('Cost (from public prices): ', 'servers about \u20b94,200 a month (Supabase, Vercel); Gemini about \u20b92 per 30-minute talk; about \u20b91,600 per clinic a month if 10 clinics share it. Free for patients; clinics or NGOs pay \u20b91,500\u20132,000 a month.'),
+    ('Cost (from public prices): ', 'servers about \u20b94,200 a month (Supabase, Vercel); Sarvam AI about \u20b923 per 30-minute talk; about \u20b93,700 per clinic a month if 10 clinics share it. Free for patients; clinics or NGOs pay \u20b91,500\u20132,000 a month.'),
 ]:
     plan.append(('new', make_para(tS, [S(head, b=True), S(rest)], bullet=True, bullet_src=bullet_src, space_before=2)))
 plan.append(('new', make_para(tS, [S(' ')], size=4)))
