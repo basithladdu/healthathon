@@ -28,7 +28,7 @@ const PLAY_URL = 'https://play.google.com/store/apps/details?id=in.wedevit.sahar
 const PROMPT_KEY = 'sahara.appPrompt.dismissed';
 const PROMPT_DELAY_MS = 0;
 
-function PlayLink({ className = '' }: { className?: string }): React.JSX.Element {
+export function PlayLink({ className = '' }: { className?: string }): React.JSX.Element {
   return (
     <a className={`lp-play-badge ${className}`.trim()} href={PLAY_URL} target="_blank" rel="noopener" aria-label="Get it on Google Play">
       <svg className="lp-play-icon" width="28" height="30" viewBox="0 0 24 26" aria-hidden="true" focusable="false">
@@ -42,7 +42,7 @@ function PlayLink({ className = '' }: { className?: string }): React.JSX.Element
   );
 }
 
-function AppDownloadDialog(): React.JSX.Element | null {
+export function AppDownloadDialog(): React.JSX.Element | null {
   const [open, setOpen] = React.useState(false);
   const [qr, setQr] = React.useState('');
   const dialogRef = React.useRef<HTMLDivElement>(null);
@@ -241,7 +241,6 @@ export function LandingPage(props: {
           </details>
         </div>
       </main>
-      <AppDownloadDialog />
       <footer className="lp-footer"><p>Sahara - A Palliative Care Companion</p></footer>
     </div>
   );

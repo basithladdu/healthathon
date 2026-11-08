@@ -37,6 +37,7 @@ import './doctor-care-home.css';
 import './care-colors.css';
 import './doctor-notes.css';
 import './sahara-theme.css';
+import { AppDownloadPrompt } from './app-download-prompt';
 
 // Noto Sans for reading and Anek for headings and commands (both OFL), each with Latin and Devanagari.
 const noto = Noto_Sans({
@@ -71,6 +72,7 @@ export default function RootLayout({
     <html lang="en" className={`${noto.variable} ${anek.variable}`}>
       <body className="antialiased">
         {children}
+        <AppDownloadPrompt />
       </body>
     </html>
   );
