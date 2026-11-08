@@ -172,15 +172,16 @@ text(tech, 0.55, 4.02, 12.2, 0.38, [[R('Built with', size=16, bold=True, color=R
 stack = [('android', 'Android', 'the phone app'), ('kotlin', 'Kotlin + Compose', 'language and screens of the app'),
          ('nextdotjs', 'Next.js', 'the website'), ('vercel', 'Vercel', 'puts the website online'),
          ('supabase', 'Supabase', 'server, sign-in, storage'), ('postgresql', 'PostgreSQL', 'database; each family sees only its own'),
-         ('googlegemini', 'Google Gemini', 'AI: speech to text, fills the document'), (None, 'Sarvam AI', 'Indian-language speech to text and translation'), ('openai', 'OpenAI Whisper', 'speech to text with no internet'),
+         ('googlegemini', 'Google Gemini', 'AI: speech to text, fills the document'), ('sarvam', 'Sarvam AI', 'Indian-language speech to text and translation'), ('openai', 'OpenAI Whisper', 'speech to text with no internet'),
          ('googletranslate', 'Google ML Kit', '5 languages and read-aloud on the phone'), ('openstreetmap', 'OpenStreetMap', 'free map of nearby centres'),
          (None, 'Clinical tools', 'ESAS-r, NCCN Distress Thermometer, ZBI-4'), (None, 'FHIR', 'standard format hospital software can read')]
 for i, (lg, h, d) in enumerate(stack):
     x = 0.55 + (i % 7) * 1.755; y = 4.45 + (i // 7) * 1.27
     card(tech, x, y, 1.66, 1.15, fill='FFFFFF', radius=0.12)
-    if lg: pic(tech, LG / f'{lg}.png', x + 0.12, y + 0.14, 0.42, 0.42)
-    else: icon(tech, {'Clinical tools': 27, 'Sarvam AI': 26}.get(h, 23), x + 0.12, y + 0.14, 0.42)
-    text(tech, x + 0.6, y + 0.1, 1.04, 0.5, [[R(h, size=11, bold=True)]], anchor=MSO_ANCHOR.MIDDLE)
+    if lg == 'sarvam': pic(tech, LG / 'sarvam.png', x + 0.2, y + 0.2, 1.26, 1.26 * 207 / 1114)
+    elif lg: pic(tech, LG / f'{lg}.png', x + 0.12, y + 0.14, 0.42, 0.42)
+    else: icon(tech, {'Clinical tools': 27}.get(h, 23), x + 0.12, y + 0.14, 0.42)
+    if lg != 'sarvam': text(tech, x + 0.6, y + 0.1, 1.04, 0.5, [[R(h, size=11, bold=True)]], anchor=MSO_ANCHOR.MIDDLE)
     text(tech, x + 0.1, y + 0.6, 1.5, 0.55, [[R(d, size=9.5, color=MUTED)]])
 notes(tech, 'Logos from the simple-icons set (CC0), used only to name the tools we use. Gemini models: 3.1 Flash-Lite first, then other Flash models when busy; on-device Whisper; typing.')
 '''
