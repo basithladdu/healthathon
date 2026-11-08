@@ -123,7 +123,7 @@ for segs in SUJ_AI:
     plan.append(('new', make_para(tBody, segs, space_before=2, size=P1)))
 plan.append(('new', make_para(tBody, [S(' ')], size=3)))
 plan.append(('keep', 6))
-plan.append(('new', make_para(tBody, [S('Android (Kotlin, Compose) and web (Next.js, Vercel); '), S('Supabase', b=True), S(' with row-level security (each family sees only its own records); '), S('Google Gemini', b=True), S(' with backup models; '), S('OpenAI Whisper', b=True), S(' offline on the phone; Google ML Kit for 5 languages.')], space_before=2, size=P1)))
+plan.append(('new', make_para(tBody, [S('Android (Kotlin, Compose) and web (Next.js, Vercel); '), S('Supabase', b=True), S(' with row-level security (each family sees only its own records); '), S('Google Gemini', b=True), S(' with backup models; '), S('Sarvam AI', b=True), S(': speech-to-text and translation for Indian languages (Hindi, Telugu, Kannada, Urdu), so patients and families can speak in their own language; '), S('OpenAI Whisper', b=True), S(' offline on the phone; Google ML Kit for 5 languages.')], space_before=2, size=P1)))
 plan.append(('new', make_para(tBody, [S(' ')], size=3)))
 plan.append(('keep', 14))
 SUJ_FEAT = [

@@ -156,7 +156,7 @@ LG = B / 'assets/logos'
 text(tech, 0.55, 0.98, 12.2, 0.4, [[R('How a conversation becomes a signed clinical document', size=16, bold=True, color=RUST)]])
 flow = [(LG / 'android.png', 'Doctor’s phone', 'records only after patient consent'),
         (LG / 'supabase.png', 'Our server', 'keeps the AI password; the phone never has it'),
-        (LG / 'googlegemini.png', 'Google Gemini AI', 'types out the talk and fills in the clinical document'),
+        (LG / 'googlegemini.png', 'Gemini + Sarvam AI', 'type out the talk, in Indian languages too, and fill the clinical document'),
         (IC / 'image11.png', 'Doctor', 'reads it, corrects it, signs; the patient or caregiver also signs'),
         (IC / 'image29.png', 'Locked document', 'PDF + QR code; any later change creates a new version that requires re-signatures')]
 for i, (lg, h, d) in enumerate(flow):
@@ -172,16 +172,16 @@ text(tech, 0.55, 4.02, 12.2, 0.38, [[R('Built with', size=16, bold=True, color=R
 stack = [('android', 'Android', 'the phone app'), ('kotlin', 'Kotlin + Compose', 'language and screens of the app'),
          ('nextdotjs', 'Next.js', 'the website'), ('vercel', 'Vercel', 'puts the website online'),
          ('supabase', 'Supabase', 'server, sign-in, storage'), ('postgresql', 'PostgreSQL', 'database; each family sees only its own'),
-         ('googlegemini', 'Google Gemini', 'AI: speech to text, fills the document'), ('openai', 'OpenAI Whisper', 'speech to text with no internet'),
+         ('googlegemini', 'Google Gemini', 'AI: speech to text, fills the document'), (None, 'Sarvam AI', 'Indian-language speech to text and translation'), ('openai', 'OpenAI Whisper', 'speech to text with no internet'),
          ('googletranslate', 'Google ML Kit', '5 languages and read-aloud on the phone'), ('openstreetmap', 'OpenStreetMap', 'free map of nearby centres'),
          (None, 'Clinical tools', 'ESAS-r, NCCN Distress Thermometer, ZBI-4'), (None, 'FHIR', 'standard format hospital software can read')]
 for i, (lg, h, d) in enumerate(stack):
-    x = 0.55 + (i % 6) * 2.05; y = 4.45 + (i // 6) * 1.27
-    card(tech, x, y, 1.93, 1.15, fill='FFFFFF', radius=0.12)
+    x = 0.55 + (i % 7) * 1.755; y = 4.45 + (i // 7) * 1.27
+    card(tech, x, y, 1.66, 1.15, fill='FFFFFF', radius=0.12)
     if lg: pic(tech, LG / f'{lg}.png', x + 0.12, y + 0.14, 0.42, 0.42)
-    else: icon(tech, 27 if h == 'Clinical tools' else 23, x + 0.12, y + 0.14, 0.42)
-    text(tech, x + 0.62, y + 0.1, 1.27, 0.5, [[R(h, size=11.5, bold=True)]], anchor=MSO_ANCHOR.MIDDLE)
-    text(tech, x + 0.12, y + 0.62, 1.75, 0.5, [[R(d, size=10, color=MUTED)]])
+    else: icon(tech, {'Clinical tools': 27, 'Sarvam AI': 26}.get(h, 23), x + 0.12, y + 0.14, 0.42)
+    text(tech, x + 0.6, y + 0.1, 1.04, 0.5, [[R(h, size=11, bold=True)]], anchor=MSO_ANCHOR.MIDDLE)
+    text(tech, x + 0.1, y + 0.6, 1.5, 0.55, [[R(d, size=9.5, color=MUTED)]])
 notes(tech, 'Logos from the simple-icons set (CC0), used only to name the tools we use. Gemini models: 3.1 Flash-Lite first, then other Flash models when busy; on-device Whisper; typing.')
 '''
 
