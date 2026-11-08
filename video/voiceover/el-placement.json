@@ -1,0 +1,515 @@
+[
+ {
+  "id": "O1",
+  "block": 1,
+  "scene_start": 0.0,
+  "scene_end": 4.5,
+  "line_start": 0.4,
+  "speech_onset": 0.4,
+  "duration": 2.5,
+  "speech_duration": 2.32,
+  "speech_end": 2.72,
+  "spare": 1.78,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/01_O1.wav",
+  "src_cut": [
+   0.0,
+   2.5
+  ]
+ },
+ {
+  "id": "O2",
+  "block": 2,
+  "scene_start": 4.5,
+  "scene_end": 9.5,
+  "line_start": 4.82,
+  "speech_onset": 4.9,
+  "duration": 4.32,
+  "speech_duration": 4.06,
+  "speech_end": 8.96,
+  "spare": 0.54,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/02_O2.wav",
+  "src_cut": [
+   2.8,
+   7.12
+  ]
+ },
+ {
+  "id": "O3",
+  "block": 3,
+  "scene_start": 9.5,
+  "scene_end": 14.0,
+  "line_start": 9.8,
+  "speech_onset": 9.9,
+  "duration": 2.96,
+  "speech_duration": 2.68,
+  "speech_end": 12.58,
+  "spare": 1.42,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/03_O3.wav",
+  "src_cut": [
+   8.18,
+   11.14
+  ]
+ },
+ {
+  "id": "O4+O5",
+  "block": 4,
+  "scene_start": 14.0,
+  "scene_end": 21.0,
+  "line_start": 14.301,
+  "speech_onset": 14.4,
+  "duration": 6.673,
+  "speech_duration": 6.396,
+  "speech_end": 20.796,
+  "spare": 0.204,
+  "atempo": 1.01,
+  "needs_atempo": 1.01,
+  "file": "el-lines/04_O4_O5.wav",
+  "src_cut": [
+   11.3,
+   18.04
+  ]
+ },
+ {
+  "id": "CH1",
+  "block": 5,
+  "scene_start": 21.0,
+  "scene_end": 23.2,
+  "line_start": 21.1,
+  "speech_onset": 21.2,
+  "duration": 0.94,
+  "speech_duration": 0.66,
+  "speech_end": 21.86,
+  "spare": 1.34,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/05_CH1.wav",
+  "src_cut": [
+   18.3,
+   19.24
+  ]
+ },
+ {
+  "id": "F1",
+  "block": 6,
+  "scene_start": 23.2,
+  "scene_end": 33.2,
+  "line_start": 23.59,
+  "speech_onset": 23.6,
+  "duration": 6.45,
+  "speech_duration": 6.26,
+  "speech_end": 29.86,
+  "spare": 3.34,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/06_F1.wav",
+  "src_cut": [
+   19.31,
+   25.76
+  ]
+ },
+ {
+  "id": "F2",
+  "block": 7,
+  "scene_start": 33.2,
+  "scene_end": 44.7,
+  "line_start": 33.6,
+  "speech_onset": 33.6,
+  "duration": 7.52,
+  "speech_duration": 7.34,
+  "speech_end": 40.94,
+  "spare": 3.76,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/07_F2.wav",
+  "src_cut": [
+   25.78,
+   33.3
+  ]
+ },
+ {
+  "id": "F3",
+  "block": 8,
+  "scene_start": 44.7,
+  "scene_end": 54.2,
+  "line_start": 45.0,
+  "speech_onset": 45.1,
+  "duration": 5.48,
+  "speech_duration": 5.2,
+  "speech_end": 50.3,
+  "spare": 3.9,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/08_F3.wav",
+  "src_cut": [
+   33.74,
+   39.22
+  ]
+ },
+ {
+  "id": "F4",
+  "block": 9,
+  "scene_start": 54.2,
+  "scene_end": 63.7,
+  "line_start": 54.54,
+  "speech_onset": 54.6,
+  "duration": 6.32,
+  "speech_duration": 6.08,
+  "speech_end": 60.68,
+  "spare": 3.02,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/09_F4.wav",
+  "src_cut": [
+   39.26,
+   45.58
+  ]
+ },
+ {
+  "id": "F5",
+  "block": 10,
+  "scene_start": 63.7,
+  "scene_end": 73.2,
+  "line_start": 64.1,
+  "speech_onset": 64.1,
+  "duration": 5.475,
+  "speech_duration": 5.38,
+  "speech_end": 69.48,
+  "spare": 3.72,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/10_F5.wav",
+  "src_cut": [
+   45.64,
+   51.115
+  ]
+ },
+ {
+  "id": "F6",
+  "block": 11,
+  "scene_start": 73.2,
+  "scene_end": 85.7,
+  "line_start": 73.5,
+  "speech_onset": 73.6,
+  "duration": 9.92,
+  "speech_duration": 9.76,
+  "speech_end": 83.36,
+  "spare": 2.34,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/11_F6.wav",
+  "src_cut": [
+   51.28,
+   61.2
+  ]
+ },
+ {
+  "id": "CH2",
+  "block": 12,
+  "scene_start": 85.7,
+  "scene_end": 87.9,
+  "line_start": 85.96,
+  "speech_onset": 85.9,
+  "duration": 1.14,
+  "speech_duration": 1.02,
+  "speech_end": 86.92,
+  "spare": 0.98,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/12_CH2.wav",
+  "src_cut": [
+   61.2,
+   62.34
+  ]
+ },
+ {
+  "id": "F9",
+  "block": 13,
+  "scene_start": 87.9,
+  "scene_end": 97.4,
+  "line_start": 88.275,
+  "speech_onset": 88.3,
+  "duration": 5.265,
+  "speech_duration": 5.18,
+  "speech_end": 93.48,
+  "spare": 3.92,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/13_F9.wav",
+  "src_cut": [
+   62.515,
+   67.78
+  ]
+ },
+ {
+  "id": "CH3",
+  "block": 14,
+  "scene_start": 97.4,
+  "scene_end": 99.6,
+  "line_start": 97.66,
+  "speech_onset": 97.6,
+  "duration": 1.18,
+  "speech_duration": 1.06,
+  "speech_end": 98.66,
+  "spare": 0.94,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/14_CH3.wav",
+  "src_cut": [
+   67.78,
+   68.96
+  ]
+ },
+ {
+  "id": "F7",
+  "block": 15,
+  "scene_start": 99.6,
+  "scene_end": 109.1,
+  "line_start": 99.935,
+  "speech_onset": 100.0,
+  "duration": 6.045,
+  "speech_duration": 5.8,
+  "speech_end": 105.8,
+  "spare": 3.3,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/15_F7.wav",
+  "src_cut": [
+   69.255,
+   75.3
+  ]
+ },
+ {
+  "id": "CH4",
+  "block": 16,
+  "scene_start": 109.1,
+  "scene_end": 111.3,
+  "line_start": 109.27,
+  "speech_onset": 109.3,
+  "duration": 0.81,
+  "speech_duration": 0.6,
+  "speech_end": 109.9,
+  "spare": 1.4,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/16_CH4.wav",
+  "src_cut": [
+   75.39,
+   76.2
+  ]
+ },
+ {
+  "id": "F8",
+  "block": 17,
+  "scene_start": 111.3,
+  "scene_end": 120.8,
+  "line_start": 111.7,
+  "speech_onset": 111.7,
+  "duration": 5.96,
+  "speech_duration": 5.78,
+  "speech_end": 117.48,
+  "spare": 3.32,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/17_F8.wav",
+  "src_cut": [
+   76.3,
+   82.26
+  ]
+ },
+ {
+  "id": "F10",
+  "block": 18,
+  "scene_start": 120.8,
+  "scene_end": 130.3,
+  "line_start": 121.13,
+  "speech_onset": 121.2,
+  "duration": 3.99,
+  "speech_duration": 3.98,
+  "speech_end": 125.18,
+  "spare": 5.12,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/18_F10.wav",
+  "src_cut": [
+   82.35,
+   86.34
+  ]
+ },
+ {
+  "id": "F13",
+  "block": 19,
+  "scene_start": 130.3,
+  "scene_end": 139.8,
+  "line_start": 130.64,
+  "speech_onset": 130.7,
+  "duration": 6.36,
+  "speech_duration": 6.12,
+  "speech_end": 136.82,
+  "spare": 2.98,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/19_F13.wav",
+  "src_cut": [
+   86.34,
+   92.7
+  ]
+ },
+ {
+  "id": "CH5",
+  "block": 20,
+  "scene_start": 139.8,
+  "scene_end": 142.0,
+  "line_start": 140.0,
+  "speech_onset": 140.0,
+  "duration": 1.74,
+  "speech_duration": 1.56,
+  "speech_end": 141.56,
+  "spare": 0.44,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/20_CH5.wav",
+  "src_cut": [
+   92.9,
+   94.64
+  ]
+ },
+ {
+  "id": "F11",
+  "block": 21,
+  "scene_start": 142.0,
+  "scene_end": 151.5,
+  "line_start": 142.36,
+  "speech_onset": 142.4,
+  "duration": 6.1,
+  "speech_duration": 5.88,
+  "speech_end": 148.28,
+  "spare": 3.22,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/21_F11.wav",
+  "src_cut": [
+   94.76,
+   100.86
+  ]
+ },
+ {
+  "id": "F12",
+  "block": 22,
+  "scene_start": 151.5,
+  "scene_end": 161.0,
+  "line_start": 151.895,
+  "speech_onset": 151.9,
+  "duration": 5.54,
+  "speech_duration": 5.4,
+  "speech_end": 157.3,
+  "spare": 3.7,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/22_F12.wav",
+  "src_cut": [
+   100.995,
+   106.535
+  ]
+ },
+ {
+  "id": "CH6",
+  "block": 23,
+  "scene_start": 161.0,
+  "scene_end": 163.2,
+  "line_start": 161.1,
+  "speech_onset": 161.2,
+  "duration": 1.5,
+  "speech_duration": 1.22,
+  "speech_end": 162.42,
+  "spare": 0.78,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/23_CH6.wav",
+  "src_cut": [
+   106.64,
+   108.14
+  ]
+ },
+ {
+  "id": "F14",
+  "block": 24,
+  "scene_start": 163.2,
+  "scene_end": 174.7,
+  "line_start": 163.6,
+  "speech_onset": 163.6,
+  "duration": 8.735,
+  "speech_duration": 8.58,
+  "speech_end": 172.18,
+  "spare": 2.52,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/24_F14.wav",
+  "src_cut": [
+   108.2,
+   116.935
+  ]
+ },
+ {
+  "id": "F15",
+  "block": 25,
+  "scene_start": 174.7,
+  "scene_end": 184.2,
+  "line_start": 175.0,
+  "speech_onset": 175.1,
+  "duration": 4.22,
+  "speech_duration": 3.94,
+  "speech_end": 179.04,
+  "spare": 5.16,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/25_F15.wav",
+  "src_cut": [
+   117.02,
+   121.24
+  ]
+ },
+ {
+  "id": "C1",
+  "block": 26,
+  "scene_start": 184.2,
+  "scene_end": 188.7,
+  "line_start": 184.6,
+  "speech_onset": 184.6,
+  "duration": 3.38,
+  "speech_duration": 3.2,
+  "speech_end": 187.8,
+  "spare": 0.9,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/26_C1.wav",
+  "src_cut": [
+   121.5,
+   124.88
+  ]
+ },
+ {
+  "id": "C2",
+  "block": 27,
+  "scene_start": 188.7,
+  "scene_end": 192.2,
+  "line_start": 189.05,
+  "speech_onset": 189.1,
+  "duration": 1.99,
+  "speech_duration": 1.76,
+  "speech_end": 190.86,
+  "spare": 1.34,
+  "atempo": 1.0,
+  "needs_atempo": 1.0,
+  "file": "el-lines/27_C2.wav",
+  "src_cut": [
+   125.03,
+   127.02
+  ]
+ }
+]
