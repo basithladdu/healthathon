@@ -21,3 +21,23 @@
   .care-profile-fields { grid-template-columns: minmax(0, 1fr); gap: 16px; }
   .care-profile-actions .primary-button { width: 100%; justify-content: center; }
 }
+.care-profile-card { margin-bottom: 16px; padding: 20px 24px; border: 1px solid var(--care-line, #e6ddd1); border-radius: 20px; background: var(--care-surface, #fffdf9); }
+.care-profile-card h2 { margin: 0 0 8px; font-size: 18px; font-weight: 700; }
+.care-profile-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.care-profile-card-head p { display: flex; align-items: baseline; gap: 10px; margin: 0; font-size: 18px; }
+.care-profile-diagnosis { margin: 0; font-size: 17px; line-height: 1.5; overflow-wrap: anywhere; }
+.care-profile-hint { margin: 8px 0 0; color: var(--care-muted, #76675d); font-size: 14px; }
+.care-weight-trend { font-size: 14px; font-weight: 650; color: var(--care-muted, #76675d); }
+.care-weight-chart { display: block; width: 100%; max-height: 200px; margin-top: 8px; }
+.care-weight-chart text { fill: var(--care-muted, #76675d); font-size: 13px; }
+.care-weight-axis { stroke: #c5d1b8; stroke-width: 1; }
+.care-weight-line { fill: none; stroke: var(--care-primary, #3b7562); stroke-width: 2.5; stroke-linejoin: round; }
+.care-weight-point { fill: var(--care-primary, #3b7562); stroke: var(--care-surface, #fffdf9); stroke-width: 2; }
+.care-profile .care-weight-form { display: grid; grid-template-columns: 1fr 1fr auto; align-items: end; gap: 12px; margin-top: 12px; padding: 0; border: 0; background: none; }
+.care-weight-form .secondary-button { min-height: 48px; border-radius: 14px; }
+.care-weight-list { margin: 0; padding: 0; list-style: none; }
+.care-weight-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; border-bottom: 1px solid var(--care-line, #e6ddd1); }
+@media (max-width: 540px) {
+  .care-profile-card { padding: 16px; }
+  .care-profile .care-weight-form { grid-template-columns: minmax(0, 1fr); }
+}

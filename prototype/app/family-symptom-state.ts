@@ -183,3 +183,18 @@ export function painTriggerText(value: PainTrigger, hindi: boolean | CareLang = 
   const labels = { rest: ['At rest', 'आराम करते समय'], turning: ['Turning in bed', 'बिस्तर में करवट लेते समय'], walking: ['Standing or walking', 'खड़े होते या चलते समय'], coughing: ['Coughing', 'खाँसते समय'], other: ['Other situation', 'किसी और समय'], 'not-sure': ['Not sure', 'पक्का नहीं'] };
   return careText(careLangOf(hindi), labels[value][0], labels[value][1]);
 }
+
+/**
+ * Verbal pain bands beside the 0-10 number, twin of PainBands in CareSymptomData.kt. NCCN adult cancer pain cut-offs:
+ * 0 none, 1-3 mild, 4-6 moderate, 7-10 severe (Swarm et al., J Natl Compr Canc Netw 2010;8(9):1046-86). The number stays the record.
+ */
+export function painBandText(rating: number, hindi: boolean | CareLang = false): string {
+  const lang = careLangOf(hindi);
+  const value = Math.max(0, Math.min(10, Math.round(rating)));
+  if (value === 0) return careText(lang, 'None', 'कोई नहीं');
+  if (value <= 3) return careText(lang, 'Mild', 'हल्का');
+  if (value <= 6) return careText(lang, 'Moderate', 'मध्यम');
+  return careText(lang, 'Severe', 'तेज़');
+}
+export const PAIN_BANDS_SOURCE_EN = 'Source: bands from the NCCN Adult Cancer Pain guideline (Swarm et al., JNCCN 2010): 0 none, 1–3 mild, 4–6 moderate, 7–10 severe.';
+export const PAIN_BANDS_SOURCE_HI = 'स्रोत: NCCN Adult Cancer Pain गाइडलाइन (Swarm et al., JNCCN 2010) के समूह: 0 कोई नहीं, 1–3 हल्का, 4–6 मध्यम, 7–10 तेज़।';

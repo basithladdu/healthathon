@@ -83,3 +83,5 @@
 .doctor-request-state.is-progress { background:#e9f2f8; color:#1c5680; }
 .doctor-request-state.is-done { background:#e6f5ec; color:#146b3e; }
 .doctor-home-empty { margin:8px 0 0; padding:16px; border:1px dashed #d6dbe1; border-radius:14px; color:#5f6b76; font-size:15px; text-align:center; }
+.doctor-patient-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.doctor-patient-tabs button { min-height: 44px; padding: 0 14px; border-radius: 12px; font-size: 14px; }

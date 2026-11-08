@@ -14,6 +14,7 @@
 .symptom-ratings { display: grid; gap: 12px; min-width: 0; }
 .symptom-ratings h3 { margin: 0; font-size: 15px; font-weight: 650; }
 .symptom-scale-key { margin: -5px 0 0; color: var(--care-muted); font-size: 14px; line-height: 1.5; }
+.symptom-source { margin: 4px 0 0; color: var(--care-muted); font-size: 13px; line-height: 1.45; }
 .symptom-diary-form .symptom-rating { padding: 12px; border: 1px solid #e8d0be; border-radius: var(--care-radius-card); background: #fff9f2; }
 .symptom-diary-form .symptom-rating legend { display: flex; align-items: baseline; gap: 8px; width: 100%; float: left; padding: 0; margin-bottom: 10px; }
 .symptom-rating legend > span:first-child { flex: 1; min-width: 0; overflow-wrap: normal; }

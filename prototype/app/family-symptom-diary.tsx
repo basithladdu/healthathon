@@ -4,7 +4,7 @@ import { useId, useRef, useState, type FormEvent } from 'react';
 import {
   SYMPTOM_SEVERITIES, addSymptomEntry, updateSymptomEntry, removeSymptomEntry,
   restoreSymptomEntry, selectSymptomEntries, symptomDiaryText, symptomSeverityText, validateSymptomInput,
-  SYMPTOM_SCALE, symptomComparison, symptomRecallText, symptomRespondentText, symptomChangeText, painTriggerText,
+  SYMPTOM_SCALE, PAIN_BANDS_SOURCE_EN, PAIN_BANDS_SOURCE_HI, painBandText, symptomComparison, symptomRecallText, symptomRespondentText, symptomChangeText, painTriggerText,
   type SymptomEntry, type SymptomRange, type SymptomSeverity, type SymptomRespondent, type SymptomRecall, type SymptomChange, type PainTrigger,
 } from './family-symptom-state';
 import type { CareSaveStatus } from './care-local-store';
@@ -46,7 +46,8 @@ function SymptomDiaryForPatient({ patientId, author, today, lang, entries, onCha
   const [symptomSeverities, setSymptomSeverities] = useState<Partial<Record<string, SymptomSeverity>>>({});
   const [date, setDate] = useState(today);
   const [time, setTime] = useState(clockTime);
-  const [respondent, setRespondent] = useState<SymptomRespondent | undefined>();
+  // Who is describing it comes from the role, as on Android: a family member is the caregiver, the patient is the patient. Still changeable.
+  const [respondent, setRespondent] = useState<SymptomRespondent | undefined>(role === 'family' ? 'caregiver' : 'patient');
   const [recall, setRecall] = useState<SymptomRecall | undefined>('now');
   const [ownChanges, setOwnChanges] = useState<Partial<Record<string, SymptomChange>>>({});
   const [painLocation, setPainLocation] = useState('');
@@ -240,7 +241,7 @@ function SymptomDiaryForPatient({ patientId, author, today, lang, entries, onCha
               ...(value === 'Pain' ? { painLocation, painTriggers } : {}),
             });
             return <fieldset className="symptom-rating" key={value}>
-              <legend><span>{label}</span><span className="symptom-rating-value">{rating === undefined ? t('Choose 0–10', '0–10 चुनें') : symptomSeverityText(rating, lang)}</span></legend>
+              <legend><span>{label}</span><span className="symptom-rating-value">{rating === undefined ? (value === 'Pain' ? t('Rate pain 0–10', 'दर्द को 0–10 अंक दें') : t('Rate 0–10', '0–10 अंक दें')) : value === 'Pain' && typeof rating === 'number' ? `${symptomSeverityText(rating, lang)} · ${painBandText(rating, lang)}` : symptomSeverityText(rating, lang)}</span></legend>
               <div className="symptom-rating-options">{SYMPTOM_SEVERITIES.map((level) => <button key={level} type="button" aria-pressed={rating === level} aria-label={`${label}: ${level}/10`} onClick={() => { setSymptomSeverities((previous) => ({ ...previous, [value]: level })); setError(''); }}>{level}</button>)}</div>
               <button type="button" className="care-text-button" aria-pressed={rating === null} onClick={() => { setSymptomSeverities((previous) => ({ ...previous, [value]: null })); setOwnChanges((previous) => ({ ...previous, [value]: undefined })); }}>{t('I cannot give a number', 'अंक नहीं बता सकते')}</button>
               {comparison && <div>
@@ -250,6 +251,7 @@ function SymptomDiaryForPatient({ patientId, author, today, lang, entries, onCha
               </div>}
             </fieldset>;
           })}
+          {shownRatings.includes('Pain') && <p className="symptom-source" data-testid="pain-bands-source">{t(PAIN_BANDS_SOURCE_EN, PAIN_BANDS_SOURCE_HI)}</p>}
         </div>}
         {(session || editingId) && <>
         <div className="symptom-date-fields"><label>{t('Day', 'दिन')}<input type="date" value={date} max={today} onChange={(event) => { setDate(event.target.value); setOwnChanges({}); if (event.target.value !== today) setTime(''); }} required /></label><label>{t('Time being described', 'किस समय की हालत है')}<input type="time" value={time} onChange={(event) => { setTime(event.target.value); setOwnChanges({}); }} required /></label></div>

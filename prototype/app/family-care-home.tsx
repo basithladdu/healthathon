@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useState } from 'react';
 import QRCode from 'qrcode';
-import { IconArrowRight } from './icons';
+import { IconArrowRight, IconFileText, IconHeartPulse, IconClock, IconShieldAlert } from './icons';
 import { CareRouteLink } from './care-route-link';
 import { CareArt, type CareArtKind } from './care-art';
 import { CARE_ROUTES, type CareView } from './care-routes';
@@ -75,7 +75,7 @@ export function FamilyCareHome({ patientName, lang, signedCareNote, patientId, t
 
   return <section className="family-care-home care-home-organised">
     <div className="care-home-top">
-    <CareTodayGreeting name={patientName} role={role} today={today} lang={lang} />
+    <CareTodayGreeting name={patientName} viewerName={isFamily ? author : ''} role={role} today={today} lang={lang} />
     <header className="family-care-home-heading">
       {/* The greeting above is the visible title; the h1 stays for screen readers and page structure. */}
       <h1 className="family-care-home-sr-title">{isFamily ? t(`Caring for ${name}`, `${name} की देखभाल`) : t(`${name}’s care`, `${name} की देखभाल`)}</h1>
@@ -102,6 +102,14 @@ export function FamilyCareHome({ patientName, lang, signedCareNote, patientId, t
         <CareRouteLink view="my-plan" className="care-home-note-open">{t('Care Note history', 'देखभाल के पुराने नोट')} <IconArrowRight /></CareRouteLink>
       </div>}
     </section>
+    {/* Big buttons, as on Android's "at a glance" card: goals of care is one tap from home. A family member's most used action comes first. */}
+    <nav className="care-home-glance" aria-label={t(`${name} at a glance`, `${name} एक नज़र में`)}>
+      {isFamily && <CareRouteLink view="symptom-diary" className="care-home-glance-primary" data-testid="home-note-symptom"><IconHeartPulse />{t('Note a symptom', 'तबीयत का नोट लिखें')}</CareRouteLink>}
+      <CareRouteLink view="care-plan" className="care-home-glance-button" data-testid="home-goals-of-care"><IconFileText /><span>{t('Goals of care', 'देखभाल के लक्ष्य')}</span><IconArrowRight /></CareRouteLink>
+      {!isFamily && <CareRouteLink view="symptom-diary" className="care-home-glance-button"><IconHeartPulse /><span>{t('How I feel', 'मैं कैसा महसूस कर रहा हूँ')}</span><IconArrowRight /></CareRouteLink>}
+      <CareRouteLink view="next-visit" className="care-home-glance-button"><IconClock /><span>{t('Next visit', 'अगली मुलाक़ात')}</span><IconArrowRight /></CareRouteLink>
+      <CareRouteLink view="emergency-card" className="care-home-glance-button"><IconShieldAlert /><span>{t('Emergency plan', 'आपातकालीन योजना')}</span><IconArrowRight /></CareRouteLink>
+    </nav>
     <nav className="care-home-category-nav" aria-label={t('Care sections', 'देखभाल के विभाग')}>
       {categoryCards.map((section) => <CareRouteLink key={section.view} view={section.view} className={`care-home-category tone-${section.color}`}>
         <CareArt kind={section.art} /><strong>{careText(lang, section.en, section.hi)}</strong><IconArrowRight />

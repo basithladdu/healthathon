@@ -902,6 +902,15 @@ export function ContinuityPrototype() {
   const [activeImpactEpisodes, setActiveImpactEpisodes] = useCareLocalState<Record<string, string>>('conversation-impact-active', {});
   const [medicineAccess, setMedicineAccess, medicineAccessSave] = useCareLocalState<Record<string, MedicineAccessEntry>>('medicine-access', {});
   const [noteSelection, setNoteSelection] = useState<{ patientId: string; version: number } | null>(null);
+  // Set by the doctor's "Goals of care" button so the care plan opens at the talk; cleared once the doctor leaves the care plan.
+  const [planStartAt, setPlanStartAt] = useState<'goc' | undefined>(undefined);
+  const planViewBefore = useRef(view);
+  useEffect(() => {
+    const left = planViewBefore.current === 'doctor-care-plan' && view !== 'doctor-care-plan';
+    planViewBefore.current = view;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the one-time "open at the talk" request ends when the care plan closes.
+    if (left) setPlanStartAt(undefined);
+  }, [view]);
   const [newDoctorConversation, setNewDoctorConversation] = useState(true);
   const isFamilySession = sessionType === 'family';
   const isPatientSession = sessionType === 'patient';
@@ -5746,7 +5755,7 @@ export function ContinuityPrototype() {
           </>
         );
       case 'my-details':
-        return simpleMode ? <CareProfile key={portalPatientId} details={detailsFor(portalPatientId)} lang={lang} onSave={(next) => saveDetails(portalPatientId, next)} /> : (
+        return simpleMode ? <CareProfile key={portalPatientId} details={detailsFor(portalPatientId)} lang={lang} today={careToday} diagnosis={patientProfiles[portalPatientId]?.diagnosis ?? patientProfiles[portalPatientId]?.stage ?? ''} onSave={(next) => saveDetails(portalPatientId, next)} /> : (
           <MyDetails
             details={detailsFor(portalPatientId)}
             onSave={(next) => saveDetails(portalPatientId, next)}
@@ -5757,7 +5766,7 @@ export function ContinuityPrototype() {
         );
       case 'care-plan':
       case 'doctor-care-plan':
-        return <EctprPlanScreen key={portalPatientId} patientId={portalPatientId} patientName={portalPatientName} role={isPatientSession ? 'patient' : isFamilySession ? 'family' : 'doctor'} clinician={currentRole} lang={lang} />;
+        return <EctprPlanScreen key={`${portalPatientId}:${planStartAt ?? ''}`} patientId={portalPatientId} patientName={portalPatientName} role={isPatientSession ? 'patient' : isFamilySession ? 'family' : 'doctor'} clinician={currentRole} lang={lang} startAt={sessionType === 'care-team' ? planStartAt : undefined} />;
       case 'living-will':
         return <AmdScreen key={portalPatientId} patientId={portalPatientId} patientName={portalPatientName} role={isPatientSession ? 'patient' : isFamilySession ? 'family' : 'doctor'} lang={lang} />;
       case 'consent':
@@ -5848,6 +5857,8 @@ export function ContinuityPrototype() {
         records={recordStates} appointments={appointments} physician={currentRole.split(' · ')[0]} today={careToday} lang={lang}
         conversationRequests={conversationRequests} conversationImpactEpisodes={conversationImpactEpisodes} conversationImpactLoading={impactSave === 'loading' || requestSave === 'loading'} onStartConversationRequest={startConversationRequest} onOpenConversationVersion={openConversationVersion}
         onReview={(id) => { selectPatient(id); setView('doctor-review'); }}
+        onGoals={(id) => { selectPatient(id); setPlanStartAt('goc'); navigate('doctor-care-plan'); }}
+        onCarePlan={(id) => { selectPatient(id); setPlanStartAt(undefined); navigate('doctor-care-plan'); }}
         onRecord={(id) => { const patientId = id ?? selectedId; if (id) selectPatient(id); startDoctorImpactEpisode(patientId); setNewDoctorConversation(true); setView('doctor-record'); }}
         onHistory={(id) => { if (id) selectPatient(id); setView('doctor-history'); }} onInstructions={saveAppointmentInstructions}
         onTasks={(id) => { selectPatient(id); setView('family-tasks'); }} />

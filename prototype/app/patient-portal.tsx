@@ -29,6 +29,8 @@ export type PatientDetails = {
   primaryDecisionMaker: DecisionMaker;
   alternateDecisionMaker: DecisionMaker;
   localPhysician: { name: string; clinic: string; phone: string };
+  /** Weights by day, oldest first (care-weight-state.ts). Optional so details saved before weights load unchanged. */
+  weights?: Array<{ date: string; kg: number }>;
 };
 
 export type ConsentRecord = {

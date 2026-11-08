@@ -314,7 +314,7 @@ export function CareNearMe({ homeAddress }: CareNearMeProps): React.JSX.Element 
     } catch { if (originRequest.current === controller) setLocationMessage('Location search could not load. Try again.'); }
     finally { clearTimeout(timeout); if (originRequest.current === controller) setFindingOrigin(false); }
   }
-  function useLocation() {
+  function locateMe() {
     originRequest.current?.abort();
     const request = ++locationRequest.current;
     if (!navigator.geolocation) { setLocationMessage('Location is unavailable on this device. Enter a starting point.'); return; }
@@ -327,6 +327,13 @@ export function CareNearMe({ homeAddress }: CareNearMeProps): React.JSX.Element 
       setFindingOrigin(false); setLocationMessage(error.code === error.PERMISSION_DENIED ? 'Location permission was not given. Enter a starting point instead.' : 'Your location could not be found. Enter a starting point instead.');
     }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 });
   }
+  // The map centres on the person, as on Android: when location is already allowed, it is used on open (no new permission prompt).
+  useEffect(() => {
+    let live = true;
+    navigator.permissions?.query({ name: 'geolocation' as PermissionName }).then((state) => { if (live && state.state === 'granted') locateMe(); }).catch(() => {});
+    return () => { live = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once on open.
+  }, []);
   async function selectCentre(centre: CareCentre) {
     setMobileView('map');
     centreRequest.current?.abort(); setSelectedId(centre.id); setCentreMatches(null); setCentreMessage('');
@@ -389,7 +396,7 @@ export function CareNearMe({ homeAddress }: CareNearMeProps): React.JSX.Element 
       <form className="cnm-start-row" onSubmit={searchOrigin}>
         <label>Starting point<input ref={startInput} value={startText} onChange={(event) => setStartText(event.target.value)} placeholder="City, area or address" autoComplete="off" /></label>
         <button type="submit" className="cnm-btn cnm-btn-secondary" disabled={findingOrigin}>Find place</button>
-        <button type="button" className="cnm-btn cnm-btn-primary" onClick={useLocation} disabled={findingOrigin}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v3m0 14v3M2 12h3m14 0h3" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></svg>Use my location</button>
+        <button type="button" className="cnm-btn cnm-btn-primary" onClick={locateMe} disabled={findingOrigin}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v3m0 14v3M2 12h3m14 0h3" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></svg>Use my location</button>
         {homeAddress?.trim() && <button type="button" className="cnm-btn cnm-btn-secondary" onClick={() => { setStartText(homeAddress.trim()); startInput.current?.focus(); }}>Use home address</button>}
       </form>
       {findingOrigin && <p className="cnm-message is-loading" role="status">Finding your starting point…</p>}

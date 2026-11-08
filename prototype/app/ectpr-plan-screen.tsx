@@ -13,6 +13,7 @@ import { EctprPilotLog } from './ectpr-pilot-log';
 import { FhirExportButton, PaperAndCopies, ReviewReminder } from './ectpr-plan-extras';
 import { ReadAloudButton } from './tts-speech';
 import type { GocOptionSets } from './goc-transcribe';
+import { gocStartNewVersion, gocTalkLocked, type GocTalk } from './goc-version';
 import type {
   AmbulanceOption, AuditEvent, AuthorityBasis, Capacity, Cpr, DecisionMaker, Dialysis, DnacprReason, EctprRecord, EctprStatus,
   GoalOfCare, HospitalTransfer, Hydration, Icu, IdType, ImplantedDevice, NgFeeding, PegFeeding, RespCeiling, RuleIssue, Signature,
@@ -582,8 +583,8 @@ function AlwaysContinues({ t, lang }: { t: T; lang: CareLang }) {
 
 type Mode = { kind: 'overview' } | { kind: 'wizard' } | { kind: 'done'; record: EctprRecord };
 
-export function EctprPlanScreen(props: { patientId: string; patientName: string; role: 'doctor' | 'patient' | 'family'; clinician: string; lang: CareLang }) {
-  const { patientId, patientName, role, clinician, lang } = props;
+export function EctprPlanScreen(props: { patientId: string; patientName: string; role: 'doctor' | 'patient' | 'family'; clinician: string; lang: CareLang; startAt?: 'goc' }) {
+  const { patientId, patientName, role, clinician, lang, startAt } = props;
   const t: T = useCallback((en: string, hi: string) => careText(lang, en, hi), [lang]);
   const actorName = role === 'doctor' ? (clinician.split('·')[0].trim() || clinician) : role === 'patient' ? patientName : 'Family member';
 
@@ -596,6 +597,9 @@ export function EctprPlanScreen(props: { patientId: string; patientName: string;
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [toast, setToast] = useState('');
+  // Opened from the doctor's "Goals of care" button: the talk opens straight away (Android CarePlanUi startAt = "goc").
+  const [gocFirst, setGocFirst] = useState(false);
+  const startHandled = useRef(false);
 
   // Load versions and audit; refresh whenever the store changes (this tab or another).
   useEffect(() => {
@@ -679,8 +683,9 @@ export function EctprPlanScreen(props: { patientId: string; patientName: string;
     setStep(next);
   }
 
-  function openWizard(record: EctprRecord, startStep = 0) {
+  function openWizard(record: EctprRecord, startStep = 0, openGoc = false) {
     setDraft(structuredClone(record));
+    setGocFirst(openGoc);
     setDirty(false);
     setError('');
     setToast('');
@@ -689,14 +694,44 @@ export function EctprPlanScreen(props: { patientId: string; patientName: string;
     setMode({ kind: 'wizard' });
   }
 
-  function startNew(inEd: boolean) {
+  function startNew(inEd: boolean, openGoc = false) {
     const record = emptyEctpr(patientId, { name: patientName, uhid: patientId }, actorName);
     const highest = versions?.reduce((max, item) => Math.max(max, item.version), 0) ?? 0;
     record.version = highest + 1;
     record.createdInEd = inEd;
-    openWizard(record);
+    openWizard(record, 0, openGoc);
     setDirty(true);
   }
+
+  /**
+   * "Start a new version" of a signed goals-of-care talk on the plan in use (Android GocNewVersion.start): a review draft that carries the
+   * earlier note as the starting point, the signed talk kept locked in its history. The draft is marked changed, so Save draft saves it.
+   */
+  async function startNewGocVersion(openGoc = true) {
+    if (!active) return;
+    setBusy(true);
+    const record = await startReview(patientId, 'PATIENT_OR_FAMILY_REQUEST', actorName);
+    setBusy(false);
+    if (!record) { setError(t('There is no signed plan to review yet.', 'समीक्षा के लिए अभी कोई साइन की गई योजना नहीं है।')); return; }
+    const earlier = active.gocTranscript as GocTalk | undefined;
+    const carried = !record.gocTranscript && gocTalkLocked(earlier) ? gocStartNewVersion(earlier) : null;
+    openWizard(carried ? { ...record, gocTranscript: carried as EctprRecord['gocTranscript'] } : record, 0, openGoc);
+    if (carried) {
+      setDirty(true);
+      void logAudit({ actor: actorName, action: 'CREATE', recordType: 'ECTPR', recordId: record.id, patientId, detail: `New goals-of-care version ${carried.version} started from plan version ${active.version}` });
+    }
+  }
+
+  // From the Goals of care button: an open draft opens at the talk; a signed plan starts a new version; no plan starts a first one.
+  useEffect(() => {
+    if (startAt !== 'goc' || role !== 'doctor' || versions === null || startHandled.current) return;
+    startHandled.current = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- opening the requested page once the saved versions have loaded.
+    if (openDraft) openWizard(openDraft, 0, true);
+    else if (active) void startNewGocVersion(true);
+    else startNew(false, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once, when the versions first load.
+  }, [startAt, role, versions]);
 
   async function beginReview(trigger: ReviewTrigger) {
     setBusy(true);
@@ -754,13 +789,13 @@ export function EctprPlanScreen(props: { patientId: string; patientName: string;
 
   if (mode.kind === 'wizard' && draft && role === 'doctor') {
     return <Wizard t={t} lang={lang} draft={draft} previous={versions?.find((record) => record.id === draft.supersedes) ?? null} issues={issues} step={step} busy={busy} error={error} toast={toast} dirty={dirty}
-      saveBlocked={saveBlocked} actorName={actorName} patientName={patientName} edit={edit} goTo={goTo} top={top} heading={heading}
+      saveBlocked={saveBlocked} actorName={actorName} patientName={patientName} edit={edit} goTo={goTo} top={top} heading={heading} gocFirst={gocFirst}
       onSave={() => void persist(false)} onClose={closeWizard} onSign={addSignature} />;
   }
 
   return <Overview anchor={top} t={t} lang={lang} role={role} patientId={patientId} patientName={patientName} actorName={actorName}
     versions={versions} audit={audit} active={active} openDraft={openDraft} busy={busy} error={error} setError={setError}
-    onStartNew={startNew} onContinueDraft={(record) => openWizard(record)} onStartReview={beginReview} onSign={async (record, signature) => {
+    onStartNew={startNew} onContinueDraft={(record) => openWizard(record)} onStartReview={beginReview} onNewGocVersion={() => void startNewGocVersion(true)} onSign={async (record, signature) => {
       setBusy(true);
       const result = await signEctpr(record.id, signature);
       setBusy(false);
@@ -773,10 +808,11 @@ export function EctprPlanScreen(props: { patientId: string; patientName: string;
 // ---------------------------------------------------------------------------
 // Overview: active plan, versions, review, cancellation, audit
 
-function Overview({ anchor, t, lang, role, patientId, patientName, actorName, versions, audit, active, openDraft, busy, error, setError, onStartNew, onContinueDraft, onStartReview, onSign }: {
+function Overview({ anchor, t, lang, role, patientId, patientName, actorName, versions, audit, active, openDraft, busy, error, setError, onStartNew, onContinueDraft, onStartReview, onNewGocVersion, onSign }: {
   anchor: RefObject<HTMLDivElement | null>; t: T; lang: CareLang; role: Role; patientId: string; patientName: string; actorName: string;
   versions: EctprRecord[]; audit: AuditEvent[]; active: EctprRecord | null; openDraft: EctprRecord | null; busy: boolean; error: string; setError: (value: string) => void;
   onStartNew: (inEd: boolean) => void; onContinueDraft: (record: EctprRecord) => void; onStartReview: (trigger: ReviewTrigger) => Promise<void>;
+  onNewGocVersion: () => void;
   onSign: (record: EctprRecord, signature: Signature) => Promise<boolean>;
 }) {
   const [panel, setPanel] = useState<'none' | 'new' | 'review' | 'request' | 'revoke' | 'sign'>('none');
@@ -854,6 +890,7 @@ function Overview({ anchor, t, lang, role, patientId, patientName, actorName, ve
             : latestSigned ? <button type="button" className="ep-btn" onClick={() => { setPanel(panel === 'review' ? 'none' : 'review'); setTrigger(null); }} aria-expanded={panel === 'review'}>{t('Start a review', 'समीक्षा शुरू करें')}</button>
               : null}
           {!openDraft ? <button type="button" className={latestSigned ? 'ep-btn ep-quiet' : 'ep-btn'} onClick={() => setPanel(panel === 'new' ? 'none' : 'new')} aria-expanded={panel === 'new'}>{latestSigned ? t('Start a blank plan', 'खाली योजना शुरू करें') : t('Start a plan', 'योजना शुरू करें')}</button> : null}
+          {active && !openDraft && gocTalkLocked(active.gocTranscript as GocTalk | undefined) ? <button type="button" className="ep-btn ep-quiet" data-testid="plan-goc-new-version" disabled={busy} onClick={onNewGocVersion}>{t('Start a new version', 'नया संस्करण शुरू करें')}</button> : null}
           {active ? <button type="button" className="ep-btn ep-danger" onClick={() => setPanel(panel === 'revoke' ? 'none' : 'revoke')} aria-expanded={panel === 'revoke'}>{t('Cancel this plan', 'यह योजना रद्द करें')}</button> : null}
         </div>
         {panel === 'new' ? <div className="ep-dialog">
@@ -961,10 +998,10 @@ function auditAction(t: T, action: AuditEvent['action']): string {
 // ---------------------------------------------------------------------------
 // Wizard (doctor)
 
-function Wizard({ t, lang, draft, previous, issues, step, busy, error, toast, dirty, saveBlocked, actorName, patientName, edit, goTo, top, heading, onSave, onClose, onSign }: {
+function Wizard({ t, lang, draft, previous, issues, step, busy, error, toast, dirty, saveBlocked, actorName, patientName, edit, goTo, top, heading, gocFirst = false, onSave, onClose, onSign }: {
   t: T; lang: CareLang; draft: EctprRecord; previous: EctprRecord | null; issues: RuleIssue[]; step: number; busy: boolean; error: string; toast: string; dirty: boolean; saveBlocked: boolean;
   actorName: string; patientName: string; edit: (change: (record: EctprRecord) => void) => void; goTo: (step: number) => void;
-  top: RefObject<HTMLDivElement | null>; heading: RefObject<HTMLHeadingElement | null>;
+  top: RefObject<HTMLDivElement | null>; heading: RefObject<HTMLHeadingElement | null>; gocFirst?: boolean;
   onSave: () => void; onClose: () => void; onSign: (signature: Signature) => Promise<boolean>;
 }) {
   // The signatures step lists what still blocks activation itself (computed with the consultant's signature in place).
@@ -976,7 +1013,7 @@ function Wizard({ t, lang, draft, previous, issues, step, busy, error, toast, di
   const progress = (step + 1) / STEPS.length;
   const stepTitle = t(STEPS[step].en, STEPS[step].hi);
   const stepBody = useRef<HTMLDivElement>(null);
-  const [gocOpen, setGocOpen] = useState(false);
+  const [gocOpen, setGocOpen] = useState(gocFirst);
   const stepList = useRef<HTMLOListElement>(null);
   // Keeps the current step pill in view on a phone, where the row scrolls sideways.
   useEffect(() => {

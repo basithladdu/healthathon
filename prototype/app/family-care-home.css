@@ -26,6 +26,14 @@
 .care-home-note-empty .care-home-note-open:hover { background: var(--care-surface-2); }
 .care-home-note-empty .care-home-note-open svg { color: var(--care-primary); }
 .care-home-note-feature.is-empty { grid-template-columns: minmax(0, 1fr); min-height: 0; padding: 16px 20px; }
+.care-home-glance { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.care-home-glance-primary { grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 64px; padding: 0 20px; border-radius: 16px; background: var(--care-primary, #3b7562); color: #fff; font-size: 18px; font-weight: 700; text-decoration: none; }
+.care-home-glance-primary:hover { background: var(--care-primary-hover, #2f5f4f); }
+.care-home-glance-primary svg { width: 24px; height: 24px; }
+.care-home-glance-button { display: grid; grid-template-columns: 28px minmax(0, 1fr) 18px; align-items: center; gap: 12px; min-height: 64px; padding: 12px 16px; border: 1.5px solid var(--care-primary, #3b7562); border-radius: 16px; background: var(--care-surface, #fffdf9); color: var(--care-ink, #382e29); font-size: 17px; font-weight: 650; text-decoration: none; }
+.care-home-glance-button > svg:first-child { width: 26px; height: 26px; color: var(--care-primary, #3b7562); }
+.care-home-glance-button > svg:last-child { width: 18px; height: 18px; color: var(--care-primary, #3b7562); }
+@media (max-width: 600px) { .care-home-glance { grid-template-columns: minmax(0, 1fr); } }
 .care-home-category-nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 24px; }
 .care-home-category { display: grid; grid-template-columns: 52px minmax(0, 1fr) 20px; align-items: center; gap: 12px; min-width: 0; min-height: 76px; padding: 12px 16px; border: 1px solid color-mix(in srgb, var(--care-peach, #ffd1b3) 70%, #b9472c); border-radius: 20px; background: var(--care-peach, #ffd1b3); color: var(--care-ink, #382e29); text-decoration: none; }
 .care-home-category.tone-lavender { border-color: color-mix(in srgb, var(--care-lavender, #ddc8ff) 75%, #655278); background: var(--care-lavender, #ddc8ff); }
