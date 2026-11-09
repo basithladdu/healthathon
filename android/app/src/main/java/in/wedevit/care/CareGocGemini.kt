@@ -67,7 +67,7 @@ object GocGeminiRules {
     const val geminiOverlapSec = 2.0
     const val maxSeconds = 4 * 3600
 
-    fun consentLine(gemini: Boolean): String = if (gemini) "Audio is sent to Google Gemini to transcribe." else ""
+    fun consentLine(gemini: Boolean): String = if (gemini) "Audio is sent to a secure AI service to transcribe." else ""
 
     fun speaker(value: Any?): String {
         val key = (value as? String)?.trim()?.uppercase()?.replace(Regex("[\\s/-]+"), "_").orEmpty()
@@ -380,7 +380,7 @@ internal class GocGeminiPipeline(private val transport: GocGeminiTransport, priv
                     if (ok) break
                     pause(1000L shl attempt)
                 }
-                if (!ok) throw GocEngineFailure("upload_failed", "The audio could not be uploaded to Google Gemini.")
+                if (!ok) throw GocEngineFailure("upload_failed", "The audio could not be uploaded to the AI service.")
                 offset += part.size
                 progress(0.4f * offset / piece.bytes.size)
             }
@@ -400,7 +400,7 @@ internal class GocGeminiPipeline(private val transport: GocGeminiTransport, priv
                     else -> { done = true; progress(1f); val value = JSONObject(body); return lines(value, end + 5) to value.optString("model", "gemini") }
                 }
             }
-            throw GocEngineFailure("unavailable", "Google Gemini took too long to prepare the audio.")
+            throw GocEngineFailure("unavailable", "The AI service took too long to prepare the audio.")
         } finally {
             // The function deletes the file after a final answer; otherwise ask it to.
             if (!done) withContext(NonCancellable) { runCatching { transport.post("goc-transcribe-delete", JSONObject().put("ticket", ticket).put("file", file ?: JSONObject.NULL).toString()) } }
@@ -431,7 +431,7 @@ internal class GocGeminiPipeline(private val transport: GocGeminiTransport, priv
             } catch (error: GocGeminiException) {
                 throw GocGeminiException(error.code, error.message ?: "Online transcription could not finish.", GocGeminiRules.merge(parts))
             } catch (_: IOException) {
-                throw GocGeminiException("offline", "Google Gemini could not be reached. Use on-device transcription or type the words.", GocGeminiRules.merge(parts))
+                throw GocGeminiException("offline", "The AI service could not be reached. Use on-device transcription or type the words.", GocGeminiRules.merge(parts))
             }
         }
         onProgress(1f)
@@ -458,7 +458,7 @@ suspend fun geminiGocAvailable(): Boolean = gocOnlineEngines().gemini
 /**
  * Transcribes a goals-of-care recording online with Gemini, through the website route /api/goc-transcribe, then reads it onto the form (analysis). Throws [GocGeminiException] (with `partial` lines) when
  * Gemini cannot finish ("offline" with no network); the caller then offers on-device Whisper, then typing. `lang` is en, hi, te, ur, kn, or null for auto.
- * Show [GocOnlineEngines.consentLine] ("Audio is sent to Google Gemini to transcribe.") and get consent before calling this.
+ * Show [GocOnlineEngines.consentLine] ("Audio is sent to a secure AI service to transcribe.") and get consent before calling this.
  */
 suspend fun transcribeGocWithGemini(audio: File, lang: String?, patientId: String? = null, conversationId: String? = null, onProgress: (Float) -> Unit): GocGeminiResult {
     val token = GocGeminiAuth.token ?: { "" }
@@ -518,7 +518,7 @@ private suspend fun analyzeGocWithGemini(transport: GocGeminiTransport, result: 
     val lines = JSONArray()
     result.lines.forEach { lines.put(JSONObject().put("startSec", it.startSec).put("speaker", it.speaker).put("lang", it.lang).put("text", it.text)) }
     val request = JSONObject().put("consent", true).put("requestId", UUID.randomUUID().toString()).put("lines", lines)
-        .put("transcribedBy", "Google Gemini (${result.model})".take(120)).put("language", lang ?: "auto")
+        .put("transcribedBy", "Online AI service (${result.model})".take(120)).put("language", lang ?: "auto")
     patientId?.takeIf { Regex("[A-Za-z0-9._:-]{1,120}").matches(it) }?.let { request.put("patientId", it) }
     conversationId?.takeIf { Regex("[A-Za-z0-9._:-]{1,120}").matches(it) }?.let { request.put("conversationId", it) }
     val (status, body) = transport.post("goc-analyze", request.toString())

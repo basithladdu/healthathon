@@ -148,7 +148,7 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
         if (canRecord) Surface(color = if (agreedAt > 0) GocTickSoft else Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(if (agreedAt > 0) 1.5.dp else 1.dp, if (agreedAt > 0) DoctorStatusGood else DoctorCardSub.copy(alpha = .5f)), modifier = Modifier.fillMaxWidth().testTag("goc-card-consent-box")) {
             Column(Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
                 Box(Modifier.testTag("goc-card-consent")) { CheckLine(agreedAt > 0, { agreedAt = if (it) System.currentTimeMillis() else 0L }, t("Everyone present agrees to this conversation being recorded and written down", "मौजूद सभी लोग इस बातचीत को रिकॉर्ड करने और लिखने के लिए राज़ी हैं")) }
-                if (gemini) Text(t("Audio is sent to Google Gemini to transcribe.", "ऑडियो लिखने के लिए Google Gemini को भेजा जाता है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.padding(start = 12.dp, end = 8.dp, bottom = 10.dp))
+                if (gemini) Text(t("Audio is sent to a secure AI service to transcribe.", "ऑडियो लिखने के लिए एक सुरक्षित AI सेवा को भेजा जाता है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.padding(start = 12.dp, end = 8.dp, bottom = 10.dp))
             }
         }
         val press = remember { MutableInteractionSource() }
@@ -445,7 +445,7 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
             GocLines.fromText(line.text, gocSegmentKey(clip.id, (line.startSec * 1000).toLong())).map { it.copy(party = party, guessed = party != GocParty.UNSET) }
         }
         lines = lines + added.filter { new -> lines.none { it.key == new.key } }
-        model = result.model; transcribedBy = "Google Gemini (${result.model})"
+        model = result.model; transcribedBy = "Online AI service (${result.model})"
         result.analysis?.let { geminiReading = GocLines.text(lines) to it }
         added.isNotEmpty()
     } catch (c: CancellationException) { throw c } catch (_: Exception) { false }
@@ -463,7 +463,7 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
                     if (segment.text.isNotBlank() && lines.none { it.key.startsWith("$key:") }) lines = lines + GocLines.fromText(segment.text, key)
                 }
             }
-            model = OfflineWhisperModel.id; transcribedBy = "Whisper on this phone (${OfflineWhisperModel.id})"
+            model = OfflineWhisperModel.id; transcribedBy = "On this phone (${OfflineWhisperModel.id})"
             // Who spoke when, on the phone, with no prompt. The speaker who clearly asks the questions is taken as the doctor; otherwise the screen asks once.
             if (segments.any { it.text.isNotBlank() }) runCatching {
                 if (!gocDiarizeModelsReady(context)) { operation = t("Downloading", "डाउनलोड हो रहा है"); downloadGocDiarizeModels(context) { done, total -> progressFlow.value = done to total } }
@@ -521,7 +521,7 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
                 if (!recorderState.recording && !busy) Surface(color = if (consentAt > 0) GocTickSoft else Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(if (consentAt > 0) 1.5.dp else 1.dp, if (consentAt > 0) DoctorStatusGood else DoctorCardSub.copy(alpha = .5f)), modifier = Modifier.fillMaxWidth().testTag("goc-consent")) {
                     Column(Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
                         CheckLine(consentAt > 0, { consentAt = if (it) System.currentTimeMillis() else 0L }, t("Everyone present agrees to this conversation being recorded and written down", "मौजूद सभी लोग इस बातचीत को रिकॉर्ड करने और लिखने के लिए राज़ी हैं"))
-                        if (gemini) Text(t("Audio is sent to Google Gemini to transcribe.", "ऑडियो लिखने के लिए Google Gemini को भेजा जाता है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.padding(start = 12.dp, end = 8.dp, bottom = 10.dp).testTag("goc-gemini-line"))
+                        if (gemini) Text(t("Audio is sent to a secure AI service to transcribe.", "ऑडियो लिखने के लिए एक सुरक्षित AI सेवा को भेजा जाता है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.padding(start = 12.dp, end = 8.dp, bottom = 10.dp).testTag("goc-gemini-line"))
                     }
                 }
                 if (!recorderState.recording && !busy) { GocRunModePicker(guideMe) { guideMe = it }; guidePanel() }

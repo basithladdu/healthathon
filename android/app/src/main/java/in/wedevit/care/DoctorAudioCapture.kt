@@ -76,7 +76,7 @@ import java.time.format.DateTimeFormatter
             AudioConsentCheck(storage,{storage=it},"Audio stays on this device unless separately uploaded or shared.","doctor-record-storage")
             AudioConsentCheck(access,{access=it},"People with access to this device may read or share its local records.","doctor-record-access")
             HorizontalDivider()
-            AudioConsentCheck(cloud,{cloud=it},"Everyone separately agrees to upload this fictional test audio to Supabase and Google Gemini for transcription and AI drafting.","doctor-record-cloud")
+            AudioConsentCheck(cloud,{cloud=it},"Everyone separately agrees to upload this fictional test audio to a secure AI service for transcription and AI drafting.","doctor-record-cloud")
             Text("Test audio only. Google may review it. Up to 5 minutes.",style=MaterialTheme.typography.bodySmall)
         }
     },confirmButton={TextButton(onClick={

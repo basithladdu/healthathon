@@ -67,9 +67,8 @@ internal fun planStepOf(field: String): Int = when {
     field.startsWith("prognosticUnderstanding") || field.startsWith("surrogateDeclaration") -> 3
     field.startsWith("values") -> 4
     field.startsWith("choices") -> 5
-    field == "withdrawal" -> 6
-    field == "reviewDue" -> 7
-    else -> 8
+    field == "reviewDue" -> 6
+    else -> 7
 }
 
 /**
@@ -375,7 +374,7 @@ internal fun planStepOf(field: String): Int = when {
     LaunchedEffect(step) { listState.scrollToItem(0) }
     LaunchedEffect(shown) { if (shown.isNotEmpty()) listState.animateScrollToItem((listState.layoutInfo.totalItemsCount - 1).coerceAtLeast(0)) }
     val steps = listOf(t("Patient and illness", "मरीज़ और बीमारी"), t("Decision-makers", "फ़ैसला लेने वाले"), t("Capacity", "निर्णय-क्षमता"),
-        t("Understanding", "समझ"), t("What matters", "क्या ज़रूरी है"), t("Treatment choices", "इलाज के फ़ैसले"), t("Stopping treatment", "इलाज रोकना"), t("Review date", "समीक्षा की तारीख़"), t("Signatures", "हस्ताक्षर"), t("Check and sign", "जाँचें और हस्ताक्षर करें"))
+        t("Understanding", "समझ"), t("What matters", "क्या ज़रूरी है"), t("Treatment choices", "इलाज के फ़ैसले"), t("Review date", "समीक्षा की तारीख़"), t("Signatures", "हस्ताक्षर"), t("Check and sign", "जाँचें और हस्ताक्षर करें"))
     val blockers = EctprRules.saveBlockers(d, today)
     fun update(change: (EctprRecord) -> EctprRecord) { d = change(d); shown = emptyList() }
     fun choices(change: (PlanChoices) -> PlanChoices) = update { it.copy(choices = change(it.choices)) }
@@ -406,9 +405,8 @@ internal fun planStepOf(field: String): Int = when {
                 3 -> understandingStep(d, ::update)
                 4 -> valuesStep(d, ::update, familyReadOnly, personName)
                 5 -> treatmentStep(d, today, ::update, ::choices)
-                6 -> withdrawalStep(d, today, ::update)
-                7 -> reviewStep(d, today, ::update)
-                8 -> signatureStep(d, clinician, ::update)
+                6 -> reviewStep(d, today, ::update)
+                7 -> signatureStep(d, clinician, ::update)
                 else -> item { Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     val stop = EctprRules.activationBlockers(d, today); val warn = EctprRules.warnings(d, today)
                     val ready = stop.isEmpty()
@@ -642,30 +640,6 @@ private fun LazyListScope.treatmentStep(d: EctprRecord, today: LocalDate, update
     }
 }
 
-private fun LazyListScope.withdrawalStep(d: EctprRecord, today: LocalDate, update: ((EctprRecord) -> EctprRecord) -> Unit) { item { WithdrawalFields(d, today, update) } }
-
-/** Records the process only. The app never triggers withdrawal. */
-@Composable private fun WithdrawalFields(d: EctprRecord, today: LocalDate, update: ((EctprRecord) -> EctprRecord) -> Unit) { val t = careText()
-    val w = d.withdrawal ?: EctprWithdrawal()
-    fun set(change: (EctprWithdrawal) -> EctprWithdrawal) = update { it.copy(withdrawal = change(it.withdrawal ?: EctprWithdrawal())) }
-    Column(Modifier.testTag("withdrawal-step"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        IssueList(EctprRules.check(d, today).filter { it.id == "W1" })
-        PlanCard {
-            SectionTitle(t("Withdrawal or withholding (medical boards)", "इलाज रोकना या शुरू न करना (मेडिकल बोर्ड)"))
-            CheckLine(w.applicable, { v -> set { it.copy(applicable = v) } }, t("Withdrawing or withholding treatment has been decided for this patient", "इस मरीज़ के लिए इलाज रोकने या शुरू न करने का फ़ैसला हुआ है"))
-            if (w.applicable) {
-                PlanDateField(w.primaryBoardDate, t("Date the Primary Board was formed", "प्राथमिक बोर्ड बनने की तारीख़"), { v -> set { it.copy(primaryBoardDate = v) } })
-                PlanDateField(w.secondaryBoardDate, t("Date the Secondary Board was formed", "द्वितीय बोर्ड बनने की तारीख़"), { v -> set { it.copy(secondaryBoardDate = v) } })
-                CareField(w.primaryBoardMembers, { v -> set { it.copy(primaryBoardMembers = v) } }, t("Members of the Primary Board", "प्राथमिक बोर्ड के सदस्य"), minLines = 2)
-                CareField(w.secondaryBoardMembers, { v -> set { it.copy(secondaryBoardMembers = v) } }, t("Members of the Secondary Board", "द्वितीय बोर्ड के सदस्य"), minLines = 2)
-                CareField(w.boardDecision, { v -> set { it.copy(boardDecision = v) } }, t("Decision of the Boards", "बोर्ड का फ़ैसला"), minLines = 2)
-                OptionGroup(t("Final decision", "अंतिम फ़ैसला"), w.finalDecision, WithdrawalFinal.entries, { PlanText.withdrawalFinal(it) }, tag = "withdrawal-final", noneLabel = NOT_RECORDED) { x -> set { it.copy(finalDecision = x) } }
-                CareField(w.protocol, { v -> set { it.copy(protocol = v) } }, t("Protocol for withdrawal or withholding", "इलाज रोकने या शुरू न करने का तरीका"), minLines = 3)
-            }
-        }
-    }
-}
-
 @Composable private fun LockedTreatment(d: EctprRecord) { val t = careText()
     Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().testTag("treatment-locked")) {
         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
@@ -871,7 +845,7 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
 /** What was added by the legal review, on the check-and-sign step, so it is seen before signing. */
 @Composable private fun PlanSummaryExtras(d: EctprRecord) { val t = careText(); val hindi = careHindi()
     val lines = listOfNotNull(d.decisionMakers.alternate?.takeUnless { it.blank }?.let { Bi.labeled(Bi("Secondary decision-maker", "द्वितीय फ़ैसला लेने वाले"), Bi.plain(listOf(it.name, it.relation, it.phone24h).filter(String::isNotBlank).joinToString(" · "))) }) +
-        PlanText.fullRecordLines(d) + PlanText.homeCareLines(d) + PlanText.withdrawalLines(d)
+        PlanText.fullRecordLines(d) + PlanText.homeCareLines(d)
     if (lines.isEmpty()) return
     PlanCard {
         SectionTitle(t("Full record", "पूरा रिकॉर्ड"))

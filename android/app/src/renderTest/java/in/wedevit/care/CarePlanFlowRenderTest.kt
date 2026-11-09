@@ -68,8 +68,6 @@ class CarePlanFlowRenderTest {
         click("goal-c_comfort"); click("cpr-attempt"); shot("6-treatment"); next()
         exists("plan-issues"); shot("7-v2-blocked"); exists("cpr-none")
         click("cpr-none"); click("ceiling-2"); next()
-        // The separate step for withdrawal or withholding is left unticked.
-        exists("withdrawal-step"); shot("7b-withdrawal"); next()
         // Review date, then V7: the consultant signs with a registration number.
         compose.onNodeWithText("In 12 weeks").performSemanticsAction(SemanticsActions.OnClick); settle(); next()
         type("Consultant's name", "Dr Test Consultant"); type("Medical registration number", "KMC-00000"); click("sign-consultant"); shot("8-signed"); next()

@@ -123,6 +123,7 @@ data class PlanChoices(
 
 /** Legal review, Rituparna P, 31 Oct 2026. Null on the record because older saved records do not have them. */
 data class EctprHomeCare(val assessmentFrequency: String = "", val coordinator: String = "", val ngoContact: String = "", val ngoConsulted: Boolean = false, val previousAdmission: Boolean? = null, val previousAdmissionDetails: String = "")
+/** The removed "stopping or not starting treatment" step (lead doctor, Nov 2026). Kept only so older saved plans still load and save unchanged; never shown. */
 enum class WithdrawalFinal { TO_BE_PERFORMED, FAMILY_REFUSED, BOARD_REFUSED, PHYSICIAN_REVOKED }
 data class EctprWithdrawal(val applicable: Boolean = false, val primaryBoardDate: String = "", val secondaryBoardDate: String = "", val primaryBoardMembers: String = "", val secondaryBoardMembers: String = "", val boardDecision: String = "", val finalDecision: WithdrawalFinal? = null, val protocol: String = "")
 
@@ -177,7 +178,7 @@ object PlanIds {
 /** Rules V1–V9 (tech spec §5) and C1–C8 (clinical spec §4), plus L1 and the trial and capacity completeness checks. */
 object EctprRules {
     /** Checks that only stop a plan becoming Active; a draft may be saved without them. */
-    val ACTIVATION_ONLY = setOf("V6", "V7", "V8", "REVIEW_DUE", "W1")
+    val ACTIVATION_ONLY = setOf("V6", "V7", "V8", "REVIEW_DUE")
 
     private fun issue(id: String, severity: IssueSeverity, field: String, en: String, hi: String) = RuleIssue(id, severity, field, en, hi)
 
@@ -258,11 +259,6 @@ object EctprRules {
         if (r.patient.name.isBlank() || r.patient.uhid.isBlank()) add(issue("V8", IssueSeverity.BLOCK, "patient", "Every printed page shows the name and hospital number (UHID). Enter both.", "हर छपे पन्ने पर नाम और अस्पताल नंबर (UHID) होता है। दोनों लिखें।"))
         if ((r.limitedLiteracy || r.signatures.any { it.thumbImpression == true }) && r.witnesses.size < 2)
             add(issue("V6", IssueSeverity.BLOCK, "signatures", "A thumb impression or limited literacy needs two witnesses.", "अँगूठे के निशान या कम पढ़े-लिखे होने पर दो गवाह ज़रूरी हैं।"))
-        // W1, legal review: going ahead needs the whole Board record. The plan itself never authorises it.
-        val w = r.withdrawal
-        if (w != null && w.applicable && w.finalDecision == WithdrawalFinal.TO_BE_PERFORMED &&
-            !(PlanDates.day(w.primaryBoardDate) != null && PlanDates.day(w.secondaryBoardDate) != null && w.primaryBoardMembers.isNotBlank() && w.secondaryBoardMembers.isNotBlank() && w.boardDecision.isNotBlank() && w.protocol.isNotBlank()))
-            add(issue("W1", IssueSeverity.BLOCK, "withdrawal", "Before this can go ahead, record both Board dates, their members, their decision and the protocol.", "आगे बढ़ने से पहले दोनों बोर्ड की तारीख़, सदस्य, उनका फ़ैसला और तरीका दर्ज करें।"))
         // W2, legal review: primary and secondary decision-makers both sign.
         if (r.signatures.any { it.role == SignatureRole.SURROGATE } && r.decisionMakers.alternate?.name?.isNotBlank() == true && r.signatures.none { it.surrogateRank == SurrogateRank.SECONDARY })
             add(issue("W2", IssueSeverity.WARN, "signatures", "A secondary decision-maker is named. They should sign too.", "द्वितीय फ़ैसला लेने वाले का नाम दर्ज है। उन्हें भी साइन करना चाहिए।"))
@@ -425,27 +421,7 @@ object PlanText {
         return Bi.join("", listOf(Bi.plain(" · ${t.durationValue} "), unit(t.durationUnit), Bi.plain(", "), review))
     }
     fun knowsRecordedWhen(k: KnowsRecordedWhen) = when (k) { KnowsRecordedWhen.BEFORE_COUNSELLING -> Bi("Before counselling", "काउंसलिंग से पहले"); KnowsRecordedWhen.AFTER_COUNSELLING -> Bi("After counselling", "काउंसलिंग के बाद") }
-    fun withdrawalFinal(value: WithdrawalFinal?) = when (value) {
-        WithdrawalFinal.TO_BE_PERFORMED -> Bi("Withdrawal or withholding to be performed", "इलाज रोका जाएगा या शुरू नहीं किया जाएगा")
-        WithdrawalFinal.FAMILY_REFUSED -> Bi("Family refused consent (patient has lost decision-making capacity)", "परिवार ने सहमति नहीं दी (मरीज़ निर्णय क्षमता खो चुके हैं)")
-        WithdrawalFinal.BOARD_REFUSED -> Bi("Primary or Secondary Board refused permission", "प्राथमिक या द्वितीय बोर्ड ने अनुमति नहीं दी")
-        WithdrawalFinal.PHYSICIAN_REVOKED -> Bi("Treating doctor revoked their decision to support it", "इलाज करने वाले डॉक्टर ने समर्थन का अपना फ़ैसला वापस लिया")
-        null -> Bi("No final decision recorded", "कोई अंतिम फ़ैसला दर्ज नहीं")
-    }
     private fun filled(label: Bi, value: String): Bi? = value.takeIf { it.isNotBlank() }?.let { Bi.labeled(label, Bi.plain(it)) }
-    /** Empty lines are left out. Nothing at all unless the section is ticked. */
-    fun withdrawalLines(r: EctprRecord): List<Bi> {
-        val w = r.withdrawal?.takeIf { it.applicable } ?: return emptyList()
-        return listOfNotNull(
-            Bi.labeled(Bi("Final decision", "अंतिम फ़ैसला"), withdrawalFinal(w.finalDecision)),
-            filled(Bi("Date the Primary Board was formed", "प्राथमिक बोर्ड बनने की तारीख़"), w.primaryBoardDate),
-            filled(Bi("Members of the Primary Board", "प्राथमिक बोर्ड के सदस्य"), w.primaryBoardMembers),
-            filled(Bi("Date the Secondary Board was formed", "द्वितीय बोर्ड बनने की तारीख़"), w.secondaryBoardDate),
-            filled(Bi("Members of the Secondary Board", "द्वितीय बोर्ड के सदस्य"), w.secondaryBoardMembers),
-            filled(Bi("Decision of the Boards", "बोर्ड का फ़ैसला"), w.boardDecision),
-            filled(Bi("Protocol for withdrawal or withholding", "इलाज रोकने या शुरू न करने का तरीका"), w.protocol),
-        )
-    }
     fun homeCareLines(r: EctprRecord): List<Bi> {
         val h = r.homeCare ?: return emptyList()
         val ngo = h.ngoContact.takeIf { it.isNotBlank() }?.let { contact ->
@@ -610,13 +586,8 @@ object EdView {
 
     val ORDER = listOf("TRANSFER", "CPR", "RESP_CEILING", "ICU", "GOAL", "ALLERGIES", "DEVICE", "DECISION_MAKER", "TEAM", "CAPACITY", "AMD", "VERSION")
 
-    /** Extra lines for the ED view, shown whatever state the plan is in, as on the web. */
-    private fun flags(r: EctprRecord?): List<Bi> {
-        val w = r?.withdrawal
-        return if (w != null && w.applicable && w.finalDecision == WithdrawalFinal.TO_BE_PERFORMED) listOf(Bi("Withdrawal or withholding is recorded with medical board decisions. Check with the treating team.", "इलाज रोकने या शुरू न करने का फ़ैसला मेडिकल बोर्ड के साथ दर्ज है। इलाज करने वाली टीम से पूछें।")) else emptyList()
-    }
 
-    fun interpret(r: EctprRecord?, today: LocalDate): EdInterpretation = state(r, today).copy(flags = flags(r))
+    fun interpret(r: EctprRecord?, today: LocalDate): EdInterpretation = state(r, today)
 
     private fun state(r: EctprRecord?, today: LocalDate): EdInterpretation = when {
         r == null -> EdInterpretation(EdKind.NONE, null, true, false, Bi("NO PLAN FOUND — standard care applies", "कोई योजना नहीं मिली — सामान्य इलाज लागू"))
@@ -636,7 +607,7 @@ object EdView {
     fun forToken(token: String, tokens: List<CardToken>, records: List<EctprRecord>, today: LocalDate): EdInterpretation {
         val t = tokens.firstOrNull { it.token == token } ?: return interpret(null, today)
         val r = records.firstOrNull { it.id == t.ectprId }
-        if (!t.live) return EdInterpretation(EdKind.REVOKED, r, true, false, Bi("CARD WITHDRAWN — this card is no longer valid. Standard care applies.", "कार्ड वापस लिया गया — यह कार्ड अब मान्य नहीं। सामान्य इलाज लागू।"), flags(r))
+        if (!t.live) return EdInterpretation(EdKind.REVOKED, r, true, false, Bi("CARD WITHDRAWN — this card is no longer valid. Standard care applies.", "कार्ड वापस लिया गया — यह कार्ड अब मान्य नहीं। सामान्य इलाज लागू।"))
         return interpret(r, today)
     }
 
@@ -678,11 +649,11 @@ object EdView {
             r.careTeam.palliativePhysician.takeIf { it.isNotBlank() }?.let { Bi("Palliative: $it ${r.careTeam.palliativePhone24h}".trim(), "पैलिएटिव: $it ${r.careTeam.palliativePhone24h}".trim()) })
         val capacity = r.capacity.status?.let { s -> join(PlanText.capacity(s), Bi("reassess by ${r.capacity.reassessOn}", "${r.capacity.reassessOn} तक दोबारा जाँचें").takeIf { s == Capacity.FLUCTUATES && r.capacity.reassessOn.isNotBlank() }) }
         val decider = join(dm(r.decisionMakers.primary), dm(r.decisionMakers.alternate)?.let { Bi.labeled(Bi("Secondary", "द्वितीय"), it) })
-        val homeCare = PlanText.homeCareLines(r); val withdrawal = PlanText.withdrawalLines(r)
+        val homeCare = PlanText.homeCareLines(r)
         val signedDay = consultant?.signedAt?.take(10) ?: "—"; val dueDay = r.reviewDue.ifBlank { "—" }; val form = r.formVersion; val number = r.version
         val version = Bi.join(" · ", listOfNotNull(Bi("v$number · $form · signed $signedDay · review due $dueDay", "v$number · $form · हस्ताक्षर $signedDay · समीक्षा $dueDay"),
             reviewRequest?.let { Bi.labeled(Bi("Review requested", "समीक्षा माँगी"), Bi.join(" ", listOf(PlanText.trigger(it.trigger), Bi.plain("(${it.at.take(10)})")))) }))
-        // ORDER is the clinical spec's fixed list. Home care and withdrawal appear only when recorded, just before capacity, as on the web.
+        // ORDER is the clinical spec's fixed list. Home care appears only when recorded, just before capacity, as on the web.
         return listOfNotNull(
             EdRow("TRANSFER", Bi("Hospital transfer", "अस्पताल ले जाना"), transfer ?: NO_PREFERENCE),
             EdRow("CPR", Bi("CPR", "CPR"), cpr ?: NO_PREFERENCE, flag = c.cpr == Cpr.DNACPR),
@@ -694,7 +665,6 @@ object EdView {
             EdRow("DECISION_MAKER", Bi("Decision-maker (24 h phone)", "फ़ैसला लेने वाले (24 घंटे फ़ोन)"), decider.takeIf { it.en.isNotBlank() } ?: NOT_RECORDED),
             EdRow("TEAM", Bi("Treating consultant and palliative contact", "इलाज करने वाले कंसल्टेंट और पैलिएटिव संपर्क"), team.takeIf { it.en.isNotBlank() } ?: NOT_RECORDED),
             homeCare.takeIf { it.isNotEmpty() }?.let { EdRow("HOME_CARE", Bi("Home care", "घर पर देखभाल"), Bi.join("\n", it)) },
-            withdrawal.takeIf { it.isNotEmpty() }?.let { EdRow("WITHDRAWAL", Bi("Withdrawal or withholding (medical boards)", "इलाज रोकना या शुरू न करना (मेडिकल बोर्ड)"), Bi.join("\n", it)) },
             EdRow("CAPACITY", Bi("Capacity", "निर्णय-क्षमता"), capacity ?: NOT_RECORDED, flag = r.capacity.status == Capacity.FLUCTUATES),
             EdRow("AMD", Bi("Advance care planning", "अग्रिम देखभाल योजना"), amd, flag = amdGoverns),
             EdRow("VERSION", Bi("Version, signed, review due", "संस्करण, हस्ताक्षर, समीक्षा"), version),

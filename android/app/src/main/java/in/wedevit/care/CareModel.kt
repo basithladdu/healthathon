@@ -880,7 +880,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
                     }.trim()
                 } catch (failure: Exception) {
                     if (failure is kotlinx.coroutines.CancellationException) throw failure
-                    message.value = "Gemini could not finish. Writing it on this phone…"
+                    message.value = "The AI service could not finish. Writing it on this phone…"
                     val engine = GocSpeechEngine(getApplication())
                     if (!engine.models.ready()) { requireWhisperDownloadAllowed(getApplication()); engine.models.download { _, _ -> } }
                     engineName = "whisper-on-phone"; engineModel = OfflineWhisperModel.id

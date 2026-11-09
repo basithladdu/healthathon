@@ -13,31 +13,14 @@ class CarePlanLegalReviewTest {
     private val complete = EctprWithdrawal(true, "2026-11-01", "2026-11-02", "A, B, C", "D, E, F", "Permitted", WithdrawalFinal.TO_BE_PERFORMED, "Stepwise")
     private fun ids(r: EctprRecord) = EctprRules.check(r, today).map { it.id }
 
-    @Test fun goingAheadNeedsTheWholeBoardRecord() {
+    /** The "stopping or not starting treatment" step was removed (lead doctor, Nov 2026). An old plan that still carries it shows nothing of it and is never blocked by it. */
+    @Test fun anOldPlanWithTheRemovedStepShowsNothingOfIt() {
         val r = base().copy(withdrawal = EctprWithdrawal(applicable = true, finalDecision = WithdrawalFinal.TO_BE_PERFORMED))
-        val issue = EctprRules.check(r, today).first { it.id == "W1" }
-        assertEquals(IssueSeverity.BLOCK, issue.severity)
-        // As on the web it stops signing, not saving.
-        assertTrue("W1" in EctprRules.activationBlockers(r, today).map { it.id })
-        assertFalse("W1" in EctprRules.saveBlockers(r, today).map { it.id })
-        assertFalse("W1" in ids(r.copy(withdrawal = complete)))
-        assertTrue("W1" in ids(r.copy(withdrawal = complete.copy(secondaryBoardDate = "not a date"))))
-        assertTrue("W1" in ids(r.copy(withdrawal = complete.copy(protocol = " "))))
-    }
-
-    @Test fun aRefusalNeedsNoBoardRecordAndAnUntickedSectionIsIgnored() {
-        assertFalse("W1" in ids(base().copy(withdrawal = EctprWithdrawal(applicable = true, finalDecision = WithdrawalFinal.FAMILY_REFUSED))))
-        val unticked = base().copy(withdrawal = EctprWithdrawal(finalDecision = WithdrawalFinal.TO_BE_PERFORMED))
-        assertFalse("W1" in ids(unticked))
-        assertTrue(PlanText.withdrawalLines(unticked).isEmpty())
-    }
-
-    @Test fun theEmergencyViewIsToldWhenWithdrawalIsRecorded() {
-        val r = base().copy(withdrawal = complete)
-        assertTrue(EdView.interpret(r, today).flags.any { it.en.contains("medical board") })
-        assertTrue(EdView.interpret(r.copy(withdrawal = complete.copy(finalDecision = WithdrawalFinal.BOARD_REFUSED)), today).flags.isEmpty())
-        assertTrue(EdView.interpret(base(), today).flags.isEmpty()); assertTrue(EdView.interpret(null, today).flags.isEmpty())
-        assertTrue(PlanSpeech.edView(EdView.interpret(r, today), NOT_RECORDED, false).contains("medical board"))
+        assertFalse("W1" in ids(r)); assertFalse("W1" in ids(r.copy(withdrawal = complete)))
+        assertTrue(EdView.interpret(r.copy(withdrawal = complete), today).flags.isEmpty())
+        assertFalse(PlanSpeech.edView(EdView.interpret(r.copy(withdrawal = complete), today), NOT_RECORDED, false).contains("medical board"))
+        assertEquals(EdView.ORDER, EdView.rows(r.copy(withdrawal = complete), NOT_RECORDED).map { it.key })
+        assertFalse(PlanSpeech.summary(r.copy(withdrawal = complete), null, false).contains("Stepwise"))
     }
 
     @Test fun secondaryDecisionMakerIsAskedToSignOnceASurrogateHasSigned() {
@@ -49,13 +32,13 @@ class CarePlanLegalReviewTest {
         assertFalse("W2" in ids(r.copy(decisionMakers = DecisionMakers())))
     }
 
-    @Test fun theWithdrawalStepSitsBeforeReviewDate() {
+    @Test fun reviewDateFollowsTreatmentChoices() {
         assertEquals(5, planStepOf("choices.cpr")); assertEquals(5, planStepOf("clinical.icdDeactivation"))
-        assertEquals(6, planStepOf("withdrawal")); assertEquals(7, planStepOf("reviewDue")); assertEquals(8, planStepOf("signatures"))
+        assertEquals(6, planStepOf("reviewDue")); assertEquals(7, planStepOf("signatures")); assertEquals(7, planStepOf("withdrawal"))
         val r = base().copy(reviewDue = "2027-01-20", withdrawal = complete)
-        assertTrue(PlanSpeech.wizardStep(r, 6, false).contains("Common Cause")); assertTrue(PlanSpeech.wizardStep(r, 6, false).contains("Stepwise"))
-        assertTrue(PlanSpeech.wizardStep(r, 7, false).contains("2027-01-20"))
-        assertTrue(PlanSpeech.wizardStep(r, 8, false).contains("registration number"))
+        (0..8).forEach { assertFalse(PlanSpeech.wizardStep(r, it, false).contains("Common Cause")); assertFalse(PlanSpeech.wizardStep(r, it, false).contains("Stepwise")) }
+        assertTrue(PlanSpeech.wizardStep(r, 6, false).contains("2027-01-20"))
+        assertTrue(PlanSpeech.wizardStep(r, 7, false).contains("registration number"))
     }
 
     @Test fun theSameKeysAsTheWebRoundTrip() {
@@ -89,27 +72,24 @@ class CarePlanLegalReviewTest {
         val r = PlanJson.decode(old)
         assertEquals(base(), r); assertNull(r.homeCare); assertNull(r.withdrawal)
         assertFalse(PlanJson.encode(r).has("homeCare")); assertFalse(PlanJson.encode(r).has("withdrawal"))
-        assertTrue(PlanText.homeCareLines(r).isEmpty()); assertTrue(PlanText.withdrawalLines(r).isEmpty()); assertTrue(PlanText.fullRecordLines(r).isEmpty())
-        assertEquals("No final decision recorded", PlanText.withdrawalFinal(null).en)
+        assertTrue(PlanText.homeCareLines(r).isEmpty()); assertTrue(PlanText.fullRecordLines(r).isEmpty())
         // An unknown value from a newer version reads as not recorded.
         val odd = JSONObject(old.toString()).put("withdrawal", JSONObject().put("applicable", true).put("finalDecision", "SOMETHING_NEW"))
         assertNull(PlanJson.decode(odd).withdrawal?.finalDecision)
     }
 
-    @Test fun theEmergencyViewShowsHomeCareAndWithdrawalOnlyWhenRecorded() {
+    @Test fun theEmergencyViewShowsHomeCareOnlyWhenRecorded() {
         assertEquals(EdView.ORDER, EdView.rows(base(), NOT_RECORDED).map { it.key })
         val r = base().copy(withdrawal = complete, homeCare = EctprHomeCare(ngoContact = "Karunashraya", ngoConsulted = true, previousAdmission = true),
             decisionMakers = DecisionMakers(DecisionMaker("Ravi", "Brother"), DecisionMaker("Asha", "Partner")), careTeam = CareTeam(oncologist = "Dr Rao"))
         val rows = EdView.rows(r, NOT_RECORDED)
         val keys = rows.map { it.key }
-        assertEquals(keys.indexOf("TEAM") + 1, keys.indexOf("HOME_CARE")); assertEquals(keys.indexOf("CAPACITY") - 1, keys.indexOf("WITHDRAWAL"))
+        assertEquals(keys.indexOf("TEAM") + 1, keys.indexOf("HOME_CARE")); assertEquals(keys.indexOf("CAPACITY") - 1, keys.indexOf("HOME_CARE")); assertFalse("WITHDRAWAL" in keys)
         val by = rows.associateBy { it.key }
         assertTrue(by.getValue("HOME_CARE").value.en.contains("The organisation was consulted about this plan")); assertTrue(by.getValue("HOME_CARE").value.en.contains("Admitted before for this condition"))
-        assertTrue(by.getValue("WITHDRAWAL").value.en.contains("Withdrawal or withholding to be performed"))
         assertTrue(by.getValue("DECISION_MAKER").value.en.contains("Secondary: Asha"))
         // A doctor who is not an oncologist reads correctly.
         assertTrue(by.getValue("TEAM").value.en.contains("Treating consultant: Dr Rao")); assertFalse(by.getValue("TEAM").value.en.contains("Oncologist"))
-        assertTrue(by.getValue("WITHDRAWAL").value.hi.contains("अंतिम फ़ैसला"))
     }
 
     /** The server's quickViewSnapshot drops these from a scan; the offline QR, which this phone writes, must not carry them either. */
@@ -136,8 +116,8 @@ class CarePlanLegalReviewTest {
     }
 
     @Test fun everyNewLabelHasHindi() {
-        (WithdrawalFinal.entries.map { PlanText.withdrawalFinal(it) } + PlanText.withdrawalFinal(null) + KnowsRecordedWhen.entries.map(PlanText::knowsRecordedWhen)).forEach { assertTrue(it.en, HindiScan.hasHindi(it.hi)) }
+        KnowsRecordedWhen.entries.map(PlanText::knowsRecordedWhen).forEach { assertTrue(it.en, HindiScan.hasHindi(it.hi)) }
         val r = base().copy(withdrawal = EctprWithdrawal(applicable = true, finalDecision = WithdrawalFinal.TO_BE_PERFORMED), signatures = listOf(Signature(SignatureRole.SURROGATE, "Ravi", signedAt = now)), decisionMakers = DecisionMakers(alternate = DecisionMaker("Asha")))
-        EctprRules.check(r, today).filter { it.id == "W1" || it.id == "W2" }.also { assertEquals(2, it.size) }.forEach { assertTrue(it.id, HindiScan.hasHindi(it.messageHi)) }
+        EctprRules.check(r, today).filter { it.id == "W2" }.also { assertEquals(1, it.size) }.forEach { assertTrue(it.id, HindiScan.hasHindi(it.messageHi)) }
     }
 }

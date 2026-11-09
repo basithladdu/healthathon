@@ -43,7 +43,7 @@ class CareGocGeminiTest {
         assertEquals("PATIENT_PARTY", GocGeminiRules.speaker("patient")); assertEquals("PATIENT_PARTY", GocGeminiRules.speaker("Family")); assertEquals("UNKNOWN", GocGeminiRules.speaker(3))
         assertEquals("ur", GocGeminiRules.lang("ur-IN")); assertEquals("kn", GocGeminiRules.lang("Kannada")); assertEquals("und", GocGeminiRules.lang("??"))
         assertEquals(3675.0, GocGeminiRules.seconds("1:01:15")!!, 0.0); assertEquals(75.5, GocGeminiRules.seconds("75.5s")!!, 0.0); assertNull(GocGeminiRules.seconds("soon"))
-        assertEquals("Audio is sent to Google Gemini to transcribe.", GocGeminiRules.consentLine(true)); assertEquals("", GocGeminiRules.consentLine(false))
+        assertEquals("Audio is sent to a secure AI service to transcribe.", GocGeminiRules.consentLine(true)); assertEquals("", GocGeminiRules.consentLine(false))
         assertEquals("provider_busy", GocGeminiRules.errorCode("attempt_unavailable")); assertEquals("sign_in_required", GocGeminiRules.errorCode("confirmed_account_required"))
     }
 
@@ -136,6 +136,6 @@ class CareGocGeminiTest {
         assertFalse(gocOnlineEngines(FakeFunction(ready = false)).gemini)
         assertFalse(gocOnlineEngines(null).gemini)
         val on = gocOnlineEngines(FakeFunction())
-        assertTrue(on.gemini); assertEquals("Audio is sent to Google Gemini to transcribe.", on.consentLine)
+        assertTrue(on.gemini); assertEquals("Audio is sent to a secure AI service to transcribe.", on.consentLine)
     }
 }

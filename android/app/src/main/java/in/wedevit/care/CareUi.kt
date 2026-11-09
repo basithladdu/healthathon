@@ -929,7 +929,7 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
             if (!quickConsent) CheckLine(accessAccepted, { accessAccepted = it }, t("We understand people with access to this person's phone or shared records may be able to read the written note.", "हम समझते हैं कि इस व्यक्ति के फ़ोन या साझा रिकॉर्ड तक पहुँच वाले लोग लिखा नोट पढ़ सकते हैं।"))
             if (BuildConfig.CLOUD_AUDIO_ENABLED) {
             if (!quickConsent) { HorizontalDivider(); Text(t("Online transcription", "ऑनलाइन लिखाई"), fontWeight = FontWeight.Bold) }
-            CheckLine(transcriptionAccepted, { transcriptionAccepted = it }, t("Use Google Gemini to write it down", "Google Gemini से लिखवाएँ"))
+            CheckLine(transcriptionAccepted, { transcriptionAccepted = it }, t("Use the AI service to write it down", "AI सेवा से लिखवाएँ"))
             }
         }
     }, confirmButton = {
