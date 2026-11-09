@@ -1,0 +1,53 @@
+[softly] A patient tells her doctor what she wants.
+
+[serious] Two months later, in the emergency room, nobody can find what she said.
+
+[serious] Ninety-eight percent of advanced cancer patients had unmet needs.
+
+[warmly] This is Sahara! [excited] A palliative-care companion, with one care record for patients, families and their doctors.
+
+[cheerfully] Goals of care.
+
+[excited] With everyone's consent, the doctor records the talk. AI writes out who said what, then fills in the form!
+
+[warmly] But the AI never has the last word. The doctor reviews every line, edits what needs changing, and only then signs.
+
+[excited] Thirteen topics tick off as they come up. Before finishing, Sahara shows what wasn't discussed.
+
+[warmly] People change their minds. The latest statement takes over, and the earlier one stays visible, struck through.
+
+[confident] The talk becomes a clinical document. Doctor and patient sign it, and that version locks.
+
+[excited] The talk can happen in English, Hindi, Telugu, Urdu or Kannada, even mixed in one sentence! Indian-language speech and translation, with Sarvam AI.
+
+[cheerfully] For the doctor.
+
+[confident] The doctor sees the whole story from the very first entry, with the worst symptoms on top.
+
+[serious] In an emergency.
+
+[confident] One scan shows the patient's wishes. The QR card and latest care document are a tap away from home.
+
+[cheerfully] Every day.
+
+[cheerfully] Each day, patients rate their symptoms, use the distress thermometer, and mark pain on a body map.
+
+[excited] Scan a prescription or tablet strip, and every dose gets its own tick!
+
+[cheerfully] Every visit is in one place: the date, the doctor, the speciality, and that day's prescription.
+
+[cheerfully] Finding answers and help.
+
+[excited] Sahara sorts bills from lab reports, and finds answers in your own papers, showing the lines it used!
+
+[warmly] Find palliative centres and morphine-listed hospitals on a map, with directions in Google Maps.
+
+[warmly] Caring for the carer.
+
+[softly] Caring for someone you love can wear you down. [warmly] A short check shows the strain on the carer, then links them to counsellors, Tele-MANAS and support groups.
+
+[warmly] And carers can talk with others who've been there. For now, it's a preview.
+
+[warmly] Sahara. Care that follows what matters to the patient.
+
+[cheerfully] Made by Team Zeros and Ones.
