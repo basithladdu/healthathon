@@ -183,9 +183,9 @@ async function geminiStart(config: Config, mime: string, bytes: number, origin: 
     }
   }
   if (last?.status === 429) return fail(429, 'provider_busy', BUSY, last.retryAfterSec);
-  if (last?.status === null) return fail(502, 'gemini_unavailable', 'Google Gemini could not be reached.');
-  if (last && last.status >= 500) return fail(502, 'gemini_unavailable', 'Google Gemini could not start the upload.');
-  return fail(502, 'gemini_rejected', 'Google Gemini refused the upload.');
+  if (last?.status === null) return fail(502, 'gemini_unavailable', 'The AI service could not be reached.');
+  if (last && last.status >= 500) return fail(502, 'gemini_unavailable', 'The AI service could not start the upload.');
+  return fail(502, 'gemini_rejected', 'The AI service refused the upload.');
 }
 
 /** The key whose Google project holds this ticket's upload. A ticket from before key slots, or with no slot, uses the first key. */
@@ -256,14 +256,14 @@ export async function geminiTranscribeWindow(config: Config, request: GeminiWind
           headers: { 'x-goog-api-key': request.key ?? config.gemini, 'Content-Type': 'application/json', Accept: 'application/json' }, body });
       } catch (error) {
         console.warn('goc_gemini_fetch_failed', model, String(error).slice(0, 200));
-        last = new GocFailure(502, 'gemini_unavailable', 'Google Gemini did not answer in time.');
+        last = new GocFailure(502, 'gemini_unavailable', 'The AI service did not answer in time.');
         if (attempt === 0) { await pause(2000); continue; } break;
       }
-      if (response.status === 404) { void response.body?.cancel().catch(() => {}); last = new GocFailure(502, 'gemini_unavailable', 'The Gemini model was not found.'); break; }
+      if (response.status === 404) { void response.body?.cancel().catch(() => {}); last = new GocFailure(502, 'gemini_unavailable', 'The AI service model was not found.'); break; }
       if (response.status === 429 || response.status >= 500) {
         console.warn('goc_gemini_error', model, response.status, (await response.text().catch(() => '')).slice(0, 300));
         if (response.status === 429) busy++;
-        last = response.status === 429 ? new GocFailure(429, 'provider_busy', BUSY, retryAfter(response)) : new GocFailure(502, 'gemini_unavailable', 'Google Gemini had a problem. Try again later.');
+        last = response.status === 429 ? new GocFailure(429, 'provider_busy', BUSY, retryAfter(response)) : new GocFailure(502, 'gemini_unavailable', 'The AI service had a problem. Try again later.');
         if (attempt === 0) { await pause(Math.min(8, retryAfter(response) ?? 2) * 1000); continue; } break;
       }
       const value = await response.json().catch(() => null) as Json | null;
@@ -271,21 +271,21 @@ export async function geminiTranscribeWindow(config: Config, request: GeminiWind
         const message = String((isObject(value?.error) ? (value.error as Json).message : '') ?? '');
         console.warn('goc_gemini_rejected', model, response.status, message.slice(0, 300));
         // A retired or unknown model: try the next one. Anything else (format, size) will not improve with a retry.
-        if (/model|not found|not supported/iu.test(message) && !/mime|audio|file/iu.test(message)) { last = new GocFailure(502, 'gemini_unavailable', 'The Gemini model is not available.'); break; }
-        throw new GocFailure(502, 'gemini_rejected', 'Google Gemini could not read this audio.');
+        if (/model|not found|not supported/iu.test(message) && !/mime|audio|file/iu.test(message)) { last = new GocFailure(502, 'gemini_unavailable', 'The AI service is not available.'); break; }
+        throw new GocFailure(502, 'gemini_rejected', 'The AI service could not read this audio.');
       }
       try {
         return { lines: parseGeminiAnswer(value, request), model };
       } catch (error) {
         if (error instanceof GocOutputError && error.code === 'output_truncated') throw new GocFailure(422, 'output_truncated', 'This part was too long for one answer.');
-        if (error instanceof GocOutputError && error.code === 'blocked') throw new GocFailure(502, 'gemini_rejected', 'Google Gemini declined to transcribe this audio.');
-        last = new GocFailure(502, 'invalid_output', 'Google Gemini did not return a usable transcript.');
+        if (error instanceof GocOutputError && error.code === 'blocked') throw new GocFailure(502, 'gemini_rejected', 'The AI service declined to transcribe this audio.');
+        last = new GocFailure(502, 'invalid_output', 'The AI service did not return a usable transcript.');
         if (attempt === 0) continue; break;
       }
     }
   }
   if (busy > 0 && busy === tries && last) throw last;
-  throw last ?? new GocFailure(502, 'gemini_unavailable', 'Google Gemini could not finish.');
+  throw last ?? new GocFailure(502, 'gemini_unavailable', 'The AI service could not finish.');
 }
 
 /** Reads a generateContent answer: candidate text → JSON → checked lines. Exported for tests. */
@@ -327,7 +327,7 @@ async function analyze(config: Config, body: Json, from: Caller, send: typeof fe
       language: typeof body.language === 'string' ? body.language.slice(0, 12) : '', analyzed_at: analyzedAt,
     }, send);
   }
-  return { ...result.analysis, id, model: result.model, answeredBy: 'Google Gemini', engine: 'gemini', requiresReview: true, saved, analyzedAt };
+  return { ...result.analysis, id, model: result.model, answeredBy: 'the AI service', engine: 'gemini', requiresReview: true, saved, analyzedAt };
 }
 
 // ---------- the handler ----------
@@ -353,7 +353,7 @@ export function createGocTranscribeHandler(send: typeof fetch = fetch, env: Envi
       if (binary === 'chunk') {
         if (request.headers.get('x-sahara-consent') !== 'online-transcription') fail(400, 'consent_required', 'Agree to sending the audio first.');
         if (Number(request.headers.get('content-length') || '0') > GOC_RELAY_MAX_BYTES + 4096) fail(413, 'too_large', 'This part is too large.');
-        if (!gemini) fail(503, 'not_enabled', 'Gemini transcription is not set up.');
+        if (!gemini) fail(503, 'not_enabled', 'AI transcription is not set up.');
         const from = await caller(request, env, send);
         if (!gocAllowed(from.who, 'chunk')) fail(429, 'attempt_unavailable', 'The hourly transcription limit was reached. Try again later.', 600);
         const audio = await request.blob();
@@ -366,7 +366,7 @@ export function createGocTranscribeHandler(send: typeof fetch = fetch, env: Envi
         if (!Number.isInteger(offset) || offset < 0 || offset + audio.size > ticket.b || (final && offset + audio.size !== ticket.b)) fail(400, 'invalid_body', 'The upload part did not fit.');
         const forwarded = await send(ticket.relayUrl as string, { method: 'POST', redirect: 'error', signal: AbortSignal.timeout(60_000), body: audio,
           headers: { 'X-Goog-Upload-Command': final ? 'upload, finalize' : 'upload', 'X-Goog-Upload-Offset': String(offset), 'Content-Length': String(audio.size) } }).catch(() => null);
-        if (!forwarded) fail(502, 'gemini_unavailable', 'Google Gemini could not be reached.');
+        if (!forwarded) fail(502, 'gemini_unavailable', 'The AI service could not be reached.');
         const value = await (forwarded as Response).json().catch(() => null);
         if (!(forwarded as Response).ok) fail((forwarded as Response).status === 429 ? 429 : 502, (forwarded as Response).status === 429 ? 'provider_busy' : 'gemini_unavailable', 'The upload could not continue.');
         return reply({ status: (forwarded as Response).headers.get('x-goog-upload-status') || '', file: readFile(value)?.name ?? null });
@@ -383,7 +383,7 @@ export function createGocTranscribeHandler(send: typeof fetch = fetch, env: Envi
       const action = body.action as 'start' | 'transcribe' | 'delete' | 'analyze';
       if (action !== 'analyze' && raw.length > 16 * 1024) fail(413, 'too_large', 'The request is too large.');
       if (action !== 'delete' && body.consent !== true) fail(400, 'consent_required', 'Agree to sending the audio first.');
-      if (!gemini) fail(503, 'not_enabled', 'Gemini transcription is not set up.');
+      if (!gemini) fail(503, 'not_enabled', 'AI transcription is not set up.');
       const from = await caller(request, env, send);
       if (!gocAllowed(from.who, action)) fail(429, 'attempt_unavailable', 'The hourly transcription limit was reached. Try again later.', 600);
 
@@ -402,7 +402,7 @@ export function createGocTranscribeHandler(send: typeof fetch = fetch, env: Envi
         }
         // The URL is not safe to hand out: keep it sealed in the ticket and relay chunks through this route.
         const chunkBytes = Math.floor(GOC_RELAY_MAX_BYTES / started.granularity) * started.granularity;
-        if (!started.url || chunkBytes < 1) fail(502, 'gemini_unavailable', 'Google Gemini could not start the upload.');
+        if (!started.url || chunkBytes < 1) fail(502, 'gemini_unavailable', 'The AI service could not start the upload.');
         return reply({ mode: 'relay', chunkBytes, ticket: await signTicket(config.ticketSecret, ticket, started.url as string) });
       }
 
@@ -416,7 +416,7 @@ export function createGocTranscribeHandler(send: typeof fetch = fetch, env: Envi
       const window = windowFrom(body);
       const file = await geminiFile(slot.key, ticket, body.file, send);
       if (file.state === 'PROCESSING') return reply({ pending: true, file: file.name, retryMs: 2000 }, 202);
-      if (file.state === 'FAILED') { await geminiDelete(slot.key, file.name, send); fail(502, 'gemini_rejected', 'Google Gemini could not process this audio.'); }
+      if (file.state === 'FAILED') { await geminiDelete(slot.key, file.name, send); fail(502, 'gemini_rejected', 'The AI service could not process this audio.'); }
       let keep = false;
       try {
         const result = await geminiTranscribeWindow(config, { file: { uri: file.uri, mimeType: file.mimeType || ticket.m }, lang: langFrom(body.lang), ...window, key: slot.key }, send, Date.now, pause);

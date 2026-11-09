@@ -30,8 +30,6 @@ export type ImplantedDevice = 'NONE' | 'PACEMAKER' | 'ICD' | 'CRT_D' | 'OTHER';
 
 /** Legal review, Rituparna P, 31 Oct 2026. Optional because older saved records do not have them. */
 export type EctprHomeCare = { assessmentFrequency: string; coordinator: string; ngoContact: string; ngoConsulted: boolean; previousAdmission: boolean | null; previousAdmissionDetails: string };
-export type WithdrawalFinal = 'TO_BE_PERFORMED' | 'FAMILY_REFUSED' | 'BOARD_REFUSED' | 'PHYSICIAN_REVOKED';
-export type EctprWithdrawal = { applicable: boolean; primaryBoardDate: string; secondaryBoardDate: string; primaryBoardMembers: string; secondaryBoardMembers: string; boardDecision: string; finalDecision: WithdrawalFinal | null; protocol: string };
 
 /** A goals-of-care conversation the doctor reviewed (goc-transcribe.tsx). Stays on this device: never on the emergency card. */
 export type GocTranscriptSpeaker = 'DOCTOR' | 'PATIENT_PARTY' | null;
@@ -105,7 +103,8 @@ export type EctprRecord = {
     goalAConfirmed: boolean; // V3 confirmation
   };
   homeCare?: EctprHomeCare;
-  withdrawal?: EctprWithdrawal;
+  /** Removed from the plan (Nov 2026). Older saved records may still carry it; it is ignored. */
+  withdrawal?: unknown;
   /** Optional, so older saved records still read. */
   gocTranscript?: GocTranscript;
   reviewDue: string;

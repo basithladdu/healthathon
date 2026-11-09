@@ -36,8 +36,8 @@ test('the chain is Gemini, Groq, OpenRouter, Hugging Face, Cloudflare; missing k
 
 test('the consent label names every service that may receive the words, within 60 characters', () => {
   const label = chainLabel(chatProviders(ALL));
-  assert.ok(label.startsWith('Google Gemini / Groq / OpenRouter')); assert.ok(label.length <= 60);
-  assert.equal(configuration({ GEMINI_API_KEY: 'g', GROQ_API_KEY: 'q' }).label, 'Google Gemini / Groq');
+  assert.ok(label.startsWith('the AI service / Groq / OpenRouter')); assert.ok(label.length <= 60);
+  assert.equal(configuration({ GEMINI_API_KEY: 'g', GROQ_API_KEY: 'q' }).label, 'the AI service / Groq');
   assert.equal(chainLabel(chatProviders(ALL), 'Sahara AI partners'), 'Sahara AI partners');
 });
 
@@ -115,7 +115,7 @@ test('the Android ask answer says which free service answered, keeping the contr
     'api.groq.com': () => ok('{"found":true,"answer":"Your review is on 12/11/2026.","citations":[{"document":"D1","page":1,"line":1}]}') });
   const handler = createSaharaAssistHandler(send, { GEMINI_API_KEY: 'g', GROQ_API_KEY: 'q' });
   const status = await (await handler(request(''))).json();
-  assert.equal(status.label, 'Google Gemini / Groq'); assert.deepEqual(status.providers, ['Google Gemini', 'Groq']);
+  assert.equal(status.label, 'the AI service / Groq'); assert.deepEqual(status.providers, ['the AI service', 'Groq']);
   const response = await handler(request('/ask', ask('When is my review?')));
   assert.equal(response.status, 200);
   const body = await response.json();

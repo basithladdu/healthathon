@@ -1886,8 +1886,8 @@
    "ectpr-plan-screen.tsx"
   ]
  },
- "Audio is sent to Google Gemini to transcribe.": {
-  "hi": "ऑडियो लिखने के लिए Google Gemini को भेजा जाता है।",
+ "Audio is sent to a secure AI service to transcribe.": {
+  "hi": "ऑडियो लिखने के लिए एक सुरक्षित AI सेवा को भेजा जाता है।",
   "files": [
    "goc-transcribe.tsx"
   ]

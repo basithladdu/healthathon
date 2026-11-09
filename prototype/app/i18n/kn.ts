@@ -2674,7 +2674,7 @@ registerCareDictionary('kn', {
   "Any change to the note or a signature will show.": "ಟಿಪ್ಪಣಿಯಲ್ಲಿ ಅಥವಾ ಸಹಿಯಲ್ಲಿ ಯಾವುದೇ ಬದಲಾವಣೆ ಕಾಣಿಸುತ್ತದೆ.",
   "Attested by Gazetted Officer": "ಗೆಜೆಟೆಡ್ ಅಧಿಕಾರಿಯಿಂದ ದೃಢೀಕರಿಸಲಾಗಿದೆ",
   "Attested by Notary": "ನೋಟರಿಯಿಂದ ದೃಢೀಕರಿಸಲಾಗಿದೆ",
-  "Audio is sent to Google Gemini to transcribe.": "ಬರಹ ರೂಪಕ್ಕೆ ಪರಿವರ್ತಿಸಲು ಆಡಿಯೋವನ್ನು Google Gemini ಗೆ ಕಳುಹಿಸಲಾಗುತ್ತದೆ.",
+  "Audio is sent to a secure AI service to transcribe.": "ಬರಹ ರೂಪಕ್ಕೆ ಪರಿವರ್ತಿಸಲು ಆಡಿಯೋವನ್ನು ಸುರಕ್ಷಿತ AI ಸೇವೆಗೆ ಕಳುಹಿಸಲಾಗುತ್ತದೆ.",
   "B. BALANCED / CEILING OF CARE — Treat reversible problems, but with the specific limits and as a time-limited trial.": "B. ಸಮತೋಲಿತ / ಆರೈಕೆಯ ಮಿತಿ — ಸರಿಪಡಿಸಬಹುದಾದ ಸಮಸ್ಯೆಗಳಿಗೆ ಚಿಕಿತ್ಸೆ ನೀಡಿ, ಆದರೆ ನಿರ್ದಿಷ್ಟ ಮಿತಿಗಳೊಂದಿಗೆ ಮತ್ತು ಸಮಯ ಮಿತಿಯ ಪ್ರಯೋಗವಾಗಿ.",
   "Back to review": "ಪರಿಶೀಲನೆಗೆ ಹಿಂತಿರುಗಿ",
   "Basis for authority": "ಅಧಿಕಾರದ ಆಧಾರ",

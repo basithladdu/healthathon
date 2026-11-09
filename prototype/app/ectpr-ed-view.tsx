@@ -8,7 +8,7 @@ import type { CareLang } from './care-i18n';
 import { careDir, careText } from './care-i18n';
 import type { AmdStatusSummary, EctprRecord } from './ectpr-model';
 import { edInterpretation, type EdInterpretation } from './ectpr-rules';
-import { homeCareLines, withdrawalLines,
+import { homeCareLines,
   alwaysProvidedCare, amdCaveat, ambulanceLabel, authorityLabel, ceilingDetails, ceilingLabel, cprDecidedBy, cprLabel, deviceLabel,
   dialysisLabel, dyingPhasePrompt, edAmdLines, edBanner, edFlag, formatDay, goalLabel, hydrationLabel, icuLabel, ifInDoubtAfter, ifInDoubtConditions, ifInDoubtTitle,
   ngLabel, notRecorded, pegLabel, telHref, textFor, transferLabel, treatingConsultant, vasopressorLabel,
@@ -157,7 +157,6 @@ export function EctprEdView(props: { record: EctprRecord | null; lang?: CareLang
                 <div>{t('Palliative care', 'पैलिएटिव केयर')}: {record.careTeam.palliativePhysician || notRecorded(lang)} · <Phone phone={record.careTeam.palliativePhone24h} lang={lang} /></div>
               </Row>
               {homeCareLines(record, lang).length > 0 && <Row label={t('Home care', 'घर पर देखभाल')} recorded>{homeCareLines(record, lang).map((line) => <div key={line}>{line}</div>)}</Row>}
-              {withdrawalLines(record, lang).length > 0 && <Row label={t('Withdrawal or withholding (medical boards)', 'इलाज रोकना या शुरू न करना (मेडिकल बोर्ड)')} recorded>{withdrawalLines(record, lang).map((line) => <div key={line}>{line}</div>)}</Row>}
               <Row label={t('10 · Capacity', '10 · निर्णय क्षमता')} recorded={!!record.capacity.status}>
                 {record.capacity.status === 'FLUCTUATES'
                   ? <strong className="ectpr-ed-alert">{t('Capacity fluctuates — reassess', 'निर्णय क्षमता बदलती है — दोबारा जाँचें')}{record.capacity.reassessOn ? ` (${formatDay(record.capacity.reassessOn, lang)})` : ''}</strong>

@@ -234,8 +234,8 @@ export function GocTranscribe({ t, lang, draft, previous, actorName, patientId, 
         const next = gocLinesFromOnline(result);
         added = next.length;
         setLines((current) => [...current, ...next]);
-        setTranscribedBy(`Google Gemini (${result.model})`);
-        void logAudit({ actor: actorName, action: 'SHARE', recordType: 'ECTPR', recordId: draft.id, patientId, detail: 'Conversation audio sent to Google Gemini for transcription, with consent' });
+        setTranscribedBy('The AI service');
+        void logAudit({ actor: actorName, action: 'SHARE', recordType: 'ECTPR', recordId: draft.id, patientId, detail: 'Conversation audio sent to the AI service for transcription, with consent' });
         if (added) { done(); return; }
       } catch (error) {
         if (controller.signal.aborted) { setProgress(null); cancel.current = null; return; }
@@ -409,7 +409,7 @@ export function GocTranscribe({ t, lang, draft, previous, actorName, patientId, 
       <label className="goc-consent" data-on={consented || undefined}>
         <input type="checkbox" checked={consented} onChange={(event) => agree(event.target.checked)} />
         <span><strong>{t('Everyone present agrees to this conversation being recorded and written down', 'मौजूद सभी लोग इस बातचीत को रिकॉर्ड करने और लिखने के लिए राज़ी हैं')}</strong>
-          {gemini ? <small>{t('Audio is sent to Google Gemini to transcribe.', 'ऑडियो लिखने के लिए Google Gemini को भेजा जाता है।')}</small> : null}</span>
+          {gemini ? <small>{t('Audio is sent to a secure AI service to transcribe.', 'ऑडियो लिखने के लिए एक सुरक्षित AI सेवा को भेजा जाता है।')}</small> : null}</span>
       </label>
       {talkVersion > 1 || talk?.history?.length ? <details className="goc-carry">
         <summary>{t(`Version ${talkVersion} of this conversation`, `इस बातचीत का संस्करण ${talkVersion}`)}</summary>

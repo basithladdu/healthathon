@@ -46,7 +46,7 @@ test('when Bhashini fails, changes a number, or is not set up, the free LLM chai
   assert.equal(a.answeredBy, 'Groq'); assert.equal(a.translation, 'मुझे 2 दिन से दर्द है'); assert.equal(a.label, 'Machine translation');
   const changed = transport({ bhashini: 'ok', target: 'నాకు 3 రోజులుగా నొప్పి ఉంది', llm: 'నాకు 2 రోజులుగా నొప్పి ఉంది' });
   const b = await (await createTranslateHandler(changed.send, { ...BHASHINI, GEMINI_API_KEY: 'g' })(post({ text: 'I have had pain for 2 days', sourceLanguage: 'en', targetLanguage: 'te' }))).json();
-  assert.equal(b.answeredBy, 'Google Gemini');
+  assert.equal(b.answeredBy, 'the AI service');
   const none = transport({ llm: 'It hurts' });
   const c = await (await createTranslateHandler(none.send, { OPENROUTER_API_KEY: 'o' })(post({ text: 'Dard hai', sourceLanguage: 'hi', targetLanguage: 'en' }))).json();
   assert.equal(c.answeredBy, 'OpenRouter');

@@ -41,7 +41,7 @@ export type ChatProvider = {
 };
 export type AudioProvider = { id: ProviderId; label: string; kind: 'gemini' | 'openai'; base: string; key: string; model: string };
 
-const LABELS: Record<ProviderId, string> = { custom: 'the AI service', gemini: 'Google Gemini', groq: 'Groq', openrouter: 'OpenRouter', huggingface: 'Hugging Face', cloudflare: 'Cloudflare' };
+const LABELS: Record<ProviderId, string> = { custom: 'the AI service', gemini: 'the AI service', groq: 'Groq', openrouter: 'OpenRouter', huggingface: 'Hugging Face', cloudflare: 'Cloudflare' };
 
 function chainOrder(env: Environment): ProviderId[] {
   const raw = env.SAHARA_AI_CHAIN?.trim();

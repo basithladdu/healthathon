@@ -119,7 +119,7 @@ export function planGocWindows(durationSec: number, size: number, cutNear: (at: 
 
 /** The plain consent line shown before anything is sent. */
 export function gocConsentLine(gemini: boolean) {
-  return gemini ? 'Audio is sent to Google Gemini to transcribe.' : '';
+  return gemini ? 'Audio is sent to a secure AI service to transcribe.' : '';
 }
 
 /** Instructions for Gemini. Verbatim transcript with speaker roles only: no summary, no advice. Extraction stays in the phrase matcher. */

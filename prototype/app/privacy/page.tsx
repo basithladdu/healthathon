@@ -256,7 +256,7 @@ export default function PrivacyPage() {
             ML Kit text models. The website runs Tesseract in a browser worker using
             engine and language files served by Sahara for English text. The selected
             photos and their recognised words are
-            not sent to Gemini, Supabase or another OCR service. Handwriting, small print
+            not sent to an AI service, Supabase or another OCR service. Handwriting, small print
             and other scripts may need manual entry. You can always add medicines by hand.
           </p>
           <p>

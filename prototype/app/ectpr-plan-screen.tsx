@@ -2,13 +2,13 @@
 // Emergency care plan (ECTPR): step-by-step entry wizard (tech spec §4), rules V1–V9 / C1–C8 shown inline,
 // versions (Draft / Active / Superseded / Revoked), review, cancellation, signatures and the audit log.
 // Doctors create, edit and sign. Patients view, sign their part, request a review or cancel. Family view and request a review.
-import { emptyHomeCare, emptyWithdrawal } from './ectpr-rules.ts';
-import type { EctprHomeCare, EctprWithdrawal, WithdrawalFinal } from './ectpr-model.ts';
+import { emptyHomeCare } from './ectpr-rules.ts';
+import type { EctprHomeCare } from './ectpr-model.ts';
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { careLocale, careText, type CareLang } from './care-i18n';
 import { AMD_BOARD_PATHWAY } from './amd-rules';
 import { DpdpNotice } from './dpdp-notice';
-import { alwaysProvidedCare, capacityGuide, homeCareLines, withdrawalFinalLabel, withdrawalLines, boardReconsiderationNotice } from './ectpr-labels';
+import { alwaysProvidedCare, capacityGuide, homeCareLines, boardReconsiderationNotice } from './ectpr-labels';
 import { EctprPilotLog } from './ectpr-pilot-log';
 import { FhirExportButton, PaperAndCopies, ReviewReminder } from './ectpr-plan-extras';
 import { ReadAloudButton } from './tts-speech';
@@ -181,7 +181,6 @@ const STEPS: Array<{ en: string; hi: string }> = [
   { en: 'Values', hi: 'मूल्य' },
   { en: 'Emergency choices', hi: 'इमरजेंसी के फ़ैसले' },
   { en: 'Other treatment', hi: 'दूसरे इलाज' },
-  { en: 'Stopping or not starting treatment', hi: 'इलाज रोकना या शुरू न करना' },
   { en: 'Review date', hi: 'समीक्षा की तारीख़' },
   { en: 'Signatures', hi: 'हस्ताक्षर' },
 ];
@@ -274,9 +273,8 @@ function stepForField(field: string): number {
   if (field.startsWith('values')) return 4;
   if (/^choices\.(icu|vasopressors|dialysis|feeding|hydration|conflictReasons\.C[23])/.test(field) || field.startsWith('clinical.icdDeactivation')) return 6;
   if (field.startsWith('choices')) return 5;
-  if (field === 'withdrawal') return 7;
-  if (field === 'reviewDue') return 8;
-  if (field === 'signatures') return 9;
+  if (field === 'reviewDue') return 7;
+  if (field === 'signatures') return 8;
   return 0;
 }
 
@@ -520,7 +518,6 @@ function describe(t: T, lang: CareLang, record: EctprRecord) {
       [t('Present for the discussion', 'बातचीत में मौजूद'), (record.decisionMakers.presentAtDiscussion ?? []).join('\n') || none],
       [t('Could not be reached', 'संपर्क नहीं हो सका'), (record.decisionMakers.attemptedContact ?? []).join('\n') || none],
       [t('Home care', 'घर पर देखभाल'), homeCareLines(record, lang).join('\n') || none],
-      [t('Withdrawal or withholding (medical boards)', 'इलाज रोकना या शुरू न करना (मेडिकल बोर्ड)'), withdrawalLines(record, lang).join('\n') || none],
       [t('Ability to decide', 'फ़ैसला लेने की क्षमता'), opt(CAPACITY_OPTS, record.capacity.status)],
       [t('Advance care planning', 'अग्रिम देखभाल योजना'), directive ? opt(DIRECTIVE_OPTS, directive.kind) : none],
       [t('In the patient’s own words', 'मरीज़ के अपने शब्दों में'), record.values.ownWords.trim() || none],
@@ -1361,9 +1358,8 @@ function Wizard({ t, lang, draft, previous, issues, step, busy, error, toast, di
           </fieldset> : null}
         </> : null}
 
-        {step === 7 ? <WithdrawalFields t={t} lang={lang} draft={draft} edit={edit} invalid={bad('withdrawal')} /> : null}
 
-        {step === 8 ? <>
+        {step === 7 ? <>
           <IssueList t={t} lang={lang} issues={issues.filter((item) => item.id === 'V1')} record={draft} />
           <fieldset className="ep-group" aria-invalid={bad('reviewDue')}><legend>{t('When must this plan be reviewed?', 'इस योजना की समीक्षा कब ज़रूरी है?')}</legend>
             <div className="ep-fields">
@@ -1378,8 +1374,8 @@ function Wizard({ t, lang, draft, previous, issues, step, busy, error, toast, di
           <AlwaysContinues t={t} lang={lang} />
         </> : null}
 
-        {step === 9 && draft.gocTranscript ? <GocSavedNote t={t} record={draft} showLines /> : null}
-        {step === 9 ? <SignStep t={t} lang={lang} draft={draft} actorName={actorName} busy={busy} dirty={dirty} saveBlocked={saveBlocked} edit={edit} onSign={onSign} />
+        {step === 8 && draft.gocTranscript ? <GocSavedNote t={t} record={draft} showLines /> : null}
+        {step === 8 ? <SignStep t={t} lang={lang} draft={draft} actorName={actorName} busy={busy} dirty={dirty} saveBlocked={saveBlocked} edit={edit} onSign={onSign} />
           : null}
       </div>
 
@@ -1442,34 +1438,6 @@ function HomeCareFields({ t, draft, edit }: { t: T; draft: EctprRecord; edit: (c
     <YesNo t={t} name="ep-home-admitted" legend={t('Admitted to any hospital before for this condition?', 'क्या इस बीमारी के लिए पहले किसी अस्पताल में भर्ती हुए थे?')} value={home.previousAdmission} onChange={(value) => set({ previousAdmission: value })} />
     {home.previousAdmission ? <div className="ep-fields"><Field id="ep-home-admitted-where" label={t('Where and when', 'कहाँ और कब')} wide><input id="ep-home-admitted-where" type="text" value={home.previousAdmissionDetails} onChange={(event) => set({ previousAdmissionDetails: event.target.value })} /></Field></div> : null}
   </fieldset>;
-}
-
-function WithdrawalFields({ t, lang, draft, edit, invalid }: { t: T; lang: CareLang; draft: EctprRecord; edit: (change: (record: EctprRecord) => void) => void; invalid?: boolean }) {
-  const w = draft.withdrawal ?? emptyWithdrawal();
-  const set = (patch: Partial<EctprWithdrawal>) => edit((r) => { r.withdrawal = { ...(r.withdrawal ?? emptyWithdrawal()), ...patch }; });
-  const finals: WithdrawalFinal[] = ['TO_BE_PERFORMED', 'FAMILY_REFUSED', 'BOARD_REFUSED', 'PHYSICIAN_REVOKED'];
-  return <>
-    <p>{t('Fill this only if withdrawing or withholding treatment has been decided (Common Cause v Union of India, 2018 and 2023). It records the process. This plan alone never authorises it.', 'इसे तभी भरें जब इलाज रोकने या शुरू न करने का फ़ैसला हुआ हो (Common Cause v Union of India, 2018 और 2023)। यह प्रक्रिया दर्ज करता है। सिर्फ़ यह योजना इसकी अनुमति कभी नहीं देती।')}</p>
-    <fieldset className="ep-group" aria-invalid={invalid}><legend>{t('Withdrawal or withholding (medical boards)', 'इलाज रोकना या शुरू न करना (मेडिकल बोर्ड)')}</legend>
-      <label className="ep-option"><input type="checkbox" checked={w.applicable} onChange={(event) => set({ applicable: event.target.checked })} /><span><strong>{t('Withdrawing or withholding treatment has been decided for this patient', 'इस मरीज़ के लिए इलाज रोकने या शुरू न करने का फ़ैसला हुआ है')}</strong></span></label>
-      {w.applicable ? <>
-        <div className="ep-fields" style={{ marginTop: 12 }}>
-          <Field id="ep-w-pdate" label={t('Date the Primary Board was formed', 'प्राथमिक बोर्ड बनने की तारीख़')}><input id="ep-w-pdate" type="date" value={w.primaryBoardDate} onChange={(event) => set({ primaryBoardDate: event.target.value })} /></Field>
-          <Field id="ep-w-sdate" label={t('Date the Secondary Board was formed', 'द्वितीय बोर्ड बनने की तारीख़')}><input id="ep-w-sdate" type="date" value={w.secondaryBoardDate} onChange={(event) => set({ secondaryBoardDate: event.target.value })} /></Field>
-          <Field id="ep-w-pmem" label={t('Members of the Primary Board', 'प्राथमिक बोर्ड के सदस्य')} wide><textarea id="ep-w-pmem" rows={2} value={w.primaryBoardMembers} onChange={(event) => set({ primaryBoardMembers: event.target.value })} /></Field>
-          <Field id="ep-w-smem" label={t('Members of the Secondary Board', 'द्वितीय बोर्ड के सदस्य')} wide><textarea id="ep-w-smem" rows={2} value={w.secondaryBoardMembers} onChange={(event) => set({ secondaryBoardMembers: event.target.value })} /></Field>
-          <Field id="ep-w-dec" label={t('Decision of the Boards', 'बोर्ड का फ़ैसला')} wide><textarea id="ep-w-dec" rows={2} value={w.boardDecision} onChange={(event) => set({ boardDecision: event.target.value })} /></Field>
-          <Field id="ep-w-final" label={t('Final decision', 'अंतिम फ़ैसला')} wide>
-            <select id="ep-w-final" value={w.finalDecision ?? ''} onChange={(event) => set({ finalDecision: (event.target.value || null) as WithdrawalFinal | null })}>
-              <option value="">{t('Not recorded', 'दर्ज नहीं')}</option>
-              {finals.map((value) => <option key={value} value={value}>{withdrawalFinalLabel(value, lang)}</option>)}
-            </select>
-          </Field>
-          <Field id="ep-w-protocol" label={t('Protocol for withdrawal or withholding', 'इलाज रोकने या शुरू न करने का तरीका')} wide><textarea id="ep-w-protocol" rows={3} value={w.protocol} onChange={(event) => set({ protocol: event.target.value })} /></Field>
-        </div>
-      </> : null}
-    </fieldset>
-  </>;
 }
 
 function SignStep({ t, lang, draft, actorName, busy, dirty, saveBlocked, edit, onSign }: {

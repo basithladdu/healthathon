@@ -101,10 +101,10 @@ class UnusableAnswer extends Error {}
 
 function readAnswer(value: unknown, lines: GocAnalyzeLine[]): GocAnalysis {
   const answer = value as { promptFeedback?: { blockReason?: string }; candidates?: { finishReason?: string; content?: { parts?: { text?: unknown; thought?: boolean }[] } }[] } | null;
-  if (answer?.promptFeedback?.blockReason) throw new GocAnalyzeFailure(502, 'gemini_rejected', 'Google Gemini declined to read this conversation.');
+  if (answer?.promptFeedback?.blockReason) throw new GocAnalyzeFailure(502, 'gemini_rejected', 'The AI service declined to read this conversation.');
   const candidate = answer?.candidates?.[0];
   if (!candidate) throw new UnusableAnswer();
-  if (candidate.finishReason && ['SAFETY', 'RECITATION', 'PROHIBITED_CONTENT', 'BLOCKLIST', 'SPII'].includes(candidate.finishReason)) throw new GocAnalyzeFailure(502, 'gemini_rejected', 'Google Gemini declined to read this conversation.');
+  if (candidate.finishReason && ['SAFETY', 'RECITATION', 'PROHIBITED_CONTENT', 'BLOCKLIST', 'SPII'].includes(candidate.finishReason)) throw new GocAnalyzeFailure(502, 'gemini_rejected', 'The AI service declined to read this conversation.');
   if (candidate.finishReason === 'MAX_TOKENS') throw new UnusableAnswer();
   const text = (candidate.content?.parts ?? []).filter((part) => !part.thought).map((part) => typeof part.text === 'string' ? part.text : '').join('');
   let parsed: unknown;
@@ -160,13 +160,13 @@ export async function analyzeGoc(lines: GocAnalyzeLine[], options: GocAnalyzeOpt
     return { ...result.value, slot: result.slot.slot };
   } catch (error) {
     if (error instanceof GocAnalyzeFailure) throw error;
-    if (error instanceof UnusableAnswer) throw new GocAnalyzeFailure(502, 'invalid_output', 'Google Gemini did not return a usable reading. The transcript is unchanged.');
-    if (error instanceof ModelMissing) throw new GocAnalyzeFailure(502, 'gemini_unavailable', 'The Gemini model is not available.');
+    if (error instanceof UnusableAnswer) throw new GocAnalyzeFailure(502, 'invalid_output', 'The AI service did not return a usable reading. The transcript is unchanged.');
+    if (error instanceof ModelMissing) throw new GocAnalyzeFailure(502, 'gemini_unavailable', 'The AI service is not available.');
     if (error instanceof GeminiCallError) {
-      if (error.status === 429) throw new GocAnalyzeFailure(429, 'provider_busy', 'Google Gemini is busy. Try again in a minute; the transcript is unchanged.');
-      if (error.status === 503 && error.detail === 'not configured') throw new GocAnalyzeFailure(503, 'not_enabled', 'Gemini is not set up.');
-      if (error.status !== null && error.status >= 400 && error.status < 500 && error.status !== 401 && error.status !== 403) throw new GocAnalyzeFailure(502, 'gemini_rejected', 'Google Gemini could not read this conversation.');
-      throw new GocAnalyzeFailure(502, 'gemini_unavailable', 'Google Gemini could not finish. The transcript is unchanged.');
+      if (error.status === 429) throw new GocAnalyzeFailure(429, 'provider_busy', 'The AI service is busy. Try again in a minute; the transcript is unchanged.');
+      if (error.status === 503 && error.detail === 'not configured') throw new GocAnalyzeFailure(503, 'not_enabled', 'The AI service is not set up.');
+      if (error.status !== null && error.status >= 400 && error.status < 500 && error.status !== 401 && error.status !== 403) throw new GocAnalyzeFailure(502, 'gemini_rejected', 'The AI service could not read this conversation.');
+      throw new GocAnalyzeFailure(502, 'gemini_unavailable', 'The AI service could not finish. The transcript is unchanged.');
     }
     throw error;
   }

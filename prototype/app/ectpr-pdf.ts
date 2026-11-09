@@ -10,7 +10,7 @@ import { careText, type CareLang } from './care-i18n';
 import { AMD_ED_CAVEAT, AMD_ED_CAVEAT_HI } from './amd-rules';
 import type { EctprRecord } from './ectpr-model';
 import { edInterpretation, pageFooter } from './ectpr-rules';
-import { capacityGuide, homeCareLines, withdrawalLines,
+import { capacityGuide, homeCareLines,
   alwaysProvidedCare, amdCaveat, ambulanceLabel, edAmdLines, authorityLabel, ceilingDetails, ceilingLabel, ceilingShort, cprDecidedBy, cprLabel,
   cprShort, deviceLabel, dialysisLabel, dyingPhasePrompt, edBanner, edFlag, formatDay, goalLabel, hydrationLabel, icuLabel, ifInDoubtAfter,
   ifInDoubtConditions, ifInDoubtTitle, ngLabel, notRecorded, pegLabel, textFor, transferLabel, transferShort,
@@ -224,7 +224,6 @@ export async function makeEctprPdf(record: EctprRecord, opts: { lang?: CareLang;
       `${t('Palliative care', 'पैलिएटिव केयर')}: ${record.careTeam.palliativePhysician || notRecorded(lang)} · ${record.careTeam.palliativePhone24h || notRecorded(lang)}`,
     ]],
     ...(homeCareLines(record, lang).length ? [[t('Home care', 'घर पर देखभाल'), homeCareLines(record, lang)] as [string, string[]]] : []),
-    ...(withdrawalLines(record, lang).length ? [[t('Withdrawal or withholding (medical boards)', 'इलाज रोकना या शुरू न करना (मेडिकल बोर्ड)'), withdrawalLines(record, lang)] as [string, string[]]] : []),
     ...((record.decisionMakers.presentAtDiscussion ?? []).length ? [[t('Present for the discussion', 'बातचीत में मौजूद'), record.decisionMakers.presentAtDiscussion!] as [string, string[]]] : []),
     ...((record.decisionMakers.attemptedContact ?? []).length ? [[t('Could not be reached', 'संपर्क नहीं हो सका'), record.decisionMakers.attemptedContact!] as [string, string[]]] : []),
     [t('Capacity', 'निर्णय क्षमता'), [

@@ -2674,7 +2674,7 @@ registerCareDictionary('te', {
   "Any change to the note or a signature will show.": "నోట్‌లో లేదా సంతకంలో ఏదైనా మార్పు కనిపిస్తుంది.",
   "Attested by Gazetted Officer": "గెజిటెడ్ అధికారిచే ధృవీకరించబడింది",
   "Attested by Notary": "నోటరీచే ధృవీకరించబడింది",
-  "Audio is sent to Google Gemini to transcribe.": "లిఖిత రూపంలోకి మార్చడానికి ఆడియో Google Gemini కి పంపబడుతుంది.",
+  "Audio is sent to a secure AI service to transcribe.": "లిఖిత రూపంలోకి మార్చడానికి ఆడియో సురక్షిత AI సేవకు పంపబడుతుంది.",
   "B. BALANCED / CEILING OF CARE — Treat reversible problems, but with the specific limits and as a time-limited trial.": "B. సమతుల్యం / సంరక్షణ పరిమితి — తిరిగి నయం చేయగల సమస్యలకు చికిత్స చేయండి, కానీ నిర్దిష్ట పరిమితులతో మరియు సమయ పరిమిత ప్రయత్నంగా.",
   "Back to review": "సమీక్షకు తిరిగి వెళ్ళండి",
   "Basis for authority": "అధికారానికి ఆధారం",

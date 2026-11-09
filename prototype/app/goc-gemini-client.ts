@@ -3,7 +3,7 @@
 //
 // Order: Google Gemini (verbatim lines with speaker roles) → when it cannot finish, the caller falls back to on-device Whisper
 // (goc-transcribe-model.ts) with the lines already done (GocOnlineError.partial) → typing.
-// Consent line to show first: gocOnlineEngines().consentLine, "Audio is sent to Google Gemini to transcribe."
+// Consent line to show first: gocOnlineEngines().consentLine, "Audio is sent to a secure AI service to transcribe."
 //
 // A long recording is decoded once to 16 kHz mono and sent to Gemini in 10-minute windows, each cut at a quiet moment.
 import { GEMINI_AUDIO_MIME, GOC_MAX_SECONDS, GOC_MIN_WINDOW_SEC, GOC_WINDOW_SEC, baseMime,
@@ -128,7 +128,7 @@ async function geminiWindow(source: GocAudioSource, window: { start: number; end
         } catch (error) { if (signal?.aborted) throw new GocOnlineError('aborted', 'Stopped.'); void error; }
         if (!ok) await deps.pause(1000 * 2 ** attempt, signal);
       }
-      if (!ok) throw new EngineError('upload_failed', 'The audio could not be uploaded to Google Gemini.');
+      if (!ok) throw new EngineError('upload_failed', 'The audio could not be uploaded to the AI service.');
       progress(0.4 * (offset + part.size) / piece.blob.size);
     }
     // The file may take a moment to be ready; a busy answer gets one wait on the same upload.
@@ -142,7 +142,7 @@ async function geminiWindow(source: GocAudioSource, window: { start: number; end
       done = true; progress(1);
       return { lines: asLines(answer.body.lines), model: String(answer.body.model || 'gemini') };
     }
-    throw new EngineError('unavailable', 'Google Gemini took too long to prepare the audio.');
+    throw new EngineError('unavailable', 'The AI service took too long to prepare the audio.');
   } finally {
     // The route deletes the file after a final answer; otherwise ask it to.
     if (!done) await deps.http.json({ action: 'delete', ticket, file }).catch(() => null);
@@ -173,7 +173,7 @@ export async function runGocOnline(source: GocAudioSource, opts: GocOnlineOption
       parts.push(result.lines); models.add(result.model); doneSec += window.end - window.start;
     } catch (error) {
       if (error instanceof GocOnlineError) throw Object.assign(error, { partial: mergeGocLines(parts) });
-      const failure = error instanceof EngineError ? error : new EngineError('offline', 'Google Gemini could not be reached.');
+      const failure = error instanceof EngineError ? error : new EngineError('offline', 'The AI service could not be reached.');
       if (failure.code === 'output_truncated' && window.end - window.start > GOC_MIN_WINDOW_SEC * 2) {
         const length = window.end - window.start;
         const cut = Math.max(window.start + GOC_MIN_WINDOW_SEC, Math.min(window.end - GOC_MIN_WINDOW_SEC, source.cutNear(window.start + length / 2)));
@@ -190,7 +190,7 @@ export async function runGocOnline(source: GocAudioSource, opts: GocOnlineOption
 export async function gocOnlineEngines(http: GocHttp = fetchHttp()): Promise<{ gemini: boolean; consentLine: string }> {
   const info = await http.info().catch(() => ({} as Json));
   const gemini = info.gemini === true;
-  return { gemini, consentLine: gemini ? 'Audio is sent to Google Gemini to transcribe.' : '' };
+  return { gemini, consentLine: gemini ? 'Audio is sent to a secure AI service to transcribe.' : '' };
 }
 
 /** True when the server has a Gemini key. False when offline or not set up. */

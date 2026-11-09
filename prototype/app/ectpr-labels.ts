@@ -5,7 +5,7 @@ import { careText, type CareLang } from './care-i18n.ts';
 import { ALWAYS_PROVIDED_CARE, IF_IN_DOUBT_ACTION, IF_IN_DOUBT_RESUSCITATE, TRANSFER_REASON_LABELS, consultantSignature, type EdInterpretation } from './ectpr-rules.ts';
 import type {
   AmbulanceOption, AmdStatusSummary, AuthorityBasis, Dialysis, EctprRecord, ExistingDirective, GoalOfCare, HospitalTransfer, Hydration,
-  Icu, ImplantedDevice, NgFeeding, PegFeeding, RespCeiling, TransferReason, TrialPlan, Vasopressors, WithdrawalFinal,
+  Icu, ImplantedDevice, NgFeeding, PegFeeding, RespCeiling, TransferReason, TrialPlan, Vasopressors,
 } from './ectpr-model.ts';
 
 type T = (en: string, hi: string) => string;
@@ -386,38 +386,11 @@ export function telHref(phone: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Legal review (Rituparna P, 31 Oct 2026): capacity guidance, home care, withdrawal or withholding
+// Legal review (Rituparna P, 31 Oct 2026): capacity guidance, home care
 
 export function capacityGuide(lang: CareLang): { title: string; note: string; points: string[] } {
   const t = textFor(lang);
   return { title: t('How to assess decision-making capacity', 'निर्णय लेने की क्षमता कैसे जाँचें'), note: t('Draft annexure. A clinician and the legal team must approve this wording before the pilot.', 'मसौदा अनुलग्नक। पायलट से पहले डॉक्टर और क़ानूनी टीम को यह भाषा मंज़ूर करनी होगी।'), points: [t('Start by assuming the patient has capacity. Age, diagnosis or disagreeing with the doctor does not remove it.', 'पहले मानें कि मरीज़ में क्षमता है। उम्र, बीमारी या डॉक्टर से असहमति से यह ख़त्म नहीं होती।'), t('Assess this one decision, at this time. Do not rely on old notes.', 'इसी एक फ़ैसले के लिए, अभी जाँचें। पुराने नोट पर भरोसा न करें।'), t('Help them first: use their language, plain words and any aids, at the time of day they are most alert.', 'पहले मदद करें: उनकी भाषा, सरल शब्द और कोई भी सहायक साधन इस्तेमाल करें, उस समय जब वे सबसे ज़्यादा सतर्क हों।'), t('Check all four: can they understand the information, retain it long enough, weigh the choices and their results, and communicate a choice in any way?', 'चारों जाँचें: क्या वे जानकारी समझ सकते हैं, उसे काफ़ी देर याद रख सकते हैं, विकल्पों और नतीजों को तौल सकते हैं, और किसी भी तरह अपना फ़ैसला बता सकते हैं?'), t('If any one is missing, they lack capacity for this decision only. Record the basis and who assessed it, and still involve them as far as possible.', 'अगर एक भी न हो, तो सिर्फ़ इस फ़ैसले की क्षमता नहीं है। आधार और जाँचने वाले का नाम लिखें, और फिर भी उन्हें जितना हो सके शामिल करें।'), t('If it may be temporary (delirium, medicines, pain, infection), treat the cause and check again before acting.', 'अगर यह अस्थायी हो सकती है (डेलिरियम, दवाएँ, दर्द, संक्रमण), तो कारण का इलाज करें और कुछ करने से पहले दोबारा जाँचें।')] };
-}
-
-export function withdrawalFinalLabel(value: WithdrawalFinal | null | undefined, lang: CareLang): string {
-  const t = textFor(lang);
-  switch (value) {
-    case 'TO_BE_PERFORMED': return t('Withdrawal or withholding to be performed', 'इलाज रोका जाएगा या शुरू नहीं किया जाएगा');
-    case 'FAMILY_REFUSED': return t('Family refused consent (patient has lost decision-making capacity)', 'परिवार ने सहमति नहीं दी (मरीज़ निर्णय क्षमता खो चुके हैं)');
-    case 'BOARD_REFUSED': return t('Primary or Secondary Board refused permission', 'प्राथमिक या द्वितीय बोर्ड ने अनुमति नहीं दी');
-    case 'PHYSICIAN_REVOKED': return t('Treating doctor revoked their decision to support it', 'इलाज करने वाले डॉक्टर ने समर्थन का अपना फ़ैसला वापस लिया');
-    default: return t('No final decision recorded', 'कोई अंतिम फ़ैसला दर्ज नहीं');
-  }
-}
-
-/** Empty lines are left out. A QR snapshot has no board members or decision, so those lines disappear there. */
-export function withdrawalLines(record: EctprRecord, lang: CareLang): string[] {
-  const t = textFor(lang);
-  const w = record.withdrawal;
-  if (!w?.applicable) return [];
-  return [
-    `${t('Final decision', 'अंतिम फ़ैसला')}: ${withdrawalFinalLabel(w.finalDecision, lang)}`,
-    w.primaryBoardDate && `${t('Date the Primary Board was formed', 'प्राथमिक बोर्ड बनने की तारीख़')}: ${w.primaryBoardDate}`,
-    w.primaryBoardMembers && `${t('Members of the Primary Board', 'प्राथमिक बोर्ड के सदस्य')}: ${w.primaryBoardMembers}`,
-    w.secondaryBoardDate && `${t('Date the Secondary Board was formed', 'द्वितीय बोर्ड बनने की तारीख़')}: ${w.secondaryBoardDate}`,
-    w.secondaryBoardMembers && `${t('Members of the Secondary Board', 'द्वितीय बोर्ड के सदस्य')}: ${w.secondaryBoardMembers}`,
-    w.boardDecision && `${t('Decision of the Boards', 'बोर्ड का फ़ैसला')}: ${w.boardDecision}`,
-    w.protocol && `${t('Protocol for withdrawal or withholding', 'इलाज रोकने या शुरू न करने का तरीका')}: ${w.protocol}`,
-  ].filter((line): line is string => !!line);
 }
 
 export function homeCareLines(record: EctprRecord, lang: CareLang): string[] {

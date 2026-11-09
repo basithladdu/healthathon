@@ -24,7 +24,7 @@ test('a Gemini key alone sets up drafting, asking, translation and transcription
   const config = configuration({ GEMINI_API_KEY: 'test-key' });
   assert.equal(config.ready, true); assert.equal(config.audioReady, true);
   assert.equal(config.chain[0].base, 'https://generativelanguage.googleapis.com/v1beta/openai');
-  assert.equal(config.model, 'gemini-3.5-flash-lite'); assert.equal(config.label, 'Google Gemini');
+  assert.equal(config.model, 'gemini-3.5-flash-lite'); assert.equal(config.label, 'the AI service');
   assert.equal(configuration({}).ready, false);
 });
 

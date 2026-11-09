@@ -41,7 +41,7 @@ test('speaker, language and time helpers', () => {
   assert.equal(gocSpeaker('patient'), 'PATIENT_PARTY'); assert.equal(gocSpeaker('Family'), 'PATIENT_PARTY'); assert.equal(gocSpeaker('DOCTOR'), 'DOCTOR'); assert.equal(gocSpeaker(3), 'UNKNOWN');
   assert.equal(gocLang('ur-IN'), 'ur'); assert.equal(gocLang('Kannada'), 'kn'); assert.equal(gocLang('??'), 'und');
   assert.equal(gocSeconds('1:01:15'), 3675); assert.equal(gocSeconds('75.5s'), 75.5); assert.equal(gocSeconds('soon'), null);
-  assert.equal(gocConsentLine(true), 'Audio is sent to Google Gemini to transcribe.'); assert.equal(gocConsentLine(false), '');
+  assert.equal(gocConsentLine(true), 'Audio is sent to a secure AI service to transcribe.'); assert.equal(gocConsentLine(false), '');
 });
 
 test('windows split long audio at quiet cuts; merge drops a line repeated across a cut', () => {
@@ -147,7 +147,7 @@ test('GET says which engines are set up and gives the consent line, without the 
   const text = await response.text();
   assert.ok(!text.includes(KEY));
   const on = JSON.parse(text);
-  assert.equal(on.gemini, true); assert.equal('groq' in on, false); assert.equal(on.consentLine, 'Audio is sent to Google Gemini to transcribe.'); assert.equal(on.geminiModel, GOC_GEMINI_MODELS[0]);
+  assert.equal(on.gemini, true); assert.equal('groq' in on, false); assert.equal(on.consentLine, 'Audio is sent to a secure AI service to transcribe.'); assert.equal(on.geminiModel, GOC_GEMINI_MODELS[0]);
 });
 
 test('POST needs consent and a same-origin, Android or signed-in caller', async () => {

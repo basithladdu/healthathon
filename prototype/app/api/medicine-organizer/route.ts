@@ -145,7 +145,7 @@ export async function POST(request: Request) {
     return failure(413, 'images_too_large', 'The selected images are too large together. Use fewer or tighter photos.');
   }
   const config = configuration();
-  if (!config) return failure(503, 'not_configured', 'Sahara AI is being connected. Add the Gemini key and try again.');
+  if (!config) return failure(503, 'not_configured', 'Sahara AI is being connected. Add the AI service key and try again.');
 
   const now = Date.now();
   if (now - rateWindowStarted >= RATE_WINDOW_MS) { rateWindowStarted = now; attempts = 0; }

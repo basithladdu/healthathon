@@ -2674,7 +2674,7 @@ registerCareDictionary('ur', {
   "Any change to the note or a signature will show.": "نوٹ یا دستخط میں کوئی بھی تبدیلی نظر آئے گی۔",
   "Attested by Gazetted Officer": "گزیٹڈ افسر سے تصدیق شدہ",
   "Attested by Notary": "نوٹری سے تصدیق شدہ",
-  "Audio is sent to Google Gemini to transcribe.": "آڈیو کو تحریر میں بدلنے کے لیے Google Gemini کو بھیجا جاتا ہے۔",
+  "Audio is sent to a secure AI service to transcribe.": "آڈیو کو تحریر میں بدلنے کے لیے ایک محفوظ AI سروس کو بھیجا جاتا ہے۔",
   "B. BALANCED / CEILING OF CARE — Treat reversible problems, but with the specific limits and as a time-limited trial.": "B. متوازن / علاج کی حد — قابلِ واپسی مسائل کا علاج کریں، لیکن مخصوص حدود کے ساتھ اور وقت کی حد والے آزمائشی علاج کے طور پر۔",
   "Back to review": "جائزے پر واپس جائیں",
   "Basis for authority": "اختیار کی بنیاد",

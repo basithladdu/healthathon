@@ -46,13 +46,14 @@ export function quickViewSnapshot(record: EctprRecord): EctprRecord {
   const dm = record.decisionMakers?.primary ?? null;
   const alt = record.decisionMakers?.alternate ?? null;
   const strip = (d: typeof dm) => (d ? { ...d, idType: null, idLast4: null } : null);
+  // An older record may still carry the removed withdrawal section; it is never shown.
+  const { withdrawal: _withdrawal, ...rest } = withoutGocTranscript(record);
   return {
-    ...withoutGocTranscript(record),
+    ...rest,
     patient: { ...record.patient, dob: '', address: '', phone: '', gender: '' },
     decisionMakers: { primary: strip(dm), alternate: strip(alt), familyToInform: [], familyConsensusNote: '' },
     values: { patientKnows: null, ownWords: '', unacceptableOutcomes: [], familyAskedNotToTell: false, directQuestionPlan: '', financialConcernDiscussed: null, socialWorkReferral: null },
     capacity: { ...record.capacity, basis: '' },
-    ...(record.withdrawal ? { withdrawal: { ...record.withdrawal, primaryBoardMembers: '', secondaryBoardMembers: '', boardDecision: '' } } : {}),
   };
 }
 

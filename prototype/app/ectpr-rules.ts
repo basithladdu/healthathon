@@ -3,7 +3,7 @@
 // Messages are written for a Class 8 reading level.
 
 import { FORM_VERSION } from './ectpr-model.ts';
-import type { EctprHomeCare, EctprRecord, EctprWithdrawal, RuleIssue, TrialPlan, Signature } from './ectpr-model.ts';
+import type { EctprHomeCare, EctprRecord, RuleIssue, TrialPlan, Signature } from './ectpr-model.ts';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -114,7 +114,6 @@ export function newId(prefix: string): string {
 }
 
 export const emptyHomeCare = (): EctprHomeCare => ({ assessmentFrequency: '', coordinator: '', ngoContact: '', ngoConsulted: false, previousAdmission: null, previousAdmissionDetails: '' });
-export const emptyWithdrawal = (): EctprWithdrawal => ({ applicable: false, primaryBoardDate: '', secondaryBoardDate: '', primaryBoardMembers: '', secondaryBoardMembers: '', boardDecision: '', finalDecision: null, protocol: '' });
 
 /** A fresh DRAFT version 1 with every choice null (V1: nothing pre-selected). */
 export function emptyEctpr(patientId: string, patient: Partial<EctprRecord['patient']>, createdBy: string, now: Date = new Date()): EctprRecord {
@@ -469,13 +468,6 @@ export function validateEctpr(record: EctprRecord, now: Date = new Date()): Rule
     out.push(issue('V7', 'block', 'signatures', 'The treating consultant must sign with their registration number. Until then this is a conversation note, not a plan.', 'activate'));
   }
 
-  // W1 — legal review: going ahead needs the whole Board record. The plan itself never authorises it.
-  const w = record.withdrawal;
-  if (w?.applicable && w.finalDecision === 'TO_BE_PERFORMED'
-    && !(parseDate(w.primaryBoardDate) && parseDate(w.secondaryBoardDate) && w.primaryBoardMembers.trim() && w.secondaryBoardMembers.trim() && w.boardDecision.trim() && w.protocol.trim())) {
-    out.push(issue('W1', 'block', 'withdrawal', 'Before this can go ahead, record both Board dates, their members, their decision and the protocol.', 'activate'));
-  }
-
   // W2 — legal review: primary and secondary decision-makers both sign.
   const signedAsSurrogate = record.signatures.some((s) => s.role === 'SURROGATE');
   if (signedAsSurrogate && record.decisionMakers.alternate?.name.trim() && !record.signatures.some((s) => s.surrogateRank === 'SECONDARY')) {
@@ -530,7 +522,6 @@ export function edInterpretation(record: EctprRecord | null | undefined, now: Da
   const flags: string[] = [];
   const capacity = capacityFlag(record);
   if (capacity) flags.push(capacity);
-  if (record.withdrawal?.applicable && record.withdrawal.finalDecision === 'TO_BE_PERFORMED') flags.push('Withdrawal or withholding is recorded with medical board decisions. Check with the treating team.');
   if (boardPathwayRequired(record)) flags.push('Removing the existing feeding tube needs the medical board process — not from this record alone.');
 
   if (record.status === 'REVOKED') {
