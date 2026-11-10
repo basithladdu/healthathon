@@ -1,12 +1,14 @@
-﻿/* H: "Oh, wait." Freeze, the late-night idea, then the spotlight swings from the patient to the daughter. */
+/* H: "Oh, wait." Freeze, the late-night idea, then the spotlight swings from the patient to the daughter. */
 import React from 'react';
 import {AbsoluteFill, Freeze} from 'remotion';
 import {P, useGT, at, camAt, World, PhoneClip, Rise, Pill, FONT_BODY, FONT_HEAD, spring, pop, mv, ramp, clamp, lerp, kick, easeInCubic, easeInOutCubic} from '../kit';
 import {RoomBG, RoomLight, RoomFG, Bed, SeatedDaughter, Spotlight, toScreen, PATIENT_HEAD, CHAIR, Chair} from './A_room';
 import {GShot} from './G_scan';
 import {Office, Bulb, BULB} from './H_office';
+import {WIN} from '../windows';
 
-const H0 = 72.8;
+const H0 = WIN.H[0];
+const H1 = WIN.H[1];
 const FREEZE_T = at('s17', 'Oh');
 
 /* part 1: the G shot, frozen on "Oh, wait" */
@@ -54,14 +56,15 @@ export const Scene: React.FC = () => {
     [
       {t: tLate - 0.3, x: 1060, y: 560, z: 1.1},
       {t: tLate + 0.5, x: 960, y: 560, z: 1.12},
-      {t: tHit - 0.15, x: 960, y: 560, z: 1.1},
-      {t: tHit + 0.5, x: 960, y: 480, z: 1.38},
-      {t: tKept, x: 960, y: 460, z: 1.5},
+      {t: tHit - 0.15, x: 980, y: 560, z: 1.1},
+      {t: tHit + 0.5, x: 1130, y: 470, z: 1.3},
+      {t: tKept, x: 1190, y: 440, z: 1.42},
     ],
     t,
     0.01,
   );
   const bulbS = pop(t, tHit - 0.04, 13, 0.4);
+  const tags = [0, 1, 2].map((i) => pop(t, tLate + 0.15 + i * 0.16, 13, 0.5));
   const looks = mv(t, tHit + 0.1, tHit + 0.4);
   const aExpr = t > tHit + 0.5 ? 'happy' : t > tHit - 0.05 ? 'surprised' : 'tired';
   const aArm = lerp(18, 150, spring(t, tHit + 0.12, 12, 0.5));
@@ -80,7 +83,7 @@ export const Scene: React.FC = () => {
       {t: tDaughter, x: 480, y: 630, z: 1.68},
       {t: tSo, x: 470, y: 630, z: 1.72},
       {t: tSo + 0.8, x: 700, y: 630, z: 1.5},
-      {t: 83.1, x: 700, y: 610, z: 1.56},
+      {t: H1, x: 700, y: 610, z: 1.56},
     ],
     t,
     0.004,
@@ -105,7 +108,7 @@ export const Scene: React.FC = () => {
 
   const phoneP = spring(t, tSo + 0.05, 8, 0.6);
   const callP = spring(t, tSomeone - 0.08, 10, 0.5);
-  const sageP = easeInCubic(ramp(t, 82.72, 83.1));
+  const sageP = easeInCubic(ramp(t, H1 - 0.38, H1));
 
   return (
     <AbsoluteFill style={{background: P.night0, overflow: 'hidden'}}>
@@ -144,7 +147,7 @@ export const Scene: React.FC = () => {
           {phoneP > 0.01 && (
             <>
               <PhoneClip clip={14} x={1430} y={lerp(1500, 560, phoneP)} h={760} rot={lerp(12, 4, phoneP) + Math.sin(t * 1.3) * 0.6} startAt={tSo + 0.2} />
-              <div style={{position: 'absolute', left: 1430 - 200, top: lerp(1500, 560, phoneP) + 400, width: 400, textAlign: 'center', fontFamily: FONT_BODY, fontSize: 20, color: 'rgba(255,255,255,0.45)'}}>Practice data. All names are fictional.</div>
+              <div style={{position: 'absolute', left: 1640, top: lerp(1500, 560, phoneP) + 250, width: 230, textAlign: 'left', lineHeight: 1.3, fontFamily: FONT_BODY, fontSize: 20, color: 'rgba(255,255,255,0.45)'}}>Practice data. All names are fictional.</div>
               <div style={{position: 'absolute', left: 1430 - 200, top: lerp(1500, 560, phoneP) - 470, width: 400, display: 'flex', justifyContent: 'center', transform: `scale(${pop(t, tCheck - 0.1, 12, 0.45)})`}}>
                 <Pill bg={P.rose} color={P.white} size={30}>
                   A check for her too
@@ -174,7 +177,7 @@ export const Scene: React.FC = () => {
       {/* office */}
       {showOffice && (
         <AbsoluteFill style={{transform: `translateX(${(1 - whip) * 1920}px)`}}>
-          <Office t={t} cam={oCam} looks={looks} aExpr={aExpr} aArm={aArm} />
+          <Office t={t} cam={oCam} looks={looks} aExpr={aExpr} aArm={aArm} tags={tags} />
           {bulbS > 0.01 && (
             <World cam={oCam}>
               <div style={{position: 'absolute', left: 0, top: Math.sin(t * 3) * 6}}>

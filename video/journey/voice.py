@@ -8,6 +8,13 @@ VOICE = sys.argv[1] if len(sys.argv) > 1 else "en-IN-PrabhatNeural"
 RATE = sys.argv[2] if len(sys.argv) > 2 else "+0%"
 SR = 48000
 lines = json.load(open(os.path.join(HERE, "script.json"), encoding="utf-8"))
+# spoken respellings so the TTS says the names right; captions and words.json keep the real spelling
+SAY = {}
+BACK = {v: k for k, v in SAY.items()}
+def say(t):
+    for k, v in SAY.items():
+        t = t.replace(k, v)
+    return t
 os.makedirs(os.path.join(HERE, "vo"), exist_ok=True)
 
 
@@ -50,7 +57,7 @@ async def main():
     t = 0.0
     for l in lines:
         mp3 = os.path.join(HERE, "vo", l["id"] + ".mp3")
-        words = await synth(l["text"], mp3)
+        words = await synth(say(l["text"]), mp3)
         raw = pcm(mp3)
         a, b = lead_trail(raw)
         seg = np.frombuffer(raw, dtype=np.int16)[a:b]
@@ -58,7 +65,7 @@ async def main():
         out.append(np.zeros(int(l["gap"] * SR), dtype=np.int16))
         off = a / SR
         for w in words:
-            allw.append({"id": l["id"], "w": w["w"], "s": round(t + w["s"] - off, 3), "e": round(t + w["e"] - off, 3)})
+            allw.append({"id": l["id"], "w": BACK.get(w["w"], w["w"]), "s": round(t + w["s"] - off, 3), "e": round(t + w["e"] - off, 3)})
         out.append(seg)
         print(l["id"], "%.2f" % t, "%.2f s" % (len(seg) / SR), flush=True)
         t += len(seg) / SR

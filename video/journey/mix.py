@@ -1,4 +1,4 @@
-"""Mix voice + music + sfx. Music sits 7 dB under the voice (gated RMS), swelling +5 dB under the title; SFX peaks 6 dB under voice peak.
+"""Mix voice + music + sfx. Music sits 8.5 dB under the voice (gated RMS), swelling +5 dB under the title; SFX peaks 7.5 dB under voice peak.
 Then loudness to -14 LUFS with a -2.2 dBTP ceiling (ffmpeg loudnorm, two pass). Writes journey/mix.wav."""
 import json, os, subprocess, wave
 import numpy as np
@@ -31,13 +31,13 @@ def gated_rms(a):
 
 
 rv, rm = gated_rms(v), gated_rms(m)
-gm = rv / rm * 10 ** (-7 / 20)
+gm = rv / rm * 10 ** (-8.5 / 20)
 title = json.load(open(os.path.join(HERE, '..', 'src', 'journey', 'words.json')))
-TITLE = [w for w in title['words'] if w['id'] == 's22'][0]['s']
+TITLE = [w for w in title['words'] if w['id'] == 'm35'][0]['s']
 t = np.arange(n) / SR
 swell = 10 ** ((5 * np.clip((t - (TITLE - 0.6)) / 1.2, 0, 1)) / 20)
 m = m * gm * swell[:, None]
-gs = (np.abs(v).max() * 10 ** (-6 / 20)) / max(np.abs(s).max(), 1e-9)
+gs = (np.abs(v).max() * 10 ** (-7.5 / 20)) / max(np.abs(s).max(), 1e-9)
 s = s * gs
 mix = v + m + s
 print('voice gated rms %.1f dB, music gain %.1f dB, sfx gain %.1f dB' % (20 * np.log10(rv), 20 * np.log10(gm), 20 * np.log10(gs)))

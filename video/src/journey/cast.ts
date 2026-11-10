@@ -9,11 +9,13 @@ export const CAST: Record<string, Look> = {
   patient: {skin: P.skin2, hairStyle: 'grey', top: '#9FB8C9', dupatta: '#C9D8E2', bottom: '#5E6E80', seed: 7},
   // her daughter, the caregiver (A, G, H)
   daughter: {skin: P.skin1, hair: P.hair, hairStyle: 'long', top: P.rose, dupatta: P.marigold, bottom: '#3D3550', seed: 11},
-  // the doctor on our team (B, E, I)
+  // Dr Sujay, the doctor on our team (B, E, I)
   teamDoctor: {skin: P.skin4, hair: P.hair, hairStyle: 'short', glasses: true, coat: true, top: P.sage, stetho: false, bottom: '#2F3A4F', seed: 5},
-  // the medical student on our team (D, I)
+  // Dr Sharada, the second doctor on our team (B, E, I): shoulder-length hair, stethoscope, coat
+  sharada: {skin: P.skin2, hair: P.hair, hairStyle: 'long', coat: true, top: '#8A9BB0', stetho: true, bottom: '#3A3F55', seed: 29},
+  // Shirin, the medical student on our team (B, D, H, I)
   medStudent: {skin: P.skin3, hair: P.hair, hairStyle: 'bun', top: P.plum, stetho: true, bottom: '#3A3F55', seed: 13},
-  // engineers on the team (B, C, D, H, I)
+  // engineers on the team: engA = Basith (curly hair), engB = Awaiz. engC is NOT a real team member: never use it.
   engA: {skin: P.skin1, hair: P.hair, hairStyle: 'curly', top: P.marigold, bottom: '#34405A', seed: 17},
   engB: {skin: P.skin2, hair: P.hair, hairStyle: 'short', top: P.indigo, bottom: '#2A2F40', glasses: true, seed: 19},
   engC: {skin: P.skin3, hair: P.hair, hairStyle: 'braid', top: P.sage, bottom: '#3A3F55', seed: 23},

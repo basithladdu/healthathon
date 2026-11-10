@@ -5,10 +5,11 @@ import {AbsoluteFill, Img, staticFile} from 'remotion';
 import {at, camAt, clamp, easeInCubic, easeOutQuint, FONT_BODY, FONT_HEAD, mv, P, Person, pop, ramp, useGT, World} from '../kit';
 import {CAST} from '../cast';
 import {FgLeaves, Motes, PhoneSeq, Plant, toScreen} from './E_parts';
+import {WIN} from '../windows';
 
 const SON = {skin: P.skin2, hair: P.hair, hairStyle: 'short' as const, top: '#4E9A8A', bottom: '#3A3F55', seed: 31};
-const START = 58.8;
-const END = 68.1;
+const START = WIN.F[0];
+const END = WIN.F[1];
 
 const T = {
   families: at('s15', 'families'),

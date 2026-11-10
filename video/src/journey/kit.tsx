@@ -2,10 +2,30 @@
 import React from 'react';
 import {Freeze, OffthreadVideo, random, Sequence, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
 import words from './words.json';
+import baseWords from './base_words.json';
+import edl from './edl.json';
 
 export const FPS = 30;
 export const TOTAL_SEC = (words as any).total as number;
 export const TOTAL_FRAMES = Math.ceil(TOTAL_SEC * FPS);
+/** Scenes were animated against base_words.json (the "base" timeline). The narration now follows words.json.
+ *  edl.json is an edit list over film time: each segment either maps film time linearly onto a base-timeline span
+ *  (cuts, skips and speed changes allowed) or shows an inserted shot by name. */
+export const BASE_TOTAL = (baseWords as any).total as number;
+type Seg = {n0: number; n1: number; b0?: number; b1?: number; insert?: string};
+const SEGS = edl as Seg[];
+export const segAt = (t: number): Seg => SEGS.find((s) => t >= s.n0 && t < s.n1) ?? SEGS[SEGS.length - 1];
+/** film (narration) seconds -> scene timeline seconds (inside an insert: the base time it holds on) */
+export const toBase = (t: number) => {
+  const s = segAt(t);
+  if (s.insert || s.b0 === undefined || s.b1 === undefined) return s.b0 ?? 0;
+  return s.b0 + ((t - s.n0) / (s.n1 - s.n0)) * (s.b1 - s.b0);
+};
+/** first film time that shows base time b (approximate inverse, used only for rough lookups) */
+export const toNew = (b: number) => {
+  for (const s of SEGS) if (!s.insert && s.b0 !== undefined && s.b1 !== undefined && b >= s.b0 && b < s.b1) return s.n0 + ((b - s.b0) / (s.b1 - s.b0)) * (s.n1 - s.n0);
+  return b;
+};
 export const FONT_HEAD = "'SaharaHead','SaharaSans',sans-serif";
 export const FONT_BODY = "'SaharaSans',sans-serif";
 
@@ -51,7 +71,7 @@ export const P = {
 
 /* ---------- time helpers ---------- */
 type Word = {id: string; w: string; s: number; e: number};
-const W: Word[] = (words as any).words;
+const W: Word[] = (baseWords as any).words; // scene cues live on the base timeline
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9']/g, '');
 /** seconds when word `w` (nth occurrence, default first) of sentence `id` starts. at('s07','Twenty') */
 export const at = (id: string, w?: string, nth = 0): number => {
@@ -228,9 +248,8 @@ export const PhoneClip: React.FC<{clip: number; x: number; y: number; h?: number
   const t = f / FPS;
   const w = h * 0.47;
   const bez = h * 0.018;
-  const off = React.useContext(OffsetCtx);
-  const startF = Math.round(startAt * FPS) - off; // local frame when the clip starts
-  const from = startF - Math.round((clipFrom / rate) * FPS);
+  // the clip follows the scene's own (base) clock, so cuts and speed changes in the edit list carry through
+  const vt = Math.max(0, (toBase(t) - startAt) * rate) + clipFrom;
   const src = staticFile(`cut/f${String(clip).padStart(2, '0')}.mp4`);
   return (
     <div
@@ -248,15 +267,9 @@ export const PhoneClip: React.FC<{clip: number; x: number; y: number; h?: number
       }}
     >
       <div style={{width: '100%', height: '100%', borderRadius: h * 0.055, overflow: 'hidden', background: P.cream, position: 'relative'}}>
-        {f < startF ? (
-          <Freeze frame={Math.round(clipFrom * FPS)}>
-            <OffthreadVideo src={src} muted style={{width: '100%', height: '100%', objectFit: 'cover'}} />
-          </Freeze>
-        ) : (
-          <Sequence from={from} layout="none">
-            <OffthreadVideo src={src} muted playbackRate={rate} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
-          </Sequence>
-        )}
+        <Freeze frame={Math.round(vt * FPS)}>
+          <OffthreadVideo src={src} muted style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+        </Freeze>
       </div>
     </div>
   );
@@ -516,16 +529,33 @@ export const useFrameT = () => {
 /* ---------- scene windows: scenes read GLOBAL film seconds via useGT() ---------- */
 const OffsetCtx = React.createContext(0);
 export const SceneWindow: React.FC<{from: number; to: number; children: React.ReactNode}> = ({from, to, children}) => {
-  const a = Math.max(0, Math.round(from * FPS));
-  const b = Math.round(to * FPS);
-  return (
-    <Sequence from={a} durationInFrames={Math.max(1, b - a)} layout="none">
-      <OffsetCtx.Provider value={a}>{children}</OffsetCtx.Provider>
-    </Sequence>
-  );
+  const t = useCurrentFrame() / FPS;
+  const s = segAt(t);
+  if (s.insert) return null;
+  const b = toBase(t);
+  if (b < from || b >= to) return null;
+  return <OffsetCtx.Provider value={0}>{children}</OffsetCtx.Provider>;
 };
 /** global film time in seconds (works inside SceneWindow). */
 export const useGT = () => {
   const off = React.useContext(OffsetCtx);
-  return (useCurrentFrame() + off) / FPS;
+  return toBase((useCurrentFrame() + off) / FPS);
 };
+
+/* ---------- film-time cues (the narration as recorded): for inserts and overlays ---------- */
+const NW: Word[] = (words as any).words;
+/** film seconds when word `w` of narration sentence `id` starts */
+export const nat = (id: string, w?: string, nth = 0): number => {
+  const ws = NW.filter((x) => x.id === id);
+  if (!ws.length) throw new Error('no narration sentence ' + id);
+  if (!w) return ws[0].s;
+  const hits = ws.filter((x) => norm(x.w) === norm(w));
+  if (!hits.length) throw new Error(`no narration word ${w} in ${id}`);
+  return hits[Math.min(nth, hits.length - 1)].s;
+};
+export const nend = (id: string) => {
+  const ws = NW.filter((x) => x.id === id);
+  return ws[ws.length - 1].e;
+};
+/** film seconds */
+export const useFilmT = () => useCurrentFrame() / FPS;

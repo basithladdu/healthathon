@@ -1,22 +1,33 @@
 s01 0.48-2.58: Three@0.48 in@0.71 the@0.78 morning@0.84 An@1.62 emergency@1.68 room@2.25
 s02 2.87-5.57: A@2.87 doctor@2.93 meets@3.26 a@3.58 very@3.63 sick@4.02 patient@4.29 for@4.75 the@4.86 first@4.91 time@5.25
 s03 5.85-10.24: And@5.85 her@5.93 family@6.05 has@6.48 to@6.69 have@6.75 the@7.30 hardest@7.39 conversation@7.85 of@8.45 their@8.49 lives@8.62 all@9.47 over@9.67 again@9.90
-s04 10.79-11.90: That's@10.79 where@10.93 Sahara@11.04 started@11.45
-s05 12.19-17.80: Back@12.19 in@12.39 August@12.47 a@12.96 doctor@13.01 on@13.44 our@13.54 team@13.66 told@14.03 us@14.34 patients@14.96 say@15.38 what@15.54 they@15.70 want@15.82 and@16.52 none@16.63 of@16.84 it@16.91 gets@17.00 written@17.19 down@17.41
-s06 18.32-21.04: So@18.32 we@18.42 did@18.52 what@18.71 engineers@18.81 do@19.31 We@20.04 built@20.12 everything@20.51
-s07 21.28-27.91: Syringe@21.28 drivers@21.66 Spinal@22.66 cord@23.15 compression@23.51 Sedation@24.48 protocols@24.99 Twenty@26.22 tools@26.50 in@27.12 one@27.27 week@27.53
-s08 28.30-31.06: Then@28.30 a@28.40 medical@28.44 student@28.79 on@29.11 our@29.23 team@29.35 asked@30.01 one@30.31 question@30.53
-s09 31.34-32.81: Why@31.34 would@31.44 a@31.51 family@31.56 install@31.95 this@32.36
-s10 33.34-36.28: She@33.34 was@33.48 right@33.61 We'd@34.33 built@34.51 it@34.72 for@34.78 us@34.95 not@35.56 for@35.87 them@36.06
-s11 36.54-40.63: So@36.54 we@36.62 cut@36.71 almost@36.88 all@37.18 of@37.37 it@37.46 and@37.83 kept@38.02 one@38.33 thing@38.68 The@39.52 goals@39.57 of@39.84 care@39.91 talk@40.19
-s12 41.14-48.96: With@41.14 everyone's@41.28 consent@41.70 the@42.54 doctor@42.64 records@43.12 the@43.48 talk@43.56 Sahara@44.43 writes@44.78 out@45.07 who@45.25 said@45.37 what@45.65 and@46.46 ticks@46.59 off@46.82 thirteen@47.00 topics@47.48 as@48.34 they@48.44 come@48.55 up@48.73
-s13 49.27-54.23: At@49.27 first@49.37 we@50.11 let@50.22 the@50.37 app@50.48 write@50.90 the@51.09 note@51.16 The@51.97 doctors@52.03 said@52.44 no@52.64 The@53.33 doctor@53.36 leads@53.70
-s14 54.52-58.59: So@54.52 now@54.64 nothing@54.88 is@55.22 final@55.32 until@55.70 the@55.91 doctor@55.99 reads@56.40 it@56.67 edits@57.11 it@57.38 and@57.78 signs@57.88
-s15 58.98-67.79: And@58.98 families@59.05 don't@59.50 talk@59.70 in@60.09 one@60.21 language@60.45 So@61.41 it@61.57 listens@61.63 in@61.95 English@62.06 Hindi@62.84 Telugu@63.52 Urdu@64.42 and@65.19 Kannada@65.34 even@66.39 mixed@66.60 in@66.92 one@67.03 sentence@67.21
-s16 68.32-72.44: Back@68.32 to@68.56 that@68.70 emergency@68.86 room@69.41 One@70.10 scan@70.33 and@71.09 the@71.14 doctor@71.22 knows@71.59 what@71.80 she@71.90 wanted@72.05
-s17 73.06-75.47: Oh@73.06 wait@73.19 Late@73.89 one@74.01 night@74.18 it@74.76 hit@74.84 us@75.06
-s18 75.73-79.50: We@75.73 kept@75.83 asking@76.08 how@76.53 the@76.64 patient@76.72 feels@77.11 Nobody@78.06 was@78.43 asking@78.59 the@79.02 daughter@79.09
-s19 79.77-82.77: So@79.77 caregivers@79.93 get@80.37 their@80.50 own@80.65 check@80.84 too@81.14 and@81.81 someone@82.14 to@82.36 call@82.41
-s20 83.29-87.43: Three@83.29 months@83.46 Six@84.44 hundred@84.65 commits@84.86 Doctors@85.81 who@86.27 kept@86.44 telling@86.67 us@86.95 no@87.08
-s21 87.78-89.18: It's@87.78 live@87.86 on@88.12 Google@88.25 Play@88.56 today@88.77
-s22 89.64-92.83: Sahara@89.64 Care@90.53 that@90.76 follows@90.89 what@91.42 matters@91.68 to@92.20 the@92.30 patient@92.38
+s04 10.78-13.13: That's@10.78 where@10.94 Sahara@11.07 started@11.46 With@12.31 five@12.38 of@12.68 us@12.76
+s04a 13.42-16.27: Basith@13.42 and@13.81 Awaiz@13.91 run@14.58 a@14.88 small@14.94 software@15.38 company@15.83
+s04b 16.52-22.02: Dr@16.52 Sujay@16.83 and@17.48 Dr@17.60 Sharada@17.96 are@18.66 lung@18.84 doctors@19.21 and@20.26 Shirin@20.37 is@21.04 a@21.14 medical@21.18 student@21.54
+s05 22.39-28.16: Back@22.39 in@22.59 August@22.68 Dr@23.38 Sujay@23.71 told@24.28 us@24.62 patients@25.22 say@25.68 what@25.95 they@26.08 want@26.19 and@26.88 none@27.02 of@27.22 it@27.30 gets@27.39 written@27.57 down@27.76
+s06 28.67-31.39: So@28.67 we@28.77 did@28.87 what@29.07 engineers@29.16 do@29.66 We@30.39 built@30.47 everything@30.87
+s07 31.63-38.03: Syringe@31.63 drivers@32.00 Spinal@32.98 cord@33.42 compression@33.78 Sedation@34.74 protocols@35.25 Twenty@36.45 tools@36.71 in@37.17 two@37.31 days@37.53
+s08 38.44-41.62: Then@38.44 Shirin@38.54 our@39.25 medical@39.35 student@39.73 asked@40.56 one@40.87 question@41.03
+s09 41.89-43.36: Why@41.89 would@41.99 a@42.06 family@42.11 install@42.50 this@42.91
+s10 43.90-46.84: She@43.90 was@44.04 right@44.17 We'd@44.88 built@45.07 it@45.27 for@45.34 us@45.51 not@46.12 for@46.43 them@46.62
+s11 47.15-49.23: So@47.15 we@47.27 changed@47.37 it@47.80 one@48.19 switch@48.46 at@48.74 a@48.80 time@48.83
+s11a 49.44-52.14: Doctor@49.44 tools@49.73 became@50.09 an@50.43 app@50.50 for@50.77 patients@50.89 and@51.37 families@51.43
+s11b 52.38-56.82: When@52.38 we@52.45 got@52.53 shortlisted@52.67 Basith@53.61 and@54.11 Awaiz@54.18 rebuilt@54.60 it@55.19 as@55.52 a@55.65 real@55.70 Android@56.20 app.@56.52
+s11c 57.03-60.79: And@57.03 the@57.10 doctors@57.17 kept@57.57 pulling@57.80 us@58.13 back@58.25 to@58.57 one@58.68 thing@58.93 The@59.69 goals@59.75 of@60.03 care@60.09 talk@60.36
+s12 61.33-70.12: With@61.33 everyone's@61.45 consent@61.82 the@62.68 doctor@62.79 records@63.20 the@63.53 talk@63.61 Sahara@64.49 writes@64.89 out@65.19 who@65.45 said@65.60 what@65.92 and@66.66 ticks@66.79 off@67.03 Dr@67.22 Sujay's@67.52 thirteen@68.13 topics@68.67 as@69.48 they@69.61 come@69.72 up@69.90
+s13 70.43-75.40: At@70.43 first@70.53 we@71.28 let@71.39 the@71.53 app@71.65 write@72.06 the@72.26 note@72.32 The@73.13 doctors@73.19 said@73.61 no@73.80 The@74.49 doctor@74.53 leads@74.87
+s14 75.68-82.94: So@75.68 now@75.79 nothing@76.01 is@76.35 final@76.46 until@76.99 the@77.22 doctor@77.30 reads@77.71 it@78.01 edits@78.41 it@78.69 and@79.08 signs@79.42 Then@80.58 the@80.64 family@80.73 signs@81.14 too@81.51 and@82.15 it@82.26 locks@82.33
+s14a 83.47-87.24: And@83.47 at@83.90 home@84.01 between@84.69 visits@85.08 families@85.95 get@86.41 real@86.64 help@86.89
+s14b 87.40-91.53: Symptoms@87.40 and@87.96 pain@88.06 marked@89.00 on@89.23 a@89.31 body@89.36 map@89.74 with@90.29 trends@90.42 for@90.84 the@90.93 doctor@90.99
+s14c 91.74-94.92: Snap@91.74 a@92.02 prescription@92.08 and@93.13 every@93.35 dose@93.62 gets@94.13 a@94.30 reminder@94.34
+s14d 95.12-98.05: Ask@95.12 your@95.33 reports@95.43 a@95.76 question@95.81 and@96.74 see@96.83 the@97.00 line@97.10 that@97.33 answers@97.48 it@97.87
+s14e 98.24-104.23: And@98.24 we@98.33 gathered@98.47 over@99.01 sixteen@99.24 hundred@99.71 palliative@99.95 care@100.34 centres@100.60 in@101.37 every@101.73 state@102.05 with@102.95 where@103.10 to@103.25 find@103.32 morphine@103.64
+s15 104.59-113.40: And@104.59 families@104.66 don't@105.11 talk@105.31 in@105.70 one@105.83 language@106.06 So@107.03 it@107.19 listens@107.25 in@107.56 English@107.68 Hindi@108.45 Telugu@109.13 Urdu@110.03 and@110.80 Kannada@110.95 even@112.00 mixed@112.21 in@112.53 one@112.64 sentence@112.82
+s16 113.94-118.20: Back@113.94 to@114.12 that@114.22 emergency@114.36 room@114.89 One@115.54 scan@115.71 of@115.93 her@115.98 card@116.11 and@116.94 the@116.97 doctor@117.04 knows@117.37 what@117.61 she@117.70 wanted@117.83
+s17 118.84-121.25: Oh@118.84 wait@118.97 Late@119.66 one@119.79 night@119.96 it@120.53 hit@120.62 us@120.84
+s18 121.51-125.28: We@121.51 kept@121.61 asking@121.86 how@122.31 the@122.42 patient@122.49 feels@122.89 Nobody@123.84 was@124.21 asking@124.37 the@124.80 daughter@124.87
+s19 125.55-128.55: So@125.55 caregivers@125.70 get@126.15 their@126.28 own@126.43 check@126.62 too@126.92 and@127.59 someone@127.92 to@128.14 call@128.19
+s20 129.07-136.38: Three@129.07 months@129.29 Almost@130.29 six@130.55 hundred@130.86 commits@131.07 A@132.03 survey@132.08 of@132.57 doctors@132.71 and@133.31 hospitals@133.38 And@134.52 doctors@134.59 who@135.15 kept@135.33 telling@135.59 us@135.91 no@136.03
+s21 136.72-138.12: It's@136.72 live@136.81 on@137.07 Google@137.19 Play@137.51 today@137.72
+s22 138.59-141.77: Sahara@138.59 Care@139.47 that@139.70 follows@139.84 what@140.36 matters@140.62 to@141.15 the@141.25 patient@141.32
+TOTAL 143.333

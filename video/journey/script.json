@@ -1,25 +1,237 @@
 [
-  {"id": "s01", "gap": 0.5, "text": "Three in the morning. An emergency room."},
-  {"id": "s02", "gap": 0.24, "text": "A doctor meets a very sick patient for the first time."},
-  {"id": "s03", "gap": 0.24, "text": "And her family has to have the hardest conversation of their lives, all over again."},
-  {"id": "s04", "gap": 0.5, "text": "That's where Sahara started."},
-  {"id": "s05", "gap": 0.24, "text": "Back in August, a doctor on our team told us: patients say what they want, and none of it gets written down."},
-  {"id": "s06", "gap": 0.5, "text": "So we did what engineers do. We built everything."},
-  {"id": "s07", "gap": 0.2, "text": "Syringe drivers. Spinal cord compression. Sedation protocols. Twenty tools in one week."},
-  {"id": "s08", "gap": 0.36, "text": "Then a medical student on our team asked one question."},
-  {"id": "s09", "gap": 0.24, "text": "Why would a family install this?"},
-  {"id": "s10", "gap": 0.5, "text": "She was right. We'd built it for us, not for them."},
-  {"id": "s11", "gap": 0.24, "text": "So we cut almost all of it, and kept one thing. The goals of care talk."},
-  {"id": "s12", "gap": 0.5, "text": "With everyone's consent, the doctor records the talk. Sahara writes out who said what, and ticks off thirteen topics as they come up."},
-  {"id": "s13", "gap": 0.36, "text": "At first, we let the app write the note. The doctors said no. The doctor leads."},
-  {"id": "s14", "gap": 0.24, "text": "So now nothing is final until the doctor reads it, edits it, and signs."},
-  {"id": "s15", "gap": 0.36, "text": "And families don't talk in one language. So it listens in English, Hindi, Telugu, Urdu and Kannada, even mixed in one sentence."},
-  {"id": "s16", "gap": 0.5, "text": "Back to that emergency room. One scan, and the doctor knows what she wanted."},
-  {"id": "s17", "gap": 0.6, "text": "Oh, wait. Late one night, it hit us."},
-  {"id": "s18", "gap": 0.24, "text": "We kept asking how the patient feels. Nobody was asking the daughter."},
-  {"id": "s19", "gap": 0.24, "text": "So caregivers get their own check too, and someone to call."},
-  {"id": "s20", "gap": 0.5, "text": "Three months. Six hundred commits. Doctors who kept telling us no."},
-  {"id": "s21", "gap": 0.3, "text": "It's live on Google Play today."},
-  {"id": "s22", "gap": 0.4, "text": "Sahara. Care that follows what matters to the patient."}
+ {
+  "id": "m01",
+  "gap": 0.5,
+  "text": "It's three in the morning, in an emergency room."
+ },
+ {
+  "id": "m02",
+  "gap": 0.2,
+  "text": "A doctor is meeting a woman with cancer for the first time. And nobody in that room knows what she wants."
+ },
+ {
+  "id": "m03",
+  "gap": 0.2,
+  "text": "So her family has to have the hardest conversation of their lives, all over again."
+ },
+ {
+  "id": "m04",
+  "gap": 0.4,
+  "text": "In India, ninety-eight percent of people with advanced cancer don't get the palliative care they need. Yes, you heard that right. Ninety-eight."
+ },
+ {
+  "id": "m05",
+  "gap": 0.4,
+  "text": "That's why we built Sahara. It's an app for people with cancer, and for the families who look after them."
+ },
+ {
+  "id": "m06",
+  "gap": 0.2,
+  "text": "We're five people who met at Health-a-thon."
+ },
+ {
+  "id": "m06a",
+  "gap": 0.2,
+  "text": "Basith and Awaiz run a software company called WeDevIT."
+ },
+ {
+  "id": "m06b",
+  "gap": 0.2,
+  "text": "Dr Sujay is from IISc, Bengaluru."
+ },
+ {
+  "id": "m06c",
+  "gap": 0.2,
+  "text": "Dr Sharada is from AIIMS, Mangalagiri."
+ },
+ {
+  "id": "m06d",
+  "gap": 0.2,
+  "text": "And Shirin is a final-year medical student."
+ },
+ {
+  "id": "m07",
+  "gap": 0.3,
+  "text": "Back in August, we had our first team meeting. And Dr Sujay told us something that stayed with all of us."
+ },
+ {
+  "id": "m07a",
+  "gap": 0.3,
+  "text": "Patients do tell you what they want at the end of life. But nobody writes it down. And in an emergency, nobody can find it."
+ },
+ {
+  "id": "m08",
+  "gap": 0.4,
+  "text": "So we did what technical people do. We built everything. Screen after screen, all for doctors."
+ },
+ {
+  "id": "m09",
+  "gap": 0.3,
+  "text": "Then we asked ourselves one question. Why would a family install all this?"
+ },
+ {
+  "id": "m10",
+  "gap": 0.4,
+  "text": "So we pivoted, towards the patient and the family."
+ },
+ {
+  "id": "m11",
+  "gap": 0.2,
+  "text": "And we kept one thing at the centre: the goals of care talk."
+ },
+ {
+  "id": "m11a",
+  "gap": 0.2,
+  "text": "That's when the doctor, the patient and the family sit down together, and decide what kind of care she wants."
+ },
+ {
+  "id": "m12",
+  "gap": 0.4,
+  "text": "With everyone's consent, the doctor records that talk. AI writes out who said what."
+ },
+ {
+  "id": "m12a",
+  "gap": 0.2,
+  "text": "For Indian languages, we use Sarvam AI."
+ },
+ {
+  "id": "m12b",
+  "gap": 0.2,
+  "text": "Then the AI checks that nothing important was missed. It goes through thirteen topics, taken from India's end-of-life care guidelines, written by the national critical care and palliative care societies."
+ },
+ {
+  "id": "m13",
+  "gap": 0.3,
+  "text": "Then the AI turns the conversation into a goals of care document. That's a clinical record of her wishes. Does she want CPR? A ventilator? Intensive care? And where does she want to be cared for?"
+ },
+ {
+  "id": "m14",
+  "gap": 0.2,
+  "text": "Nothing is final until the doctor reads it, corrects it, and signs it. Then the family signs too, and it's locked."
+ },
+ {
+  "id": "mLegal",
+  "gap": 0.4,
+  "text": "We also took legal advice on the wording and the format of that document."
+ },
+ {
+  "id": "m15",
+  "gap": 0.4,
+  "text": "But goals of care is only the start. Sahara stays with the family, every single day."
+ },
+ {
+  "id": "m16",
+  "gap": 0.3,
+  "text": "Patients track their symptoms."
+ },
+ {
+  "id": "m16a",
+  "gap": 0.2,
+  "text": "They rate how they're feeling on a distress thermometer,"
+ },
+ {
+  "id": "m16b",
+  "gap": 0.2,
+  "text": "and they mark where it hurts on a body map. Their doctor can see how it's changing over time."
+ },
+ {
+  "id": "m17",
+  "gap": 0.3,
+  "text": "There's a mood journal, for the days that are hard to put into words."
+ },
+ {
+  "id": "m18",
+  "gap": 0.3,
+  "text": "They take a photo of a prescription, or a medicine strip. AI works out the medicines, and reminds them about every dose."
+ },
+ {
+  "id": "m19",
+  "gap": 0.3,
+  "text": "They upload their reports, and ask a question in plain words. AI answers, and shows the exact line in the report it came from."
+ },
+ {
+  "id": "m20",
+  "gap": 0.3,
+  "text": "Their next hospital visit is scheduled right in the app."
+ },
+ {
+  "id": "m21",
+  "gap": 0.3,
+  "text": "Family members get their own login, so everyone stays in the loop."
+ },
+ {
+  "id": "m22",
+  "gap": 0.3,
+  "text": "There's an emergency SOS button. And a QR card that carries the patient's wishes, contacts and medicines."
+ },
+ {
+  "id": "m23",
+  "gap": 0.3,
+  "text": "We also scraped public listings, and put over sixteen hundred palliative care centres, from across India, on one map. It even shows where to find oral morphine."
+ },
+ {
+  "id": "m24",
+  "gap": 0.3,
+  "text": "And there's a community, so no family goes through this alone."
+ },
+ {
+  "id": "m25",
+  "gap": 0.4,
+  "text": "Families don't talk in just one language. So Sahara understands English, Hindi, Telugu, Urdu and Kannada, even when they're mixed in one sentence."
+ },
+ {
+  "id": "m26",
+  "gap": 0.4,
+  "text": "Now, back to that emergency room. One scan of her QR card, and the doctor knows exactly what she wanted."
+ },
+ {
+  "id": "m27",
+  "gap": 0.5,
+  "text": "Oh, wait. Late one night, something hit us."
+ },
+ {
+  "id": "m28",
+  "gap": 0.2,
+  "text": "We kept asking how the patient feels. Nobody was asking her daughter."
+ },
+ {
+  "id": "m29",
+  "gap": 0.2,
+  "text": "So caregivers get their own wellbeing check too, and someone to call."
+ },
+ {
+  "id": "m30",
+  "gap": 0.4,
+  "text": "All of this took three months."
+ },
+ {
+  "id": "m30a",
+  "gap": 0.2,
+  "text": "We had a lot of meetings with our doctors. We met our mentor for a review. And we ran a survey of doctors and hospitals."
+ },
+ {
+  "id": "m31",
+  "gap": 0.3,
+  "text": "We saved our work to GitHub almost six hundred times. Each of those is called a commit. It's one more improvement to the app."
+ },
+ {
+  "id": "m32",
+  "gap": 0.3,
+  "text": "It's built with free and open-source tools, and it runs on a cloud server."
+ },
+ {
+  "id": "m33",
+  "gap": 0.3,
+  "text": "When Sahara got shortlisted, we rebuilt it as a full Android app."
+ },
+ {
+  "id": "m34",
+  "gap": 0.3,
+  "text": "And it's live on Google Play today."
+ },
+ {
+  "id": "m35",
+  "gap": 0.4,
+  "text": "Sahara. Care that follows what matters to the patient."
+ }
 ]
-

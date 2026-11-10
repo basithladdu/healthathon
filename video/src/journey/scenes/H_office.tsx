@@ -2,14 +2,18 @@
 import React from 'react';
 import {Cam, P, World, Person} from '../kit';
 import {CAST} from '../cast';
+import {NameTag, Who} from '../team';
+
+const WHO: Record<string, Who> = {engA: 'basith', engB: 'awaiz', medStudent: 'shirin'};
 
 export const ENG_Y = 768;
 export const ENGS = [
   {k: 'engB', x: 610},
   {k: 'engA', x: 960},
-  {k: 'engC', x: 1310},
+  {k: 'medStudent', x: 1310},
 ];
-export const BULB = {x: 960, y: 330};
+/* the idea pops above Shirin: caregiver wellbeing came from her research */
+export const BULB = {x: 1310, y: 262};
 const TABLE_Y = 762;
 
 const Laptop: React.FC<{x: number; glow: number}> = ({x, glow}) => (
@@ -23,7 +27,7 @@ const Laptop: React.FC<{x: number; glow: number}> = ({x, glow}) => (
   </g>
 );
 
-export const Office: React.FC<{t: number; cam: Cam; looks: number; aExpr: 'neutral' | 'surprised' | 'happy' | 'tired' | 'think'; aArm: number}> = ({t, cam, looks, aExpr, aArm}) => {
+export const Office: React.FC<{t: number; cam: Cam; looks: number; aExpr: 'neutral' | 'surprised' | 'happy' | 'tired' | 'think'; aArm: number; tags?: number[]}> = ({t, cam, looks, aExpr, aArm, tags = [0, 0, 0]}) => {
   const ox = (cam.x - 960) * 0.6;
   const oy = (cam.y - 540) * 0.4;
   return (
@@ -123,8 +127,8 @@ export const Office: React.FC<{t: number; cam: Cam; looks: number; aExpr: 'neutr
         </svg>
         {/* the team behind the table */}
         {ENGS.map((e, i) => {
-          const isA = e.k === 'engA';
-          const lookDir = isA ? 0 : e.x < 960 ? looks : -looks;
+          const isA = e.k === 'medStudent';
+          const lookDir = isA ? 0 : looks;
           return (
             <Person
               key={e.k}
@@ -137,10 +141,10 @@ export const Office: React.FC<{t: number; cam: Cam; looks: number; aExpr: 'neutr
               expr={isA ? aExpr : looks > 0.5 ? 'surprised' : 'tired'}
               look={lookDir}
               headTilt={isA ? 0 : lookDir * 8}
-              armR={isA ? aArm : 18}
-              elbowR={isA ? 30 : -40}
-              armL={18}
-              elbowL={-40}
+              armR={18}
+              elbowR={-40}
+              armL={isA ? aArm : 18}
+              elbowL={isA ? 30 : -40}
               bob={0.7}
               seed={i * 3 + 2}
             />
@@ -174,6 +178,9 @@ export const Office: React.FC<{t: number; cam: Cam; looks: number; aExpr: 'neutr
           <rect x={360} y={TABLE_Y - 6} width={120} height={8} rx={2} fill="#E6E2F2" transform={`rotate(-3 420 ${TABLE_Y})`} />
           <rect x={1420} y={TABLE_Y - 6} width={90} height={8} rx={2} fill="#E6E2F2" />
         </svg>
+        {ENGS.map((e, i) => (
+          <NameTag key={'tag' + e.k} who={WHO[e.k]} x={e.x + 62} y={612 + Math.sin(t * 1.6 + i) * 3} a={tags[i]} size={0.82} dark />
+        ))}
       </World>
       {/* light: desk lamp pool + screen glow on faces */}
       <World cam={cam} style={{pointerEvents: 'none'}}>
@@ -203,7 +210,7 @@ export const Office: React.FC<{t: number; cam: Cam; looks: number; aExpr: 'neutr
 export const Bulb: React.FC<{t: number; t0: number; s: number}> = ({t, t0, s}) => {
   const k = Math.max(0, t - t0);
   return (
-    <svg width={360} height={360} viewBox="-180 -180 360 360" style={{position: 'absolute', left: BULB.x - 180, top: BULB.y - 180, overflow: 'visible', transform: `scale(${s * 0.62})`}}>
+    <svg width={360} height={360} viewBox="-180 -180 360 360" style={{position: 'absolute', left: BULB.x - 180, top: BULB.y - 180, overflow: 'visible', transform: `scale(${s * 0.82})`}}>
       <defs>
         <radialGradient id="bulbGlow">
           <stop offset="0" stopColor="#FFE7A8" stopOpacity="0.9" />

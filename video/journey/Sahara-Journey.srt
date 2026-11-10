@@ -1,0 +1,544 @@
+1
+00:00:00,000 --> 00:00:01,432
+It's three in the morning
+
+2
+00:00:01,527 --> 00:00:03,146
+in an emergency room
+
+3
+00:00:03,170 --> 00:00:04,364
+A doctor is meeting a woman
+
+4
+00:00:04,384 --> 00:00:06,382
+with cancer for the first time
+
+5
+00:00:06,402 --> 00:00:07,900
+And nobody in that room
+
+6
+00:00:07,920 --> 00:00:09,700
+knows what she wants
+
+7
+00:00:09,759 --> 00:00:11,739
+So her family has to have the hardest
+
+8
+00:00:11,759 --> 00:00:13,650
+conversation of their lives
+
+9
+00:00:13,670 --> 00:00:15,146
+all over again
+
+10
+00:00:16,009 --> 00:00:17,739
+In India, ninety-eight percent
+
+11
+00:00:17,759 --> 00:00:18,918
+of people with advanced
+
+12
+00:00:18,938 --> 00:00:20,275
+cancer don't get the
+
+13
+00:00:20,295 --> 00:00:22,075
+palliative care they need
+
+14
+00:00:22,170 --> 00:00:24,039
+Yes, you heard that right
+
+15
+00:00:24,491 --> 00:00:25,521
+Ninety-eight
+
+16
+00:00:26,009 --> 00:00:27,700
+That's why we built Sahara
+
+17
+00:00:27,956 --> 00:00:29,561
+It's an app for people with cancer
+
+18
+00:00:29,581 --> 00:00:32,364
+and for the families who look after them
+
+19
+00:00:32,384 --> 00:00:33,257
+We're five people who
+
+20
+00:00:33,277 --> 00:00:34,754
+met at Health-a-thon
+
+21
+00:00:35,134 --> 00:00:36,971
+Basith and Awaiz run a software
+
+22
+00:00:36,991 --> 00:00:38,843
+company called WeDevIT
+
+23
+00:00:39,402 --> 00:00:42,968
+Dr Sujay is from IISc, Bengaluru
+
+24
+00:00:43,402 --> 00:00:46,396
+Dr Sharada is from AIIMS, Mangalagiri
+
+25
+00:00:46,545 --> 00:00:47,900
+And Shirin is a final-year
+
+26
+00:00:47,920 --> 00:00:49,218
+medical student
+
+27
+00:00:49,259 --> 00:00:50,525
+Back in August, we had
+
+28
+00:00:50,545 --> 00:00:51,986
+our first team meeting
+
+29
+00:00:52,170 --> 00:00:53,686
+And Dr Sujay told us something
+
+30
+00:00:53,706 --> 00:00:55,504
+that stayed with all of us
+
+31
+00:00:55,831 --> 00:00:56,739
+Patients do tell you what
+
+32
+00:00:56,759 --> 00:00:58,504
+they want at the end of life
+
+33
+00:00:58,563 --> 00:01:00,311
+But nobody writes it down
+
+34
+00:01:00,331 --> 00:01:03,611
+And in an emergency, nobody can find it
+
+35
+00:01:03,938 --> 00:01:05,989
+So we did what technical people do
+
+36
+00:01:06,009 --> 00:01:07,361
+We built everything
+
+37
+00:01:07,474 --> 00:01:10,004
+Screen after screen, all for doctors
+
+38
+00:01:10,402 --> 00:01:12,932
+Then we asked ourselves one question
+
+39
+00:01:13,152 --> 00:01:15,221
+Why would a family install all this?
+
+40
+00:01:15,241 --> 00:01:17,043
+So we pivoted, towards the
+
+41
+00:01:17,063 --> 00:01:19,057
+patient and the family
+
+42
+00:01:19,813 --> 00:01:22,096
+And we kept one thing at the centre
+
+43
+00:01:22,116 --> 00:01:23,825
+the goals of care talk
+
+44
+00:01:24,152 --> 00:01:25,436
+That's when the doctor
+
+45
+00:01:25,456 --> 00:01:27,293
+the patient and the family sit
+
+46
+00:01:27,313 --> 00:01:28,846
+down together, and decide
+
+47
+00:01:28,866 --> 00:01:30,968
+what kind of care she wants
+
+48
+00:01:31,081 --> 00:01:32,596
+With everyone's consent
+
+49
+00:01:32,616 --> 00:01:34,646
+the doctor records that talk
+
+50
+00:01:35,027 --> 00:01:37,218
+AI writes out who said what
+
+51
+00:01:37,313 --> 00:01:40,611
+For Indian languages, we use Sarvam AI
+
+52
+00:01:40,724 --> 00:01:42,204
+Then the AI checks that
+
+53
+00:01:42,224 --> 00:01:44,146
+nothing important was missed
+
+54
+00:01:44,188 --> 00:01:45,650
+It goes through thirteen topics
+
+55
+00:01:45,670 --> 00:01:46,918
+taken from India's
+
+56
+00:01:46,938 --> 00:01:48,186
+end-of-life care guidelines
+
+57
+00:01:48,206 --> 00:01:49,846
+written by the national critical
+
+58
+00:01:49,866 --> 00:01:52,521
+care and palliative care societies
+
+59
+00:01:53,295 --> 00:01:55,168
+Then the AI turns the conversation
+
+60
+00:01:55,188 --> 00:01:57,664
+into a goals of care document
+
+61
+00:01:57,688 --> 00:01:59,932
+That's a clinical record of her wishes
+
+62
+00:02:00,063 --> 00:02:01,432
+Does she want CPR?
+
+63
+00:02:01,706 --> 00:02:02,829
+A ventilator?
+
+64
+00:02:02,849 --> 00:02:04,182
+Intensive care?
+
+65
+00:02:04,206 --> 00:02:06,504
+And where does she want to be cared for?
+
+66
+00:02:06,866 --> 00:02:08,614
+Nothing is final until the doctor
+
+67
+00:02:08,634 --> 00:02:11,829
+reads it, corrects it, and signs it
+
+68
+00:02:11,849 --> 00:02:13,775
+Then the family signs too
+
+69
+00:02:13,795 --> 00:02:15,057
+and it's locked
+
+70
+00:02:15,759 --> 00:02:17,436
+We also took legal advice on the
+
+71
+00:02:17,456 --> 00:02:19,900
+wording and the format of that document
+
+72
+00:02:19,920 --> 00:02:22,629
+But goals of care is only the start
+
+73
+00:02:23,420 --> 00:02:24,471
+Sahara stays with the family
+
+74
+00:02:24,491 --> 00:02:26,521
+every single day
+
+75
+00:02:26,688 --> 00:02:28,486
+Patients track their symptoms
+
+76
+00:02:28,563 --> 00:02:29,561
+They rate how they're feeling
+
+77
+00:02:29,581 --> 00:02:31,132
+on a distress thermometer
+
+78
+00:02:31,152 --> 00:02:32,114
+and they mark where it
+
+79
+00:02:32,134 --> 00:02:33,718
+hurts on a body map
+
+80
+00:02:34,081 --> 00:02:35,114
+Their doctor can see how
+
+81
+00:02:35,134 --> 00:02:36,789
+it's changing over time
+
+82
+00:02:37,027 --> 00:02:38,364
+There's a mood journal, for the days
+
+83
+00:02:38,384 --> 00:02:40,200
+that are hard to put into words
+
+84
+00:02:40,349 --> 00:02:41,632
+They take a photo of a prescription
+
+85
+00:02:41,652 --> 00:02:43,593
+or a medicine strip
+
+86
+00:02:44,116 --> 00:02:45,239
+AI works out the medicines
+
+87
+00:02:45,259 --> 00:02:47,914
+and reminds them about every dose
+
+88
+00:02:48,099 --> 00:02:49,257
+They upload their reports
+
+89
+00:02:49,277 --> 00:02:52,164
+and ask a question in plain words
+
+90
+00:02:52,474 --> 00:02:54,829
+AI answers, and shows the exact
+
+91
+00:02:54,849 --> 00:02:56,846
+line in the report it came from
+
+92
+00:02:56,866 --> 00:02:58,507
+Their next hospital visit is
+
+93
+00:02:58,527 --> 00:03:00,307
+scheduled right in the app
+
+94
+00:03:01,045 --> 00:03:02,329
+Family members get their own login
+
+95
+00:03:02,349 --> 00:03:04,754
+so everyone stays in the loop
+
+96
+00:03:04,991 --> 00:03:07,471
+There's an emergency SOS button
+
+97
+00:03:07,491 --> 00:03:10,025
+And a QR card that carries the patient's
+
+98
+00:03:10,045 --> 00:03:12,611
+wishes, contacts and medicines
+
+99
+00:03:12,920 --> 00:03:14,793
+We also scraped public listings
+
+100
+00:03:14,813 --> 00:03:16,436
+and put over sixteen hundred
+
+101
+00:03:16,456 --> 00:03:17,686
+palliative care centres
+
+102
+00:03:17,706 --> 00:03:20,468
+from across India, on one map
+
+103
+00:03:20,599 --> 00:03:23,650
+It even shows where to find oral morphine
+
+104
+00:03:23,670 --> 00:03:25,043
+And there's a community
+
+105
+00:03:25,063 --> 00:03:27,521
+so no family goes through this alone
+
+106
+00:03:27,902 --> 00:03:30,346
+Families don't talk in just one language
+
+107
+00:03:30,366 --> 00:03:31,632
+So Sahara understands
+
+108
+00:03:31,652 --> 00:03:34,343
+English, Hindi, Telugu
+
+109
+00:03:34,509 --> 00:03:36,650
+Urdu and Kannada, even when
+
+110
+00:03:36,670 --> 00:03:38,557
+they're mixed in one sentence
+
+111
+00:03:38,616 --> 00:03:40,757
+Now, back to that emergency room
+
+112
+00:03:40,777 --> 00:03:42,775
+One scan of her QR card, and the
+
+113
+00:03:42,795 --> 00:03:45,254
+doctor knows exactly what she wanted
+
+114
+00:03:45,474 --> 00:03:47,900
+Oh, wait. Late one night
+
+115
+00:03:47,920 --> 00:03:49,132
+something hit us
+
+116
+00:03:49,152 --> 00:03:51,361
+We kept asking how the patient feels
+
+117
+00:03:51,491 --> 00:03:53,132
+Nobody was asking her daughter
+
+118
+00:03:53,152 --> 00:03:55,087
+So caregivers get their own wellbeing
+
+119
+00:03:55,107 --> 00:03:57,879
+check too, and someone to call
+
+120
+00:03:58,384 --> 00:04:00,632
+All of this took three months
+
+121
+00:04:00,652 --> 00:04:03,025
+We had a lot of meetings with our doctors
+
+122
+00:04:03,045 --> 00:04:05,061
+We met our mentor for a review
+
+123
+00:04:05,081 --> 00:04:06,454
+And we ran a survey of
+
+124
+00:04:06,474 --> 00:04:08,132
+doctors and hospitals
+
+125
+00:04:08,152 --> 00:04:09,686
+We saved our work to GitHub
+
+126
+00:04:09,706 --> 00:04:11,843
+almost six hundred times
+
+127
+00:04:12,045 --> 00:04:14,111
+Each of those is called a commit
+
+128
+00:04:14,402 --> 00:04:16,521
+It's one more improvement to the app
+
+129
+00:04:16,581 --> 00:04:17,507
+It's built with free
+
+130
+00:04:17,527 --> 00:04:19,007
+and open-source tools
+
+131
+00:04:19,027 --> 00:04:21,164
+and it runs on a cloud server
+
+132
+00:04:21,402 --> 00:04:23,043
+When Sahara got shortlisted
+
+133
+00:04:23,063 --> 00:04:25,775
+we rebuilt it as a full Android app
+
+134
+00:04:25,795 --> 00:04:28,629
+And it's live on Google Play today
+
+135
+00:04:29,134 --> 00:04:31,186
+Sahara. Care that follows
+
+136
+00:04:31,206 --> 00:04:32,968
+what matters to the patient
+

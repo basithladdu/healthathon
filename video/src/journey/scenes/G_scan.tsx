@@ -4,6 +4,7 @@ import {AbsoluteFill} from 'remotion';
 import {P, useGT, at, camAt, World, Person, PhoneClip, Rise, FONT_BODY, FONT_HEAD, spring, pop, mv, ramp, clamp, lerp} from '../kit';
 import {CAST} from '../cast';
 import {RoomBG, RoomLight, RoomFG, Bed, CLOCK, STAND, handPos} from './A_room';
+import {WIN} from '../windows';
 
 const DOC = {x: 1210, y: 1000, s: 1.1};
 
@@ -19,14 +20,14 @@ export const GShot: React.FC<{t: number}> = ({t}) => {
 
   const cam = camAt(
     [
-      {t: 68.1, x: CLOCK.x, y: CLOCK.y + 16, z: 2.45},
+      {t: WIN.G[0], x: CLOCK.x, y: CLOCK.y + 16, z: 2.45},
       {t: tEm - 0.1, x: CLOCK.x + 4, y: CLOCK.y + 12, z: 2.6},
       {t: tEm + 0.9, x: 900, y: 580, z: 1.1},
       {t: tOne - 0.05, x: 880, y: 590, z: 1.14},
       {t: tScan + 0.35, x: 810, y: 600, z: 1.55},
       {t: tDoc - 0.1, x: 820, y: 590, z: 1.6},
       {t: tKnows + 0.45, x: 890, y: 520, z: 1.14},
-      {t: 73.2, x: 890, y: 515, z: 1.16},
+      {t: WIN.G[1] + 0.5, x: 890, y: 515, z: 1.16},
     ],
     t,
     0.004,

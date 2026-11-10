@@ -12,13 +12,36 @@ rng = np.random.RandomState(11)
 W = WJ['words']
 
 
-def at(sid, w=None, nth=0):
-    ws = [x for x in W if x['id'] == sid]
+BW = json.load(open(os.path.join(HERE, '..', 'src', 'journey', 'base_words.json')))['words']
+EDL = json.load(open(os.path.join(HERE, '..', 'src', 'journey', 'edl.json')))
+EDL = EDL['segs'] if isinstance(EDL, dict) else EDL
+_n = lambda s: ''.join(c for c in s.lower() if c.isalnum() or c == "'")
+
+
+def _find(words, sid, w, nth):
+    ws = [x for x in words if x['id'] == sid]
+    if not ws:
+        return float('nan')
     if w is None:
         return ws[0]['s']
-    n = lambda s: ''.join(c for c in s.lower() if c.isalnum() or c == "'")
-    h = [x for x in ws if n(x['w']) == n(w)]
-    return h[min(nth, len(h) - 1)]['s']
+    h = [x for x in ws if _n(x['w']) == _n(w)]
+    return h[min(nth, len(h) - 1)]['s'] if h else float('nan')
+
+
+def nat(sid, w=None, nth=0):
+    """film time of a narration word"""
+    t = _find(W, sid, w, nth)
+    assert t == t, (sid, w)
+    return t
+
+
+def at(sid, w=None, nth=0):
+    """film time at which the picture reaches a cue of the original (base) timeline; nan when that moment was cut"""
+    b = _find(BW, sid, w, nth)
+    for g in EDL:
+        if 'insert' not in g and g['b0'] <= b < g['b1']:
+            return g['n0'] + (b - g['b0']) / (g['b1'] - g['b0']) * (g['n1'] - g['n0'])
+    return float('nan')
 
 
 def mtof(m):
@@ -31,6 +54,8 @@ class Bus:
         self.R = np.zeros(N)
 
     def add(self, t0, sig, pan=0.0, gain=1.0):
+        if t0 != t0:
+            return
         i = int(t0 * SR)
         if i < 0:
             sig = sig[-i:]
@@ -110,17 +135,20 @@ def shaker(vel=0.2):
 
 # ---------------- music plan ----------------
 mus = Bus()
-B_A = at('s04')  # night section ends
-B_C = at('s06')  # playful building
-Q = at('s08')  # thins out
-Q2 = at('s09')  # question: stop
-RIGHT = at('s10', 'right')
-REB = at('s11', 'kept')  # rebuild
-G0 = at('s16')
-WAIT = at('s17', 'Oh')
-TEND = at('s17', 'Late')
-END0 = at('s20')
-TITLE = at('s22')
+B_A = nat('m05')  # night section ends
+B_C = nat('m08')  # playful building
+Q = nat('m09')  # thins out
+Q2 = nat('m09', 'Why')  # question: stop
+RIGHT = nat('m10')
+REB = nat('m10')  # the pivot: hopeful
+GOC = nat('m11')
+HOME = nat('m15')  # everyday features
+LANG = nat('m25')
+G0 = nat('m26')
+WAIT = nat('m27', 'Oh')
+TEND = nat('m27', 'Late')
+END0 = nat('m30')
+TITLE = nat('m35')
 
 Am = [45, 52, 57, 60, 64]
 F = [41, 53, 57, 60, 65]
@@ -177,10 +205,13 @@ chords(B_C, Q, [C, F, G, C], e8 * 8, gain=0.035, pno=False)
 mus.add(Q, pad(45, Q2 - Q + 1.5, att=0.4, rel=1.2), 0, 0.06)
 mus.add(Q2, pad(33, RIGHT - Q2 + 0.8, att=0.6, rel=0.8), 0, 0.09)
 # rebuild: hopeful
-chords(REB - 0.3, G0, [F, C, G, Am], 4.4, gain=0.05, pno=True, pvel=0.38)
+chords(REB - 0.3, GOC, [F, C], 2.2, gain=0.05, pno=True, pvel=0.38)
+chords(GOC, HOME, [F, C, G, Am], 4.4, gain=0.045, pno=True, pvel=0.33, arp=[2, 4, 3])
+chords(HOME, LANG, [C, G, Am, F], 3.6, gain=0.05, pno=True, pvel=0.38)
+chords(LANG, G0, [F, C, G, C], 2.7, gain=0.05, pno=True, pvel=0.38)
 # F language part: add light marimba sparkle
-for k in range(int((G0 - at('s15')) / 0.54)):
-    tk = at('s15') + k * 0.54
+for k in range(int((G0 - LANG) / 0.54)):
+    tk = LANG + k * 0.54
     if rng.rand() > 0.3:
         mus.add(tk, marimba([72, 74, 76, 79, 81][k % 5], 0.18), (rng.rand() - 0.5) * 0.8, 0.5)
 # G: night callback, warm rise
@@ -295,15 +326,45 @@ def S(t, sig, gain=1.0, pan=0.0):
 
 
 # A
-for k in range(10):
+for k in range(14):
     S(0.15 + k * 1.05, beep(988, 0.35), 1, 0.4)  # monitor
 S(0.0, tick(1800, 0.6)); S(0.5, tick(1500, 0.6)); S(1.0, tick(1800, 0.5))
 S(at('s01', 'An') - 0.25, whoosh(0.9, 250, 900, 0.8))
 footsteps(at('s02', 'doctor') - 0.1, 3)
 S(at('s03', 'hardest') - 0.05, pop_(500, 0.7)); S(at('s03', 'conversation'), pop_(620, 0.7))
 S(at('s03', 'all') - 0.1, whoosh(1.0, 300, 1500, 0.7))
+# inserted shots: a soft whoosh in, and the beats the narration lands on
+for g in EDL:
+    if 'insert' in g:
+        S(g['n0'] - 0.12, whoosh(0.55, 350, 1600, 0.45), 0.8)
+S(nat('m04', 'ninety-eight') - 0.03, thunk(90, 1.0)); S(nat('m04', 'ninety-eight') + 0.9, chime(76, 0.45, 2.0))
+S(nat('m04', 'Yes') - 0.03, pop_(420, 0.6))
+S(nat('m04', 'ninety-eight', 1) - 0.03, thunk(70, 1.0)); S(nat('m04', 'ninety-eight', 1), rumble(1.4), 0.8)
+S(nat('m05', "It's") - 0.05, chime(88, 0.6))
+S(nat('m12a', 'Sarvam') - 0.05, pop_(640, 0.7))
+S(nat('m12b', 'critical') - 0.05, pop_(560, 0.6)); S(nat('m12b', 'palliative') - 0.05, pop_(660, 0.6))
+for k, w in enumerate(('CPR', 'ventilator', 'Intensive', 'where')):
+    S(nat('m13', w) - 0.05, pop_(520 + k * 60, 0.65))
+S(nat('mLegal', 'legal') - 0.05, thunk(200, 0.7))
+S(nat('m16a') + 0.3, whoosh(1.2, 500, 2400, 0.4), 0.7)
+S(nat('m17') + 0.9, pop_(700, 0.6))
+S(nat('m20') - 0.03, pop_(620, 0.6))
+S(nat('m21') - 0.03, pop_(560, 0.6)); S(nat('m21', 'so'), chime(91, 0.4, 1.2))
+S(nat('m22', 'SOS') - 0.05, beep(880, 0.6)); S(nat('m22', 'SOS') + 0.25, beep(880, 0.6))
+for k, w in enumerate(('wishes', 'contacts', 'medicines')):
+    S(nat('m22', w) - 0.05, pop_(560 + k * 70, 0.6))
+S(nat('m24', 'community') - 0.05, chime(84, 0.5, 1.5))
+S(nat('m30a') - 0.05, pop_(520, 0.65)); S(nat('m30a', 'We', 1) - 0.1, pop_(600, 0.65)); S(nat('m30a', 'And') - 0.1, pop_(680, 0.65))
+for k in range(14):
+    S(nat('m31', 'Each') + 0.15 + k * 0.11, tick(2000 + k * 50, 0.4), 1, (k - 7) / 9)
+S(nat('m32') - 0.05, pop_(560, 0.65)); S(nat('m32', 'runs') - 0.2, pop_(660, 0.65))
 # B
 S(at('s04', 'Sahara') - 0.05, chime(88, 0.7))
+S(at('s04', 'five') - 0.03, pop_(560, 0.6))
+for k in range(5):
+    S(at('s04', 'five') + 0.08 + k * 0.09, pop_(620 + k * 70, 0.45), 1, (k - 2) * 0.3)
+for sid, w, f in (('s04a', 'Basith', 640), ('s04a', 'Awaiz', 720), ('s04b', 'Sujay', 600), ('s04b', 'Sharada', 680), ('s04b', 'Shirin', 760)):
+    S(at(sid, w) - 0.03, pop_(f, 0.55), 1, 0.0)
 S(at('s05', 'August') - 0.05, page(0.9))
 S(at('s05', 'patients'), pop_(560, 0.8))
 S(at('s05', 'none') - 0.1, whoosh(1.3, 600, 3000, 0.7))
@@ -315,16 +376,20 @@ t0 = at('s07', 'Sedation') + 0.6
 for k in range(9):
     S(t0 + k * 0.13, thunk(170 + k * 12, 0.55), 1, (k % 2 - 0.5) * 0.6)
 S(at('s07', 'Twenty'), chime(91, 0.5, 1.2))
-S(at('s07', 'week'), pop_(800, 0.7))
+S(at('s07', 'days'), pop_(800, 0.7))
 # D
 S(at('s08', 'medical') - 0.05, pop_(600, 0.8))
 S(at('s09', 'Why') - 0.05, pop_(450, 0.6))
 S(at('s09', 'install'), creak(0.9), 0.8)
 S(at('s10', 'right') - 0.05, rumble(1.6), 1.0)
 S(at('s10', 'not') - 0.05, page(0.8))
-S(at('s11', 'cut') - 0.05, whoosh(0.8, 300, 2000, 1.0))
-S(at('s11', 'thing') - 0.1, chime(84, 0.6))
-S(at('s11', 'talk') - 0.1, whoosh(0.9, 400, 2500, 0.8))
+S(at('s11', 'switch') - 0.03, tick(1500, 0.9)); S(at('s11', 'switch') + 0.02, thunk(260, 0.4))
+S(at('s11a', 'became') - 0.03, tick(1500, 0.9)); S(at('s11a', 'became'), thunk(260, 0.45)); S(at('s11a', 'families') - 0.05, pop_(640, 0.6))
+S(at('s11b', 'shortlisted') - 0.03, thunk(140, 1.0)); S(at('s11b', 'shortlisted') + 0.05, chime(88, 0.45, 1.4))
+S(at('s11b', 'Android') - 0.03, tick(1500, 0.9)); S(at('s11b', 'Android'), thunk(260, 0.45))
+S(at('s11c', 'pulling') - 0.1, whoosh(0.8, 250, 900, 0.6))
+S(at('s11c', 'thing') - 0.1, chime(84, 0.6))
+S(at('s11c', 'talk') - 0.1, whoosh(0.9, 400, 2500, 0.8))
 # E
 S(at('s12', 'records') - 0.03, beep(1318, 0.6))
 t0 = at('s12', 'thirteen')
@@ -333,7 +398,18 @@ for k in range(13):
 S(at('s13', 'no') - 0.03, thunk(120, 1.0), 1)
 S(at('s13', 'leads') - 0.05, pop_(520, 0.6))
 S(at('s14', 'reads'), tick(2200, 0.7)); S(at('s14', 'edits'), tick(2400, 0.7)); S(at('s14', 'signs'), whoosh(0.5, 2000, 4000, 0.5))
-S(at('s14', 'signs') + 0.55, tick(1200, 1.0)); S(at('s14', 'signs') + 0.6, thunk(300, 0.4))
+S(at('s14', 'family') - 0.03, pop_(600, 0.5)); S(at('s14', 'signs', 1), whoosh(0.5, 2000, 4000, 0.5))
+S(at('s14', 'locks') - 0.02, tick(1200, 1.0)); S(at('s14', 'locks') + 0.03, thunk(300, 0.5))
+# X: at home
+S(at('s14a') - 0.2, whoosh(0.9, 300, 1400, 0.6))
+S(at('s14b', 'map') - 0.03, pop_(560, 0.6)); S(at('s14b', 'trends'), tick(2400, 0.6))
+S(at('s14c', 'Snap') - 0.02, tick(3200, 1.0)); S(at('s14c', 'Snap') + 0.01, hipass(whoosh(0.18, 3000, 6000), 2000), 0.8)
+S(at('s14c', 'reminder') - 0.03, beep(1318, 0.6)); S(at('s14c', 'reminder') + 0.13, beep(1760, 0.45))
+S(at('s14d', 'question') - 0.03, pop_(600, 0.5)); S(at('s14d', 'line') - 0.03, pop_(720, 0.6))
+t0 = at('s14e', 'sixteen')
+for k in range(22):
+    S(t0 - 0.4 + k * 0.07, tick(2200 + (k % 5) * 160, 0.35), 1, (rng.rand() - 0.5) * 0.8)
+S(at('s14e', 'morphine') - 0.03, pop_(700, 0.6))
 # F
 for w in ('English', 'Hindi', 'Telugu', 'Urdu', 'Kannada'):
     S(at('s15', w) - 0.03, pop_(480 + 60 * len(w), 0.7), 1, rng.rand() - 0.5)
@@ -351,7 +427,8 @@ S(at('s19', 'someone') - 0.03, pop_(660, 0.7))
 # I
 for k, w in enumerate(('Three', 'months')):
     S(at('s20', w), page(0.7))
-t0 = at('s20', 'Six')
+S(at('s20', 'survey') - 0.03, page(0.7)); S(at('s20', 'survey') + 0.3, tick(2400, 0.5)); S(at('s20', 'survey') + 0.45, tick(2600, 0.5))
+t0 = at('s20', 'six')
 for k in range(16):
     S(t0 + k * 0.06, tick(2000 + k * 40, 0.35), 1, (k % 2 - 0.5) * 0.5)
 S(at('s21', 'Play') - 0.03, pop_(700, 0.8))
