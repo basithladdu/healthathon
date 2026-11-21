@@ -2,11 +2,12 @@ package `in`.wedevit.care
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -96,7 +97,8 @@ import java.time.ZoneId
     val chosen = LocalDate.parse(day)
     LaunchedEffect(person) { if (person != capturedPerson) onDismiss() }
     AlertDialog(onDismissRequest = { if (!busy) onDismiss() }, title = { Text(t("Next visit", "अगली मुलाक़ात")) }, text = {
-        Column(Modifier.animateContentSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        // No size animation here: an AlertDialog window can't resize smoothly, so animating made the fields clip and the dialog feel slow.
+        Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(onClick = { DatePickerDialog(context, { _, y, m, d -> day = LocalDate.of(y, m + 1, d).toString() }, chosen.year, chosen.monthValue - 1, chosen.dayOfMonth).show() }, modifier = Modifier.heightIn(min = 48.dp).testTag("quick-visit-date")) {
                     Icon(Icons.Default.Event, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Day *", "दिन *") + ": " + chosen.format(careDateFormat("d MMM", careHindi())), maxLines = 1, softWrap = false)
@@ -108,7 +110,7 @@ import java.time.ZoneId
             TextButton(onClick = { more = !more }, modifier = Modifier.heightIn(min = 48.dp).testTag("quick-visit-more")) {
                 Text(t("More details", "और जानकारी"), fontWeight = FontWeight.SemiBold); Icon(if (more) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, null)
             }
-            AnimatedVisibility(more) {
+            if (more) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(who, { who = it.take(200) }, label = { Text(t("Doctor or hospital (optional)", "डॉक्टर या अस्पताल (चाहें तो)")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
                     OutlinedTextField(place, { place = it.take(500) }, label = { Text(t("Place or note (optional)", "जगह या नोट (चाहें तो)")) }, modifier = Modifier.fillMaxWidth())

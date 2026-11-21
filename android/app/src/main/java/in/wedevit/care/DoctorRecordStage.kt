@@ -36,9 +36,9 @@ import kotlin.math.abs
 import kotlin.math.sin
 import kotlinx.coroutines.launch
 
-/** Record-step stage colours. Terracotta is the stage; deep terracotta is the icon on the cream button. */
-internal val DoctorStageTerracotta = Color(0xFFC9785A)
-internal val DoctorStageDeep = Color(0xFF7A3B24)
+/** Record-step stage colours: the app's sage green is the stage; the deeper green is the icon on the cream button. (Was terracotta until 21 Nov 2026.) */
+internal val DoctorStageTerracotta = SaharaColors.Primary
+internal val DoctorStageDeep = SaharaColors.PrimaryPressed
 internal val DoctorStageCream = Color(0xFFFFF8EE)
 
 fun doctorStageStatus(recording: Boolean, saving: Boolean, seconds: Long, hindi: Boolean = false): String { val clock = "${seconds / 60}:${(seconds % 60).toString().padStart(2, '0')}"
