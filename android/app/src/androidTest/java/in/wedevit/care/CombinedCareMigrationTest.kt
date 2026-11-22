@@ -115,7 +115,7 @@ class CombinedCareMigrationTest {
                 db.close()
                 db = open()
                 // The merged doctor conversation/prescription schema extends the preserved v6 superset.
-                assertEquals(7, db.openHelper.readableDatabase.version)
+                assertEquals(8, db.openHelper.readableDatabase.version)
                 assertEquals(report, db.care().reports(person.id).first().single())
                 assertEquals(consent, db.care().recordingConsents(person.id).first().single())
                 assertEquals(note, db.care().latest(person.id))

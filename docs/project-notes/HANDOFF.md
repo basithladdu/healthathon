@@ -2,6 +2,49 @@
 
 > **30 Oct 2026:** SVK spec build (emergency care plan, living will, QR card, languages): see [docs/SAHARA_SVK_BUILD_HANDOFF.md](docs/SAHARA_SVK_BUILD_HANDOFF.md).
 
+## 23 Nov: on-device tests (`connectedDebugAndroidTest`) on Awaiz's emulator
+
+First full run on Awaiz's PC (the emulator works now that the hypervisor driver is installed). Emulator `Sahara_Doctor_Demo`, Android 17 (API 37), 1080×2400.
+
+**Runs**
+
+| Code | Tests | Failed | Notes |
+|---|---|---|---|
+| `ac4c350` (main, with checkpoint `285b76f`) | 168 | 56 | The app still had the doctor demo signed in. |
+| `cde8962` (+ Basith's `b3dc5eb`) | 170 | 58 | Fresh install: the same tests failed, plus 2 new ones in `DoctorConversationLandingTest`. So the failures are steady, not flaky, and not caused by leftover sign-ins. |
+
+The 877 unit tests (`testDebugUnitTest`) are separate and weren't rerun here.
+
+**Fixed by Awaiz (9 tests, all passing now: 10/10 in those classes)**
+- `CombinedCareMigrationTest` (7) and `CareReportTest` (1) expected database version 7 and 6. The app has been on version 8 since `231aad1` (send-later queue, `CareSyncMigration7To8`). The upgrade steps were already in the tests; only the expected number was stale.
+- `SaharaTitleTypographyTest` (1) expected system serif titles and the default body font. The app now uses Anek Latin SemiBold for titles and Noto Sans for body and labels. The test is renamed `anekTitlesAndNotoSansBodyKeepTheBaseSizes` and checks the new fonts, with the base sizes unchanged.
+
+**Still failing: 49 tests, Basith to look at**
+
+Almost all are UI tests written before the doctor and patient redesigns. They look for tags, texts or scroll containers that have moved or changed. The tags mostly still exist in the code, but on a different screen or behind a different step. No app crashes were seen.
+
+| Class | Fails | What goes wrong |
+|---|---|---|
+| `CareSymptomDiaryUiTest` | 12 | `performScrollTo()`: "no parent layout with a Scroll action". The symptom form's steps are no longer in a scrollable column. Some texts are gone too ('Head', 'Neck'). |
+| `CareFlowTest` | 8 | Typing into fields and tapping fail; the 'Start ta…' and 'An okay day' texts aren't found. |
+| `DailyCareFlowsTest` | 4 | Scroll fails; '2 result…' isn't found; a tap fails. |
+| `DoctorDemoFlowTest`, `DoctorPatientHubFlowTest`, `DoctorProgressRouteTest`, `DoctorReportsUiTest`, `DoctorConversationsUiTest` | 7 | `demo-patient-search` isn't on screen when the test types into it (the demo patient list changed). |
+| `DoctorPatientGridTest` | 2 | '6 patients' count and search changed. |
+| `DoctorWorkflowFlowTest` | 2 | Can't scroll to 'Cancel visit'. |
+| `DoctorPatientDayContentTest`, `DoctorConditionColumnsTest`, `DoctorEmbeddedNavigationTest`, `DoctorCareDemoFlowTest`, `DoctorMedicineReportUiTest`, `DoctorMedicineTabsTest`, `DoctorPatientRecordUiTest`, `DoctorPreparationQuestionsTest`, `DoctorConversationLandingTest` | 11 | Elements are missing, still present when they should be gone, or found 3 times instead of 1 after the redesign. One is missing the tag `doctor-checkin-count`. |
+| `CarePainHistoryUiTest` | 2 | Empty-state text and history label changed. |
+| `CarePainWebViewRuntimeTest` | 1 | The 3D body map (WebGL) didn't answer within 15 s. Possibly the emulator's graphics; check on a real phone. |
+
+**One to check as a possible real bug:** `CareFlowTest.realUsersHaveNoRoleMenuAndKeepDraftAndComputedRoleAfterRecreation` (line 95). After the screen is recreated (for example on rotation), the view role is "Doctor" where the test expects "Patient". It fails the same way on a fresh install. Either the role isn't restored correctly after recreation, or the test's set-up is out of date.
+
+**How to rerun** (from `android/`, emulator running, about 10 minutes):
+```bash
+gradlew connectedDebugAndroidTest --no-daemon --max-workers=1
+# one class at a time:
+gradlew connectedDebugAndroidTest "-Pandroid.testInstrumentationRunnerArguments.class=in.wedevit.care.CareFlowTest"
+```
+The report is in `android/app/build/reports/androidTests/connected/debug/index.html`.
+
 ## 21 Nov: switch on doctor approvals, impact, morphine reports and Sarvam (owner of the Supabase project)
 
 New in the code (not live until these steps are done): `/admin` has **Doctor sign-ups** (approve / reject / suspend) and **Impact** tabs; the Android app asks a family who logs oral morphine where they got it; Goals of Care recordings and note translation use **Sarvam AI** (all 22 scheduled Indian languages plus English) with Gemini as the fallback.

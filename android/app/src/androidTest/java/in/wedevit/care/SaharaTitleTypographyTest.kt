@@ -8,28 +8,27 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Rule
 import org.junit.Test
 
 class SaharaTitleTypographyTest {
     @get:Rule val ui = createComposeRule()
-    @Test fun originalSystemSerifTitlesAndDefaultBodyControlsAreRestored() {
+    // Updated 23 Nov: titles are Anek Latin SemiBold and body/labels are Noto Sans (the AI-FIR pairing in SaharaTitleTypography.kt),
+    // no longer the system serif and default. Sizes still come from the Material base.
+    @Test fun anekTitlesAndNotoSansBodyKeepTheBaseSizes() {
         val base = Typography()
         val styled = saharaTitleTypography(base)
         assertEquals(SaharaTitleFont, styled.headlineLarge.fontFamily)
         assertEquals(SaharaTitleFont, styled.titleLarge.fontFamily)
-        assertEquals(FontFamily.Serif, SaharaTitleFont)
-        assertEquals(FontFamily.Default, SaharaBodyFont)
-        assertEquals(base.titleLarge.fontWeight, styled.titleLarge.fontWeight)
-        assertEquals(base.bodyLarge, styled.bodyLarge)
-        assertEquals(base.bodyMedium, styled.bodyMedium)
-        assertEquals(base.bodySmall, styled.bodySmall)
+        assertEquals(FontWeight.SemiBold, styled.titleLarge.fontWeight)
+        assertNotEquals(FontFamily.Default, SaharaTitleFont)
+        listOf(styled.bodyLarge, styled.bodyMedium, styled.bodySmall, styled.labelLarge, styled.labelMedium, styled.labelSmall).forEach { assertEquals(SaharaBodyFont, it.fontFamily) }
         assertEquals(base.bodyLarge.fontSize, styled.bodyLarge.fontSize)
         assertEquals(base.bodyLarge.lineHeight, styled.bodyLarge.lineHeight)
-        assertEquals(base.labelLarge, styled.labelLarge)
-        assertEquals(base.labelMedium, styled.labelMedium)
-        assertEquals(base.labelSmall, styled.labelSmall)
+        assertEquals(base.labelSmall.fontSize, styled.labelSmall.fontSize)
         ui.setContent { CareTheme { Column {
             Heading("Care conversations")
             Text("Capture their words", style = MaterialTheme.typography.headlineSmall)
