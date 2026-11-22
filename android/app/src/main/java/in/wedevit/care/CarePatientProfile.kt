@@ -13,25 +13,66 @@ data class CarePatientProfile(
     val age: Int? = null, val sex: String = "", val weightKg: Double? = null, val heightCm: Int? = null,
     val bloodGroup: String = "", val illness: String = "", val allergies: String = "", val phone: String = "", val address: String = "",
     val weights: List<CareWeightEntry> = emptyList(),
+    // The care now (Dr Shirin, 23 Nov): since when the illness is known (typed, e.g. "Mar 2025"), the doctor seen now, and the
+    // treatment now as [TREATMENTS] codes plus a free line. All optional; blank / empty means not filled in.
+    val illnessSince: String = "", val doctorName: String = "", val doctorPlace: String = "", val doctorPhone: String = "",
+    val treatments: List<String> = emptyList(), val treatmentNote: String = "",
 ) {
-    // Still "v": 1: "weights" is an extra key that older apps ignore, and a profile without it reads as an empty history.
+    // Still "v": 1: "weights" and the care-now keys are extra keys that older apps ignore; each is written only when filled in,
+    // so a profile without them reads exactly as before. (An older app that edits the profile will not keep them.)
     fun encode(): String = JSONObject().put("v", 1).put("sex", sex).put("blood", bloodGroup).put("illness", illness)
         .put("allergies", allergies).put("phone", phone).put("address", address)
         .also { j -> age?.let { j.put("age", it) }; weightKg?.let { j.put("weight", it) }; heightCm?.let { j.put("height", it) } }
         .also { j -> if (weights.isNotEmpty()) j.put("weights", JSONArray().apply { weights.forEach { put(JSONObject().put("day", it.day.toString()).put("kg", it.kg)) } }) }
+        .also { j ->
+            listOf("illnessSince" to illnessSince, "doctorName" to doctorName, "doctorPlace" to doctorPlace, "doctorPhone" to doctorPhone, "treatmentNote" to treatmentNote)
+                .forEach { (key, value) -> if (value.isNotBlank()) j.put(key, value) }
+            if (treatments.isNotEmpty()) j.put("treatments", JSONArray().apply { treatments.forEach { put(it) } })
+        }
         .toString()
+    /** True when any of the care-now details is filled in. */
+    val hasCareNow: Boolean get() = illnessSince.isNotBlank() || doctorName.isNotBlank() || doctorPlace.isNotBlank() || doctorPhone.isNotBlank() || treatments.isNotEmpty() || treatmentNote.isNotBlank()
     companion object {
         val SEX = listOf("Female", "Male", "Other")
         val BLOOD = listOf("A+", "A−", "B+", "B−", "AB+", "AB−", "O+", "O−", "Not known")
+        /** Treatment now, stored as these codes (labels are translated on screen). The last three stand alone: picking one clears the others. */
+        val TREATMENTS = listOf("chemotherapy", "radiotherapy", "surgery", "hormone_targeted", "symptom_care_only", "none_now", "not_sure")
+        val TREATMENTS_ALONE = setOf("symptom_care_only", "none_now", "not_sure")
         fun decode(json: String): CarePatientProfile = decodeOrNull(json) ?: CarePatientProfile()
         fun decodeOrNull(json: String): CarePatientProfile? = runCatching {
             val j = JSONObject(json)
+            val treatments = j.optJSONArray("treatments")?.let { a -> (0 until a.length()).mapNotNull { a.optString(it).takeIf { code -> code in TREATMENTS } }.distinct() }.orEmpty()
             CarePatientProfile(if (j.has("age")) j.getInt("age") else null, j.optString("sex"), if (j.has("weight")) j.getDouble("weight") else null,
                 if (j.has("height")) j.getInt("height") else null, j.optString("blood"), j.optString("illness"), j.optString("allergies"), j.optString("phone"), j.optString("address"),
-                CareWeightHistory.decode(j.optJSONArray("weights")))
+                CareWeightHistory.decode(j.optJSONArray("weights")),
+                illnessSince = j.optString("illnessSince"), doctorName = j.optString("doctorName"), doctorPlace = j.optString("doctorPlace"), doctorPhone = j.optString("doctorPhone"),
+                treatments = treatments, treatmentNote = j.optString("treatmentNote"))
         }.getOrNull()
+
+        /** Ticks or unticks one treatment; the stand-alone choices (symptom care only, none now, not sure) clear every other one, and any other choice clears them. */
+        fun toggleTreatment(current: List<String>, code: String): List<String> = when {
+            code in current -> current - code
+            code in TREATMENTS_ALONE -> listOf(code)
+            else -> current.filterNot { it in TREATMENTS_ALONE } + code
+        }.sortedBy { TREATMENTS.indexOf(it) }
     }
 }
+
+/** The on-screen name of a treatment code ([CarePatientProfile.TREATMENTS]); [t] is careText(). */
+internal fun careTreatmentLabel(code: String, t: (String, String) -> String): String = when (code) {
+    "chemotherapy" -> t("Chemotherapy", "कीमोथेरेपी")
+    "radiotherapy" -> t("Radiotherapy", "रेडियोथेरेपी")
+    "surgery" -> t("Surgery", "सर्जरी")
+    "hormone_targeted" -> t("Hormone or targeted therapy", "हार्मोन या टार्गेटेड थेरेपी")
+    "symptom_care_only" -> t("Pain and symptom care only", "सिर्फ़ दर्द और लक्षणों की देखभाल")
+    "none_now" -> t("No treatment now", "अभी कोई इलाज नहीं")
+    "not_sure" -> t("Not sure", "पक्का नहीं पता")
+    else -> code
+}
+
+/** One line for cards and summaries: the treatment names, then the free note. */
+internal fun careTreatmentLine(profile: CarePatientProfile, t: (String, String) -> String): String =
+    (profile.treatments.map { careTreatmentLabel(it, t) } + listOfNotNull(profile.treatmentNote.trim().ifBlank { null })).joinToString(" · ")
 
 /**
  * The profile travels in the shared care record as one "journal" entry (an allowed server kind) whose detail carries [PREFIX], like side-effect notes.

@@ -64,6 +64,41 @@ class CarePatientProfileTest {
         assertFalse(JSONObject(CarePatientProfile(weightKg = 60.0).encode()).has("weights"))
     }
 
+    @Test fun careNowFieldsRoundTripAndOldProfilesReadAsBlank() {
+        val p = CarePatientProfile(58, "Female", illness = "Carcinoma breast", illnessSince = "Mar 2025", doctorName = "Dr Shirin", doctorPlace = "MNJ Cancer Hospital",
+            doctorPhone = "+91 98765 43210", treatments = listOf("chemotherapy", "radiotherapy"), treatmentNote = "Cycle 3 of 6")
+        assertEquals(p, CarePatientProfile.decode(p.encode()))
+        assertEquals(p, PatientProfileCodec.decode(PatientProfileCodec.encode(p)))
+        assertTrue(p.hasCareNow)
+        val json = JSONObject(p.encode())
+        assertEquals(1, json.getInt("v")); assertEquals("Mar 2025", json.getString("illnessSince")); assertEquals(2, json.getJSONArray("treatments").length())
+        // A profile written before 23 Nov has none of the keys and reads as blank care-now details.
+        val old = """{"v":1,"sex":"Male","blood":"B+","illness":"Cancer","allergies":"","phone":"","address":"","age":58}"""
+        val decoded = CarePatientProfile.decode(old)
+        assertEquals(CarePatientProfile(58, "Male", bloodGroup = "B+", illness = "Cancer"), decoded)
+        assertFalse(decoded.hasCareNow); assertTrue(decoded.treatments.isEmpty()); assertEquals("", decoded.doctorName)
+        // Blank details write no keys, so older apps see exactly what they wrote before.
+        val plain = JSONObject(CarePatientProfile(age = 60, illness = "Cancer").encode())
+        listOf("illnessSince", "doctorName", "doctorPlace", "doctorPhone", "treatments", "treatmentNote").forEach { assertFalse(it, plain.has(it)) }
+        // Unknown or repeated treatment codes are dropped.
+        assertEquals(listOf("surgery"), CarePatientProfile.decode("""{"v":1,"treatments":["surgery","laser","surgery",3]}""").treatments)
+    }
+
+    @Test fun standAloneTreatmentsClearTheOthers() {
+        assertEquals(listOf("chemotherapy"), CarePatientProfile.toggleTreatment(emptyList(), "chemotherapy"))
+        assertEquals(listOf("chemotherapy", "surgery"), CarePatientProfile.toggleTreatment(listOf("surgery"), "chemotherapy"))
+        assertEquals(listOf("none_now"), CarePatientProfile.toggleTreatment(listOf("chemotherapy", "surgery"), "none_now"))
+        assertEquals(listOf("radiotherapy"), CarePatientProfile.toggleTreatment(listOf("not_sure"), "radiotherapy"))
+        assertEquals(emptyList<String>(), CarePatientProfile.toggleTreatment(listOf("symptom_care_only"), "symptom_care_only"))
+    }
+
+    @Test fun uploadRedactsCareNowFreeTextButKeepsTheDoctorPhone() {
+        val p = CarePatientProfile(doctorName = "Dr Rao", doctorPlace = "Clinic, call 98765 43210", doctorPhone = "98765 43210", treatmentNote = "ring 98765 43210", treatments = listOf("surgery"))
+        val decoded = PatientProfileCodec.decode(CarePrivacy.entryForUpload(PatientProfileCodec.item("a", p, 1, "i")).detail)!!
+        assertEquals("98765 43210", decoded.doctorPhone); assertEquals("Dr Rao", decoded.doctorName); assertEquals(listOf("surgery"), decoded.treatments)
+        assertFalse(decoded.doctorPlace.contains("98765")); assertFalse(decoded.treatmentNote.contains("98765"))
+    }
+
     @Test fun brokenWeightEntriesAreSkipped() {
         val json = """{"v":1,"weight":60,"weights":[{"day":"2026-10-01","kg":61},{"day":"not a day","kg":60},{"day":"2026-10-02","kg":0},{"day":"2026-10-03"},"x",{"day":"2026-10-04","kg":60}]}"""
         assertEquals(listOf(CareWeightEntry(d("2026-10-01"), 61.0), CareWeightEntry(d("2026-10-04"), 60.0)), CarePatientProfile.decode(json).weights)

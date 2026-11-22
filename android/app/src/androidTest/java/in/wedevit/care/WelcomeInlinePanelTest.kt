@@ -87,10 +87,46 @@ class WelcomeInlinePanelTest {
         ui.onNodeWithTag("onboarding-next").assertIsNotEnabled()
         ui.onNodeWithTag("onboarding-age").performTextReplacement("62")
         ui.onNodeWithTag("onboarding-next").assertIsEnabled().performClick()
+        // About the illness: skipped here (the care-now steps have their own test).
+        ui.onNodeWithText("About the illness").assertIsDisplayed()
+        ui.onNodeWithTag("onboarding-skip-step").performClick()
+        ui.onNodeWithTag("onboarding-skip-step").performClick()
         ui.onNodeWithTag("onboarding-skip-step").performClick()
         ui.onNodeWithText("You're all set").assertIsDisplayed()
         ui.onNodeWithTag("welcome-save-person").performClick()
         ui.runOnIdle { assertEquals("Synthetic patient", saved.single().first); assertEquals(62, saved.single().second?.age); assertEquals("", saved.single().second?.illness) }
+    }
+
+    @Test fun careNowStepsSaveIllnessDoctorAndTreatment() {
+        val saved = mutableListOf<Pair<String, CarePatientProfile?>>()
+        ui.setContent { CareTheme { Welcome({}, {}, onSaveProfile = { name, profile -> saved += name to profile }, showIntro = false) } }
+        ui.onNodeWithTag("welcome-patient-family").performScrollTo().performClick()
+        ui.onNodeWithTag("welcome-add-person").performScrollTo().performClick()
+        ui.onNodeWithTag("onboarding-name").performTextInput("Synthetic patient")
+        ui.onNodeWithTag("onboarding-next").performClick()
+        ui.onNodeWithTag("onboarding-skip-step").performClick()
+        ui.onNodeWithTag("onboarding-illness").performTextInput("Synthetic illness")
+        ui.onNodeWithTag("onboarding-illness-since").performTextInput("Mar 2025")
+        ui.onNodeWithTag("onboarding-next").performClick()
+        ui.onNodeWithTag("onboarding-next").assertIsNotEnabled()
+        ui.onNodeWithTag("onboarding-doctor-name").performTextInput("Dr Synthetic")
+        ui.onNodeWithTag("onboarding-doctor-place").performTextInput("Synthetic clinic")
+        ui.onNodeWithTag("onboarding-doctor-phone").performTextInput("98765x43210")
+        ui.onNodeWithTag("onboarding-next").performClick()
+        ui.onNodeWithTag("onboarding-treatment-chemotherapy").assertHeightIsAtLeast(48.dp).performClick()
+        ui.onNodeWithTag("onboarding-treatment-surgery").performScrollTo().performClick()
+        ui.onNodeWithTag("onboarding-treatment-none_now").performScrollTo().performClick()
+        ui.onNodeWithTag("onboarding-treatment-none_now").assertIsOn()
+        ui.onNodeWithTag("onboarding-treatment-chemotherapy").assertIsOff().performClick()
+        ui.onNodeWithTag("onboarding-next").performClick()
+        ui.onNodeWithTag("onboarding-summary-care").performScrollTo().assertIsDisplayed()
+        ui.onNodeWithTag("welcome-save-person").performClick()
+        ui.runOnIdle {
+            val p = saved.single().second!!
+            assertEquals("Synthetic illness", p.illness); assertEquals("Mar 2025", p.illnessSince)
+            assertEquals("Dr Synthetic", p.doctorName); assertEquals("Synthetic clinic", p.doctorPlace); assertEquals("9876543210", p.doctorPhone)
+            assertEquals(listOf("chemotherapy"), p.treatments)
+        }
     }
 
     @Test fun skippingEveryOptionalStepSavesOnlyTheName() {
@@ -101,8 +137,7 @@ class WelcomeInlinePanelTest {
         ui.onNodeWithText("What is your name?").assertIsDisplayed()
         ui.onNodeWithTag("onboarding-name").performTextInput("x".repeat(150))
         ui.onNodeWithTag("onboarding-next").performClick()
-        ui.onNodeWithTag("onboarding-skip-step").performClick()
-        ui.onNodeWithTag("onboarding-skip-step").performClick()
+        repeat(4) { ui.onNodeWithTag("onboarding-skip-step").performClick() }
         ui.onNodeWithTag("welcome-save-person").performClick()
         ui.runOnIdle { assertEquals(100, saved.single().first.length); assertNull(saved.single().second) }
     }
@@ -151,8 +186,7 @@ class WelcomeInlinePanelTest {
         ui.onNodeWithTag("welcome-add-person").performScrollTo().performClick()
         ui.onNodeWithTag("onboarding-name").performTextInput("Synthetic patient")
         ui.onNodeWithTag("onboarding-next").performClick()
-        ui.onNodeWithTag("onboarding-skip-step").performClick()
-        ui.onNodeWithTag("onboarding-skip-step").performClick()
+        repeat(4) { ui.onNodeWithTag("onboarding-skip-step").performClick() }
         ui.onNodeWithTag("welcome-save-person").performClick()
         ui.onNodeWithTag("welcome-panel-back").assertIsNotEnabled()
         ui.onNodeWithTag("welcome-save-person").assertIsNotEnabled()
