@@ -8,6 +8,10 @@ New in the code (not live until these steps are done): `/admin` has **Doctor sig
 
 Two Supabase projects are involved: the **Android project** `kjnhtakqzboayqorrlue` (app data, doctor sign-ups) and the **website project** `cghlkqeqiokjqdionrkc` (hospital survey). Never paste keys into chat; put them only in Vercel or Supabase.
 
+- [ ] **0. Open logins (22 Nov, going to production):** Supabase → the Android project `kjnhtakqzboayqorrlue` → Authentication → Sign In / Providers → Email:
+  - "Allow new users to sign up": **on**.
+  - "Confirm email": **off**. Patients and family then sign up and use the app at once, with no approval and no email to wait for. (Supabase's built-in mailer allows only a few emails an hour, so confirmation mail would block testers.)
+  - Doctors still need approval: they sign up, send their council and registration number in the app, and stay "pending" until approved in `/admin` → Doctor sign-ups (steps 1 and 2 below).
 - [ ] **1. Apply the two migrations** to the Android project `kjnhtakqzboayqorrlue`. From `android/`:
   ```bash
   supabase link --project-ref kjnhtakqzboayqorrlue

@@ -216,17 +216,17 @@ internal fun doctorLabRange(data: CareEntry): Pair<Double?, Double?> {
 @Composable internal fun DoctorPatientSectionBar(selected: String, onSection: (String) -> Unit, modifier: Modifier = Modifier) {
     val t = careText()
     val tab = (doctorPatientTabs + doctorMoreSections).firstOrNull { it.section == selected }
-    // The section's header band: its colour as a solid strip, white icon and title on one line, and a white Sections button.
+    // The section's header band: its colour as a solid strip, white icon and title on one line.
     val barTone = tab?.let { doctorTabTone(it.section) } ?: DoctorTones.Rust
-    val barFill by androidx.compose.animation.animateColorAsState(barTone.band, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "sectionbar")
+    val barFill by androidx.compose.animation.animateColorAsState(barTone.wash, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "sectionbar")
     Row(modifier.fillMaxWidth().background(barFill).padding(start = 16.dp, end = 12.dp, top = 8.dp, bottom = 8.dp).testTag("doctor-section-bar"), verticalAlignment = Alignment.CenterVertically) {
         // The title changes in place when the doctor jumps to another section.
         AnimatedContent(tab, Modifier.weight(1f), transitionSpec = { SaharaMotion.crossfade() }, label = "sectiontitle") { shown ->
             Row(verticalAlignment = Alignment.CenterVertically) {
-                if (shown != null) { Icon(shown.icon, null, Modifier.size(26.dp), tint = barTone.onSolid); Spacer(Modifier.width(12.dp)) }
+                if (shown != null) { Icon(shown.icon, null, Modifier.size(26.dp), tint = barTone.ink); Spacer(Modifier.width(12.dp)) }
                 // One line: the title shrinks a step instead of dropping "& card" to a second line beside the button.
                 SaharaFitText(shown?.let { t(it.en, it.hi) } ?: "", Modifier.a11yHeading().testTag("doctor-section-title"), style = LocalTextStyle.current.copy(fontFamily = SaharaTitleFont, fontSize = 20.sp),
-                    color = barTone.onSolid, maxLines = 1, min = 15f, fontWeight = FontWeight.Bold, textAlign = null)
+                    color = barTone.ink, maxLines = 1, min = 15f, fontWeight = FontWeight.Bold, textAlign = null)
             }
         }
         // No "Sections" button and sheet here (Dr Sujay, 22 Nov): it only repeated the patient's list. Back returns to that list.
@@ -234,7 +234,7 @@ internal fun doctorLabRange(data: CareEntry): Pair<Double?, Double?> {
 }
 
 /**
- * The doctor's patient screen. Phone: the hub, then one section at a time under a slim section bar ("Sections" jumps to another).
+ * The doctor's patient screen. Phone: the hub, then one section at a time under a slim section bar (Back returns to the hub).
  * 840dp and wider: the hub stays on the left as the list and the chosen tab fills the right.
  * [hub] gets (pane, selected): pane is true in the two-pane layout. [care] draws every section except "Labs".
  */

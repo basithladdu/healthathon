@@ -75,7 +75,7 @@ internal fun planStepOf(field: String): Int = when {
  * Emergency care plan (ECTPR) and living will (AMD), offline on this phone. Reached from Today and More (family and patient)
  * and from the doctor's patient tools. Pages: home, plan wizard, goals of care (the doctor's Goals of care tab), ED Quick View, wallet card, living will.
  */
-@Composable fun CarePlanScreen(vm: CareModel, clinician: Boolean, onBack: () -> Unit, startAt: String = "") {
+@Composable fun CarePlanScreen(vm: CareModel, clinician: Boolean, onBack: () -> Unit, startAt: String = "", onGoalsOfCare: (() -> Unit)? = null) {
     val context = LocalContext.current; val t = careText(); val hindi = careHindi(); val scope = rememberCoroutineScope()
     val people by vm.people.collectAsStateWithLifecycle(); val selected by vm.selected.collectAsStateWithLifecycle(); val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     val person = people.firstOrNull { it.id == selected }
@@ -126,7 +126,17 @@ internal fun planStepOf(field: String): Int = when {
         else CarePlanBook.startPlan(s, selected, actor, planNow(), EctprPrefill.patient(person?.name.orEmpty(), profile()), clinical = EctprPrefill.clinical(profile())).first
     BackHandler(page != "home") { page = "home" }
     if (person == null) { Box(Modifier.fillMaxSize()); return }
-    if (startAt == "goc") LaunchedEffect(selected) {
+    // Patients and families never open the doctor's talk or form (Dr Sujay, 22 Nov): their Goals of care tab is the signed note, read-only, and the way to ask for the conversation.
+    if (!clinician && startAt == "goc") {
+        LazyColumn(Modifier.fillMaxSize().testTag("goc-family-page"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            item { PlanHeader(t("Goals of care", "देखभाल के लक्ष्य"), onBack, "goc-family-header") }
+            item { FamilyTile(t("Goals of care discussion", "देखभाल के लक्ष्यों की चर्चा"), Icons.Default.Forum, FamilyAccent.Indigo) { PatientGocStatus(vm, state.ectprs, person.id) } }
+        }
+        return
+    }
+    // The way from anywhere else to the doctor's one Goals of care place: the section when the caller has one, else this screen's talk page.
+    val openGoalsOfCare: () -> Unit = onGoalsOfCare ?: { if (EctprLifecycle.draft(state.ectprs, selected) != null || (canEdit && commit { gocStart(it) })) page = "goc" }
+    if (startAt == "goc" && clinician) LaunchedEffect(selected) {
         if (page != "home") return@LaunchedEffect
         if (EctprLifecycle.draft(state.ectprs, selected) == null && canEdit) commit { gocStart(it) }
         if (EctprLifecycle.draft(state.ectprs, selected) != null) page = "goc"
@@ -140,10 +150,17 @@ internal fun planStepOf(field: String): Int = when {
         "goc" -> {
             val draft = EctprLifecycle.draft(state.ectprs, selected)
             if (draft == null) { LaunchedEffect(Unit) { page = "home" }; return@SaharaScreenHost }
-            CompositionLocalProvider(LocalGocFolder provides runCatching { store.folder(selected) }.getOrNull()) { GocTabFlow(draft, canEdit,
-                onSave = { r -> commit { CarePlanBook.saveDraft(it, r, actor, planNow(), today) } },
-                onClose = { if (startAt == "goc") onBack() else page = "home" }, onFullPlan = { pending -> gocPending = pending; page = "wizard" },
-                onNewVersion = { commit { GocNewVersion.start(it, selected, actor, planNow(), today) } }) }
+            // D15: a request from the patient or family shows above the talk until a signed note answers it.
+            val latestSigned = DoctorGocDiscussions.list(state.ectprs, selected).filter { it.signed }.mapNotNull { gocMillis(it.at) }.maxOrNull()
+            Column(Modifier.fillMaxSize()) {
+                DoctorGocRequestBanner(vm, selected, latestSigned)
+                Box(Modifier.weight(1f).fillMaxWidth()) {
+                    CompositionLocalProvider(LocalGocFolder provides runCatching { store.folder(selected) }.getOrNull()) { GocTabFlow(draft, canEdit,
+                        onSave = { r -> commit { CarePlanBook.saveDraft(it, r, actor, planNow(), today) } },
+                        onClose = { if (startAt == "goc") onBack() else page = "home" }, onFullPlan = { pending -> gocPending = pending; page = "wizard" },
+                        onNewVersion = { commit { GocNewVersion.start(it, selected, actor, planNow(), today) } }) }
+                }
+            }
         }
         "wizard" -> {
             val draft = EctprLifecycle.draft(state.ectprs, selected)
@@ -151,7 +168,8 @@ internal fun planStepOf(field: String): Int = when {
             CompositionLocalProvider(LocalGocFolder provides runCatching { store.folder(selected) }.getOrNull()) { EctprWizard(draft, clinician, canEdit, start = gocPending?.takeIf { it.id == draft.id } ?: draft, familyReadOnly = actor == "Family" && !clinician, personName = person.name,
                 onSave = { r -> commit { CarePlanBook.saveDraft(it, r, actor, planNow(), today) } },
                 onSign = { r -> commit { CarePlanBook.sign(CarePlanBook.saveDraft(it, r, actor, planNow(), today), r.id, actor, planNow(), today) }.also { ok -> if (ok) page = "ed" } },
-                onClose = { gocPending = null; page = wizardBack }) }
+                onClose = { gocPending = null; page = wizardBack },
+                onGoc = if (clinician) ({ gocPending = null; if (startAt == "goc") page = "goc" else openGoalsOfCare() }) else null) }
         }
         "pilot" -> PilotLogPage(state, selected, actor, ED_VIEW_DETAIL, onBack = { page = "home" }, commit = ::commit)
         "ed" -> EdQuickViewPage(state, selected, onBack = { page = "home" }, onCard = { page = "card" }, onShare = ::sharePlanPdf,
@@ -160,8 +178,7 @@ internal fun planStepOf(field: String): Int = when {
             onViewed = { id -> commit { CarePlanBook.viewed(it, AuditRecordType.CARD, id, actor, planNow(), CARD_VIEW_DETAIL) } })
         "amd" -> LivingWillPage(state, person, store, canEdit, clinician, canManageData, actor, onBack = { page = "home" }, commit = ::commit, onShare = { file, id -> share(file, t("Share the advance care planning", "अग्रिम देखभाल योजना साझा करें"), AuditRecordType.AMD, id) })
         else -> CarePlanHome(state, person, clinician, canEdit, loadProblem, store, canManageData, actor, ::commit, transport.takeIf { online }, onBack = onBack, onPage = { page = it },
-            onGoc = { if (EctprLifecycle.draft(state.ectprs, selected) != null || commit { gocStart(it) }) page = "goc" },
-            onNewGoc = { if (commit { GocNewVersion.start(it, selected, actor, planNow(), today) }) page = "goc" },
+            vm = vm, onGoc = openGoalsOfCare,
             onStart = { inEd -> if (commit { CarePlanBook.startPlan(it, selected, actor, planNow(), EctprPrefill.patient(person.name, profile()), inEd, EctprPrefill.clinical(profile())).first }) page = "wizard" },
             onReview = { trigger -> if (commit { CarePlanBook.requestReview(it, selected, trigger, actor, planNow(), today).first }) page = "wizard" },
             onWithdraw = { id, reason, by -> if (commit { CarePlanBook.withdraw(it, id, reason, by, actor, planNow()) }) vm.message.value = t("Plan withdrawn", "योजना वापस ली गई") },
@@ -266,7 +283,7 @@ internal fun planStepOf(field: String): Int = when {
 
 // ───────────────────────────── Home ─────────────────────────────
 
-@Composable private fun CarePlanHome(state: CarePlanState, person: Person, clinician: Boolean, canEdit: Boolean, loadProblem: Boolean, store: CarePlanStore, canManage: Boolean, actor: String, commit: ((CarePlanState) -> CarePlanState) -> Boolean, transport: EdCardTransport?, onBack: () -> Unit, onPage: (String) -> Unit, onGoc: () -> Unit, onNewGoc: () -> Unit,
+@Composable private fun CarePlanHome(state: CarePlanState, person: Person, clinician: Boolean, canEdit: Boolean, loadProblem: Boolean, store: CarePlanStore, canManage: Boolean, actor: String, commit: ((CarePlanState) -> CarePlanState) -> Boolean, transport: EdCardTransport?, onBack: () -> Unit, onPage: (String) -> Unit, vm: CareModel, onGoc: () -> Unit,
     onStart: (Boolean) -> Unit, onReview: (ReviewTrigger) -> Unit, onWithdraw: (String, String, String) -> Unit, onDiscard: (String) -> Unit) {
     val t = careText(); val hindi = careHindi(); val today = LocalDate.now()
     val active = EctprLifecycle.active(state.ectprs, person.id); val draft = EctprLifecycle.draft(state.ectprs, person.id)
@@ -279,14 +296,9 @@ internal fun planStepOf(field: String): Int = when {
         item { Text(t("Goals of care discussion, advance care planning and the emergency care plan belong together. All three are clinical documents.", "देखभाल के लक्ष्यों की चर्चा, अग्रिम देखभाल योजना और आपातकालीन देखभाल योजना साथ चलती हैं। तीनों क्लिनिकल दस्तावेज़ हैं।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub, modifier = Modifier.testTag("care-plan-family-intro")) }
         item { FamilyTile(t("Goals of care discussion", "देखभाल के लक्ष्यों की चर्चा"), Icons.Default.Forum, FamilyAccent.Indigo, Modifier.testTag("care-plan-goc-tile")) {
             Text(t("The recorded conversation about what matters most and the care to aim for.", "सबसे ज़रूरी क्या है और किस देखभाल का लक्ष्य रखें, इस पर दर्ज की गई बातचीत।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub)
-            val gocRecord = draft ?: active; val gocLocked = GocNewVersion.locked(gocRecord)
-            if (clinician) {
-                // A signed note is locked for good; with no open draft the way on is a new version, never an edit.
-                if (gocLocked) Text(t("Signed and locked (version ${gocRecord?.version}). A new talk makes a new version; this one stays in the history.", "साइन होकर बंद (संस्करण ${gocRecord?.version})। नई बातचीत से नया संस्करण बनेगा; यह इतिहास में रहेगा।"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("care-plan-goc-locked"))
-                if (draft != null || !gocLocked) Button(onClick = onGoc, enabled = canEdit, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-goc-entry")) { Text(t("Open", "खोलें")) }
-                if (gocLocked && canEdit) GocNewVersionButton(onNewGoc)
-            }
-            else Text(t("Your doctor records this conversation with you.", "आपके डॉक्टर यह बातचीत आपके साथ दर्ज करते हैं।"), style = MaterialTheme.typography.bodySmall)
+            // One Goals of care place (Dr Sujay, 22 Nov): here the doctor sees the versions and goes there; the family reads the signed note and can ask for the talk.
+            if (clinician) DoctorGocHistory(remember(state.ectprs, person.id) { DoctorGocDiscussions.list(state.ectprs, person.id) }, onOpenGoalsOfCare = onGoc.takeIf { canEdit || draft != null })
+            else PatientGocStatus(vm, state.ectprs, person.id)
         } }
         item { ActionCard(if (interp.kind == EdKind.ACTIVE) Mint else Peach, Modifier.fillMaxWidth().testTag("care-plan-ed-entry"), onClick = { onPage("ed") }) {
             Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -326,6 +338,12 @@ internal fun planStepOf(field: String): Int = when {
         if (active != null && transport != null && ReviewReminder.due(active, today)) item { ReviewReminderCard(active, canEdit, transport) { status -> commit { CarePlanBook.reminded(it, active.id, actor, planNow(), status) } } }
         item { FamilyTile(t("Advance care planning", "अग्रिम देखभाल योजना"), Icons.Default.Gavel, FamilyAccent.Plum) {
             Text(t("The person’s own wishes about future care, written down.", "भविष्य की देखभाल के बारे में व्यक्ति की अपनी इच्छाएँ, लिखित रूप में।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub)
+            // How it differs from the doctor's note, in plain words (Dr Sujay, 22 Nov: the three looked like one form).
+            Text(if (clinician) t("The patient fills this in, in their own words, and can change it at any time. Your goals-of-care note is different: you write and sign it after the conversation.",
+                "मरीज़ इसे अपने शब्दों में भरते हैं और कभी भी बदल सकते हैं। आपका देखभाल के लक्ष्यों का नोट अलग है: उसे आप बातचीत के बाद लिखते और साइन करते हैं।")
+                else t("This is yours: the patient fills it in, in their own words, and can change it at any time. The goals-of-care note above is different: your doctor writes and signs it after talking with you.",
+                "यह आपका है: मरीज़ इसे अपने शब्दों में भरते हैं और कभी भी बदल सकते हैं। ऊपर वाला देखभाल के लक्ष्यों का नोट अलग है: उसे आपके डॉक्टर आपसे बात करने के बाद लिखते और साइन करते हैं।"),
+                fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardInk, modifier = Modifier.testTag("care-plan-amd-difference"))
             Button(onClick = { onPage("amd") }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-amd-entry")) { Icon(Icons.Default.Gavel, null); Spacer(Modifier.width(8.dp)); Text(t("Open", "खोलें")) }
         } }
         // Versions as a plain register, always visible: version, status, date.
@@ -369,12 +387,14 @@ internal fun planStepOf(field: String): Int = when {
 
 // ───────────────────────────── Wizard ─────────────────────────────
 
-@Composable private fun EctprWizard(record: EctprRecord, clinician: Boolean, canEdit: Boolean, start: EctprRecord = record, familyReadOnly: Boolean = false, personName: String = "", onSave: (EctprRecord) -> Boolean, onSign: (EctprRecord) -> Unit, onClose: () -> Unit) {
+@Composable private fun EctprWizard(record: EctprRecord, clinician: Boolean, canEdit: Boolean, start: EctprRecord = record, familyReadOnly: Boolean = false, personName: String = "", onSave: (EctprRecord) -> Boolean, onSign: (EctprRecord) -> Unit, onClose: () -> Unit, onGoc: (() -> Unit)? = null) {
     val t = careText(); val hindi = careHindi(); val today = LocalDate.now()
     var d by remember(record.id) { mutableStateOf(start) }
     var step by rememberSaveable(record.id) { mutableIntStateOf(0) }
     var shown by remember { mutableStateOf<List<RuleIssue>>(emptyList()) }
     var leaving by remember { mutableStateOf(false) }
+    // Where "Discard changes" goes when the plan cannot be saved yet: closing, or the Goals of care section.
+    var leaveThen by remember { mutableStateOf<(() -> Unit)?>(null) }
     val listState = androidx.compose.foundation.lazy.rememberLazyListState()
     // Each step opens at its top; a refused "Next" brings its reasons into view, since the step can be long.
     LaunchedEffect(step) { listState.scrollToItem(0) }
@@ -384,7 +404,8 @@ internal fun planStepOf(field: String): Int = when {
     val blockers = EctprRules.saveBlockers(d, today)
     fun update(change: (EctprRecord) -> EctprRecord) { d = change(d); shown = emptyList() }
     fun choices(change: (PlanChoices) -> PlanChoices) = update { it.copy(choices = change(it.choices)) }
-    fun tryLeave() { if (samePlan(d, record)) onClose() else if (blockers.isEmpty()) { if (onSave(d)) onClose() } else leaving = true }
+    fun leaveTo(then: () -> Unit) { if (samePlan(d, record)) then() else if (blockers.isEmpty()) { if (onSave(d)) then() } else { leaveThen = then; leaving = true } }
+    fun tryLeave() = leaveTo(onClose)
     fun next() {
         val mine = blockers.filter { planStepOf(it.field) <= step }
         if (mine.isNotEmpty()) { shown = mine; return }
@@ -410,7 +431,7 @@ internal fun planStepOf(field: String): Int = when {
                 2 -> capacityStep(d, ::update)
                 3 -> understandingStep(d, ::update)
                 4 -> valuesStep(d, ::update, familyReadOnly, personName)
-                5 -> treatmentStep(d, today, ::update, ::choices)
+                5 -> treatmentStep(d, today, ::update, ::choices, onGoc?.let { go -> { leaveTo(go) } })
                 6 -> reviewStep(d, today, ::update)
                 7 -> signatureStep(d, clinician, ::update)
                 else -> item { Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -449,7 +470,7 @@ internal fun planStepOf(field: String): Int = when {
     if (leaving) AlertDialog(onDismissRequest = { leaving = false }, title = { Text(t("Can't save yet", "अभी सहेजा नहीं जा सकता")) },
         text = { Column { blockers.forEach { Text("• " + it.text(hindi), style = MaterialTheme.typography.bodySmall) } } },
         confirmButton = { TextButton(onClick = { leaving = false }) { Text(t("Fix them", "ठीक करें")) } },
-        dismissButton = { TextButton(onClick = { leaving = false; onClose() }) { Text(t("Discard changes", "बदलाव छोड़ें"), color = RustText) } })
+        dismissButton = { TextButton(onClick = { leaving = false; (leaveThen ?: onClose)() }) { Text(t("Discard changes", "बदलाव छोड़ें"), color = RustText) } })
 }
 
 private fun LazyListScope.patientStep(d: EctprRecord, update: ((EctprRecord) -> EctprRecord) -> Unit) {
@@ -668,10 +689,10 @@ private fun LazyListScope.valuesStep(d: EctprRecord, update: ((EctprRecord) -> E
     }
 }
 
-private fun LazyListScope.treatmentStep(d: EctprRecord, today: LocalDate, update: ((EctprRecord) -> EctprRecord) -> Unit, choices: ((PlanChoices) -> PlanChoices) -> Unit) {
+private fun LazyListScope.treatmentStep(d: EctprRecord, today: LocalDate, update: ((EctprRecord) -> EctprRecord) -> Unit, choices: ((PlanChoices) -> PlanChoices) -> Unit, onGoc: (() -> Unit)? = null) {
     val locked = !d.prognosticUnderstanding.confirmed || (d.surrogateDeclaration.answeringAsSurrogate && !d.surrogateDeclaration.confirmed)
-    // The recording comes first and is never locked: the talk is where understanding and the decision-maker get covered.
-    item(key = "goc-conversation") { GocConversationCard(d, update) }
+    // The talk is recorded only in the Goals of care section (Dr Sujay, 22 Nov); here is where it stands for this version, and the way there.
+    item(key = "goc-conversation") { GocPlanStepLink(d, onGoc) }
     if (locked) { item { LockedTreatment(d) }; item { HomeCareFields(d, update) }; return }
     item { TreatmentIntro() }
     item { GoalAndTransfer(d, choices) }
@@ -681,6 +702,22 @@ private fun LazyListScope.treatmentStep(d: EctprRecord, today: LocalDate, update
     item { FeedingFields(d, choices) }
     item { ConflictFields(d, today, choices) }
     item { HomeCareFields(d, update) }
+}
+
+/** The plan's treatment step: this version's goals-of-care talk, read-only, with its status, and one way to the Goals of care section. */
+@Composable private fun GocPlanStepLink(d: EctprRecord, onGoc: (() -> Unit)?) { val t = careText(); val hindi = careHindi()
+    val own = d.gocTranscript?.takeIf { it.planVersion == d.version }
+    PlanCard {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.testTag("goc-plan-link")) {
+            Icon(if (own?.signOff != null) Icons.Default.Lock else Icons.Default.Forum, null, tint = RustText); Spacer(Modifier.width(10.dp))
+            Text(t("Goals of care", "देखभाल के लक्ष्य"), Modifier.weight(1f).a11yHeading(), fontWeight = FontWeight.Bold, fontSize = 18.sp, fontFamily = SaharaTitleFont, color = DoctorCardInk)
+            FamilyPill(when { own?.signOff != null -> t("Signed and locked", "साइन होकर बंद"); own != null -> t("Not signed yet", "अभी साइन नहीं"); else -> t("Not recorded", "दर्ज नहीं") },
+                when { own?.signOff != null -> FamilyTone.GOOD; own != null -> FamilyTone.WAIT; else -> FamilyTone.NEUTRAL })
+        }
+        own?.let { g -> Text(GocNote.kindLabel(g.noteKind).pick(hindi), fontSize = 14.sp, color = DoctorCardSub) }
+        Text(t("The conversation is recorded and signed in the Goals of care section. The choices it confirmed show in the steps below.", "बातचीत देखभाल के लक्ष्य वाले हिस्से में रिकॉर्ड और साइन होती है। उसमें पक्के हुए फ़ैसले नीचे के चरणों में दिखते हैं।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
+        if (onGoc != null) OutlinedButton(onClick = onGoc, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("goc-plan-link-open")) { Text(t("Open Goals of care", "देखभाल के लक्ष्य खोलें"), color = RustText) }
+    }
 }
 
 /** Helps a doctor called to the home. Not a treatment choice, so the V4 and V5 locks do not apply. */

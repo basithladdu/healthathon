@@ -285,7 +285,7 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
                             } else vm.message.value = askOwner
                         })
                     3 -> NearbyScreen(vm.centres, vm)
-                    5 -> CareDocuments(vm, onRead = { reading = it }, onTalk = { go(1) }, onCalendarAt = ::openCalendar, onLabs = { go(8) }, onCare = { go(2) })
+                    5 -> CareDocuments(vm, onRead = { reading = it }, onTalk = { go(1) }, onCalendarAt = ::openCalendar, onLabs = { go(8) }, onCare = { careFilter = "All"; go(2) })
                     6 -> CareCalendar(vm, onWorkflow = { go(7) }, initialDay = calendarDay)
                     7 -> CareWorkflows(vm, onTalk = { go(1) })
                     8 -> CareLabs(vm)

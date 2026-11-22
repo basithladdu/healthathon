@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.sp
 import java.time.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.first
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
@@ -129,6 +130,21 @@ private val DoctorMist = Peach
     var carePersonId by rememberSaveable(careAccount) { mutableStateOf<String?>(null) }
     var addingCarePerson by rememberSaveable(careAccount) { mutableStateOf(false) }
     var pendingCreatedProfileId by rememberSaveable(careAccount) { mutableStateOf<String?>(null) }
+    // The rest of what the doctor entered when adding a patient, saved once the new profile exists (each save waits for the one before).
+    var pendingNewPatient by remember(careAccount) { mutableStateOf<Pair<String, DoctorNewPatient>?>(null) }
+    LaunchedEffect(pendingNewPatient) {
+        val (id, details) = pendingNewPatient ?: return@LaunchedEffect
+        val model = careModel ?: return@LaunchedEffect
+        suspend fun idle() = model.busy.first { !it }
+        idle()
+        if (model.selected.value == id) details.profile?.let { model.saveItem("journal", PatientProfileCodec.TITLE, PatientProfileCodec.encode(it)) }
+        idle()
+        if (model.selected.value == id) details.referralNote?.let { model.saveItem("journal", DoctorNewPatient.REFERRAL_TITLE, it) }
+        idle()
+        if (model.selected.value == id) details.caregiver(id)?.let { model.saveCareContact(it, model.accountNamespace) {} }
+        idle()
+        pendingNewPatient = null
+    }
     val careBusy = careModel?.busy?.collectAsState()?.value == true || careModel?.refreshing?.collectAsState()?.value == true
     val careError = careModel?.actionError?.collectAsState()?.value
     val careDraftId = careModel?.draft?.collectAsState()?.value?.personId
@@ -139,11 +155,13 @@ private val DoctorMist = Peach
     var sampleCareOpen by rememberSaveable {mutableStateOf(false)}
     var testCarePerson by rememberSaveable {mutableStateOf(DoctorCareDemoData.PERSON_ID)}
     var testInitialSection by rememberSaveable {mutableStateOf("Hub")}
+    // Opened from Home (an unsigned note or a visit to pick up): Back returns to Home, not to the patient list (Dr Sujay, 22 Nov).
+    var careFromHome by rememberSaveable {mutableStateOf(false)}
     var earlierWorkspace by rememberSaveable {mutableStateOf(false)}
     var homePending by remember {mutableStateOf<List<HomeCarePending>>(emptyList())}
     var homeVisits by remember {mutableStateOf<List<HomeVisit>>(emptyList())}
     var homeLoaded by remember {mutableStateOf(false)} // until the first device read finishes, the visit and draft tiles show "—" instead of a false 0
-    LaunchedEffect(sampleCareOpen) {if(!sampleCareOpen) {homePending=loadHomeCarePending(context); homeVisits=loadHomeVisits(context); homeLoaded=true}}
+    LaunchedEffect(sampleCareOpen) {if(!sampleCareOpen) {careFromHome=false; homePending=loadHomeCarePending(context); homeVisits=loadHomeVisits(context); homeLoaded=true}}
     var sampleCareBack by remember {mutableStateOf<(() -> Unit)?>(null)}
     val embeddedCareStates = rememberSaveableStateHolder()
     val carePerson = carePeople.firstOrNull { it.id == carePersonId }
@@ -246,7 +264,7 @@ private val DoctorMist = Peach
                 IconButton(onClick = { notice = null }) { Icon(Icons.Default.Close, t("Dismiss status", "सूचना हटाएँ")) }
             } }
             if(earlierWorkspace && !sampleCareOpen && patientId==null && carePersonId==null) Row(Modifier.fillMaxWidth().padding(horizontal=20.dp),verticalAlignment=Alignment.CenterVertically){Text(t("Earlier demo workspace", "पहले का डेमो वर्कस्पेस"),Modifier.weight(1f));TextButton(onClick={earlierWorkspace=false;workflowRoute=null;tab=0}){Text(t("Return to current workspace", "मौजूदा वर्कस्पेस पर लौटें"))}}
-            if(sampleCareOpen) DoctorCareDemoHost(onExit={sampleCareOpen=false;tab=1;testInitialSection="Hub"},onNavigationBlockedChange={careNavigationBlocked=it},onHeaderBackChange={sampleCareBack=it},initialPersonId=testCarePerson,initialSection=testInitialSection)
+            if(sampleCareOpen) DoctorCareDemoHost(onExit={tab=if(careFromHome) 0 else 1;sampleCareOpen=false;testInitialSection="Hub"},onNavigationBlockedChange={careNavigationBlocked=it},onHeaderBackChange={sampleCareBack=it},initialPersonId=testCarePerson,initialSection=testInitialSection,backLeavesFromInitialSection=careFromHome)
             else if (carePersonId != null && careModel != null) {
                 if (carePerson == null) Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) { Text(t("This care profile is unavailable", "यह देखभाल प्रोफ़ाइल उपलब्ध नहीं है"), style = MaterialTheme.typography.titleLarge); TextButton(onClick = { carePersonId = null }) { Text(t("Back to patients", "मरीज़ों की सूची पर वापस")) } }
                 else DoctorPatientWorkspace(careModel, carePerson.id, careSection, { next -> navigateCare { careSection = next } },
@@ -280,7 +298,7 @@ private val DoctorMist = Peach
                     reports=reports,reportQuery=reportQuery,reportCategory=reportCategory,onReportQuery={reportQuery=it},onReportCategory={reportCategory=it},onReportOpen={focus.clearFocus();reportId=it},
                     conversations=DoctorConversationsData.build(shownPatient.id,workflow.versions(shownPatient.id),workflow.draft(shownPatient.id),System.currentTimeMillis()))
                 destination.second == 0 && earlierWorkspace -> DemoHome(demoStore.patients, appointments, ::openPatient, onSchedule = { tab = 2 }, onAdd = { creatingFor = demoStore.patients.first().id }, workflow = workflow, onRequests={workflowRoute="requests"}, onDraft={workflowRoute=it;patientId=it;recordTab="Conversations"})
-                destination.second == 0 -> DoctorHomeWorkday(DoctorTestProfiles.profiles.map { DoctorTestProfiles.personId(it) }.let { ids -> ids.size + carePeople.count { it.id !in ids } }, demoStore.patients, homePending, homeVisits, homeLoaded, workflow, onPatients={tab=1}, onSchedule={tab=2}, onProfile={p->navigateCare {testCarePerson=DoctorTestProfiles.personId(p);testInitialSection="Hub";sampleCareOpen=true}}, onPending={c->navigateCare {testCarePerson=DoctorTestProfiles.personId(c.profile);testInitialSection=c.section;sampleCareOpen=true}}, onConversation={id->workflowRoute=id}, onRequests={workflowRoute="requests"})
+                destination.second == 0 -> DoctorHomeWorkday(DoctorTestProfiles.profiles.map { DoctorTestProfiles.personId(it) }.let { ids -> ids.size + carePeople.count { it.id !in ids } }, demoStore.patients, homePending, homeVisits, homeLoaded, workflow, onPatients={tab=1}, onSchedule={tab=2}, onProfile={p->navigateCare {testCarePerson=DoctorTestProfiles.personId(p);testInitialSection="Hub";sampleCareOpen=true}}, onPending={c->navigateCare {testCarePerson=DoctorTestProfiles.personId(c.profile);testInitialSection=c.section;careFromHome=true;sampleCareOpen=true}}, onConversation={id->workflowRoute=id}, onRequests={workflowRoute="requests"})
                 destination.second == 1 -> { var patientQuery by rememberSaveable { mutableStateOf("") }
                 // Search matches the patient's name and the family names shown under it.
                 val q = patientQuery.trim().lowercase()
@@ -292,7 +310,7 @@ private val DoctorMist = Peach
                     if (q.isNotEmpty() && shownCare.isEmpty() && shownTest.isEmpty()) item { DemoEmpty(t("No matching patient", "कोई मरीज़ नहीं मिला"), null, t("Clear search", "खोज मिटाएँ"), { patientQuery = "" }, Icons.Default.Search) }
                     if (careModel != null) {
                         if (carePeople.isNotEmpty()) item { DoctorSection(t("Care profiles", "देखभाल प्रोफ़ाइल"), Modifier.padding(top = 4.dp)) }
-                        if (careModel.cloud == null) item { OutlinedButton(onClick = { addingCarePerson = true }, enabled = !careBusy && pendingCreatedProfileId == null, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("doctor-add-device-profile")) { Icon(Icons.Default.PersonAdd, null); Spacer(Modifier.width(8.dp)); Text(t("Add profile", "प्रोफ़ाइल जोड़ें")) } }
+                        if (careModel.cloud == null) item { OutlinedButton(onClick = { addingCarePerson = true }, enabled = !careBusy && pendingCreatedProfileId == null, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("doctor-add-device-profile")) { Icon(Icons.Default.PersonAdd, null); Spacer(Modifier.width(8.dp)); Text(t("Add patient", "मरीज़ जोड़ें")) } }
                         if (pendingCreatedProfileId != null) item { SaharaSkeleton(rows = 1) }
                         items(shownCare, key = { "care:${careAccount}:${it.id}" }) { person -> DoctorPatientListCard(person.name, "", { openCare(person.id) }) }
                     }
@@ -316,8 +334,8 @@ private val DoctorMist = Peach
     val latestCareBusy by rememberUpdatedState(careBusy)
     val addCareSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true, confirmValueChange = { !latestCareBusy })
     if (addingCarePerson && careModel != null && careModel.cloud == null) SaharaScreenSheet(onDismissRequest = { if (!careBusy) addingCarePerson = false }, sheetState = addCareSheetState, containerColor = Cream) {
-        AddPersonContent(busy = careBusy, error = careError, onDismiss = { if (!careBusy) addingCarePerson = false }, onSave = { name ->
-            if (!careBusy) careModel.addPerson(name) { addingCarePerson = false; pendingCreatedProfileId = careModel.selected.value }
+        DoctorAddPatientContent(busy = careBusy, error = careError, onDismiss = { if (!careBusy) addingCarePerson = false }, onSave = { details ->
+            if (!careBusy) careModel.addPerson(details.name) { addingCarePerson = false; pendingCreatedProfileId = careModel.selected.value; pendingNewPatient = careModel.selected.value to details }
         })
     }
     if (creatingFor != null || editingId != null) {
@@ -675,7 +693,7 @@ private suspend fun loadHomeCarePending(context: android.content.Context): List<
             val draft = db.care().draft(id)?.takeIf { it.source.isNotBlank() || it.priorities.isNotBlank() || it.questions.isNotBlank() || it.nextSteps.isNotBlank() }
             val visit = people.filter { it.personId == id && it.kind == "visit" && it.due > now && CareEntryCodec.decode(it.detail)?.status == "open" }.minByOrNull { it.due }
             listOfNotNull(
-                draft?.let { HomeCarePending("draft-${profile.key}", profile, "Conversations", "Draft", "${demoDay(demoDate(it.updated))}, ${demoTime(it.updated)}") },
+                draft?.let { HomeCarePending("draft-${profile.key}", profile, "Conversations", "Unsigned note", "${demoDay(demoDate(it.updated))}, ${demoTime(it.updated)}") },
                 visit?.let { HomeCarePending("visit-${profile.key}", profile, "Visits", CareEntryCodec.decode(it.detail)?.location.orEmpty().ifBlank { "Visit" }, "${demoDay(demoDate(it.due))} · ${demoTime(it.due)}") })
         }
     }.getOrDefault(emptyList())
@@ -697,19 +715,37 @@ private suspend fun loadHomeVisits(context: android.content.Context): List<HomeV
     val byId = patients.associateBy { it.id }
     val state = workflow.snapshot()
     val newRequests = state.requests.filter { it.status == WorkflowRequestStatus.NEW && it.patientId in byId }.sortedByDescending { it.createdAt }
+    val unsigned = pending.filter { it.section == "Conversations" }
+    var unsignedOpen by rememberSaveable { mutableStateOf(false) }
+    if (unsignedOpen) SaharaScreenSheet(onDismissRequest = { unsignedOpen = false }, containerColor = Cream) {
+        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 16.dp, end = 16.dp, bottom = 32.dp).testTag("home-unsigned-notes"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text(t("Unsigned notes", "बिना हस्ताक्षर के नोट"), Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+            Text(t("Conversation notes you started but have not signed yet. Open one to finish and sign it.", "बातचीत के वे नोट जो आपने शुरू किए पर अभी हस्ताक्षर नहीं किए। पूरा करने और हस्ताक्षर करने के लिए एक खोलें।"), fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardSub)
+            if (unsigned.isEmpty()) Text(t("No unsigned notes.", "कोई बिना हस्ताक्षर का नोट नहीं।"), fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.testTag("home-unsigned-empty"))
+            unsigned.forEach { c ->
+                Surface(onClick = { unsignedOpen = false; onPending(c) }, color = Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp).testTag("home-unsigned-${c.key}")) {
+                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                        Icon(Icons.Default.Forum, null, tint = DoctorAccent)
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) { Text(c.profile.name, fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk); Text(c.detail, fontSize = 14.sp, color = DoctorCardSub) }
+                        Icon(Icons.Default.ChevronRight, null, tint = DoctorAccent)
+                    }
+                }
+            }
+        }
+    }
     LazyColumn(Modifier.fillMaxSize().testTag("demo-home-list"), contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item {
             // The date is the heading; the doctor already knows who they are (no "Good evening, Dr …" line).
             Text(java.time.LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, d MMMM", careLocale(careHindi()))), Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
         }
         item {
-            val drafts = pending.filter { it.section == "Conversations" }
+            // "Unsigned notes" (Dr Sujay, 22 Nov: "Drafts" was unclear): conversation notes started but not yet signed. The tile opens a short list that says so.
             val tiles = listOf(
                 Triple(t("Patients", "मरीज़"), careCount, Icons.Default.People to DoctorTones.Rust),
                 Triple(t("Visits this week", "इस हफ़्ते की विज़िट"), visits.size.takeIf { loaded }, Icons.Default.CalendarMonth to DoctorTones.Teal),
-                Triple(t("Drafts", "ड्राफ़्ट"), drafts.size.takeIf { loaded }, Icons.Default.Forum to DoctorTones.Plum),
+                Triple(t("Unsigned notes", "बिना हस्ताक्षर के नोट"), unsigned.size.takeIf { loaded }, Icons.Default.Forum to DoctorTones.Plum),
                 Triple(t("Requests", "अनुरोध"), newRequests.size, Icons.Default.Inbox to DoctorTones.Marigold))
-            val clicks = listOf<() -> Unit>(onPatients, onSchedule, { drafts.firstOrNull()?.let(onPending) ?: onPatients() }, onRequests)
+            val clicks = listOf<() -> Unit>(onPatients, onSchedule, { unsignedOpen = true }, onRequests)
             BoxWithConstraints {
                 val paired = doctorTilesPaired(maxWidth.value, LocalDensity.current.fontScale)
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -740,7 +776,7 @@ private suspend fun loadHomeVisits(context: android.content.Context): List<HomeV
                 Surface(onClick = { onPending(c) }, color = if (c.section == "Visits") DoctorCardVisit else DoctorCardConversation, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.animateItem().fillMaxWidth().heightIn(min = 72.dp).testTag("home-conversation-${c.key}").semantics(mergeDescendants = true) { contentDescription = "${c.profile.name}: ${c.title}. ${c.detail}. Opens ${c.section.lowercase()}." }) {
                     Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                         Icon(if (c.section == "Visits") Icons.Default.CalendarMonth else Icons.Default.Forum, null, tint = DoctorAccent)
-                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) { Text(c.profile.name, fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk); Text(c.title, fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardInk); Text(c.detail, fontSize = 14.sp, color = DoctorCardSub) }
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) { Text(c.profile.name, fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk); Text(if (c.section == "Conversations") t("Unsigned note", "बिना हस्ताक्षर का नोट") else c.title, fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardInk); Text(c.detail, fontSize = 14.sp, color = DoctorCardSub) }
                         Icon(Icons.Default.ChevronRight, null, tint = DoctorAccent)
                     }
                 }

@@ -62,13 +62,16 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Text(patient?.name?.removeSuffix(" Demo") ?: "Patient", fontSize = 19.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f)); Spacer(Modifier.width(8.dp)); when (request.status) { WorkflowRequestStatus.COMPLETED -> WorkflowChip(requestLabel(request.status), DoctorStatusGood, DoctorStatusGoodBg); WorkflowRequestStatus.NEW -> WorkflowChip(requestLabel(request.status), DoctorStatusWarn, DoctorStatusWarnBg); else -> WorkflowChip(requestLabel(request.status)) } }
                 Text(workflowDate(request.createdAt), fontSize = 14.sp, color = DoctorCardSub)
                 Text(request.reason, fontSize = 16.sp)
+                // The request is not another place to record goals of care (Dr Sujay, 22 Nov): it shows the versions already saved and opens the one conversation.
+                val saved = remember(store, revision, refreshToken, request.patientId) { store.versions(request.patientId) }
+                if (saved.isNotEmpty()) Text(t("Saved versions", "सहेजे संस्करण") + ": " + saved.joinToString(" · ") { "v${it.number} · ${workflowDate(it.publishedAt)}" }, fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.testTag("workflow-request-versions-${request.id}"))
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     if (request.status in listOf(WorkflowRequestStatus.NEW, WorkflowRequestStatus.DEFERRED)) Button(onClick = { message = store.transitionRequest(request.id, WorkflowRequestStatus.ACCEPTED) ?: t("Planned", "तय"); revision++ }, modifier = Modifier.heightIn(min = 48.dp).testTag("workflow-accept-${request.id}")) { Text(t("Plan this", "इसे तय करें")) }
                     if (request.status == WorkflowRequestStatus.ACCEPTED) Button(onClick = { onSchedule(request) }, modifier = Modifier.heightIn(min = 48.dp).testTag("workflow-schedule-${request.id}")) { Text(t("Schedule visit", "विज़िट तय करें")) }
                     if (request.status in listOf(WorkflowRequestStatus.NEW, WorkflowRequestStatus.ACCEPTED, WorkflowRequestStatus.SCHEDULED)) TextButton(onClick = { message = store.transitionRequest(request.id, WorkflowRequestStatus.DEFERRED) ?: t("Deferred", "टाला गया"); revision++ }, modifier = Modifier.heightIn(min = 48.dp).testTag("workflow-defer-${request.id}")) { Text(t("Defer", "टालें")) }
                     if (request.status == WorkflowRequestStatus.SCHEDULED) TextButton(onClick = { message = store.transitionRequest(request.id, WorkflowRequestStatus.COMPLETED) ?: t("Completed", "पूरी हुई"); revision++ }, modifier = Modifier.heightIn(min = 48.dp).testTag("workflow-complete-${request.id}")) { Text(t("Complete discussion", "चर्चा पूरी करें")) }
                 }
-                OutlinedButton(onClick = { onOpen(request.patientId) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("workflow-request-${request.id}")) { Text(t("Open", "खोलें")); Spacer(Modifier.width(8.dp)); Icon(Icons.Default.ChevronRight, null) }
+                OutlinedButton(onClick = { onOpen(request.patientId) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("workflow-request-${request.id}")) { Text(t("Open the care conversation", "देखभाल पर बातचीत खोलें")); Spacer(Modifier.width(8.dp)); Icon(Icons.Default.ChevronRight, null) }
             }
         }
     }

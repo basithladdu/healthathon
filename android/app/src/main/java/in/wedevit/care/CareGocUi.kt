@@ -42,6 +42,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -517,6 +518,11 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
     val step = when (stage) { GocStage.CAPTURE -> 0; GocStage.REVIEW -> 1; GocStage.NOTE -> 2 }
     Column(Modifier.fillMaxSize().testTag("goc-page")) {
     GocBand(t("Goals of care", "देखभाल के लक्ष्य"), d.patient.name, step, signOff != null, onClose)
+    // The current topic and its prompts stay in view while the doctor talks and records; it folds to one line.
+    if (stage == GocStage.CAPTURE && guideMe && !busy) GocPinnedGuide(guideState, guideCur, recorderState.recording,
+        onDone = { val next = GocTopicGuide.done(guideState, guideCur, guideSeconds); guideApply(next); GocTopicGuide.next(next.discussed, guideCur, guideRows.size)?.let { guideCur = it } },
+        onAllTopics = { guideMe = false },
+        onFinish = if (recorderState.recording && recorder != null) ({ recorder.stopAndGet()?.let { transcribe(it) } }) else null)
     SaharaStateSwitch(stage, Modifier.weight(1f), label = "goc stage") { shown ->
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
 
@@ -530,7 +536,8 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
                         if (gemini) Text(t("Audio is sent to a secure AI service to transcribe.", "ऑडियो लिखने के लिए एक सुरक्षित AI सेवा को भेजा जाता है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.padding(start = 12.dp, end = 8.dp, bottom = 10.dp).testTag("goc-gemini-line"))
                     }
                 }
-                if (!recorderState.recording && !busy) { GocRunModePicker(guideMe) { guideMe = it }; guidePanel() }
+                // "Guide me" is pinned above this list (Dr Sujay, 22 Nov: no scrolling between the prompt and the rest); free flow's topic grid stays here.
+                if (!recorderState.recording && !busy) { GocRunModePicker(guideMe) { guideMe = it }; if (!guideMe) guidePanel() }
                 if (busy) GocWorkingCard(operation, progress) { task?.cancel() }
                 else if (recorder != null) {
                     // Step 2: record. A big calm button, the timer above it and the voice level as a soft ring around it.
@@ -550,9 +557,9 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
                         Text(if (recorderState.paused) t("Resume", "फिर शुरू") else t("Pause", "रोकें"), color = RustText, fontSize = 16.sp)
                     }
                     recorderState.error?.let { Text(it.pick(hindi), color = MaterialTheme.colorScheme.error, fontSize = 15.sp, textAlign = TextAlign.Center, modifier = Modifier.announce()) }
-                    if (recorderState.recording) guidePanel()
+                    if (recorderState.recording && !guideMe) guidePanel()
                 }
-                if (!recorderState.recording && !busy) CareField(participants, { participants = it.take(600) }, t("Who's present", "कौन मौजूद है"))
+                if (!recorderState.recording && !busy) GocPeoplePresent(d, update, participants, signedInDoctor?.name.orEmpty()) { participants = it }
                 if (!recorderState.recording && !busy) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
                     if (recorder != null) OutlinedButton(onClick = { upload.launch(arrayOf("audio/*", "video/webm")) }, enabled = consentAt > 0, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, if (consentAt > 0) RustText else DoctorCardSub.copy(alpha = .4f)), colors = ButtonDefaults.outlinedButtonColors(contentColor = RustText), contentPadding = PaddingValues(horizontal = 12.dp), modifier = Modifier.weight(1f).heightIn(min = 52.dp).testTag("goc-upload")) {
                         Icon(Icons.Default.UploadFile, null); Spacer(Modifier.width(6.dp)); Text(t("Upload", "अपलोड करें"), textAlign = TextAlign.Center)
@@ -715,8 +722,47 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
             }
         }
         if (onFullPlan != null && !recorderState.recording && !busy) item(key = "full-plan") { GocFullPlanButton(onFullPlan) }
+        // The last button (Done, Continue) sits above the phone's own navigation bar, so it can always be tapped.
+        item(key = "nav-space") { Spacer(Modifier.navigationBarsPadding().height(24.dp)) }
     }
     }
+    }
+}
+
+/**
+ * "Who's present" (Dr Sujay, 22 Nov: unclear what to type, and how the document gets the attendant's name, phone and relation).
+ * Entered once, here: the family and friends in the room go on the consent record and the document's "Members present for discussion";
+ * the main decision-maker's name, relation and phone fill the document's decision-maker table (the same fields as the full plan's step 2).
+ * The patient's own name, phone and address come from their profile.
+ */
+@Composable private fun GocPeoplePresent(d: EctprRecord, update: ((EctprRecord) -> EctprRecord) -> Unit, participants: String, doctorName: String, onParticipants: (String) -> Unit) {
+    val t = careText()
+    val dm = d.decisionMakers.primary ?: DecisionMaker()
+    fun others(text: String) = text.lines().map(String::trim).filter { it.isNotBlank() && !it.equals(doctorName.trim(), ignoreCase = true) }
+    // An earlier talk kept only the names typed here; they move into the document's line once.
+    LaunchedEffect(d.id) { if (d.decisionMakers.presentAtDiscussion.none(String::isNotBlank) && others(participants).isNotEmpty()) update { it.copy(decisionMakers = it.decisionMakers.copy(presentAtDiscussion = others(participants))) } }
+    fun setPresent(v: String) {
+        val lines = v.lines()
+        update { it.copy(decisionMakers = it.decisionMakers.copy(presentAtDiscussion = lines)) }
+        onParticipants((listOf(doctorName) + lines).map(String::trim).filter(String::isNotBlank).distinct().joinToString("\n").take(600))
+    }
+    fun setDm(change: (DecisionMaker) -> DecisionMaker) = update { r -> val next = change(r.decisionMakers.primary ?: DecisionMaker()); r.copy(decisionMakers = r.decisionMakers.copy(primary = next.takeUnless { it == DecisionMaker() })) }
+    PlanCard {
+        Text(t("Who's present", "कौन मौजूद है"), fontWeight = FontWeight.Bold, fontSize = 17.sp, color = DoctorCardInk, modifier = Modifier.a11yHeading().testTag("goc-present-title"))
+        Text(t("Write each family member or friend in the room on its own line, with how they are related to the patient. For example: Rekha, daughter. These names go on the consent record and on the document's line for members present.",
+            "कमरे में मौजूद हर परिवार वाले या दोस्त को अलग लाइन में लिखें, साथ में मरीज़ से उनका रिश्ता। जैसे: रेखा, बेटी। ये नाम सहमति के रिकॉर्ड पर और दस्तावेज़ में मौजूद सदस्यों वाली लाइन पर जाते हैं।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
+        Box(Modifier.testTag("goc-present")) { CareField(d.decisionMakers.presentAtDiscussion.joinToString("\n"), ::setPresent, t("Family and friends present (name, relation)", "मौजूद परिवार और दोस्त (नाम, रिश्ता)"), minLines = 2) }
+        HorizontalDivider(color = DoctorHairline)
+        Text(t("Primary decision-maker", "मुख्य फ़ैसला लेने वाले"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
+        Text(t("The person who decides with the team if the patient cannot. Their name, relation and phone fill the decision-maker table on the document.",
+            "अगर मरीज़ फ़ैसला न ले सकें, तो जो व्यक्ति टीम के साथ फ़ैसला करेंगे। उनका नाम, रिश्ता और फ़ोन दस्तावेज़ की फ़ैसला लेने वालों की तालिका में जाते हैं।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
+        Box(Modifier.testTag("goc-dm-name")) { CareField(dm.name, { v -> setDm { it.copy(name = v) } }, t("Name", "नाम"), singleLine = true) }
+        Box(Modifier.testTag("goc-dm-relation")) { CareField(dm.relation, { v -> setDm { it.copy(relation = v) } }, t("Relation", "रिश्ता"), singleLine = true) }
+        Box(Modifier.testTag("goc-dm-phone")) { CareField(dm.phone24h, { v -> setDm { it.copy(phone24h = v) } }, t("24-hour phone", "24 घंटे का फ़ोन"), singleLine = true) }
+        Text(t("The patient's own name, phone and address come from their profile. The full care plan holds the rest, such as a second decision-maker and their ID.",
+            "मरीज़ का अपना नाम, फ़ोन और पता उनकी प्रोफ़ाइल से आते हैं। बाकी, जैसे दूसरे फ़ैसला लेने वाले और उनकी पहचान, पूरी देखभाल योजना में है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
+        val patientLine = listOf(d.patient.name, d.patient.phone).filter(String::isNotBlank).joinToString(" · ")
+        if (patientLine.isNotBlank()) Text(t("Patient", "मरीज़") + ": " + patientLine, fontSize = 14.sp, color = DoctorCardInk, modifier = Modifier.testTag("goc-present-patient"))
     }
 }
 

@@ -24,6 +24,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.IconButton
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -247,6 +256,66 @@ private fun sectionTitle(section: String): Pair<String, String> = when (section)
                     Text("${t("Essentials", "ज़रूरी विषय")} $essentials/${GocTopicGuide.ESSENTIAL_COUNT}", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
                     LinearProgressIndicator(progress = { essentials.toFloat() / GocTopicGuide.ESSENTIAL_COUNT }, modifier = Modifier.fillMaxWidth().height(4.dp).clip(CircleShape), color = DoctorStatusGood, trackColor = DoctorCardSub.copy(alpha = .2f))
                 }
+            }
+        }
+    }
+}
+
+/**
+ * "Guide me", pinned under the page band (Dr Sujay, 22 Nov: he had to scroll up to read the prompt and down to tap Done).
+ * The topic, what to decide and what to say stay in view; the arrow folds it to one line. After the last topic it says so,
+ * and while recording offers to stop and review, so the final step is never a Done that does nothing.
+ */
+@Composable internal fun GocPinnedGuide(state: GocGuideState, cur: Int, recording: Boolean, onDone: () -> Unit, onAllTopics: () -> Unit, onFinish: (() -> Unit)?) {
+    val t = careText(); val hindi = careHindi()
+    val rows = GocChecklist.ROWS
+    val discussed = state.discussed
+    val idx = cur.coerceIn(rows.indices); val row = rows[idx]; val text = GUIDE_TEXT[idx]
+    val next = GocTopicGuide.next(discussed + idx, idx, rows.size)
+    val allDone = rows.indices.all { it in discussed }
+    var open by rememberSaveable { mutableStateOf(true) }
+    Surface(color = Paper, shadowElevation = 3.dp, modifier = Modifier.fillMaxWidth().testTag("goc-guide-card")) {
+        Column(Modifier.padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(Modifier.fillMaxWidth().padding(end = 8.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                rows.indices.forEach { i ->
+                    Box(Modifier.weight(1f).height(5.dp).clip(CircleShape).background(when { i == idx && !allDone -> Rust; i in discussed -> DoctorStatusGood; else -> DoctorCardSub.copy(alpha = .25f) }))
+                }
+            }
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(if (allDone) "${rows.size}/${rows.size}" else "${t("Topic", "विषय")} ${idx + 1}/${rows.size} · ${row.section}", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub)
+                    Text(if (allDone) t("All topics covered", "सभी विषयों पर बात हो गई") else row.title.pick(hindi), fontSize = 18.sp, lineHeight = 23.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, fontFamily = SaharaTitleFont, modifier = Modifier.testTag("goc-guide-topic"))
+                }
+                IconButton(onClick = { open = !open }, modifier = Modifier.size(48.dp).testTag("goc-guide-fold")) {
+                    Icon(if (open) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, if (open) t("Collapse", "बंद करें") else t("Expand", "खोलें"), tint = RustText)
+                }
+            }
+            if (open && !allDone) Column(Modifier.fillMaxWidth().padding(end = 8.dp).heightIn(max = 200.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("${t("Decide:", "तय करना है:")} ${t(text.decide.first, text.decide.second)}", fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardInk)
+                text.say.forEach { (en, hi) ->
+                    Surface(color = Cream, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
+                        Text("“${t(en, hi)}”", fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardInk, modifier = Modifier.padding(10.dp))
+                    }
+                }
+                FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    text.answers.forEach { (en, hi) ->
+                        Surface(color = Color.Transparent, shape = RoundedCornerShape(50), border = BorderStroke(1.dp, DoctorCardSub.copy(alpha = .6f))) {
+                            Text(t(en, hi), fontSize = 13.sp, color = DoctorCardInk, modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp))
+                        }
+                    }
+                }
+            }
+            if (allDone) Text(if (recording) t("Every topic is marked. Stop the recording when you are ready, then review.", "हर विषय पर निशान लग गया। जब तैयार हों, रिकॉर्डिंग रोकें, फिर समीक्षा करें।")
+                else t("Every topic is marked.", "हर विषय पर निशान लग गया।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.padding(end = 8.dp).announce())
+            Row(Modifier.fillMaxWidth().padding(end = 8.dp), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                OutlinedButton(onClick = onAllTopics, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, RustText), modifier = Modifier.weight(.4f).heightIn(min = 48.dp).testTag("goc-guide-all")) {
+                    Text(t("All topics", "सभी विषय"), color = RustText, fontSize = 15.sp, textAlign = TextAlign.Center)
+                }
+                if (!allDone) Button(onClick = onDone, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust, contentColor = Color.White), modifier = Modifier.weight(.6f).heightIn(min = 48.dp).testTag("goc-guide-done")) {
+                    Text(if (next == null) t("Done", "हो गया") else "${t("Done", "हो गया")} · ${t("Next", "अगला")}: ${rows[next].title.pick(hindi)}", fontSize = 15.sp, lineHeight = 19.sp, textAlign = TextAlign.Center, maxLines = 2)
+                } else if (onFinish != null) Button(onClick = onFinish, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust, contentColor = Color.White), modifier = Modifier.weight(.6f).heightIn(min = 48.dp).testTag("goc-guide-finish")) {
+                    Text(t("Stop and review", "रोकें और समीक्षा करें"), fontSize = 15.sp, textAlign = TextAlign.Center)
+                } else Spacer(Modifier.weight(.6f))
             }
         }
     }

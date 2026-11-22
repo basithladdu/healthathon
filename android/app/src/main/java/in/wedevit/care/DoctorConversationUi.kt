@@ -59,7 +59,7 @@ import kotlinx.coroutines.CancellationException
 private fun conversationDate(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy, h:mm a").withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(at))
 
 /** Presentation only: the original model remains responsible for consent, saving and review. */
-@Composable fun DoctorConversations(vm: CareModel, canEdit: Boolean, onRead: (CareVersion) -> Unit, onRequestConversation: () -> Unit, onInteractionActiveChange: (Boolean) -> Unit, onHeaderBackChange: ((() -> Unit)?) -> Unit = {}, onCaptureHeroChange: (Boolean) -> Unit = {}) { val t = careText();
+@Composable fun DoctorConversations(vm: CareModel, canEdit: Boolean, onRead: (CareVersion) -> Unit, onRequestConversation: () -> Unit, onInteractionActiveChange: (Boolean) -> Unit, onHeaderBackChange: ((() -> Unit)?) -> Unit = {}, onCaptureHeroChange: (Boolean) -> Unit = {}, onGoalsOfCare: (() -> Unit)? = null) { val t = careText();
     val person by vm.selected.collectAsStateWithLifecycle()
     val draft by vm.draft.collectAsStateWithLifecycle()
     val versions by vm.versions.collectAsStateWithLifecycle()
@@ -105,8 +105,10 @@ private fun conversationDate(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy
             onHistory = { destination = "history" },
             recentPreview = own.firstOrNull()?.let { t("Version ${it.version}", "संस्करण ${it.version}") + " \u00B7 ${conversationDate(it.published)}" },
             archivedCount = own.size + archives.count { it.personId == person }) {
-            if (gocs.isNotEmpty() || own.isNotEmpty()) item(key = "goc-heading") { SectionTitle(t("Goals-of-care discussions", "देखभाल के लक्ष्यों पर बातचीत")) }
-            items(gocs, key = { "goc:${it.id}" }) { d -> DoctorGocDiscussionRow(d) { openGoc = d.id } }
+            // Goals of care is recorded in its own section (Dr Sujay, 22 Nov); here it is only its history of versions, and the way there.
+            item(key = "goc-heading") { SectionTitle(t("Goals of care", "देखभाल के लक्ष्य")) }
+            item(key = "goc-history") { DoctorGocHistory(gocs, onOpenGoalsOfCare = onGoalsOfCare) }
+            if (own.isNotEmpty()) item(key = "notes-heading") { SectionTitle(t("Care notes", "देखभाल नोट")) }
             items(own, key = { "note:${it.id}" }) { note -> DoctorNoteDiscussionRow(note) { onRead(note) } }
         }
         return
@@ -321,7 +323,7 @@ private val doctorSectionOrder = listOf("patient_priorities", "participants", "u
 
 @Composable fun DoctorConversationLanding(canRecord: Boolean, onRecent: () -> Unit, onRecord: () -> Unit, onHistory: () -> Unit, recentPreview: String? = null, archivedCount: Int = 0, discussions: androidx.compose.foundation.lazy.LazyListScope.() -> Unit = {}) { val t = careText();
     LazyColumn(Modifier.fillMaxSize().testTag("doctor-conversations"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Heading(t("Goals of care", "देखभाल के लक्ष्य"), 30) }
+        item { Heading(t("Conversations", "बातचीत"), 30) }
         val titles = listOf(t("Recent conversation", "हाल की बातचीत"), t("Record conversation", "बातचीत रिकॉर्ड करें"), t("Conversation history", "बातचीत का इतिहास"))
         val arts = listOf(R.drawable.conversation_recent_art, R.drawable.conversation_record_art, R.drawable.conversation_history_art)
         val previews = listOf(recentPreview ?: t("Nothing saved yet", "अभी कुछ सहेजा नहीं"), "", if (archivedCount == 0) "" else if (archivedCount == 1) t("1 saved conversation", "1 सहेजी बातचीत") else t("$archivedCount saved conversations", "$archivedCount सहेजी बातचीत"))

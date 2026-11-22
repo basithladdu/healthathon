@@ -5490,3 +5490,56 @@ Add a journal entry	ڈائری میں لکھیں
 Add today's weight	آج کا وزن لکھیں
 Last weight	پچھلا وزن
 Add weight	وزن شامل کریں
+$count visits	$count ملاقاتیں
+1 visit	1 ملاقات
+Add patient	مریض شامل کریں
+Another doctor	کوئی اور ڈاکٹر
+Caregiver's name	دیکھ بھال کرنے والے کا نام
+Caregiver's phone	دیکھ بھال کرنے والے کا فون
+Check the phone number.	فون نمبر دیکھ لیں۔
+Community or NGO	برادری یا فلاحی ادارہ
+Conversation notes you started but have not signed yet. Open one to finish and sign it.	بات چیت کے وہ نوٹ جو آپ نے شروع کیے مگر ابھی دستخط نہیں کیے۔ مکمل کرنے اور دستخط کرنے کے لیے ایک کھولیں۔
+Family or self	خاندان یا خود
+Hospital or oncologist	اسپتال یا کینسر کے ڈاکٹر
+How were they referred?	انہیں کس نے بھیجا؟
+Last noted	آخری بار درج
+Main caregiver (optional)	اہم دیکھ بھال کرنے والا (اختیاری)
+Main diagnosis	اہم بیماری
+No unsigned notes.	کوئی بغیر دستخط نوٹ نہیں۔
+Only the name is needed now. Add the rest if you have it; you can change it later.	ابھی صرف نام ضروری ہے۔ باقی ہو تو شامل کریں؛ بعد میں بدل سکتے ہیں۔
+Patient's phone	مریض کا فون
+Referred by	کس نے بھیجا
+Relationship, for example daughter	رشتہ، مثلاً بیٹی
+Unsigned note	بغیر دستخط نوٹ
+Unsigned notes	بغیر دستخط نوٹ
+Who can see this patient's record, and what each person can do	اس مریض کا ریکارڈ کون دیکھ سکتا ہے، اور ہر شخص کیا کر سکتا ہے
+Your doctor writes and signs this note after talking with you. You can read it here; only your doctor can change it.	آپ سے بات کرنے کے بعد آپ کے ڈاکٹر یہ نوٹ لکھتے اور اس پر دستخط کرتے ہیں۔ آپ اسے یہاں پڑھ سکتے ہیں؛ اسے صرف آپ کے ڈاکٹر بدل سکتے ہیں۔
+Version ${signed.record.version}	ورژن ${signed.record.version}
+No signed goals-of-care note on this phone yet.	اس فون پر ابھی دیکھ بھال کے مقاصد کا کوئی دستخط شدہ نوٹ نہیں ہے۔
+Version ${writing.record.version}	ورژن ${writing.record.version}
+Your doctor is still writing this one.	آپ کے ڈاکٹر ابھی اسے لکھ رہے ہیں۔
+Read the signed note	دستخط شدہ نوٹ پڑھیں
+You asked for this conversation	آپ نے یہ گفتگو مانگی ہے
+Ask my doctor for a goals of care conversation	دیکھ بھال کے مقاصد پر گفتگو کے لیے میرے ڈاکٹر سے کہیں
+Someone in the family who can make changes can send this.	خاندان میں جو تبدیلیاں کر سکتے ہیں، وہ اسے بھیج سکتے ہیں۔
+Version ${d.record.version}	ورژن ${d.record.version}
+Read only. Only your doctor can change this note.	صرف پڑھنے کے لیے۔ اس نوٹ کو صرف آپ کے ڈاکٹر بدل سکتے ہیں۔
+Recorded, signed and opened in the Goals of care section. Every version stays here as history.	دیکھ بھال کے مقاصد والے حصے میں ریکارڈ، دستخط اور کھولے جاتے ہیں۔ ہر ورژن یہاں تاریخ کے طور پر رہتا ہے۔
+No goals-of-care note yet.	ابھی دیکھ بھال کے مقاصد کا کوئی نوٹ نہیں۔
+Version ${n.record.version}	ورژن ${n.record.version}
+Open Goals of care	دیکھ بھال کے مقاصد کھولیں
+The patient or family asked for a goals of care conversation on ${gocDay(latest.created)}.	مریض یا خاندان نے ${gocDay(latest.created)} کو دیکھ بھال کے مقاصد پر گفتگو مانگی۔
+A quick check for this patient. There is no signed goals-of-care note yet, or the last one is about 3 months old.	اس مریض کے لیے ایک مختصر جانچ۔ ابھی دیکھ بھال کے مقاصد کا کوئی دستخط شدہ نوٹ نہیں ہے، یا پچھلا تقریباً 3 مہینے پرانا ہے۔
+The patient fills this in, in their own words, and can change it at any time. Your goals-of-care note is different: you write and sign it after the conversation.	مریض اسے اپنے الفاظ میں بھرتے ہیں اور کسی بھی وقت بدل سکتے ہیں۔ آپ کا دیکھ بھال کے مقاصد کا نوٹ الگ ہے: اسے آپ گفتگو کے بعد لکھتے اور اس پر دستخط کرتے ہیں۔
+This is yours: the patient fills it in, in their own words, and can change it at any time. The goals-of-care note above is different: your doctor writes and signs it after talking with you.	یہ آپ کا ہے: مریض اسے اپنے الفاظ میں بھرتے ہیں اور کسی بھی وقت بدل سکتے ہیں۔ اوپر والا دیکھ بھال کے مقاصد کا نوٹ الگ ہے: آپ سے بات کرنے کے بعد آپ کے ڈاکٹر اسے لکھتے اور اس پر دستخط کرتے ہیں۔
+The conversation is recorded and signed in the Goals of care section. The choices it confirmed show in the steps below.	گفتگو دیکھ بھال کے مقاصد والے حصے میں ریکارڈ اور دستخط ہوتی ہے۔ اس میں پکے ہوئے فیصلے نیچے کے مرحلوں میں دکھتے ہیں۔
+Write each family member or friend in the room on its own line, with how they are related to the patient. For example: Rekha, daughter. These names go on the consent record and on the document's line for members present.	کمرے میں موجود ہر خاندان والے یا دوست کو الگ لائن میں، مریض سے ان کے رشتے کے ساتھ لکھیں۔ مثال کے طور پر: ریکھا، بیٹی۔ یہ نام رضامندی کے ریکارڈ پر اور دستاویز میں موجود افراد والی لائن پر جاتے ہیں۔
+Family and friends present (name, relation)	موجود خاندان اور دوست (نام، رشتہ)
+The person who decides with the team if the patient cannot. Their name, relation and phone fill the decision-maker table on the document.	اگر مریض فیصلہ نہ کر سکیں تو جو شخص ٹیم کے ساتھ فیصلہ کرے گا۔ ان کا نام، رشتہ اور فون دستاویز میں فیصلہ کرنے والوں کی جدول میں جاتے ہیں۔
+The patient's own name, phone and address come from their profile. The full care plan holds the rest, such as a second decision-maker and their ID.	مریض کا اپنا نام، فون اور پتہ ان کی پروفائل سے آتے ہیں۔ باقی، جیسے دوسرا فیصلہ کرنے والا اور اس کی شناخت، مکمل دیکھ بھال کے منصوبے میں ہے۔
+All topics covered	تمام موضوعات پر بات ہو گئی
+Every topic is marked. Stop the recording when you are ready, then review.	ہر موضوع پر نشان لگ گیا۔ جب تیار ہوں تو ریکارڈنگ روکیں، پھر جائزہ لیں۔
+Every topic is marked.	ہر موضوع پر نشان لگ گیا۔
+Stop and review	روکیں اور جائزہ لیں
+Saved versions	محفوظ ورژن
+Open the care conversation	دیکھ بھال کی گفتگو کھولیں

@@ -5490,3 +5490,56 @@ Add a journal entry	ಡೈರಿಯಲ್ಲಿ ಬರೆಯಿರಿ
 Add today's weight	ಇಂದಿನ ತೂಕ ಬರೆಯಿರಿ
 Last weight	ಕೊನೆಯ ತೂಕ
 Add weight	ತೂಕ ಸೇರಿಸಿ
+$count visits	$count ಭೇಟಿಗಳು
+1 visit	1 ಭೇಟಿ
+Add patient	ರೋಗಿಯನ್ನು ಸೇರಿಸಿ
+Another doctor	ಇನ್ನೊಬ್ಬ ವೈದ್ಯರು
+Caregiver's name	ಆರೈಕೆದಾರರ ಹೆಸರು
+Caregiver's phone	ಆರೈಕೆದಾರರ ಫೋನ್
+Check the phone number.	ಫೋನ್ ಸಂಖ್ಯೆಯನ್ನು ಪರಿಶೀಲಿಸಿ.
+Community or NGO	ಸಮುದಾಯ ಅಥವಾ ಸ್ವಯಂಸೇವಾ ಸಂಸ್ಥೆ
+Conversation notes you started but have not signed yet. Open one to finish and sign it.	ನೀವು ಆರಂಭಿಸಿ ಇನ್ನೂ ಸಹಿ ಮಾಡದ ಸಂಭಾಷಣೆ ಟಿಪ್ಪಣಿಗಳು. ಪೂರ್ಣಗೊಳಿಸಿ ಸಹಿ ಮಾಡಲು ಒಂದನ್ನು ತೆರೆಯಿರಿ.
+Family or self	ಕುಟುಂಬ ಅಥವಾ ಸ್ವತಃ
+Hospital or oncologist	ಆಸ್ಪತ್ರೆ ಅಥವಾ ಕ್ಯಾನ್ಸರ್ ವೈದ್ಯರು
+How were they referred?	ಅವರನ್ನು ಯಾರು ಕಳುಹಿಸಿದರು?
+Last noted	ಕೊನೆಯ ದಾಖಲೆ
+Main caregiver (optional)	ಮುಖ್ಯ ಆರೈಕೆದಾರರು (ಐಚ್ಛಿಕ)
+Main diagnosis	ಮುಖ್ಯ ರೋಗ
+No unsigned notes.	ಸಹಿ ಮಾಡದ ಟಿಪ್ಪಣಿಗಳಿಲ್ಲ.
+Only the name is needed now. Add the rest if you have it; you can change it later.	ಈಗ ಹೆಸರು ಮಾತ್ರ ಬೇಕು. ಉಳಿದವು ಇದ್ದರೆ ಸೇರಿಸಿ; ನಂತರ ಬದಲಾಯಿಸಬಹುದು.
+Patient's phone	ರೋಗಿಯ ಫೋನ್
+Referred by	ಯಾರು ಕಳುಹಿಸಿದರು
+Relationship, for example daughter	ಸಂಬಂಧ, ಉದಾಹರಣೆಗೆ ಮಗಳು
+Unsigned note	ಸಹಿ ಮಾಡದ ಟಿಪ್ಪಣಿ
+Unsigned notes	ಸಹಿ ಮಾಡದ ಟಿಪ್ಪಣಿಗಳು
+Who can see this patient's record, and what each person can do	ಈ ರೋಗಿಯ ದಾಖಲೆಯನ್ನು ಯಾರು ನೋಡಬಹುದು, ಮತ್ತು ಪ್ರತಿಯೊಬ್ಬರು ಏನು ಮಾಡಬಹುದು
+Your doctor writes and signs this note after talking with you. You can read it here; only your doctor can change it.	ನಿಮ್ಮೊಂದಿಗೆ ಮಾತನಾಡಿದ ನಂತರ ನಿಮ್ಮ ವೈದ್ಯರು ಈ ಟಿಪ್ಪಣಿಯನ್ನು ಬರೆದು ಸಹಿ ಮಾಡುತ್ತಾರೆ. ನೀವು ಇದನ್ನು ಇಲ್ಲಿ ಓದಬಹುದು; ಇದನ್ನು ನಿಮ್ಮ ವೈದ್ಯರು ಮಾತ್ರ ಬದಲಾಯಿಸಬಹುದು.
+Version ${signed.record.version}	ಆವೃತ್ತಿ ${signed.record.version}
+No signed goals-of-care note on this phone yet.	ಈ ಫೋನ್‌ನಲ್ಲಿ ಇನ್ನೂ ಸಹಿ ಮಾಡಿದ ಆರೈಕೆಯ ಗುರಿಗಳ ಟಿಪ್ಪಣಿ ಇಲ್ಲ.
+Version ${writing.record.version}	ಆವೃತ್ತಿ ${writing.record.version}
+Your doctor is still writing this one.	ನಿಮ್ಮ ವೈದ್ಯರು ಇನ್ನೂ ಇದನ್ನು ಬರೆಯುತ್ತಿದ್ದಾರೆ.
+Read the signed note	ಸಹಿ ಮಾಡಿದ ಟಿಪ್ಪಣಿ ಓದಿ
+You asked for this conversation	ನೀವು ಈ ಮಾತುಕತೆಯನ್ನು ಕೇಳಿದ್ದೀರಿ
+Ask my doctor for a goals of care conversation	ಆರೈಕೆಯ ಗುರಿಗಳ ಕುರಿತು ಮಾತುಕತೆಗಾಗಿ ನನ್ನ ವೈದ್ಯರನ್ನು ಕೇಳಿ
+Someone in the family who can make changes can send this.	ಬದಲಾವಣೆ ಮಾಡಬಲ್ಲ ಕುಟುಂಬದವರು ಇದನ್ನು ಕಳುಹಿಸಬಹುದು.
+Version ${d.record.version}	ಆವೃತ್ತಿ ${d.record.version}
+Read only. Only your doctor can change this note.	ಓದಲು ಮಾತ್ರ. ಈ ಟಿಪ್ಪಣಿಯನ್ನು ನಿಮ್ಮ ವೈದ್ಯರು ಮಾತ್ರ ಬದಲಾಯಿಸಬಹುದು.
+Recorded, signed and opened in the Goals of care section. Every version stays here as history.	ಆರೈಕೆಯ ಗುರಿಗಳ ವಿಭಾಗದಲ್ಲಿ ದಾಖಲಿಸಿ, ಸಹಿ ಮಾಡಿ, ತೆರೆಯಲಾಗುತ್ತದೆ. ಪ್ರತಿ ಆವೃತ್ತಿಯೂ ಇಲ್ಲಿ ಇತಿಹಾಸವಾಗಿ ಉಳಿಯುತ್ತದೆ.
+No goals-of-care note yet.	ಇನ್ನೂ ಆರೈಕೆಯ ಗುರಿಗಳ ಟಿಪ್ಪಣಿ ಇಲ್ಲ.
+Version ${n.record.version}	ಆವೃತ್ತಿ ${n.record.version}
+Open Goals of care	ಆರೈಕೆಯ ಗುರಿಗಳನ್ನು ತೆರೆಯಿರಿ
+The patient or family asked for a goals of care conversation on ${gocDay(latest.created)}.	${gocDay(latest.created)} ರಂದು ರೋಗಿ ಅಥವಾ ಕುಟುಂಬ ಆರೈಕೆಯ ಗುರಿಗಳ ಕುರಿತು ಮಾತುಕತೆ ಕೇಳಿದ್ದಾರೆ.
+A quick check for this patient. There is no signed goals-of-care note yet, or the last one is about 3 months old.	ಈ ರೋಗಿಗಾಗಿ ಒಂದು ಸಣ್ಣ ಪರಿಶೀಲನೆ. ಇನ್ನೂ ಸಹಿ ಮಾಡಿದ ಆರೈಕೆಯ ಗುರಿಗಳ ಟಿಪ್ಪಣಿ ಇಲ್ಲ, ಅಥವಾ ಕೊನೆಯದು ಸುಮಾರು 3 ತಿಂಗಳು ಹಳೆಯದು.
+The patient fills this in, in their own words, and can change it at any time. Your goals-of-care note is different: you write and sign it after the conversation.	ರೋಗಿ ಇದನ್ನು ತಮ್ಮದೇ ಮಾತುಗಳಲ್ಲಿ ತುಂಬುತ್ತಾರೆ ಮತ್ತು ಯಾವಾಗ ಬೇಕಾದರೂ ಬದಲಾಯಿಸಬಹುದು. ನಿಮ್ಮ ಆರೈಕೆಯ ಗುರಿಗಳ ಟಿಪ್ಪಣಿ ಬೇರೆ: ಮಾತುಕತೆಯ ನಂತರ ನೀವು ಅದನ್ನು ಬರೆದು ಸಹಿ ಮಾಡುತ್ತೀರಿ.
+This is yours: the patient fills it in, in their own words, and can change it at any time. The goals-of-care note above is different: your doctor writes and signs it after talking with you.	ಇದು ನಿಮ್ಮದು: ರೋಗಿ ಇದನ್ನು ತಮ್ಮದೇ ಮಾತುಗಳಲ್ಲಿ ತುಂಬುತ್ತಾರೆ ಮತ್ತು ಯಾವಾಗ ಬೇಕಾದರೂ ಬದಲಾಯಿಸಬಹುದು. ಮೇಲಿನ ಆರೈಕೆಯ ಗುರಿಗಳ ಟಿಪ್ಪಣಿ ಬೇರೆ: ನಿಮ್ಮೊಂದಿಗೆ ಮಾತನಾಡಿದ ನಂತರ ನಿಮ್ಮ ವೈದ್ಯರು ಅದನ್ನು ಬರೆದು ಸಹಿ ಮಾಡುತ್ತಾರೆ.
+The conversation is recorded and signed in the Goals of care section. The choices it confirmed show in the steps below.	ಮಾತುಕತೆಯನ್ನು ಆರೈಕೆಯ ಗುರಿಗಳ ವಿಭಾಗದಲ್ಲಿ ದಾಖಲಿಸಿ ಸಹಿ ಮಾಡಲಾಗುತ್ತದೆ. ಅದರಲ್ಲಿ ಖಚಿತಪಡಿಸಿದ ಆಯ್ಕೆಗಳು ಕೆಳಗಿನ ಹಂತಗಳಲ್ಲಿ ಕಾಣುತ್ತವೆ.
+Write each family member or friend in the room on its own line, with how they are related to the patient. For example: Rekha, daughter. These names go on the consent record and on the document's line for members present.	ಕೋಣೆಯಲ್ಲಿರುವ ಪ್ರತಿ ಕುಟುಂಬ ಸದಸ್ಯ ಅಥವಾ ಸ್ನೇಹಿತರನ್ನು ಬೇರೆ ಬೇರೆ ಸಾಲಿನಲ್ಲಿ, ರೋಗಿಯೊಂದಿಗಿನ ಸಂಬಂಧದೊಂದಿಗೆ ಬರೆಯಿರಿ. ಉದಾಹರಣೆಗೆ: ರೇಖಾ, ಮಗಳು. ಈ ಹೆಸರುಗಳು ಒಪ್ಪಿಗೆಯ ದಾಖಲೆಯಲ್ಲಿ ಮತ್ತು ದಾಖಲೆಪತ್ರದ ಹಾಜರಿದ್ದ ಸದಸ್ಯರ ಸಾಲಿನಲ್ಲಿ ಬರುತ್ತವೆ.
+Family and friends present (name, relation)	ಹಾಜರಿರುವ ಕುಟುಂಬ ಮತ್ತು ಸ್ನೇಹಿತರು (ಹೆಸರು, ಸಂಬಂಧ)
+The person who decides with the team if the patient cannot. Their name, relation and phone fill the decision-maker table on the document.	ರೋಗಿ ನಿರ್ಧರಿಸಲು ಸಾಧ್ಯವಾಗದಿದ್ದರೆ ತಂಡದೊಂದಿಗೆ ನಿರ್ಧರಿಸುವ ವ್ಯಕ್ತಿ. ಅವರ ಹೆಸರು, ಸಂಬಂಧ ಮತ್ತು ಫೋನ್ ದಾಖಲೆಪತ್ರದ ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವವರ ಕೋಷ್ಟಕದಲ್ಲಿ ಬರುತ್ತವೆ.
+The patient's own name, phone and address come from their profile. The full care plan holds the rest, such as a second decision-maker and their ID.	ರೋಗಿಯ ಸ್ವಂತ ಹೆಸರು, ಫೋನ್ ಮತ್ತು ವಿಳಾಸ ಅವರ ಪ್ರೊಫೈಲ್‌ನಿಂದ ಬರುತ್ತವೆ. ಉಳಿದದ್ದು, ಎರಡನೇ ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವವರು ಮತ್ತು ಅವರ ಗುರುತಿನಂತಹದ್ದು, ಪೂರ್ಣ ಆರೈಕೆ ಯೋಜನೆಯಲ್ಲಿದೆ.
+All topics covered	ಎಲ್ಲಾ ವಿಷಯಗಳ ಬಗ್ಗೆ ಮಾತನಾಡಲಾಗಿದೆ
+Every topic is marked. Stop the recording when you are ready, then review.	ಪ್ರತಿ ವಿಷಯವನ್ನೂ ಗುರುತಿಸಲಾಗಿದೆ. ನೀವು ಸಿದ್ಧರಾದಾಗ ರೆಕಾರ್ಡಿಂಗ್ ನಿಲ್ಲಿಸಿ, ನಂತರ ಪರಿಶೀಲಿಸಿ.
+Every topic is marked.	ಪ್ರತಿ ವಿಷಯವನ್ನೂ ಗುರುತಿಸಲಾಗಿದೆ.
+Stop and review	ನಿಲ್ಲಿಸಿ ಪರಿಶೀಲಿಸಿ
+Saved versions	ಉಳಿಸಿದ ಆವೃತ್ತಿಗಳು
+Open the care conversation	ಆರೈಕೆ ಮಾತುಕತೆಯನ್ನು ತೆರೆಯಿರಿ

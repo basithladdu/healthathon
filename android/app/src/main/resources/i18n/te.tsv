@@ -5490,3 +5490,56 @@ Add a journal entry	డైరీలో రాయండి
 Add today's weight	ఈరోజు బరువు రాయండి
 Last weight	చివరి బరువు
 Add weight	బరువు జోడించండి
+$count visits	$count సందర్శనలు
+1 visit	1 సందర్శన
+Add patient	రోగిని జోడించండి
+Another doctor	మరో డాక్టర్
+Caregiver's name	సంరక్షకుడి పేరు
+Caregiver's phone	సంరక్షకుడి ఫోన్
+Check the phone number.	ఫోన్ నంబర్ సరిచూడండి.
+Community or NGO	సమాజం లేదా స్వచ్ఛంద సంస్థ
+Conversation notes you started but have not signed yet. Open one to finish and sign it.	మీరు మొదలుపెట్టి ఇంకా సంతకం చేయని సంభాషణ నోట్లు. పూర్తి చేసి సంతకం చేయడానికి ఒకటి తెరవండి.
+Family or self	కుటుంబం లేదా స్వయంగా
+Hospital or oncologist	ఆసుపత్రి లేదా క్యాన్సర్ డాక్టర్
+How were they referred?	వారిని ఎవరు పంపారు?
+Last noted	చివరిగా నమోదు
+Main caregiver (optional)	ప్రధాన సంరక్షకుడు (ఐచ్ఛికం)
+Main diagnosis	ప్రధాన వ్యాధి
+No unsigned notes.	సంతకం చేయని నోట్లు లేవు.
+Only the name is needed now. Add the rest if you have it; you can change it later.	ఇప్పుడు పేరు మాత్రమే అవసరం. మిగతావి ఉంటే జోడించండి; తర్వాత మార్చవచ్చు.
+Patient's phone	రోగి ఫోన్
+Referred by	ఎవరు పంపారు
+Relationship, for example daughter	సంబంధం, ఉదాహరణకు కూతురు
+Unsigned note	సంతకం చేయని నోట్
+Unsigned notes	సంతకం చేయని నోట్లు
+Who can see this patient's record, and what each person can do	ఈ రోగి రికార్డును ఎవరు చూడగలరు, ప్రతి ఒక్కరు ఏమి చేయగలరు
+Your doctor writes and signs this note after talking with you. You can read it here; only your doctor can change it.	మీతో మాట్లాడిన తర్వాత మీ డాక్టర్ ఈ నోట్ రాసి సంతకం చేస్తారు. మీరు దీన్ని ఇక్కడ చదవవచ్చు; దీన్ని మీ డాక్టర్ మాత్రమే మార్చగలరు.
+Version ${signed.record.version}	వెర్షన్ ${signed.record.version}
+No signed goals-of-care note on this phone yet.	ఈ ఫోన్‌లో ఇంకా సంతకం చేసిన సంరక్షణ లక్ష్యాల నోట్ లేదు.
+Version ${writing.record.version}	వెర్షన్ ${writing.record.version}
+Your doctor is still writing this one.	మీ డాక్టర్ ఇంకా దీన్ని రాస్తున్నారు.
+Read the signed note	సంతకం చేసిన నోట్ చదవండి
+You asked for this conversation	మీరు ఈ సంభాషణ అడిగారు
+Ask my doctor for a goals of care conversation	సంరక్షణ లక్ష్యాలపై సంభాషణ కోసం నా డాక్టర్‌ను అడగండి
+Someone in the family who can make changes can send this.	మార్పులు చేయగల కుటుంబ సభ్యులు దీన్ని పంపగలరు.
+Version ${d.record.version}	వెర్షన్ ${d.record.version}
+Read only. Only your doctor can change this note.	చదవడానికి మాత్రమే. ఈ నోట్‌ను మీ డాక్టర్ మాత్రమే మార్చగలరు.
+Recorded, signed and opened in the Goals of care section. Every version stays here as history.	సంరక్షణ లక్ష్యాల విభాగంలో రికార్డ్ చేసి, సంతకం చేసి, తెరుస్తారు. ప్రతి వెర్షన్ ఇక్కడ చరిత్రగా ఉంటుంది.
+No goals-of-care note yet.	ఇంకా సంరక్షణ లక్ష్యాల నోట్ లేదు.
+Version ${n.record.version}	వెర్షన్ ${n.record.version}
+Open Goals of care	సంరక్షణ లక్ష్యాలు తెరవండి
+The patient or family asked for a goals of care conversation on ${gocDay(latest.created)}.	${gocDay(latest.created)}న రోగి లేదా కుటుంబం సంరక్షణ లక్ష్యాలపై సంభాషణ అడిగారు.
+A quick check for this patient. There is no signed goals-of-care note yet, or the last one is about 3 months old.	ఈ రోగి కోసం ఒక చిన్న తనిఖీ. ఇంకా సంతకం చేసిన సంరక్షణ లక్ష్యాల నోట్ లేదు, లేదా చివరిది సుమారు 3 నెలల పాతది.
+The patient fills this in, in their own words, and can change it at any time. Your goals-of-care note is different: you write and sign it after the conversation.	రోగి దీన్ని తమ సొంత మాటల్లో నింపుతారు, ఎప్పుడైనా మార్చవచ్చు. మీ సంరక్షణ లక్ష్యాల నోట్ వేరు: సంభాషణ తర్వాత మీరు దాన్ని రాసి సంతకం చేస్తారు.
+This is yours: the patient fills it in, in their own words, and can change it at any time. The goals-of-care note above is different: your doctor writes and signs it after talking with you.	ఇది మీది: రోగి దీన్ని తమ సొంత మాటల్లో నింపుతారు, ఎప్పుడైనా మార్చవచ్చు. పైన ఉన్న సంరక్షణ లక్ష్యాల నోట్ వేరు: మీతో మాట్లాడిన తర్వాత మీ డాక్టర్ దాన్ని రాసి సంతకం చేస్తారు.
+The conversation is recorded and signed in the Goals of care section. The choices it confirmed show in the steps below.	సంభాషణ సంరక్షణ లక్ష్యాల విభాగంలో రికార్డ్ చేసి సంతకం చేయబడుతుంది. అందులో నిర్ధారించిన ఎంపికలు కింది దశల్లో కనిపిస్తాయి.
+Write each family member or friend in the room on its own line, with how they are related to the patient. For example: Rekha, daughter. These names go on the consent record and on the document's line for members present.	గదిలో ఉన్న ప్రతి కుటుంబ సభ్యుడిని లేదా స్నేహితుడిని ఒక్కో లైన్‌లో, రోగితో వారి సంబంధంతో రాయండి. ఉదాహరణకు: రేఖ, కూతురు. ఈ పేర్లు సమ్మతి రికార్డులో, పత్రంలో హాజరైన సభ్యుల లైన్‌లో వస్తాయి.
+Family and friends present (name, relation)	హాజరైన కుటుంబం మరియు స్నేహితులు (పేరు, సంబంధం)
+The person who decides with the team if the patient cannot. Their name, relation and phone fill the decision-maker table on the document.	రోగి నిర్ణయించలేకపోతే బృందంతో కలిసి నిర్ణయించే వ్యక్తి. వారి పేరు, సంబంధం, ఫోన్ పత్రంలోని నిర్ణయం తీసుకునేవారి పట్టికలో వస్తాయి.
+The patient's own name, phone and address come from their profile. The full care plan holds the rest, such as a second decision-maker and their ID.	రోగి సొంత పేరు, ఫోన్, చిరునామా వారి ప్రొఫైల్ నుండి వస్తాయి. మిగతావి, రెండవ నిర్ణయం తీసుకునేవారు మరియు వారి గుర్తింపు వంటివి, పూర్తి సంరక్షణ ప్రణాళికలో ఉంటాయి.
+All topics covered	అన్ని అంశాలపై మాట్లాడారు
+Every topic is marked. Stop the recording when you are ready, then review.	ప్రతి అంశం గుర్తించబడింది. మీరు సిద్ధమైనప్పుడు రికార్డింగ్ ఆపి, తర్వాత సమీక్షించండి.
+Every topic is marked.	ప్రతి అంశం గుర్తించబడింది.
+Stop and review	ఆపి సమీక్షించండి
+Saved versions	సేవ్ చేసిన వెర్షన్లు
+Open the care conversation	సంరక్షణ సంభాషణ తెరవండి

@@ -181,7 +181,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                         }
                     }
                 } else DoctorPatientWorkspace(vm, realPatientId, section, { next -> navigate { section = next } },
-                    hub = { pane, open -> DoctorSharedPatientHub(realPatient!!, onSection = { next -> navigate { section = next } }, items = vm.items, pane = pane, selected = open) },
+                    hub = { pane, open -> GocSurpriseQuestionPrompt(vm, realPatientId) { navigate { section = "GoalsOfCare" } }; DoctorSharedPatientHub(realPatient!!, onSection = { next -> navigate { section = next } }, items = vm.items, pane = pane, selected = open) },
                     care = { shown -> key(selection!!.stateKey) {
                         editorStates.SaveableStateProvider("${selection!!.stateKey}:care") {
                             EmbeddedPatientCare(vm, realPatientId, shown, { next -> section = next }, onAccount, { selection = null }, onNavigationBlockedChange = { navigationBlocked = it }, onHeaderBackChange = { nestedBack = it })
@@ -347,12 +347,12 @@ private fun connectedTopicLabel(status: WorkflowTopicStatus, t: (String, String)
     } ?: (t("No check-ins yet", "अभी कोई हालचाल नहीं") to DoctorTones.Teal)
     // The patient's header band: their colour as a solid strip with a white initial disc, name and facts in white; status, allergies and ID below on white.
     Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.5.dp, tone.solid), modifier = Modifier.fillMaxWidth().saharaAppear().testTag("doctor-patient-header")) { Column {
-            Row(Modifier.fillMaxWidth().background(tone.band).padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.fillMaxWidth().background(tone.wash).padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.size(48.dp).background(Paper, CircleShape), contentAlignment = Alignment.Center) { Text(person.name.trim().take(1).uppercase(), color = tone.ink, fontFamily = SaharaTitleFont, fontWeight = FontWeight.Bold, fontSize = 22.sp) }
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text(person.name, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = if (pane) 20.sp else 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Bold, color = tone.onSolid, style = DoctorWholeWords)
-                    if (facts.isNotBlank()) Text(facts, fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.SemiBold, color = tone.onSolid, style = DoctorWholeWords, modifier = Modifier.testTag("doctor-patient-facts"))
+                    Text(person.name, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = if (pane) 20.sp else 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Bold, color = tone.ink, style = DoctorWholeWords)
+                    if (facts.isNotBlank()) Text(facts, fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.SemiBold, color = tone.ink, style = DoctorWholeWords, modifier = Modifier.testTag("doctor-patient-facts"))
                 }
             }
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
