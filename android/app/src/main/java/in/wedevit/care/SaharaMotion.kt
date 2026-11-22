@@ -272,10 +272,19 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
     return graphicsLayer { val p = progress.value; alpha = p; translationY = (1f - p) * 8.dp.toPx() }
 }
 
-/** Press feedback for tappable cards: a slight 2% settle while pressed. */
+/**
+ * Press feedback for tappable cards, tiles and buttons: a slight 3% settle while pressed, then a soft spring back with a
+ * touch of overshoot on release (Material 3 Expressive's physics feel, kept small). Draw-only, so the tap itself is never
+ * delayed; instant when motion is off.
+ */
 @Composable fun Modifier.saharaPress(interaction: InteractionSource): Modifier {
     val pressed by interaction.collectIsPressedAsState()
-    val scale by animateFloatAsState(if (pressed) 0.98f else 1f, SaharaMotion.tween(SaharaMotion.PRESS_MS), label = "card press")
+    val spec: androidx.compose.animation.core.AnimationSpec<Float> = when {
+        !SaharaMotion.enabled -> androidx.compose.animation.core.snap()
+        pressed -> SaharaMotion.tween(SaharaMotion.PRESS_MS)
+        else -> spring(dampingRatio = .55f, stiffness = Spring.StiffnessMediumLow)
+    }
+    val scale by animateFloatAsState(if (pressed) 0.97f else 1f, spec, label = "card press")
     return graphicsLayer { scaleX = scale; scaleY = scale }
 }
 
@@ -659,4 +668,137 @@ fun Modifier.saharaContentSize(): Modifier = animateContentSize(SaharaMotion.twe
         val left = if (rtl) size.width - center - bar / 2f else center - bar / 2f
         drawRoundRect(color.copy(alpha = color.alpha * shown), topLeft = Offset(left, 0f), size = Size(bar, h), cornerRadius = CornerRadius(h / 2f))
     }
+}
+
+/*
+ * Round 4 (22 Nov): small moments of delight for the patient's daily screens. Same rules as above: draw-only, never in the
+ * way of a tap, still when animations are removed or Battery Saver is on, idle ones rest after a few cycles, and none of
+ * the celebratory ones are used on distress, goals-of-care or end-of-life screens.
+ */
+
+/**
+ * A light confirming tap of the phone's vibration for a real save (a dose ticked, a mood chosen). Uses the system haptic
+ * constants, so it follows the phone's own "Touch feedback" setting and does nothing where that is off.
+ */
+@Composable fun rememberSaharaHaptic(): () -> Unit {
+    val view = androidx.compose.ui.platform.LocalView.current
+    return remember(view) {
+        val tap: () -> Unit = {
+            val kind = if (android.os.Build.VERSION.SDK_INT >= 30) android.view.HapticFeedbackConstants.CONFIRM else android.view.HapticFeedbackConstants.VIRTUAL_KEY
+            runCatching { view.performHapticFeedback(kind) }
+            Unit
+        }
+        tap
+    }
+}
+
+/**
+ * A chosen thing answers back: when [selected] turns true (not on first show) it swells about [amount] and springs back
+ * with one soft bounce. For mood faces and similar one-of-many choices.
+ */
+@Composable fun Modifier.saharaSelectBounce(selected: Boolean, amount: Float = .16f): Modifier {
+    if (!SaharaMotion.enabled) return this
+    val scale = remember { Animatable(1f) }
+    var last by remember { mutableStateOf(selected) }
+    LaunchedEffect(selected) {
+        if (selected && !last && SaharaMotion.enabled) {
+            scale.animateTo(1f + amount, androidx.compose.animation.core.tween(120, easing = FastOutSlowInEasing))
+            scale.animateTo(1f, spring(dampingRatio = .4f, stiffness = Spring.StiffnessMediumLow))
+        }
+        last = selected
+    }
+    return graphicsLayer { scaleX = scale.value; scaleY = scale.value }
+}
+
+/**
+ * A soft bloom when something is completed: as [done] turns true (not on first show), a ring in [color] spreads out from
+ * the element's edge and fades, and the element itself pops from 94% with a gentle spring. [corner] matches its shape.
+ */
+@Composable fun Modifier.saharaBloom(done: Boolean, color: Color = SaharaColors.Primary, corner: Dp = SaharaRadius.Lg): Modifier {
+    if (!SaharaMotion.enabled) return this
+    val ring = remember { Animatable(0f) }
+    val pop = remember { Animatable(1f) }
+    var last by remember { mutableStateOf(done) }
+    LaunchedEffect(done) {
+        if (done && !last && SaharaMotion.enabled) {
+            launch { pop.snapTo(.94f); pop.animateTo(1f, spring(dampingRatio = .45f, stiffness = Spring.StiffnessMediumLow)) }
+            ring.snapTo(0f); ring.animateTo(1f, androidx.compose.animation.core.tween(SaharaMotion.GLOW_MS - 400, easing = LinearOutSlowInEasing)); ring.snapTo(0f)
+        }
+        last = done
+    }
+    return drawBehind {
+        val v = ring.value
+        if (v > 0f && v < 1f) {
+            val spread = 12.dp.toPx() * v
+            drawRoundRect(color.copy(alpha = .22f * (1f - v)), topLeft = Offset(-spread, -spread), size = Size(size.width + 2 * spread, size.height + 2 * spread), cornerRadius = CornerRadius(corner.toPx() + spread))
+            drawRoundRect(color.copy(alpha = .5f * (1f - v)), topLeft = Offset(-spread, -spread), size = Size(size.width + 2 * spread, size.height + 2 * spread),
+                cornerRadius = CornerRadius(corner.toPx() + spread), style = Stroke(width = 2.dp.toPx()))
+        }
+    }.graphicsLayer { scaleX = pop.value; scaleY = pop.value }
+}
+
+/**
+ * A see-through wash in [color] (give it a low alpha) that rises from the bottom over the element while [filled] (a
+ * pillbox once its dose is taken), and drains when it is undone. Already-filled elements start full, so nothing replays.
+ */
+@Composable fun Modifier.saharaFillRise(filled: Boolean, color: Color, corner: Dp = 14.dp): Modifier {
+    val level = remember { Animatable(if (filled) 1f else 0f) }
+    LaunchedEffect(filled) {
+        val goal = if (filled) 1f else 0f
+        if (!SaharaMotion.enabled) level.snapTo(goal) else level.animateTo(goal, androidx.compose.animation.core.tween(SaharaMotion.FILL_MS, easing = SaharaMotion.Emphasized))
+    }
+    return drawWithContent {
+        drawContent()
+        val v = level.value
+        if (v > 0f) {
+            val h = size.height * v
+            clipRect(top = size.height - h) { drawRoundRect(color, cornerRadius = CornerRadius(corner.toPx())) }
+        }
+    }
+}
+
+/** Idle sway for an illustration (the sun or moon on Today): tilts [degrees] each way over [SaharaMotion.FLOAT_MS], [cycles] times, then rests upright. */
+@Composable fun Modifier.saharaSway(degrees: Float = 6f, cycles: Int = 3): Modifier {
+    if (!SaharaMotion.enabled) return this
+    val angle = remember { Animatable(0f) }
+    LaunchedEffect(cycles) {
+        delay(400)
+        repeat(cycles) {
+            if (!SaharaMotion.enabled) { angle.snapTo(0f); return@LaunchedEffect }
+            angle.animateTo(degrees, androidx.compose.animation.core.tween(SaharaMotion.FLOAT_MS / 2, easing = FastOutSlowInEasing))
+            angle.animateTo(-degrees, androidx.compose.animation.core.tween(SaharaMotion.FLOAT_MS, easing = FastOutSlowInEasing))
+            angle.animateTo(0f, androidx.compose.animation.core.tween(SaharaMotion.FLOAT_MS / 2, easing = FastOutSlowInEasing))
+        }
+    }
+    return graphicsLayer { rotationZ = angle.value }
+}
+
+/**
+ * A tick that draws itself, stroke by stroke (about a quarter second), the first time it is shown. Fully drawn at once
+ * when motion is off. Decorative: the text or description beside it says what it means.
+ */
+@Composable fun SaharaDrawnCheck(modifier: Modifier = Modifier, color: Color = Color.White, strokeWidth: Dp = 3.dp) {
+    val p = remember { Animatable(if (SaharaMotion.enabled) 0f else 1f) }
+    LaunchedEffect(Unit) { if (SaharaMotion.enabled) p.animateTo(1f, androidx.compose.animation.core.tween(SaharaMotion.SAVED_MS + 80, 60, SaharaMotion.Emphasized)) else p.snapTo(1f) }
+    androidx.compose.foundation.Canvas(modifier.clearAndSetSemantics { }.testTag("sahara-drawn-check")) {
+        val path = androidx.compose.ui.graphics.Path().apply {
+            moveTo(size.width * .2f, size.height * .53f); lineTo(size.width * .42f, size.height * .74f); lineTo(size.width * .8f, size.height * .3f)
+        }
+        val measure = androidx.compose.ui.graphics.PathMeasure().apply { setPath(path, false) }
+        val part = androidx.compose.ui.graphics.Path()
+        measure.getSegment(0f, measure.length * p.value, part, true)
+        drawPath(part, color, style = Stroke(width = strokeWidth.toPx(), cap = androidx.compose.ui.graphics.StrokeCap.Round, join = androidx.compose.ui.graphics.StrokeJoin.Round))
+    }
+}
+
+/** A short-lived overlay: shows [content] each time [trigger] changes to a non-null, non-false value (not on first show) for [showMs], then removes it. Never shown with motion off. */
+@Composable fun SaharaMoment(trigger: Any?, showMs: Long = 1600, content: @Composable () -> Unit) {
+    var shown by remember { mutableStateOf(false) }
+    var first by remember { mutableStateOf(true) }
+    LaunchedEffect(trigger) {
+        if (first) { first = false; return@LaunchedEffect }
+        if (trigger == null || trigger == false || !SaharaMotion.enabled) return@LaunchedEffect
+        shown = true; delay(showMs); shown = false
+    }
+    if (shown) content()
 }

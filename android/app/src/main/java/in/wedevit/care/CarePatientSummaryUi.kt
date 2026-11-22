@@ -57,17 +57,19 @@ import java.time.ZoneId
     }
     val note = summary.latestNote
     // Four rows, always open; each names its page. Medicines have their own section on Today, so they are not repeated here.
-    // A solid teal header strip with the patient's initial; each row below sits on its own section's wash.
+    // A light teal wash header with the patient's initial; each row below sits on its own section's wash.
     // Family: the one thing they do most is first and big. (The patient has it on the check-in card above.)
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
     if (role == "Family") Button(onClick = onSymptoms, shape = RoundedCornerShape(SaharaRadius.Md), colors = ButtonDefaults.buttonColors(containerColor = SaharaTone.Teal.solid, contentColor = SaharaTone.Teal.onSolid), modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp).saharaAppear().testTag("summary-note-symptom")) {
         Icon(Icons.Default.Healing, null, Modifier.size(24.dp)); Spacer(Modifier.width(10.dp)); Text(t("Note a symptom", "तबीयत का नोट लिखें"), fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
     }
-    Surface(Modifier.fillMaxWidth().saharaAppear().animateContentSize().testTag("patient-summary"), shape = RoundedCornerShape(SaharaRadius.Lg), color = SaharaColors.Surface, border = BorderStroke(1.5.dp, SaharaTone.Teal.solid)) { Column {
-        Row(Modifier.fillMaxWidth().background(SaharaTone.Teal.solid).padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-            Surface(shape = CircleShape, color = SaharaColors.Surface, modifier = Modifier.size(40.dp)) { Box(contentAlignment = Alignment.Center) { Text(name.take(1).uppercase(), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = SaharaTone.Teal.ink) } }
+    // Calm wash header (22 Nov premium pass): the solid teal strip read dark; now a light teal wash with dark ink and a teal initial.
+    Surface(Modifier.fillMaxWidth().saharaAppear().animateContentSize().testTag("patient-summary"), shape = RoundedCornerShape(SaharaRadius.Lg), color = SaharaColors.Surface,
+        border = BorderStroke(1.dp, SaharaTone.Teal.solid), shadowElevation = SaharaElevation.Card) { Column {
+        Row(Modifier.fillMaxWidth().background(SaharaTone.Teal.wash).padding(horizontal = 14.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+            Surface(shape = CircleShape, color = SaharaTone.Teal.solid, modifier = Modifier.size(40.dp)) { Box(contentAlignment = Alignment.Center) { Text(name.take(1).uppercase(), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = SaharaTone.Teal.onSolid) } }
             Spacer(Modifier.width(12.dp))
-            Text(t("$name at a glance", "$name एक नज़र में"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = SaharaTone.Teal.onSolid, maxLines = 2, modifier = Modifier.weight(1f).semantics { heading() })
+            Text(t("$name at a glance", "$name एक नज़र में"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = SaharaColors.Ink, maxLines = 2, modifier = Modifier.weight(1f).semantics { heading() })
         }
         Column(Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         GlanceRow(Icons.Default.Healing, SaharaSection.Symptoms, t("Pain and symptoms", "दर्द और लक्षण"), summary.symptoms.firstOrNull()?.let { CarePatientSummaryRules.symptomLine(it, hindi) } ?: CarePatientSummaryRules.noSymptoms(hindi), "summary-symptoms", onSymptoms)

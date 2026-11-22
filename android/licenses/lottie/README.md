@@ -8,12 +8,12 @@
 
 ## Animations
 
-Twelve small animations in `app/src/main/res/raw/lottie_*.json`, played through `SaharaLottie` (SaharaLottie.kt).
+Fourteen small animations in `app/src/main/res/raw/lottie_*.json`, played through `SaharaLottie` (SaharaLottie.kt).
 
 | File | Kind | Shown on | Playback |
 | --- | --- | --- | --- |
 | `lottie_success.json` | Success | Check-in saved, dose marked taken (Undo row), post sent, success dialog | once |
-| `lottie_breathe.json` | Breathe | Today check-in card, behind the sun icon | loop (4 s) |
+| `lottie_breathe.json` | Breathe | Not shown at present (Today's sun now uses SaharaDaySky, 22 Nov); kept for reuse | loop (4 s) |
 | `lottie_heart.json` | Heart | Family: "How are you holding up?" card | loop (2.4 s) |
 | `lottie_pill.json` | Pill | Medicines, none yet | loop (2 s) |
 | `lottie_document.json` | Document | Documents, none yet | once |
@@ -24,6 +24,11 @@ Twelve small animations in `app/src/main/res/raw/lottie_*.json`, played through 
 | `lottie_hug.json` | Hug | Community group with no posts | once |
 | `lottie_calendar.json` | Calendar | Visits, none yet | once |
 | `lottie_offline.json` | Offline | Community could not load (offline) | loop (3 s) |
+| `lottie_bloom.json` | Bloom | Today: a mood check-in has just been saved (never on distress) | once (1.5 s), then hidden |
+| `lottie_sprout.json` | Sprout | Calm empty states (no check-ins, no symptom notes, empty module lists) | 2 sways (3 s each), then rests |
+
+`lottie_bloom.json` and `lottie_sprout.json` (22 Nov 2026) are also original, hand-authored for Sahara by
+`generate_sahara_lottie_extra.py` in this folder, in the Sahara palette; no outside licence applies.
 
 - **Source:** original animations made for Sahara (November 2026) as plain Lottie (bodymovin 5.7) JSON from simple
   shapes and keyframes by `generate_sahara_lottie.py` in this folder (`python3 generate_sahara_lottie.py <out-dir>`).

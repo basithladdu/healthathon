@@ -121,9 +121,10 @@ import java.time.format.DateTimeFormatter
         }
         // Friendly empty state: a calm picture and one line; the "How are you feeling?" button above is its action.
         if (notes.isEmpty()) item {
-            Surface(shape = RoundedCornerShape(20.dp), color = SaharaSection.Symptoms.wash, border = BorderStroke(1.5.dp, SaharaSection.Symptoms.solid), modifier = Modifier.fillMaxWidth()) {
+            Surface(shape = RoundedCornerShape(20.dp), color = SaharaSection.Symptoms.wash, border = BorderStroke(1.5.dp, SaharaSection.Symptoms.solid), modifier = Modifier.fillMaxWidth().saharaAppear()) {
                 Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 24.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    SaharaIllustration(SaharaArtKind.NoSymptoms)
+                    // The picture floats gently a few times, then rests.
+                    Box(Modifier.saharaFloat(3.dp, cycles = 3)) { SaharaIllustration(SaharaArtKind.NoSymptoms) }
                     Text(t("No symptom notes yet", "अभी तबीयत का कोई नोट नहीं है"), fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                 }
             }

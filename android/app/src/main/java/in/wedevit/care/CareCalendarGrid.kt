@@ -183,7 +183,8 @@ private const val PAGER_YEARS = 10L
         // Fixed legend
         HorizontalDivider(color = DoctorHairline)
         androidx.compose.foundation.layout.FlowRow(Modifier.fillMaxWidth().testTag("calendar-legend"), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            CalendarKinds.order.forEach { k -> Row(verticalAlignment = Alignment.CenterVertically) { Box(Modifier.size(10.dp).background(CalendarKinds.color(k), CircleShape)); Spacer(Modifier.width(6.dp)); Text(CalendarKinds.label(k), fontSize = 14.sp, color = DoctorCardSub) } }
+            // Medicines are no longer on the calendar (Dr Sujay, 22 Nov), so they are not in the legend either.
+            CalendarKinds.order.filter { it != "Medicine" }.forEach { k -> Row(verticalAlignment = Alignment.CenterVertically) { Box(Modifier.size(10.dp).background(CalendarKinds.color(k), CircleShape)); Spacer(Modifier.width(6.dp)); Text(CalendarKinds.label(k), fontSize = 14.sp, color = DoctorCardSub) } }
         }
     }
     }

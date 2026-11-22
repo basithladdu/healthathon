@@ -41,7 +41,7 @@ object AfterDeathGuide {
     // The SOS row names what the family sees, not a conclusion; "if they have died" comes only after the checking step.
     val entry = "Not breathing or not waking up?" to "साँस नहीं ले रहे या जाग नहीं रहे?"
     val entrySub = "What to check, and what to do next" to "क्या देखें, और आगे क्या करें"
-    val opening = "Stay with them." to "उनके पास रहिए।"
+    val opening = "What to do, step by step." to "क्या करें, एक-एक करके।"
     val reassurance = "Check gently first. If you are not sure, or this was sudden, call 112 now." to
         "पहले धीरे से देखें। अगर आपको यक़ीन न हो, या यह अचानक हुआ हो, तो अभी 112 पर कॉल करें।"
 
@@ -97,8 +97,7 @@ object AfterDeathGuide {
                 "कानूनी वारिस प्रमाणपत्र तहसीलदार या राजस्व कार्यालय से मिलता है। कुछ दावों के लिए अदालत से उत्तराधिकार प्रमाणपत्र चाहिए होता है।",
             "Their Aadhaar can be marked on myAadhaar using the death registration number." to "मृत्यु पंजीकरण संख्या से myAadhaar पर उनका आधार दर्ज कराया जा सकता है।",
         )),
-        AfterDeathStep("you", "Looking after yourself", "अपना ख़याल रखना", listOf(
-            "Grief comes in waves. It is all right to ask for help." to "दुख लहरों में आता है। मदद माँगना ठीक है।",
+        AfterDeathStep("you", "Support for the family", "परिवार के लिए सहायता", listOf(
             "Your palliative team can stay in touch with your family after the death. You can call Tele-MANAS on 14416, free, any time, in your language." to
                 "मृत्यु के बाद भी आपकी पैलिएटिव टीम आपके परिवार से जुड़ी रह सकती है। आप किसी भी समय, मुफ़्त, अपनी भाषा में Tele-MANAS को 14416 पर कॉल कर सकते हैं।",
         )),

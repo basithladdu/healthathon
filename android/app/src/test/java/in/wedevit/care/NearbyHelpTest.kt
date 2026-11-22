@@ -60,7 +60,8 @@ class NearbyHelpTest {
     }
     @Test fun layerFilterShowsOnlyTheChosenLayersAndCombinesWithOtherFilters() {
         assertEquals(listOf("a", "b", "c", "d"), ids())
-        assertEquals(listOf("a", "b", "d"), ids(layers = setOf(NearbyHelp.LAYER_PALLIATIVE)))
+        // "c" lists morphine and also gives palliative care, so it shows under both chips (Dr Sujay, 22 Nov).
+        assertEquals(listOf("a", "b", "c", "d"), ids(layers = setOf(NearbyHelp.LAYER_PALLIATIVE)))
         assertEquals(listOf("c"), ids(layers = setOf(NearbyHelp.LAYER_MORPHINE)))
         assertEquals(emptyList<String>(), ids(state = "Delhi", layers = setOf(NearbyHelp.LAYER_MORPHINE)))
         assertEquals(listOf("a", "b"), ids(state = "Kerala", district = "Kollam", layers = setOf(NearbyHelp.LAYER_PALLIATIVE)))

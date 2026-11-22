@@ -129,7 +129,7 @@ internal class CareAssistProviderAdapter(private val transport: CareAssistTransp
         require(value.getString("provider") == CARE_ASSIST_PROVIDER)
         val ready = value.getBoolean("ready")
         return CareAssistCapabilities(ready, ready && value.optBoolean("audioReady"), ready && value.optBoolean("translationReady"),
-            value.optString("label").take(60).ifBlank { "the online service" }, value.optString("model").take(100), ready && value.optBoolean("askReady"))
+            "the online service" /* never a vendor name in the app (owner, Nov 2026) */.also { value.optString("label") }, value.optString("model").take(100), ready && value.optBoolean("askReady"))
     }
 
     suspend fun draft(source: String, token: String, consent: Boolean): CareAssistedDraft {

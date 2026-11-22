@@ -139,7 +139,8 @@ internal enum class FeedbackSendState { NONE, LOCAL, SENDING, SENT, QUEUED }
         }
         Text(if (checkIn) t("How was your day?", "आज का दिन कैसा रहा?") else t("How was Sahara?", "सहारा कैसा रहा?"), color = Ink, fontFamily = SaharaTitleFont, fontSize = 26.sp, lineHeight = 32.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.a11yHeading())
         Spacer(Modifier.height(8.dp))
-        CareMoodFace(expression, Modifier.size(120.dp).clearAndSetSemantics { })
+        // The big face floats gently a few times and answers each new choice with a small spring.
+        CareMoodFace(expression, Modifier.saharaFloat(3.dp, cycles = 3).saharaPop(label).size(120.dp).clearAndSetSemantics { })
         Text(shownLabel, fontSize = 22.sp, fontWeight = FontWeight.Medium, color = Ink, modifier = Modifier.testTag("feedback-state"), fontFamily = SaharaTitleFont)
         Spacer(Modifier.height(12.dp))
         if (checkIn) {
@@ -153,7 +154,7 @@ internal enum class FeedbackSendState { NONE, LOCAL, SENDING, SENT, QUEUED }
                     Surface(selected = on, onClick = { score = value; saved = false; error = null }, shape = RoundedCornerShape(SaharaRadius.Md), color = fill, contentColor = if (on) tone.onSolid else tone.ink,
                         border = BorderStroke(2.dp, tone.solid), interactionSource = press, modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = 64.dp).saharaPress(press).testTag("checkin-mood-$value")) {
                         Column(Modifier.padding(horizontal = 6.dp, vertical = 10.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                            CareMoodFace(value, Modifier.size(40.dp).clearAndSetSemantics { })
+                            CareMoodFace(value, Modifier.size(40.dp).saharaSelectBounce(on, .2f).clearAndSetSemantics { })
                             Spacer(Modifier.height(6.dp))
                             Text(moodText(name), textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontSize = 15.sp, fontWeight = FontWeight.Bold,
                                 style = LocalTextStyle.current.copy(lineBreak = androidx.compose.ui.text.style.LineBreak.Heading, hyphens = androidx.compose.ui.text.style.Hyphens.None))
@@ -184,7 +185,11 @@ internal enum class FeedbackSendState { NONE, LOCAL, SENDING, SENT, QUEUED }
             icon = if (saved && (checkIn || sendState == FeedbackSendState.SENT || sendState == FeedbackSendState.LOCAL)) Icons.Outlined.CheckCircle else null, modifier = Modifier.fillMaxWidth().testTag("feedback-save"))
         if (savedCheckIn) Text(t("Check-in saved", "आज का हाल सहेज लिया"), Modifier.padding(top = 8.dp).announce(), color = DoctorStatusGood, fontWeight = FontWeight.SemiBold)
         Spacer(Modifier.height(12.dp))
-        if (checkIn && saved) SaharaLottie(SaharaLottieKind.Success, Modifier.size(96.dp))
+        // Saved: the tick, and for an okay or good day a soft bloom of petals around it. A hard day gets only the quiet tick.
+        if (checkIn && saved) Box(contentAlignment = Alignment.Center) {
+            if (SaharaMotion.enabled && CheckInMood.title(score) != CheckInMood.HARD) SaharaLottie(SaharaLottieKind.Bloom, Modifier.size(132.dp))
+            SaharaLottie(SaharaLottieKind.Success, Modifier.size(96.dp))
+        }
         if (account != null && sendState == FeedbackSendState.QUEUED) TextButton(onClick = { send(account) }, modifier = Modifier.heightIn(min = 48.dp).testTag("feedback-retry")) { Text(t("Try again", "फिर कोशिश करें"), color = RustText) }
         // The check-in also asks about distress and links to a symptom note: secondary, so below the main action, without a card around them.
         if (checkIn && careModel != null) Column(Modifier.fillMaxWidth().testTag("checkin-extras"), verticalArrangement = Arrangement.spacedBy(8.dp)) {

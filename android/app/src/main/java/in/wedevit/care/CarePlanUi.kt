@@ -486,6 +486,9 @@ private fun LazyListScope.patientStep(d: EctprRecord, update: ((EctprRecord) -> 
         PlanDateField(d.patient.dob, t("Date of birth", "जन्मतिथि"), { v -> p { it.copy(dob = v) } }, latest = LocalDate.now())
         CareField(d.patient.sex, { v -> p { it.copy(sex = v) } }, t("Sex", "लिंग"), singleLine = true)
         CareField(d.patient.gender, { v -> p { it.copy(gender = v) } }, t("Gender", "जेंडर"), singleLine = true)
+        // Both are asked on legal advice (22 Nov); one line says why they differ, without judgement.
+        Text(t("Sex is as on medical records. Gender is how the patient describes themselves. Often they are the same.", "लिंग वह है जो मेडिकल रिकॉर्ड में लिखा है। जेंडर वह है जैसे मरीज़ खुद को बताते हैं। अक्सर दोनों एक ही होते हैं।"),
+            fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub, modifier = Modifier.testTag("plan-sex-gender-hint"))
         CareField(d.patient.uhid, { v -> p { it.copy(uhid = v) } }, t("Hospital number (UHID)", "अस्पताल नंबर (UHID)"), singleLine = true)
         CareField(d.patient.phone, { v -> p { it.copy(phone = v) } }, t("Phone", "फ़ोन"), singleLine = true)
         CareField(d.patient.address, { v -> p { it.copy(address = v) } }, t("Address", "पता"))

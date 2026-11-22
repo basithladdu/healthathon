@@ -167,9 +167,12 @@ class CarePlanRulesTest {
         assertFalse("C8" in saveIds(r.copy(capacity = CapacityAssessment(Capacity.LACKS, "Dr", "2026-10-29", "Coma"))))
     }
 
-    @Test fun l1_underEighteenIsBlocked() {
-        assertTrue("L1" in saveIds(base().copy(patient = EctprPatient(dob = "2010-05-05"))))
-        assertFalse("L1" in saveIds(base().copy(patient = EctprPatient(dob = "2008-10-29"))))
+    @Test fun childrenAreAllowedWithAGuardianDecidingAndTheirWishesAsked() {
+        val child = base().copy(patient = EctprPatient(dob = "2016-05-05"))
+        assertTrue("MINOR" in ids(child)); assertFalse("MINOR" in saveIds(child))
+        assertTrue("MINOR_GUARDIAN" in ids(child)); assertFalse("MINOR_GUARDIAN" in saveIds(child))
+        assertFalse("MINOR_GUARDIAN" in ids(child.copy(decisionMakers = DecisionMakers(primary = DecisionMaker(name = "Asha", relation = "Mother")))))
+        assertFalse("MINOR" in ids(base().copy(patient = EctprPatient(dob = "2008-10-29"))))
     }
 
     @Test fun dnacprNeedsReasonAndDecisionMaker() {

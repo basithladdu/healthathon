@@ -77,7 +77,7 @@ import java.time.format.DateTimeFormatter
             AudioConsentCheck(access,{access=it},"People with access to this device may read or share its local records.","doctor-record-access")
             HorizontalDivider()
             AudioConsentCheck(cloud,{cloud=it},"Everyone separately agrees to upload this fictional test audio to a secure AI service for transcription and AI drafting.","doctor-record-cloud")
-            Text("Test audio only. Google may review it. Up to 5 minutes.",style=MaterialTheme.typography.bodySmall)
+            Text("Test audio only. The online service may review it. Up to 5 minutes.",style=MaterialTheme.typography.bodySmall)
         }
     },confirmButton={TextButton(onClick={
         consentOpen=false

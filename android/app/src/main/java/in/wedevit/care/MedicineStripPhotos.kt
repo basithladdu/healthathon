@@ -357,7 +357,7 @@ class MedicineStripPhotos(context: Context, storage: String) {
         if (MedicineDoses.askWhichNight(item, dose, events, ZonedDateTime.now(zone))) whichNight = dose.time to save else save(LocalDate.now(zone))
     }
     // Medicines plum: the card sits on the plum wash with a solid plum edge; the white pillboxes stand out on it.
-    Surface(shape = RoundedCornerShape(20.dp), color = SaharaSection.Medicines.wash, border = BorderStroke(1.5.dp, SaharaSection.Medicines.solid), modifier = Modifier.fillMaxWidth().testTag("today-doses")) {
+    Surface(shape = RoundedCornerShape(20.dp), color = SaharaSection.Medicines.wash, border = BorderStroke(1.5.dp, SaharaSection.Medicines.solid), modifier = Modifier.fillMaxWidth().saharaAppear().testTag("today-doses")) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 // Medicines keep the plum section colour on their icon tile.
@@ -450,6 +450,9 @@ class MedicineStripPhotos(context: Context, storage: String) {
 @Composable private fun MedicinePillbox(item: CareItem, dose: MedicineDose, state: MedicineDoseState, photo: File?, caption: String, enabled: Boolean, family: Boolean = false, onMark: (taken: Boolean, quick: Boolean) -> Unit) {
     val t = careText(); var menu by remember { mutableStateOf(false) }
     val interaction = remember { MutableInteractionSource() }
+    val haptic = rememberSaharaHaptic()
+    // Only a tick made here blooms; doses that load as already taken just show their state.
+    var tickedHere by remember { mutableStateOf(false) }
     Column(Modifier.width(112.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Box {
             // Ring colour echoes the state: green taken, red-brown missed, a hairline while not yet marked.
@@ -457,20 +460,24 @@ class MedicineStripPhotos(context: Context, storage: String) {
             val label = medicineDoseLabel(dose)
             val stateWord = when (state) { MedicineDoseState.TAKEN -> t("Taken", "ली"); MedicineDoseState.MISSED -> t("Missed", "छूटी"); else -> t("Not yet", "अभी नहीं") }
             val pending = state == MedicineDoseState.PENDING
+            val taken = state == MedicineDoseState.TAKEN
+            // Taken: a soft green ring blooms out from the pillbox and a light green wash rises over it (the tap itself is never delayed).
             Surface(shape = RoundedCornerShape(14.dp), color = Paper, border = BorderStroke(if (pending) 1.dp else 2.dp, ringColor),
-                modifier = Modifier.saharaPress(interaction).clip(RoundedCornerShape(14.dp))
+                modifier = Modifier.saharaBloom(taken && tickedHere, DoctorStatusGood, 14.dp).saharaPress(interaction).clip(RoundedCornerShape(14.dp))
                     .combinedClickable(interactionSource = interaction, indication = LocalIndication.current, enabled = enabled, role = Role.Button,
-                        onClickLabel = if (pending) t("Mark taken", "ली हुई दर्ज करें") else t("Change", "बदलें"), onLongClickLabel = t("Taken or missed", "ली या छूटी"), onLongClick = { menu = true }) { if (pending) onMark(true, true) else menu = true }
-                    .semantics { contentDescription = "${item.title}, $label: $stateWord" }.testTag("today-dose-${item.id}-${dose.key}")) { StripThumb(photo, 80) }
-            // The tick or cross pops in on the corner the moment the dose is marked.
+                        onClickLabel = if (pending) t("Mark taken", "ली हुई दर्ज करें") else t("Change", "बदलें"), onLongClickLabel = t("Taken or missed", "ली या छूटी"), onLongClick = { menu = true }) { if (pending) { haptic(); tickedHere = true; onMark(true, true) } else menu = true }
+                    .semantics { contentDescription = "${item.title}, $label: $stateWord" }.testTag("today-dose-${item.id}-${dose.key}")) {
+                Box(Modifier.saharaFillRise(taken, DoctorStatusGood.copy(alpha = .16f))) { StripThumb(photo, 80) }
+            }
+            // The tick draws itself (or the cross pops in) on the corner the moment the dose is marked.
             androidx.compose.animation.AnimatedVisibility(visible = !pending, modifier = Modifier.align(Alignment.TopEnd).padding(4.dp), enter = fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)) + scaleIn(SaharaMotion.tween(SaharaMotion.SAVED_MS, easing = SaharaMotion.Emphasized), initialScale = 0.3f), exit = fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS))) {
                 val badge by animateColorAsState(if (state == MedicineDoseState.MISSED) DoctorStatusRest else DoctorStatusGood, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "pillbox-badge")
                 Surface(shape = RoundedCornerShape(50), color = badge, modifier = Modifier.size(26.dp)) {
-                    Box(Modifier.padding(3.dp), contentAlignment = Alignment.Center) { DoseStateIcon(state, Paper, 20) }
+                    Box(Modifier.padding(3.dp), contentAlignment = Alignment.Center) { if (taken) SaharaDrawnCheck(Modifier.size(20.dp), Paper, 2.5.dp) else DoseStateIcon(state, Paper, 20) }
                 }
             }
             DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
-                DropdownMenuItem(text = { Text(t("Taken", "ली"), color = DoctorCardInk) }, leadingIcon = { Icon(Icons.Default.Check, null, tint = DoctorStatusGood) }, onClick = { menu = false; onMark(true, false) }, modifier = Modifier.heightIn(min = 48.dp).testTag("today-dose-taken-${item.id}-${dose.key}"))
+                DropdownMenuItem(text = { Text(t("Taken", "ली"), color = DoctorCardInk) }, leadingIcon = { Icon(Icons.Default.Check, null, tint = DoctorStatusGood) }, onClick = { menu = false; haptic(); tickedHere = true; onMark(true, false) }, modifier = Modifier.heightIn(min = 48.dp).testTag("today-dose-taken-${item.id}-${dose.key}"))
                 DropdownMenuItem(text = { Text(t("Missed", "छूटी"), color = DoctorCardInk) }, leadingIcon = { Icon(Icons.Default.Close, null, tint = DoctorStatusRest) }, onClick = { menu = false; onMark(false, false) }, modifier = Modifier.heightIn(min = 48.dp).testTag("today-dose-missed-${item.id}-${dose.key}"))
             }
         }

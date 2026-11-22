@@ -18,6 +18,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.filled.Bedtime
+import androidx.compose.material.icons.filled.WbSunny
+import androidx.compose.material.icons.filled.WbTwilight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -318,6 +321,43 @@ fun Modifier.saharaAccentBar(tone: SaharaTone): Modifier = drawWithContent {
                 }
             }
             if (actionLabel != null && onAction != null) SaharaPrimaryButton(actionLabel, onAction, Modifier.fillMaxWidth(), icon = Icons.Default.Refresh)
+        }
+    }
+}
+
+/** Part of the day, for the Today illustration: a sun in the morning and afternoon, a low sun in the evening, a moon at night. */
+internal enum class SaharaDayPart(val icon: ImageVector, val tone: SaharaTone) {
+    Morning(Icons.Default.WbSunny, SaharaTone.Gold), Afternoon(Icons.Default.WbSunny, SaharaTone.Gold),
+    Evening(Icons.Default.WbTwilight, SaharaTone.Marigold), Night(Icons.Default.Bedtime, SaharaTone.Indigo);
+    companion object {
+        fun at(hour: Int): SaharaDayPart = when (hour) { in 5..11 -> Morning; in 12..16 -> Afternoon; in 17..19 -> Evening; else -> Night }
+        fun now(): SaharaDayPart = at(java.time.LocalTime.now().hour)
+    }
+}
+
+/**
+ * Today's calm idle illustration: the sun (or evening sun, or moon) for the time of day on a soft halo that breathes, the
+ * icon floating and swaying slowly a few times and then resting. Decorative; still when motion is off.
+ */
+@Composable fun SaharaDaySky(modifier: Modifier = Modifier, size: Int = 32) {
+    val part = remember { SaharaDayPart.now() }
+    Box(modifier.size((size + 14).dp).testTag("sahara-day-${part.name.lowercase()}"), contentAlignment = Alignment.Center) {
+        Box(Modifier.matchParentSize().saharaBreathe(cycles = 4, amount = .1f).clip(CircleShape).background(part.tone.wash))
+        SaharaIconChip(part.icon, part.tone, Modifier.saharaFloat(cycles = 4).saharaSway(if (part == SaharaDayPart.Night) 5f else 8f, cycles = 3).clip(CircleShape), size = size)
+    }
+}
+
+/**
+ * A calm, friendly empty line for a list inside a card ("No check-ins yet."): a small sprout that sways twice and rests,
+ * beside the words. Lighter than [SaharaEmpty], for places where the list is one part of a screen.
+ */
+@Composable fun SaharaCalmEmpty(text: String, modifier: Modifier = Modifier, detail: String? = null) {
+    Row(modifier.fillMaxWidth().saharaAppear().padding(horizontal = 4.dp, vertical = 4.dp).testTag("sahara-calm-empty"), verticalAlignment = Alignment.CenterVertically) {
+        SaharaLottie(SaharaLottieKind.Sprout, Modifier.size(56.dp), iterations = 2)
+        Spacer(Modifier.width(10.dp))
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(text, fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.SemiBold, color = SaharaColors.InkSub)
+            if (detail != null) Text(detail, fontSize = 14.sp, lineHeight = 19.sp, color = SaharaColors.InkSub)
         }
     }
 }

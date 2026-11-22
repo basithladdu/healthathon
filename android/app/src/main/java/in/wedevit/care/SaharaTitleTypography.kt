@@ -22,7 +22,13 @@ internal val SaharaBodyFont = FontFamily(
     listOf(400, 500, 600, 700).map { w -> Font(R.font.sahara_noto_sans, FontWeight(w), variationSettings = FontVariation.Settings(FontVariation.weight(w))) })
 
 /** Radii: 12 cards and fields, 14 tiles, 16 large tiles and registers, 28 dialogs and sheets (Material 3), pill for buttons, chips and status. */
-object SaharaRadius { val Sm = 12.dp; val Md = 14.dp; val Lg = 16.dp; val Hero = 28.dp; val Pill = 999.dp }
+object SaharaRadius { val Sm = 12.dp; val Md = 14.dp; val Lg = 16.dp; val Xl = 20.dp; val Hero = 28.dp; val Pill = 999.dp }
+
+/** Elevation (22 Nov premium pass): flat by default, one soft step for cards, a higher one for the floating bar and sheets. Shadows are warm ([SaharaColors.Shadow]). */
+object SaharaElevation { val Flat = 0.dp; val Card = 1.dp; val Raised = 3.dp; val Floating = 6.dp }
+
+/** Spacing on a 4 dp grid: screen gutter 16, gaps between cards 12, inside cards 16, between sections 24. */
+object SaharaSpacing { val Xs = 4.dp; val Sm = 8.dp; val Md = 12.dp; val Lg = 16.dp; val Xl = 24.dp; val Gutter = 16.dp }
 
 /** No word is ever split across lines: whole-word wrapping, no hyphenation. Headings balance their lines. */
 private fun TextStyle.words(heading: Boolean) = copy(lineBreak = if (heading) LineBreak.Heading else LineBreak.Paragraph, hyphens = Hyphens.None)
@@ -43,8 +49,13 @@ internal fun saharaTitleTypography(base: Typography = Typography()): Typography 
 /** The app's theme typography: [saharaTitleTypography] with the small roles raised for tired eyes and cheap screens. */
 internal fun saharaTypography(base: Typography = Typography()): Typography {
     val t = saharaTitleTypography(base)
+    // Premium pass (22 Nov): large titles tracked in a touch (-0.2 sp) for a calmer, set look; body lines get 1.5x leading for easy reading.
+    fun tight(s: TextStyle) = s.copy(letterSpacing = (-0.2).sp)
     return t.copy(
-        bodyMedium = t.bodyMedium.copy(fontSize = 16.sp, lineHeight = 22.sp, letterSpacing = 0.1.sp),
+        displaySmall = tight(t.displaySmall), headlineLarge = tight(t.headlineLarge), headlineMedium = tight(t.headlineMedium), headlineSmall = tight(t.headlineSmall),
+        titleLarge = t.titleLarge.copy(lineHeight = 30.sp),
+        bodyLarge = t.bodyLarge.copy(lineHeight = 26.sp, letterSpacing = 0.15.sp),
+        bodyMedium = t.bodyMedium.copy(fontSize = 16.sp, lineHeight = 24.sp, letterSpacing = 0.1.sp),
         bodySmall = t.bodySmall.copy(fontSize = 14.sp, lineHeight = 20.sp, letterSpacing = 0.1.sp),
         labelLarge = t.labelLarge.copy(fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.SemiBold),
         labelMedium = t.labelMedium.copy(fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium),

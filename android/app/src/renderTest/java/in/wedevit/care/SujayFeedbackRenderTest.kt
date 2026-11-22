@@ -29,7 +29,7 @@ class SujayFeedbackRenderTest {
         runCatching { compose.onAllNodes(tagged(tag)).onFirst().performScrollTo() }
         settle()
     }
-    private fun click(tag: String) { bring(tag); compose.onAllNodes(tagged(tag)).onFirst().performSemanticsAction(SemanticsActions.OnClick); settle() }
+    private fun click(tag: String) { compose.skipSaharaIntroFor(tag); bring(tag); compose.onAllNodes(tagged(tag)).onFirst().performSemanticsAction(SemanticsActions.OnClick); settle() }
     private fun back() { compose.runOnUiThread { compose.activity.onBackPressedDispatcher.onBackPressed() }; settle() }
     private fun shot(name: String) { compose.onRoot().captureRoboImage(File(System.getProperty("sahara.render.dir") ?: "build/outputs/sujay", "$name.png").path) }
     private fun step(name: String, block: () -> Unit) { runCatching { block(); shot(name) }.onFailure { println("SujayFeedbackRenderTest $name: $it") } }

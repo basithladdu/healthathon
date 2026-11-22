@@ -102,7 +102,8 @@ class CareRemoteAssistTest {
         assertFalse(notReady.ready || notReady.audioReady || notReady.translationReady)
         val on = CareRemoteAssist(CareAssistTransport { _, _, _ ->
             JSONObject().put("provider", CARE_ASSIST_PROVIDER).put("ready", true).put("audioReady", false).put("translationReady", true).put("label", "Groq").put("model", "llama-3.3-70b").toString() })
-        assertEquals(CareAssistCapabilities(true, false, true, "Groq", "llama-3.3-70b"), on.capabilities("account"))
+        // The app never shows a vendor name (owner, Nov 2026): the server label is ignored.
+        assertEquals(CareAssistCapabilities(true, false, true, "the online service", "llama-3.3-70b"), on.capabilities("account"))
         val other = CareRemoteAssist(CareAssistTransport { _, _, _ -> JSONObject().put("provider", "sarvam").put("ready", true).toString() })
         try { other.capabilities("account"); fail("Expected provider check") } catch (_: IllegalArgumentException) { }
     }

@@ -25,6 +25,7 @@ class FamilyMoreRenderTest {
 
     private fun settle() { compose.mainClock.advanceTimeBy(1500); compose.waitForIdle() }
     private fun click(tag: String) {
+        compose.skipSaharaIntroFor(tag)
         runCatching { compose.onAllNodes(hasScrollToIndexAction()).onFirst().performScrollToNode(tagged(tag)) }
         runCatching { compose.onNode(tagged(tag)).performScrollTo() }
         compose.onAllNodes(tagged(tag)).onFirst().performSemanticsAction(SemanticsActions.OnClick); settle()

@@ -44,7 +44,7 @@ object NearbyHelp {
         val matches = centres.filterIndexed { index, c ->
             matches(searchText[index], words) &&
                 (state == ALL_INDIA || c.state == state) && servesAs(c, service) &&
-                layerOf(c) in layers &&
+                layersOf(c).any { it in layers } &&
                 (district.isBlank() || c.district.equals(district, true) || c.address.contains(district, true))
         }
         return if (district.isBlank()) matches else matches.sortedBy { !it.district.equals(district, true) }
@@ -54,6 +54,8 @@ object NearbyHelp {
      * Map and list layers. Every centre in the directory is a palliative care centre; the ones whose source listing says
      * morphine is available form the second layer, in their own colour. "Listed" only: the app never says morphine is in stock.
      */
+    /** Every layer a centre belongs to: one listing morphine that also gives palliative care shows under both chips (AIIMS Mangalagiri). */
+    fun layersOf(c: Centre): Set<String> = if (layerOf(c) == LAYER_MORPHINE && offersPalliativeCare(c)) setOf(LAYER_MORPHINE, LAYER_PALLIATIVE) else setOf(layerOf(c))
     fun layerOf(c: Centre): String = if (c.sourceListedMorphine == "available") LAYER_MORPHINE else LAYER_PALLIATIVE
     val layerOptions = listOf(LAYER_PALLIATIVE, LAYER_MORPHINE)
     /** Turns a layer chip on or off. The last layer that is on stays on, so the map is never empty because of the chips alone. */

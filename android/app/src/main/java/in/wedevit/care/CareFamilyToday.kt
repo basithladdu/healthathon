@@ -130,7 +130,7 @@ internal class CaregiverCheckStore(context: Context) {
                         Box(Modifier.weight(1f).heightIn(min = 48.dp)
                             .clickable(role = Role.RadioButton) { store.save(key, today, score); saved = score; picking = false }
                             .semantics { contentDescription = "$score/10"; selected = chosen }.testTag("family-check-$score"), contentAlignment = Alignment.Center) {
-                            Box(Modifier.fillMaxWidth().aspectRatio(1f).clip(CircleShape).background(shown).border(2.dp, fill, CircleShape), contentAlignment = Alignment.Center) {
+                            Box(Modifier.fillMaxWidth().aspectRatio(1f).saharaSelectBounce(chosen, .12f).clip(CircleShape).background(shown).border(2.dp, fill, CircleShape), contentAlignment = Alignment.Center) {
                                 Text("$score", fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1, softWrap = false, color = if (chosen) Color.White else DoctorCardInk)
                             }
                         }
@@ -142,7 +142,9 @@ internal class CaregiverCheckStore(context: Context) {
                 }
             } else {
                 val current = saved ?: 0
-                LinearProgressIndicator(progress = { current / 10f }, color = CareFamilyRules.colour(current), trackColor = Paper, modifier = Modifier.fillMaxWidth().height(10.dp).clip(RoundedCornerShape(50)))
+                // The bar fills up to the saved score once shown (instant when motion is off).
+                val shown = saharaFill(current / 10f)
+                LinearProgressIndicator(progress = { shown }, color = CareFamilyRules.colour(current), trackColor = Paper, modifier = Modifier.fillMaxWidth().height(10.dp).clip(RoundedCornerShape(50)))
                 if (current >= CareFamilyRules.TALK_FROM) Text(t("Tell your care team how you are.", "देखभाल टीम को अपना हाल बताएँ।"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk)
                 TextButton(onClick = { picking = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("family-check-change")) { Text(t("Change", "बदलें"), color = RustText) }
             } } }
@@ -159,7 +161,7 @@ internal class CaregiverCheckStore(context: Context) {
     Surface(shape = RoundedCornerShape(20.dp), color = SaharaSoftGold, modifier = Modifier.fillMaxWidth().saharaAppear().testTag("family-caregiver-tips")) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(shape = CircleShape, color = Paper) { Icon(Icons.Default.Lightbulb, null, Modifier.padding(10.dp).size(22.dp), tint = RustText) }
+                Surface(shape = CircleShape, color = Paper) { Icon(Icons.Default.Lightbulb, null, Modifier.padding(10.dp).size(22.dp).saharaPop(offset), tint = RustText) }
                 Spacer(Modifier.width(12.dp))
                 Text(t("Tip of the day", "आज का सुझाव"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
             }

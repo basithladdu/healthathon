@@ -64,21 +64,24 @@ internal fun doctorTabTone(section: String): DoctorTone = when (section) {
     else -> DoctorTones.Teal
 }
 
-/** The first thing a doctor does here: a solid button-like row in the section colour with white text. */
+/**
+ * The first thing a doctor does here (22 Nov premium pass): a light row in the section's wash with a 1.5 dp edge in its colour,
+ * a solid icon chip, dark ink title and an arrow in the section ink, so it still leads the page without a solid block.
+ */
 @Composable private fun PatientHubPrimaryRow(tab: DoctorPatientTab, onSection: (String) -> Unit, tagPrefix: String, meta: String?, selected: Boolean) { val t = careText()
     val tone = doctorTabTone(tab.section)
     val press = remember { MutableInteractionSource() }
-    Surface(onClick = { onSection(tab.section) }, interactionSource = press, shape = RoundedCornerShape(16.dp), color = tone.solid, contentColor = tone.onSolid, shadowElevation = 2.dp,
-        border = if (selected) BorderStroke(3.dp, DoctorCardInk) else null,
+    Surface(onClick = { onSection(tab.section) }, interactionSource = press, shape = RoundedCornerShape(SaharaRadius.Lg), color = tone.wash, contentColor = SaharaColors.Ink, shadowElevation = SaharaElevation.Card,
+        border = if (selected) BorderStroke(3.dp, DoctorCardInk) else BorderStroke(1.5.dp, tone.solid),
         modifier = Modifier.fillMaxWidth().saharaAppear().saharaPulseGlow(tone.solid, 16.dp, active = !selected).saharaPress(press).heightIn(min = 64.dp).testTag("$tagPrefix-${tab.section}").semantics { role = Role.Button; semanticsSelected = selected }) {
-        Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(tab.icon, null, tint = tone.onSolid, modifier = Modifier.size(28.dp))
-            Spacer(Modifier.width(16.dp))
+        Row(Modifier.padding(horizontal = 14.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(44.dp).background(tone.band, RoundedCornerShape(SaharaRadius.Sm)), contentAlignment = Alignment.Center) { Icon(tab.icon, null, tint = tone.onSolid, modifier = Modifier.size(24.dp)) }
+            Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(t(tab.en, tab.hi), fontSize = 18.sp, lineHeight = 23.sp, fontWeight = FontWeight.Bold, fontFamily = SaharaTitleFont, color = tone.onSolid, style = DoctorWholeWords)
-                if (!meta.isNullOrBlank()) Text(meta, fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium, color = tone.onSolid, style = DoctorWholeWords, modifier = Modifier.testTag("$tagPrefix-${tab.section}-meta"))
+                Text(t(tab.en, tab.hi), fontSize = 18.sp, lineHeight = 23.sp, fontWeight = FontWeight.Bold, fontFamily = SaharaTitleFont, color = SaharaColors.Ink, style = DoctorWholeWords)
+                if (!meta.isNullOrBlank()) Text(meta, fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium, color = SaharaColors.InkSub, style = DoctorWholeWords, modifier = Modifier.testTag("$tagPrefix-${tab.section}-meta"))
             }
-            Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = tone.onSolid, modifier = Modifier.size(22.dp))
+            Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = tone.ink, modifier = Modifier.size(22.dp))
         }
     }
 }

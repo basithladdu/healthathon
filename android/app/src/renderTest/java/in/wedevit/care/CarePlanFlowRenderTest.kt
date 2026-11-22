@@ -32,7 +32,7 @@ class CarePlanFlowRenderTest {
         runCatching { compose.onNode(tagged(tag)).performScrollTo() }
         settle()
     }
-    private fun click(tag: String) { bring(tag); compose.onNode(tagged(tag)).performSemanticsAction(SemanticsActions.OnClick); settle() }
+    private fun click(tag: String) { compose.skipSaharaIntroFor(tag); bring(tag); compose.onNode(tagged(tag)).performSemanticsAction(SemanticsActions.OnClick); settle() }
     private fun exists(tag: String) { bring(tag); compose.onNode(tagged(tag)).assertExists() }
     private fun next() = click("ectpr-next")
     private fun type(label: String, value: String) {

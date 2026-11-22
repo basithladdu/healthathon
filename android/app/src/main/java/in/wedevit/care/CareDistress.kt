@@ -33,6 +33,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -319,6 +320,9 @@ private val DistressRowHeight = 24.dp
         }
         nudged = true
     }
+    // The fill rises (or falls) smoothly to the chosen number instead of jumping; instant when motion is off. Level n+1 = rows 0..n full.
+    val level by androidx.compose.animation.core.animateFloatAsState(if (picked) score + 1f else 0f, SaharaMotion.tween(SaharaMotion.FILL_MS, easing = SaharaMotion.Emphasized), label = "distress-level")
+    val fillColour by androidx.compose.animation.animateColorAsState(if (picked) distressBand(score) else empty, SaharaMotion.tween(SaharaMotion.VALUE_MS), label = "distress-colour")
     Column(modifier.testTag("distress-thermometer"), horizontalAlignment = Alignment.Start) {
         Text(t("Extreme distress", "बहुत ज़्यादा परेशानी"), fontSize = 13.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub, modifier = Modifier.padding(bottom = 4.dp))
         Column(Modifier.selectableGroup().pointerInput(Unit) {
@@ -328,7 +332,7 @@ private val DistressRowHeight = 24.dp
             (10 downTo 0).forEach { n ->
                 val on = score == n
                 // The whole fill takes the chosen level's colour (one colour, not green-then-amber), and starts at 0 so it meets the bulb.
-                val filled = picked && n in 0..score
+                val part = (level - n).coerceIn(0f, 1f)
                 val ghost = !picked && n in 0..hint.value.toInt()
                 val anchor = when (n) { 0 -> t("No distress", "कोई परेशानी नहीं"); 10 -> t("Extreme distress", "बहुत ज़्यादा परेशानी"); else -> "" }
                 val description = if (anchor.isEmpty()) "$n" else "$n, $anchor"
@@ -336,7 +340,8 @@ private val DistressRowHeight = 24.dp
                     Text("$n", fontSize = if (on) 17.sp else 14.sp, fontWeight = if (on) FontWeight.Bold else FontWeight.Medium, color = if (on) distressBandText(n) else DoctorCardSub, textAlign = TextAlign.End, modifier = Modifier.width(26.dp))
                     Spacer(Modifier.width(8.dp))
                     val shape = if (n == 10) RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp) else RoundedCornerShape(0.dp)
-                    Box(Modifier.width(24.dp).fillMaxHeight().background(if (filled) distressBand(score) else if (ghost) distressBand(hint.value.toInt()).copy(alpha = .45f) else empty, shape)) {
+                    Box(Modifier.width(24.dp).fillMaxHeight().clip(shape).background(if (ghost) distressBand(hint.value.toInt()).copy(alpha = .45f) else empty)) {
+                        if (part > 0f) Box(Modifier.align(Alignment.BottomCenter).fillMaxWidth().fillMaxHeight(part).background(fillColour))
                         if (n in 1..9) Box(Modifier.align(Alignment.TopEnd).width(8.dp).height(1.dp).background(Paper))
                     }
                     if (on) Text("◀", fontSize = 13.sp, color = distressBandText(n), modifier = Modifier.padding(start = 6.dp))
@@ -344,7 +349,7 @@ private val DistressRowHeight = 24.dp
             }
         }
         // The bulb, under the tube (its centre lines up with the tube's: 26 + 8 + 12 = 46dp from the left).
-        Box(Modifier.padding(start = 24.dp).offset(y = (-10).dp).size(44.dp).background(if (picked) distressBand(score) else empty, CircleShape).testTag("distress-chosen"), contentAlignment = Alignment.Center) {
+        Box(Modifier.padding(start = 24.dp).offset(y = (-10).dp).saharaPop(score.takeIf { picked }).size(44.dp).background(fillColour, CircleShape).testTag("distress-chosen"), contentAlignment = Alignment.Center) {
             Text(if (picked) "$score" else "–", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = if (picked) distressOnBand(score) else DoctorCardSub)
         }
         Text(t("No distress", "कोई परेशानी नहीं"), fontSize = 13.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub)
@@ -355,12 +360,14 @@ private val DistressRowHeight = 24.dp
 @Composable private fun DistressGroupTile(title: String, count: Int, done: Boolean, open: Boolean, icon: ImageVector, colour: Color, tag: String, onToggle: () -> Unit) {
     val t = careText()
     val state = when { open -> t("Expanded", "खुला"); count > 0 -> t("$count selected", "$count चुने"); done -> t("None selected", "कुछ नहीं चुना"); else -> t("Collapsed", "बंद") }
-    Surface(shape = RoundedCornerShape(14.dp), color = if (open) colour.copy(alpha = 0.14f) else Paper, border = BorderStroke(1.dp, if (open) colour else DoctorHairline), modifier = Modifier.fillMaxWidth().testTag(tag)) {
-        Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button, onClick = onToggle).semantics { stateDescription = state }.padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    val fill by androidx.compose.animation.animateColorAsState(if (open) colour.copy(alpha = 0.14f) else Paper, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "distress-group")
+    val press = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+    Surface(shape = RoundedCornerShape(14.dp), color = fill, border = BorderStroke(1.dp, if (open) colour else DoctorHairline), modifier = Modifier.fillMaxWidth().saharaPress(press).testTag(tag)) {
+        Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(interactionSource = press, indication = androidx.compose.material3.ripple(), role = Role.Button, onClick = onToggle).semantics { stateDescription = state }.padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Box(Modifier.size(28.dp).background(colour.copy(alpha = 0.16f), CircleShape), contentAlignment = Alignment.Center) { Icon(icon, contentDescription = null, tint = colour, modifier = Modifier.size(17.dp)) }
             Text(title, fontSize = 14.sp, lineHeight = 17.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
             if (count > 0) Box(Modifier.size(22.dp).background(colour, CircleShape), contentAlignment = Alignment.Center) { Text("$count", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White) }
-            else Icon(if (open) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, contentDescription = null, tint = DoctorCardSub, modifier = Modifier.size(20.dp))
+            else SaharaChevron(open, null, Modifier.size(20.dp))
         }
     }
 }

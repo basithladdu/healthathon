@@ -12,12 +12,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.WbSunny as OutlinedSunny
+import androidx.compose.material.icons.outlined.Forum as OutlinedForum
+import androidx.compose.material.icons.outlined.Place as OutlinedPlace
+import androidx.compose.material.icons.outlined.MoreHoriz as OutlinedMore
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -46,29 +52,48 @@ import androidx.compose.ui.unit.sp
     val keys = if (clinician) listOf("Today", "Talk", "Care", "Help", "More") else listOf("Today", "Care", "Help", "More")
     val labels = (if (clinician) listOf(t("Today", "आज"), t("Talk", "बातचीत")) else listOf(t("Today", "आज"))) + listOf(t("Care", "देखभाल"), t("Help", "मदद"), t("More", "और"))
     val routes = if (clinician) listOf(0, 1, 2, 3, 4) else listOf(0, 2, 3, 4)
-    val icons = (if (clinician) listOf(Icons.Default.WbSunny, Icons.Default.Forum) else listOf(Icons.Default.WbSunny)) + listOf(Icons.Default.FavoriteBorder, Icons.Default.Place, Icons.Default.MoreHoriz)
     // Documents and a patient's conversations page are opened from All care tools, so Care stays lit while they are open.
     fun lit(route: Int) = selected == route || (route == 2 && (selected == 5 || (!clinician && selected == 1)))
-    // Material 3 bar in Sahara colours: a hairline on top; the selected tab's icon sits white in a solid rust pill above a bold rust label.
-    Surface(color = SaharaColors.Surface, shadowElevation = 3.dp) { Column {
-        HorizontalDivider(color = DoctorHairline)
-        Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 4.dp, vertical = 4.dp).saharaNavIndicator(routes.indexOfFirst { lit(it) }, labels.size, gap = 2.dp).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-            labels.forEachIndexed { index, label ->
-                val active = lit(routes[index])
-                val pill by animateColorAsState(if (active) SaharaColors.Primary else Color.Transparent, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "selected tab")
-                val iconTint by animateColorAsState(if (active) SaharaColors.OnPrimary else SaharaColors.InkSub, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "selected-tab-icon")
-                Column(Modifier.weight(1f).testTag("nav-${keys[index]}").clip(RoundedCornerShape(SaharaRadius.Lg))
-                    .selectable(selected = active, role = Role.Tab, onClick = { onSelect(routes[index]) }).heightIn(min = 64.dp).padding(vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                    Box(Modifier.size(width = 56.dp, height = 32.dp).clip(RoundedCornerShape(SaharaRadius.Pill)).background(pill), contentAlignment = Alignment.Center) {
-                        Icon(icons[index], null, Modifier.size(24.dp), tint = iconTint)
+    // Selected tab: the filled icon; others: the outlined one (Care keeps its heart outline / filled heart).
+    val selectedIcons = (if (clinician) listOf(Icons.Default.WbSunny, Icons.Default.Forum) else listOf(Icons.Default.WbSunny)) + listOf(Icons.Default.Favorite, Icons.Default.Place, Icons.Default.MoreHoriz)
+    val restIcons = (if (clinician) listOf(Icons.Outlined.OutlinedSunny, Icons.Outlined.OutlinedForum) else listOf(Icons.Outlined.OutlinedSunny)) + listOf(Icons.Default.FavoriteBorder, Icons.Outlined.OutlinedPlace, Icons.Outlined.OutlinedMore)
+    val current = routes.indexOfFirst { lit(it) }
+    // Premium pass (22 Nov): a floating, softly elevated bar with rounded ends above the system navigation, and one light sage pill
+    // that slides under the selected tab (icon filled, label bold dark sage on it). Light wash, not a solid fill, after "dark and scary".
+    Box(Modifier.fillMaxWidth().navigationBarsPadding().padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 10.dp)) {
+        Surface(Modifier.fillMaxWidth().shadow(SaharaElevation.Floating, RoundedCornerShape(SaharaRadius.Hero), ambientColor = SaharaColors.Shadow, spotColor = SaharaColors.Shadow),
+            shape = RoundedCornerShape(SaharaRadius.Hero), color = SaharaColors.Surface, border = BorderStroke(1.dp, SaharaColors.Line)) {
+            Row(Modifier.fillMaxWidth().padding(6.dp).saharaNavPill(current, labels.size, gap = 4.dp).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                labels.forEachIndexed { index, label ->
+                    val active = index == current
+                    val tint by animateColorAsState(if (active) SaharaColors.NavOnPill else SaharaColors.InkSub, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "selected-tab-icon")
+                    Column(Modifier.weight(1f).testTag("nav-${keys[index]}").clip(RoundedCornerShape(SaharaRadius.Xl))
+                        .selectable(selected = active, role = Role.Tab, onClick = { onSelect(routes[index]) }).heightIn(min = 60.dp).padding(vertical = 6.dp, horizontal = 2.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                        Icon(if (active) selectedIcons[index] else restIcons[index], null, Modifier.size(24.dp), tint = tint)
+                        Spacer(Modifier.height(4.dp))
+                        SaharaFitText(label, style = MaterialTheme.typography.labelMedium.copy(fontSize = cappedLabelSize(14f)), fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
+                            color = tint, maxLines = 2, min = 11f)
                     }
-                    Spacer(Modifier.height(4.dp))
-                    SaharaFitText(label, style = MaterialTheme.typography.labelMedium.copy(fontSize = cappedLabelSize(14f)), fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
-                        color = if (active) RustText else SaharaColors.InkSub, maxLines = 2, min = 11f)
                 }
             }
         }
-    } }
+    }
+}
+
+/** The bottom bar's selected marker: one rounded light-sage pill the size of a tab that slides to [index] (hidden at -1). [gap] is the space between tabs. */
+@Composable private fun Modifier.saharaNavPill(index: Int, count: Int, gap: androidx.compose.ui.unit.Dp): Modifier {
+    if (count <= 0) return this
+    val x by animateFloatAsState(index.coerceAtLeast(0).toFloat(), SaharaMotion.tween(SaharaMotion.ENTER_MS, easing = SaharaMotion.Emphasized), label = "navPillX")
+    val shown by animateFloatAsState(if (index in 0 until count) 1f else 0f, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "navPillAlpha")
+    val rtl = androidx.compose.ui.platform.LocalLayoutDirection.current == androidx.compose.ui.unit.LayoutDirection.Rtl
+    val pill = SaharaColors.NavPill
+    return drawBehind {
+        if (shown <= 0f) return@drawBehind
+        val g = gap.toPx(); val cell = (size.width + g) / count; val w = cell - g
+        val left = if (rtl) size.width - cell * x - w else cell * x
+        val r = SaharaRadius.Xl.toPx()
+        drawRoundRect(pill.copy(alpha = shown), topLeft = androidx.compose.ui.geometry.Offset(left, 0f), size = androidx.compose.ui.geometry.Size(w, size.height), cornerRadius = androidx.compose.ui.geometry.CornerRadius(r, r))
+    }
 }
 
 /** Short labels in fixed-width slots (bottom tabs, step names) grow with the system font only up to 1.3x, so a word like "Nearby" never breaks mid-word; all other text scales fully. */
@@ -283,13 +308,18 @@ private val SosRed = SaharaColors.Error
     val time = if (day != null && (day.hour != 0 || day.minute != 0)) " · " + day.format(careDateFormat("h:mm a", hindi)) else ""
     ActionCard(tint, Modifier.fillMaxWidth().testTag("up-next-${item.id}"), onOpen) {
         Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            // Visits indigo: a solid date badge with white month and day.
-            Surface(shape = RoundedCornerShape(14.dp), color = SaharaSection.Visits.solid, shadowElevation = 1.dp, modifier = Modifier.size(width = 62.dp, height = 68.dp)) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+            // Visits indigo (22 Nov premium pass): a light calendar page instead of a solid block: paper with an indigo edge,
+            // the month on a thin indigo wash strip and the day in indigo ink.
+            Surface(shape = RoundedCornerShape(SaharaRadius.Md), color = SaharaColors.Surface, border = BorderStroke(1.dp, SaharaSection.Visits.solid), shadowElevation = SaharaElevation.Card, modifier = Modifier.size(width = 62.dp, height = 68.dp)) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     if (day != null) {
-                        Text(day.format(careDateFormat("MMM", hindi)).uppercase(), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = SaharaSection.Visits.onSolid, maxLines = 1)
-                        Text("${day.dayOfMonth}", fontSize = 26.sp, fontWeight = FontWeight.Bold, color = SaharaSection.Visits.onSolid, maxLines = 1)
-                    } else Icon(Icons.Default.Event, null, Modifier.size(28.dp), tint = SaharaSection.Visits.onSolid)
+                        Box(Modifier.fillMaxWidth().background(SaharaSection.Visits.wash).padding(vertical = 3.dp), contentAlignment = Alignment.Center) {
+                            Text(day.format(careDateFormat("MMM", hindi)).uppercase(), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = SaharaSection.Visits.ink, maxLines = 1)
+                        }
+                        Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
+                            Text("${day.dayOfMonth}", fontSize = 26.sp, fontWeight = FontWeight.Bold, color = SaharaSection.Visits.ink, maxLines = 1)
+                        }
+                    } else Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Icon(Icons.Default.Event, null, Modifier.size(28.dp), tint = SaharaSection.Visits.ink) }
                 }
             }
             Spacer(Modifier.width(16.dp))
