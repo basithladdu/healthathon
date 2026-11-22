@@ -1,0 +1,55 @@
+/* Scene E word times (global film seconds), shared by E_talk and E_doc. */
+import {at} from '../kit';
+
+export const T = {
+  start: 61.06,
+  end: 83.21,
+  everyone: at('s12', "everyone's"),
+  consent: at('s12', 'consent'),
+  doctor: at('s12', 'doctor'),
+  records: at('s12', 'records'),
+  sahara: at('s12', 'Sahara'),
+  who: at('s12', 'who'),
+  what: at('s12', 'what'),
+  ticks: at('s12', 'ticks'),
+  dr: at('s12', 'Dr'),
+  thirteen: at('s12', 'thirteen'),
+  topics: at('s12', 'topics'),
+  atFirst: at('s13', 'At'),
+  app: at('s13', 'app'),
+  write: at('s13', 'write'),
+  note: at('s13', 'note'),
+  doctors: at('s13', 'doctors'),
+  said: at('s13', 'said'),
+  no: at('s13', 'no'),
+  leadsThe: at('s13', 'The', 1),
+  leads: at('s13', 'leads'),
+  so: at('s14', 'So'),
+  nothing: at('s14', 'nothing'),
+  final: at('s14', 'final'),
+  reads: at('s14', 'reads'),
+  edits: at('s14', 'edits'),
+  signs: at('s14', 'signs'),
+  then: at('s14', 'Then'),
+  family: at('s14', 'family'),
+  famSigns: at('s14', 'signs', 1),
+  locks: at('s14', 'locks'),
+};
+
+/** 13 topics in Dr Sujay's goals-of-care conversation */
+export const TOPICS = [
+  'Patient details',
+  'Caregiver details',
+  'Capacity',
+  'Existing directives',
+  'Understanding',
+  'Values',
+  'Goals of care',
+  'Home vs transfer',
+  'CPR',
+  'ICU',
+  'Ventilatory support',
+  'Dialysis',
+  'Nutritional support',
+];
+export const tickTime = (i: number) => T.dr + 0.05 + i * 0.205;

@@ -152,7 +152,8 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
     LazyColumn(Modifier.fillMaxSize().saharaScreenEnter().testTag("documents-list"), state = listState, contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         // The marigold Documents band, with Add as a white button on it (it glows while there is nothing yet).
         item { SaharaSectionBand(t("Documents", "कागज़ात"), SaharaSection.Documents) {
-            if (canEdit) SaharaBandButton(t("Add document", "कागज़ जोड़ें"), onClick = { addSheet = true }, tone = SaharaSection.Documents, icon = Icons.Default.Add, enabled = !busy, modifier = Modifier.saharaPulseGlow(color = SaharaColors.Surface, corner = SaharaRadius.Md, active = reports.isEmpty()).testTag("document-add"))
+            // The doctor reads the patient's documents; adding them stays with the patient and family (Dr Sujay, 22 Nov).
+            if (canEdit && !clinician) SaharaBandButton(t("Add document", "कागज़ जोड़ें"), onClick = { addSheet = true }, tone = SaharaSection.Documents, icon = Icons.Default.Add, enabled = !busy, modifier = Modifier.saharaPulseGlow(color = SaharaColors.Surface, corner = SaharaRadius.Md, active = reports.isEmpty()).testTag("document-add"))
         } }
         // Timeline and Ask as two slim buttons (they open their own screens), so the list starts in the first screenful.
         item { Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -168,7 +169,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         } }
         // Auto-sorted folders as coloured tiles with their counts; tap one to open it, tap again to see everything.
         // Only folders that hold something (and the open one) are shown, so empty tiles never push the list down.
-        if (reports.isNotEmpty()) item { val counts = DocumentFolderRules.counts(reports.map(::folderOf))
+        if (reports.isNotEmpty() && !clinician) item { val counts = DocumentFolderRules.counts(reports.map(::folderOf))
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 DocumentFolderRules.folders.filter { (counts[it] ?: 0) > 0 || it == folderFilter }.chunked(2).forEach { pair -> Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     pair.forEach { folder -> FolderTile(DocumentFolderRules.label(folder, t), folder, counts[folder] ?: 0, folderFilter == folder, Modifier.weight(1f).fillMaxHeight().saharaStagger(DocumentFolderRules.folders.indexOf(folder)).testTag("document-folder-$folder")) { folderFilter = if (folderFilter == folder) "" else folder } }
@@ -210,7 +211,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
             Spacer(Modifier.height(12.dp)); Text(if (search.isNotBlank()) t("No documents found", "कोई कागज़ नहीं मिला") else when (filter) { "Reports" -> t("No reports yet", "अभी कोई रिपोर्ट नहीं"); "Care notes" -> t("No care notes yet", "अभी कोई देखभाल नोट नहीं"); "Cancer" -> t("No cancer documents yet", "अभी कैंसर का कोई कागज़ नहीं"); else -> t("No documents yet", "अभी कोई कागज़ नहीं") }, fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk)
             Spacer(Modifier.height(4.dp))
             if (search.isNotBlank()) TextButton(onClick = { search = ""; filter = "All" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Clear search", "खोज मिटाएँ")) }
-            else if (filter != "Care notes" && canEdit) TextButton(onClick = { addSheet = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Add document", "कागज़ जोड़ें")) }
+            else if (filter != "Care notes" && canEdit && !clinician) TextButton(onClick = { addSheet = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Add document", "कागज़ जोड़ें")) }
         } }
         if (visibleNotes.isNotEmpty()) item { SectionTitle(t("Care notes", "देखभाल नोट")) }
         items(visibleNotes, key = { it.id }) { note ->

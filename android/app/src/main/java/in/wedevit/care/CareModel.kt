@@ -189,6 +189,15 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
             finally { centreSuggestionSending.value = false }
         }
     }
+    /** "Where did you get this morphine?": queued like a centre suggestion; reports "pending", "waiting" or "kept". */
+    fun reportMorphineSource(draft: MorphineSourceDraft, done: (String) -> Unit) {
+        val queue = sync ?: return
+        if (MorphineSourceRules.error(draft) != null) return
+        viewModelScope.launch {
+            try { done(when (queue.enqueue(MorphineSourceOps.write(draft))) { CareSyncStatus.SENT -> "pending"; CareSyncStatus.KEPT -> "kept"; else -> "waiting" }) }
+            catch (e: Exception) { if (e is CancellationException) throw e; message.value = careBilingual("Couldn't save that. Please try again.", "यह सहेजा नहीं जा सका। फिर से कोशिश करें।") }
+        }
+    }
     /** Activating reminders commits preferences and re-sets every alarm; it runs in the background, before any reminder reconcile. */
     private val reminderActivation = viewModelScope.async(Dispatchers.IO) { runCatching { reminderScheduler?.activate() } }
     init {

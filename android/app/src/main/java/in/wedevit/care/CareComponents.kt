@@ -259,12 +259,17 @@ fun careIcon(kind: String): ImageVector = when (kind) {
 
 private val SosRed = SaharaColors.Error
 
-/** SOS on Today: one large red button that opens the emergency sheet (numbers, the emergency QR card and the emergency plan). */
+/**
+ * SOS on Today: one large button that opens the emergency sheet (numbers, the emergency QR card and the emergency plan).
+ * Soft red tint with red text, not a solid red block: easy to find, calm to live with every day (team feedback 21 Nov).
+ */
 @Composable fun CareSosBar(onSos: () -> Unit) {
     val t = careText()
-    Button(onClick = onSos, shape = RoundedCornerShape(20.dp), colors = ButtonDefaults.buttonColors(containerColor = SosRed, contentColor = Color.White),
+    Button(onClick = onSos, shape = RoundedCornerShape(20.dp), colors = ButtonDefaults.buttonColors(containerColor = SaharaTone.Error.wash, contentColor = SaharaTone.Error.ink),
+        border = BorderStroke(1.5.dp, SosRed.copy(alpha = .55f)),
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp).testTag("today-sos")) {
-        Icon(Icons.Default.Call, null, Modifier.size(26.dp)); Spacer(Modifier.width(10.dp))
+        Surface(shape = CircleShape, color = SosRed, contentColor = Color.White, modifier = Modifier.size(36.dp)) { Box(contentAlignment = Alignment.Center) { Icon(Icons.Default.Call, null, Modifier.size(20.dp)) } }
+        Spacer(Modifier.width(12.dp))
         Text(t("SOS · Emergency help", "SOS · आपातकालीन मदद"), Modifier.weight(1f), fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Icon(Icons.Default.ChevronRight, null, Modifier.size(24.dp))
     }

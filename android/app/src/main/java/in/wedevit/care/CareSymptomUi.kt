@@ -76,7 +76,10 @@ import java.time.format.DateTimeFormatter
         .map { it to SymptomNoteCodec.decode(it.detail)?.let { n -> "${n.observedDate}T${n.observedTime}" }.orEmpty() }
         .sortedByDescending { it.second }.map { it.first } }
     var severeFirst by rememberSaveable(selected) { mutableStateOf(true) }
-    val shown = remember(notes, severeFirst) { if (severeFirst) SymptomSort.severeFirst(notes, { SymptomSort.headline(it) }, { SymptomSort.stamp(it) }) else notes }
+    // One small card per symptom (22 Nov review); tapping a card opens that symptom's graph and notes.
+    val summaries = remember(entries, selected) { SymptomSummaryRules.summaries(entries, selected) }
+    val shown = remember(summaries, severeFirst) { if (severeFirst) SymptomSort.severeFirst(summaries, { it.latestScore }, { SymptomSort.stamp(it.latest) }) else summaries }
+    var openSymptom by rememberSaveable(selected) { mutableStateOf("") }
     val hasPainHistory = remember(entries, person?.id) { person != null && PainHistoryRules.entries(entries, person.id).isNotEmpty() }
     val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     // Recently noted symptoms first, then the common ones, so the usual note is one tap away.
@@ -136,14 +139,15 @@ import java.time.format.DateTimeFormatter
             }, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Share, null, Modifier.size(20.dp), tint = SaharaSection.Symptoms.ink); Spacer(Modifier.width(6.dp)); Text(t("Share notes", "नोट साझा करें"), color = SaharaSection.Symptoms.ink, fontSize = 16.sp, fontWeight = FontWeight.SemiBold) }
             }
         }
-        if (notes.size > 1) item {
+        if (summaries.size > 1) item {
             SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().testTag("symptom-sort")) {
                 SegmentedButton(selected = severeFirst, onClick = { severeFirst = true }, shape = SegmentedButtonDefaults.itemShape(0, 2), modifier = Modifier.heightIn(min = 48.dp).testTag("symptom-sort-severe")) { Text(t("Most severe", "सबसे गंभीर")) }
                 SegmentedButton(selected = !severeFirst, onClick = { severeFirst = false }, shape = SegmentedButtonDefaults.itemShape(1, 2), modifier = Modifier.heightIn(min = 48.dp).testTag("symptom-sort-newest")) { Text(t("Newest", "सबसे नया")) }
             }
         }
-        items(shown, key = { it.id }) { Box(Modifier.animateItem().saharaAppear()) { SymptomNoteCard(it, vm, hindi) } }
+        items(shown, key = { it.symptom }) { s -> Box(Modifier.animateItem().saharaAppear()) { SymptomSummaryCard(s, hindi) { openSymptom = s.symptom } } }
     }
+    summaries.firstOrNull { it.symptom == openSymptom }?.let { s -> SymptomDetailSheet(s, entries, vm, hindi, onClose = { openSymptom = "" }) }
     if (adding && person != null) SymptomNoteEditor(vm, hindi, startSymptom = quickStart.ifBlank { null }, onClose = { adding = false; quickStart = "" })
     if (distressOpen && person != null) androidx.compose.ui.window.Dialog(onDismissRequest = { distressOpen = false },
         properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
@@ -515,7 +519,11 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
                 Text(personName, color = DoctorCardSub, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 if (!quick && !picking) {
                     if (steps.size > 1) Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) { steps.forEachIndexed { i, _ -> val bar by androidx.compose.animation.animateColorAsState(if (i <= pos) DoctorAccent else DoctorHairline, SaharaMotion.tween(SaharaMotion.ENTER_MS), label = "step-bar"); Box(Modifier.weight(1f).height(6.dp).clip(RoundedCornerShape(3.dp)).background(bar)) } }
-                    if (inSession && queueList.size > 1) Text("${SymptomDiaryRules.symptomLabel(symptom, hindi)} · ${sesIdx + 1} ${t("of", "/")} ${queueList.size}", color = DoctorCardSub, fontSize = 14.sp, modifier = Modifier.testTag("symptom-step-indicator"))
+                    // Several symptoms in a row: the symptom's name is the big line, so nobody loses track of which one they are scoring (team feedback 21 Nov).
+                    if (inSession && queueList.size > 1) Column(Modifier.testTag("symptom-step-indicator")) {
+                        Text(SymptomDiaryRules.symptomLabel(symptom, hindi), color = SaharaSection.Symptoms.ink, fontSize = 26.sp, lineHeight = 32.sp, fontWeight = FontWeight.Bold, fontFamily = SaharaTitleFont)
+                        Text("${sesIdx + 1} ${t("of", "/")} ${queueList.size}", color = DoctorCardSub, fontSize = 15.sp)
+                    }
                     else if (steps.size > 1) Text("${pos + 1} ${t("of", "/")} ${steps.size}", color = DoctorCardSub, fontSize = 14.sp, modifier = Modifier.testTag("symptom-step-indicator"))
                 }
             }
@@ -786,21 +794,18 @@ internal fun symptomTreatmentMarkers(entries: List<CareItem>, personId: String):
         val v = score.coerceIn(0f, 1f)
         val w = size.minDimension
         val c = androidx.compose.ui.geometry.Offset(size.width / 2f, size.height / 2f)
-        val r = w * .46f
-        drawCircle(lerp(Color(0xFFFFE3C2), Color(0xFFFFE08A), v), r, c)
-        drawCircle(Color(0xFFE8B86A).copy(alpha = .55f), r, c, style = androidx.compose.ui.graphics.drawscope.Stroke(w * .018f))
-        val ink = Ink.copy(alpha = .85f)
-        // Eyes: round dots that squint a little on a good day.
-        val eyeY = c.y - r * .12f; val eyeDx = r * .34f; val eyeR = r * .085f; val squash = 1f - .25f * v
-        listOf(-1f, 1f).forEach { side ->
-            drawOval(ink, androidx.compose.ui.geometry.Offset(c.x + side * eyeDx - eyeR, eyeY - eyeR * squash), androidx.compose.ui.geometry.Size(eyeR * 2, eyeR * 2 * squash))
-        }
-        // Cheeks, rosier on a good day.
-        listOf(-1f, 1f).forEach { side -> drawCircle(Color(0xFFF4978E).copy(alpha = .18f + .22f * v), r * .13f, androidx.compose.ui.geometry.Offset(c.x + side * r * .56f, c.y + r * .14f)) }
+        val r = w * .47f
+        // The faces from the Sahara film (team feedback 21 Nov): a solid colour per mood, soft orange, amber, green.
+        val hard = Color(0xFFE8926A); val okay = Color(0xFFEFB84A); val good = Color(0xFF6FBF8E)
+        drawCircle(if (v < .5f) lerp(hard, okay, v * 2f) else lerp(okay, good, (v - .5f) * 2f), r, c)
+        val ink = Color(0xFF3A2B26)
+        // Eyes: two round dots.
+        val eyeY = c.y - r * .18f; val eyeDx = r * .34f; val eyeR = r * .12f
+        listOf(-1f, 1f).forEach { side -> drawCircle(ink, eyeR, androidx.compose.ui.geometry.Offset(c.x + side * eyeDx, eyeY)) }
         // Mouth: one smooth curve whose bend follows the score.
-        val bend = (v - .5f) * r * .5f
-        val y = c.y + r * .36f
-        val mouth = androidx.compose.ui.graphics.Path().apply { moveTo(c.x - r * .3f, y); quadraticBezierTo(c.x, y + bend * 2f, c.x + r * .3f, y) }
-        drawPath(mouth, ink, style = androidx.compose.ui.graphics.drawscope.Stroke(width = w * .035f, cap = androidx.compose.ui.graphics.StrokeCap.Round))
+        val bend = (v - .5f) * r * .55f
+        val y = c.y + r * .34f
+        val mouth = androidx.compose.ui.graphics.Path().apply { moveTo(c.x - r * .38f, y); quadraticBezierTo(c.x, y + bend * 2f, c.x + r * .38f, y) }
+        drawPath(mouth, ink, style = androidx.compose.ui.graphics.drawscope.Stroke(width = w * .06f, cap = androidx.compose.ui.graphics.StrokeCap.Round))
     }
 }

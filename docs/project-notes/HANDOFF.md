@@ -2,6 +2,39 @@
 
 > **30 Oct 2026:** SVK spec build (emergency care plan, living will, QR card, languages): see [docs/SAHARA_SVK_BUILD_HANDOFF.md](docs/SAHARA_SVK_BUILD_HANDOFF.md).
 
+## 21 Nov: switch on doctor approvals, impact, morphine reports and Sarvam (owner of the Supabase project)
+
+New in the code (not live until these steps are done): `/admin` has **Doctor sign-ups** (approve / reject / suspend) and **Impact** tabs; the Android app asks a family who logs oral morphine where they got it; Goals of Care recordings and note translation use **Sarvam AI** (all 22 scheduled Indian languages plus English) with Gemini as the fallback.
+
+Two Supabase projects are involved: the **Android project** `kjnhtakqzboayqorrlue` (app data, doctor sign-ups) and the **website project** `cghlkqeqiokjqdionrkc` (hospital survey). Never paste keys into chat; put them only in Vercel or Supabase.
+
+- [ ] **0. Open logins (22 Nov, going to production):** Supabase → the Android project `kjnhtakqzboayqorrlue` → Authentication → Sign In / Providers → Email:
+  - "Allow new users to sign up": **on**.
+  - "Confirm email": **off**. Patients and family then sign up and use the app at once, with no approval and no email to wait for. (Supabase's built-in mailer allows only a few emails an hour, so confirmation mail would block testers.)
+  - Doctors still need approval: they sign up, send their council and registration number in the app, and stay "pending" until approved in `/admin` → Doctor sign-ups (steps 1 and 2 below).
+- [ ] **1. Apply the two migrations** to the Android project `kjnhtakqzboayqorrlue`. From `android/`:
+  ```bash
+  supabase link --project-ref kjnhtakqzboayqorrlue
+  supabase db push --dry-run
+  ```
+  The dry run must list **only** these two (older files were applied by hand; if it lists more, don't push: paste each file into Supabase → SQL Editor instead):
+  - `android/supabase/migrations/20261120120000_admin_clinician_review.sql`: lets `/admin` approve, reject and suspend doctors (writes the review log too) and count emergency-card views.
+  - `android/supabase/migrations/20261120180000_morphine_reports.sql`: private table for "where did you get this morphine?" reports. Only the place is stored; nothing is public until the team checks it.
+
+  Then run `supabase db push`.
+- [ ] **2. Add the website's key** in Vercel → the website project → Settings → Environment Variables (Production), then redeploy:
+  - `SAHARA_ANDROID_SUPABASE_SERVICE_ROLE_KEY` = the **secret** key of the Android project `kjnhtakqzboayqorrlue` (Supabase → Project Settings → API keys).
+  - `/admin` keeps using the same `ADMIN_PASSWORD`. Until this key is set, the Doctor sign-ups tab shows an error and the Impact tiles say "not available".
+- [ ] **3. Switch on Sarvam**: create a key at dashboard.sarvam.ai and add it in **two** places (the same key):
+  - **Vercel** → the website project → Environment Variables (Production): `SARVAM_API_KEY`, then redeploy. This is the one that matters for recordings: the Android app sends goals-of-care audio to `sahara.wedevit.in/api/goc-transcribe` (`prototype/app/goc-transcribe-server.ts`).
+  - **Supabase** → the Android project → Edge Functions → Secrets: `SARVAM_API_KEY`. This turns on Sarvam for note translation (all 23 languages). Then deploy the function from `android/`:
+  ```bash
+  supabase functions deploy sahara-care-assist --project-ref kjnhtakqzboayqorrlue
+  ```
+  Without the key, nothing changes: recordings keep using Gemini. With it, each 5-minute part goes to Sarvam first and falls back to Gemini on any failure.
+
+Check after: open `/admin` → Doctor sign-ups (pending requests list, the NMC register link works) and Impact (tiles show numbers). Record a short goals-of-care test in Hindi or Telugu on a phone: "Transcribed by saaras:v4" should show.
+
 ## 6 Nov: Awaiz, switch on the community
 
 Owner decisions (6 Nov): moderators use the existing `clinical_verifier` role (yes, it also allows clinician review); the built-in example posts show only in Practice; the single "Confirm and continue" button in Goals of care stays.

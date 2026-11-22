@@ -286,6 +286,7 @@ class CareSyncQueue private constructor(private val db: CareDatabase, @Volatile 
             CareSyncOps.CONTACT_SAVE -> service.saveCareContactOnce(CareSyncOps.contact(op)).revision
             CareSyncOps.CONTACT_REMOVE -> { service.removeCareContactOnce(CareSyncOps.contact(op)); null }
             CentreSuggestionOps.KIND -> { service.sendCentreSuggestion(op, account); null }
+            MorphineSourceOps.KIND -> { service.sendMorphineSource(op, account); null }
             else -> throw IllegalArgumentException("This change needs an updated app.")
         }
     }

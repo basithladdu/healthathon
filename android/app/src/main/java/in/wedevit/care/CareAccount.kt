@@ -6,6 +6,7 @@ import android.net.Uri
 import android.app.Application
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -121,7 +122,7 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
         } }
         } }
         CompositionLocalProvider(LocalCareLanguage provides rootLanguage) { CareLanguageDirection(rootLanguage) {
-        if (accountOpen) AccountSheet(cloud, model, onDismiss = { accountOpen = false; if (cloud.session.value == null) doctorEntryPending = false }, banner = joinBanner, onInvite = root::offerInviteLink, onDeleted = { accountNotice = it; accountOpen = false })
+        if (accountOpen) AccountSheet(cloud, model, onDoctorWorkspace = { accountOpen = false; doctorOpen = true }, onDismiss = { accountOpen = false; if (cloud.session.value == null) doctorEntryPending = false }, banner = joinBanner, onInvite = root::offerInviteLink, onDeleted = { accountNotice = it; accountOpen = false })
         val joinSession = session
         if (joinSession != null && pending != null) PendingJoinDialog(cloud, model, pending!!, joinSession.email, onClear = root::clearPendingJoin)
         } }
@@ -151,7 +152,7 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
     }
 }
 
-@Composable fun AccountSheet(cloud: CareCloud, vm: CareModel, onDismiss: () -> Unit, banner: String? = null, onInvite: ((String) -> Unit)? = null, onDeleted: (String) -> Unit = {}) {
+@Composable fun AccountSheet(cloud: CareCloud, vm: CareModel, onDismiss: () -> Unit, banner: String? = null, onInvite: ((String) -> Unit)? = null, onDeleted: (String) -> Unit = {}, onDoctorWorkspace: (() -> Unit)? = null) {
     val t = careText()
     var busy by remember { mutableStateOf(false) }
     val session by cloud.session.collectAsStateWithLifecycle()
@@ -163,13 +164,13 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
                 TopAppBar(title = { Text(t("Account", "खाता"), fontWeight = FontWeight.Bold) },
                     navigationIcon = { IconButton(onClick = { if (!busy) onDismiss() }, enabled = !busy, modifier = Modifier.testTag("account-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) } },
                     actions = { CareLanguageMenu(compact = true) }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Cream))
-            }) { padding -> Box(Modifier.padding(padding).padding(top = 8.dp)) { AccountContent(cloud, vm, onDismiss, heading = "", onBusyChange = { busy = it }, banner = banner, onInvite = onInvite, onDeleted = onDeleted) } }
+            }) { padding -> Box(Modifier.padding(padding).padding(top = 8.dp)) { AccountContent(cloud, vm, onDismiss, heading = "", onBusyChange = { busy = it }, banner = banner, onInvite = onInvite, onDeleted = onDeleted, onDoctorWorkspace = onDoctorWorkspace) } }
         }
     }
     else SaharaScreenSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         // The sheet covers the app header, so the language dropdown comes along to the sign-in form.
         Box(Modifier.fillMaxWidth().padding(horizontal = 12.dp), contentAlignment = Alignment.CenterEnd) { CareLanguageMenu() }
-        AccountContent(cloud, vm, onDismiss, onBusyChange = { busy = it }, banner = banner, onInvite = onInvite, onDeleted = onDeleted)
+        AccountContent(cloud, vm, onDismiss, onBusyChange = { busy = it }, banner = banner, onInvite = onInvite, onDeleted = onDeleted, onDoctorWorkspace = onDoctorWorkspace)
     }
 }
 
@@ -177,7 +178,7 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
 private fun clipboardText(context: android.content.Context): String? = (context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager)?.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(context)?.toString()
 
 /** [onInvite] keeps a pasted invitation while signed out (it is offered after sign-in). [onDeleted] receives the message to show once the account is gone. */
-@Composable fun AccountContent(cloud: CareCloud, vm: CareModel, onDismiss: () -> Unit, heading: String? = null, onBusyChange: (Boolean) -> Unit = {}, banner: String? = null, onInvite: ((String) -> Unit)? = null, onDeleted: (String) -> Unit = {}) {
+@Composable fun AccountContent(cloud: CareCloud, vm: CareModel, onDismiss: () -> Unit, heading: String? = null, onBusyChange: (Boolean) -> Unit = {}, banner: String? = null, onInvite: ((String) -> Unit)? = null, onDeleted: (String) -> Unit = {}, onDoctorWorkspace: (() -> Unit)? = null) {
     val session by cloud.session.collectAsStateWithLifecycle()
     val people by vm.people.collectAsStateWithLifecycle()
     val selected by vm.selected.collectAsStateWithLifecycle()
@@ -188,6 +189,8 @@ private fun clipboardText(context: android.content.Context): String? = (context.
     var password by remember { mutableStateOf("") }
     var passwordShown by remember { mutableStateOf(false) }
     var create by rememberSaveable { mutableStateOf(false) }
+    var signupRole by rememberSaveable { mutableStateOf("") }
+    var signupAgreed by rememberSaveable { mutableStateOf(false) }
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
     var notice by remember { mutableStateOf<String?>(null) }
@@ -254,6 +257,12 @@ private fun clipboardText(context: android.content.Context): String? = (context.
             if (heading != "") Heading(heading ?: if (session == null) if (create) t("Create an account", "खाता बनाएँ") else t("Sign in", "साइन इन करें") else t("Your account", "आपका खाता"), if (session == null) 24 else 28)
             banner?.let { Surface(color = Mint, shape = RoundedCornerShape(14.dp)) { Text(it, Modifier.fillMaxWidth().padding(16.dp), fontWeight = FontWeight.Medium) } }
             if (session == null) {
+                if (create) SignupRolePicker(signupRole) { signupRole = it }
+                if (create) Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable { signupAgreed = !signupAgreed }.testTag("signup-agree"), verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(checked = signupAgreed, onCheckedChange = { signupAgreed = it })
+                    Text(t("I am 18 or over and agree to the privacy policy. If the patient is a child, I am their parent or guardian.",
+                        "मेरी उम्र 18 साल या उससे ज़्यादा है और मैं निजता नीति से सहमत हूँ। अगर मरीज़ बच्चा है, तो मैं उनका माता-पिता या अभिभावक हूँ।"), fontSize = 14.sp, color = DoctorCardInk)
+                }
                 OutlinedTextField(email, { email = it }, label = { Text(t("Email", "ईमेल")) }, singleLine = true, leadingIcon = { Icon(Icons.Default.MailOutline, null) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next), shape = RoundedCornerShape(SaharaRadius.Sm), modifier = Modifier.fillMaxWidth())
                 OutlinedTextField(password, { password = it }, label = { Text(t("Password", "पासवर्ड")) }, singleLine = true, leadingIcon = { Icon(Icons.Default.Lock, null) },
                     trailingIcon = { IconButton(onClick = { passwordShown = !passwordShown }) { Icon(if (passwordShown) Icons.Default.VisibilityOff else Icons.Default.Visibility, if (passwordShown) t("Hide password", "पासवर्ड छिपाएँ") else t("Show password", "पासवर्ड दिखाएँ")) } },
@@ -261,13 +270,13 @@ private fun clipboardText(context: android.content.Context): String? = (context.
                     placeholder = if (create) { { Text(t("At least 10 characters", "कम से कम 10 अक्षर")) } } else null)
                 SaharaPrimaryButton(if (busy) t("Please wait…", "कृपया रुकें…") else if (create) t("Create account", "खाता बनाएँ") else t("Sign in", "साइन इन करें"), onClick = { authRun {
                     if (create) when (cloud.signUp(email, password)) {
-                        CareSignUp.SIGNED_IN -> password = ""
-                        CareSignUp.CONFIRMATION_SENT -> { awaitingConfirmation = email.trim(); create = false; password = ""; notice = t("Check your email to confirm, then sign in.", "पुष्टि के लिए अपना ईमेल देखें, फिर साइन इन करें।") }
+                        CareSignUp.SIGNED_IN -> { password = ""; SignupRole.save(context, signupRole); SignupRole.agreed(context) }
+                        CareSignUp.CONFIRMATION_SENT -> { SignupRole.save(context, signupRole); SignupRole.agreed(context); awaitingConfirmation = email.trim(); create = false; password = ""; notice = t("Check your email to confirm, then sign in.", "पुष्टि के लिए अपना ईमेल देखें, फिर साइन इन करें।") }
                         CareSignUp.ALREADY_REGISTERED -> { create = false; password = ""; error = careAuthMessage(CARE_ALREADY_REGISTERED, hindi) }
                     }
                     else { cloud.signIn(email, password); awaitingConfirmation = "" }
                 } },
-                    enabled = email.contains('@') && password.isNotEmpty(), busy = busy, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp))
+                    enabled = email.contains('@') && password.isNotEmpty() && (!create || (signupRole.isNotEmpty() && signupAgreed)), busy = busy, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp))
                 if (awaitingConfirmation.isNotBlank()) SaharaSecondaryButton(t("Resend email", "ईमेल फिर भेजें"), onClick = { authRun { cloud.resendConfirmation(awaitingConfirmation); notice = t("Email sent again.", "ईमेल फिर भेजा गया।") } }, enabled = !busy, icon = Icons.Default.MailOutline, modifier = Modifier.fillMaxWidth())
                 // Secondary links side by side, so the form stays short.
                 FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -285,6 +294,14 @@ private fun clipboardText(context: android.content.Context): String? = (context.
                         Icon(Icons.Default.AccountCircle, null, Modifier.size(28.dp), tint = Rust); Spacer(Modifier.width(12.dp))
                         Text(session!!.email, Modifier.weight(1f), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         IconButton(onClick = { vm.refresh(); onDismiss() }, enabled = !busy, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Refresh, t("Refresh", "ताज़ा करें"), tint = Rust) }
+                    }
+                }
+                if (onDoctorWorkspace != null && SignupRole.get(context) == SignupRole.DOCTOR) Surface(shape = RoundedCornerShape(16.dp), color = SaharaTone.Indigo.wash, modifier = Modifier.fillMaxWidth().testTag("account-doctor-verify")) {
+                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(t("Finish your doctor verification", "डॉक्टर सत्यापन पूरा करें"), fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+                        Text(t("Add your medical council and registration number. The Sahara team checks it, usually within a day, before you can see patients.",
+                            "अपनी मेडिकल काउंसिल और पंजीकरण संख्या जोड़ें। मरीज़ों को देखने से पहले Sahara टीम इसे जाँचती है, आम तौर पर एक दिन में।"), fontSize = 14.sp, color = DoctorCardInk)
+                        SaharaPrimaryButton(t("Open doctor workspace", "डॉक्टर वर्कस्पेस खोलें"), onClick = { onDoctorWorkspace() }, tone = SaharaTone.Indigo, modifier = Modifier.fillMaxWidth())
                     }
                 }
                 if (owner && selected.isNotBlank()) {
@@ -405,6 +422,42 @@ private fun clipboardText(context: android.content.Context): String? = (context.
         } }, enabled = deleteUnderstood) { Text(t("Delete", "मिटाएँ")) } },
         dismissButton = { TextButton(onClick = { deleting = false }) { Text(t("Keep my account", "खाता रहने दें")) } })
     if (signingOut) AlertDialog(onDismissRequest = { signingOut = false }, title = { Text(t("Sign out?", "साइन आउट करें?")) }, confirmButton = { TextButton(onClick = { signingOut = false; run { vm.stopRecording(); cloud.signOut() } }, modifier = Modifier.testTag("account-sign-out-confirm")) { Text(t("Sign out", "साइन आउट करें")) } }, dismissButton = { TextButton(onClick = { signingOut = false }) { Text(t("Cancel", "रद्द करें")) } })
+}
+
+/**
+ * "Who are you?" when creating an account. Different from apps that ask for Aadhaar, date of birth and gender: Sahara asks only
+ * what care needs. The choice is kept on this phone; a doctor is pointed to registration-number verification after sign-up.
+ */
+internal object SignupRole {
+    const val PATIENT = "patient"; const val FAMILY = "family"; const val DOCTOR = "doctor"
+    private const val PREFS = "sahara-signup-role"
+    fun save(context: android.content.Context, role: String) { if (role.isNotBlank()) context.getSharedPreferences(PREFS, 0).edit().putString("role", role).apply() }
+    fun get(context: android.content.Context): String = context.getSharedPreferences(PREFS, 0).getString("role", "").orEmpty()
+    /** Which version of the sign-up agreement was accepted, and when (kept as a record of consent). */
+    const val AGREEMENT_VERSION = "2026-11-21"
+    fun agreed(context: android.content.Context, now: Long = System.currentTimeMillis()) {
+        context.getSharedPreferences(PREFS, 0).edit().putString("agreement", AGREEMENT_VERSION).putLong("agreedAt", now).apply()
+    }
+}
+
+@Composable private fun SignupRolePicker(role: String, onRole: (String) -> Unit) { val t = careText()
+    Text(t("Who are you?", "आप कौन हैं?"), fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = DoctorCardInk)
+    listOf(
+        Triple(SignupRole.FAMILY, t("I'm caring for someone", "मैं किसी की देखभाल कर रहा/रही हूँ"), t("Family member or carer", "परिवार का सदस्य या देखभाल करने वाले")),
+        Triple(SignupRole.PATIENT, t("I'm the patient", "मैं मरीज़ हूँ"), t("Keep your own care in one place", "अपनी देखभाल एक जगह रखें")),
+        Triple(SignupRole.DOCTOR, t("I'm a doctor or nurse", "मैं डॉक्टर या नर्स हूँ"), t("We check your registration number first", "पहले हम आपकी पंजीकरण संख्या जाँचते हैं")),
+    ).forEach { (value, title, sub) ->
+        val chosen = role == value
+        Surface(shape = RoundedCornerShape(14.dp), color = if (chosen) Mint else Paper, border = BorderStroke(if (chosen) 2.dp else 1.dp, if (chosen) Rust else DoctorHairline),
+            modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).clickable { onRole(value) }.testTag("signup-role-$value")) {
+            Row(Modifier.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) { Text(title, fontWeight = FontWeight.SemiBold, color = DoctorCardInk); Text(sub, fontSize = 13.sp, color = DoctorCardSub) }
+                if (chosen) Icon(Icons.Default.Check, null, tint = Rust)
+            }
+        }
+    }
+    Text(t("We never ask for Aadhaar, date of birth or gender to sign up. Only an email and a password.", "साइन अप के लिए हम कभी आधार, जन्मतिथि या लिंग नहीं माँगते। सिर्फ़ ईमेल और पासवर्ड।"),
+        fontSize = 13.sp, color = DoctorCardSub)
 }
 
 /** One access choice as a chip with a tick when on; at least 48dp tall. */

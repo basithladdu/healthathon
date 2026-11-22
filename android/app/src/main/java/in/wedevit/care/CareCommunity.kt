@@ -135,7 +135,7 @@ private const val TELE_MANAS = "14416"
     var editingName by remember { mutableStateOf(false) }
     var draft by rememberSaveable { mutableStateOf("") }
     // The name others see starts as the first name from the sign-in email; the person can change it before it is used.
-    var nameDraft by rememberSaveable(accountId) { mutableStateOf(CommunityRules.suggestName(session?.email).orEmpty()) }
+    var nameDraft by rememberSaveable(accountId) { mutableStateOf("") }
     // Built-in community: read-only while signed out (or in Practice); per account while the server lacks the community functions.
     val signedIn = cloud != null && accountId != null
     var serverMissing by remember(accountId) { mutableStateOf(false) }

@@ -306,7 +306,7 @@ internal const val NEARBY_PAGE = 10
                 TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(c.url))) }, contentPadding = PaddingValues(0.dp), modifier = Modifier.testTag("centre-source-${c.id}")) { Text(t("Open the source listing", "मूल सूची खोलें")) }
             }
         }
-        val tags = listOf(layer) + NearbyHelp.serviceTags(c)
+        val tags = NearbyHelp.cardTags(c)
         Spacer(Modifier.height(12.dp))
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { tags.forEach { NearbyTag(it, optionLabel(it)) } }
         Spacer(Modifier.height(12.dp))

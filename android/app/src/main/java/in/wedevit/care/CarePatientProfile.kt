@@ -93,6 +93,13 @@ object CareWeightHistory {
     fun afterSave(before: CarePatientProfile, newKg: Double?, day: LocalDate): List<CareWeightEntry> =
         if (newKg == null || newKg == before.weightKg) sorted(before.weights) else record(before.weights, newKg, day)
 
+    /**
+     * "Add weight" on the profile card (22 Nov review): records [kg] for [day] and makes it the current weight, leaving
+     * every other detail as it was. Always logged, even when it equals the last weight, because the person weighed today.
+     */
+    fun addWeight(profile: CarePatientProfile, kg: Double, day: LocalDate): CarePatientProfile =
+        profile.copy(weightKg = kg, weights = record(profile.weights, kg, day))
+
     fun sorted(history: List<CareWeightEntry>): List<CareWeightEntry> = history.sortedBy { it.day }
 
     /**

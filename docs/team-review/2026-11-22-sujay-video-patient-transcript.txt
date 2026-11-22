@@ -1,0 +1,83 @@
+[0:00] Hello okay guys so this is my review about I mean all the changes we need to
+[0:07] make first of all the colors here are too bright or too dark you know we need to
+[0:12] change that so first going to SOS emergency help this is fine when I take
+[0:19] a this is fine this is okay you can see the picture of the thing that I have
+[0:27] sent with the printout of the QR card if I click on care planning right it comes
+[0:33] multiple times emergency care plan and card advance care planning and they're
+[0:39] all open very similar things so I get confused so if I if you look at continued
+[0:44] draft right so step one step two step three all of these if you follow it this
+[0:51] is basically what the goals of care is on the doctor's portal right and we
+[0:55] don't want that here if you go in fact you know I don't know this one part comes
+[0:59] as a record but everything else you can just type in from the patient portal
+[1:04] itself and I'm even able to sign it and it's I don't think that should be allowed
+[1:16] on this side anyway if I then go to the advance care planning thing oh god I'm
+[1:26] sorry so if I go to the advance care planning thing again I can do the same
+[1:32] thing know how this is different from the other thing you know but yeah this
+[1:43] also probably shouldn't be here I don't know but yeah you can tell me if this
+[1:48] is different anyway hmm then if we go back so if we go back now how is today
+[2:00] this is okay so if I go to notice symptom if I click on pain poor appetite
+[2:05] breathlessness next right so for pain this is great it shows the body area rate
+[2:13] the pain save now if I look at this so this is for poor appetite right but poor
+[2:18] appetite comes out so small here you know I'm not able to actually see it so
+[2:24] that is a problem skip this one okay that's a thing then if we scroll down
+[2:32] all of these these cards are too big it's really really big and pain comes
+[2:37] multiple times you know ideally we should have like tiny cards which says
+[2:41] pain and then which says you know low mode and stuff once we click on it we
+[2:46] should be able to really go into that in more detail I think of course this one I
+[2:54] already told you that how is today yeah the faces can be changed to the ones we
+[3:01] had in the video those are better coming down you know these are only three
+[3:08] medicines but if a patient had like 20 medicines a day it would be very
+[3:13] difficult for any time medicines right we should have like you know I might want
+[3:18] to take morphine multiple times a day and every time I take it and I click
+[3:23] this I should be able to say that you know this medicine was taken on this
+[3:30] date and this time and all the SOS medicines can show up on the doctors
+[3:35] portal that they started taking God they started taking these medicines you
+[3:41] know these many times on SOS basis so the doctor can know how you know
+[3:47] whether you know they're requiring too many SOS medications or not okay so this
+[3:52] is I think fine that's okay next pain and symptoms have already done that
+[4:00] maybe you can also you know really dim down the you know colors you know I
+[4:05] think that would be good if I go to next visit it shows up as the calendar
+[4:10] that is fine and these are just cards I'm assuming I can just click them as
+[4:16] done or undone and medicines again show up here maybe the medicines need not show
+[4:20] up here in the calendar when it has to be only for visits and all I think that
+[4:25] might be a little too crowded then again if I go to goals of care this whole
+[4:32] thing shows up again right and again I can put it and put in everything and I
+[4:38] can sign here also you know I don't think that is right and again if I go to
+[4:43] emergency plan oh yeah this is another thing if I click on something that I've
+[4:48] already scrolled onto it doesn't start from the beginning of the page which I
+[4:51] think is a problem it should start from the beginning of the page and again you
+[4:54] know you have like two three goals of care here also then if you go to all
+[5:00] care tools again so because I had opened medicines before it opens the medicine
+[5:04] part again but it should you know open in the starting of the care page but you
+[5:10] know now if I click it and go back then it goes to the sorry for the old phone
+[5:23] I'm not even able to go back I don't know if it's the phone issue but yeah
+[5:27] now if I go back it goes to the care thing but ideally that should open first
+[5:32] so medicines we already date check-ins yeah so it shows the distress score it
+[5:37] shows everyday symptom login you know this is getting too long and too you
+[5:46] know I don't know we'll have to condense this somehow it's very difficult
+[5:49] otherwise to do is fine but I'm not able to add another to do I don't know
+[5:55] how to add another to do we can't do that same thing with journal I'm not able
+[6:03] to add another journal you know review anywhere and none of these I find okay so
+[6:10] I don't know why but yeah that happens visits I don't know how does this get
+[6:16] populated again you know when the doctor schedules a visit does it add
+[6:19] here or do the patients had it here how does that work I don't know for
+[6:24] example if I click this yeah that's okay then if we go to calendar was fine so
+[6:32] again you know I had scrolled a little bit down so it doesn't start from the
+[6:35] beginning of the page it starts from below we need to change that then if we
+[6:42] go to documents is pretty good I think you know documents is nice go back
+[6:51] conversation again if I open conversations the same goals of care comes
+[6:56] again I'm like what is happening anyway again if I go to emergency prison the
+[7:01] goals of care comes and it doesn't start from the beginning of the page tubes
+[7:06] and lines is fine community is great but you know living with cancer is there a
+[7:11] way to create new communities or things like that I don't know so this might be
+[7:16] something we want to talk about later help so help is more or less okay but
+[7:25] there is this issue that yeah so these patients right so aims mongolgiri when
+[7:33] they say home care clinic visits and inpatient care it means that they also
+[7:36] have palliative care but it doesn't show up it just shows that it is morphine
+[7:39] listed you know so same thing with ashraya hospice even this will be
+[7:44] offering palliative cares but it's not showing up here so that needs to be
+[7:47] changed and then if you go to more there's no way for me to add another
+[7:55] weight for the patient without going to edit and add the weight there where I
+[8:01] can you know change all the details again so I think that should not be
+[8:06] there the rest of it is fine I think so this is what I had to say if there's
+[8:12] any other thing we can talk about it

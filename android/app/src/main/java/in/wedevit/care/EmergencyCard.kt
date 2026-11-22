@@ -71,9 +71,11 @@ object EmergencyCardRules {
      * shortened, then contacts are dropped. Everything removed is listed in [EmergencyCardText.leftOut]
      * and named on the card itself, so the reader knows the card is not complete.
      */
+    /** Failsafe for old printed cards (team meeting, 22 Nov): every offline card states a valid-until date, 90 days after it was made. */
+    const val VALID_DAYS = 90L
     fun build(source: EmergencySource, sections: Set<EmergencySection>, cardNumber: Int, cardId: String, madeAt: Long, zone: ZoneId = ZoneId.systemDefault(), maxBytes: Int = MAX_BYTES): EmergencyCardText {
         require(sections.isNotEmpty()) { "Choose at least one part to put on the card." }
-        val header = "SAHARA EMERGENCY CARD\nCard $cardNumber · ID $cardId · made ${day(madeAt, zone)}\nOffline card, not linked to any hospital system. Ask the family if a newer card exists."
+        val header = "SAHARA EMERGENCY CARD\nCard $cardNumber · ID $cardId · made ${day(madeAt, zone)} · VALID UNTIL ${day(madeAt + VALID_DAYS * 86_400_000L, zone)}\nOffline card, not linked to any hospital system. After the valid-until date treat it as out of date and call the family; always ask if a newer card exists."
         val goals = source.goals.takeIf { EmergencySection.GOALS in sections }
         var meds = if (EmergencySection.MEDICINES in sections) source.medicines.map(::medicineLine) else emptyList()
         var contacts = if (EmergencySection.CONTACTS in sections) source.contacts.map(::contactLine) else emptyList()
@@ -84,6 +86,8 @@ object EmergencyCardRules {
         val missing = buildList {
             if (EmergencySection.GOALS in sections && goals == null) add("no confirmed goals-of-care note")
             if (EmergencySection.CONTACTS in sections && source.contacts.isEmpty()) add("no contacts saved")
+            // Shirin, 21 Nov: the emergency team should be able to call the guardian, not only read names.
+            if (EmergencySection.CONTACTS in sections && source.contacts.isNotEmpty() && source.contacts.none { it.phone.isNotBlank() }) add("no phone number saved for the guardian")
             if (EmergencySection.MEDICINES in sections && source.medicines.isEmpty()) add("no current medicines listed")
             addAll(recordedNotOnCard(source))
         }

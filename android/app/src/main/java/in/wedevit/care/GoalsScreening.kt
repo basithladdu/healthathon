@@ -102,15 +102,21 @@ internal object GoalsScreening {
         answers.filter { (q, v) -> tool.questions.firstOrNull { it.id == q }?.options?.any { it.value == v && it.selectable } == true }
 }
 
-/** Optional, collapsed helper at the start of the doctor's conversation flow. Nothing is saved; it never blocks Continue. */
-@Composable internal fun GoalsScreeningHelper(scope: String, tool: GoalsScreeningTool = GoalsScreening.active) { val t = careText()
-    var open by rememberSaveable(scope) { mutableStateOf(false) }
+/**
+ * The surprise question on the doctor's patient page. Nothing is saved. "No, I would not be surprised" offers the goals-of-care
+ * conversation and the quiet planning-ahead guide (who certifies a death at home, registering it), which the doctor can go through with the family.
+ */
+@Composable internal fun GoalsScreeningHelper(scope: String, tool: GoalsScreeningTool = GoalsScreening.active, startOpen: Boolean = false,
+    onStartGoalsOfCare: (() -> Unit)? = null) { val t = careText()
+    var open by rememberSaveable(scope) { mutableStateOf(startOpen) }
+    var guideOpen by rememberSaveable(scope) { mutableStateOf(false) }
+    if (guideOpen) AfterDeathGuideSheet { guideOpen = false }
     var answers by rememberSaveable(scope, tool.id) { mutableStateOf(mapOf<String, String>()) }
     val suggestion = remember(answers) { tool.suggest(GoalsScreening.clean(tool, answers)) }
     Surface(shape = RoundedCornerShape(20.dp), color = DoctorCardReport, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("goals-screening")) {
         Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button, onClickLabel = if (open) t("Collapse", "बंद करें") else t("Expand", "खोलें")) { open = !open }, verticalAlignment = Alignment.CenterVertically) {
-                Text(t("Screening", "जाँच"), Modifier.weight(1f), fontSize = 16.sp, lineHeight = 22.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+                Text(t("Would you be surprised if this patient died in the next 12 months?", "अगर यह मरीज़ अगले 12 महीनों में गुज़र जाए, तो क्या आपको हैरानी होगी?"), Modifier.weight(1f), fontSize = 16.sp, lineHeight = 22.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
                 Icon(if (open) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, null, tint = RustText, modifier = Modifier.size(48.dp).padding(12.dp))
             }
             if (open) {
@@ -129,6 +135,14 @@ internal object GoalsScreening {
                 if (suggestion != null) Surface(shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, if (suggestion.consider) DoctorStatusWarn.copy(alpha = .35f) else DoctorHairline), color = if (suggestion.consider) DoctorStatusWarnBg else DoctorStatusRestBg, modifier = Modifier.fillMaxWidth().testTag("goals-screening-suggestion")) {
                     Text(t(suggestion.en, suggestion.hi), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk, modifier = Modifier.padding(12.dp).announce())
                 }
+                if (suggestion?.consider == true) {
+                    if (onStartGoalsOfCare != null) Button(onClick = onStartGoalsOfCare, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("goals-screening-start-goc")) {
+                        Text(t("Start the goals of care conversation", "देखभाल के लक्ष्यों पर बातचीत शुरू करें"))
+                    }
+                    OutlinedButton(onClick = { guideOpen = true }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("goals-screening-planning")) {
+                        Text(t("Planning ahead with the family: death certificate and next steps", "परिवार के साथ आगे की तैयारी: मृत्यु प्रमाणपत्र और अगले कदम"))
+                    }
+                }
                 InfoDisclosure(t("Sources", "स्रोत")) {
                     tool.sources.forEach { Text(it, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub) }
                     tool.questions.filter { it.noteEn.isNotBlank() }.forEach { q -> Text(t(q.noteEn, q.noteHi), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub) }
@@ -137,4 +151,78 @@ internal object GoalsScreening {
             }
         }
     }
+}
+
+/**
+ * When the surprise question pops up on the doctor's patient page (meeting, 22 Nov 2026): no goals-of-care note yet, or about
+ * 90 days after the latest signed one. A note still being written does not prompt. An answer quiets it for 90 days, "Not now" for 7.
+ */
+internal object GocSurpriseSchedule {
+    const val AFTER_SIGNED_NOTE_DAYS = 90L
+    const val AFTER_ANSWER_DAYS = 90L
+    const val AFTER_NOT_NOW_DAYS = 7L
+    private const val DAY = 86_400_000L
+
+    fun due(now: Long, latestSignedAt: Long?, hasUnsignedNote: Boolean, answeredAt: Long, snoozedAt: Long): Boolean {
+        if (answeredAt > 0 && now - answeredAt < AFTER_ANSWER_DAYS * DAY) return false
+        if (snoozedAt > 0 && now - snoozedAt < AFTER_NOT_NOW_DAYS * DAY) return false
+        return if (latestSignedAt != null) now - latestSignedAt >= AFTER_SIGNED_NOTE_DAYS * DAY else !hasUnsignedNote
+    }
+}
+
+/** Per patient, on this phone: when the doctor last answered the surprise question or chose "Not now". */
+internal class GocSurpriseMemory(context: android.content.Context, namespace: String, personId: String) {
+    private val prefs = context.applicationContext.getSharedPreferences("sahara-goc-surprise", android.content.Context.MODE_PRIVATE)
+    private val key = "$namespace|$personId"
+    fun answeredAt(): Long = prefs.getLong("$key|answered", 0L)
+    fun snoozedAt(): Long = prefs.getLong("$key|snoozed", 0L)
+    fun answered(now: Long = System.currentTimeMillis()) { prefs.edit().putLong("$key|answered", now).apply() }
+    fun snoozed(now: Long = System.currentTimeMillis()) { prefs.edit().putLong("$key|snoozed", now).apply() }
+}
+
+/**
+ * Doctors only: the surprise question as a dialog when they open a patient's page and [GocSurpriseSchedule] says it is due.
+ * Reads the doctor's own goals-of-care notes on this phone. "No, I would not be surprised" offers the conversation.
+ */
+@Composable internal fun GocSurpriseQuestionPrompt(vm: CareModel, personId: String, onStartGoalsOfCare: () -> Unit) {
+    val t = careText(); val context = androidx.compose.ui.platform.LocalContext.current
+    val namespace = vm.storageNamespace
+    val memory = remember(namespace, personId) { GocSurpriseMemory(context, namespace, personId) }
+    var show by remember(namespace, personId) { mutableStateOf(false) }
+    var answer by rememberSaveable(personId) { mutableStateOf("") }
+    LaunchedEffect(namespace, personId) {
+        if (personId.isBlank()) return@LaunchedEffect
+        val notes = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            runCatching { DoctorGocDiscussions.list(CarePlanStore(context.applicationContext, namespace).load(personId).ectprs, personId) }.getOrNull()
+        } ?: return@LaunchedEffect
+        val latestSigned = notes.filter { it.signed }.mapNotNull { gocMillis(it.at) }.maxOrNull()
+        show = GocSurpriseSchedule.due(System.currentTimeMillis(), latestSigned, notes.any { !it.signed }, memory.answeredAt(), memory.snoozedAt())
+    }
+    if (!show) return
+    val tool = SurpriseQuestionEcog
+    val question = tool.questions.first { it.id == SurpriseQuestionEcog.SURPRISE }
+    val suggestion = if (answer.isEmpty()) null else tool.suggest(mapOf(SurpriseQuestionEcog.SURPRISE to answer))
+    fun close() { if (answer.isEmpty()) memory.snoozed() else memory.answered(); show = false }
+    AlertDialog(onDismissRequest = ::close, modifier = Modifier.testTag("goc-surprise-dialog"),
+        title = { Text(t(question.en, question.hi), fontWeight = FontWeight.SemiBold) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (answer.isEmpty()) {
+                    Text(t("A quick check for this patient. There is no signed goals-of-care note yet, or the last one is about 3 months old.", "इस मरीज़ के लिए एक छोटी जाँच। अभी देखभाल के लक्ष्यों का कोई साइन किया हुआ नोट नहीं है, या पिछला लगभग 3 महीने पुराना है।"), fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardSub)
+                    question.options.forEach { option ->
+                        OutlinedButton(onClick = { answer = option.value; memory.answered() }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("goc-surprise-${option.value}")) {
+                            Text(t(option.en, option.hi), color = DoctorCardInk)
+                        }
+                    }
+                } else suggestion?.let { Text(t(it.en, it.hi), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk, modifier = Modifier.announce().testTag("goc-surprise-suggestion")) }
+            }
+        },
+        confirmButton = {
+            if (answer == SurpriseQuestionEcog.NOT_SURPRISED) Button(onClick = { show = false; onStartGoalsOfCare() }, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("goc-surprise-start")) {
+                Text(t("Start the goals of care conversation", "देखभाल के लक्ष्यों पर बातचीत शुरू करें"))
+            } else if (answer.isNotEmpty()) TextButton(onClick = ::close, modifier = Modifier.testTag("goc-surprise-close")) { Text(t("Close", "बंद करें")) }
+        },
+        dismissButton = {
+            if (answer != SurpriseQuestionEcog.SURPRISED) TextButton(onClick = ::close, modifier = Modifier.testTag("goc-surprise-later")) { Text(if (answer.isEmpty()) t("Not now", "अभी नहीं") else t("Later", "बाद में")) }
+        })
 }

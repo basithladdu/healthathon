@@ -211,7 +211,7 @@ internal object DistressCodec {
     fun toggle(step: Int) { if (open > 0) markDone(open); open = if (open == step) -1 else step }
     LaunchedEffect(Unit) { vm.actionError.value = null }
     BackHandler { onClose() }
-    Column(Modifier.fillMaxSize().background(Cream).safeDrawingPadding().imePadding().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 16.dp).testTag("distress-screen"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(Modifier.fillMaxSize().background(Cream).safeDrawingPadding().imePadding().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(top = 12.dp, bottom = 16.dp).testTag("distress-screen"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onClose, modifier = Modifier.sizeIn(minWidth = 48.dp, minHeight = 48.dp).testTag("distress-close")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Close", "बंद करें"), tint = Ink) }
             Box(Modifier.weight(1f)) { Heading(t("Distress Thermometer", "परेशानी थर्मामीटर"), 24) }
@@ -287,7 +287,8 @@ private fun distressAbout(t: (String, String) -> String): String =
 private fun distressBand(n: Int): Color = ChartBands.color(n)
 /** Darker versions of the same colours, for text on the cream background. */
 private fun distressBandText(n: Int): Color = when { n <= 3 -> Color(0xFF1E6B3C); n <= 6 -> Color(0xFF8A5A00); else -> Color(0xFFB3261E) }
-private fun distressOnBand(n: Int): Color = if (n in 4..6) Ink else Color.White
+/** The number in the bulb is white on every colour (team feedback 21 Nov). */
+@Suppress("UNUSED_PARAMETER") private fun distressOnBand(n: Int): Color = Color.White
 
 private fun distressGroupStyle(en: String): Pair<ImageVector, Color> = when (en) {
     "Physical Concerns" -> Icons.Filled.Healing to Color(0xFFC2453B)
@@ -326,15 +327,16 @@ private val DistressRowHeight = 24.dp
         }) {
             (10 downTo 0).forEach { n ->
                 val on = score == n
-                val filled = picked && n in 1..score
-                val ghost = !picked && n in 1..hint.value.toInt()
+                // The whole fill takes the chosen level's colour (one colour, not green-then-amber), and starts at 0 so it meets the bulb.
+                val filled = picked && n in 0..score
+                val ghost = !picked && n in 0..hint.value.toInt()
                 val anchor = when (n) { 0 -> t("No distress", "कोई परेशानी नहीं"); 10 -> t("Extreme distress", "बहुत ज़्यादा परेशानी"); else -> "" }
                 val description = if (anchor.isEmpty()) "$n" else "$n, $anchor"
                 Row(Modifier.fillMaxWidth().height(DistressRowHeight).selectable(selected = on, role = Role.RadioButton, onClick = { onPick(n) }).semantics { contentDescription = description }.testTag("distress-score-$n"), verticalAlignment = Alignment.CenterVertically) {
                     Text("$n", fontSize = if (on) 17.sp else 14.sp, fontWeight = if (on) FontWeight.Bold else FontWeight.Medium, color = if (on) distressBandText(n) else DoctorCardSub, textAlign = TextAlign.End, modifier = Modifier.width(26.dp))
                     Spacer(Modifier.width(8.dp))
                     val shape = if (n == 10) RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp) else RoundedCornerShape(0.dp)
-                    Box(Modifier.width(24.dp).fillMaxHeight().background(if (filled) distressBand(n) else if (ghost) distressBand(n).copy(alpha = .45f) else empty, shape)) {
+                    Box(Modifier.width(24.dp).fillMaxHeight().background(if (filled) distressBand(score) else if (ghost) distressBand(hint.value.toInt()).copy(alpha = .45f) else empty, shape)) {
                         if (n in 1..9) Box(Modifier.align(Alignment.TopEnd).width(8.dp).height(1.dp).background(Paper))
                     }
                     if (on) Text("◀", fontSize = 13.sp, color = distressBandText(n), modifier = Modifier.padding(start = 6.dp))
@@ -342,7 +344,7 @@ private val DistressRowHeight = 24.dp
             }
         }
         // The bulb, under the tube (its centre lines up with the tube's: 26 + 8 + 12 = 46dp from the left).
-        Box(Modifier.padding(start = 24.dp).offset(y = (-4).dp).size(44.dp).background(if (picked) distressBand(score) else empty, CircleShape).testTag("distress-chosen"), contentAlignment = Alignment.Center) {
+        Box(Modifier.padding(start = 24.dp).offset(y = (-10).dp).size(44.dp).background(if (picked) distressBand(score) else empty, CircleShape).testTag("distress-chosen"), contentAlignment = Alignment.Center) {
             Text(if (picked) "$score" else "–", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = if (picked) distressOnBand(score) else DoctorCardSub)
         }
         Text(t("No distress", "कोई परेशानी नहीं"), fontSize = 13.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub)

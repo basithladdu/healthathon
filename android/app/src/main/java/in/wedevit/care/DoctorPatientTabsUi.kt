@@ -65,7 +65,7 @@ internal val doctorPatientTabs = listOf(
 /** The hub's less used routes ("Today" is the Care today page); named here so the section bar can title them too. */
 internal val doctorMoreSections = listOf(
     DoctorPatientTab("Today", "Care today", "आज की देखभाल", Icons.Outlined.GridView, DoctorCardOverview),
-    DoctorPatientTab("Tools", "Daily care", "रोज़ की देखभाल", Icons.Outlined.Apps, DoctorCardReport),
+    // "Daily care" (the whole patient app) is no longer a doctor section (Dr Sujay, 22 Nov).
     DoctorPatientTab("Shared", "Sharing & access", "साझा करना और पहुँच", Icons.Outlined.Lock, DoctorCardReport),
 )
 
@@ -208,51 +208,33 @@ internal fun doctorLabRange(data: CareEntry): Pair<Double?, Double?> {
 }
 
 /**
- * Phone, inside a section: the section's colour chip and title, and one compact "Sections" button that opens the
- * ordered section list in a sheet. No permanent tab row (owner, 6 Nov: it distracts while working in a section).
+ * Phone, inside a section: the section's colour chip and title. No permanent tab row (owner, 6 Nov: it distracts while
+ * working in a section) and no "Sections" sheet (Dr Sujay, 22 Nov: it repeated the list); Back returns to the patient's list.
  * The host's top bar keeps the back arrow (back to the patient) and the patient's name.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable internal fun DoctorPatientSectionBar(selected: String, onSection: (String) -> Unit, modifier: Modifier = Modifier) {
     val t = careText()
     val tab = (doctorPatientTabs + doctorMoreSections).firstOrNull { it.section == selected }
-    var open by rememberSaveable { mutableStateOf(false) }
-    // The section's header band: its colour as a solid strip, white icon and title on one line, and a white Sections button.
+    // The section's header band: its colour as a solid strip, white icon and title on one line.
     val barTone = tab?.let { doctorTabTone(it.section) } ?: DoctorTones.Rust
-    val barFill by androidx.compose.animation.animateColorAsState(barTone.band, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "sectionbar")
+    val barFill by androidx.compose.animation.animateColorAsState(barTone.wash, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "sectionbar")
     Row(modifier.fillMaxWidth().background(barFill).padding(start = 16.dp, end = 12.dp, top = 8.dp, bottom = 8.dp).testTag("doctor-section-bar"), verticalAlignment = Alignment.CenterVertically) {
         // The title changes in place when the doctor jumps to another section.
         AnimatedContent(tab, Modifier.weight(1f), transitionSpec = { SaharaMotion.crossfade() }, label = "sectiontitle") { shown ->
             Row(verticalAlignment = Alignment.CenterVertically) {
-                if (shown != null) { Icon(shown.icon, null, Modifier.size(26.dp), tint = barTone.onSolid); Spacer(Modifier.width(12.dp)) }
+                if (shown != null) { Icon(shown.icon, null, Modifier.size(26.dp), tint = barTone.ink); Spacer(Modifier.width(12.dp)) }
                 // One line: the title shrinks a step instead of dropping "& card" to a second line beside the button.
                 SaharaFitText(shown?.let { t(it.en, it.hi) } ?: "", Modifier.a11yHeading().testTag("doctor-section-title"), style = LocalTextStyle.current.copy(fontFamily = SaharaTitleFont, fontSize = 20.sp),
-                    color = barTone.onSolid, maxLines = 1, min = 15f, fontWeight = FontWeight.Bold, textAlign = null)
+                    color = barTone.ink, maxLines = 1, min = 15f, fontWeight = FontWeight.Bold, textAlign = null)
             }
         }
-        Spacer(Modifier.width(8.dp))
-        OutlinedButton(onClick = { open = true }, shape = RoundedCornerShape(50), border = BorderStroke(1.5.dp, Paper), colors = ButtonDefaults.outlinedButtonColors(containerColor = Paper, contentColor = barTone.ink),
-            contentPadding = PaddingValues(horizontal = 14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-sections-open")) {
-            Icon(Icons.Outlined.GridView, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Sections", "हिस्से"), fontWeight = FontWeight.SemiBold, softWrap = false)
-        }
-    }
-    if (open) SaharaScreenSheet(onDismissRequest = { open = false }, containerColor = Cream) {
-        Column(Modifier.fillMaxWidth().navigationBarsPadding().padding(start = 16.dp, end = 16.dp, bottom = 16.dp).testTag("doctor-sections-sheet"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(t("Sections", "हिस्से"), Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 22.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
-            Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
-                Column {
-                    doctorPatientTabs.forEachIndexed { index, item ->
-                        if (index > 0) HorizontalDivider(Modifier.padding(start = 64.dp), color = DoctorHairline)
-                        DoctorSectionRow(item, { next -> open = false; if (next != selected) onSection(next) }, "doctor-tab", selected = item.section == selected)
-                    }
-                }
-            }
-        }
+        // No "Sections" button and sheet here (Dr Sujay, 22 Nov): it only repeated the patient's list. Back returns to that list.
     }
 }
 
 /**
- * The doctor's patient screen. Phone: the hub, then one section at a time under a slim section bar ("Sections" jumps to another).
+ * The doctor's patient screen. Phone: the hub, then one section at a time under a slim section bar (Back returns to the hub).
  * 840dp and wider: the hub stays on the left as the list and the chosen tab fills the right.
  * [hub] gets (pane, selected): pane is true in the two-pane layout. [care] draws every section except "Labs".
  */

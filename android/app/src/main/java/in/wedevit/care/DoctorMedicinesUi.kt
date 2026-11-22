@@ -6,6 +6,8 @@ import android.app.TimePickerDialog
 import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -89,7 +91,7 @@ private fun medicineTime(at: Long?) = at?.let { DateTimeFormatter.ofPattern("d M
 
         if(busy)item {SaharaProgressBar(null)}
         error?.let {message->item {SurfaceCard(Peach){Row(verticalAlignment=Alignment.CenterVertically){Icon(Icons.Default.ErrorOutline,null,tint=RustText,modifier=Modifier.size(20.dp));Spacer(Modifier.width(8.dp));Text(message, Modifier.weight(1f).announce(),fontSize=15.sp,color=DoctorCardInk);TextButton(onClick=::refresh,enabled=!busy,modifier=Modifier.heightIn(min=48.dp)){Text(t("Retry", "फिर कोशिश करें"), color = RustText)}}}}}
-        item {DoctorSideEffectsSection(vm,personId)}
+        item {DoctorSideEffectsCompact(vm,personId)}
         item {MedicineHistoryTabs(tab,busy){tab=it}}
         prescriptionError?.let {message->item {Text(message,fontSize=14.sp,color=DoctorCardSub,modifier=Modifier.announce())}}
         if(prescriptions==null&&loaded) item {TextButton(onClick={if(same(true)&&!busy)add=true},enabled=editable&&!busy,modifier=Modifier.heightIn(min=48.dp)){Text(t("Add medicine", "दवा जोड़ें"))}}
@@ -128,6 +130,13 @@ private fun medicineTime(at: Long?) = at?.let { DateTimeFormatter.ofPattern("d M
                 if(lines.size>1)Text(lines.drop(1).joinToString("\n"),fontSize=14.sp,color=DoctorCardSub)
                 val course=snapshot.courses.firstOrNull {it.medicineId==medicine.id}
                 if(course?.past==true){Text(t("Moved to past ${medicineTime(course.changedAt)}", "${medicineTime(course.changedAt)} को पुरानी में डाली गई"),fontSize=14.sp,fontWeight=FontWeight.Medium,color=DoctorAccent);if(course.reason.isNotBlank())Text(course.reason,fontSize=14.sp,color=DoctorCardSub)}
+                if (MedicineDoses.isAsNeededMedicine(medicine)) {
+                    val now = System.currentTimeMillis()
+                    val taken = snapshot.events.filter { it.medicineId == medicine.id && it.outcome == "taken" && it.note == MedicineDoses.AS_NEEDED_NOTE }.map { it.reportedTakenAt ?: it.loggedAt }
+                    val day = taken.count { now - it <= 86_400_000L }; val week = taken.count { now - it <= 7 * 86_400_000L }
+                    Text(t("As-needed doses: $day in the last 24 hours, $week in the last 7 days", "ज़रूरत पर ली गई खुराकें: पिछले 24 घंटों में $day, पिछले 7 दिनों में $week"),
+                        fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.testTag("doctor-as-needed-count"))
+                }
                 val last=snapshot.events.firstOrNull {it.medicineId==medicine.id&&it.outcome !in setOf("course_past","course_current")}
                 if(last!=null)MedicineStatusChip(MedicineHistoryRules.status(last,snapshot.events,System.currentTimeMillis()),last.outcome)
                 else MedicineHistoryRules.legacyDate(medicine)?.let {date->MedicineStatusChip("Taken reported","taken");Text(date,fontSize=14.sp,color=DoctorCardFaint)}
@@ -168,6 +177,43 @@ private fun medicineTime(at: Long?) = at?.let { DateTimeFormatter.ofPattern("d M
     edit?.let {item->AddCareItem("medicine",vm,onDismiss={edit=null},initial=item)}
     report?.let {item->MedicineReportDialog(item,busy||!loaded,snapshot.events.filter {it.medicineId==item.id&&it.outcome=="planned"},onClose={report=null},onSave={event->if(loaded&&same(true))run {val result=repo.append(personId,event);if(same()){snapshot=result;report=null}}})}
     retire?.let {item->val past=retireTargetPast;AlertDialog(onDismissRequest={if(!busy)retire=null},title={Text(if(past)t("Move to past medicines?", "पुरानी दवाओं में डालें?") else t("Return to current medicines?", "अभी की दवाओं में वापस डालें?"))},text={Column(Modifier.verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(12.dp)){Text(item.title,fontSize=18.sp,fontWeight=FontWeight.Medium,fontFamily=SaharaTitleFont,color=DoctorCardInk);OutlinedTextField(reason,{reason=it.take(1000)},label={Text(t("Reason (optional)", "कारण (चाहें तो)"))},enabled=!busy&&loaded,shape=RoundedCornerShape(14.dp),modifier=Modifier.fillMaxWidth())}},containerColor=Cream,confirmButton={Button(onClick={if(loaded&&same(true))run {val result=repo.setPast(personId,item,past,reason,retireRevision);if(same()){snapshot=result;retire=null;vm.refreshMedicineHistory()}}},enabled=!busy&&editable&&loaded,shape=RoundedCornerShape(14.dp),modifier=Modifier.heightIn(min=48.dp)){Text(t("Confirm", "पक्का करें"))}},dismissButton={TextButton(onClick={retire=null},enabled=!busy){Text(t("Cancel", "रद्द करें"))}})}
+}
+
+/**
+ * The doctor's side effects since the last visit, compact (Dr Sujay, 22 Nov: the cards were too big): one line per side effect
+ * (medicine, what happened, severity); tap a line for the full note and the Discussed button.
+ */
+@Composable private fun DoctorSideEffectsCompact(vm: CareModel, personId: String) { val t = careText(); val hindi = careHindi()
+    val all by vm.allItems.collectAsStateWithLifecycle()
+    val busy by vm.busy.collectAsStateWithLifecycle(); val canEdit by vm.canEdit.collectAsStateWithLifecycle()
+    val capturedAccount = remember(personId) { vm.accountNamespace }
+    val now = remember(all) { System.currentTimeMillis() }
+    val recent = remember(all, personId, now) { SideEffectLog.sinceVisit(SideEffectLog.entries(all, personId), SideEffectLog.lastVisitAt(all, personId, now)).sortedBy { it.note.discussedAt > 0 } }
+    var open by rememberSaveable(personId) { mutableStateOf("") }
+    Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("doctor-side-effects")) {
+        Column(Modifier.padding(horizontal = 16.dp, vertical = 10.dp)) {
+            Text(if (recent.isEmpty()) t("Side effects", "दुष्प्रभाव") else t("Side effects", "दुष्प्रभाव") + " · ${recent.size}", fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading().padding(vertical = 4.dp))
+            if (recent.isEmpty()) Row(Modifier.heightIn(min = 40.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Check, null, Modifier.size(18.dp), tint = DoctorStatusGood); Spacer(Modifier.width(8.dp)); Text(t("Nothing since last visit", "पिछली मुलाक़ात के बाद कुछ नहीं"), fontSize = 15.sp, color = DoctorCardInk) }
+            recent.forEachIndexed { i, e -> key(e.item.id) {
+                if (i > 0) HorizontalDivider(color = DoctorHairline)
+                val n = e.note; val expanded = open == e.item.id
+                val severityInk = when (n.severity) { "severe" -> DoctorStatusRest; "moderate" -> DoctorStatusWarn; else -> DoctorStatusGood }
+                val line = listOf(n.medicineName, SideEffectRules.effectsText(n, hindi), SideEffectRules.severityLabel(n.severity, hindi)).filter { it.isNotBlank() }.joinToString(" · ")
+                Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = androidx.compose.ui.semantics.Role.Button) { open = if (expanded) "" else e.item.id }.testTag("doctor-side-effect-row-${e.item.id}"), verticalAlignment = Alignment.CenterVertically) {
+                    Box(Modifier.size(10.dp).background(severityInk, androidx.compose.foundation.shape.CircleShape))
+                    Spacer(Modifier.width(10.dp))
+                    Text(line, Modifier.weight(1f), fontSize = 15.sp, color = DoctorCardInk, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                    if (n.discussedAt > 0) Icon(Icons.Default.Check, t("Discussed", "बात हुई"), Modifier.size(18.dp), tint = DoctorStatusGood)
+                    Icon(if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore, if (expanded) t("Hide details", "विवरण छिपाएँ") else t("Show details", "विवरण देखें"), Modifier.size(22.dp), tint = DoctorCardSub)
+                }
+                if (expanded) Column(Modifier.padding(bottom = 8.dp)) {
+                    SideEffectSummary(e, showMedicine = false) {
+                        if (n.discussedAt == 0L && canEdit) TextButton(onClick = { if (canEditCareContext(vm, e.item.personId, capturedAccount)) vm.updateItem(SideEffectLog.markDiscussed(e, "Doctor", System.currentTimeMillis())) {} }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-side-effect-discussed-${e.item.id}")) { Text(t("Discussed", "बात हुई"), color = DoctorAccent) }
+                    }
+                }
+            } }
+        }
+    }
 }
 
 @Composable internal fun MedicineReportCard(event: MedicineIntakeEvent, all: List<MedicineIntakeEvent>, now: Long) { val t = careText();

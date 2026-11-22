@@ -52,6 +52,17 @@ object MedicineDoses {
     /** True when [text] says the medicine is taken only when needed ("SOS", "as needed", "PRN"). */
     fun isAsNeeded(text: String): Boolean = asNeeded.containsMatchIn(text)
 
+    /** Note on every as-needed log, so the count can find them again (and a doctor reading the history sees what it was). */
+    const val AS_NEEDED_NOTE = "As-needed dose taken."
+    fun isAsNeededMedicine(item: CareItem): Boolean = item.kind == "medicine" && (isAsNeeded(item.detail) || isAsNeeded(item.title))
+    /** One as-needed dose, taken now. Never merges with an earlier one: two doses an hour apart are two reports. */
+    fun asNeededDose(item: CareItem, now: Long, reporter: String, id: String = UUID.randomUUID().toString()) =
+        MedicineIntakeEvent(id, item.id, item.title, "taken", plannedAt = null, reportedTakenAt = now, loggedAt = now, reporter = reporter, note = AS_NEEDED_NOTE, source = "manual")
+    /** When the as-needed doses of [medicineId] were taken on [day], earliest first. */
+    fun asNeededTimes(medicineId: String, events: List<MedicineIntakeEvent>, day: LocalDate, zone: ZoneId): List<Long> =
+        events.filter { it.medicineId == medicineId && it.outcome == "taken" && it.note == AS_NEEDED_NOTE }
+            .map { it.reportedTakenAt ?: it.loggedAt }.filter { localDay(it, zone) == day }.sorted()
+
     /** Doses a day written in [text], or null when it says "as needed", is not daily, or gives no clear count. Never more than [MAX_PER_DAY]. */
     fun perDay(text: String): Int? {
         val clean = text.replace(Regex("\\s+"), " ").trim()

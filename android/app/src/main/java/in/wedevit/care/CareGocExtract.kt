@@ -1008,7 +1008,9 @@ object GocNewVersion {
 object GocKeep {
     /** What can be saved now: the stored plan with this talk and its "What matters" words, never the treatment choices the plan's rules still block. */
     fun talkOnly(stored: EctprRecord, working: EctprRecord, today: java.time.LocalDate): EctprRecord {
-        val talk = stored.copy(gocTranscript = working.gocTranscript)
+        // Who was present and the main decision-maker are typed on the talk page ("Who's present"), so they are kept with the talk when the plan's own rules allow.
+        val bare = stored.copy(gocTranscript = working.gocTranscript)
+        val talk = bare.copy(decisionMakers = working.decisionMakers).takeIf { EctprRules.saveBlockers(it, today).isEmpty() } ?: bare
         val withValues = talk.copy(values = working.values)
         return if (EctprRules.saveBlockers(withValues, today).isEmpty()) withValues else talk
     }

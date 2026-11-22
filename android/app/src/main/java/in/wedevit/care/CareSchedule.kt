@@ -43,6 +43,9 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
     item.due > 0 && careDay(item.due) == day && calendarCategory(item).isNotBlank() && CareEntryCodec.decode(item.detail)?.status != "cancelled"
 }.sortedWith(compareBy<CareItem> { if (it.kind == "medicine") it.doneOn == day.toString() else it.doneOn.isNotBlank() }.thenBy { it.due }.thenBy { it.title.lowercase() })
 
+/** The Calendar is for visits and other dated care (Dr Sujay, 22 Nov review); daily medicines stay on the Medicines page and Today. */
+fun calendarShows(item: CareItem, showMedicines: Boolean = false): Boolean = showMedicines || (item.kind != "medicine" && calendarCategory(item) != "Medicine")
+
 @Composable fun DailyCareShortcuts(onCalendar: () -> Unit, onWorkflow: () -> Unit, onLabs: () -> Unit) {
     val t = careText()
     Row(Modifier.fillMaxWidth().height(IntrinsicSize.Max), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -64,8 +67,9 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
     }
 }
 
-@Composable fun CareCalendar(vm: CareModel, onWorkflow: () -> Unit = {}, onAddDoctorVisit: (() -> Unit)? = null, initialDay: Long = 0L) {
-    val entries by vm.items.collectAsStateWithLifecycle()
+@Composable fun CareCalendar(vm: CareModel, onWorkflow: () -> Unit = {}, onAddDoctorVisit: (() -> Unit)? = null, initialDay: Long = 0L, showMedicines: Boolean = false) {
+    val allEntries by vm.items.collectAsStateWithLifecycle()
+    val entries = remember(allEntries, showMedicines) { allEntries.filter { calendarShows(it, showMedicines) } }
     val person by vm.selected.collectAsStateWithLifecycle()
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     var dayString by rememberSaveable(person, initialDay) { mutableStateOf(calendarStartDay(initialDay).toString()) }
@@ -75,7 +79,7 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
     var editing by remember { mutableStateOf<CareItem?>(null) }; val t = careText(); val hindi = careHindi()
     val day =LocalDate.parse(dayString)
     val visible = calendarItems(entries.filter { it.personId == person }, day).filter { filter == "All" || calendarCategory(it) == filter }
-    val undated = entries.filter { it.personId == person && it.kind == "medicine" && it.due == 0L }
+    val undated = if (showMedicines) entries.filter { it.personId == person && it.kind == "medicine" && it.due == 0L } else emptyList()
     LazyColumn(Modifier.fillMaxSize().testTag("care-calendar"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         // Title first, then the doctor's extra entry link under it.
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Heading(t("Calendar", "कैलेंडर")); Spacer(Modifier.weight(1f)); if (canEdit) FilledTonalIconButton(onClick = { if (onAddDoctorVisit != null) onAddDoctorVisit() else adding = true }, modifier = Modifier.size(48.dp), colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = Gold)) { Icon(Icons.Default.Add, t("Add to calendar", "कैलेंडर में जोड़ें")) } } }
@@ -86,7 +90,7 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
             Box(Modifier.weight(1f)) { CareDateButton(careEpoch(day), "", { dayString = careDay(it).toString() }) }
             if (day != LocalDate.now()) TextButton(onClick = { dayString = LocalDate.now().toString() }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Back to today", "आज पर वापस")) }
         } }
-        item { FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { listOf("All", "Medicine", "Visit", "Test", "Follow-up", "Procedure", "Chemotherapy", "Radiotherapy", "Task", "Conversation").forEach { category -> FilterChip(filter == category, { filter = category }, label = { Text(if (category in TreatmentDayRules.categories) TreatmentDayRules.label(category) else careCategoryLabel(category, hindi), maxLines = 1, softWrap = false) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp), leadingIcon = if (filter == category) { { Icon(Icons.Default.Check, null, Modifier.size(16.dp)) } } else null) } } }
+        item { FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { listOfNotNull("All", "Medicine".takeIf { showMedicines }, "Visit", "Test", "Follow-up", "Procedure", "Chemotherapy", "Radiotherapy", "Task", "Conversation").forEach { category -> FilterChip(filter == category, { filter = category }, label = { Text(if (category in TreatmentDayRules.categories) TreatmentDayRules.label(category) else careCategoryLabel(category, hindi), maxLines = 1, softWrap = false) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp), leadingIcon = if (filter == category) { { Icon(Icons.Default.Check, null, Modifier.size(16.dp)) } } else null) } } }
         if (visible.isEmpty()) item { SurfaceCard {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Surface(shape = androidx.compose.foundation.shape.CircleShape, color = SaharaSoftBlue) { Icon(Icons.Default.EventAvailable, null, Modifier.padding(8.dp).size(20.dp), tint = DoctorAccent) }

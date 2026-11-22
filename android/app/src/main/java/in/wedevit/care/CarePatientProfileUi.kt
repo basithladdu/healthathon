@@ -42,14 +42,39 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
     // A phone-only profile saved before sharing existed is still shown until the first shared save replaces it.
     val profile = remember(sharedItem, person.id, store) { sharedItem?.let { PatientProfileCodec.decode(it.detail) } ?: store.loadOrNull(person.id) ?: CarePatientProfile() }
     var editing by remember { mutableStateOf(false) }
-    PatientProfileCard(profile, person.name, editable = canEdit, onEdit = { editing = true })
-    if (editing && canEdit) PatientProfileSheet(profile, shared = vm.cloud != null, busy = busy, onDismiss = { editing = false }) { saved ->
-        if (canEditCareContext(vm, person.id, capturedAccount)) {
-            val done = { runCatching { store.remove(person.id) }; editing = false }
-            if (sharedItem != null) vm.updateItem(sharedItem.copy(detail = PatientProfileCodec.encode(saved)), done)
-            else vm.saveItem("journal", PatientProfileCodec.TITLE, PatientProfileCodec.encode(saved), done = done)
-        }
+    var addingWeight by remember { mutableStateOf(false) }
+    // Saves a profile to the shared record (or creates it), then clears the old phone-only copy.
+    fun save(saved: CarePatientProfile, done: () -> Unit) {
+        if (!canEditCareContext(vm, person.id, capturedAccount)) return
+        val finished = { runCatching { store.remove(person.id) }; done() }
+        if (sharedItem != null) vm.updateItem(sharedItem.copy(detail = PatientProfileCodec.encode(saved)), finished)
+        else vm.saveItem("journal", PatientProfileCodec.TITLE, PatientProfileCodec.encode(saved), done = finished)
     }
+    PatientProfileCard(profile, person.name, editable = canEdit, onEdit = { editing = true }, onAddWeight = if (canEdit) ({ addingWeight = true }) else null)
+    if (addingWeight && canEdit) AddWeightDialog(profile.weightKg, busy = busy, onDismiss = { addingWeight = false }) { kg ->
+        save(CareWeightHistory.addWeight(profile, kg, java.time.LocalDate.now())) { addingWeight = false }
+    }
+    if (editing && canEdit) PatientProfileSheet(profile, shared = vm.cloud != null, busy = busy, onDismiss = { editing = false }) { saved -> save(saved) { editing = false } }
+}
+
+/** Today's weight in one field: no need to open the whole profile editor (Dr Sujay, 22 Nov review). */
+@Composable private fun AddWeightDialog(current: Double?, busy: Boolean, onDismiss: () -> Unit, onSave: (Double) -> Unit) {
+    val t = careText()
+    var text by remember { mutableStateOf("") }
+    var error by remember { mutableStateOf<ProfileError?>(null) }
+    AlertDialog(onDismissRequest = { if (!busy) onDismiss() }, modifier = Modifier.testTag("patient-profile-add-weight-dialog"),
+        title = { Text(t("Add today's weight", "आज का वज़न लिखें")) },
+        text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            current?.let { Text(t("Last weight", "पिछला वज़न") + ": ${CarePatientProfileRules.weightText(it)} " + t("kg", "किलो"), fontSize = 14.sp, color = DoctorCardSub) }
+            ProfileField(text, { text = it.filter { c -> c.isDigit() || c == '.' || c == ',' }.take(6); error = null }, t("Weight (kg)", "वज़न (किलो)"), Icons.Default.MonitorWeight, KeyboardType.Decimal,
+                Modifier.fillMaxWidth().testTag("patient-profile-add-weight-field"))
+            error?.let { Text(t(it.en, it.hi), color = RustText, fontSize = 14.sp, fontWeight = FontWeight.Medium, modifier = Modifier.announce()) }
+        } },
+        confirmButton = { TextButton(onClick = {
+            val (kg, bad) = CarePatientProfileRules.weight(text)
+            if (kg == null) error = bad ?: ProfileError.WEIGHT else onSave(kg)
+        }, enabled = !busy && text.isNotBlank(), modifier = Modifier.heightIn(min = 48.dp).testTag("patient-profile-add-weight-save")) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Save", "सहेजें"), fontWeight = FontWeight.SemiBold) } },
+        dismissButton = { TextButton(onClick = onDismiss, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें")) } })
 }
 
 /** The doctor's read-only view of the same card; a compact note when nobody has filled the profile in yet. */
@@ -62,7 +87,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
  * One fixed, compact card for both sides (no sideways scrolling): name, sex · illness, three tiles (age, blood group,
  * height) and a weight tile with its small trend. [profile] null means nothing recorded; [editable] adds "Edit" and "Add ..." prompts.
  */
-@Composable fun PatientProfileCard(profile: CarePatientProfile?, name: String, editable: Boolean, onEdit: () -> Unit, modifier: Modifier = Modifier, tag: String = "patient-profile-card") {
+@Composable fun PatientProfileCard(profile: CarePatientProfile?, name: String, editable: Boolean, onEdit: () -> Unit, modifier: Modifier = Modifier, tag: String = "patient-profile-card", onAddWeight: (() -> Unit)? = null) {
     val t = careText()
     if (profile == null) {
         Surface(shape = RoundedCornerShape(12.dp), color = Cream, border = BorderStroke(1.dp, DoctorHairline), modifier = modifier.fillMaxWidth().testTag(tag)) {
@@ -101,6 +126,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                 ProfileTile(t("Height", "क़द"), profile.heightCm?.let { "$it ${t("cm", "सेमी")}" } ?: "—", Mint, Modifier.weight(1f).fillMaxHeight())
             }
             ProfileWeightTile(profile.weightKg, weights, onOpen = { history = true }, tag = "$tag-weight")
+            // One tap to log today's weight without opening the whole editor.
+            if (editable && onAddWeight != null) OutlinedButton(onClick = onAddWeight, shape = RoundedCornerShape(50), contentPadding = PaddingValues(horizontal = 14.dp), border = BorderStroke(1.dp, DoctorHairline),
+                modifier = Modifier.heightIn(min = 48.dp).testTag("patient-profile-add-weight")) {
+                Icon(Icons.Default.Add, null, Modifier.size(18.dp), tint = DoctorAccent); Spacer(Modifier.width(4.dp)); Text(t("Add weight", "वज़न जोड़ें"), color = DoctorAccent, fontWeight = FontWeight.SemiBold)
+            }
             // The patient's own card leaves allergies out; a doctor sees them, tinted so they are hard to miss, only when recorded.
             if (!editable && profile.allergies.isNotBlank()) Surface(shape = RoundedCornerShape(12.dp), color = Peach.copy(alpha = .5f), modifier = Modifier.fillMaxWidth().testTag("$tag-allergies")) {
                 Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {

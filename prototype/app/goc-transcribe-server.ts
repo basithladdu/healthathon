@@ -20,6 +20,7 @@
 // The Android app uses this route too (CareGocGemini.kt), and after transcription posts {action: "analyze"}: Gemini maps the transcript
 // onto the goals-of-care form (goc-analyze-server.ts) and the checked result is saved to Supabase as the signed-in account.
 import { DEFAULT_MODELS, GEMINI_NATIVE, jsonPart } from './ai-providers.ts';
+import { createSarvamJob, putSarvamChunk, SARVAM_MODEL, sarvamLines, sarvamWindow, speakerPrompt } from './goc-sarvam.ts';
 import { GeminiCallError, geminiKeyResting, geminiKeySlots, restGeminiKey, withGeminiKeys, type GeminiKeySlot } from './gemini-keys.ts';
 import { analyzeGoc, gocAnalyzeLines, GocAnalyzeFailure, saveGocAnalysis, sha256Hex } from './goc-analyze-server.ts';
 import { checkedGocLines, GEMINI_AUDIO_MIME, GOC_MAX_SECONDS, GOC_RELAY_MAX_BYTES, GOC_RESPONSE_SCHEMA, GOC_WINDOW_SEC, GocOutputError,
@@ -50,6 +51,8 @@ export function gocTranscribeConfig(env: Environment = process.env) {
     slots,
     geminiModels: secret('GEMINI_GOC_MODEL') ? [secret('GEMINI_GOC_MODEL')] : [...new Set([...configured, ...GOC_GEMINI_MODELS])],
     ticketSecret: secret('GOC_TICKET_SECRET') || (gemini ? `sahara-goc-ticket:${gemini}` : ''),
+    // Sarvam AI (India's 22 scheduled languages plus English) goes first when its key is set; Gemini stays the fallback for every part.
+    sarvamKey: secret('SARVAM_API_KEY'),
   };
 }
 type Config = ReturnType<typeof gocTranscribeConfig>;
@@ -74,31 +77,33 @@ async function keys(secret: string) {
     seal: await crypto.subtle.importKey('raw', raw, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt']),
   };
 }
-/** k: the key slot that started the upload (its file lives in that key's Google project). */
-type Ticket = { d: string; b: number; m: string; e: number; u?: string; k?: string };
-export async function signTicket(secret: string, ticket: Omit<Ticket, 'u'>, relayUrl?: string) {
+/** k: the key slot that started the upload (its file lives in that key's Google project). j/a/c/z: the Sarvam job, Azure storage, relay chunk size and sealed storage URL. */
+type Ticket = { d: string; b: number; m: string; e: number; u?: string; k?: string; j?: string; a?: 1 | 0; c?: number; z?: string };
+async function seal(key: CryptoKey, text: string) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const sealed = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(text)));
+  return `${b64url(iv)}.${b64url(sealed)}`;
+}
+async function unseal(key: CryptoKey, value: string) {
+  const [iv, sealed] = value.split('.');
+  return new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64url(iv) }, key, unb64url(sealed)));
+}
+export async function signTicket(secret: string, ticket: Omit<Ticket, 'u' | 'z'>, relayUrl?: string, sarvamUrl?: string) {
   const k = await keys(secret);
-  let u: string | undefined;
-  if (relayUrl) {
-    const iv = crypto.getRandomValues(new Uint8Array(12));
-    const sealed = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, k.seal, new TextEncoder().encode(relayUrl)));
-    u = `${b64url(iv)}.${b64url(sealed)}`;
-  }
-  const body = b64url(new TextEncoder().encode(JSON.stringify({ ...ticket, ...(u ? { u } : {}) })));
+  const u = relayUrl ? await seal(k.seal, relayUrl) : undefined;
+  const z = sarvamUrl ? await seal(k.seal, sarvamUrl) : undefined;
+  const body = b64url(new TextEncoder().encode(JSON.stringify({ ...ticket, ...(u ? { u } : {}), ...(z ? { z } : {}) })));
   const mac = new Uint8Array(await crypto.subtle.sign('HMAC', k.sign, new TextEncoder().encode(body)));
   return `${body}.${b64url(mac)}`;
 }
-export async function readTicket(secret: string, value: unknown, now = Date.now()): Promise<Ticket & { relayUrl?: string }> {
-  if (!secret || typeof value !== 'string' || value.length > 4096 || !/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/u.test(value)) fail(400, 'ticket_invalid', 'Start the upload again.');
+export async function readTicket(secret: string, value: unknown, now = Date.now()): Promise<Ticket & { relayUrl?: string; sarvamUrl?: string }> {
+  if (!secret || typeof value !== 'string' || value.length > 8192 || !/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/u.test(value)) fail(400, 'ticket_invalid', 'Start the upload again.');
   const [body, mac] = (value as string).split('.');
   const k = await keys(secret);
   if (!await crypto.subtle.verify('HMAC', k.sign, unb64url(mac), new TextEncoder().encode(body))) fail(400, 'ticket_invalid', 'Start the upload again.');
   const ticket = JSON.parse(new TextDecoder().decode(unb64url(body))) as Ticket;
   if (ticket.e < now) fail(410, 'ticket_expired', 'This upload expired. Start again.');
-  if (!ticket.u) return ticket;
-  const [iv, sealed] = ticket.u.split('.');
-  const relayUrl = new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64url(iv) }, k.seal, unb64url(sealed)));
-  return { ...ticket, relayUrl };
+  return { ...ticket, ...(ticket.u ? { relayUrl: await unseal(k.seal, ticket.u) } : {}), ...(ticket.z ? { sarvamUrl: await unseal(k.seal, ticket.z) } : {}) };
 }
 
 /** The upload URL may go to the client only when it is Google's upload host and carries no key. */
@@ -340,6 +345,27 @@ function windowFrom(source: { offsetSec?: unknown; overlapSec?: unknown; duratio
 const langFrom = (value: unknown): GocLangHint => typeof value === 'string' && LANGS.has(value) ? value as GocLangHint : 'auto';
 
 /** Injected transport and environment keep tests synthetic: they never call a live AI service. */
+/** Names each Sarvam speaker id as DOCTOR / PATIENT_PARTY / UNKNOWN with one short text-only Gemini call; all UNKNOWN if it cannot. */
+async function nameSpeakers(config: Config, key: string, entries: { text: string; start: number; speaker: string }[], send: typeof fetch): Promise<Record<string, string>> {
+  const { ids, text } = speakerPrompt(entries);
+  if (ids.length === 0 || !key) return {};
+  for (const model of config.geminiModels.slice(0, 2)) {
+    const response = await send(`${GEMINI_NATIVE}/models/${encodeURIComponent(model)}:generateContent`, { method: 'POST', redirect: 'error', signal: AbortSignal.timeout(20_000),
+      headers: { 'x-goog-api-key': key, 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text }] }], generationConfig: { responseMimeType: 'application/json', maxOutputTokens: 512 } }) }).catch(() => null);
+    if (!response?.ok) { void response?.body?.cancel().catch(() => {}); continue; }
+    const value = await response.json().catch(() => null) as { candidates?: { content?: { parts?: { text?: unknown; thought?: boolean }[] } }[] } | null;
+    const answer = (value?.candidates?.[0]?.content?.parts ?? []).filter((part) => !part.thought).map((part) => typeof part.text === 'string' ? part.text : '').join('');
+    try {
+      const parsed = JSON.parse(answer.slice(answer.indexOf('{'), answer.lastIndexOf('}') + 1)) as { speakers?: Record<string, unknown> };
+      const roles: Record<string, string> = {};
+      for (const id of ids) { const v = String(parsed.speakers?.[id] ?? '').toUpperCase(); roles[id] = v === 'DOCTOR' || v === 'PATIENT_PARTY' ? v : 'UNKNOWN'; }
+      return roles;
+    } catch { continue; }
+  }
+  return {};
+}
+
 export function createGocTranscribeHandler(send: typeof fetch = fetch, env: Environment = process.env, pause: (ms: number) => Promise<void> = sleep) {
   return async (request: Request): Promise<Response> => {
     try {
@@ -369,6 +395,11 @@ export function createGocTranscribeHandler(send: typeof fetch = fetch, env: Envi
         if (!forwarded) fail(502, 'gemini_unavailable', 'The AI service could not be reached.');
         const value = await (forwarded as Response).json().catch(() => null);
         if (!(forwarded as Response).ok) fail((forwarded as Response).status === 429 ? 429 : 502, (forwarded as Response).status === 429 ? 'provider_busy' : 'gemini_unavailable', 'The upload could not continue.');
+        if (ticket.sarvamUrl && config.sarvamKey && ticket.c) {
+          // Best effort: if this fails, the part is transcribed by Gemini.
+          await putSarvamChunk({ key: config.sarvamKey, send }, { url: ticket.sarvamUrl, azure: ticket.a === 1, chunkBytes: ticket.c, mime: ticket.m },
+            new Uint8Array(await audio.arrayBuffer()), offset, final);
+        }
         return reply({ status: (forwarded as Response).headers.get('x-goog-upload-status') || '', file: readFile(value)?.name ?? null });
       }
 
@@ -397,6 +428,11 @@ export function createGocTranscribeHandler(send: typeof fetch = fetch, env: Envi
         const started = await geminiStart(config, mime, bytes, request.headers.get('origin'), send, pause);
         console.info('gemini_key_used', started.slot.slot, 'start');
         const ticket = { d: started.display, b: bytes, m: mime, e: Date.now() + TICKET_HOURS * 3_600_000, k: started.slot.slot };
+        const relayChunk = Math.floor(GOC_RELAY_MAX_BYTES / started.granularity) * started.granularity;
+        if (config.sarvamKey && started.url && relayChunk > 0) {
+          const job = await createSarvamJob({ key: config.sarvamKey, send }, mime, 'auto').catch((error) => { console.warn('sarvam_fallback', String((error as Error).message).slice(0, 60)); return null; });
+          if (job) return reply({ mode: 'relay', chunkBytes: relayChunk, ticket: await signTicket(config.ticketSecret, { ...ticket, j: job.jobId, a: job.azure ? 1 : 0, c: relayChunk }, started.url as string, job.url) });
+        }
         if (config.slots.every((slot) => uploadUrlIsSafe(started.url, slot.key))) {
           return reply({ mode: 'direct', uploadUrl: started.url, chunkBytes: Math.max(started.granularity, Math.floor(UPLOAD_CHUNK / started.granularity) * started.granularity), ticket: await signTicket(config.ticketSecret, ticket) });
         }
@@ -415,6 +451,21 @@ export function createGocTranscribeHandler(send: typeof fetch = fetch, env: Envi
       }
       const window = windowFrom(body);
       const file = await geminiFile(slot.key, ticket, body.file, send);
+      if (ticket.j && config.sarvamKey) {
+        try {
+          const result = await sarvamWindow({ key: config.sarvamKey, send, pause }, ticket.j, 150_000);
+          if (result.state === 'pending') return reply({ pending: true, file: file.name, retryMs: 4000 }, 202);
+          if (result.entries.length > 0) {
+            const roles = await nameSpeakers(config, slot.key, result.entries, send);
+            const lines = checkedGocLines(sarvamLines(result.entries, result.lang, roles), window);
+            await geminiDelete(slot.key, file.name, send);
+            return reply({ lines, model: SARVAM_MODEL, engine: 'sarvam', file: file.name });
+          }
+          console.warn('sarvam_fallback', 'empty');
+        } catch (error) {
+          console.warn('sarvam_fallback', String((error as Error).message).slice(0, 60));
+        }
+      }
       if (file.state === 'PROCESSING') return reply({ pending: true, file: file.name, retryMs: 2000 }, 202);
       if (file.state === 'FAILED') { await geminiDelete(slot.key, file.name, send); fail(502, 'gemini_rejected', 'The AI service could not process this audio.'); }
       let keep = false;

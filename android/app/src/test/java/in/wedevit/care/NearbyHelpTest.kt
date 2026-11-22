@@ -143,6 +143,24 @@ class NearbyHelpTest {
         assertEquals(tags.size, tags.map { NearbyHelp.tagColors(it) }.distinct().size)
         assertEquals(tags.size, tags.map { NearbyHelp.tagColors(it).first }.distinct().size)
     }
+    @Test fun centresGivingHomeClinicOrInpatientCareShowPalliativeCareEvenWithMorphineListed() {
+        // AIIMS Mangalagiri (22 Nov review): OP / IP / Home care with morphine listed must say "Palliative care", not only "Morphine listed".
+        val aiims = centre("m", "Andhra Pradesh", services = "Clinic visits · Inpatient care · Home care", morphine = "available").copy(name = "AIIMS, Mangalagiri")
+        assertTrue(NearbyHelp.offersPalliativeCare(aiims))
+        assertEquals(listOf(NearbyHelp.LAYER_PALLIATIVE, NearbyHelp.LAYER_MORPHINE, "Home care", "Clinic visits", "Inpatient care"), NearbyHelp.cardTags(aiims))
+        // A hospice with only inpatient beds and morphine listed (Aashraya Hospice).
+        val hospice = centre("h", "Andhra Pradesh", services = "Inpatient care", morphine = "available").copy(name = "Aashraya Hospice")
+        assertEquals(listOf(NearbyHelp.LAYER_PALLIATIVE, NearbyHelp.LAYER_MORPHINE, "Inpatient care", "Hospice"), NearbyHelp.cardTags(hospice))
+        // Home care alone, and the word palliative in the name, are enough.
+        assertTrue(NearbyHelp.offersPalliativeCare(centre("hc", "Kerala", services = "Home care", morphine = "available")))
+        assertTrue(NearbyHelp.offersPalliativeCare(centre("p", "Kerala", services = "", morphine = "available").copy(name = "Ashraya Pain & Palliative Care")))
+        // Morphine listed with nothing else in the listing: only the morphine tag.
+        val bare = centre("b", "Kerala", services = "", morphine = "available")
+        assertFalse(NearbyHelp.offersPalliativeCare(bare))
+        assertEquals(listOf(NearbyHelp.LAYER_MORPHINE), NearbyHelp.cardTags(bare))
+        // A centre in the palliative layer always carries the palliative tag, once.
+        assertEquals(listOf(NearbyHelp.LAYER_PALLIATIVE, "Home care"), NearbyHelp.cardTags(centre("k", "Kerala", services = "Home care")))
+    }
     @Test fun distanceOrdersMappedCentresFirstAndKeepsTheRestInOrder() {
         val pune = 18.52 to 73.86
         val near = towns[1].copy(id = "near", latitude = 18.53, longitude = 73.85)

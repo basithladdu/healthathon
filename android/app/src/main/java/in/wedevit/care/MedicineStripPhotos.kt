@@ -401,7 +401,12 @@ class MedicineStripPhotos(context: Context, storage: String) {
                 HorizontalDivider(color = SaharaSection.Medicines.solid.copy(alpha = .35f))
                 Text(t("Any time", "कभी भी"), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = SaharaSection.Medicines.ink, modifier = Modifier.padding(top = 4.dp))
                 FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    untimed.forEach { (item, dose) -> key(item.id, dose.key) {
+                    untimed.filter { (item, _) -> MedicineDoses.isAsNeededMedicine(item) }.distinctBy { it.first.id }.forEach { (item, _) -> key(item.id, "as-needed") {
+                        AsNeededTile(item, MedicineDoses.asNeededTimes(item.id, events, today, zone), photos[item.id], canEdit && !busy && !working) {
+                            scope.launch { working = true; try { recordAsNeededDose(context, vm, item) } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; problem = t("This dose could not be saved. Try again.", "यह खुराक सहेजी नहीं जा सकी। फिर कोशिश करें।") } finally { working = false } }
+                        }
+                    } }
+                    untimed.filterNot { (item, _) -> MedicineDoses.isAsNeededMedicine(item) }.forEach { (item, dose) -> key(item.id, dose.key) {
                         val doseLabel = medicineDoseLabel(dose)
                         MedicinePillbox(item, dose, MedicineDoses.state(item, dose, events, today, zone), photos[item.id], if (dose.count > 1) t("Dose ${dose.index}", "खुराक ${dose.index}") else "", canEdit && !busy && !working, MedicineDoses.loggedByFamily(item, dose, events, today, zone)) { yes, quick -> mark(item, dose, yes, quick, doseLabel) }
                     } }
@@ -417,10 +422,35 @@ class MedicineStripPhotos(context: Context, storage: String) {
  * One dose in Today's doses: the strip photo (or the empty pillbox) and a tick or cross once marked.
  * One tap on a dose not marked yet ticks it Taken; a marked dose, or a long press, opens Taken / Missed.
  */
+/**
+ * An as-needed (SOS) medicine on Today: "Took a dose now" can be tapped any number of times; each tap is saved with its time,
+ * and the tile shows how many today and when the last one was (Dr Sujay, 21 Nov: the doctor uses the count to adjust doses).
+ */
+@Composable private fun AsNeededTile(item: CareItem, times: List<Long>, photo: File?, enabled: Boolean, onTook: () -> Unit) {
+    val t = careText(); val zone = ZoneId.systemDefault()
+    val last = times.lastOrNull()?.let { java.time.Instant.ofEpochMilli(it).atZone(zone).toLocalTime().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm")) }
+    Column(Modifier.width(220.dp).testTag("today-as-needed-${item.id}"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            StripThumb(photo, 56)
+            Column(Modifier.weight(1f)) {
+                Text(item.title, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(when { times.isEmpty() -> t("Not taken today", "आज नहीं ली")
+                    times.size == 1 -> t("Taken once today, at $last", "आज एक बार ली, $last पर")
+                    else -> t("Taken ${times.size} times today, last at $last", "आज ${times.size} बार ली, आख़िरी $last पर") },
+                    fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.testTag("today-as-needed-count"))
+            }
+        }
+        OutlinedButton(onClick = onTook, enabled = enabled, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, SaharaSection.Medicines.solid),
+            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("today-as-needed-took")) {
+            Text(t("Took a dose now", "अभी एक खुराक ली"), color = SaharaSection.Medicines.ink, fontWeight = FontWeight.SemiBold)
+        }
+    }
+}
+
 @Composable private fun MedicinePillbox(item: CareItem, dose: MedicineDose, state: MedicineDoseState, photo: File?, caption: String, enabled: Boolean, family: Boolean = false, onMark: (taken: Boolean, quick: Boolean) -> Unit) {
     val t = careText(); var menu by remember { mutableStateOf(false) }
     val interaction = remember { MutableInteractionSource() }
-    Column(Modifier.width(100.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    Column(Modifier.width(112.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Box {
             // Ring colour echoes the state: green taken, red-brown missed, a hairline while not yet marked.
             val ringColor by animateColorAsState(when (state) { MedicineDoseState.TAKEN -> DoctorStatusGood; MedicineDoseState.MISSED -> DoctorStatusRest; else -> DoctorHairline }, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "pillbox-ring")
@@ -445,7 +475,9 @@ class MedicineStripPhotos(context: Context, storage: String) {
             }
         }
         // Whole words only: a medicine name never breaks mid-word under its pillbox.
-        Text(item.title, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis, lineHeight = 18.sp, textAlign = TextAlign.Center,
+        // A long single word (Dexamethasone, Ondansetron) gets a slightly smaller size so it fits on one line instead of splitting.
+        val longest = item.title.split(' ').maxOfOrNull { it.length } ?: 0
+        Text(item.title, fontSize = if (longest >= 12) 13.sp else 14.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis, lineHeight = 18.sp, textAlign = TextAlign.Center,
             style = LocalTextStyle.current.copy(hyphens = androidx.compose.ui.text.style.Hyphens.None, lineBreak = androidx.compose.ui.text.style.LineBreak.Heading))
         if (caption.isNotBlank()) Text(caption, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1)
         // A dose ticked by an invited family member says so, so the patient and the doctor can tell who logged it.

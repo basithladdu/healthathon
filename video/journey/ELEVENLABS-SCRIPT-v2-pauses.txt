@@ -1,0 +1,65 @@
+It's three in the morning, in an emergency room. <break time="0.6s" />
+
+A doctor is meeting a woman with cancer for the first time. And nobody in that room knows what she wants.
+
+So her family has to have the hardest conversation of their lives, all over again. <break time="0.8s" />
+
+In India, ninety-eight percent of people with advanced cancer don't get the palliative care they need. <break time="0.5s" /> Yes, you heard that right. <break time="0.3s" /> Ninety-eight. <break time="1.0s" />
+
+That's why we built Sahara. It's an app for people with cancer, and for the families who look after them.
+
+We're five people who met at Health-a-thon. Baasith and Uh-ways run a software company called WeDevIT. Dr Soo-jay is from I.I.Sc., Bengaluru. Dr Shaarada is from Aims, Mangalagiri. And Shireen is a final-year medical student. <break time="0.6s" />
+
+Back in August, we had our first team meeting. And Dr Soo-jay told us something that stayed with all of us. Patients do tell you what they want at the end of life. But nobody writes it down. And in an emergency, nobody can find it. <break time="0.7s" />
+
+So we did what technical people do. We built everything. Screen after screen, all for doctors. <break time="0.5s" />
+
+Then we asked ourselves one question. Why would a family install all this? <break time="0.9s" />
+
+So we pivoted, towards the patient and the family. And we kept one thing at the centre: the goals of care talk. That's when the doctor, the patient and the family sit down together, and decide what kind of care she wants. <break time="0.6s" />
+
+With everyone's consent, the doctor records that talk. AI writes out who said what. For Indian languages, we use Sarvam AI. Then the AI checks that nothing important was missed. It goes through thirteen topics, taken from India's end-of-life care guidelines, written by the national critical care and palliative care societies.
+
+Then the AI turns the conversation into a goals of care document. That's a clinical record of her wishes. Does she want CPR? A ventilator? Intensive care? And where does she want to be cared for?
+
+Nothing is final until the doctor reads it, corrects it, and signs it. Then the family signs too, and it's locked. <break time="0.5s" />
+
+We also took legal advice on the wording and the format of that document. <break time="0.9s" />
+
+But goals of care is only the start. Sahara stays with the family, every single day. <break time="0.6s" />
+
+Patients track their symptoms. They rate how they're feeling on a distress thermometer, and they mark where it hurts on a body map. Their doctor can see how it's changing over time.
+
+There's a mood journal, for the days that are hard to put into words.
+
+They take a photo of a prescription, or a medicine strip. AI works out the medicines, and reminds them about every dose.
+
+They upload their reports, and ask a question in plain words. AI answers, and shows the exact line in the report it came from.
+
+Their next hospital visit is scheduled right in the app.
+
+Family members get their own login, so everyone stays in the loop.
+
+There's an emergency SOS button. And a QR card that carries the patient's wishes, contacts and medicines.
+
+We also scraped public listings, and put over sixteen hundred palliative care centres, from across India, on one map. It even shows where to find oral morphine.
+
+And there's a community, so no family goes through this alone. <break time="0.7s" />
+
+Families don't talk in just one language. So Sahara understands English, Hindi, Telugu, Urdu and Kannada, even when they're mixed in one sentence. <break time="0.8s" />
+
+Now, back to that emergency room. One scan of her QR card, and the doctor knows exactly what she wanted. <break time="1.0s" />
+
+Oh, wait. <break time="0.4s" /> Late one night, something hit us. We kept asking how the patient feels. Nobody was asking her daughter. <break time="0.5s" />
+
+So caregivers get their own wellbeing check too, and someone to call. <break time="0.9s" />
+
+All of this took three months. We had a lot of meetings with our doctors. We met our mentor for a review. And we ran a survey of doctors and hospitals.
+
+We saved our work to GitHub almost six hundred times. Each of those is called a commit. It's one more improvement to the app.
+
+It's built with free and open-source tools, and it runs on a cloud server.
+
+When Sahara got shortlisted, we rebuilt it as a full Android app. And it's live on Google Play today. <break time="1.0s" />
+
+Sahara. <break time="0.5s" /> Care that follows what matters to the patient.

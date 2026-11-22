@@ -4,7 +4,7 @@ import styles from './policy.module.css';
 
 export const metadata: Metadata = {
   title: 'Privacy policy · Sahara',
-  description: 'How Sahara handles care information, recordings, voluntary feedback, hospital surveys and deletion.',
+  description: 'How Sahara handles care information, recordings, AI transcription and drafts, community posts, voluntary feedback, hospital surveys and deletion.',
   alternates: { canonical: 'https://sahara.wedevit.in/privacy' },
 };
 
@@ -17,16 +17,35 @@ export default function PrivacyPage() {
           <Link href="/delete-account">Delete your account</Link>
         </header>
         <h1>Your care information</h1>
-        <p className={styles.date}>Privacy policy · Updated 27 October 2026</p>
+        <p className={styles.date}>Privacy policy · Updated 21 November 2026</p>
         <p>
-          Sahara — A Palliative Care Companion is provided by WEDEVIT PRIVATE LIMITED.
-          This policy covers the Sahara Android app, its website workspaces and the
+          Sahara — A Palliative Care Companion is provided by WEDEVIT PRIVATE LIMITED,
+          the team behind Sahara. This policy covers the Sahara Android app, its website workspaces and the
           voluntary feedback and hospital-survey forms. The older browser care
           workspaces keep their own local records. The <Link href="/shared-care">shared
           care workspace</Link> signs into the same Sahara account-backed records as
           Android; it does not automatically import that older browser workspace or
           unsigned-in phone records.
         </p>
+
+        <section aria-labelledby="fiduciary">
+          <h2 id="fiduciary">Who is responsible for your data</h2>
+          <p>
+            WEDEVIT PRIVATE LIMITED, the team behind Sahara, decides why and how your
+            personal data is used in Sahara. Under India’s Digital Personal Data
+            Protection Act, 2023, that makes us the data fiduciary. The service
+            providers listed below process data for us; they do not decide how it is used.
+          </p>
+        </section>
+
+        <section aria-labelledby="age">
+          <h2 id="age">Who can use Sahara</h2>
+          <p>
+            You must be 18 or over to create a Sahara account. If the patient is a
+            child, a parent or lawful guardian must set up and manage their records
+            and give any consent for them.
+          </p>
+        </section>
 
         <section aria-labelledby="information">
           <h2 id="information">What we use and why</h2>
@@ -84,11 +103,11 @@ export default function PrivacyPage() {
             Microphone permission is requested when you choose to record. Ask everyone
             taking part for permission first. You can stop at any time; recording also
             stops when the app leaves the foreground. Standard recordings remain on
-            your phone and are not transcribed automatically. The public cloud-audio
-            transcription service remains disabled. Android does not send recordings
-            to a cloud speech or generative-AI provider. Saving or sending a text draft
-            to the shared clinician workspace
-            uploads that text to your account; it does not upload its recording.
+            your phone and are not transcribed automatically. Goals-of-care recordings
+            can be sent to an online AI speech service, but only after consent; see
+            “Goals-of-care recordings and AI drafts” below. Saving or sending a text
+            draft to the shared clinician workspace uploads that text to your account;
+            it does not upload its recording.
           </p>
           <p>
             Optional turn-by-turn dictation uses Android’s on-device
@@ -132,8 +151,41 @@ export default function PrivacyPage() {
           </p>
         </section>
 
+        <section aria-labelledby="goc-ai">
+          <h2 id="goc-ai">Goals-of-care recordings and AI drafts</h2>
+          <p>
+            A doctor can record a goals-of-care conversation in Sahara. Before recording,
+            the doctor ticks that everyone present agrees to the conversation being
+            recorded and written down. The screen says that the audio is sent to an AI
+            service to transcribe it. Without that tick, nothing is recorded or sent.
+          </p>
+          <p>
+            The phone then uploads the audio in parts to an online AI speech service.
+            Today this is Google Gemini. The audio goes straight from the phone to
+            Google; the request passes through Sahara’s website server on Vercel. We ask
+            Google to delete each uploaded part once it is transcribed, and Google
+            removes uploaded files after 48 hours in any case. Google may process this
+            data outside India. When we switch it on, Sahara can also send the audio to
+            Sarvam AI, an Indian company, for transcription. Google Gemini stays the
+            fallback, and a short text-only Gemini step labels who spoke (doctor or
+            patient and family).
+          </p>
+          <p>
+            The AI then reads the transcript and drafts a goals-of-care document, with a
+            word-for-word quote for each item. The draft is a suggestion. The doctor
+            reviews it, edits it and signs it before it is used. The transcript and the
+            AI’s reading are stored in Supabase under the signed-in account, and only
+            that account can read them. The original recording stays on the phone.
+          </p>
+          <p>
+            You do not have to use the online service. Transcription on the phone and
+            typing the conversation remain available, and Sahara falls back to them if
+            the online service cannot finish.
+          </p>
+        </section>
+
         <section aria-labelledby="translation">
-          <h2 id="translation">Hindi and English reading</h2>
+          <h2 id="translation">Translation</h2>
           <p>
             Android offers optional Hindi–English machine translation using Google
             ML Kit on-device models. An initial language-pack download needs a
@@ -143,6 +195,13 @@ export default function PrivacyPage() {
             are handled as described below. The original remains visible beside the
             translation. Check the result with a bilingual person before relying on
             it; machine translation is not a clinical interpretation.
+          </p>
+          <p>
+            You can also ask for a care note to be translated online, including into
+            other Indian languages. This sends the note’s text, after you agree, to
+            Sarvam AI when it is switched on, or otherwise to the AI service named on
+            the screen (currently Google Gemini). The translation is marked for review,
+            and the original stays beside it.
           </p>
         </section>
 
@@ -301,8 +360,9 @@ export default function PrivacyPage() {
           <p>
             From version 0.4.0, you can choose a PDF or photo using Android’s file
             picker. Sahara saves a private copy for the selected person and account.
-            It does not read other files or upload reports to Supabase or an AI service.
-            Added reports stay on that phone until you remove them, remove the person’s
+            It does not read other files or upload report files to Supabase or an AI
+            service. Only text you choose to send with a question leaves the phone (see
+            below). Added reports stay on that phone until you remove them, remove the person’s
             records or uninstall the app. Keep your original files. Removing a report
             in Sahara does not delete the original.
           </p>
@@ -325,6 +385,15 @@ export default function PrivacyPage() {
             text. If you explicitly copy a fact into a signed-in care record, that copy
             follows the care-record sharing and deletion rules above; removing its
             source report does not silently remove previously confirmed care entries.
+          </p>
+          <p>
+            You can ask a question about your own reports. Sahara first looks for
+            matching lines on the phone. If you also want an online answer, you tick a
+            box each time to agree, and the app sends your question and the text read
+            from the chosen reports (never the photos or files) to the AI service named
+            on the screen (currently Google Gemini). The answer must point to lines in
+            your reports, and you check it against them. It does not diagnose or advise
+            on medicines.
           </p>
         </section>
 
@@ -350,6 +419,12 @@ export default function PrivacyPage() {
             urgent-care or guaranteed medication-administration service. The website’s
             calendar alone cannot send an alert after its page is closed.
           </p>
+          <p>
+            If a medicine has not been marked taken after several reminders over at
+            least a day, the phone may show one gentle “missed medicine” notification
+            (at most once in three days for each medicine). This is worked out on the
+            phone and is not sent to us or to anyone else.
+          </p>
         </section>
 
         <section aria-labelledby="sharing">
@@ -369,6 +444,61 @@ export default function PrivacyPage() {
             professional register and the applicant’s identity/control. That review does
             not certify treatment decisions, create a legal signature or replace the
             patient’s separate invitation.
+          </p>
+        </section>
+
+        <section aria-labelledby="emergency-link">
+          <h2 id="emergency-link">Emergency QR card and web link</h2>
+          <p>
+            The printed emergency card is plain text; anyone who scans it can read it.
+            If the record owner also turns on the emergency web link, a copy of the card
+            is kept on our server: the person’s name, their latest confirmed goals of
+            care, emergency contacts and medicines. Anyone who has the link or QR code
+            can open that copy without signing in, read-only. It stops working when the
+            owner turns it off, makes a new link, or after 365 days. We count how many
+            times it is opened and when it was last opened. Only the person who added
+            the profile can manage the link.
+          </p>
+        </section>
+
+        <section aria-labelledby="community">
+          <h2 id="community">Community</h2>
+          <p>
+            Signed-in members can join groups, write posts and replies, react, save posts
+            and report posts or replies. Other members see the community name you choose,
+            never your email or phone number. Posts cannot contain links, email addresses
+            or phone numbers. Please do not share patient details. The Sahara team can
+            read reports and hide or restore posts and replies. A post reported by three
+            different members is hidden until the team looks at it. You can remove your
+            own posts and replies.
+          </p>
+        </section>
+
+        <section aria-labelledby="morphine-reports">
+          <h2 id="morphine-reports">Centre suggestions and morphine reports</h2>
+          <p>
+            You can suggest a palliative care centre that is missing from the directory.
+            After a dose of oral morphine is marked taken, the app may also ask (at most
+            once a month for each medicine) where the morphine came from: a centre from
+            the directory, or a pharmacy or hospital you type. Only the place is stored.
+            A morphine report is not linked to your account: the server keeps only a
+            one-way code of it to limit reports per day, which cannot be turned back into
+            your account. Centre suggestions are linked to your account. Both are private
+            to the Sahara team. Nothing is public. Only centres the team has checked are
+            recognised institutions may be shown to other families, in a later directory
+            release; places you type are never published as morphine sources.
+          </p>
+        </section>
+
+        <section aria-labelledby="phone-only">
+          <h2 id="phone-only">Living will, care plan and wellbeing check</h2>
+          <p>
+            The living will (advance medical directive) and care plan you prepare in
+            Sahara are kept in private storage on the phone. They are not sent to our
+            server. If an emergency card is issued, it carries only the status, date,
+            version and attesting officer of the advance care plan. The app prepares the
+            paper; it becomes valid only when signed and attested as the law requires.
+            The caregiver wellbeing check and its private journal also stay on the phone.
           </p>
         </section>
 
@@ -409,6 +539,31 @@ export default function PrivacyPage() {
             storage protections; its database does not have separate app-level encryption.
             Supabase processes account and shared care information to provide the service.
           </p>
+          <p>
+            If a data breach affects your personal data, we will tell the people affected
+            and the Data Protection Board of India, as the law requires.
+          </p>
+        </section>
+
+        <section aria-labelledby="processors">
+          <h2 id="processors">Service providers who process data for us</h2>
+          <ul>
+            <li>Supabase: sign-in, account storage and syncing of signed-in records.</li>
+            <li>
+              Google Gemini: goals-of-care transcription and drafts, document questions
+              and note translation, only when you agree. Google may process data
+              outside India.
+            </li>
+            <li>
+              Sarvam AI, an Indian company: goals-of-care transcription and note
+              translation, when we switch it on and you agree.
+            </li>
+            <li>Vercel: hosting for the Sahara website and its server routes.</li>
+          </ul>
+          <p>
+            Google ML Kit, Hugging Face, OpenFreeMap, OpenStreetMap and Photon receive
+            the technical information described above.
+          </p>
         </section>
 
         <section aria-labelledby="deletion">
@@ -421,10 +576,26 @@ export default function PrivacyPage() {
           </p>
           <p>
             To delete your Sahara account and associated information, use Your account →
-            Delete account in the app, or <Link href="/delete-account">request deletion
-            here</Link>. We verify control of the registered email before processing,
+            Delete account in the app. This deletes it straight away. If the app cannot
+            finish, <Link href="/delete-account">request deletion here</Link>. For an
+            email request, we verify control of the registered email before processing,
             explain the expected completion date and confirm by email when complete.
             Opening the page or an email draft does not delete anything.
+          </p>
+          <p>
+            Deleting in the app removes your unfinished shared drafts, your
+            clinician-verification request, the care records you own and your
+            memberships, and then removes your sign-in. Removing the sign-in also
+            deletes what is linked to it: goals-of-care transcripts and AI readings,
+            community profile, posts, replies, reactions, saves and reports, centre
+            suggestions, morphine reports, emergency links and app feedback.
+          </p>
+          <p>
+            Withdrawing consent: you can untick or decline any online AI step at any
+            time, and Sahara keeps working on the phone. To stop sharing, remove a family
+            member or doctor in Your account, or turn off the emergency link. Signing out
+            stops new data being sent. Withdrawing consent does not undo processing that
+            already happened, but you can delete the data as described here.
           </p>
           <p>
             Deletion removes your Sahara account details, care records you own, invitations
@@ -437,7 +608,9 @@ export default function PrivacyPage() {
           <p>
             If another service still needs your sign-in, we keep only its account ID and
             the Sahara closure date to keep Sahara access closed. This marker is removed
-            when that shared sign-in is deleted.
+            when that shared sign-in is deleted. In that case, the items linked only to
+            the sign-in (listed above) also stay until it is deleted; email us to remove
+            them sooner.
           </p>
           <p>
             Closure removes active staff permissions, your clinician-verification request,
@@ -450,7 +623,8 @@ export default function PrivacyPage() {
           </p>
           <p>
             We keep information while it is needed to provide your account and care records.
-            We keep support correspondence while handling your request. If any information
+            Online records are kept while your account is open and deleted when the
+            account is deleted; there is no automatic expiry today. We keep support correspondence while handling your request. If any information
             must be retained for a legal or security reason, we will tell you what is kept,
             why and for how long when handling your deletion request.
           </p>
@@ -459,9 +633,22 @@ export default function PrivacyPage() {
         <section aria-labelledby="care">
           <h2 id="care">About care decisions</h2>
           <p>
-            Sahara helps record and organise care. It is not a medical device and does
-            not diagnose, prescribe or replace advice from your care team. Saved goals-of-care
-            notes record a conversation; they are not treatment orders or legal directives.
+            Sahara supports care and record-keeping. It does not diagnose, prescribe or
+            decide treatment, and it does not replace advice from your care team. A
+            doctor reviews every AI draft before it is used. Saved goals-of-care notes
+            record a conversation; they are not treatment orders or legal directives.
+          </p>
+        </section>
+
+        <section aria-labelledby="grievance">
+          <h2 id="grievance">Grievance contact</h2>
+          <p>
+            For a complaint about your data or about community content, email{' '}
+            <a href="mailto:workwithdevit@gmail.com">workwithdevit@gmail.com</a>. We
+            acknowledge community complaints within 24 hours and resolve them within 15
+            days. We answer other privacy requests (access, correction, deletion or
+            withdrawing consent) within 30 days. If you are not satisfied, you can
+            complain to the Data Protection Board of India.
           </p>
         </section>
 
@@ -471,9 +658,8 @@ export default function PrivacyPage() {
             Contact WEDEVIT PRIVATE LIMITED at{' '}
             <a href="mailto:workwithdevit@gmail.com">workwithdevit@gmail.com</a> for privacy
             questions, corrections or deletion requests. We will update this page when
-            data handling changes. Any future audio upload or materially different AI
-            processing will require an updated explanation and consent before that
-            information is sent.
+            data handling changes, and we will ask for consent again before personal
+            data is sent to a new kind of service.
           </p>
         </section>
         <footer className={styles.footer}>

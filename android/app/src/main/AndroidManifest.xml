@@ -38,6 +38,7 @@
             </intent-filter>
         </activity>
         <receiver android:name=".CareReminderReceiver" android:exported="false" />
+        <receiver android:name=".CareReminderActionReceiver" android:exported="false" />
         <receiver android:name=".CareReminderRestoreReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

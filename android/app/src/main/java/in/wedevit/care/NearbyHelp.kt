@@ -123,6 +123,21 @@ object NearbyHelp {
     /** Services a centre's listing names, in chip order, for the coloured tags on its card. */
     fun serviceTags(c: Centre): List<String> = serviceOptions.filter { it != ALL_SERVICES && servesAs(c, it) }
 
+    /** Words in a listing that mean the centre gives palliative care: home care, clinic or OPD visits, inpatient beds, day care, hospice or palliative care itself. */
+    private val palliativeWords = listOf("palliative", "hospice", "home care", "clinic visit", "opd", "out patient", "outpatient", "inpatient", "in patient", "day care", "beds")
+
+    /**
+     * True when the listing's services, name or address show palliative care. A centre with morphine listed that also gives
+     * home care, clinic visits or inpatient care is a palliative care centre too, so it carries both tags (22 Nov review).
+     */
+    fun offersPalliativeCare(c: Centre): Boolean =
+        listOf(c.services, c.name, c.address).any { text -> palliativeWords.any { text.contains(it, ignoreCase = true) } }
+
+    /** The tags on a centre card, in order: "Palliative care" when the listing shows it, "Morphine listed" when the source says so, then the services. */
+    fun cardTags(c: Centre): List<String> =
+        listOfNotNull(LAYER_PALLIATIVE.takeIf { offersPalliativeCare(c) || layerOf(c) == LAYER_PALLIATIVE },
+            LAYER_MORPHINE.takeIf { layerOf(c) == LAYER_MORPHINE }) + serviceTags(c)
+
     /** Tag colours (background, text) per service and layer. Text on its background stays above 4.5:1 contrast. */
     fun tagColors(tag: String): Pair<Long, Long> = when (tag) {
         "Home care" -> 0xFFDCEBE4 to 0xFF1F5C46

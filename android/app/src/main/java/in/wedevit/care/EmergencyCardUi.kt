@@ -204,6 +204,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
     var fullScreen by rememberSaveable(selected) { mutableStateOf(false) }
     var lockFor by rememberSaveable(selected) { mutableStateOf<String?>(null) }
     var confirmNewLink by rememberSaveable(selected) { mutableStateOf(false) }
+    var confirmLinkOff by rememberSaveable(selected) { mutableStateOf(false) }
     var linkProblem by remember(selected) { mutableStateOf<EmergencyLinkProblem?>(null) }
     var linkBusy by remember(selected) { mutableStateOf(false) }
     var linkStatus by remember(selected) { mutableStateOf<EmergencyLinkStatus?>(null) }
@@ -220,7 +221,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
         EmergencySource(
             name = name,
             goals = EmergencyCardRules.latestConfirmed(versions.filter { it.personId == selected }, acknowledgements) { vm.cloud == null || it.id in trustedAcks },
-            contacts = contacts.filter { it.personId == selected }.sortedBy { it.role != "family" }.map { EmergencyContact(it.name, it.relationship, it.phone) },
+            contacts = contacts.filter { it.personId == selected }.sortedWith(compareBy({ it.role != "family" }, { it.phone.isBlank() })).map { EmergencyContact(it.name, it.relationship, it.phone) },
             medicines = items.filter { it.kind == "medicine" && it.personId == selected }.map { EmergencyMedicine(it.title, if (CareEntryCodec.isStructured(it.detail)) "" else it.detail) },
             age = profile?.age, conditions = profile?.illness.orEmpty(), allergies = profile?.allergies.orEmpty(),
         )
@@ -360,6 +361,24 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
                     SaharaSecondaryButton(t("Print", "प्रिंट करें"), onClick = { print(card) }, icon = Icons.Default.Print, tone = SaharaTone.Indigo, modifier = Modifier.weight(1f).testTag("emergency-card-print"))
                 }
                 TextButton(onClick = { setup = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp).testTag("emergency-card-replace")) { Text(t("Edit card and PDF", "कार्ड और PDF बदलें"), color = RustText, fontWeight = FontWeight.Bold) }
+                // The family can switch the web link off at any time; printed cards then show only the offline code, and a new link can be made later.
+                if (link != null && problem == null && client != null && owner && !linkBusy) TextButton(onClick = { confirmLinkOff = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("emergency-link-off")) {
+                    Text(t("Turn off the web link", "वेब लिंक बंद करें"), color = DoctorCardSub)
+                }
+                if (confirmLinkOff) AlertDialog(onDismissRequest = { confirmLinkOff = false },
+                    title = { Text(t("Turn off the web link?", "वेब लिंक बंद करें?")) },
+                    text = { Text(t("Anyone who scans the printed card will no longer see the online page. The offline code on the card still works. You can make a new link later.", "छपा कार्ड स्कैन करने वाले अब ऑनलाइन पेज नहीं देख पाएँगे। कार्ड का ऑफ़लाइन कोड काम करता रहेगा। आप बाद में नया लिंक बना सकते हैं।")) },
+                    confirmButton = { TextButton(onClick = {
+                        confirmLinkOff = false
+                        scope.launch {
+                            linkBusy = true
+                            try { client?.revoke(card.personId); val off = card.copy(link = null); withContext(Dispatchers.IO) { keep(off) }; record = off; linkProblem = EmergencyLinkProblem.LINK_OFF; done = t("Web link turned off", "वेब लिंक बंद हो गया") }
+                            catch (e: EmergencyLinkException) { alert = t(e.problem.en, e.problem.hi) }
+                            catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; alert = t(EmergencyLinkProblem.OFFLINE.en, EmergencyLinkProblem.OFFLINE.hi) }
+                            finally { linkBusy = false }
+                        }
+                    }, modifier = Modifier.testTag("emergency-link-off-confirm")) { Text(t("Turn off", "बंद करें"), color = RustText, fontWeight = FontWeight.SemiBold) } },
+                    dismissButton = { TextButton(onClick = { confirmLinkOff = false }) { Text(t("Keep it on", "चालू रखें")) } })
             }
         }
         if (fullScreen) EmergencyQrFullScreen(linkQr, qr, card) { fullScreen = false }

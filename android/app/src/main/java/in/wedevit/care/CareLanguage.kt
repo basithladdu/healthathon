@@ -320,6 +320,8 @@ internal val ReminderTextHindi = mapOf(
     "Sahara reminder" to "सहारा रिमाइंडर",
     "A saved care activity is due. Open Sahara to check the record." to "सहेजा हुआ देखभाल का काम अब है। रिकॉर्ड देखने के लिए सहारा खोलें।",
     "Care reminders" to "देखभाल रिमाइंडर",
+    "Medicine and visit alarms" to "दवा और विज़िट के अलार्म",
+    "Noted" to "देख लिया",
     "Reminders for your chosen medicine times and dated care activities. Android may delay alerts." to "चुने हुए दवा के समय और तारीख़ वाले देखभाल के कामों के रिमाइंडर। Android सूचनाएँ देर से भेज सकता है।",
 )
 

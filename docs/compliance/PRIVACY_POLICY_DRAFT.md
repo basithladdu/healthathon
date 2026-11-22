@@ -1,6 +1,6 @@
 # Sahara privacy policy: plain-words draft (DPDP Act 2023)
 
-_Draft, 27 Oct 2026, compliance lane. Not published. The live policy is at `https://sahara.wedevit.in/privacy` (`prototype/app/privacy/page.tsx`) and stays unchanged until the owner approves this draft._
+_Draft, updated 21 Nov 2026 to match the app and the live policy text (`prototype/app/privacy/page.tsx`, "Updated 21 November 2026"). Earlier draft: 27 Oct 2026._
 
 Based on code on `origin/main` (commit `1304b6d`) and the audit [`docs/research/handoff-2026-10-27/sahara-data-flow-audit.md`](../research/handoff-2026-10-27/sahara-data-flow-audit.md). Section numbers for the DPDP Act come from [`docs/research/handoff-2026-10-27/landscape/india-palliative-policy-law.md`](../research/handoff-2026-10-27/landscape/india-palliative-policy-law.md) and should be checked against the official Act text before publishing **[verify]**. This is not legal advice. Have a lawyer review it before real patients use the app.
 
@@ -21,9 +21,14 @@ Based on code on `origin/main` (commit `1304b6d`) and the audit [`docs/research/
 ## The policy (draft text)
 
 ### Who we are
-Sahara is a palliative-care companion app for patients and families. **[owner to confirm: company or new entity]** decides why and how your data is used, so under India's Digital Personal Data Protection Act 2023 we are the "data fiduciary".
+Sahara is a palliative-care companion app for patients and families. WEDEVIT PRIVATE LIMITED, the team behind Sahara (the name the live policy and store listing already use), decides why and how your data is used, so under India's Digital Personal Data Protection Act 2023 we are the "data fiduciary". **[owner to confirm if a new entity replaces it]**
 
-Grievance and privacy contact: **[owner to confirm: name, email]**.
+Grievance officer: [to be named by the Sahara team before release]
+
+Grievance contact: workwithdevit@gmail.com. We acknowledge community complaints within 24 hours and resolve them within 15 days. We answer other privacy requests within 30 days.
+
+### Who can use Sahara
+You must be 18 or over to create an account. For a child patient, a parent or lawful guardian sets up and manages the records and gives consent.
 
 ### Two ways to use Sahara
 - **Without an account.** Everything you enter stays on this phone. Nothing goes to our server. _(Source: `CareModel.kt:22, 98`, `cloud == null`.)_
@@ -49,15 +54,27 @@ Grievance and privacy contact: **[owner to confirm: name, email]**.
 We do not use advertising, we do not sell your data, and we do not use it to profile you. _(No advertising or analytics SDK in `build.gradle.kts:65-94`.)_
 
 ### What stays only on your phone
-- **Recordings** of conversations. They are never uploaded. Speech-to-text runs on the phone. _(Sources: `CareModel.kt:625, 710`; cloud transcription is off, `build.gradle.kts:37, 46`.)_
-- **Report files and photos**, and the text read from them. They are never uploaded unless you copy a fact into an entry yourself. _(Sources: `CareReports.kt:18`; `CareModel.kt:568-574`; `CareDocumentReader.kt:114`.)_
+- **Recordings** of ordinary conversations. Goals-of-care recordings are the exception: see "AI services" below. _(Sources: `CareModel.kt:625, 710`; `CareGocUi.kt:148-151`.)_
+- **Report files and photos.** Files and photos are never uploaded. The text read from them leaves the phone only if you copy a fact into an entry or send a question with consent (see "AI services"). _(Sources: `CareReports.kt:18`; `CareDocumentAskUi.kt:45, 165`.)_
+- **Living will (advance directive), care plan, caregiver wellbeing check and journal.** _(Sources: `CarePlanStore.kt:152`; `CarePlanPilot.kt:139`; `CaregiverWellbeing.kt:41-43`.)_
+- **Reminders and missed-medicine notifications** are worked out on the phone. _(Source: `CareReminders.kt:141-161`.)_
 - **Unsent drafts**, reminders and in-app feedback. _(Sources: `FeedbackStore.kt:7`; audit "What stays only on the phone".)_
-- Online AI is switched off in the app. _(Source: `CareRemoteAssist.kt:28-30`.)_
+
+### AI services
+- **Goals-of-care recordings.** The doctor ticks that everyone present agrees to recording and writing down; the screen says audio is sent to an AI service. The phone uploads the audio in parts to Google Gemini (through the website route on Vercel; uploaded files are deleted after each part and expire after 48 hours). Sarvam AI, an Indian company, can also transcribe when switched on, with Gemini as fallback and a short text-only Gemini step to label speakers. Google may process data outside India. The AI drafts a goals-of-care document that the doctor reviews, edits and signs. The transcript and AI reading are stored in Supabase (`sahara_goc_analyses`), readable only by that account. On-device transcription and typing remain available. _(Sources: `CareGocGemini.kt:29-44`; `prototype/app/goc-transcribe-server.ts`; `goc-gemini.ts:1-13`; `goc-sarvam.ts:1-12`; `20261105120000_goc_analyses.sql`.)_
+- **Questions about your documents.** With a tick each time, the question and the text read on the phone (never files) go to the AI service named on screen. _(Sources: `CareDocumentAskUi.kt`; `index.ts` `/ask`.)_
+- **Note translation.** With consent, note text goes to Sarvam AI when set up, otherwise the configured AI service. _(Source: `index.ts` `/translate`.)_
+
+### Community, centre suggestions and morphine reports
+- **Community.** Posts, replies, reactions, saves and reports, shown under a chosen community name. The Sahara team moderates; three member reports hide a post until reviewed. _(Source: `20261106120000_community.sql`.)_
+- **Centre suggestions and morphine reports.** Only the place is stored. Centre suggestions are linked to the account and private to the author and the Sahara team. Morphine reports are not linked to the account (only a one-way code is kept for the daily limit) and only the Sahara team can read them; only recognised institutions are ever shown to other families. Only reviewed places may be shown to other families in a later directory release. _(Sources: `20261028160510_centre_suggestions.sql`; `20261120180000_morphine_reports.sql`.)_
 
 The phone also keeps a copy of your server records so you can read them offline. App data is not included in Android cloud backup or transfer to a new phone. _(Sources: `CareModel.kt:196-205`; `res/xml/data_extraction_rules.xml`.)_
 
 ### Where it is stored
-On Supabase servers in **[owner to confirm: region; `AI_HANDOFF.md` records ap-south-1, Mumbai]**. Supabase stores the data on our behalf (a "data processor"). All connections use HTTPS. _(Source: `AndroidManifest.xml:15`, `usesCleartextTraffic="false"`.)_
+On Supabase servers in **[owner to confirm: region; `AI_HANDOFF.md` records ap-south-1, Mumbai]**. All connections use HTTPS. _(Source: `AndroidManifest.xml:15`, `usesCleartextTraffic="false"`.)_
+
+Processors: Supabase (storage and sign-in), Google Gemini (transcription, drafts, document questions, translation), Sarvam AI (transcription and translation when switched on), Vercel (website hosting and server routes).
 
 ### Who can see it
 - **You**, as the owner of a person's records.
@@ -65,37 +82,37 @@ On Supabase servers in **[owner to confirm: region; `AI_HANDOFF.md` records ap-s
 - **A doctor you invite.** The doctor must first be approved by Sahara staff, and then needs your invitation. You choose what they see (care notes, calendar, reports, costs, care team), whether they can make changes, and for how many days (1, 7, 30 or 90). A doctor sees a conversation draft only after you send it. _(Sources: `CareAccount.kt:240-246`; `20261019151322_shared_care_clinician_review.sql:117-155, 123-129, 222-224`.)_
 - **Sahara's server administrators** can technically see all stored data. **[owner to confirm who, and what limits apply]**
 - **Anyone you share with yourself**, through Android's share button or the printed emergency QR card. Those copies leave Sahara. The offline emergency card is plain text that anyone who scans it can read. _(Source: `EmergencyCard.kt:12-15`.)_
+- **Anyone with the emergency web link**, if the owner turns it on: name, latest confirmed goals of care, emergency contacts and medicines, read-only, for up to 365 days or until turned off or replaced. We count views. _(Source: `20261027190000_emergency_card_links.sql`.)_
 
 When you remove a member, they lose access from then on. We cannot recall copies they already saved.
 
 ### Your rights and how to use them
-- **Withdraw consent.** Sign out to stop sending new data. Remove a family member or doctor in Your account. Withdrawing does not undo past processing. _(DPDP s.6 [verify])_
+- **Withdraw consent.** Untick or decline any online AI step. Sign out to stop sending new data. Remove a family member or doctor in Your account, or turn off the emergency link. Withdrawing does not undo past processing. _(DPDP s.6 [verify])_
 - **See and correct.** You can see and edit your records in the app, or ask us for a summary. _(s.11, s.12 [verify])_
 - **Delete one person's records.** More → Remove this person's records. This deletes them on the server and on the phone. _(Source: `CareCloud.kt:73`.)_
-- **Delete your account.** Today: Your account → Delete account opens our deletion page, and you send us an email from your registered address. We check that it is your account, then delete your account details, the records you own, their invitations, and your access to other people's records. Records owned by someone else stay with them. _(Sources: `CareAccount.kt:263`; `prototype/app/delete-account/page.tsx`; `20261010122352_sahara_account_closure.sql`.)_
+- **Delete your account.** Your account → Delete account deletes it in the app: unfinished drafts, clinician request, records you own, memberships, then the sign-in, which also deletes everything linked to it (goals-of-care analyses, community content, suggestions, morphine reports, emergency links, feedback). If the sign-in is shared with another service, Sahara access is closed and those linked items stay until the sign-in is removed; the email deletion page remains the fallback. Records owned by someone else stay with them. _(Sources: `CareAccount.kt:411-418`; `20261027210000_sahara_account_lane.sql:55-73`; `20261010122352_sahara_account_closure.sql`.)_
 - **Name a nominee** to use these rights if you die or cannot act. **[owner to decide how; DPDP s.14 — see open question 4]**
 - **Complain.** Contact our grievance contact first: **[owner to confirm]**. If you are not satisfied, you can complain to the Data Protection Board of India. _(s.13 [verify])_
 
 Uninstalling the app deletes the phone copy only. It does not delete your online account.
 
 ### How long we keep it
-Until you delete it, delete the person's records, or close your account **[owner to decide a fixed period, open question 5]**. If the law requires us to keep something, we will tell you what, why and for how long.
+Online records are kept while the account is open and deleted when the account is deleted; there is no automatic expiry today **[owner to decide a fixed period, open question 5]**. If the law requires us to keep something, we will tell you what, why and for how long.
 
 ### Security
 - The sign-in token is encrypted with Android Keystore. _(Source: `CareCloud.kt` `seal`.)_
 - Server rules let only the owner and invited members read records. _(Source: `20261009162933_android_care_accounts.sql:47-77`.)_
 - The app's local database has no separate encryption, so please use a screen lock. _(Source: live policy, "How information is protected".)_
-- If there is a data breach, we will tell you and the Data Protection Board as the law requires. **[owner to set up the process]**
+- If there is a data breach, we will tell affected people and the Data Protection Board as the law requires. **[owner to set up the process]**
 
 ### Not medical advice
-Sahara records and organises care. It does not diagnose or prescribe. A goals-of-care note records a conversation; it is not a treatment order or a legal directive.
+Sahara supports care and record-keeping. It does not diagnose, prescribe or decide treatment. A doctor reviews every AI draft. A goals-of-care note records a conversation; it is not a treatment order or a legal directive.
 
 ### Changes in progress (in progress, verify before submitting)
 Keep a paragraph only if that change has shipped.
 - **Send later.** _[in progress, verify before submitting; `sa4-queue`]_ If you have no internet, your entry is kept on the phone and sent when the connection returns. _(Today a signed-in save without internet fails: `CareModel.kt:552`.)_
 - **Removing contact details before upload.** _[in progress, verify before submitting; branch `sa4-privacy`, `086e591`]_ Before symptom notes and conversation drafts are sent, phone numbers, emails, Aadhaar-like numbers, PAN and PIN-code addresses are replaced with labels such as [phone]. Names are not removed. This is not full anonymisation.
-- **Emergency web link.** _[in progress, verify before submitting; branch `sa3-qr`, `b2b2456`; server change not applied]_ If you turn it on, a copy of the emergency card (name, latest confirmed goals, emergency contacts, medicines) is kept on our server. Anyone with the link or QR can read it without signing in, for up to one year or until you turn it off or make a new one. We count how many times it is opened.
-- **Delete account in the app.** _[in progress, verify before submitting; `sa4-account`; server change not applied]_ You can delete your account and data directly in Your account, without emailing us.
+- Emergency web link and in-app account deletion are now in the policy text above (migrations `20261027190000`, `20261027210000`; confirm both are applied on the server the shipped build uses).
 
 ---
 

@@ -30,6 +30,7 @@ class MainActivity : ComponentActivity() {
             ViewModelProvider(this)[CareRootModel::class.java].openToday.value = intent.getStringExtra(CareTodayRules.OPEN_PERSON_EXTRA).orEmpty()
             intent.removeExtra(CareTodayRules.OPEN_PERSON_EXTRA)
         }
+        intent?.getIntExtra(CareReminderScheduler.DISMISS_EXTRA, 0)?.takeIf { it != 0 }?.let { androidx.core.app.NotificationManagerCompat.from(this).cancel(it); intent.removeExtra(CareReminderScheduler.DISMISS_EXTRA) }
         CareReminderLaunch.offer(intent)
     }
     private fun handleInviteIntent(intent: Intent?) {

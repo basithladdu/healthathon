@@ -52,11 +52,12 @@ class DoctorEmbeddedNavigationTest {
         listOf("Progress", "Labs", "Conversations", "Visits", "Medicines", "Reports").forEach {
             ui.onNodeWithTag("doctor-shared-$it").performScrollTo().assertIsDisplayed().assertHeightIsAtLeast(48.dp).performClick()
         }
-        ui.onNodeWithTag("doctor-shared-patient-hub").performScrollToNode(hasTestTag("doctor-shared-tools"))
-        ui.onNodeWithTag("doctor-shared-tools").assertIsDisplayed().performSemanticsAction(SemanticsActions.OnClick) { it() }
+        // "Daily care" (the whole patient app) is no longer offered to the doctor (Dr Sujay, 22 Nov).
+        ui.onNodeWithTag("doctor-shared-tools").assertDoesNotExist()
         ui.onNodeWithTag("doctor-shared-patient-hub").performScrollToNode(hasText("Sharing & access"))
+        ui.onNodeWithTag("doctor-shared-access-detail").assertExists()
         ui.onNodeWithText("Sharing & access").performClick()
-        assertEquals(listOf("Progress", "Labs", "Conversations", "Visits", "Medicines", "Reports", "Tools", "Shared"), opened)
+        assertEquals(listOf("Progress", "Labs", "Conversations", "Visits", "Medicines", "Reports", "Shared"), opened)
         listOf("Today", "Talk", "Care", "Nearby", "More").forEach { ui.onNodeWithText(it).assertDoesNotExist() }
     }
 

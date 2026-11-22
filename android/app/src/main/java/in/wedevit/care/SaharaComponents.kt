@@ -1,5 +1,7 @@
 package `in`.wedevit.care
 
+import androidx.compose.ui.graphics.compositeOver
+
 import android.app.Activity
 import android.content.ContextWrapper
 import androidx.compose.animation.animateColorAsState
@@ -124,20 +126,21 @@ internal fun splitsWord(text: String, lineEnds: List<Int>): Boolean {
     value: String? = null, caption: String? = null) {
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
-    val fill by animateColorAsState(if (pressed) tone.ink else tone.solid, SaharaMotion.tween(SaharaMotion.PRESS_MS), label = "tile-press")
+    // Softer tiles (Dr Sujay, 22 Nov): the section's light wash, a thin section-colour edge, the icon on a solid disc, dark ink text.
+    val fill by animateColorAsState(if (pressed) tone.solid.copy(alpha = .22f).compositeOver(tone.wash) else tone.wash, SaharaMotion.tween(SaharaMotion.PRESS_MS), label = "tile-press")
     val shape = RoundedCornerShape(SaharaRadius.Lg)
-    Column(modifier.saharaAppear().saharaPress(interaction).heightIn(min = 112.dp).shadow(if (pressed) 1.dp else 4.dp, shape).clip(shape).background(fill)
-        .clickable(interactionSource = interaction, indication = androidx.compose.material3.ripple(color = tone.onSolid), role = Role.Button, onClick = onClick).a11yCard().padding(14.dp),
+    Column(modifier.saharaAppear().saharaPress(interaction).heightIn(min = 112.dp).clip(shape).background(fill).border(1.dp, tone.solid.copy(alpha = .4f), shape)
+        .clickable(interactionSource = interaction, indication = androidx.compose.material3.ripple(color = tone.ink), role = Role.Button, onClick = onClick).a11yCard().padding(14.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(40.dp).clip(CircleShape).background(tone.onSolid.copy(alpha = .2f)), contentAlignment = Alignment.Center) {
+            Box(Modifier.size(40.dp).clip(CircleShape).background(tone.solid), contentAlignment = Alignment.Center) {
                 Icon(icon, null, Modifier.size(24.dp), tint = tone.onSolid)
             }
             Spacer(Modifier.weight(1f))
-            if (value != null) Text(value, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = tone.onSolid, maxLines = 1)
+            if (value != null) Text(value, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = tone.ink, maxLines = 1)
         }
-        Text(title, style = MaterialTheme.typography.titleMedium, fontSize = 17.sp, lineHeight = 22.sp, fontWeight = FontWeight.Bold, color = tone.onSolid, maxLines = 2, overflow = TextOverflow.Ellipsis)
-        if (caption != null) Text(caption, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold, color = tone.onSolid, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        Text(title, style = MaterialTheme.typography.titleMedium, fontSize = 17.sp, lineHeight = 22.sp, fontWeight = FontWeight.Bold, color = SaharaColors.Ink, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        if (caption != null) Text(caption, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold, color = tone.ink, maxLines = 2, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -199,14 +202,16 @@ fun Modifier.saharaAccentBar(tone: SaharaTone): Modifier = drawWithContent {
 @Composable fun SaharaSectionBand(title: String, tone: SaharaTone, modifier: Modifier = Modifier, onBack: (() -> Unit)? = null, subtitle: String? = null,
     backTag: String? = null, trailing: (@Composable RowScope.() -> Unit)? = null) {
     val t = careText()
-    Surface(modifier.fillMaxWidth().saharaAppear(), shape = RoundedCornerShape(SaharaRadius.Lg + 4.dp), color = tone.band, contentColor = tone.onSolid, shadowElevation = 3.dp) {
+    // Softer (Dr Sujay's video, 22 Nov: solid bands felt dark and scary): the section's light wash with its dark ink, a thin edge in the section colour.
+    Surface(modifier.fillMaxWidth().saharaAppear(), shape = RoundedCornerShape(SaharaRadius.Lg + 4.dp), color = tone.wash, contentColor = tone.ink,
+        border = androidx.compose.foundation.BorderStroke(1.dp, tone.solid.copy(alpha = 0.35f))) {
         Row(Modifier.heightIn(min = 72.dp).padding(start = if (onBack != null) 4.dp else 18.dp, end = 12.dp, top = 10.dp, bottom = 10.dp), verticalAlignment = Alignment.CenterVertically) {
             if (onBack != null) IconButton(onClick = onBack, modifier = Modifier.size(48.dp).then(if (backTag != null) Modifier.testTag(backTag) else Modifier)) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस"), tint = tone.onSolid)
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस"), tint = tone.ink)
             }
             Column(Modifier.weight(1f).padding(start = 4.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(title, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Bold, fontSize = 24.sp, lineHeight = 30.sp, color = tone.onSolid)
-                if (!subtitle.isNullOrBlank()) Text(subtitle, fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.SemiBold, color = tone.onSolid, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(title, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Bold, fontSize = 24.sp, lineHeight = 30.sp, color = tone.ink)
+                if (!subtitle.isNullOrBlank()) Text(subtitle, fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.SemiBold, color = SaharaColors.InkSub, maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
             if (trailing != null) { Spacer(Modifier.width(8.dp)); trailing() }
         }
