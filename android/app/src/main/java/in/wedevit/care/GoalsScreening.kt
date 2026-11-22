@@ -102,15 +102,21 @@ internal object GoalsScreening {
         answers.filter { (q, v) -> tool.questions.firstOrNull { it.id == q }?.options?.any { it.value == v && it.selectable } == true }
 }
 
-/** Optional, collapsed helper at the start of the doctor's conversation flow. Nothing is saved; it never blocks Continue. */
-@Composable internal fun GoalsScreeningHelper(scope: String, tool: GoalsScreeningTool = GoalsScreening.active) { val t = careText()
-    var open by rememberSaveable(scope) { mutableStateOf(false) }
+/**
+ * The surprise question on the doctor's patient page. Nothing is saved. "No, I would not be surprised" offers the goals-of-care
+ * conversation and the quiet planning-ahead guide (who certifies a death at home, registering it), which the doctor can go through with the family.
+ */
+@Composable internal fun GoalsScreeningHelper(scope: String, tool: GoalsScreeningTool = GoalsScreening.active, startOpen: Boolean = false,
+    onStartGoalsOfCare: (() -> Unit)? = null) { val t = careText()
+    var open by rememberSaveable(scope) { mutableStateOf(startOpen) }
+    var guideOpen by rememberSaveable(scope) { mutableStateOf(false) }
+    if (guideOpen) AfterDeathGuideSheet { guideOpen = false }
     var answers by rememberSaveable(scope, tool.id) { mutableStateOf(mapOf<String, String>()) }
     val suggestion = remember(answers) { tool.suggest(GoalsScreening.clean(tool, answers)) }
     Surface(shape = RoundedCornerShape(20.dp), color = DoctorCardReport, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("goals-screening")) {
         Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button, onClickLabel = if (open) t("Collapse", "बंद करें") else t("Expand", "खोलें")) { open = !open }, verticalAlignment = Alignment.CenterVertically) {
-                Text(t("Screening", "जाँच"), Modifier.weight(1f), fontSize = 16.sp, lineHeight = 22.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+                Text(t("Would you be surprised if this patient died in the next 12 months?", "अगर यह मरीज़ अगले 12 महीनों में गुज़र जाए, तो क्या आपको हैरानी होगी?"), Modifier.weight(1f), fontSize = 16.sp, lineHeight = 22.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
                 Icon(if (open) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, null, tint = RustText, modifier = Modifier.size(48.dp).padding(12.dp))
             }
             if (open) {
@@ -128,6 +134,14 @@ internal object GoalsScreening {
                 }
                 if (suggestion != null) Surface(shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, if (suggestion.consider) DoctorStatusWarn.copy(alpha = .35f) else DoctorHairline), color = if (suggestion.consider) DoctorStatusWarnBg else DoctorStatusRestBg, modifier = Modifier.fillMaxWidth().testTag("goals-screening-suggestion")) {
                     Text(t(suggestion.en, suggestion.hi), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk, modifier = Modifier.padding(12.dp).announce())
+                }
+                if (suggestion?.consider == true) {
+                    if (onStartGoalsOfCare != null) Button(onClick = onStartGoalsOfCare, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("goals-screening-start-goc")) {
+                        Text(t("Start the goals of care conversation", "देखभाल के लक्ष्यों पर बातचीत शुरू करें"))
+                    }
+                    OutlinedButton(onClick = { guideOpen = true }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("goals-screening-planning")) {
+                        Text(t("Planning ahead with the family: death certificate and next steps", "परिवार के साथ आगे की तैयारी: मृत्यु प्रमाणपत्र और अगले कदम"))
+                    }
                 }
                 InfoDisclosure(t("Sources", "स्रोत")) {
                     tool.sources.forEach { Text(it, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub) }

@@ -20,6 +20,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.time.LocalDate
@@ -76,7 +77,6 @@ object DoctorSymptomSummaryRules {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
                     Text(t("Symptom", "लक्षण"), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub, modifier = Modifier.weight(1f))
                     Text(t("Latest", "अभी"), fontSize = 14.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub, textAlign = TextAlign.Center, modifier = Modifier.width(numberCol))
-                    Text(t("Highest", "सबसे ज़्यादा"), fontSize = 14.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub, textAlign = TextAlign.Center, modifier = Modifier.width(numberCol))
                     Text(t("Change", "बदलाव"), fontSize = 14.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub, textAlign = TextAlign.Center, modifier = Modifier.width(changeCol))
                 }
                 HorizontalDivider(color = DoctorHairline)
@@ -99,17 +99,13 @@ object DoctorSymptomSummaryRules {
                     if (open == id) t("Tap to hide chart.", "चार्ट छिपाने के लिए छुएँ।") else t("Tap to see chart.", "चार्ट देखने के लिए छुएँ।")
                 Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button) { open = if (open == id) "" else id }
                     .semantics { contentDescription = spoken }.testTag("doctor-symptom-row-$id"), verticalAlignment = Alignment.CenterVertically) {
-                    Column(Modifier.weight(1f).padding(vertical = 4.dp)) {
-                        Text(name, color = DoctorCardInk, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-                        Text(friendlyWhen(latest.date, latest.time, hindi), fontSize = 14.sp, color = DoctorCardSub)
-                        if (latest.respondent == "caregiver") SymptomLoggedByFamilyChip(hindi, "doctor-symptom-family-$id")
-                    }
+                    // One compact line per symptom (Dr Sujay, 22 Nov): name, latest score, change. When, highest and the chart open on tap.
+                    Text(name, Modifier.weight(1f).padding(vertical = 4.dp), color = DoctorCardInk, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Box(Modifier.width(numberCol), contentAlignment = Alignment.Center) {
                         val fill = ChartBands.color(latest.value)
                         Text("${latest.value}", color = readableOn(fill), fontWeight = FontWeight.Bold, fontSize = 16.sp, textAlign = TextAlign.Center,
                             modifier = Modifier.background(fill, RoundedCornerShape(50)).padding(horizontal = 12.dp, vertical = 4.dp))
                     }
-                    Text(highest?.toString() ?: "–", color = DoctorCardInk, fontSize = 16.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center, modifier = Modifier.width(numberCol))
                     val changeShort = when {
                         before == null -> "–"
                         arrow == "→" -> t("→ same", "→ वही")
@@ -118,10 +114,14 @@ object DoctorSymptomSummaryRules {
                     Text(changeShort, fontSize = 14.sp, lineHeight = 16.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center,
                         color = when (arrow) { "↑" -> ChartBands.Severe; "↓" -> ChartBands.Mild; else -> DoctorCardSub }, modifier = Modifier.width(changeCol))
                 }
-                if (open == id) DoctorScoreTrend(name, DoctorTrendRules.daily(row.series), range, today, "doctor-symptom-trend-$id")
+                if (open == id) Column(Modifier.fillMaxWidth().padding(bottom = 8.dp).testTag("doctor-symptom-detail-$id"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(t("Last noted", "आख़िरी नोट") + ": " + friendlyWhen(latest.date, latest.time, hindi) + " · " + t("Highest", "सबसे ज़्यादा") + ": " + (highest?.toString() ?: "–"), fontSize = 14.sp, lineHeight = 19.sp, color = DoctorCardSub)
+                    if (latest.respondent == "caregiver") SymptomLoggedByFamilyChip(hindi, "doctor-symptom-family-$id")
+                    DoctorScoreTrend(name, DoctorTrendRules.daily(row.series), range, today, "doctor-symptom-trend-$id")
+                    ChartLegend(hindi)
+                }
                 HorizontalDivider(color = DoctorHairline)
             }
-            if (rows.isNotEmpty()) ChartLegend(hindi)
             if (onSeeAll != null && all.size > rows.size) TextButton(onClick = onSeeAll, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-symptom-see-all")) {
                 Text(t("All symptoms (${all.size})", "सभी लक्षण (${all.size})"), color = DoctorAccent, fontWeight = FontWeight.Medium); Spacer(Modifier.width(4.dp)); Icon(Icons.Default.ChevronRight, null, Modifier.size(18.dp), tint = DoctorAccent)
             }

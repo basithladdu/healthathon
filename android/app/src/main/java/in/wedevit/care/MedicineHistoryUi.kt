@@ -141,8 +141,21 @@ internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: C
     var snapshot: MedicineHistorySnapshot? = null
     plan.events.forEach { snapshot = repo.append(current.personId, it) }
     snapshot?.let { if (vm.selected.value == current.personId) vm.medicineEvents.value = it.events }
+    if (taken) runCatching { CareReminderScheduler(context.applicationContext, vm.accountNamespace).markTaken(current.id) }
+    // A morphine dose marked taken: ask (at most monthly per medicine) where it came from.
+    if (taken && MorphineSourceRules.isMorphine(current.title) && MorphineSourceRules.shouldAsk(context, current.id)) MorphineSourcePrompt.ask.value = current
     // The whole-day tick is only ever today's, so a dose saved for last night leaves it as it is.
     if (day == today && (current.doneOn == today.toString()) != (plan.doneOn == today.toString())) { vm.busy.first { !it }; vm.toggle(current) }
+    return true
+}
+
+/** "Took a dose now" for an as-needed medicine: one more taken report with this moment's time. */
+internal suspend fun recordAsNeededDose(context: Context, vm: CareModel, item: CareItem): Boolean {
+    val event = MedicineDoses.asNeededDose(item, System.currentTimeMillis(), MedicineDoses.reporter(vm.viewRole.value))
+    val snapshot = MedicineHistoryRepo(context.applicationContext, vm.cloud, vm.storageNamespace).append(item.personId, event)
+    if (vm.selected.value == item.personId) vm.medicineEvents.value = snapshot.events
+    runCatching { CareReminderScheduler(context.applicationContext, vm.accountNamespace).markTaken(item.id) }
+    if (MorphineSourceRules.isMorphine(item.title) && MorphineSourceRules.shouldAsk(context, item.id)) MorphineSourcePrompt.ask.value = item
     return true
 }
 

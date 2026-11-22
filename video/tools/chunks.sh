@@ -8,9 +8,9 @@ while [ $a -lt $TOTAL ]; do
   f=out/ch/c$(printf %05d $a).mp4
   ok=0
   if [ -s "$f.ok" ]; then ok=1; fi
-  for try in 1 2 3; do
+  for try in 1 2 3 4 5 6 7 8; do
     [ $ok = 1 ] && break
-    npx remotion render src/index.ts JourneyAudio "$f" --frames=$a-$b --concurrency=2 --crf=16 --gl=angle --muted --timeout=120000 --log=error > out/ch/log.txt 2>&1 && [ -s "$f" ] && ok=1 && echo done > "$f.ok"
+    npx remotion render src/index.ts JourneyAudio "$f" --frames=$a-$b --concurrency=1 --crf=16 --gl=angle --muted --timeout=120000 --log=error > out/ch/log.txt 2>&1 && [ -s "$f" ] && ok=1 && echo done > "$f.ok"
     [ $ok = 1 ] || { echo "chunk $a try $try failed: $(grep -v '^$' out/ch/log.txt | head -1 | cut -c1-200)"; }
   done
   [ $ok = 1 ] || { echo "GIVING UP at $a"; exit 2; }

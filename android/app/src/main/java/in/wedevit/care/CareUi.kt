@@ -123,6 +123,7 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
     onWelcomePanelChanged: (String) -> Unit = {}, onPatientWalkthrough: (String) -> Unit = {},
     walkthrough: PatientWalkthrough.User? = null, onLeaveWalkthrough: () -> Unit = {}, onSwitchWalkthrough: (String) -> Unit = {},
     openToday: String? = null, onOpenTodayHandled: () -> Unit = {}) {
+    if (walkthrough == null) MorphineSourceHost(vm)
     val allPeople by vm.people.collectAsStateWithLifecycle()
     val people = if (walkthrough != null) PatientWalkthrough.visiblePeople(allPeople) else allPeople
     val selected by vm.selected.collectAsStateWithLifecycle()
@@ -145,7 +146,11 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
     // Each entry may also name an overlay or sheet to reopen on the way back (see CareNavTrail), so Back returns to the page it came from.
     var tabTrail by rememberSaveable { mutableStateOf("") }
     var tabDirection by remember { mutableStateOf(SaharaMotion.Direction.Switch) }
-    fun go(next: Int, reopen: String = "") { if (next != tab) { tabTrail = CareNavTrail.push(tabTrail, tab, reopen); tabDirection = SaharaMotion.Direction.Forward; tab = next } }
+    // Each tab keeps its own saved state (scroll position, open module) so Back returns to where the person was.
+    val screens = rememberSaveableStateHolder()
+    // Opening a page (forward or from the bottom bar) starts it fresh at the top (22 Nov review); only Back restores the old position.
+    fun freshTab(next: Int) { if (next != tab) screens.removeState("$selected:$next") }
+    fun go(next: Int, reopen: String = "") { if (next != tab) { freshTab(next); tabTrail = CareNavTrail.push(tabTrail, tab, reopen); tabDirection = SaharaMotion.Direction.Forward; tab = next } }
     // Today's SOS sheet reopens when Back returns from the emergency plan it opened.
     var sosReopen by rememberSaveable { mutableStateOf(false) }
     // Daily care opens at the section a Today "See all" points to; the bottom tab opens it from the top.
@@ -155,7 +160,7 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
     fun openCalendar(at: Long = 0L) { calendarDay = at; go(6) }
     // Today's "Note a symptom" opens the symptom form straight away; the diary clears this once it has opened the form.
     var symptomAddPending by rememberSaveable { mutableStateOf(false) }
-    fun switchTab(next: Int) { careFilter = "All"; tabTrail = ""; tabDirection = SaharaMotion.Direction.Switch; tab = next }
+    fun switchTab(next: Int) { freshTab(next); careFilter = "All"; tabTrail = ""; tabDirection = SaharaMotion.Direction.Switch; tab = next }
     var dialog by rememberSaveable { mutableStateOf("") }
     // Full-screen overlays opened from another overlay (check-in, then distress) return to it on Back.
     var overlayTrail by rememberSaveable { mutableStateOf("") }
@@ -181,7 +186,6 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
     // A tap that also names a person is handled below (select that person first, then open Reminders).
     LaunchedEffect(reminderTapped, selected, openToday) { if (reminderTapped && openToday == null && selected.isNotBlank() && walkthrough == null) { remindersOpen = true; CareReminderLaunch.pending.value = false } }
     val openDoctorWorkspace = { if (onDoctorWorkspace != null) onDoctorWorkspace() else sharedWorkspaceOpen = true }
-    val screens = rememberSaveableStateHolder()
     val snackbar = remember { SnackbarHostState() }
     val person = people.firstOrNull { it.id == selected }
     // The language name stays beside the icon on the welcome screen up to 1.3x text, so the choice is easy to find before sign-in.
@@ -464,6 +468,7 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
     val personName = todayPeople.firstOrNull { it.id == selectedPerson }?.name.orEmpty()
     // SOS opens one sheet with the emergency numbers, the emergency QR card and the emergency plan.
     var sosOpen by rememberSaveable { mutableStateOf(false) }
+    var afterDeathOpen by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(sosReopen) { if (sosReopen) { sosOpen = true; onSosReopened() } }
     val showSummary = !clinician && selectedPerson.isNotBlank()
     if (sosOpen) SaharaScreenSheet(onDismissRequest = { sosOpen = false }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Paper) {
@@ -473,8 +478,11 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
             EmergencyCardOnToday(vm, onRead)
             Spacer(Modifier.height(12.dp))
             CarePlanEntryCard { sosOpen = false; onCarePlanFromSos() }
+            // Family and carers only: the patient is never shown anything about their own death.
+            if (family) { Spacer(Modifier.height(20.dp)); AfterDeathEntry { afterDeathOpen = true } }
         }
     }
+    if (afterDeathOpen) AfterDeathGuideSheet { afterDeathOpen = false }
     val hour = java.time.LocalTime.now().hour
     val medicines = CareDailyFlow.medicinesForToday(items, today)
     val visits = CareTodayRules.upcomingVisits(items, dayStart)
@@ -1056,6 +1064,7 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
     val now = remember(entries) { System.currentTimeMillis() }; val (upcoming, pastVisits) = CareModules.splitVisits(shown.filter { it.kind == "visit" }, now)
     val tasks = shown.filter { it.kind == "task" }; val checkins = shown.filter { it.kind == "checkin" }; val journal = shown.filter { it.kind == "journal" && !SideEffectCodec.isStructured(it.detail) && !PatientProfileCodec.isStructured(it.detail) }
     val selectedPerson by vm.selected.collectAsStateWithLifecycle(); val loadedFor by vm.itemsLoadedFor.collectAsStateWithLifecycle()
+    val canAdd by vm.canEdit.collectAsStateWithLifecycle()
     // A row opens its module on its own screen; Back returns to the list. [initialFilter] can open one directly.
     var openModule by rememberSaveable(target) { mutableStateOf(target) }
     // Opening from Today ("Open medicines") always lands on that section, even if it was closed here before.
@@ -1076,15 +1085,22 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
                 SideEffectsToRaiseCard(vm)
         },
         CareModuleTile("Visits", t("Visits", "मुलाक़ातें"), "", SaharaApricot, R.drawable.conversation_history_art, upcoming.size + pastVisits.size) {
+                // How visits get here (22 Nov review: "does the doctor add them or do we?").
+                Text(if (canAdd) t("Visits your doctor schedules appear here. You can also add one yourself.", "डॉक्टर जो मुलाक़ात तय करते हैं, वह यहाँ दिखती है। आप ख़ुद भी जोड़ सकते हैं।")
+                    else t("Visits your doctor schedules appear here.", "डॉक्टर जो मुलाक़ात तय करते हैं, वह यहाँ दिखती है।"), fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardSub, modifier = Modifier.testTag("care-visits-how"))
+                if (canAdd) CareModuleAddButton(t("Add a visit", "मुलाक़ात जोड़ें"), "care-module-add-visit") { onAdd("visit") }
                 CareVisitsModule(vm, upcoming, pastVisits, onCalendarAt)
         },
         CareModuleTile("To do", t("To do", "करने के काम"), "", SaharaSoftGold, R.drawable.care_notes_illustration, tasks.size) {
+            if (canAdd) CareModuleAddButton(t("Add a to-do", "नया काम जोड़ें"), "care-module-add-task") { onAdd("task") }
             CareTodoModule(vm, tasks)
         },
         CareModuleTile("Check-ins", t("Check-ins", "रोज़ का हाल"), "", Mint, R.drawable.wellbeing_checkin_illustration, checkins.size) {
-            DistressHistoryCard(checkins, selectedPerson); CareModuleList("check-ins", checkins, t("No check-ins yet.", "अभी कोई हाल नहीं लिखा।"), keyOf = { it.id }) { CareRow(it, vm) }
+            // One short row per day (22 Nov review); a day opens to show its entries.
+            CheckInHistoryModule(checkins, selectedPerson, vm)
         },
         CareModuleTile("Journal", t("Journal", "डायरी"), "", Peach, R.drawable.conversation_record_art, journal.size) {
+            if (canAdd) CareModuleAddButton(t("Add a journal entry", "डायरी में लिखें"), "care-module-add-journal") { onAdd("journal") }
             CareModuleList("journal", journal, t("No journal notes yet.", "डायरी में अभी कोई नोट नहीं।"), keyOf = { it.id }) { CareRow(it, vm) }
         },
     )
@@ -1118,6 +1134,11 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
             }
         } }
     }
+}
+
+/** The clear "+ Add" at the top of a module page (To do, Journal, Visits), so another entry is always one tap away (22 Nov review). */
+@Composable internal fun CareModuleAddButton(label: String, tag: String, onClick: () -> Unit) {
+    SaharaSecondaryButton(label, onClick = onClick, icon = Icons.Default.Add, modifier = Modifier.fillMaxWidth().testTag(tag))
 }
 
 /** One row of All care tools: a module of this tab or another page. [detail] is the module's count. */

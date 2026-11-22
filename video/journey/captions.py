@@ -5,7 +5,7 @@ import json, os, re
 HERE = os.path.dirname(os.path.abspath(__file__))
 script = json.load(open(os.path.join(HERE, 'script.json'), encoding='utf-8'))
 words = json.load(open(os.path.join(HERE, '..', 'src', 'journey', 'words.json'), encoding='utf-8'))['words']
-MAX = 42
+MAX = 60
 norm = lambda s: re.sub(r'[^a-z0-9]', '', s.lower())
 
 lines = []
@@ -63,8 +63,9 @@ for sen in script:
 # hold each line a little after its last word, but never into the next line
 for i, l in enumerate(lines):
     nxt = lines[i + 1]['s'] if i + 1 < len(lines) else l['e'] + 2
-    l['s'] = round(max(0, l['s'] - 0.08), 3)
-    l['e'] = round(min(l['e'] + 0.45, nxt - 0.1), 3)
+    l['s'] = round(max(0, l['s'] - 0.08), 3) if i == 0 or l['s'] - 0.08 >= lines[i - 1]['e'] else lines[i - 1]['e']
+    # no flicker: a line stays up until the next one replaces it, unless there is a real pause
+    l['e'] = round(nxt if nxt - l['e'] < 1.2 else l['e'] + 0.6, 3)
     l['text'] = l['text'].rstrip('.,:')  # sparse look: no trailing full stops/commas
 
 json.dump(lines, open(os.path.join(HERE, '..', 'src', 'journey', 'captions.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=0)

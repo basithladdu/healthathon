@@ -159,7 +159,7 @@ internal object DoctorCareDemoData {
 }
 
 /** A disposable isolated model; leaving it never switches the real selected care profile. */
-@Composable internal fun DoctorCareDemoHost(onExit: () -> Unit, onNavigationBlockedChange: (Boolean) -> Unit, onHeaderBackChange: ((() -> Unit)?) -> Unit, initialPersonId:String = DoctorCareDemoData.PERSON_ID, initialSection:String = "Hub") {
+@Composable internal fun DoctorCareDemoHost(onExit: () -> Unit, onNavigationBlockedChange: (Boolean) -> Unit, onHeaderBackChange: ((() -> Unit)?) -> Unit, initialPersonId:String = DoctorCareDemoData.PERSON_ID, initialSection:String = "Hub", backLeavesFromInitialSection: Boolean = false) {
     val context=LocalContext.current.applicationContext
     val vm=remember {CareModel.createDoctorDemo(context as Application)}
     val scope=rememberCoroutineScope()
@@ -172,7 +172,10 @@ internal object DoctorCareDemoData {
     val people by vm.people.collectAsState();val selected by vm.selected.collectAsState();val draft by vm.draft.collectAsState()
     val person=people.firstOrNull {it.id==initialPersonId}
     fun leave() {if(!closing&&!childBlocked){closing=true;onNavigationBlockedChange(true);scope.launch {val job=vm.closeDoctorDemo();job.join();if(job.isCancelled){closing=false;closeFailed=true;onNavigationBlockedChange(false)}else onExit()}}}
-    val back:()->Unit={if(!closing&&!childBlocked&&(ready||error!=null||closeFailed)){if(section=="Hub")leave() else section="Hub"}}
+    // Opened straight into a section from Home (an unsigned note): Back from that section returns to where it was opened, not to this patient's list.
+    var direct by rememberSaveable(initialPersonId,initialSection) {mutableStateOf(backLeavesFromInitialSection && section!="Hub")}
+    val back:()->Unit={if(!closing&&!childBlocked&&(ready||error!=null||closeFailed)){if(section=="Hub"||(direct&&section==initialSection))leave() else section="Hub"}}
+    fun go(next:String){if(next!=section)direct=false;section=next}
     DisposableEffect(vm) {onDispose {vm.closeDoctorDemo();onNavigationBlockedChange(false);onHeaderBackChange(null)}}
     SideEffect {if(closing || (!ready&&error==null))onNavigationBlockedChange(true)}
     LaunchedEffect(vm,attempt,initialPersonId) {try {if(DoctorTestProfiles.contains(initialPersonId)) DoctorTestProfiles.seed(vm,context) else DoctorCareDemoData.seed(vm,context);vm.select(initialPersonId);vm.refreshCareContacts();vm.refreshMedicineHistory();ready=true;onNavigationBlockedChange(false)}catch(e:Exception){if(e is CancellationException)throw e;android.util.Log.e("SaharaSeed","walkthrough load failed",e);error="Practice could not open. Your own profiles were not changed.";onNavigationBlockedChange(false)}}
@@ -183,11 +186,11 @@ internal object DoctorCareDemoData {
     else if(error!=null) Column(Modifier.padding(20.dp)) {Text(error!!);Button(onClick={error=null;attempt++}){Text("Try again")};TextButton(onClick=::leave){Text("Back to patients")}}
     else if(ready && person==null && DoctorTestProfiles.contains(initialPersonId)) Column(Modifier.padding(20.dp)) {Text("This test record was removed. It will not be recreated automatically.");TextButton(onClick=::leave){Text("Back to patients")}}
     else if(!ready || person==null || selected!=person.id || draft.personId!=person.id) Column(Modifier.padding(20.dp)) {SaharaProgressBar(null);Text(if(DoctorTestProfiles.contains(initialPersonId)) "Opening care records…" else "Opening care records…")}
-    else DoctorPatientWorkspace(vm,person.id,section,{section=it},
+    else DoctorPatientWorkspace(vm,person.id,section,{go(it)},
         hub={pane,open->Column(Modifier.fillMaxSize().testTag("doctor-care-demo-hub")) {
             if(!DoctorTestProfiles.contains(initialPersonId)) Text("Practice record · not a live patient",Modifier.fillMaxWidth().padding(horizontal=20.dp,vertical=10.dp),color=Rust)
-            Box(Modifier.weight(1f)){DoctorSharedPatientHub(person,{section=it},deviceLocal=true,items=vm.items,pane=pane,selected=open)}
+            Box(Modifier.weight(1f)){DoctorSharedPatientHub(person,{go(it)},deviceLocal=true,items=vm.items,pane=pane,selected=open)}
         }},
-        care={shown->EmbeddedPatientCare(vm,person.id,shown,{section=it},{vm.message.value="Account and sharing are off in Practice."},::leave,
+        care={shown->EmbeddedPatientCare(vm,person.id,shown,{go(it)},{vm.message.value="Account and sharing are off in Practice."},::leave,
             onNavigationBlockedChange={childBlocked=it;onNavigationBlockedChange(it||closing)},allowDeviceLocal=true,onHeaderBackChange={nested->onHeaderBackChange(nested ?: back)})})
 }

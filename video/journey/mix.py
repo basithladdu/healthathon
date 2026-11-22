@@ -1,4 +1,4 @@
-"""Mix voice + music + sfx. Music sits 8.5 dB under the voice (gated RMS), swelling +5 dB under the title; SFX peaks 7.5 dB under voice peak.
+"""Mix voice + music + sfx. Music sits 14 dB under the voice (gated RMS), held level all the way through, swelling +2 dB under the title; SFX peaks 10.5 dB under voice peak.
 Then loudness to -14 LUFS with a -2.2 dBTP ceiling (ffmpeg loudnorm, two pass). Writes journey/mix.wav."""
 import json, os, subprocess, wave
 import numpy as np
@@ -9,7 +9,7 @@ SR = 48000
 
 def read(p):
     raw = subprocess.check_output(['ffmpeg', '-v', 'error', '-i', p, '-ar', str(SR), '-ac', '2', '-f', 's16le', '-'])
-    a = np.frombuffer(raw, dtype=np.int16).astype(np.float64).reshape(-1, 2) / 32768
+    a = np.frombuffer(raw, dtype=np.int16).astype(np.float32).reshape(-1, 2) / 32768
     return a
 
 
@@ -17,7 +17,7 @@ v = read(os.path.join(HERE, 'vo.wav'))
 m = read(os.path.join(HERE, 'music.wav'))
 s = read(os.path.join(HERE, 'sfx.wav'))
 n = max(len(v), len(m), len(s))
-pad = lambda a: np.vstack([a, np.zeros((n - len(a), 2))])
+pad = lambda a: np.vstack([a, np.zeros((n - len(a), 2), np.float32)])
 v, m, s = pad(v), pad(m), pad(s)
 
 
@@ -30,14 +30,33 @@ def gated_rms(a):
     return np.sqrt(np.mean(blocks[blocks > thr] ** 2))
 
 
+
+
+def flatten(a, win=3.0, lim=8.0):
+    """ride the gain so a track holds one level (keeps the voice : music ratio the same all the way through)"""
+    mono = a.mean(1)
+    b = int(0.25 * SR)
+    nb = len(mono) // b
+    r = np.sqrt((mono[:nb * b].reshape(nb, b) ** 2).mean(1)) + 1e-9
+    h = int(win / 0.25)
+    env = np.array([np.sqrt((r[max(0, i - h):i + h + 1] ** 2).mean()) for i in range(nb)])
+    ref = np.median(env[env > env.max() * 0.05])
+    g = np.clip(ref / env, 10 ** (-lim / 20), 10 ** (lim / 20))
+    g[env < env.max() * 0.02] = 1.0  # leave true silences and the fade out alone
+    k = np.ones(9) / 9
+    g = np.convolve(np.pad(g, 4, mode='edge'), k, 'valid')
+    return a * np.interp(np.arange(len(mono)), (np.arange(nb) + 0.5) * b, g).astype(np.float32)[:, None]
+
+
+m = flatten(m)
 rv, rm = gated_rms(v), gated_rms(m)
-gm = rv / rm * 10 ** (-8.5 / 20)
+gm = rv / rm * 10 ** (-14.0 / 20)
 title = json.load(open(os.path.join(HERE, '..', 'src', 'journey', 'words.json')))
 TITLE = [w for w in title['words'] if w['id'] == 'm35'][0]['s']
-t = np.arange(n) / SR
-swell = 10 ** ((5 * np.clip((t - (TITLE - 0.6)) / 1.2, 0, 1)) / 20)
+t = np.arange(n, dtype=np.float32) / SR
+swell = np.float32(10) ** ((2 * np.clip((t - (TITLE - 0.6)) / 1.2, 0, 1)) / 20)
 m = m * gm * swell[:, None]
-gs = (np.abs(v).max() * 10 ** (-7.5 / 20)) / max(np.abs(s).max(), 1e-9)
+gs = (np.abs(v).max() * 10 ** (-10.5 / 20)) / max(np.abs(s).max(), 1e-9)
 s = s * gs
 mix = v + m + s
 print('voice gated rms %.1f dB, music gain %.1f dB, sfx gain %.1f dB' % (20 * np.log10(rv), 20 * np.log10(gm), 20 * np.log10(gs)))

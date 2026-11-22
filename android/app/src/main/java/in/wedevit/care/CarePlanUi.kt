@@ -303,7 +303,13 @@ internal fun planStepOf(field: String): Int = when {
         } }
         item { FamilyTile(t("Emergency care plan & card", "आपातकालीन देखभाल योजना और कार्ड"), Icons.Default.LocalHospital, FamilyAccent.Marigold) {
             Text(t("The summary for the ambulance or emergency department, with a QR code.", "एम्बुलेंस या आपातकालीन विभाग के लिए सारांश, QR कोड के साथ।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub)
-            when {
+            // Patients and families see where the plan stands; only the doctor starts, continues, reviews or withdraws it (Dr Sujay, 21 Nov).
+            if (!clinician) Text(when {
+                active != null -> t("Signed by your doctor (version ${active.version}). Show the pocket card in an emergency.", "आपके डॉक्टर ने साइन किया (संस्करण ${active.version})। आपात स्थिति में पॉकेट कार्ड दिखाएँ।")
+                draft != null -> t("Your doctor is preparing this plan with you.", "आपके डॉक्टर आपके साथ यह योजना बना रहे हैं।")
+                else -> t("Your doctor makes this plan with you.", "आपके डॉक्टर यह योजना आपके साथ बनाते हैं।")
+            }, fontSize = 15.sp, color = DoctorCardInk, modifier = Modifier.testTag("care-plan-family-status"))
+            else when {
                 draft != null -> {
                     Button(onClick = { onPage("wizard") }, enabled = canEdit, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-continue")) { Text(t("Continue draft", "मसौदा जारी रखें")) }
                     TextButton(onClick = { dialog = "discard" }, enabled = canEdit) { Text(t("Discard draft", "मसौदा हटाएँ")) }
@@ -323,7 +329,7 @@ internal fun planStepOf(field: String): Int = when {
             Button(onClick = { onPage("amd") }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-amd-entry")) { Icon(Icons.Default.Gavel, null); Spacer(Modifier.width(8.dp)); Text(t("Open", "खोलें")) }
         } }
         // Versions as a plain register, always visible: version, status, date.
-        if (state.ectprs.any { it.patientId == person.id }) item { FamilyTile(t("Plan versions", "योजना के संस्करण"), Icons.Default.History, FamilyAccent.Indigo, Modifier.testTag("care-plan-versions")) {
+        if (clinician && state.ectprs.any { it.patientId == person.id }) item { FamilyTile(t("Plan versions", "योजना के संस्करण"), Icons.Default.History, FamilyAccent.Indigo, Modifier.testTag("care-plan-versions")) {
             state.ectprs.filter { it.patientId == person.id }.sortedByDescending { it.version }.forEachIndexed { i, r ->
                 if (i > 0) HorizontalDivider(color = DoctorHairline)
                 Text("v${r.version} · ${PlanText.status(r.status).pick(hindi)} · ${r.updatedAt.take(10)}" + (r.revokedReason?.let { " · $it" } ?: ""), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(vertical = 6.dp))
@@ -469,7 +475,7 @@ private fun LazyListScope.patientStep(d: EctprRecord, update: ((EctprRecord) -> 
         CareField(d.clinical.allergies, { v -> c { it.copy(allergies = v) } }, t("Allergies", "एलर्जी"), placeholder = t("For example: penicillin", "जैसे: पेनिसिलिन"))
         Text(t("Implanted device", "शरीर में लगा यंत्र"), fontWeight = FontWeight.Medium)
         ChipGroup(d.clinical.implantedDevice, ImplantedDevice.entries, PlanText::device, "device") { v -> c { it.copy(implantedDevice = v) } }
-        CareField(d.clinical.keyMedicines, { v -> c { it.copy(keyMedicines = v) } }, t("Key medicines", "मुख्य दवाएँ"))
+        KeyMedicinesEditor(d.clinical.keyMedicines) { v -> c { it.copy(keyMedicines = v) } }
         PlanDateField(d.clinical.eligibilityDate, t("Eligible for this plan since", "इस योजना के योग्य कब से"), { v -> c { it.copy(eligibilityDate = v) } }, latest = LocalDate.now())
         SectionTitle(t("Care team", "देखभाल टीम"))
         CareField(d.careTeam.oncologist, { v -> team { it.copy(oncologist = v) } }, t("Main treating doctor", "मुख्य इलाज करने वाले डॉक्टर"), singleLine = true)
@@ -525,11 +531,63 @@ private fun LazyListScope.decisionMakerStep(d: EctprRecord, update: ((EctprRecor
     }
 }
 
+/**
+ * Key medicines as a list (Shirin, 21 Nov): each medicine has its own name, dose, and start and end dates, with "+ Add medicine".
+ * Stored as one line per medicine in the same text field, so the PDF, the ED card and older plans keep working:
+ * "Morphine sulfate · 10 mg every 4 h · from 2026-11-01 · until 2026-12-01".
+ */
+internal data class KeyMedicine(val name: String = "", val dose: String = "", val from: String = "", val until: String = "")
+internal object KeyMedicines {
+    fun parse(text: String): List<KeyMedicine> = text.lines().map { it.trim() }.filter { it.isNotEmpty() }.map { line ->
+        val parts = line.split(" · ").map { it.trim() }
+        KeyMedicine(name = parts.first(), dose = parts.drop(1).firstOrNull { !it.startsWith("from ") && !it.startsWith("until ") }.orEmpty(),
+            from = parts.firstOrNull { it.startsWith("from ") }?.removePrefix("from ").orEmpty(), until = parts.firstOrNull { it.startsWith("until ") }?.removePrefix("until ").orEmpty())
+    }
+    fun encode(list: List<KeyMedicine>): String = list.filter { it.name.isNotBlank() || it.dose.isNotBlank() }.joinToString("\n") { m ->
+        listOf(m.name.trim(), m.dose.trim(), m.from.takeIf { it.isNotBlank() }?.let { "from $it" }.orEmpty(), m.until.takeIf { it.isNotBlank() }?.let { "until $it" }.orEmpty())
+            .filter { it.isNotBlank() }.joinToString(" · ")
+    }
+}
+
+@Composable private fun KeyMedicinesEditor(value: String, onChange: (String) -> Unit) { val t = careText()
+    var rows by remember { mutableStateOf(KeyMedicines.parse(value).ifEmpty { listOf(KeyMedicine()) }) }
+    fun set(next: List<KeyMedicine>) { rows = next; onChange(KeyMedicines.encode(next)) }
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.testTag("key-medicines")) {
+        Text(t("Key medicines", "मुख्य दवाएँ"), fontWeight = FontWeight.Medium)
+        rows.forEachIndexed { i, m ->
+            Surface(shape = RoundedCornerShape(14.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("key-medicine-$i")) {
+                Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    CareField(m.name, { v -> set(rows.toMutableList().also { it[i] = m.copy(name = v) }) }, t("Medicine ${i + 1}", "दवा ${i + 1}"), singleLine = true)
+                    CareField(m.dose, { v -> set(rows.toMutableList().also { it[i] = m.copy(dose = v) }) }, t("Dose and how often", "खुराक और कितनी बार"), singleLine = true)
+                    PlanDateField(m.from, t("Started on", "कब शुरू हुई"), { v -> set(rows.toMutableList().also { it[i] = m.copy(from = v) }) })
+                    PlanDateField(m.until, t("Planned until (optional)", "कब तक (वैकल्पिक)"), { v -> set(rows.toMutableList().also { it[i] = m.copy(until = v) }) })
+                    if (rows.size > 1) TextButton(onClick = { set(rows.toMutableList().also { it.removeAt(i) }) }, modifier = Modifier.heightIn(min = 48.dp).testTag("key-medicine-remove-$i")) {
+                        Text(t("Remove this medicine", "यह दवा हटाएँ"), color = RustText)
+                    }
+                }
+            }
+        }
+        OutlinedButton(onClick = { rows = rows + KeyMedicine() }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("key-medicine-add")) {
+            Icon(Icons.Default.Add, null); Spacer(Modifier.width(8.dp)); Text(t("Add medicine", "दवा जोड़ें"))
+        }
+    }
+}
+
 private fun LazyListScope.capacityStep(d: EctprRecord, update: ((EctprRecord) -> EctprRecord) -> Unit) { item { CapacityFields(d, update) } }
 
 @Composable private fun CapacityFields(d: EctprRecord, update: ((EctprRecord) -> EctprRecord) -> Unit) { val t = careText()
     fun cap(change: (CapacityAssessment) -> CapacityAssessment) = update { it.copy(capacity = change(it.capacity)) }
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        // What "capacity" means here, in plain words, before the choice (Shirin, 21 Nov: the step felt vague).
+        Surface(shape = RoundedCornerShape(14.dp), color = SaharaTone.Indigo.wash, modifier = Modifier.fillMaxWidth().testTag("capacity-intro")) {
+            Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(t("What capacity means here", "यहाँ निर्णय-क्षमता का मतलब"), fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+                Text(t("Can the patient, right now, make their own decisions about the treatment in this plan? That means they can understand the information, remember it long enough, weigh it up, and tell you their choice in any way.",
+                    "क्या मरीज़ अभी, इस योजना के इलाज के बारे में अपने फ़ैसले खुद ले सकते हैं? यानी वे जानकारी समझ सकें, उसे कुछ देर याद रख सकें, उस पर सोच सकें, और किसी भी तरह अपना फ़ैसला बता सकें।"), fontSize = 14.sp, color = DoctorCardInk)
+                Text(t("It is about this decision today, not about age, education or illness in general. If it changes from day to day, choose \"fluctuates\" and check again.",
+                    "यह आज के इसी फ़ैसले के बारे में है, उम्र, पढ़ाई या बीमारी के बारे में नहीं। अगर यह रोज़ बदलती है, तो \"बदलती रहती है\" चुनें और फिर से जाँचें।"), fontSize = 14.sp, color = DoctorCardSub)
+            }
+        }
         CapacityGuideCard()
         OptionGroup(t("Capacity", "निर्णय-क्षमता"), d.capacity.status, Capacity.entries, PlanText::capacity, tag = "capacity") { v -> cap { it.copy(status = v) } }
         if (d.capacity.status == Capacity.FLUCTUATES || d.capacity.status == Capacity.LACKS) {

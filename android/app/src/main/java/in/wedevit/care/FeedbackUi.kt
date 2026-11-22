@@ -152,7 +152,9 @@ internal enum class FeedbackSendState { NONE, LOCAL, SENDING, SENT, QUEUED }
                     val press = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
                     Surface(selected = on, onClick = { score = value; saved = false; error = null }, shape = RoundedCornerShape(SaharaRadius.Md), color = fill, contentColor = if (on) tone.onSolid else tone.ink,
                         border = BorderStroke(2.dp, tone.solid), interactionSource = press, modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = 64.dp).saharaPress(press).testTag("checkin-mood-$value")) {
-                        Box(Modifier.padding(horizontal = 6.dp, vertical = 10.dp), contentAlignment = Alignment.Center) {
+                        Column(Modifier.padding(horizontal = 6.dp, vertical = 10.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                            CareMoodFace(value, Modifier.size(40.dp).clearAndSetSemantics { })
+                            Spacer(Modifier.height(6.dp))
                             Text(moodText(name), textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontSize = 15.sp, fontWeight = FontWeight.Bold,
                                 style = LocalTextStyle.current.copy(lineBreak = androidx.compose.ui.text.style.LineBreak.Heading, hyphens = androidx.compose.ui.text.style.Hyphens.None))
                         }

@@ -311,21 +311,28 @@ private fun doctorToolLabel(label: String, hindi: Boolean) = careTr(hindi, label
 @Composable internal fun DoctorDistressTrend(entries: List<CareItem>, personId: String, range: DoctorTrendRange, today: LocalDate, zone: ZoneId) { val t = careText(); val hindi = careHindi()
     val history = remember(entries, personId) { DistressRules.history(entries, personId) }
     val days = remember(history, zone) { DoctorTrendRules.dailyAt(history.map { (item, check) -> item.created to (if (check.distress) check.score ?: 0 else 0) }, zone) }
+    // Distress as one line (Dr Sujay, 22 Nov: the page was cluttered): latest score, date and what was ticked. The trend opens on tap.
+    var open by rememberSaveable(personId) { mutableStateOf(false) }
     Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("doctor-distress-trend-card")) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(t("Distress", "परेशानी"), fontFamily = SaharaTitleFont, fontSize = 20.sp, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
-                history.firstOrNull()?.let { (_, check) -> val v = if (check.distress) check.score ?: 0 else 0; val fill = ChartBands.color(v)
-                    Text("$v", color = readableOn(fill), fontWeight = FontWeight.Bold, fontSize = 15.sp, modifier = Modifier.background(fill, RoundedCornerShape(50)).padding(horizontal = 10.dp, vertical = 2.dp).testTag("doctor-distress-latest")) }
+        Column(Modifier.padding(horizontal = 16.dp, vertical = 6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            val latest = history.firstOrNull()
+            Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).then(if (latest != null) Modifier.clickable(role = androidx.compose.ui.semantics.Role.Button) { open = !open } else Modifier).testTag("doctor-distress-row"), verticalAlignment = Alignment.CenterVertically) {
+                Text(t("Distress", "परेशानी"), fontFamily = SaharaTitleFont, fontSize = 18.sp, color = DoctorCardInk, modifier = Modifier.a11yHeading())
+                Spacer(Modifier.width(10.dp))
+                if (latest == null) Text(t("No distress answers yet", "अभी परेशानी का कोई जवाब नहीं"), Modifier.weight(1f).testTag("doctor-distress-empty"), fontSize = 15.sp, color = DoctorCardSub)
+                else {
+                    val (item, check) = latest; val v = if (check.distress) check.score ?: 0 else 0; val fill = ChartBands.color(v)
+                    Text("$v", color = readableOn(fill), fontWeight = FontWeight.Bold, fontSize = 15.sp, modifier = Modifier.background(fill, RoundedCornerShape(50)).padding(horizontal = 10.dp, vertical = 2.dp).testTag("doctor-distress-latest"))
+                    Spacer(Modifier.width(8.dp))
+                    Text(Instant.ofEpochMilli(item.created).atZone(zone).format(careDateFormat("d MMM", hindi)) + " · " + DistressRules.shownTitle(check, hindi),
+                        Modifier.weight(1f), fontSize = 14.sp, lineHeight = 19.sp, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
                 DoctorInfoIcon(t("Distress", "परेशानी"), t("Self-reported. Not a diagnosis.", "अपनी बताई सूचना। यह निदान नहीं है।") + "\n\n" + DistressRules.SOURCE + " · " + DistressRules.VERSION, "doctor-distress-info")
             }
-            if (history.isEmpty()) Text(t("No distress answers yet", "अभी परेशानी का कोई जवाब नहीं"), fontSize = 15.sp, color = DoctorCardInk, modifier = Modifier.testTag("doctor-distress-empty"))
-            else {
+            if (open && latest != null) Column(Modifier.padding(bottom = 10.dp).testTag("doctor-distress-detail"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                val problems = DistressRules.summary(latest.second, hindi)
+                if (problems.isNotBlank()) Text(problems, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardInk)
                 DoctorScoreTrend(t("Distress", "परेशानी"), days, range, today, "doctor-distress-trend")
-                val (item, check) = history.first()
-                val problems = DistressRules.summary(check, hindi)
-                Text(Instant.ofEpochMilli(item.created).atZone(zone).format(careDateFormat("d MMM", hindi)) + " · " + DistressRules.shownTitle(check, hindi) + if (problems.isBlank()) "" else " · $problems",
-                    fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
         }
     }

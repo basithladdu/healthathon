@@ -74,16 +74,17 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
     val today = CheckInMood.today(items, person, dayStart)
     val capturedAccount = remember(person) { vm.accountNamespace }
     val done = today != null
-    val band by animateColorAsState(if (done) TodayHero.doneBand else TodayHero.dueBand, SaharaMotion.tween(SaharaMotion.VALUE_MS))
-    Surface(shape = RoundedCornerShape(TodayHero.radius), color = band, contentColor = Color.White, modifier = Modifier.fillMaxWidth().saharaAppear().saharaPulseGlow(TodayHero.dueBand, TodayHero.radius, active = !done).testTag("today-checkin")) {
+    // Light card, dark text (team feedback 21 Nov: the dark teal felt heavy). Teal stays as the accent on buttons and icons.
+    val band by animateColorAsState(if (done) SaharaTone.Success.wash else SaharaTone.Teal.wash, SaharaMotion.tween(SaharaMotion.VALUE_MS))
+    Surface(shape = RoundedCornerShape(TodayHero.radius), color = band, contentColor = DoctorCardInk, border = BorderStroke(1.dp, SaharaTone.Teal.solid.copy(alpha = .25f)), modifier = Modifier.fillMaxWidth().saharaAppear().saharaPulseGlow(TodayHero.dueBand, TodayHero.radius, active = !done).testTag("today-checkin")) {
         Column(Modifier.saharaContentSize().padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 6.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 // The one main card on Today: its icon swells slowly a few times, then rests (off when animations are off).
                 Box(contentAlignment = Alignment.Center) { SaharaLottie(SaharaLottieKind.Breathe); SaharaIconChip(Icons.Default.WbSunny, SaharaTone.Gold, Modifier.saharaFloat(), size = 32) }; Spacer(Modifier.width(6.dp))
-                Text(t("How was today?", "आज का दिन कैसा रहा?"), fontFamily = SaharaTitleFont, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Medium, color = Color.White, modifier = Modifier.weight(1f).a11yHeading())
+                Text(t("How was today?", "आज का दिन कैसा रहा?"), fontFamily = SaharaTitleFont, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
                 // The saved tick pops in once the check-in is stored (it follows the saved record, not a timer).
                 AnimatedVisibility(done, enter = scaleIn(spring(dampingRatio = Spring.DampingRatioMediumBouncy), initialScale = .6f) + fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)), exit = fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS))) {
-                    Surface(shape = CircleShape, color = Color.White, modifier = Modifier.testTag("today-checkin-saved")) {
+                    Surface(shape = CircleShape, color = Color.White, border = BorderStroke(1.dp, TodayHero.doneBand), modifier = Modifier.testTag("today-checkin-saved")) {
                         Row(Modifier.padding(horizontal = 10.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.Check, null, Modifier.size(16.dp), tint = TodayHero.doneBand); Spacer(Modifier.width(4.dp))
                             Text(t("Saved", "सहेजा"), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = TodayHero.doneBand)
@@ -100,13 +101,13 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
             if (onDistress != null) DistressQuestion(vm, onYes = onDistress)
             Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 CareDailyFlow.moods.forEachIndexed { index, mood ->
-                    TodayMoodButton(checkInMoodLabel(mood, hindi), index / 2f, selected = today?.title == mood, enabled = !busy, ink = band, modifier = Modifier.weight(1f).fillMaxHeight().saharaStagger(index).testTag("today-checkin-$index")) {
+                    TodayMoodButton(checkInMoodLabel(mood, hindi), index / 2f, selected = today?.title == mood, enabled = !busy, ink = SaharaTone.Teal.ink, modifier = Modifier.weight(1f).fillMaxHeight().saharaStagger(index).testTag("today-checkin-$index")) {
                         val change = CareDailyFlow.checkInChange(today, mood)
                         if (change != null && canEditCareContext(vm, person, capturedAccount)) { if (today != null) vm.updateItem(change) {} else vm.saveItem("checkin", mood, "") }
                     }
                 }
             }
-            today?.detail?.takeIf { it.isNotBlank() }?.let { Text(it, fontSize = 15.sp, lineHeight = 20.sp, color = Color.White, maxLines = 2, overflow = TextOverflow.Ellipsis) }
+            today?.detail?.takeIf { it.isNotBlank() }?.let { Text(it, fontSize = 15.sp, lineHeight = 20.sp, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis) }
         }
     }
 }
@@ -114,7 +115,7 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
 /** A large white action on the Today hero: icon over a short label that wraps between words, never inside one. */
 @Composable private fun TodayBigAction(label: String, icon: ImageVector, onClick: () -> Unit, modifier: Modifier) {
     val press = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
-    Surface(onClick = onClick, shape = RoundedCornerShape(TodayHero.buttonRadius), color = Color.White, contentColor = TodayHero.dueBand, interactionSource = press, modifier = modifier.heightIn(min = 84.dp).saharaPress(press)) {
+    Surface(onClick = onClick, shape = RoundedCornerShape(TodayHero.buttonRadius), color = Color.White, contentColor = TodayHero.dueBand, border = BorderStroke(1.dp, DoctorHairline), interactionSource = press, modifier = modifier.heightIn(min = 84.dp).saharaPress(press)) {
         Column(Modifier.padding(horizontal = 8.dp, vertical = 12.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
             Icon(icon, null, Modifier.size(30.dp)); Spacer(Modifier.height(6.dp))
             SaharaFitText(label, style = LocalTextStyle.current.copy(fontSize = 17.sp, lineHeight = 21.sp), color = TodayHero.dueBand, maxLines = 2, min = 12f, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
@@ -125,9 +126,9 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
 /** One mood on the Today hero: a small face over its label. Solid white once chosen; a press shrinks it slightly. */
 @Composable private fun TodayMoodButton(label: String, face: Float, selected: Boolean, enabled: Boolean, ink: Color, modifier: Modifier, onClick: () -> Unit) {
     val press = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
-    val fill by animateColorAsState(if (selected) Color.White else Color.White.copy(alpha = .14f), SaharaMotion.tween(SaharaMotion.SELECT_MS))
-    val text by animateColorAsState(if (selected) ink else Color.White, SaharaMotion.tween(SaharaMotion.SELECT_MS))
-    Surface(shape = RoundedCornerShape(TodayHero.buttonRadius), color = fill, border = BorderStroke(2.dp, Color.White.copy(alpha = if (selected) 1f else .7f)),
+    val fill by animateColorAsState(if (selected) SaharaTone.Teal.solid.copy(alpha = .12f) else Color.White, SaharaMotion.tween(SaharaMotion.SELECT_MS))
+    val text by animateColorAsState(if (selected) ink else DoctorCardInk, SaharaMotion.tween(SaharaMotion.SELECT_MS))
+    Surface(shape = RoundedCornerShape(TodayHero.buttonRadius), color = fill, border = BorderStroke(if (selected) 2.dp else 1.dp, if (selected) SaharaTone.Teal.solid else DoctorHairline),
         modifier = modifier.heightIn(min = 76.dp).saharaPress(press).selectable(selected = selected, enabled = enabled, role = Role.RadioButton, interactionSource = press, indication = androidx.compose.material3.ripple(), onClick = onClick)) {
         Column(Modifier.padding(horizontal = 4.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
             CareMoodFace(face, Modifier.size(32.dp).clearAndSetSemantics { })

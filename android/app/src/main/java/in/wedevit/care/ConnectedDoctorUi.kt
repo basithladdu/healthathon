@@ -310,16 +310,17 @@ private fun connectedTopicLabel(status: WorkflowTopicStatus, t: (String, String)
     LazyColumn(Modifier.fillMaxSize().testTag("doctor-shared-patient-hub"), contentPadding = PaddingValues(start = 16.dp, top = 12.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { DoctorPatientHeader(person, entries, showId = !deviceLocal && !DoctorTestProfiles.contains(person.id), pane = pane) }
         item { DoctorPatientNavigationTiles(onSection, selected = selected) }
+        if (!pane) item { GoalsScreeningHelper("hub-${person.id}", onStartGoalsOfCare = { onSection("GoalsOfCare") }) }
         if (entries != null && !pane) item { DoctorSymptomSummary(entries, person.id, limit = 3) }
         item { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             SaharaSectionHeader(t("More for this patient", "इस मरीज़ के लिए और"), Modifier.padding(top = 4.dp), tone = DoctorTones.Indigo, icon = Icons.Default.MoreHoriz)
             Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().saharaAppear()) {
                 Column {
                     DoctorPlainRoute(Icons.Default.Today, t("Care today", "आज की देखभाल"), { onSection("Today") }, "doctor-shared-today")
+                    // No "Daily care" here (Dr Sujay, 22 Nov): it showed the whole patient app inside the doctor portal. The doctor keeps the read-only sections above.
                     HorizontalDivider(Modifier.padding(start = 56.dp), color = DoctorHairline)
-                    DoctorPlainRoute(Icons.Default.Apps, t("Daily care", "रोज़ की देखभाल"), { onSection("Tools") }, "doctor-shared-tools")
-                    HorizontalDivider(Modifier.padding(start = 56.dp), color = DoctorHairline)
-                    DoctorPlainRoute(Icons.Default.Lock, t("Sharing & access", "साझा करना और पहुँच"), { onSection("Shared") }, "doctor-shared-access")
+                    DoctorPlainRoute(Icons.Default.Lock, t("Sharing & access", "साझा करना और पहुँच"), { onSection("Shared") }, "doctor-shared-access",
+                        detail = t("Who can see this patient's record, and what each person can do", "इस मरीज़ का रिकॉर्ड कौन देख सकता है, और हर व्यक्ति क्या कर सकता है"))
                 }
             }
         } }
@@ -375,12 +376,15 @@ private fun connectedTopicLabel(status: WorkflowTopicStatus, t: (String, String)
 }
 
 /** A secondary route in a plain list: icon, name of the place it opens, arrow. */
-@Composable private fun DoctorPlainRoute(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, onClick: () -> Unit, tag: String) {
+@Composable private fun DoctorPlainRoute(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, onClick: () -> Unit, tag: String, detail: String? = null) {
     val press = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
     Surface(onClick = onClick, interactionSource = press, color = Paper, modifier = Modifier.fillMaxWidth().saharaPress(press).heightIn(min = 56.dp).testTag(tag)) {
         Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(icon, null, tint = RustText, modifier = Modifier.size(24.dp)); Spacer(Modifier.width(16.dp))
-            Text(label, Modifier.weight(1f), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, style = DoctorWholeWords)
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(label, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, style = DoctorWholeWords)
+                if (detail != null) Text(detail, fontSize = 14.sp, lineHeight = 19.sp, color = DoctorCardSub, modifier = Modifier.testTag("$tag-detail"))
+            }
             Icon(Icons.Default.ChevronRight, null, tint = DoctorCardSub, modifier = Modifier.size(20.dp))
         }
     }

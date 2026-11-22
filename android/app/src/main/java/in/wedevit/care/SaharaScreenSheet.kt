@@ -53,7 +53,7 @@ import androidx.compose.ui.window.DialogProperties
         val shown = remember { MutableTransitionState(false).apply { targetState = true } }
         AnimatedVisibility(shown, enter = slideInVertically(tween(220)) { it / 6 } + fadeIn(tween(180))) {
             Surface(Modifier.fillMaxSize(), color = containerColor) {
-                Column(modifier.fillMaxSize().systemBarsPadding().imePadding()) {
+                Column(modifier.fillMaxSize().systemBarsPadding().imePadding().padding(top = 8.dp)) {
                     Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                         IconButton(onClick = onDismissRequest, modifier = Modifier.testTag("screen-sheet-close")) { Icon(Icons.Default.Close, t("Close", "बंद करें")) }
                     }

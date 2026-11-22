@@ -130,6 +130,8 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
     var open by rememberSaveable(d.id) { mutableStateOf(false) }
     // Consent is ticked here, so one Record tap opens the talk already recording (6 Nov: 8 taps to a locked note became 6).
     var agreedAt by rememberSaveable(d.id) { mutableStateOf(0L) }
+    var agreedAtPatient by rememberSaveable(d.id) { mutableStateOf(false) }
+    var agreedAtFamily by rememberSaveable(d.id) { mutableStateOf(false) }
     var startNow by rememberSaveable(d.id) { mutableStateOf(false) }
     var gemini by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { gemini = gocOnlineEngines().gemini }
@@ -147,7 +149,8 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
         }
         if (canRecord) Surface(color = if (agreedAt > 0) GocTickSoft else Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(if (agreedAt > 0) 1.5.dp else 1.dp, if (agreedAt > 0) DoctorStatusGood else DoctorCardSub.copy(alpha = .5f)), modifier = Modifier.fillMaxWidth().testTag("goc-card-consent-box")) {
             Column(Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
-                Box(Modifier.testTag("goc-card-consent")) { CheckLine(agreedAt > 0, { agreedAt = if (it) System.currentTimeMillis() else 0L }, t("Everyone present agrees to this conversation being recorded and written down", "मौजूद सभी लोग इस बातचीत को रिकॉर्ड करने और लिखने के लिए राज़ी हैं")) }
+                Box(Modifier.testTag("goc-card-consent")) { Column { CheckLine(agreedAtPatient, { agreedAtPatient = it; agreedAt = if (it && agreedAtFamily) System.currentTimeMillis() else 0L }, t("The patient agrees to this conversation being recorded and written down (or their legal representative, if the patient cannot decide)", "मरीज़ इस बातचीत को रिकॉर्ड करने और लिखने के लिए सहमत हैं (या, अगर मरीज़ फ़ैसला नहीं कर सकते, तो उनके कानूनी प्रतिनिधि)"))
+                    CheckLine(agreedAtFamily, { agreedAtFamily = it; agreedAt = if (it && agreedAtPatient) System.currentTimeMillis() else 0L }, t("The family members in the room agree too", "कमरे में मौजूद परिवार के सदस्य भी सहमत हैं")) } }
                 if (gemini) Text(t("Audio is sent to a secure AI service to transcribe.", "ऑडियो लिखने के लिए एक सुरक्षित AI सेवा को भेजा जाता है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.padding(start = 12.dp, end = 8.dp, bottom = 10.dp))
             }
         }
@@ -344,6 +347,8 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
     // The signed-in doctor is in the room; their name is not asked again (still editable).
     LaunchedEffect(d.id, signedInDoctor?.name) { if (participants.isBlank() && initial == null && signedInDoctor != null) participants = signedInDoctor.name }
     var consentAt by rememberSaveable(d.id) { mutableStateOf(initial?.consentAt?.takeIf { it > 0 } ?: agreedAt) }
+    var consentAtPatient by rememberSaveable(d.id) { mutableStateOf(consentAt > 0) }
+    var consentAtFamily by rememberSaveable(d.id) { mutableStateOf(consentAt > 0) }
     var lines by remember { mutableStateOf(initial?.lines.orEmpty()) }
     var note by remember { mutableStateOf(initial?.note.orEmpty()) }
     var topics by remember { mutableStateOf(initial?.topics.orEmpty().associateBy { it.decision }) }
@@ -517,10 +522,11 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
 
         if (shown == GocStage.CAPTURE) item(key = "capture") {
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                // Consent: one tick for everyone in the room; the record button stays off until it is ticked. Hidden while recording (it was given).
+                // Consent: the patient's own tick and the family's tick, both needed; the record button stays off until it is ticked. Hidden while recording (it was given).
                 if (!recorderState.recording && !busy) Surface(color = if (consentAt > 0) GocTickSoft else Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(if (consentAt > 0) 1.5.dp else 1.dp, if (consentAt > 0) DoctorStatusGood else DoctorCardSub.copy(alpha = .5f)), modifier = Modifier.fillMaxWidth().testTag("goc-consent")) {
                     Column(Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
-                        CheckLine(consentAt > 0, { consentAt = if (it) System.currentTimeMillis() else 0L }, t("Everyone present agrees to this conversation being recorded and written down", "मौजूद सभी लोग इस बातचीत को रिकॉर्ड करने और लिखने के लिए राज़ी हैं"))
+                        CheckLine(consentAtPatient, { consentAtPatient = it; consentAt = if (it && consentAtFamily) System.currentTimeMillis() else 0L }, t("The patient agrees to this conversation being recorded and written down (or their legal representative, if the patient cannot decide)", "मरीज़ इस बातचीत को रिकॉर्ड करने और लिखने के लिए सहमत हैं (या, अगर मरीज़ फ़ैसला नहीं कर सकते, तो उनके कानूनी प्रतिनिधि)"))
+                        CheckLine(consentAtFamily, { consentAtFamily = it; consentAt = if (it && consentAtPatient) System.currentTimeMillis() else 0L }, t("The family members in the room agree too", "कमरे में मौजूद परिवार के सदस्य भी सहमत हैं"))
                         if (gemini) Text(t("Audio is sent to a secure AI service to transcribe.", "ऑडियो लिखने के लिए एक सुरक्षित AI सेवा को भेजा जाता है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.padding(start = 12.dp, end = 8.dp, bottom = 10.dp).testTag("goc-gemini-line"))
                     }
                 }

@@ -1,0 +1,72 @@
+[0:00] Okay, guys, so this is the doctor's portal, so I'm just going to start
+[0:05] I'm just going to start initially from the account page account page. I don't know how this shows up. Maybe during the
+[0:14] Registration part I guess so I'm not going to say anything feedback
+[0:18] again, you know the faces can be
+[0:21] different
+[0:23] And if I say with that's done
+[0:26] Then if I go to schedule only the week shows up
+[0:29] I think it you should be able to choose whether it's week or month or whatever it is
+[0:34] So instead of sort of Sunday 22nd, you know you have this is good
+[0:39] And you go to patients. Yeah, so this is one issue that I felt so you know in patient if I add profile
+[0:45] the only thing that I need to add is you know patient name and then
+[0:50] Suddenly it creates the whole patient. I think that's a problem. There should be a better way to add patients
+[0:56] Which is more you know
+[0:59] In keeping with how they're on how the patients are onboarded on to the doctor's
+[1:04] portal
+[1:05] if we go to home
+[1:07] Patients visits this week drafts. I don't know what drafts actually means
+[1:12] I know it shows up here, but I don't know what it means and then if I go back
+[1:16] It doesn't go back to the home page. It goes back. You know all the way over here
+[1:20] I think it should go back to the page it linked to
+[1:24] And requests, you know, these are all the patient requests. That's fine. So we can come to it one by one
+[1:30] Okay, so if we look at it, this is fine continue this I'm not sure what it is, but okay
+[1:37] Requests, okay continue. So now let's just look at say patients and if I go to I create I created a new patient
+[1:46] Okay, these colors are again too bright too dark
+[1:49] Very scary
+[1:50] So I don't know what sharing an access is and if I go to section the whole you know
+[1:55] This thing comes up again. I don't think that is necessary
+[2:00] Okay, wait, let me just check what that is sections
+[2:04] I'm not sure why that is showing up. Okay
+[2:08] Then if I go to daily care the patient's entire app comes here, which I don't think should be necessary
+[2:15] then
+[2:17] If I go to care today
+[2:19] This is I think fine. Okay. Yeah, then symptoms. Okay documents
+[2:27] I don't know why we should have this ad document thing here
+[2:31] Medicines, I think this is okay, but I think here we can add the SOS medications when they're taking it
+[2:36] That would be a good thing to add here
+[2:38] now visits
+[2:40] Hold on. Let me just get to a better patient which already has the details, you know
+[2:46] So medicine side effects come up here again. These cards are very big
+[2:52] If I go to documents prescriptions and others, I don't know why
+[2:56] This should be here
+[2:58] Then if I go to visits
+[3:01] This is fine. I don't know how this is populated again
+[3:06] If I go to conversations also I'm able to record conversations and again the whole goals of care thing comes here
+[3:13] The goals of sorry the goals of care
+[3:17] Sorry, sorry, sorry
+[3:18] the goals of care also show goals comes up and I go to care planning and it comes under goals of care and
+[3:25] Emergency and advanced care planning and if I go to goals of care again, it comes up
+[3:30] So I think only if we have this one goals of care thing
+[3:34] It should be fine the rest of it can just go as a history of care documents where every version is recorded. Okay?
+[3:41] Now if I go here right everyone agrees if I click on guide me this thing, right?
+[3:48] So I read this and then again if I click done it comes here, you know
+[3:52] I have to keep scrolling up and down to keep seeing what it is and what I should be saying what you've written is
+[3:59] That's great, but I need to keep doing this. I don't know if you understood what I want
+[4:04] So I keep going next next next next next
+[4:07] Next next done. I'm not able to click done again
+[4:11] Who's present this I don't know who what we should type here, you know, is it the family members or what?
+[4:17] I'm not sure and I want to know how it populates that part of the
+[4:22] Goals of care document where you write the name of the patient the phone number
+[4:26] Of the attendant and who what the relation is and everything, you know, it will also come up somewhere
+[4:33] Then symptoms and distress again, you know, this is a little cluttered I don't know how I should go about reading this
+[4:41] Because everything just shows up suddenly in my face and our distress is here. That's okay, but I
+[4:47] Think something has to it needs to be made more concise. I'm not sure how to say
+[4:54] But yeah, so goals of care again shows up really pretty much everywhere. Oh
+[4:59] Yeah, again, if you go to requests, right and Asha Menon if we open it again, I can do the goals
+[5:05] Okay conversation through here. Also
+[5:08] I don't know why we should be able to do this
+[5:11] Again, we record it here and again, you know, we can review it here. So it keeps showing up multiple times
+[5:16] I understand that we're trying to do the goals of care, but this is too many goals of care. Maybe you know
+[5:23] Yeah, I think these were my things with the doctor thing. Maybe even we can change the colors
+[5:28] I think overall colors we shouldn't have them opaque
+[5:30] We should have them a little more transparent and a little more hastily and yes, you know, just my opinion

@@ -9,9 +9,13 @@ const LINES = caps as Cap[];
 
 export const Captions: React.FC = () => {
   const t = useCurrentFrame() / FPS;
-  const l = LINES.find((c) => t >= c.s && t < c.e);
-  if (!l) return null;
-  const a = clamp((t - l.s) / 0.12) * clamp((l.e - t) / 0.12);
+  const i = LINES.findIndex((c) => t >= c.s && t < c.e);
+  if (i < 0) return null;
+  const l = LINES[i];
+  // fade only at a real pause; back-to-back lines swap cleanly with no flicker
+  const gapIn = i === 0 || l.s - LINES[i - 1].e > 0.05;
+  const gapOut = i === LINES.length - 1 || LINES[i + 1].s - l.e > 0.05;
+  const a = (gapIn ? clamp((t - l.s) / 0.15) : 1) * (gapOut ? clamp((l.e - t) / 0.15) : 1);
   return (
     <div style={{position: 'absolute', left: 0, right: 0, bottom: 56, display: 'flex', justifyContent: 'center', pointerEvents: 'none'}}>
       <div

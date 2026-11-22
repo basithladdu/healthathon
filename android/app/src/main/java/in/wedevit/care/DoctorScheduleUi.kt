@@ -53,6 +53,7 @@ private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone
     val selected = LocalDate.parse(selectedText)
     var picking by rememberSaveable { mutableStateOf(false) }
     var planFor by rememberSaveable { mutableStateOf<String?>(null) }
+    var monthView by rememberSaveable { mutableStateOf(false) }
     val zone = ZoneId.systemDefault(); val today = LocalDate.now()
     val visits = remember(patients, items) {
         patients.flatMap { p -> doctorVisitsFor(items, p.id).filter { it.due > 0 && CareEntryCodec.decode(it.detail)?.status != "cancelled" }.map { p to it } }
@@ -75,15 +76,24 @@ private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone
             }
         }
         item {
+            // Week or Month (Dr Sujay, 22 Nov): the month grid shows how many visits fall on each day.
+            SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().testTag("doctor-schedule-view")) {
+                SegmentedButton(selected = !monthView, onClick = { monthView = false }, shape = SegmentedButtonDefaults.itemShape(0, 2), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-schedule-week-toggle")) { Text(t("Week", "सप्ताह")) }
+                SegmentedButton(selected = monthView, onClick = { monthView = true }, shape = SegmentedButtonDefaults.itemShape(1, 2), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-schedule-month-toggle")) { Text(t("Month", "महीना")) }
+            }
+        }
+        item {
             Surface(color = Paper, shape = RoundedCornerShape(50), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
                 Row(Modifier.padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = { pick(selected.minusMonths(1)) }, Modifier.size(48.dp)) { Icon(Icons.Default.ChevronLeft, t("Previous month", "पिछला महीना"), tint = DoctorCardInk) }
-                    Text(careDateFormat("MMM yyyy", hindi).format(selected), Modifier.weight(1f), textAlign = TextAlign.Center, fontWeight = FontWeight.Medium, fontSize = 17.sp, color = DoctorCardInk)
+                    Text(careDateFormat(if (monthView) "MMMM yyyy" else "MMM yyyy", hindi).format(selected), Modifier.weight(1f), textAlign = TextAlign.Center, fontWeight = FontWeight.Medium, fontSize = 17.sp, color = DoctorCardInk)
                     IconButton(onClick = { pick(selected.plusMonths(1)) }, Modifier.size(48.dp)) { Icon(Icons.Default.ChevronRight, t("Next month", "अगला महीना"), tint = DoctorCardInk) }
                 }
             }
         }
-        item {
+        if (monthView) item(key = "schedule-month") {
+            DoctorScheduleMonth(selected, today, byDay.mapValues { it.value.size }) { pick(it) }
+        } else item {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 // Arrows stay narrow so seven day columns still fit a 360dp phone; height keeps the 48dp touch target.
                 IconButton(onClick = { pick(selected.minusWeeks(1)) }, Modifier.size(width = 32.dp, height = 48.dp)) { Icon(Icons.Default.ChevronLeft, t("Previous week", "पिछला हफ़्ता"), tint = DoctorCardInk) }
@@ -126,6 +136,32 @@ private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone
 
     if (picking) PatientPickerSheet(patients, onDismiss = { picking = false }, onPick = { picking = false; planFor = it })
     planFor?.let { id -> planner(id) { planFor = null } }
+}
+
+/** Month view: a Monday-first grid; each day shows how many visits it has. Tap a day to list its visits below; swipe for another month. */
+@Composable private fun DoctorScheduleMonth(selected: LocalDate, today: LocalDate, counts: Map<LocalDate, Int>, onDay: (LocalDate) -> Unit) { val t = careText(); val hindi = careHindi()
+    Surface(color = Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("doctor-schedule-month")) {
+        Column(Modifier.padding(horizontal = 4.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            val monday = selected.with(java.time.DayOfWeek.MONDAY)
+            Row(Modifier.fillMaxWidth()) {
+                (0L..6L).forEach { i -> Text(careDateFormat("EEE", hindi).format(monday.plusDays(i)), Modifier.weight(1f), textAlign = TextAlign.Center, fontSize = 12.sp, color = DoctorCardSub, maxLines = 1, softWrap = false) }
+            }
+            SaharaMonthPager(selected, onDay, Modifier.fillMaxWidth()) { day, inMonth ->
+                val isSelected = day == selected; val count = counts[day] ?: 0
+                val label = careDateFormat("EEEE, d MMMM", hindi).format(day) + when (count) { 0 -> ""; 1 -> ", " + t("1 visit", "1 विज़िट"); else -> ", " + t("$count visits", "$count विज़िट") }
+                Surface(onClick = { onDay(day) }, enabled = inMonth, shape = RoundedCornerShape(12.dp), color = if (isSelected) DoctorTones.Rust.solid else Color.Transparent,
+                    border = if (!isSelected && day == today) BorderStroke(1.5.dp, DoctorAccent) else null,
+                    modifier = Modifier.padding(2.dp).fillMaxWidth().heightIn(min = 52.dp).semantics { contentDescription = label }.testTag("doctor-schedule-month-day-$day")) {
+                    if (inMonth) Column(Modifier.padding(vertical = 4.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Text(day.dayOfMonth.toString(), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = if (isSelected) Color.White else DoctorCardInk, maxLines = 1)
+                        if (count > 0) Box(Modifier.clip(RoundedCornerShape(50)).background(if (isSelected) Color.White else DoctorTones.Rust.solid).padding(horizontal = 6.dp), contentAlignment = Alignment.Center) {
+                            Text(count.toString(), fontSize = 11.sp, lineHeight = 14.sp, fontWeight = FontWeight.Bold, color = if (isSelected) DoctorTones.Rust.ink else Color.White, maxLines = 1)
+                        } else Spacer(Modifier.height(14.dp))
+                    }
+                }
+            }
+        }
+    }
 }
 
 /** One visit, one tap: the whole row opens the patient. Time, place, doctor and note are on the row, so nothing needs expanding. */
