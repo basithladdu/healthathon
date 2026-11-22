@@ -16,6 +16,8 @@ private val roleTags = setOf("welcome-patient-family", "welcome-family", "doctor
 internal fun ComposeTestRule.skipSaharaIntroFor(tag: String) {
     if (tag !in roleTags) return
     fun present(t: String) = onAllNodes(hasTestTag(t)).fetchSemanticsNodes().isNotEmpty()
+    // The first-launch brand moment (~1.8 s) sits on top of everything; the test clock may not advance by itself, so step it past.
+    repeat(10) { if (present("sahara-brand-moment")) { mainClock.advanceTimeBy(500); waitForIdle() } }
     runCatching { waitUntil(20_000) { present("onboarding-skip") || present(tag) } }
     if (present("onboarding-skip")) {
         runCatching { onAllNodes(hasTestTag("onboarding-skip")).onFirst().performSemanticsAction(SemanticsActions.OnClick) }
