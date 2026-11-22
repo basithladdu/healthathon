@@ -8,11 +8,14 @@ New in the code (not live until these steps are done): `/admin` has **Doctor sig
 
 Two Supabase projects are involved: the **Android project** `kjnhtakqzboayqorrlue` (app data, doctor sign-ups) and the **website project** `cghlkqeqiokjqdionrkc` (hospital survey). Never paste keys into chat; put them only in Vercel or Supabase.
 
-- [ ] **0. Open logins (22 Nov, going to production):** Supabase → the Android project `kjnhtakqzboayqorrlue` → Authentication → Sign In / Providers → Email:
+> **23 Nov status (Awaiz):** steps 0 and 1 are done. **Basith, over to you for `/admin`:** the `/admin` Doctor sign-ups and Impact code is only on your branch `checkpoint/2026-11-22-before-review-fixes`, not on `main`, so the live site doesn't have it yet. Before step 2 can work, either merge that branch into `main` or deploy the website from it, and tell Awaiz which you chose. Awaiz then adds `SAHARA_ANDROID_SUPABASE_SERVICE_ROLE_KEY` in Vercel and the site is redeployed. (Awaiz merged the branch locally on 22 Nov with `main`'s `0d1ccec`, the Next visit dialog fix and green record stage: no conflicts, and the Android debug build passes.)
+
+- [x] **0. Open logins (22 Nov, going to production):** Supabase → the Android project `kjnhtakqzboayqorrlue` → Authentication → Sign In / Providers → Email:
   - "Allow new users to sign up": **on**.
   - "Confirm email": **off**. Patients and family then sign up and use the app at once, with no approval and no email to wait for. (Supabase's built-in mailer allows only a few emails an hour, so confirmation mail would block testers.)
   - Doctors still need approval: they sign up, send their council and registration number in the app, and stay "pending" until approved in `/admin` → Doctor sign-ups (steps 1 and 2 below).
-- [ ] **1. Apply the two migrations** to the Android project `kjnhtakqzboayqorrlue`. From `android/`:
+  - **Done (checked 23 Nov):** both settings were already like this in the dashboard.
+- [x] **1. Apply the two migrations** to the Android project `kjnhtakqzboayqorrlue`. From `android/`:
   ```bash
   supabase link --project-ref kjnhtakqzboayqorrlue
   supabase db push --dry-run
@@ -22,7 +25,9 @@ Two Supabase projects are involved: the **Android project** `kjnhtakqzboayqorrlu
   - `android/supabase/migrations/20261120180000_morphine_reports.sql`: private table for "where did you get this morphine?" reports. Only the place is stored; nothing is public until the team checks it.
 
   Then run `supabase db push`.
-- [ ] **2. Add the website's key** in Vercel → the website project → Settings → Environment Variables (Production), then redeploy:
+
+  **Done (23 Nov, Awaiz with Claude Code):** both files were pasted into the SQL Editor (the CLI isn't installed on Awaiz's PC), checked (table, row-level security, the 3 functions, the reviewer check) and recorded in `supabase_migrations.schema_migrations` as `20261120120000` and `20261120180000`. **Don't use `supabase db push` on this project yet:** `20261105120000_goc_analyses` is applied but not recorded (a push would fail on it), and `20261106120000_community` has never been applied (a push would open the community). Keep using the SQL Editor until those two are sorted.
+- [ ] **2. Add the website's key** (waiting on Basith: see the 23 Nov status above) in Vercel → the website project → Settings → Environment Variables (Production), then redeploy:
   - `SAHARA_ANDROID_SUPABASE_SERVICE_ROLE_KEY` = the **secret** key of the Android project `kjnhtakqzboayqorrlue` (Supabase → Project Settings → API keys).
   - `/admin` keeps using the same `ADMIN_PASSWORD`. Until this key is set, the Doctor sign-ups tab shows an error and the Impact tiles say "not available".
 - [ ] **3. Switch on Sarvam**: create a key at dashboard.sarvam.ai and add it in **two** places (the same key):
