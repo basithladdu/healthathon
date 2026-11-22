@@ -1,0 +1,540 @@
+package `in`.wedevit.care
+
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
+
+/*
+ * First run (22 Nov redesign). One thing per screen instead of one big form:
+ *   Intro (3 calm pages, Skip) -> Who are you? -> Account (create / sign in / keep on this phone) -> Name -> Age (optional)
+ *   -> Illness (optional) -> You're all set. The doctor card goes to the doctor sign-in and the doctor practice, as before.
+ * The account comes before the profile on purpose: a person added on this phone stays in the guest records, so someone who wants
+ * an account makes it first and the profile is then saved into the account. Progress (intro seen, role) is kept on the phone,
+ * because signing in recreates the care screens and the flow then resumes at the name question.
+ * Steps move on Sahara's shared axis ([SaharaMotion.transform]); nothing moves when animations or Battery Saver are off.
+ */
+
+/** The steps; [panel] is the old welcome panel name each one replaces, still reported to CareRoot (it watches for "doctor"). */
+internal enum class OnboardingStep(val panel: String) {
+    Intro(""), Role(""), Account("family"), SignIn("account"), SignUp("account"), Doctor("doctor"), Name("person"), Age("person"), Illness("person"), Finish("person")
+}
+
+internal object OnboardingFlow {
+    /** The patient and family path the thin progress bar measures. */
+    private val path = listOf(OnboardingStep.Role, OnboardingStep.Account, OnboardingStep.Name, OnboardingStep.Age, OnboardingStep.Illness, OnboardingStep.Finish)
+
+    /** 0..1 along [path]; null where no bar is shown (the intro and the doctor sign-in). Sign-in and sign-up sit at the account step. */
+    fun progress(step: OnboardingStep): Float? = when (step) {
+        OnboardingStep.Intro, OnboardingStep.Doctor -> null
+        OnboardingStep.SignIn, OnboardingStep.SignUp -> (path.indexOf(OnboardingStep.Account) + 1f) / path.size
+        else -> (path.indexOf(step) + 1f) / path.size
+    }
+
+    /** Where the flow opens: signed in as patient or family it resumes at the name; after the intro has been seen once it opens on the role cards. */
+    fun start(introSeen: Boolean, signedIn: Boolean, role: String): OnboardingStep = when {
+        signedIn && (role == SignupRole.PATIENT || role == SignupRole.FAMILY) -> OnboardingStep.Name
+        introSeen -> OnboardingStep.Role
+        else -> OnboardingStep.Intro
+    }
+
+    /** The step Back returns to, or null when Back should leave the app. [introShown]: the intro pages were shown in this visit. */
+    fun back(step: OnboardingStep, signedIn: Boolean, introShown: Boolean): OnboardingStep? = when (step) {
+        OnboardingStep.Intro -> null
+        OnboardingStep.Role -> if (introShown) OnboardingStep.Intro else null
+        OnboardingStep.Account, OnboardingStep.Doctor -> OnboardingStep.Role
+        OnboardingStep.SignIn, OnboardingStep.SignUp -> if (signedIn) OnboardingStep.Name else OnboardingStep.Account
+        OnboardingStep.Name -> if (signedIn) OnboardingStep.Role else OnboardingStep.Account
+        OnboardingStep.Age -> OnboardingStep.Name
+        OnboardingStep.Illness -> OnboardingStep.Age
+        OnboardingStep.Finish -> OnboardingStep.Illness
+    }
+
+    /** The optional profile details, or null when both were skipped (then only the name is saved, as before). */
+    fun profile(ageText: String, illness: String): CarePatientProfile? {
+        val age = CarePatientProfileRules.age(ageText).first
+        val text = illness.trim()
+        return if (age == null && text.isEmpty()) null else CarePatientProfile(age = age, illness = text)
+    }
+}
+
+/** First-run progress on this phone (not per account, since it is read before anyone signs in). */
+internal class CareOnboardingPrefs(context: Context) {
+    private val prefs = context.applicationContext.getSharedPreferences("sahara-onboarding", 0)
+    var introSeen: Boolean get() = prefs.getBoolean("intro-seen", false); set(value) { prefs.edit().putBoolean("intro-seen", value).apply() }
+    var role: String get() = prefs.getString("role", "").orEmpty(); set(value) { prefs.edit().putString("role", value).apply() }
+    var brandShown: Boolean get() = prefs.getBoolean("brand-shown", false); set(value) { prefs.edit().putBoolean("brand-shown", value).apply() }
+}
+
+/** Role cards stay stacked rows below 360 dp or at 1.3x text and above; wider, the icon grows a little. */
+internal fun welcomeRolesStacked(screenWidthDp: Int, fontScale: Float): Boolean = screenWidthDp < 360 || fontScale >= 1.3f
+
+/**
+ * Adds the first person, then (once that save has finished and the person is listed) the optional profile details as the shared
+ * profile entry, exactly as the profile editor saves them. Runs on the model's scope because the welcome screen leaves as soon as
+ * the person exists.
+ */
+internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientProfile?) {
+    addPerson(name) {
+        if (profile == null) return@addPerson
+        val id = selected.value
+        viewModelScope.launch {
+            val ready = withTimeoutOrNull(15_000) { people.first { list -> list.any { it.id == id } }; busy.first { !it }; true } ?: false
+            if (ready && selected.value == id && canEdit.value) saveItem("journal", PatientProfileCodec.TITLE, PatientProfileCodec.encode(profile))
+        }
+    }
+}
+
+/**
+ * The welcome flow shown while no person is open. [accountContent] and [doctorContent] are the real account forms (CareRoot);
+ * without them the old callbacks ([onAccount], [onSharedWorkspace]) open the account sheet instead. [onSaveProfile] adds the person;
+ * without it the final button calls [onStart]. [showIntro] null follows the phone's first-run state.
+ */
+@Composable fun Welcome(onAccount: () -> Unit, onStart: () -> Unit, onSharedWorkspace: () -> Unit = {}, onDoctorDemo: () -> Unit = {}, onPatientWalkthrough: (String) -> Unit = {},
+    accountContent: (@Composable (() -> Unit, (Boolean) -> Unit) -> Unit)? = null,
+    doctorContent: (@Composable (() -> Unit, (Boolean) -> Unit) -> Unit)? = null,
+    onPanelChanged: (String) -> Unit = {}, entryBusy: Boolean = false,
+    signedIn: Boolean = false, profileError: String? = null,
+    onSaveProfile: ((String, CarePatientProfile?) -> Unit)? = null, showIntro: Boolean? = null) {
+    val context = LocalContext.current
+    val prefs = remember { CareOnboardingPrefs(context) }
+    val t = careText()
+    val focus = LocalFocusManager.current
+    val haptic = LocalHapticFeedback.current
+    val scope = rememberCoroutineScope()
+    val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    var step by rememberSaveable { mutableStateOf(OnboardingFlow.start(showIntro?.not() ?: prefs.introSeen, signedIn, prefs.role)) }
+    var introShown by rememberSaveable { mutableStateOf(step == OnboardingStep.Intro) }
+    var role by rememberSaveable { mutableStateOf(prefs.role.takeIf { it == SignupRole.FAMILY } ?: SignupRole.PATIENT) }
+    var chosen by rememberSaveable { mutableStateOf(prefs.role) }
+    var name by rememberSaveable { mutableStateOf("") }
+    var age by rememberSaveable { mutableStateOf("") }
+    var illness by rememberSaveable { mutableStateOf("") }
+    var formBusy by remember { mutableStateOf(false) }
+    var direction by remember { mutableStateOf(SaharaMotion.Direction.Forward) }
+    var walkthroughChooser by rememberSaveable { mutableStateOf(false) }
+    val pager = rememberPagerState { INTRO_PAGES }
+    val locked = formBusy || entryBusy
+    val family = role == SignupRole.FAMILY
+
+    fun go(next: OnboardingStep, dir: SaharaMotion.Direction = SaharaMotion.Direction.Forward) {
+        if (next == step) return
+        focus.clearFocus()
+        if (step == OnboardingStep.Intro) prefs.introSeen = true
+        if (next.panel != step.panel) onPanelChanged(next.panel)
+        direction = dir; step = next
+    }
+    val backTarget = OnboardingFlow.back(step, signedIn, introShown)
+    fun back() {
+        if (locked) return
+        if (step == OnboardingStep.Intro) { if (pager.currentPage > 0) scope.launch { pager.animateScrollToPage(pager.currentPage - 1) } }
+        else backTarget?.let { go(it, SaharaMotion.Direction.Back) }
+    }
+    fun pick(key: String) {
+        if (locked) return
+        haptic.performHapticFeedback(HapticFeedbackType.SegmentTick)
+        chosen = key; prefs.role = key
+        if (key == SignupRole.DOCTOR) go(OnboardingStep.Doctor)
+        else { role = key; go(if (signedIn) OnboardingStep.Name else OnboardingStep.Account) }
+    }
+    val close: () -> Unit = { back() }
+    BackHandler(backTarget != null || (step == OnboardingStep.Intro && pager.currentPage > 0)) { back() }
+    if (walkthroughChooser) PatientWalkthroughChooser(onPick = { walkthroughChooser = false; onPatientWalkthrough(it) }, onDismiss = { walkthroughChooser = false })
+
+    val ageError = CarePatientProfileRules.age(age).second
+    Column(Modifier.fillMaxSize().testTag("welcome-panel-screen")) {
+        OnboardingTopRow(step, canBack = backTarget != null || (step == OnboardingStep.Intro && pager.currentPage > 0), enabled = !locked, onBack = ::back,
+            onSkip = { haptic.performHapticFeedback(HapticFeedbackType.SegmentTick); go(OnboardingStep.Role) })
+        AnimatedContent(step, Modifier.weight(1f).fillMaxWidth(), transitionSpec = { SaharaMotion.transform(direction, rtl) }, contentAlignment = Alignment.TopCenter, label = "onboarding-step") { shown ->
+            when (shown) {
+                OnboardingStep.Intro -> HorizontalPager(pager, Modifier.fillMaxSize().testTag("onboarding-intro")) { page -> IntroPage(page) }
+                OnboardingStep.Role -> OnboardingPage {
+                    StepHeading(t("Who are you?", "आप कौन हैं?"), t("Choose the one that fits you best.", "जो आप पर सबसे सही बैठे, वह चुनें।"))
+                    val large = !welcomeRolesStacked(LocalConfiguration.current.screenWidthDp, LocalDensity.current.fontScale)
+                    listOf(
+                        OnboardingChoice(SignupRole.PATIENT, t("I'm the patient", "मैं मरीज़ हूँ"), t("Keep your own care in one place", "अपनी देखभाल एक जगह रखें"), Icons.Default.Person, SaharaTone.Teal, "welcome-patient-family"),
+                        OnboardingChoice(SignupRole.FAMILY, t("I'm caring for someone", "मैं किसी की देखभाल कर रहा/रही हूँ"), t("Family member or carer", "परिवार का सदस्य या देखभाल करने वाले"), Icons.Default.People, SaharaTone.Leaf, "welcome-family"),
+                        OnboardingChoice(SignupRole.DOCTOR, t("I'm a doctor or nurse", "मैं डॉक्टर या नर्स हूँ"), t("We check your registration number first", "पहले हम आपकी पंजीकरण संख्या जाँचते हैं"), Icons.Default.MedicalServices, SaharaTone.Indigo, "doctor-workspace-entry"),
+                    ).forEachIndexed { index, choice -> OnboardingChoiceCard(choice, index, selected = chosen == choice.key, enabled = !locked, large = large) { pick(choice.key) } }
+                }
+                OnboardingStep.Account -> OnboardingPage {
+                    StepHeading(t("Do you want an account?", "क्या आप खाता बनाना चाहते हैं?"),
+                        t("With an account, your records are kept safe if you change phones, and family and doctors can join you.", "खाते के साथ, फ़ोन बदलने पर भी आपके रिकॉर्ड सुरक्षित रहते हैं, और परिवार व डॉक्टर आपसे जुड़ सकते हैं।"))
+                    val choices = buildList {
+                        if (CareEmailAvailability.ready) add(OnboardingChoice("create", t("Create an account", "खाता बनाएँ"), t("Email and password", "ईमेल और पासवर्ड"), Icons.Default.PersonAdd, SaharaTone.Rust, "welcome-create-account"))
+                        add(OnboardingChoice("signin", t("I already have an account", "मेरा पहले से खाता है"), t("Sign in", "साइन इन"), Icons.Default.AccountCircle, SaharaTone.Indigo, "welcome-account"))
+                        add(OnboardingChoice("local", t("Continue without an account", "बिना खाते के आगे बढ़ें"), t("Your records stay on this phone", "आपके रिकॉर्ड इसी फ़ोन पर रहेंगे"), Icons.Default.PhoneAndroid, SaharaTone.Leaf, "welcome-add-person"))
+                    }
+                    choices.forEachIndexed { index, choice ->
+                        OnboardingChoiceCard(choice, index, selected = false, enabled = !locked) {
+                            haptic.performHapticFeedback(HapticFeedbackType.SegmentTick)
+                            when (choice.key) {
+                                "create" -> if (accountContent == null) onAccount() else go(OnboardingStep.SignUp)
+                                "signin" -> if (accountContent == null) onAccount() else go(OnboardingStep.SignIn)
+                                else -> if (onSaveProfile == null) onStart() else go(OnboardingStep.Name)
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(4.dp))
+                    SaharaPracticeEntry(t("Try a demo account", "डेमो खाता आज़माएँ"), t("Log in to a demo account", "डेमो खाते में लॉग इन करें"),
+                        enabled = !locked, onClick = { walkthroughChooser = true }, modifier = Modifier.testTag("patient-walkthrough-entry"))
+                }
+                OnboardingStep.SignIn, OnboardingStep.SignUp -> Box(Modifier.fillMaxSize().padding(top = 4.dp)) {
+                    CompositionLocalProvider(LocalSignupIntent provides SignupIntent(create = shown == OnboardingStep.SignUp, role = role)) {
+                        accountContent?.invoke(close) { formBusy = it }
+                    }
+                }
+                OnboardingStep.Doctor -> Box(Modifier.fillMaxSize().padding(top = 4.dp)) {
+                    CompositionLocalProvider(LocalSignupIntent provides SignupIntent(create = false, role = SignupRole.DOCTOR)) {
+                        if (doctorContent != null) doctorContent.invoke(close) { formBusy = it }
+                        else OnboardingPage {
+                            StepHeading(t("Doctor sign in", "डॉक्टर साइन इन"), null)
+                            SaharaPrimaryButton(t("Sign in", "साइन इन"), onClick = onSharedWorkspace, enabled = !locked, modifier = Modifier.fillMaxWidth().testTag("welcome-open-doctor-workspace"))
+                        }
+                    }
+                }
+                OnboardingStep.Name -> OnboardingPage {
+                    StepHeading(if (family) t("What is the name of the person you care for?", "जिनकी देखभाल करते हैं, उनका नाम क्या है?") else t("What is your name?", "आपका नाम क्या है?"),
+                        if (family) t("You can add more people later.", "आप बाद में और लोग जोड़ सकते हैं।") else null)
+                    OnboardingField(name, { name = it.take(100) }, t("Name", "नाम"), "onboarding-name",
+                        KeyboardOptions(capitalization = KeyboardCapitalization.Words, keyboardType = KeyboardType.Text, imeAction = ImeAction.Next)) { if (name.isNotBlank()) go(OnboardingStep.Age) }
+                    if (signedIn && accountContent != null) TextButton(onClick = { go(OnboardingStep.SignIn) }, enabled = !locked, modifier = Modifier.heightIn(min = 48.dp).testTag("onboarding-your-account")) {
+                        Icon(Icons.Default.AccountCircle, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(t("Your account", "आपका खाता"), fontWeight = FontWeight.SemiBold)
+                    }
+                }
+                OnboardingStep.Age -> OnboardingPage {
+                    StepHeading(if (family) t("How old are they?", "उनकी उम्र क्या है?") else t("How old are you?", "आपकी उम्र क्या है?"), t("Optional", "ज़रूरी नहीं"))
+                    OnboardingField(age, { value -> age = value.filter(Char::isDigit).take(3) }, t("Age in years", "उम्र (साल)"), "onboarding-age",
+                        KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next), error = ageError?.let { t(it.en, it.hi) }) { if (ageError == null) go(OnboardingStep.Illness) }
+                }
+                OnboardingStep.Illness -> OnboardingPage {
+                    StepHeading(if (family) t("What illness are they living with?", "उन्हें कौन-सी बीमारी है?") else t("What illness are you living with?", "आपको कौन-सी बीमारी है?"),
+                        t("Optional", "ज़रूरी नहीं") + " · " + if (signedIn) t("Shared only with the family and doctors you invite.", "सिर्फ़ उन्हीं परिवार वालों और डॉक्टरों के साथ साझा होगा जिन्हें आप बुलाएँ।") else t("Kept on this phone.", "इसी फ़ोन पर रहेगा।"))
+                    OnboardingField(illness, { illness = it.take(200) }, t("Illness", "बीमारी"), "onboarding-illness",
+                        KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, keyboardType = KeyboardType.Text, imeAction = ImeAction.Done),
+                        placeholder = t("For example: breast cancer, heart failure", "जैसे: स्तन कैंसर, हृदय की कमज़ोरी")) { go(OnboardingStep.Finish) }
+                }
+                OnboardingStep.Finish -> OnboardingFinish(name.trim(), CarePatientProfileRules.age(age).first, illness.trim(), profileError)
+            }
+        }
+        OnboardingDock(step) { dockStep ->
+            when (dockStep) {
+                OnboardingStep.Intro -> Column(verticalArrangement = Arrangement.spacedBy(14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    PageDots(pager)
+                    val last = pager.currentPage == INTRO_PAGES - 1
+                    DockButton(if (last) t("Get started", "शुरू करें") else t("Next", "आगे"), Modifier.testTag("onboarding-next")) {
+                        haptic.performHapticFeedback(HapticFeedbackType.SegmentTick)
+                        if (last) go(OnboardingStep.Role) else scope.launch { pager.animateScrollToPage(pager.currentPage + 1) }
+                    }
+                }
+                OnboardingStep.Role -> Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.VerifiedUser, null, Modifier.size(22.dp), tint = SaharaColors.OnBand)
+                    Spacer(Modifier.width(10.dp))
+                    Text(t("We never ask for Aadhaar, date of birth or gender to sign up. Only an email and a password.", "साइन अप के लिए हम कभी आधार, जन्मतिथि या लिंग नहीं माँगते। सिर्फ़ ईमेल और पासवर्ड।"),
+                        Modifier.weight(1f), color = SaharaColors.OnBandSub, fontSize = 14.sp, lineHeight = 20.sp)
+                }
+                OnboardingStep.Account -> TextButton(onClick = { runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url))).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } },
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = SaharaColors.OnBand)) {
+                    Icon(Icons.Default.Policy, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(t("Privacy policy", "निजता नीति"), fontWeight = FontWeight.SemiBold)
+                }
+                OnboardingStep.Doctor -> SaharaPracticeEntry(t("Try a demo account", "डेमो खाता आज़माएँ"), t("Log in to a demo account", "डेमो खाते में लॉग इन करें"),
+                    enabled = !locked, onClick = onDoctorDemo, modifier = Modifier.testTag("doctor-demo-entry"))
+                OnboardingStep.Name -> DockButton(t("Next", "आगे"), Modifier.testTag("onboarding-next"), enabled = name.isNotBlank() && !locked) { go(OnboardingStep.Age) }
+                OnboardingStep.Age, OnboardingStep.Illness -> Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    val filled = if (dockStep == OnboardingStep.Age) age.isNotBlank() && ageError == null else illness.isNotBlank()
+                    val next = if (dockStep == OnboardingStep.Age) OnboardingStep.Illness else OnboardingStep.Finish
+                    DockButton(t("Next", "आगे"), Modifier.testTag("onboarding-next"), enabled = filled && !locked) { go(next) }
+                    TextButton(onClick = { if (dockStep == OnboardingStep.Age) age = "" else illness = ""; go(next) }, enabled = !locked,
+                        modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("onboarding-skip-step"), colors = ButtonDefaults.textButtonColors(contentColor = SaharaColors.OnBand)) {
+                        Text(t("Skip for now", "अभी छोड़ें"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                    }
+                }
+                OnboardingStep.Finish -> DockButton(if (entryBusy) t("Saving…", "सहेज रहे हैं…") else t("Open Sahara", "सहारा खोलें"), Modifier.testTag("welcome-save-person"),
+                    enabled = name.isNotBlank(), busy = entryBusy) {
+                    haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+                    val save = onSaveProfile
+                    if (save == null) onStart() else save(name.trim(), OnboardingFlow.profile(age, illness))
+                }
+                OnboardingStep.SignIn, OnboardingStep.SignUp -> Unit
+            }
+        }
+    }
+}
+
+private const val INTRO_PAGES = 3
+
+private class OnboardingChoice(val key: String, val title: String, val detail: String, val icon: ImageVector, val tone: SaharaTone, val tag: String)
+
+/** Back, the thin progress bar, and Skip on the intro. The bar fills smoothly as steps advance and fades away where it has no meaning. */
+@Composable private fun OnboardingTopRow(step: OnboardingStep, canBack: Boolean, enabled: Boolean, onBack: () -> Unit, onSkip: () -> Unit) {
+    val t = careText()
+    val progress = OnboardingFlow.progress(step)
+    val barAlpha by animateFloatAsState(if (progress == null) 0f else 1f, SaharaMotion.tween(SaharaMotion.VALUE_MS), label = "onboarding progress alpha")
+    Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        Box(Modifier.size(48.dp)) {
+            if (canBack) IconButton(onClick = onBack, enabled = enabled, modifier = Modifier.size(48.dp).testTag("welcome-panel-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस"), tint = SaharaColors.Ink) }
+        }
+        Box(Modifier.weight(1f).padding(horizontal = 8.dp).graphicsLayer { alpha = barAlpha }) {
+            SaharaProgressBar(progress ?: 0f, Modifier.testTag("onboarding-progress"), tone = SaharaTone.Rust, label = if (progress == null) null else t("Progress", "प्रगति") + " " + (progress * 100).toInt() + "%")
+        }
+        Box(Modifier.widthIn(min = 48.dp), contentAlignment = Alignment.CenterEnd) {
+            if (step == OnboardingStep.Intro) TextButton(onClick = onSkip, modifier = Modifier.heightIn(min = 48.dp).testTag("onboarding-skip"), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) {
+                Text(t("Skip", "छोड़ें"), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            }
+        }
+    }
+}
+
+/** One question or choice per page: generous padding, scrolls at large text, and its rows rise in once. */
+@Composable private fun OnboardingPage(content: @Composable ColumnScope.() -> Unit) {
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(top = 8.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(14.dp), content = content)
+}
+
+@Composable private fun StepHeading(title: String, detail: String?) {
+    Text(title, Modifier.fillMaxWidth().a11yHeading().testTag("onboarding-heading"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 28.sp, lineHeight = 34.sp, color = SaharaColors.Ink)
+    if (detail != null) Text(detail, Modifier.fillMaxWidth(), fontSize = 17.sp, lineHeight = 24.sp, color = SaharaColors.InkSub)
+    Spacer(Modifier.height(4.dp))
+}
+
+/**
+ * A big tappable choice: icon chip, title and one plain line. It springs in gently when chosen (and remembers the choice when
+ * the person comes back), bounces under the finger, and rises in after the card above it on first show.
+ */
+@Composable private fun OnboardingChoiceCard(choice: OnboardingChoice, index: Int, selected: Boolean, enabled: Boolean, large: Boolean = true, onClick: () -> Unit) {
+    val tone = choice.tone
+    val scale by animateFloatAsState(if (selected) 1.015f else 1f, if (SaharaMotion.enabled) spring(dampingRatio = .55f, stiffness = Spring.StiffnessMediumLow) else snap(), label = "choice select")
+    val edge by animateDpAsState(if (selected) 3.dp else 1.5.dp, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "choice edge")
+    Surface(onClick = onClick, enabled = enabled, shape = RoundedCornerShape(SaharaRadius.Xl), color = if (selected) tone.wash else SaharaColors.Surface, contentColor = SaharaColors.Ink,
+        border = BorderStroke(edge, tone.solid), shadowElevation = if (selected) 3.dp else 1.dp,
+        modifier = Modifier.fillMaxWidth().heightIn(min = if (large) 88.dp else 72.dp).saharaStagger(index).saharaPressBounce().graphicsLayer { scaleX = scale; scaleY = scale }
+            .semantics { this.selected = selected }.testTag(choice.tag)) {
+        Row(Modifier.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+            SaharaIconChip(choice.icon, tone, size = if (large) 52 else 44)
+            Spacer(Modifier.width(14.dp))
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(choice.title, fontSize = 19.sp, lineHeight = 24.sp, fontWeight = FontWeight.SemiBold, color = tone.ink)
+                Text(choice.detail, fontSize = 15.sp, lineHeight = 20.sp, color = SaharaColors.InkSub)
+            }
+            Spacer(Modifier.width(8.dp))
+            Icon(if (selected) Icons.Default.CheckCircle else Icons.AutoMirrored.Filled.KeyboardArrowRight, null, Modifier.size(26.dp), tint = tone.ink)
+        }
+    }
+}
+
+/** A large single-line answer field; the keyboard opens on it, and the keyboard's own Next/Done moves on. */
+@Composable private fun OnboardingField(value: String, onValueChange: (String) -> Unit, label: String, tag: String, keyboard: KeyboardOptions,
+    error: String? = null, placeholder: String? = null, onSubmit: () -> Unit) {
+    val focus = remember { FocusRequester() }
+    LaunchedEffect(Unit) { delay(SaharaMotion.ms(SaharaMotion.ENTER_MS).toLong()); runCatching { focus.requestFocus() } }
+    OutlinedTextField(value, onValueChange, singleLine = true, label = { Text(label) }, isError = error != null,
+        placeholder = placeholder?.let { { Text(it, color = SaharaColors.InkFaint) } },
+        supportingText = error?.let { { Text(it, Modifier.announce()) } },
+        textStyle = MaterialTheme.typography.titleLarge.copy(fontSize = 22.sp, lineHeight = 28.sp, color = SaharaColors.Ink),
+        keyboardOptions = keyboard, keyboardActions = KeyboardActions(onNext = { onSubmit() }, onDone = { onSubmit() }),
+        shape = RoundedCornerShape(SaharaRadius.Md),
+        colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = SaharaColors.Surface, unfocusedContainerColor = SaharaColors.Surface, focusedBorderColor = SaharaColors.Primary, focusedLabelColor = RustText),
+        modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp).focusRequester(focus).testTag(tag))
+}
+
+/** The band-coloured dock at the foot (it meets the band behind the navigation bar). Its content cross-fades between steps. */
+@Composable private fun OnboardingDock(step: OnboardingStep, content: @Composable (OnboardingStep) -> Unit) {
+    Surface(color = SaharaColors.Band, contentColor = SaharaColors.OnBand, shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp), modifier = Modifier.fillMaxWidth().testTag("welcome-orange-panel")) {
+        AnimatedContent(step, transitionSpec = { SaharaMotion.crossfade() }, contentAlignment = Alignment.Center, label = "Onboarding dock") { shown ->
+            val empty = shown == OnboardingStep.SignIn || shown == OnboardingStep.SignUp
+            Box(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(top = if (empty) 12.dp else 18.dp, bottom = if (empty) 4.dp else 14.dp)) { content(shown) }
+        }
+    }
+}
+
+/** The dock's main action: white on the band, band-coloured label, 56 dp, with Sahara's press bounce. */
+@Composable private fun DockButton(text: String, modifier: Modifier = Modifier, enabled: Boolean = true, busy: Boolean = false, onClick: () -> Unit) {
+    Button(onClick = onClick, enabled = enabled && !busy, shape = RoundedCornerShape(SaharaRadius.Md),
+        colors = ButtonDefaults.buttonColors(containerColor = SaharaColors.OnBand, contentColor = SaharaColors.Band, disabledContainerColor = SaharaColors.BandRaised, disabledContentColor = SaharaColors.OnBandSub),
+        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp), modifier = modifier.fillMaxWidth().heightIn(min = 56.dp).saharaPressBounce()) {
+        if (busy) { CircularProgressIndicator(Modifier.size(20.dp), color = SaharaColors.OnBandSub, strokeWidth = 2.5.dp); Spacer(Modifier.width(10.dp)) }
+        Text(text, fontSize = 17.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+    }
+}
+
+/** Page dots: the current one stretches into a pill. Read out as "2 / 3". */
+@Composable private fun PageDots(pager: PagerState) {
+    val current = pager.currentPage
+    Row(Modifier.clearAndSetSemantics { contentDescription = "${current + 1} / $INTRO_PAGES" }.testTag("onboarding-dots"), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        repeat(INTRO_PAGES) { index ->
+            val on = index == current
+            val width by animateDpAsState(if (on) 26.dp else 8.dp, SaharaMotion.tween(SaharaMotion.SELECT_MS + 80, easing = SaharaMotion.Emphasized), label = "dot")
+            Box(Modifier.height(8.dp).width(width).clip(CircleShape).background(if (on) SaharaColors.OnBand else SaharaColors.OnBandSub.copy(alpha = .45f)))
+        }
+    }
+}
+
+/** One intro page: a big calm picture with a soft idle float and breathing halo, a short title and two lines. */
+@Composable private fun IntroPage(page: Int) {
+    val t = careText()
+    val (title, body) = when (page) {
+        0 -> t("Welcome to Sahara", "सहारा में आपका स्वागत है") to t("Sahara helps you, your family and your doctors look after comfort, medicines and visits in one calm place.", "सहारा आपको, आपके परिवार और डॉक्टरों को आराम, दवाइयों और मुलाक़ातों का ध्यान एक शांत जगह पर रखने में मदद करता है।")
+        1 -> t("Medicines and symptoms, made simple", "दवाइयाँ और लक्षण, आसान तरीक़े से") to t("Reminders for every dose, and a quick way to note pain, sleep or worry for your doctor.", "हर खुराक की याद, और दर्द, नींद या चिंता को डॉक्टर के लिए जल्दी लिखने का आसान तरीक़ा।")
+        else -> t("Family and doctors, in step", "परिवार और डॉक्टर, एक साथ") to t("Share care with your family and invite your doctor when you are ready. Your records stay private.", "जब आप तैयार हों, परिवार के साथ देखभाल साझा करें और डॉक्टर को बुलाएँ। आपके रिकॉर्ड निजी रहते हैं।")
+    }
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        val compact = maxHeight < 520.dp
+        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).heightIn(min = maxHeight).padding(horizontal = 24.dp, vertical = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterVertically)) {
+            IntroArt(page, if (compact) 170.dp else 240.dp)
+            Spacer(Modifier.height(if (compact) 0.dp else 8.dp))
+            Text(title, Modifier.fillMaxWidth().a11yHeading().testTag(if (page == 0) "welcome-panel-heading" else "onboarding-intro-title-$page"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium,
+                fontSize = 28.sp, lineHeight = 34.sp, textAlign = TextAlign.Center, color = SaharaColors.Ink)
+            Text(body, Modifier.fillMaxWidth().widthIn(max = 420.dp), fontSize = 17.sp, lineHeight = 25.sp, textAlign = TextAlign.Center, color = SaharaColors.InkSub)
+        }
+    }
+}
+
+@Composable private fun IntroArt(page: Int, size: androidx.compose.ui.unit.Dp) {
+    Box(Modifier.fillMaxWidth().height(size), contentAlignment = Alignment.Center) {
+        val halo = when (page) { 0 -> SaharaTone.Teal; 1 -> SaharaTone.Plum; else -> SaharaTone.Leaf }
+        Box(Modifier.size(size * .92f).saharaBreathe(cycles = 5, amount = .05f).clip(CircleShape).background(halo.wash).clearAndSetSemantics { })
+        when (page) {
+            0 -> Box(Modifier.saharaFloat(4.dp, cycles = 5)) { WelcomeHero(Modifier.height(size * .9f)) }
+            1 -> Box(Modifier.size(size * .8f).saharaFloat(5.dp, cycles = 5), contentAlignment = Alignment.Center) {
+                SaharaLottie(SaharaLottieKind.Pill, Modifier.size(size * .62f))
+                SaharaLottie(SaharaLottieKind.Heart, Modifier.align(Alignment.TopEnd).size(size * .2f))
+            }
+            else -> Box(Modifier.size(size * .8f).saharaFloat(5.dp, cycles = 5), contentAlignment = Alignment.Center) {
+                SaharaLottie(SaharaLottieKind.Hug, Modifier.size(size * .66f))
+                SaharaLottie(SaharaLottieKind.Wave, Modifier.align(Alignment.TopStart).size(size * .22f))
+            }
+        }
+    }
+}
+
+/** "You're all set": the success mark, one calm line and the answers given, before the final button saves them. */
+@Composable private fun OnboardingFinish(name: String, age: Int?, illness: String, error: String?) {
+    val t = careText()
+    OnboardingPage {
+        Spacer(Modifier.height(12.dp))
+        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            Box(Modifier.size(150.dp).saharaBreathe(cycles = 3, amount = .05f).clip(CircleShape).background(SaharaTone.Success.wash))
+            SaharaLottie(SaharaLottieKind.Success, Modifier.size(128.dp))
+        }
+        Text(t("You're all set", "सब तैयार है"), Modifier.fillMaxWidth().a11yHeading().testTag("onboarding-heading"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 30.sp, lineHeight = 36.sp, textAlign = TextAlign.Center, color = SaharaColors.Ink)
+        Text(t("Sahara is ready. You can add medicines, visits and notes from Today.", "सहारा तैयार है। आज वाले पेज से दवाइयाँ, मुलाक़ातें और नोट जोड़ सकते हैं।"), Modifier.fillMaxWidth(), fontSize = 17.sp, lineHeight = 24.sp, textAlign = TextAlign.Center, color = SaharaColors.InkSub)
+        Surface(shape = RoundedCornerShape(SaharaRadius.Xl), color = SaharaColors.Surface, border = BorderStroke(1.dp, SaharaColors.Line), modifier = Modifier.fillMaxWidth().saharaAppear()) {
+            Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                SaharaIconChip(Icons.Default.Person, SaharaTone.Teal, size = 48)
+                Spacer(Modifier.width(14.dp))
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(name, fontSize = 19.sp, fontWeight = FontWeight.SemiBold, color = SaharaColors.Ink)
+                    val details = listOfNotNull(age?.let { t("Age", "उम्र") + " " + it }, illness.ifBlank { null })
+                    if (details.isNotEmpty()) Text(details.joinToString(" · "), fontSize = 15.sp, color = SaharaColors.InkSub)
+                }
+            }
+        }
+        error?.let { Text(it, Modifier.fillMaxWidth().announce(), color = MaterialTheme.colorScheme.error, fontSize = 15.sp) }
+    }
+}
+
+/**
+ * A short brand moment after the system splash, on the very first launch only: the logo (the splash icon, same size and place,
+ * so the hand-off is seamless) settles up while "Sahara" and the line under it rise in, then the whole layer fades into the
+ * welcome screen, which is already composed underneath. Skipped on later launches and whenever animations are off.
+ */
+@Composable fun SaharaBrandMoment(content: @Composable () -> Unit) {
+    val context = LocalContext.current
+    val prefs = remember { CareOnboardingPrefs(context) }
+    var showing by rememberSaveable { mutableStateOf(SaharaMotion.enabled && !prefs.brandShown) }
+    LaunchedEffect(Unit) { if (showing) prefs.brandShown = true }
+    Box(Modifier.fillMaxSize()) {
+        content()
+        if (showing) BrandOverlay { showing = false }
+    }
+}
+
+@Composable private fun BrandOverlay(onDone: () -> Unit) {
+    val t = careText()
+    val lift = remember { Animatable(0f) }
+    val words = remember { Animatable(0f) }
+    val layer = remember { Animatable(1f) }
+    LaunchedEffect(Unit) {
+        launch { lift.animateTo(1f, tween(620, easing = SaharaMotion.Emphasized)) }
+        delay(180)
+        launch { words.animateTo(1f, tween(520, easing = SaharaMotion.Emphasized)) }
+        delay(1100)
+        layer.animateTo(0f, tween(360, easing = FastOutSlowInEasing))
+        onDone()
+    }
+    Box(Modifier.fillMaxSize().graphicsLayer { alpha = layer.value }.background(SaharaColors.Ground)
+        .pointerInput(Unit) { awaitPointerEventScope { while (true) awaitPointerEvent().changes.forEach { it.consume() } } }
+        .clearAndSetSemantics { contentDescription = t("Sahara", "सहारा") }.testTag("sahara-brand-moment"), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Image(painterResource(R.drawable.splash_icon), null, Modifier.size(240.dp).graphicsLayer {
+                val s = 1f - .25f * lift.value; scaleX = s; scaleY = s; translationY = -lift.value * 20.dp.toPx() })
+            Text(t("Sahara", "सहारा"), Modifier.graphicsLayer { alpha = words.value; translationY = (1f - words.value) * 18.dp.toPx() - 40.dp.toPx() },
+                fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 40.sp, lineHeight = 46.sp, color = SaharaColors.Band)
+            Text(t("Palliative care,\ntogether.", "पैलिएटिव देखभाल,\nसाथ मिलकर।"), Modifier.padding(horizontal = 24.dp).graphicsLayer { alpha = words.value; translationY = (1f - words.value) * 24.dp.toPx() - 32.dp.toPx() },
+                fontSize = 18.sp, lineHeight = 24.sp, textAlign = TextAlign.Center, color = SaharaColors.InkSub)
+        }
+    }
+}

@@ -155,13 +155,13 @@ internal object DoctorTones {
     /** A stable tone per name so the same patient always gets the same avatar colour. */
     fun forName(name: String): DoctorTone = cycle[Math.floorMod(name.trim().lowercase().hashCode(), cycle.size)]
 }
-/** The dark header band. */
+/** The doctor header: the calm cream ground with dark ink (no dark band since 7 Nov). */
 internal val DoctorBand get() = SaharaColors.Header
 
-/** Status pill: the tone's solid (its band step, so small white text keeps 4.5:1) with bold white text; never colour alone (it always carries a word). */
+/** Status pill (22 Nov premium pass): the tone's light wash with a 1 dp edge in its colour and bold ink text (>= 4.5:1); never colour alone (it always carries a word). */
 @Composable internal fun DoctorPill(text: String, tone: DoctorTone, modifier: Modifier = Modifier) {
-    Surface(color = tone.band, shape = RoundedCornerShape(50), modifier = modifier) {
-        Text(text, Modifier.padding(horizontal = 10.dp, vertical = 3.dp), fontSize = 13.sp, lineHeight = 18.sp, fontWeight = FontWeight.Bold, color = tone.onSolid, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis)
+    Surface(color = tone.wash, shape = RoundedCornerShape(50), border = BorderStroke(1.dp, tone.solid), modifier = modifier) {
+        Text(text, Modifier.padding(horizontal = 10.dp, vertical = 3.dp), fontSize = 13.sp, lineHeight = 18.sp, fontWeight = FontWeight.Bold, color = tone.ink, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -197,11 +197,12 @@ internal val DoctorWholeWords = TextStyle(lineBreak = LineBreak.Heading, hyphens
 @Composable internal fun DoctorRegisterRow(name: String, detail: String, onClick: () -> Unit, modifier: Modifier = Modifier, pill: Pair<String, DoctorTone>? = null, lead: String? = null, section: DoctorTone? = null) {
     val press = remember { MutableInteractionSource() }
     val tone = DoctorTones.forName(name)
-    Surface(onClick = onClick, interactionSource = press, color = section?.wash ?: Paper, shape = RoundedCornerShape(14.dp), border = BorderStroke(if (section != null) 1.5.dp else 1.dp, section?.solid ?: DoctorHairline),
+    // Premium pass (22 Nov): one 1 dp edge in the list's colour (was 1.5 dp) and the radius token, so rows read lighter on the cream.
+    Surface(onClick = onClick, interactionSource = press, color = section?.wash ?: Paper, shape = RoundedCornerShape(SaharaRadius.Md), border = BorderStroke(1.dp, section?.solid ?: DoctorHairline),
         modifier = modifier.fillMaxWidth().saharaAppear().saharaPress(press).heightIn(min = 64.dp)) {
         Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             if (lead != null) Text(lead, Modifier.widthIn(min = 64.dp), fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Bold, color = (section ?: DoctorTones.Indigo).ink, style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"))
-            else Box(Modifier.size(40.dp).background(tone.band, CircleShape), contentAlignment = Alignment.Center) { Text(name.trim().take(1).uppercase(), color = tone.onSolid, fontWeight = FontWeight.Bold, fontSize = 17.sp) }
+            else Box(Modifier.size(40.dp).background(tone.wash, CircleShape).border(1.dp, tone.solid, CircleShape), contentAlignment = Alignment.Center) { Text(name.trim().take(1).uppercase(), color = tone.ink, fontWeight = FontWeight.Bold, fontSize = 17.sp) }
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(1.dp)) {
                 Text(name, fontSize = 17.sp, lineHeight = 22.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 if (detail.isNotBlank()) Text(detail, fontSize = 14.sp, lineHeight = 19.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)

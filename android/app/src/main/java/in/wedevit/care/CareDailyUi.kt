@@ -41,6 +41,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -76,11 +77,14 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
     val done = today != null
     // Light card, dark text (team feedback 21 Nov: the dark teal felt heavy). Teal stays as the accent on buttons and icons.
     val band by animateColorAsState(if (done) SaharaTone.Success.wash else SaharaTone.Teal.wash, SaharaMotion.tween(SaharaMotion.VALUE_MS))
-    Surface(shape = RoundedCornerShape(TodayHero.radius), color = band, contentColor = DoctorCardInk, border = BorderStroke(1.dp, SaharaTone.Teal.solid.copy(alpha = .25f)), modifier = Modifier.fillMaxWidth().saharaAppear().saharaPulseGlow(TodayHero.dueBand, TodayHero.radius, active = !done).testTag("today-checkin")) {
+    val haptic = rememberSaharaHaptic()
+    // The mood tapped here; the bloom plays once that mood is really saved (it follows the record, so a failed save shows nothing).
+    var tapped by remember { mutableStateOf<String?>(null) }
+    Surface(shape = RoundedCornerShape(TodayHero.radius), color = band, contentColor = DoctorCardInk, border = BorderStroke(1.dp, SaharaTone.Teal.solid.copy(alpha = .25f)), modifier = Modifier.fillMaxWidth().saharaAppear().saharaPulseGlow(TodayHero.dueBand, TodayHero.radius, active = !done).saharaBloom(tapped != null && today?.title == tapped && tapped != CheckInMood.HARD, SaharaTone.Success.solid, TodayHero.radius).testTag("today-checkin")) { Box {
         Column(Modifier.saharaContentSize().padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 6.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                // The one main card on Today: its icon swells slowly a few times, then rests (off when animations are off).
-                Box(contentAlignment = Alignment.Center) { SaharaLottie(SaharaLottieKind.Breathe); SaharaIconChip(Icons.Default.WbSunny, SaharaTone.Gold, Modifier.saharaFloat(), size = 32) }; Spacer(Modifier.width(6.dp))
+                // The one main card on Today: the sun (evening sun, or moon at night) on a breathing halo, floating and swaying a few times, then resting.
+                SaharaDaySky(size = 30); Spacer(Modifier.width(6.dp))
                 Text(t("How was today?", "आज का दिन कैसा रहा?"), fontFamily = SaharaTitleFont, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
                 // The saved tick pops in once the check-in is stored (it follows the saved record, not a timer).
                 AnimatedVisibility(done, enter = scaleIn(spring(dampingRatio = Spring.DampingRatioMediumBouncy), initialScale = .6f) + fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)), exit = fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS))) {
@@ -103,13 +107,17 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
                 CareDailyFlow.moods.forEachIndexed { index, mood ->
                     TodayMoodButton(checkInMoodLabel(mood, hindi), index / 2f, selected = today?.title == mood, enabled = !busy, ink = SaharaTone.Teal.ink, modifier = Modifier.weight(1f).fillMaxHeight().saharaStagger(index).testTag("today-checkin-$index")) {
                         val change = CareDailyFlow.checkInChange(today, mood)
-                        if (change != null && canEditCareContext(vm, person, capturedAccount)) { if (today != null) vm.updateItem(change) {} else vm.saveItem("checkin", mood, "") }
+                        if (change != null && canEditCareContext(vm, person, capturedAccount)) { haptic(); tapped = mood; if (today != null) vm.updateItem(change) {} else vm.saveItem("checkin", mood, "") }
                     }
                 }
             }
             today?.detail?.takeIf { it.isNotBlank() }?.let { Text(it, fontSize = 15.sp, lineHeight = 20.sp, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis) }
         }
-    }
+        // A soft bloom of petals by the Saved tick once an okay or good day is saved. A hard day gets only the quiet tick: nothing celebrates it.
+        SaharaMoment(today?.title?.takeIf { it == tapped && it != CheckInMood.HARD }) {
+            SaharaLottie(SaharaLottieKind.Bloom, Modifier.align(Alignment.TopEnd).padding(end = 8.dp).size(64.dp))
+        }
+    } }
 }
 
 /** A large white action on the Today hero: icon over a short label that wraps between words, never inside one. */
@@ -131,7 +139,8 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
     Surface(shape = RoundedCornerShape(TodayHero.buttonRadius), color = fill, border = BorderStroke(if (selected) 2.dp else 1.dp, if (selected) SaharaTone.Teal.solid else DoctorHairline),
         modifier = modifier.heightIn(min = 76.dp).saharaPress(press).selectable(selected = selected, enabled = enabled, role = Role.RadioButton, interactionSource = press, indication = androidx.compose.material3.ripple(), onClick = onClick)) {
         Column(Modifier.padding(horizontal = 4.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-            CareMoodFace(face, Modifier.size(32.dp).clearAndSetSemantics { })
+            // The chosen face answers with one small bounce.
+            CareMoodFace(face, Modifier.size(32.dp).saharaSelectBounce(selected, .2f).clearAndSetSemantics { })
             Spacer(Modifier.height(4.dp))
             // Shrinks the label instead of splitting a word ("ठीक-ठा / क") at large font sizes.
             SaharaFitText(label, style = LocalTextStyle.current.copy(fontSize = 15.sp, lineHeight = 18.sp), color = text, maxLines = 2, min = 10f,
@@ -203,10 +212,11 @@ internal object CareModules {
 @Composable fun CareModuleCard(key: String, title: String, icon: ImageVector, tint: Color, count: Int, defaultOpen: Boolean, forceOpen: Boolean, content: @Composable ColumnScope.() -> Unit) {
     var open by rememberSaveable(key, forceOpen) { mutableStateOf(defaultOpen || forceOpen) }; val t = careText()
     Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().saharaAppear().testTag("care-module-$key")) { Column {
-        Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).clickable(role = Role.Button) { open = !open }.padding(horizontal = 16.dp, vertical = 8.dp).testTag("care-module-$key-toggle"), verticalAlignment = Alignment.CenterVertically) {
+        val press = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+        Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).saharaPress(press).clickable(interactionSource = press, indication = androidx.compose.material3.ripple(), role = Role.Button) { open = !open }.padding(horizontal = 16.dp, vertical = 8.dp).testTag("care-module-$key-toggle"), verticalAlignment = Alignment.CenterVertically) {
             Surface(shape = androidx.compose.foundation.shape.CircleShape, color = tint) { Icon(icon, null, Modifier.padding(8.dp).size(22.dp), tint = DoctorAccent) }
             Spacer(Modifier.width(12.dp)); Text(title, fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
-            SaharaAnimatedText("$count") { Text(it, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.background(Cream, CircleShape).padding(horizontal = 10.dp, vertical = 2.dp)) }; Spacer(Modifier.width(6.dp)); Icon(if (open) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, if (open) t("Collapse $title", "$title बंद करें") else t("Expand $title", "$title खोलें"), tint = DoctorCardSub)
+            SaharaAnimatedText("$count") { Text(it, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.background(Cream, CircleShape).padding(horizontal = 10.dp, vertical = 2.dp)) }; Spacer(Modifier.width(6.dp)); SaharaChevron(open, if (open) t("Collapse $title", "$title बंद करें") else t("Expand $title", "$title खोलें"))
         }
         AnimatedVisibility(open, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) { Column(Modifier.padding(start = 12.dp, end = 12.dp, bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(10.dp), content = content) }
     } }
@@ -214,10 +224,16 @@ internal object CareModules {
 
 @Composable fun QuietLine(text: String) { Text(text, fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)) }
 
+/** An expand/collapse chevron that turns smoothly (a quarter of a second) instead of swapping icons. */
+@Composable fun SaharaChevron(open: Boolean, description: String?, modifier: Modifier = Modifier, tint: Color = DoctorCardSub) {
+    val turn by androidx.compose.animation.core.animateFloatAsState(if (open) 180f else 0f, SaharaMotion.tween(SaharaMotion.EXPAND_MS + 40, easing = SaharaMotion.Emphasized), label = "chevron")
+    Icon(Icons.Default.KeyboardArrowDown, description, modifier.graphicsLayer { rotationZ = turn }, tint = tint)
+}
+
 /** Every row of one module group, always open (a module already has its own screen, so no "Show all" toggle). [label] adds a small sub-group heading. */
 @Composable fun <T> CareModuleList(key: String, items: List<T>, empty: String, label: String? = null, keyOf: (T) -> Any, row: @Composable (T) -> Unit) {
     if (label != null) Text("$label · ${saharaCountUp(items.size)}", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub, modifier = Modifier.padding(start = 4.dp, top = 4.dp).a11yHeading())
-    SaharaStateSwitch(items.isEmpty(), Modifier.fillMaxWidth(), label = "care-module-$key") { isEmpty -> if (isEmpty) QuietLine(empty) else Column(Modifier.saharaContentSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    SaharaStateSwitch(items.isEmpty(), Modifier.fillMaxWidth(), label = "care-module-$key") { isEmpty -> if (isEmpty) { if (empty.isBlank()) QuietLine(empty) else SaharaCalmEmpty(empty) } else Column(Modifier.saharaContentSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
     items.forEachIndexed { i, item -> key(keyOf(item)) { Box(Modifier.saharaStagger(i)) { row(item) } } }
     } }
 }

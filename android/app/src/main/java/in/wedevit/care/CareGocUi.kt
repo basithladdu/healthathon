@@ -118,9 +118,12 @@ private val GocSand get() = Cream
 private val GocTickSoft get() = DoctorStatusGoodBg
 /** The page band and speaker chips (6 Nov AI-FIR grammar): a dark Sahara band, and two distinct speaker colours that carry white text above 4.5:1. */
 /** Goals of care keeps its section colour (indigo) on the band, as on Today and the doctor's hub. */
-private val GocBandColor get() = SaharaSection.GoalsOfCare.band
-private val GocBandSub get() = SaharaSection.GoalsOfCare.wash
-private val GocBandDone = Color(0xFF9BDDB0)
+// Premium pass (22 Nov): the header is the section's light wash with dark ink, not a solid band ("dark and scary").
+private val GocBandColor get() = SaharaSection.GoalsOfCare.wash
+private val GocBandSub get() = SaharaColors.InkSub
+/** Done steps: the success solid as a bar, its ink for the tick and label (>= 4.5:1 on the wash). */
+private val GocBandDone get() = SaharaTone.Success.solid
+private val GocBandDoneInk get() = SaharaTone.Success.ink
 private val GocDoctorChip get() = SaharaTone.Rust.ink
 private val GocPatientChip get() = SaharaTone.Teal.solid
 
@@ -766,18 +769,18 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
     }
 }
 
-/** The page's dark band: back, title with the patient's name, and the three steps (Record, Review, Sign), each named under its bar. */
+/** The page's header: a light indigo wash with back, title (dark ink) and the patient's name, and the three steps (Record, Review, Sign), each named under its bar. */
 @Composable private fun GocBand(title: String, name: String, step: Int, locked: Boolean, onBack: () -> Unit) { val t = careText()
     val labels = listOf(t("Record", "रिकॉर्ड"), t("Review", "समीक्षा"), t("Sign", "हस्ताक्षर"))
-    Surface(color = GocBandColor, contentColor = Color.White, modifier = Modifier.fillMaxWidth().testTag("goc-header")) {
+    Surface(color = GocBandColor, contentColor = SaharaColors.Ink, modifier = Modifier.fillMaxWidth().testTag("goc-header")) { Column {
         Column(Modifier.padding(start = 4.dp, end = 16.dp, top = 4.dp, bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onBack, modifier = Modifier.testTag("goc-header-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस"), tint = Color.White) }
+                IconButton(onClick = onBack, modifier = Modifier.testTag("goc-header-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस"), tint = SaharaColors.Ink) }
                 Column(Modifier.weight(1f)) {
-                    Text(title, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.SemiBold, fontSize = 22.sp, lineHeight = 28.sp, color = Color.White)
+                    Text(title, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.SemiBold, fontSize = 22.sp, lineHeight = 28.sp, color = SaharaColors.Ink)
                     if (name.isNotBlank()) Text(name, fontSize = 15.sp, lineHeight = 20.sp, color = GocBandSub, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.testTag("goc-header-name"))
                 }
-                if (locked) Surface(color = GocBandDone, contentColor = SaharaColors.Ink, shape = CircleShape) {
+                if (locked) Surface(color = GocBandDone, contentColor = Color.White, shape = CircleShape) {
                     Row(Modifier.padding(horizontal = 10.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.Lock, null, Modifier.size(16.dp)); Spacer(Modifier.width(4.dp)); Text(t("Locked", "लॉक"), fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
                     }
@@ -786,19 +789,20 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
             Row(Modifier.fillMaxWidth().padding(start = 12.dp).testTag("goc-steps"), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 labels.forEachIndexed { i, label ->
                     val done = i < step || locked; val now = i == step && !locked
-                    val fill by androidx.compose.animation.animateColorAsState(if (done) GocBandDone else if (now) Color.White else Color.White.copy(alpha = .28f), SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "goc-step")
+                    val fill by androidx.compose.animation.animateColorAsState(if (done) GocBandDone else if (now) SaharaSection.GoalsOfCare.solid else SaharaColors.LineStrong, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "goc-step")
                     Column(Modifier.weight(1f).semantics(mergeDescendants = true) {}, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Box(Modifier.fillMaxWidth().height(6.dp).clip(CircleShape).background(fill))
+                        Box(Modifier.fillMaxWidth().height(if (now) 6.dp else 4.dp).clip(CircleShape).background(fill))
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            if (done) { Icon(Icons.Default.Check, null, Modifier.size(16.dp), tint = GocBandDone); Spacer(Modifier.width(4.dp)) }
-                            Text(label, fontSize = 15.sp, fontWeight = if (now) FontWeight.Bold else FontWeight.Medium, color = if (now || done) Color.White else GocBandSub, maxLines = 1, softWrap = false,
+                            if (done) { Icon(Icons.Default.Check, null, Modifier.size(16.dp), tint = GocBandDoneInk); Spacer(Modifier.width(4.dp)) }
+                            Text(label, fontSize = 15.sp, fontWeight = if (now) FontWeight.Bold else FontWeight.Medium, color = if (now) SaharaColors.Ink else if (done) GocBandDoneInk else GocBandSub, maxLines = 1, softWrap = false,
                                 modifier = if (now) Modifier.testTag("goc-step-now") else Modifier)
                         }
                     }
                 }
             }
         }
-    }
+        HorizontalDivider(color = SaharaColors.HeaderLine)
+    } }
 }
 
 /** The tick on a locked note: it pops in once (no motion when animations are off). */

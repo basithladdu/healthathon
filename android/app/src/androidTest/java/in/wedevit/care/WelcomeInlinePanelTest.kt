@@ -9,96 +9,102 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
 
-/** Component-only synthetic slots: no CareModel, default preferences, authentication or network. */
+/** Component-only synthetic slots for the first-run flow (CareOnboarding.kt): no CareModel, authentication or network. */
 class WelcomeInlinePanelTest {
     @get:Rule val ui = createComposeRule()
 
-    @Test fun orangePanelOpensOnlySelectedFormAndKeepsWalkthroughSeparate() {
+    @Test fun roleCardsOpenOnlyTheirStepAndKeepWalkthroughSeparate() {
         val selections = mutableListOf<String>()
         var legacyCallbacks = 0
         var walkthroughs = 0
         ui.setContent { CareTheme {
             Welcome({ legacyCallbacks++ }, { legacyCallbacks++ }, { legacyCallbacks++ }, { walkthroughs++ },
-                addPersonContent = { close, _ -> Button(onClick = close, modifier = Modifier.testTag("fixture-person")) { Text("Synthetic person form") } },
                 accountContent = { close, _ -> Button(onClick = close, modifier = Modifier.testTag("fixture-account")) { Text("Synthetic account form") } },
                 doctorContent = { close, _ -> Button(onClick = close, modifier = Modifier.testTag("fixture-doctor")) { Text("Synthetic doctor sign-in") } },
-                onPanelChanged = { selections += it })
+                onPanelChanged = { selections += it }, onSaveProfile = { _, _ -> }, showIntro = false)
         } }
-        ui.onNodeWithTag("welcome-patient-family").assertHasClickAction().assertHeightIsAtLeast(48.dp)
-        ui.onNodeWithTag("doctor-workspace-entry").assertHasClickAction().assertHeightIsAtLeast(48.dp)
-        ui.onNodeWithTag("welcome-add-person").assertDoesNotExist()
-        ui.onNodeWithTag("welcome-account").assertDoesNotExist()
+        ui.onNodeWithText("Who are you?").assertIsDisplayed()
+        listOf("welcome-patient-family", "welcome-family", "doctor-workspace-entry").forEach { ui.onNodeWithTag(it).assertHasClickAction().assertHeightIsAtLeast(48.dp) }
+        listOf("welcome-add-person", "welcome-account", "doctor-demo-entry", "onboarding-skip").forEach { ui.onNodeWithTag(it).assertDoesNotExist() }
+        ui.onNodeWithTag("welcome-patient-family").performScrollTo().performClick()
+        ui.onNodeWithTag("welcome-add-person").assertIsDisplayed()
+        ui.onNodeWithTag("welcome-account").assertIsDisplayed()
+        ui.onNodeWithTag("patient-walkthrough-entry").performScrollTo().assertIsDisplayed()
         ui.onNodeWithTag("doctor-demo-entry").assertDoesNotExist()
-        listOf("Welcome to Sahara").forEach { label ->
-            val layouts = mutableListOf<TextLayoutResult>()
-            ui.onNodeWithText(label).performSemanticsAction(SemanticsActions.GetTextLayoutResult) { action -> action(layouts) }
-            org.junit.Assert.assertTrue("Collapsed welcome copy is centred", layouts.any { it.layoutInput.style.textAlign == TextAlign.Center })
-        }
-        // Three labelled role tiles: patient, family, doctor.
-        ui.onNodeWithTag("welcome-family").assertHasClickAction().assertHeightIsAtLeast(48.dp)
-        listOf("Patient", "Family", "Doctor").forEach { ui.onNodeWithText(it, useUnmergedTree = true).assertExists() }
-        val screen = ui.onNodeWithTag("welcome-panel-screen").fetchSemanticsNode().boundsInRoot
-        val illustration = ui.onNodeWithTag("welcome-hero-illustration").fetchSemanticsNode().boundsInRoot
-        org.junit.Assert.assertTrue(kotlin.math.abs(screen.center.x - illustration.center.x) <= 2f)
-        val collapsedPanel = ui.onNodeWithTag("welcome-orange-panel").fetchSemanticsNode().boundsInRoot
-        val doctorLink = ui.onNodeWithTag("doctor-workspace-entry").fetchSemanticsNode().boundsInRoot
-        val sixteenDp = with(ui.density) { 16.dp.toPx() }
-        org.junit.Assert.assertTrue("Collapsed orange panel should stay bottom anchored", kotlin.math.abs(screen.bottom - collapsedPanel.bottom) <= 2f)
-        org.junit.Assert.assertTrue("No empty orange block below the doctor's touch target", collapsedPanel.bottom - doctorLink.bottom in 0f..(sixteenDp + 2f))
-        listOf("welcome-add-person" to "person", "welcome-account" to "account").forEach { (entry, form) ->
-            ui.onNodeWithTag("welcome-panel-gap").assertExists()
-            val collapsedTop = ui.onNodeWithTag("welcome-orange-panel").fetchSemanticsNode().boundsInRoot.top
-            ui.onNodeWithTag("welcome-patient-family").performScrollTo().performClick()
-            ui.onNodeWithTag("welcome-add-person").assertIsDisplayed()
-            ui.onNodeWithTag("welcome-account").assertIsDisplayed()
-            ui.onNodeWithTag("doctor-demo-entry").assertDoesNotExist()
-            ui.onNodeWithTag(entry).performScrollTo().performClick()
-            ui.onNodeWithTag("welcome-orange-panel").assertExists()
-            ui.onNodeWithTag("welcome-panel-gap").assertDoesNotExist()
-            org.junit.Assert.assertTrue(ui.onNodeWithTag("welcome-orange-panel").fetchSemanticsNode().boundsInRoot.top < collapsedTop)
-            val expanded = ui.onNodeWithTag("welcome-orange-panel").fetchSemanticsNode().boundsInRoot
-            org.junit.Assert.assertTrue("Expanded form still fills the content height", kotlin.math.abs(expanded.top - screen.top) <= 2f && kotlin.math.abs(expanded.bottom - screen.bottom) <= 2f)
-            ui.onNodeWithTag("fixture-$form").assertIsDisplayed()
-            listOf("person", "account", "doctor").filterNot { it == form }.forEach { ui.onNodeWithTag("fixture-$it").assertDoesNotExist() }
-            ui.onNodeWithTag("welcome-panel-back").performClick()
-            ui.onNodeWithTag("welcome-add-person").assertIsDisplayed()
-            ui.onNodeWithTag("welcome-panel-back").performClick()
-            ui.onNodeWithTag("welcome-patient-family").assertExists()
-        }
+        ui.onNodeWithTag("welcome-account").performScrollTo().performClick()
+        ui.onNodeWithTag("fixture-account").assertIsDisplayed()
+        ui.onNodeWithTag("fixture-doctor").assertDoesNotExist()
+        ui.onNodeWithTag("welcome-panel-back").performClick()
+        ui.onNodeWithTag("welcome-add-person").assertIsDisplayed()
+        ui.onNodeWithTag("welcome-panel-back").performClick()
         ui.onNodeWithTag("doctor-workspace-entry").performScrollTo().performClick()
         ui.onNodeWithTag("fixture-doctor").assertIsDisplayed()
         ui.onNodeWithTag("welcome-add-person").assertDoesNotExist()
         ui.onNodeWithTag("doctor-demo-entry").assertIsDisplayed().performClick()
         ui.onNodeWithTag("welcome-panel-back").performClick()
+        ui.onNodeWithTag("welcome-patient-family").assertExists()
         ui.runOnIdle {
-            assertEquals(listOf("family", "person", "family", "", "family", "account", "family", "", "doctor", ""), selections)
+            assertEquals(listOf("family", "account", "family", "", "doctor", ""), selections)
             assertEquals(0, legacyCallbacks)
             assertEquals(1, walkthroughs)
         }
     }
 
-    @Test fun familyTileOpensTheSamePanelAsPatientWithFamilyWording() {
-        val selections = mutableListOf<String>()
-        ui.setContent { CareTheme { Welcome({}, {}, addPersonContent = { _, _ -> Text("Synthetic person form") }, onPanelChanged = { selections += it }) } }
-        ui.onNodeWithTag("welcome-family").performScrollTo().performClick()
-        ui.onNodeWithTag("welcome-add-person").assertIsDisplayed()
-        ui.onNodeWithText("Add the person you care for").assertIsDisplayed()
-        ui.onNodeWithTag("patient-walkthrough-entry").assertIsDisplayed()
+    @Test fun introPagesLeadToTheRoleCardsAndCanBeSkipped() {
+        ui.setContent { CareTheme { Welcome({}, {}, showIntro = true) } }
+        ui.onNodeWithTag("welcome-hero-illustration").assertExists()
+        ui.onNodeWithText("Welcome to Sahara").assertIsDisplayed()
+        ui.onNodeWithTag("welcome-patient-family").assertDoesNotExist()
+        ui.onNodeWithTag("onboarding-next").assertHeightIsAtLeast(48.dp).performClick()
+        ui.onNodeWithTag("onboarding-next").performClick()
+        ui.onNodeWithText("Get started").assertIsDisplayed()
+        ui.onNodeWithTag("onboarding-next").performClick()
+        ui.onNodeWithTag("welcome-patient-family").assertIsDisplayed()
         ui.onNodeWithTag("welcome-panel-back").performClick()
+        ui.onNodeWithTag("onboarding-skip").assertHeightIsAtLeast(48.dp).performClick()
+        ui.onNodeWithTag("welcome-family").assertIsDisplayed()
+    }
+
+    @Test fun profileStepsTrimTheNameValidateAgeAndAllowSkipping() {
+        val saved = mutableListOf<Pair<String, CarePatientProfile?>>()
+        ui.setContent { CareTheme { Welcome({}, {}, onSaveProfile = { name, profile -> saved += name to profile }, showIntro = false) } }
+        ui.onNodeWithTag("welcome-family").performScrollTo().performClick()
+        ui.onNodeWithTag("welcome-add-person").performScrollTo().performClick()
+        ui.onNodeWithText("What is the name of the person you care for?").assertIsDisplayed()
+        ui.onNodeWithTag("onboarding-next").assertIsNotEnabled()
+        ui.onNodeWithTag("onboarding-name").performTextInput("   Synthetic patient   ")
+        ui.onNodeWithTag("onboarding-next").assertIsEnabled().performClick()
+        ui.onNodeWithTag("onboarding-age").performTextInput("200")
+        ui.onNodeWithTag("onboarding-next").assertIsNotEnabled()
+        ui.onNodeWithTag("onboarding-age").performTextReplacement("62")
+        ui.onNodeWithTag("onboarding-next").assertIsEnabled().performClick()
+        ui.onNodeWithTag("onboarding-skip-step").performClick()
+        ui.onNodeWithText("You're all set").assertIsDisplayed()
+        ui.onNodeWithTag("welcome-save-person").performClick()
+        ui.runOnIdle { assertEquals("Synthetic patient", saved.single().first); assertEquals(62, saved.single().second?.age); assertEquals("", saved.single().second?.illness) }
+    }
+
+    @Test fun skippingEveryOptionalStepSavesOnlyTheName() {
+        val saved = mutableListOf<Pair<String, CarePatientProfile?>>()
+        ui.setContent { CareTheme { Welcome({}, {}, onSaveProfile = { name, profile -> saved += name to profile }, showIntro = false) } }
         ui.onNodeWithTag("welcome-patient-family").performScrollTo().performClick()
-        ui.onNodeWithText("Start with your name").assertIsDisplayed()
-        ui.runOnIdle { assertEquals(listOf("family", "", "family"), selections) }
+        ui.onNodeWithTag("welcome-add-person").performScrollTo().performClick()
+        ui.onNodeWithText("What is your name?").assertIsDisplayed()
+        ui.onNodeWithTag("onboarding-name").performTextInput("x".repeat(150))
+        ui.onNodeWithTag("onboarding-next").performClick()
+        ui.onNodeWithTag("onboarding-skip-step").performClick()
+        ui.onNodeWithTag("onboarding-skip-step").performClick()
+        ui.onNodeWithTag("welcome-save-person").performClick()
+        ui.runOnIdle { assertEquals(100, saved.single().first.length); assertNull(saved.single().second) }
     }
 
     @Test fun doctorFormRemainsReadableAtLargeTextAndCannotCloseWhileBusy() {
@@ -111,7 +117,7 @@ class WelcomeInlinePanelTest {
                     Welcome({}, {}, doctorContent = { _, onBusy ->
                         androidx.compose.runtime.LaunchedEffect(busy.value) { onBusy(busy.value) }
                         Column { Text("Synthetic doctor sign-in", Modifier.testTag("fixture-real-sign-in")); Button(onClick = { busy.value = !busy.value }, modifier = Modifier.testTag("fixture-busy")) { Text("Toggle request") } }
-                    }, onPanelChanged = { selections += it })
+                    }, onPanelChanged = { selections += it }, showIntro = false)
                 } }
             }
         }
@@ -138,22 +144,19 @@ class WelcomeInlinePanelTest {
         ui.runOnIdle { assertEquals(100, saved.last().length) }
     }
 
-    @Test fun parentSavingStateLocksAddPersonPanelUntilCompletion() {
+    @Test fun parentSavingStateLocksTheFinalStepUntilCompletion() {
         val saving = mutableStateOf(false)
-        val selections = mutableListOf<String>()
-        ui.setContent { CareTheme {
-            Welcome({}, {}, addPersonContent = { _, _ ->
-                Button(onClick = { saving.value = true }, modifier = Modifier.testTag("fixture-save-person")) { Text("Save synthetic profile") }
-            }, onPanelChanged = { selections += it }, entryBusy = saving.value)
-        } }
+        ui.setContent { CareTheme { Welcome({}, {}, onSaveProfile = { _, _ -> saving.value = true }, entryBusy = saving.value, showIntro = false) } }
         ui.onNodeWithTag("welcome-patient-family").performScrollTo().performClick()
         ui.onNodeWithTag("welcome-add-person").performScrollTo().performClick()
-        ui.onNodeWithTag("fixture-save-person").performClick()
+        ui.onNodeWithTag("onboarding-name").performTextInput("Synthetic patient")
+        ui.onNodeWithTag("onboarding-next").performClick()
+        ui.onNodeWithTag("onboarding-skip-step").performClick()
+        ui.onNodeWithTag("onboarding-skip-step").performClick()
+        ui.onNodeWithTag("welcome-save-person").performClick()
         ui.onNodeWithTag("welcome-panel-back").assertIsNotEnabled()
+        ui.onNodeWithTag("welcome-save-person").assertIsNotEnabled()
         ui.runOnIdle { saving.value = false }
-        ui.onNodeWithTag("welcome-panel-back").assertIsEnabled().performClick()
-        ui.onNodeWithTag("welcome-add-person").assertIsDisplayed()
-        ui.onNodeWithTag("welcome-panel-back").performClick()
-        ui.runOnIdle { assertEquals(listOf("family", "person", "family", ""), selections) }
+        ui.onNodeWithTag("welcome-panel-back").assertIsEnabled()
     }
 }

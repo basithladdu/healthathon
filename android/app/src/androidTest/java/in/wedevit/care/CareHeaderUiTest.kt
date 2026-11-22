@@ -90,10 +90,10 @@ class CareHeaderUiTest {
         var accounts = 0
         var workspaces = 0
         var walkthroughs = 0
-        ui.setContent { CareTheme { Welcome({ accounts++ }, { started++ }, { workspaces++ }, { walkthroughs++ }) } }
+        ui.setContent { CareTheme { Welcome({ accounts++ }, { started++ }, { workspaces++ }, { walkthroughs++ }, showIntro = false) } }
         ui.onNodeWithText("Explore what Sahara can help with").assertDoesNotExist()
         ui.onNodeWithText("Care notes, medicines and visits.").assertDoesNotExist()
-        ui.onNodeWithText("Who is using Sahara?").assertIsDisplayed()
+        ui.onNodeWithText("Who are you?").assertIsDisplayed()
         ui.onNodeWithTag("doctor-demo-entry").assertDoesNotExist()
         ui.onNodeWithTag("welcome-patient-family").performScrollTo().performClick()
         ui.onNodeWithTag("welcome-add-person").performScrollTo().performClick()

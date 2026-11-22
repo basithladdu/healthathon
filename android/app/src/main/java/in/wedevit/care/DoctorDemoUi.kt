@@ -255,7 +255,7 @@ private val DoctorMist = Peach
             val icons = listOf(Icons.Default.Home, Icons.Default.PeopleOutline, Icons.Default.CalendarMonth, Icons.Default.PersonOutline)
             labels.forEachIndexed { i, label -> NavigationBarItem(selected = if (sampleCareOpen || patientId != null || carePersonId != null) i == 1 else tab == i, enabled = !careNavigationBlocked, onClick = { navigateCare { sampleCareOpen=false;tab = i; carePersonId = null; patientId = null; progressReportId=null;reportId=null;workflowRoute=null; notice = null } },
                 icon = { Icon(icons[i], null) }, label = { Text(when (label) { "Home" -> t("Home", "होम"); "Patients" -> t("Patients", "मरीज़"); "Schedule" -> t("Schedule", "समय-सूची"); else -> t("Account", "खाता") }) }, modifier = Modifier.testTag("demo-nav-$label"),
-                colors = NavigationBarItemDefaults.colors(indicatorColor = SaharaColors.Primary, selectedIconColor = SaharaColors.OnPrimary, selectedTextColor = RustText, unselectedIconColor = SaharaColors.InkSub, unselectedTextColor = SaharaColors.InkSub)) }
+                colors = NavigationBarItemDefaults.colors(indicatorColor = SaharaColors.NavPill, selectedIconColor = SaharaColors.NavOnPill, selectedTextColor = SaharaColors.NavOnPill, unselectedIconColor = SaharaColors.InkSub, unselectedTextColor = SaharaColors.InkSub)) }
         }
     }) { padding ->
         Column(Modifier.padding(padding).consumeWindowInsets(padding).fillMaxSize()) {
@@ -733,10 +733,11 @@ private suspend fun loadHomeVisits(context: android.content.Context): List<HomeV
             }
         }
     }
-    LazyColumn(Modifier.fillMaxSize().testTag("demo-home-list"), contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    // Premium pass (22 Nov): the same calm warm backdrop as the family Today screen, and a slightly larger date heading.
+    LazyColumn(Modifier.fillMaxSize().background(SaharaBackdrop).testTag("demo-home-list"), contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item {
             // The date is the heading; the doctor already knows who they are (no "Good evening, Dr …" line).
-            Text(java.time.LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, d MMMM", careLocale(careHindi()))), Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+            Text(java.time.LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, d MMMM", careLocale(careHindi()))), Modifier.a11yHeading().padding(bottom = 2.dp), fontFamily = SaharaTitleFont, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.SemiBold, letterSpacing = (-0.2).sp, color = DoctorCardInk)
         }
         item {
             // "Unsigned notes" (Dr Sujay, 22 Nov: "Drafts" was unclear): conversation notes started but not yet signed. The tile opens a short list that says so.
@@ -771,7 +772,7 @@ private suspend fun loadHomeVisits(context: android.content.Context): List<HomeV
             }
         }
         if (pending.isNotEmpty()) {
-            item(key = "home-pick-up") { Box(Modifier.animateItem()) { DoctorSection(t("Continue", "जारी रखें"), Modifier.padding(top = 12.dp)) } }
+            item(key = "home-pick-up") { Box(Modifier.animateItem()) { DoctorSection(t("Pick up where you left off", "जहाँ छोड़ा था, वहीं से जारी रखें"), Modifier.padding(top = 12.dp)) } }
             items(pending, key = { it.key }) { c ->
                 Surface(onClick = { onPending(c) }, color = if (c.section == "Visits") DoctorCardVisit else DoctorCardConversation, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.animateItem().fillMaxWidth().heightIn(min = 72.dp).testTag("home-conversation-${c.key}").semantics(mergeDescendants = true) { contentDescription = "${c.profile.name}: ${c.title}. ${c.detail}. Opens ${c.section.lowercase()}." }) {
                     Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {

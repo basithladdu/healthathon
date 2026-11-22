@@ -50,6 +50,15 @@ class SaharaPaletteTest {
         aa("ink on warm ground", SaharaColors.Ink, SaharaColors.GroundWarm, 7f); aa("sub on warm ground", SaharaColors.InkSub, SaharaColors.GroundWarm, 7f)
     }
 
+    /** Premium pass (22 Nov): the selected bottom-tab label sits on the light sage pill; unselected labels on paper; the backdrop's foot keeps faint text AA. */
+    @Test fun navigationPillAndBackdropStayReadable() {
+        aa("selected tab label on pill", SaharaColors.NavOnPill, SaharaColors.NavPill)
+        aa("selected tab icon vs paper", SaharaColors.NavOnPill, SaharaColors.Surface, 3f)
+        aa("unselected tab label on paper", SaharaColors.InkSub, SaharaColors.Surface, 7f)
+        aa("faint on warm ground", SaharaColors.InkFaint, SaharaColors.GroundWarm)
+        aa("SOS stays strong on paper", SaharaColors.Error, SaharaColors.Surface, 3f)
+    }
+
     @Test fun readableOnPicksTheBetterInk() {
         assertEquals(Color.White, readableOn(SaharaColors.Primary))
         assertEquals(SaharaColors.Ink, readableOn(SaharaTone.Gold.wash))

@@ -70,7 +70,7 @@ abstract class SaharaScrollCrashTest(private val user: String, private val tab: 
         }
     }
 
-    private fun click(tag: String) { runCatching { compose.onNodeWithTag(tag).performScrollTo() }; compose.onNodeWithTag(tag).performClick(); settle() }
+    private fun click(tag: String) { compose.skipSaharaIntroFor(tag); runCatching { compose.onNodeWithTag(tag).performScrollTo() }; compose.onNodeWithTag(tag).performClick(); settle() }
     private fun settle() { compose.mainClock.advanceTimeBy(1500); compose.waitForIdle() }
     private fun outDir() = File(System.getProperty("sahara.render.dir") ?: "build/outputs/sahara-scroll-crash").apply { mkdirs() }
 }

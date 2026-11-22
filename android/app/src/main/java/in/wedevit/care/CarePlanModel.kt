@@ -178,7 +178,7 @@ object PlanIds {
 /** Rules V1–V9 (tech spec §5) and C1–C8 (clinical spec §4), plus L1 and the trial and capacity completeness checks. */
 object EctprRules {
     /** Checks that only stop a plan becoming Active; a draft may be saved without them. */
-    val ACTIVATION_ONLY = setOf("V6", "V7", "V8", "REVIEW_DUE")
+    val ACTIVATION_ONLY = setOf("V6", "V7", "V8", "REVIEW_DUE", "MINOR_GUARDIAN")
 
     private fun issue(id: String, severity: IssueSeverity, field: String, en: String, hi: String) = RuleIssue(id, severity, field, en, hi)
 
@@ -186,7 +186,12 @@ object EctprRules {
         val c = r.choices
         val ceiling = c.respCeiling
         // L1 / scope: adults only.
-        PlanDates.age(r.patient.dob, today)?.let { if (it < 18) add(issue("L1", IssueSeverity.BLOCK, "patient.dob", "Sahara plans are for adults. This date of birth is under 18.", "सहारा की योजना वयस्कों के लिए है। यह जन्मतिथि 18 साल से कम की है।")) }
+        // Children (Dr Shirin, 22 Nov): a plan is allowed under 18. A parent or legal guardian decides with the doctor; the child's own wishes are recorded too.
+        PlanDates.age(r.patient.dob, today)?.let { if (it < 18) {
+            add(issue("MINOR", IssueSeverity.WARN, "patient.dob", "The patient is under 18. A parent or legal guardian makes these decisions with the doctor. Ask the child what matters to them too, in words they understand, and write it in their own words.",
+                "मरीज़ 18 साल से कम के हैं। ये फ़ैसले माता-पिता या कानूनी अभिभावक डॉक्टर के साथ लेते हैं। बच्चे से भी, उनकी समझ के शब्दों में, पूछें कि उनके लिए क्या ज़रूरी है, और उन्हीं के शब्दों में लिखें।"))
+            if (r.decisionMakers.primary?.name.isNullOrBlank()) add(issue("MINOR_GUARDIAN", IssueSeverity.BLOCK, "decisionMakers", "Add the parent or legal guardian as the main decision-maker.", "माता-पिता या कानूनी अभिभावक को मुख्य फ़ैसला लेने वाले के रूप में जोड़ें।"))
+        } }
         if (r.createdInEd) add(issue("ED_START", IssueSeverity.WARN, "createdInEd", "Started in the emergency department. A plan made for the first time in the resuscitation bay records panic, not preference; review it when the patient is stable.", "यह आपातकालीन विभाग में शुरू हुई। पहली बार इमरजेंसी में बनी योजना घबराहट दर्ज करती है, पसंद नहीं; हालत स्थिर होने पर इसे दोबारा देखें।"))
         // Decision-makers: last 4 of an ID only.
         listOfNotNull(r.decisionMakers.primary, r.decisionMakers.alternate).forEach { if (!PlanIds.valid(it.idLast4)) add(issue("ID_LAST4", IssueSeverity.BLOCK, "decisionMakers", "Keep only the last 4 characters of an ID, never the full number.", "पहचान-पत्र के सिर्फ़ आख़िरी 4 अंक रखें, पूरा नंबर कभी नहीं।")) }

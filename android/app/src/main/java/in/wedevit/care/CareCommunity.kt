@@ -490,15 +490,16 @@ private fun LazyListScope.communityTiles(groups: List<CommunityGroup>, onOpen: (
         .clickable(interactionSource = interaction, indication = ripple(), role = Role.Button, onClick = onClick).a11yCard().padding(16.dp).testTag("community-group-${group.id}"),
         verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(44.dp).clip(RoundedCornerShape(12.dp)).background(tone.solid), contentAlignment = Alignment.Center) { Icon(communityIcon(group.id), null, Modifier.size(26.dp), tint = tone.onSolid) }
+            // Premium pass (22 Nov): a paper icon chip with the group's ink and edge instead of a solid block.
+            Box(Modifier.size(44.dp).clip(RoundedCornerShape(12.dp)).background(SaharaColors.Surface).border(1.dp, tone.solid, RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) { Icon(communityIcon(group.id), null, Modifier.size(26.dp), tint = tone.ink) }
             Spacer(Modifier.weight(1f))
             if (group.joined) Icon(Icons.Default.CheckCircle, t("Joined", "जुड़े हुए"), Modifier.size(24.dp), tint = tone.solid)
         }
         Text(t(group.nameEn, group.nameHi), style = MaterialTheme.typography.titleMedium.copy(fontSize = 17.sp, lineHeight = 22.sp, lineBreak = LineBreak.Heading, hyphens = Hyphens.None), fontWeight = FontWeight.Bold, color = tone.ink)
         Spacer(Modifier.weight(1f))
-        // The count as a solid pill in the group's colour.
-        Text(if (group.posts == 1) t("1 post", "1 पोस्ट") else t("${group.posts} posts", "${group.posts} पोस्ट"), Modifier.clip(RoundedCornerShape(SaharaRadius.Pill)).background(tone.solid).padding(horizontal = 10.dp, vertical = 4.dp),
-            style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold, color = tone.onSolid, maxLines = 1, softWrap = false)
+        // The count as a light paper pill with the group's ink and edge.
+        Text(if (group.posts == 1) t("1 post", "1 पोस्ट") else t("${group.posts} posts", "${group.posts} पोस्ट"), Modifier.clip(RoundedCornerShape(SaharaRadius.Pill)).background(SaharaColors.Surface).border(1.dp, tone.solid, RoundedCornerShape(SaharaRadius.Pill)).padding(horizontal = 10.dp, vertical = 4.dp),
+            style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold, color = tone.ink, maxLines = 1, softWrap = false)
     }
 }
 
@@ -601,8 +602,8 @@ private val authorTones = listOf(SaharaTone.Teal, SaharaTone.Plum, SaharaTone.Le
 private fun authorTone(name: String, byTeam: Boolean): SaharaTone = if (byTeam) SaharaTone.Indigo else authorTones[Math.floorMod(name.trim().hashCode(), authorTones.size)]
 
 @Composable private fun CommunityAvatar(name: String, tone: SaharaTone, size: Int = 40) {
-    Box(Modifier.size(size.dp).clip(CircleShape).background(tone.solid), contentAlignment = Alignment.Center) {
-        Text(name.trim().take(1).uppercase(), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = tone.onSolid)
+    Box(Modifier.size(size.dp).clip(CircleShape).background(tone.wash).border(1.dp, tone.solid, CircleShape), contentAlignment = Alignment.Center) {
+        Text(name.trim().take(1).uppercase(), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = tone.ink)
     }
 }
 

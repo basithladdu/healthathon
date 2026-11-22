@@ -188,8 +188,10 @@ private fun clipboardText(context: android.content.Context): String? = (context.
     var email by rememberSaveable { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordShown by remember { mutableStateOf(false) }
-    var create by rememberSaveable { mutableStateOf(false) }
-    var signupRole by rememberSaveable { mutableStateOf("") }
+    // The first-run flow already asked "Who are you?" and whether to create or sign in; it passes both here (see SignupIntent).
+    val signupIntent = LocalSignupIntent.current
+    var create by rememberSaveable { mutableStateOf(signupIntent?.create == true) }
+    var signupRole by rememberSaveable { mutableStateOf(signupIntent?.role.orEmpty()) }
     var signupAgreed by rememberSaveable { mutableStateOf(false) }
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -257,7 +259,7 @@ private fun clipboardText(context: android.content.Context): String? = (context.
             if (heading != "") Heading(heading ?: if (session == null) if (create) t("Create an account", "खाता बनाएँ") else t("Sign in", "साइन इन करें") else t("Your account", "आपका खाता"), if (session == null) 24 else 28)
             banner?.let { Surface(color = Mint, shape = RoundedCornerShape(14.dp)) { Text(it, Modifier.fillMaxWidth().padding(16.dp), fontWeight = FontWeight.Medium) } }
             if (session == null) {
-                if (create) SignupRolePicker(signupRole) { signupRole = it }
+                if (create && signupIntent?.role.isNullOrBlank()) SignupRolePicker(signupRole) { signupRole = it }
                 if (create) Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable { signupAgreed = !signupAgreed }.testTag("signup-agree"), verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(checked = signupAgreed, onCheckedChange = { signupAgreed = it })
                     Text(t("I am 18 or over and agree to the privacy policy. If the patient is a child, I am their parent or guardian.",
@@ -439,6 +441,13 @@ internal object SignupRole {
         context.getSharedPreferences(PREFS, 0).edit().putString("agreement", AGREEMENT_VERSION).putLong("agreedAt", now).apply()
     }
 }
+
+/**
+ * What the first-run flow (CareOnboarding.kt) already knows when it shows the account form: whether the person chose to create an
+ * account or sign in, and the role they picked. With a role the form skips its own role picker and saves that role on sign-up.
+ */
+internal data class SignupIntent(val create: Boolean, val role: String)
+internal val LocalSignupIntent = staticCompositionLocalOf<SignupIntent?> { null }
 
 @Composable private fun SignupRolePicker(role: String, onRole: (String) -> Unit) { val t = careText()
     Text(t("Who are you?", "आप कौन हैं?"), fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = DoctorCardInk)

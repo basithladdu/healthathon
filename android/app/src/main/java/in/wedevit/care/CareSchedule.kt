@@ -55,14 +55,37 @@ fun calendarShows(item: CareItem, showMedicines: Boolean = false): Boolean = sho
     }
 }
 
+/**
+ * Date field. Material date picker (Shirin, 22 Nov: the year of a date of birth could only be reached by swiping month by month):
+ * tap the month and year at the top to jump straight to a year, or the pencil to type the date.
+ * Past-only fields (date of birth) open in typing mode, since a birth date is easier typed than scrolled to.
+ */
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable fun CareDateButton(value: Long, label: String, onChange: (Long) -> Unit, allowClear: Boolean = false, latest: LocalDate? = null) {
-    val context = LocalContext.current; val t = careText()
+    val t = careText()
+    var picking by remember { mutableStateOf(false) }
+    if (picking) {
+        val zoneUtc = java.time.ZoneOffset.UTC
+        val start = (if (value > 0) careDay(value) else latest ?: LocalDate.now())
+        val maxUtc = latest?.atStartOfDay(zoneUtc)?.toInstant()?.toEpochMilli()
+        val state = androidx.compose.material3.rememberDatePickerState(
+            initialSelectedDateMillis = if (value > 0) start.atStartOfDay(zoneUtc).toInstant().toEpochMilli() else null,
+            initialDisplayedMonthMillis = start.atStartOfDay(zoneUtc).toInstant().toEpochMilli(),
+            yearRange = 1900..(LocalDate.now().year + 30),
+            initialDisplayMode = if (latest != null && value <= 0) androidx.compose.material3.DisplayMode.Input else androidx.compose.material3.DisplayMode.Picker,
+            selectableDates = object : androidx.compose.material3.SelectableDates {
+                override fun isSelectableDate(utcTimeMillis: Long) = maxUtc == null || utcTimeMillis <= maxUtc
+                override fun isSelectableYear(year: Int) = latest == null || year <= latest.year
+            })
+        androidx.compose.material3.DatePickerDialog(onDismissRequest = { picking = false },
+            confirmButton = { TextButton(onClick = { state.selectedDateMillis?.let { onChange(careEpoch(java.time.Instant.ofEpochMilli(it).atZone(zoneUtc).toLocalDate())) }; picking = false },
+                enabled = state.selectedDateMillis != null, modifier = Modifier.testTag("care-date-ok")) { Text(t("OK", "ठीक है")) } },
+            dismissButton = { TextButton(onClick = { picking = false }) { Text(t("Cancel", "रद्द करें")) } }) {
+            androidx.compose.material3.DatePicker(state, title = { Text(label, Modifier.padding(start = 24.dp, end = 12.dp, top = 16.dp)) }, showModeToggle = true)
+        }
+    }
     Row(verticalAlignment = Alignment.CenterVertically) {
-        OutlinedButton(onClick = {
-            val day = if (value > 0) careDay(value) else LocalDate.now()
-            DatePickerDialog(context, { _, year, month, date -> onChange(careEpoch(LocalDate.of(year, month + 1, date))) }, day.year, day.monthValue - 1, day.dayOfMonth)
-                .apply { latest?.let { datePicker.maxDate = careEpoch(it.plusDays(1)) - 1 } }.show()
-        }, modifier = Modifier.weight(1f).heightIn(min = 48.dp), shape = RoundedCornerShape(14.dp)) { Icon(Icons.Default.CalendarMonth, null, Modifier.size(19.dp)); Spacer(Modifier.width(8.dp)); Text(if (value > 0) listOf(label, date(value)).filter(String::isNotBlank).joinToString(" · ") else label) }
+        OutlinedButton(onClick = { picking = true }, modifier = Modifier.weight(1f).heightIn(min = 48.dp), shape = RoundedCornerShape(14.dp)) { Icon(Icons.Default.CalendarMonth, null, Modifier.size(19.dp)); Spacer(Modifier.width(8.dp)); Text(if (value > 0) listOf(label, date(value)).filter(String::isNotBlank).joinToString(" · ") else label) }
         if (allowClear && value > 0) IconButton(onClick = { onChange(0) }, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Close, t("Remove $label", "$label हटाएँ")) }
     }
 }

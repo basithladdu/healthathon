@@ -13,7 +13,8 @@ import java.time.LocalDate
  */
 class CareHindiCoverageTest {
     private val screens = mapOf(
-        "CareUi.kt" to listOf("CareApp", "Today", "CareList", "CareRow", "More", "AddPerson", "AddPersonContent", "AddCareItem", "Welcome", "Talk", "NoteReader", "AudioPlayback", "InfoDisclosure", "RawTranscriptPanel"),
+        "CareOnboarding.kt" to listOf("Welcome", "IntroPage", "OnboardingFinish", "BrandOverlay"),
+        "CareUi.kt" to listOf("CareApp", "Today", "CareList", "CareRow", "More", "AddPerson", "AddPersonContent", "AddCareItem", "Talk", "NoteReader", "AudioPlayback", "InfoDisclosure", "RawTranscriptPanel"),
         "CentreMap.kt" to listOf("CentreMap"),
         "NearbyScreen.kt" to listOf("NearbyScreen", "NearbyFilterSheet", "NearbyCallBar", "NearbyInfoButton", "NearbyPicker", "NearbyCentreCard"),
         "CentreSuggestion.kt" to listOf("CentreSuggestionSheet", "CentreSuggestionList"),

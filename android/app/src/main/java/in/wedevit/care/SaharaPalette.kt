@@ -54,7 +54,22 @@ object SaharaColors {
 
     /** Round 3: the soft warm wash behind Today, so white and tinted cards stand off it (ink keeps >= 7:1). */
     val GroundWarm = Color(0xFFFBF1E3)
+
+    // Premium pass (22 Nov): a barely-there warm gradient on the main screens (cream under the header to a warmer foot), a soft warm
+    // shadow for floating surfaces instead of Material's grey, and the selected nav pill as a light sage wash with dark sage icon and label.
+    /** Shadow tint for cards and the floating bar: warm brown, not grey, so elevation reads soft on cream. */
+    val Shadow = Color(0xFF5A3E2B)
+    /** Selected bottom-tab pill: light sage wash; the icon and label on it use [NavOnPill] (about 6:1). */
+    val NavPill = PrimaryWash
+    val NavOnPill = PrimaryPressed
 }
+
+/**
+ * The calm warm backdrop for the main family and doctor screens: [SaharaColors.Ground] under the header (so the two meet without a
+ * seam) easing to [SaharaColors.GroundWarm] at the foot. Ink stays >= 7:1 on every stop.
+ */
+val SaharaBackdrop: androidx.compose.ui.graphics.Brush =
+    androidx.compose.ui.graphics.Brush.verticalGradient(0f to SaharaColors.Ground, .35f to SaharaColors.Ground, 1f to SaharaColors.GroundWarm)
 
 /**
  * One section colour: [solid] is the bright fill for tiles, chips, headers and big buttons, [onSolid] the bold text and

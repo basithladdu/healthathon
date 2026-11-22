@@ -34,18 +34,22 @@ enum class SaharaLottieKind(@param:RawRes val res: Int, val loops: Boolean, val 
     Hug(R.raw.lottie_hug, false, 1f, 96.dp),
     Calendar(R.raw.lottie_calendar, false, 1f, 96.dp),
     Offline(R.raw.lottie_offline, true, 1f, 96.dp),
+    /** Original, hand-authored for Sahara (22 Nov 2026, licenses/lottie/generate_sahara_lottie_extra.py); no outside licence. Petals open and fade: a saved mood check-in. Ends empty, so it is an overlay. */
+    Bloom(R.raw.lottie_bloom, false, 0f, 72.dp),
+    /** Original, hand-authored for Sahara (same source). A sprout that sways once and returns to rest: calm empty states. */
+    Sprout(R.raw.lottie_sprout, false, 0f, 72.dp),
 }
 
 /**
  * One decorative Lottie (hidden from TalkBack: the text beside it says what it means). Plays once, or loops calmly when
- * [loop]; [play] false holds it. With "Remove animations" or Battery Saver on it shows the still frame instead.
- * The default size is small; a size in [modifier] wins.
+ * [loop]; [play] false holds it. [iterations] plays it that many times and rests (an idle that never runs forever).
+ * With "Remove animations" or Battery Saver on it shows the still frame instead. The default size is small; a size in [modifier] wins.
  */
-@Composable fun SaharaLottie(kind: SaharaLottieKind, modifier: Modifier = Modifier, loop: Boolean = kind.loops, play: Boolean = true) {
+@Composable fun SaharaLottie(kind: SaharaLottieKind, modifier: Modifier = Modifier, loop: Boolean = kind.loops, play: Boolean = true, iterations: Int = 1) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(kind.res))
     val motion = remember { SaharaMotion.enabled }
     val progress by animateLottieCompositionAsState(composition, isPlaying = play && motion, restartOnPlay = false,
-        iterations = if (loop) LottieConstants.IterateForever else 1)
+        iterations = if (loop) LottieConstants.IterateForever else iterations.coerceAtLeast(1))
     LottieAnimation(composition, progress = { if (motion) progress else kind.still },
         modifier = modifier.size(kind.size).testTag("sahara-lottie-${kind.name}").clearAndSetSemantics { })
 }

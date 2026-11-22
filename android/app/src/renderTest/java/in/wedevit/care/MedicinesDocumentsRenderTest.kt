@@ -29,7 +29,7 @@ class MedicinesDocumentsRenderTest {
         runCatching { compose.onNode(tagged(tag)).performScrollTo() }
         settle()
     }
-    private fun click(tag: String) { bring(tag); compose.onNode(tagged(tag)).performSemanticsAction(SemanticsActions.OnClick); settle() }
+    private fun click(tag: String) { compose.skipSaharaIntroFor(tag); bring(tag); compose.onNode(tagged(tag)).performSemanticsAction(SemanticsActions.OnClick); settle() }
     private fun tryClick(tag: String) = runCatching { click(tag) }.isSuccess
     private fun shot(name: String) = runCatching { compose.onRoot().captureRoboImage(File(System.getProperty("sahara.render.dir") ?: "build/outputs/meds", "$name.png").path) }
 

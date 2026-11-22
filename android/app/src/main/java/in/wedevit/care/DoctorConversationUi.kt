@@ -143,8 +143,8 @@ private fun conversationDate(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy
         if (own.isEmpty()) item { DoctorEmptyState(Icons.Default.Forum, t("Nothing saved yet", "अभी कुछ सहेजा नहीं")) }
         items(filtered, key = { it.id }) { DoctorConversationCard(it, onRead) }
         val ownArchives=archives.filter {it.personId==person}
-        if(ownArchives.isNotEmpty()) item { Spacer(Modifier.height(12.dp)); SectionTitle(t("Drafts", "ड्राफ़्ट")) }
-        items(ownArchives,key={"archive:${it.id}"}) { saved -> DoctorListRow(Icons.Default.Inventory2, t("Draft", "ड्राफ़्ट"), conversationDate(saved.archivedAt), onClick = { archiveDetail = saved }) }
+        if(ownArchives.isNotEmpty()) item { Spacer(Modifier.height(12.dp)); SectionTitle(t("Unsigned notes", "बिना हस्ताक्षर वाले नोट")) }
+        items(ownArchives,key={"archive:${it.id}"}) { saved -> DoctorListRow(Icons.Default.Inventory2, t("Unsigned note", "बिना हस्ताक्षर वाला नोट"), conversationDate(saved.archivedAt), onClick = { archiveDetail = saved }) }
         }
     }
 }
@@ -324,7 +324,7 @@ private val doctorSectionOrder = listOf("patient_priorities", "participants", "u
 @Composable fun DoctorConversationLanding(canRecord: Boolean, onRecent: () -> Unit, onRecord: () -> Unit, onHistory: () -> Unit, recentPreview: String? = null, archivedCount: Int = 0, discussions: androidx.compose.foundation.lazy.LazyListScope.() -> Unit = {}) { val t = careText();
     LazyColumn(Modifier.fillMaxSize().testTag("doctor-conversations"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Heading(t("Conversations", "बातचीत"), 30) }
-        val titles = listOf(t("Recent conversation", "हाल की बातचीत"), t("Record conversation", "बातचीत रिकॉर्ड करें"), t("Conversation history", "बातचीत का इतिहास"))
+        val titles = listOf(t("Recent conversation", "हाल की बातचीत"), t("Record another conversation (not goals of care)", "कोई और बातचीत रिकॉर्ड करें (देखभाल के लक्ष्य नहीं)"), t("Conversation history", "बातचीत का इतिहास"))
         val arts = listOf(R.drawable.conversation_recent_art, R.drawable.conversation_record_art, R.drawable.conversation_history_art)
         val previews = listOf(recentPreview ?: t("Nothing saved yet", "अभी कुछ सहेजा नहीं"), "", if (archivedCount == 0) "" else if (archivedCount == 1) t("1 saved conversation", "1 सहेजी बातचीत") else t("$archivedCount saved conversations", "$archivedCount सहेजी बातचीत"))
         // Record conversation is the primary action (filled accent, listed first); the other two are lighter.

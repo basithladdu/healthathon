@@ -238,7 +238,7 @@ abstract class TextFitRenderTest(private val flow: String, private val hindi: Bo
         settle()
     }
 
-    private fun click(tag: String) { bring(tag); compose.onAllNodes(tagged(tag)).onFirst().performSemanticsAction(SemanticsActions.OnClick); settle() }
+    private fun click(tag: String) { compose.skipSaharaIntroFor(tag); bring(tag); compose.onAllNodes(tagged(tag)).onFirst().performSemanticsAction(SemanticsActions.OnClick); settle() }
     private fun back() { runCatching { compose.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() } }; settle() }
     private fun settle() { compose.mainClock.advanceTimeBy(1500); compose.waitForIdle() }
     private fun outDir() = File(System.getProperty("sahara.render.dir") ?: "build/outputs/textfit").apply { mkdirs() }

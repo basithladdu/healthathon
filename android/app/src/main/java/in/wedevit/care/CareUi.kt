@@ -34,6 +34,9 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.graphics.Color
@@ -232,9 +235,19 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
     else -> {
     BackHandler(careTabBackEnabled(person != null, medicineScanner, tab, activeRecording)) { if (activeRecording) vm.stopRecording() else back() }
     BackHandler(walkthrough != null && !medicineScanner && tab == 0 && !activeRecording) { onLeaveWalkthrough() }
-    Scaffold(containerColor = Cream, snackbarHost = { CareToastHost(snackbar) }, topBar = {
+    // Calm header (22 Nov premium pass): flat on the cream with a hairline at rest; once the page scrolls under it, it lifts to
+    // paper with a soft warm shadow and the hairline fades. Tracks how far the current page has scrolled from its top.
+    var headerScroll by remember { mutableFloatStateOf(0f) }
+    LaunchedEffect(tab, selected) { headerScroll = 0f }
+    val headerScrollWatch = remember { object : androidx.compose.ui.input.nestedscroll.NestedScrollConnection {
+        override fun onPostScroll(consumed: androidx.compose.ui.geometry.Offset, available: androidx.compose.ui.geometry.Offset, source: androidx.compose.ui.input.nestedscroll.NestedScrollSource): androidx.compose.ui.geometry.Offset {
+            headerScroll = (headerScroll + consumed.y).coerceIn(-100_000f, 0f); return androidx.compose.ui.geometry.Offset.Zero }
+    } }
+    val headerLift by animateFloatAsState(if (person != null && headerScroll < -8f) 1f else 0f, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "header-lift")
+    Scaffold(Modifier.nestedScroll(headerScrollWatch), containerColor = Cream, snackbarHost = { CareToastHost(snackbar) }, topBar = {
         // Inside a person's care the top bar is the calm cream header (ink text, hairline below); the welcome screen keeps its own ground.
-        if (!medicineScanner) Surface(color = if (person != null) SaharaColors.Header else Color.Transparent, contentColor = if (person != null) SaharaColors.OnHeader else Ink) { Column {
+        if (!medicineScanner) Surface(Modifier.then(if (person != null) Modifier.shadow(SaharaElevation.Raised * headerLift, RectangleShape, clip = false, ambientColor = SaharaColors.Shadow, spotColor = SaharaColors.Shadow) else Modifier),
+            color = if (person != null) androidx.compose.ui.graphics.lerp(SaharaColors.Header, SaharaColors.Surface, headerLift) else Color.Transparent, contentColor = if (person != null) SaharaColors.OnHeader else Ink) { Column {
         if (person != null) SaharaStatusBarIcons(lightIcons = false)
         Row(Modifier.statusBarsPadding().fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             Image(saharaImage(R.drawable.sahara_professional_logo, 44.dp), null, Modifier.size(44.dp).then(if (person != null) Modifier.clip(CircleShape).background(SaharaColors.Surface).padding(3.dp) else Modifier), contentScale = ContentScale.Fit)
@@ -254,7 +267,7 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
                 onInvite = { inviteFamilyOpen = true }, canInvite = !clinician && isOwnerTop,
                 inviteLabel = if (vm.cloud == null) t("Add family", "परिवार जोड़ें") else t("Invite family", "परिवार को बुलाएँ"))
         }
-        if (person != null) HorizontalDivider(color = SaharaColors.HeaderLine, thickness = 1.dp)
+        if (person != null) HorizontalDivider(color = SaharaColors.HeaderLine.copy(alpha = 1f - headerLift), thickness = 1.dp)
         }
         }
     }, bottomBar = {
@@ -268,7 +281,8 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
             if (medicineScanner && person != null) MedicineScanner(vm, onClose = { medicineScanner = false }, onAccount = onAccount)
             else if (person == null) Welcome(onAccount = onAccount, onStart = { dialog = "person" }, onSharedWorkspace = onDoctorWorkspace ?: { sharedWorkspaceOpen = true }, onDoctorDemo = onDoctorDemo, onPatientWalkthrough = onPatientWalkthrough,
                 accountContent = welcomeAccountContent, doctorContent = welcomeDoctorContent, onPanelChanged = onWelcomePanelChanged,
-                entryBusy = busy || refreshing, addPersonContent = { close, patient -> AddPersonContent(busy = busy || refreshing, error = actionError, onDismiss = close, onSave = { vm.addPerson(it) { close() } }, patient = patient) })
+                // First run (CareOnboarding.kt): one question per screen; the last one adds the person with any optional profile details.
+                entryBusy = busy || refreshing, signedIn = vm.cloud != null, profileError = actionError, onSaveProfile = { name, profile -> vm.addPersonWithProfile(name, profile) })
             else SaharaScreenHost(person.id to tab, Modifier.fillMaxSize(), label = "Care tab", direction = { from, _ -> if (from.first == person.id) tabDirection else SaharaMotion.Direction.Switch }) { (shownId, shownTab) -> screens.SaveableStateProvider("$shownId:$shownTab") {
                 Box(Modifier.fillMaxSize()) { when (shownTab) {
                     0 -> Today(vm, clinician, onTalk = { go(1) }, onCare = { careFilter = it; go(2) }, onNearby = { go(3) }, onAdd = { if (canEdit) dialog = it else vm.message.value = askOwner }, onRead = { reading = it }, onCalendar = { openCalendar() }, onWorkflow = { go(7) }, onLabs = { go(8) }, onSharedWorkspace = { go(7) }, onSymptoms = { go(9) }, onInviteFamily = { inviteFamilyOpen = true }, onCalendarAt = ::openCalendar,
@@ -321,131 +335,7 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
 /** System back walks the care tabs only while a person's tabs are on screen; on the welcome screen (for example after removing the last person from More) back leaves the app as expected. */
 internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, tab: Int, activeRecording: Boolean): Boolean = personShown && !medicineScanner && (tab != 0 || activeRecording)
 
-@Composable fun Welcome(onAccount: () -> Unit, onStart: () -> Unit, onSharedWorkspace: () -> Unit = {}, onDoctorDemo: () -> Unit = {}, onPatientWalkthrough: (String) -> Unit = {},
-    /** The person form; the Boolean is true when the Patient tile opened it, so the form asks for the patient's own name. */
-    addPersonContent: (@Composable (() -> Unit, Boolean) -> Unit)? = null,
-    accountContent: (@Composable (() -> Unit, (Boolean) -> Unit) -> Unit)? = null,
-    doctorContent: (@Composable (() -> Unit, (Boolean) -> Unit) -> Unit)? = null,
-    onPanelChanged: (String) -> Unit = {}, entryBusy: Boolean = false) {
-    var panel by rememberSaveable { mutableStateOf("") }
-    // Which role tile opened the shared patient/family panel. It changes only the wording there; both open the same panel.
-    var role by rememberSaveable { mutableStateOf("patient") }
-    var formBusy by remember { mutableStateOf(false) }
-    var walkthroughChooser by rememberSaveable { mutableStateOf(false) }
-    val focus = LocalFocusManager.current; val t = careText()
-    val panelGap = welcomePanelGapDp(LocalConfiguration.current.screenHeightDp, LocalDensity.current.fontScale)
-    val heroTopPadding = welcomeHeroTopPaddingDp(LocalConfiguration.current.screenHeightDp, LocalDensity.current.fontScale)
-    // Three tiles side by side on a normal phone; stacked rows on a narrow screen or at large text, so no label is ever split.
-    val stackRoles = welcomeRolesStacked(LocalConfiguration.current.screenWidthDp, LocalDensity.current.fontScale)
-    fun select(value: String) { if (!formBusy && !entryBusy) { focus.clearFocus(); panel = value; onPanelChanged(value) } }
-    val close = { if (!formBusy && !entryBusy) select(if (panel == "person" || panel == "account") "family" else "") }
-    BackHandler(panel.isNotEmpty()) { close() }
-    if (walkthroughChooser) PatientWalkthroughChooser(onPick = { walkthroughChooser = false; onPatientWalkthrough(it) }, onDismiss = { walkthroughChooser = false })
-    // One value drives the whole change: the band panel rises over the picture while the picture fades and drifts up.
-    // Nothing is re-measured per frame, so it stays smooth; the panel's own contents cross-fade.
-    val open = panel.isNotEmpty()
-    val progress by animateFloatAsState(if (open) 1f else 0f, SaharaMotion.tween(SaharaMotion.PANEL_MS, easing = SaharaMotion.Emphasized))
-    var closedPanelPx by remember { mutableIntStateOf(0) }
-    val density = LocalDensity.current
-    val roles = listOf(
-        WelcomeRole("patient", t("Patient", "मरीज़"), Icons.Default.Person, SaharaTone.Teal, "welcome-patient-family"),
-        WelcomeRole("family", t("Family", "परिवार"), Icons.Default.People, SaharaTone.Leaf, "welcome-family"),
-        WelcomeRole("doctor", t("Doctor", "डॉक्टर"), Icons.Default.MedicalServices, SaharaTone.Indigo, "doctor-workspace-entry"))
-    fun pick(key: String) { if (key == "doctor") select("doctor") else if (!formBusy && !entryBusy) { role = key; select("family") } }
-    BoxWithConstraints(Modifier.fillMaxSize().imePadding().testTag("welcome-panel-screen")) {
-        val fullPx = constraints.maxHeight
-        val closedPx = closedPanelPx.coerceIn(0, fullPx)
-        val gapPx = with(density) { panelGap.dp.roundToPx() }
-        if (!(open && progress >= 1f)) Box(Modifier.align(Alignment.TopCenter).fillMaxWidth().height(with(density) { (fullPx - closedPx - gapPx).coerceAtLeast(0).toDp() })
-            .graphicsLayer { alpha = 1f - progress; translationY = -progress * 48.dp.toPx() }) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 24.dp, end = 24.dp, top = heroTopPadding.dp, bottom = 24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    WelcomeHero()
-                    Text(t("Palliative care,\ntogether.", "पैलिएटिव देखभाल,\nसाथ मिलकर।"), Modifier.fillMaxWidth(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 30.sp, lineHeight = 36.sp, textAlign = TextAlign.Center)
-                }
-                }
-        }
-        if (!open) Spacer(Modifier.align(Alignment.BottomCenter).padding(bottom = with(density) { closedPx.toDp() }).fillMaxWidth().height(panelGap.dp).testTag("welcome-panel-gap"))
-        val panelHeight = if (!open && progress <= 0f) Modifier.wrapContentHeight() else Modifier.height(with(density) { (closedPx + (fullPx - closedPx) * progress).toInt().toDp() })
-        Surface(color = WelcomePanelOrange, contentColor = WelcomePanelInk, shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
-            modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().then(panelHeight).onSizeChanged { if (!open && progress <= 0f) closedPanelPx = it.height }.testTag("welcome-orange-panel")) {
-            AnimatedContent(panel, transitionSpec = { fadeIn(SaharaMotion.tween(SaharaMotion.ENTER_MS - 60, 80)) togetherWith fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS)) using null },
-                contentAlignment = Alignment.TopCenter) { shown ->
-                Column(if (shown.isEmpty()) Modifier.fillMaxWidth() else Modifier.fillMaxSize()) {
-                    if (shown.isEmpty()) Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 14.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Text(t("Welcome to Sahara", "सहारा में आपका स्वागत है"), modifier = Modifier.fillMaxWidth().a11yHeading().testTag("welcome-panel-heading"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 26.sp, lineHeight = 32.sp, textAlign = TextAlign.Center)
-                        Text(t("Who is using Sahara?", "सहारा कौन इस्तेमाल कर रहा है?"), Modifier.fillMaxWidth(), color = SaharaColors.OnBandSub, fontSize = 16.sp, lineHeight = 22.sp, textAlign = TextAlign.Center)
-                        if (stackRoles) Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            roles.forEachIndexed { index, item -> WelcomeRoleTile(item, index, stacked = true, enabled = !entryBusy, onClick = { pick(item.key) }, modifier = Modifier.fillMaxWidth()) }
-                        } else Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                            roles.forEachIndexed { index, item -> WelcomeRoleTile(item, index, stacked = false, enabled = !entryBusy, onClick = { pick(item.key) }, modifier = Modifier.weight(1f).fillMaxHeight()) }
-                        }
-                    } else {
-                        Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                            IconButton(onClick = close, enabled = !formBusy && !entryBusy, modifier = Modifier.size(48.dp).testTag("welcome-panel-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस"), tint = WelcomePanelInk) }
-                            Spacer(Modifier.width(4.dp))
-                            Text(when(shown) { "family" -> if (role == "family") t("Family", "परिवार") else t("Patient", "मरीज़"); "person" -> t("Add a person", "व्यक्ति जोड़ें"); "doctor" -> t("Doctor", "डॉक्टर"); else -> t("Sign in", "साइन इन") },
-                                Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Medium, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                        }
-                        Surface(color = Paper, contentColor = Ink, shape = RoundedCornerShape(topStart = SaharaRadius.Hero, topEnd = SaharaRadius.Hero), modifier = Modifier.fillMaxWidth().weight(1f)) {
-                            Box(Modifier.fillMaxSize().padding(top = 16.dp)) { when(shown) {
-                                "family" -> Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 16.dp).saharaScreenEnter(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                                    Box(Modifier.fillMaxWidth()) { SaharaIllustration(SaharaArtKind.Welcome, Modifier.fillMaxWidth()); SaharaLottie(SaharaLottieKind.Wave, Modifier.align(Alignment.TopEnd).size(56.dp)) }
-                                    SaharaPrimaryButton(if (role == "family") t("Add the person you care for", "जिनकी देखभाल करते हैं, उन्हें जोड़ें") else t("Start with your name", "अपने नाम से शुरू करें"),
-                                        onClick = { if (addPersonContent == null) onStart() else select("person") }, enabled = !entryBusy, icon = Icons.Default.PersonAdd, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("welcome-add-person"))
-                                    SaharaSecondaryButton(t("Sign in", "साइन इन"), onClick = { if (accountContent == null) onAccount() else select("account") }, enabled = !entryBusy, icon = Icons.Default.AccountCircle,
-                                        modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("welcome-account"))
-                                    Spacer(Modifier.height(4.dp))
-                                    SaharaPracticeEntry(t("Try a demo account", "डेमो खाता आज़माएँ"), t("Log in to a demo account", "डेमो खाते में लॉग इन करें"),
-                                        enabled = !entryBusy, onClick = { walkthroughChooser = true }, modifier = Modifier.testTag("patient-walkthrough-entry"))
-                                }
-                                "person" -> addPersonContent?.invoke(close, role == "patient")
-                                "doctor" -> Column(Modifier.fillMaxSize()) {
-                                    Box(Modifier.fillMaxWidth().weight(1f)) {
-                                        if (doctorContent != null) doctorContent.invoke(close) { formBusy = it }
-                                        else Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                                            SaharaPrimaryButton(t("Sign in", "साइन इन"), onClick = onSharedWorkspace, enabled = !formBusy && !entryBusy, modifier = Modifier.fillMaxWidth().testTag("welcome-open-doctor-workspace"))
-                                        }
-                                    }
-                                    // Practice stays in view below the sign-in form, whatever the form's length.
-                                    HorizontalDivider(color = SaharaColors.Line)
-                                    SaharaPracticeEntry(t("Try a demo account", "डेमो खाता आज़माएँ"), t("Log in to a demo account", "डेमो खाते में लॉग इन करें"),
-                                        enabled = !formBusy && !entryBusy, onClick = onDoctorDemo, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp).testTag("doctor-demo-entry"))
-                                }
-                                else -> accountContent?.invoke(close) { formBusy = it }
-                            } }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-/** Role tiles stack as rows below 360 dp or at 1.3x text and above, so a label never has to break. */
-internal fun welcomeRolesStacked(screenWidthDp: Int, fontScale: Float): Boolean = screenWidthDp < 360 || fontScale >= 1.3f
-
-private class WelcomeRole(val key: String, val label: String, val icon: ImageVector, val tone: SaharaTone, val tag: String)
-
-/** One big labelled role choice on the welcome band: white tile, the role's colour as chip and edge, a press settle and a short staggered entrance. */
-@Composable private fun WelcomeRoleTile(role: WelcomeRole, index: Int, stacked: Boolean, enabled: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    val interaction = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
-    val shown = remember { Animatable(if (SaharaMotion.enabled) 0f else 1f) }
-    LaunchedEffect(Unit) { shown.animateTo(1f, SaharaMotion.tween(SaharaMotion.LIST_ITEM_MS, SaharaMotion.staggerDelay(index + 1), LinearOutSlowInEasing)) }
-    Surface(onClick = onClick, enabled = enabled, shape = RoundedCornerShape(SaharaRadius.Lg), color = SaharaColors.Surface, contentColor = SaharaColors.Ink,
-        border = BorderStroke(2.dp, role.tone.solid), shadowElevation = 2.dp, interactionSource = interaction,
-        modifier = modifier.heightIn(min = if (stacked) 64.dp else 112.dp).graphicsLayer { alpha = shown.value; translationY = (1f - shown.value) * 12.dp.toPx() }.saharaPress(interaction).testTag(role.tag)) {
-        if (stacked) Row(Modifier.padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-            SaharaIconChip(role.icon, role.tone, size = 40)
-            Spacer(Modifier.width(12.dp))
-            Text(role.label, Modifier.weight(1f), style = MaterialTheme.typography.titleMedium, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = role.tone.ink)
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = role.tone.ink)
-        } else Column(Modifier.padding(horizontal = 6.dp, vertical = 14.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)) {
-            SaharaIconChip(role.icon, role.tone, size = 48)
-            SaharaFitText(role.label, style = MaterialTheme.typography.titleMedium, color = role.tone.ink, fontWeight = FontWeight.SemiBold, min = 13f)
-        }
-    }
-}
+// The welcome flow (Welcome, its steps and welcomeRolesStacked) lives in CareOnboarding.kt.
 
 /**
  * Today, the landing page. It points to pages rather than holding everything (3 Nov meeting): greeting and date, SOS with
@@ -490,7 +380,7 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
     // Signed in: pull the list down to refresh (Material 3), as well as the Refresh button in the header.
     SaharaPullRefresh(vm.refreshing, vm::refresh, enabled = vm.cloud != null) {
     // A soft warm wash behind Today so the white and tinted cards stand off the ground.
-    LazyColumn(Modifier.fillMaxSize().background(SaharaColors.GroundWarm).saharaScreenEnter().testTag("today-list"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    LazyColumn(Modifier.fillMaxSize().background(SaharaBackdrop).saharaScreenEnter().testTag("today-list"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item(key = "today-header") { Row(Modifier.fillMaxWidth().saharaStagger(0), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text(CareTodayRules.greetingLine(hour, hindi, personName, patient = !family && !clinician, viewerName = if (family) viewerName else ""), Modifier.a11yHeading().testTag("today-greeting"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 22.sp, lineHeight = 28.sp, color = DoctorCardInk)
@@ -1037,7 +927,7 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
                 item { CareField(value = name, onValueChange = { name = it.take(100) }, label = t("Your name", "आपका नाम"), singleLine = true) }
                 item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("Patient", "Family / carer").forEach { role -> FilterChip(selected = relationship == role, onClick = { relationship = role }, enabled = (vm.cloud == null || (role == "Patient") == owner) && !(familyOnly && role == "Patient") && if (role == "Patient") patientConfirmation == null else patientConfirmation != null, label = { Text(if (role == "Patient") t("Patient", "मरीज़") else t("Family / carer", "परिवार / देखभाल करने वाले")) }) } } }
                 item { CheckLine(reviewed, { reviewed = it }, t("I have read this version. This is not a legal signature, consent for treatment or a treatment decision. I can ask my doctor to change it later.", "मैंने यही संस्करण पढ़ा है। यह क़ानूनी हस्ताक्षर, इलाज की सहमति या इलाज का फ़ैसला नहीं है। मैं बाद में डॉक्टर से इसे बदलवा सकता/सकती हूँ।")) }
-                item { NoteSignatureCapture(signatureDraft, enabled = !busy) { vm.message.value = it } }
+                // No signing pad for the patient or family (Dr Sujay, 22 Nov: "I can sign here also, I don't think that is right"): a read receipt only. The doctor signs in Goals of care.
                 val alreadyConfirmed = confirmations.any { it.relationship == relationship && it.name.equals(name.trim(), ignoreCase = true) && (vm.cloud == null || it.id in authenticatedAcks) }
                 item { Button(onClick = {
                     val signed = signatureDraft.image(); var signatureFailed = false
@@ -1045,7 +935,8 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
                         reviewed = false; name = ""; signatureDraft.clear(); signaturesRead++
                         if (signatureFailed) vm.message.value = t("Your confirmation is saved, but the signature could not be saved on this phone.", "आपकी पुष्टि सहेजी गई, पर हस्ताक्षर इस फ़ोन पर सहेजा नहीं जा सका।")
                     }
-                }, enabled = reviewed && name.isNotBlank() && signatureDraft.ready && !busy && !alreadyConfirmed && (relationship == "Patient" || patientConfirmation != null), modifier = Modifier.fillMaxWidth()) { Text(if (alreadyConfirmed) t("Confirmation already saved", "पुष्टि पहले से सहेजी है") else t("Sign and confirm", "हस्ताक्षर करके पुष्टि करें")) } }
+                    else vm.confirm(note, name, relationship, reviewed) { reviewed = false; name = "" }
+                }, enabled = reviewed && name.isNotBlank() && !busy && !alreadyConfirmed && (relationship == "Patient" || patientConfirmation != null), modifier = Modifier.fillMaxWidth()) { Text(if (alreadyConfirmed) t("Confirmation already saved", "पुष्टि पहले से सहेजी है") else t("Confirm I have read it", "पुष्टि करें कि मैंने पढ़ लिया")) } }
             }
         }
     }
@@ -1074,7 +965,7 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
     val t = careText()
     // [name] stays English: it is the module's key and test tag; only [title] is shown.
     val tiles = listOf(
-        CareModuleTile("Conversations", t("Conversations", "बातचीत"), "", SaharaLavender, R.drawable.conversation_recent_art, versions.size) {
+        CareModuleTile("Conversations", t("Goals of care notes", "देखभाल के लक्ष्यों के नोट"), "", SaharaLavender, R.drawable.conversation_recent_art, versions.size) {
             CareModuleList("conversations", versions, t("No saved conversations yet.", "अभी कोई सहेजी हुई बातचीत नहीं।"), keyOf = { it.id }) { CareConversationRow(it, onReadNote) }
         },
         CareModuleTile("Medicines", t("Medicines", "दवाइयाँ"), "", SaharaSoftBlue, R.drawable.care_medicines_art, currentMeds.size + pastMeds.size) {
@@ -1125,8 +1016,8 @@ private class WelcomeRole(val key: String, val label: String, val icon: ImageVec
         } }
         groups.forEachIndexed { g, (group, groupTone, rows) -> item(key = "care-group-$group") {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                // Each group's name sits on a solid pill in its colour; its register takes the matching wash and edge bar.
-                Text(group, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = groupTone.onSolid, modifier = Modifier.clip(RoundedCornerShape(SaharaRadius.Pill)).background(groupTone.solid).padding(horizontal = 12.dp, vertical = 4.dp).a11yHeading())
+                // Each group's name sits on a light pill of its colour (wash, ink text, hairline edge; was solid until the 22 Nov premium pass); its register takes the matching wash and edge bar.
+                Text(group, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = groupTone.ink, modifier = Modifier.clip(RoundedCornerShape(SaharaRadius.Pill)).background(groupTone.wash).border(1.dp, groupTone.solid, RoundedCornerShape(SaharaRadius.Pill)).padding(horizontal = 12.dp, vertical = 4.dp).a11yHeading())
                 SaharaRegister(tone = groupTone) { rows.forEachIndexed { index, row ->
                     if (index > 0) HorizontalDivider(color = groupTone.solid.copy(alpha = .35f), modifier = Modifier.padding(horizontal = 12.dp))
                     SaharaListRow(row.label, Modifier.saharaStagger(g * 3 + index).testTag(row.tag), detail = row.detail, icon = row.icon, tone = row.tone, onClick = row.onClick)

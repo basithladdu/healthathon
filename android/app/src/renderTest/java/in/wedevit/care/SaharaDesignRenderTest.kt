@@ -22,7 +22,7 @@ abstract class SaharaDesignRenderBase {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
     protected val tagged = { tag: String -> SemanticsMatcher.expectValue(SemanticsProperties.TestTag, tag) }
     protected fun settle() { compose.mainClock.advanceTimeBy(1500); compose.waitForIdle() }
-    protected fun click(tag: String) { runCatching { compose.onNode(tagged(tag)).performScrollTo() }; compose.onNode(tagged(tag)).performSemanticsAction(SemanticsActions.OnClick); settle() }
+    protected fun click(tag: String) { compose.skipSaharaIntroFor(tag); runCatching { compose.onNode(tagged(tag)).performScrollTo() }; compose.onNode(tagged(tag)).performSemanticsAction(SemanticsActions.OnClick); settle() }
     protected fun shot(name: String) { compose.onRoot().captureRoboImage(File(System.getProperty("sahara.render.dir") ?: "build/outputs/design", "$name.png").path) }
     protected fun start(language: String) {
         compose.waitForIdle()

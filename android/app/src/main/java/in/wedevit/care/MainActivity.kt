@@ -21,7 +21,8 @@ class MainActivity : ComponentActivity() {
         if (!BuildConfig.DEBUG) window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         if (savedInstanceState == null) { handleInviteIntent(intent); handleReminderIntent(intent) }
         CareLanguageState.current // Created here, outside any Compose snapshot, or reading it during composition can throw.
-        setContent { CareTheme { CareRoot(this) } }
+        // After the system splash (the logo blooming, res/drawable/splash_icon_animated.xml), the first launch gets a short brand moment (CareOnboarding.kt).
+        setContent { CareTheme { SaharaBrandMoment { CareRoot(this) } } }
     }
     override fun onNewIntent(intent: Intent) { super.onNewIntent(intent); setIntent(intent); handleInviteIntent(intent); handleReminderIntent(intent) }
     /** A tapped reminder selects the person whose saved activity is due (openToday), then opens Reminders (CareReminderLaunch). */

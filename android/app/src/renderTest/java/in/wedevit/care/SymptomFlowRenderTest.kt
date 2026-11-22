@@ -35,7 +35,7 @@ class SymptomFlowRenderTest {
     }
     private fun has(tag: String) = compose.onAllNodes(tagged(tag)).fetchSemanticsNodes().isNotEmpty()
     private fun click(m: SemanticsMatcher) { bring(m); compose.onAllNodes(m).onFirst().performSemanticsAction(SemanticsActions.OnClick); settle() }
-    private fun click(tag: String) = click(tagged(tag))
+    private fun click(tag: String) { compose.skipSaharaIntroFor(tag); click(tagged(tag)) }
     private fun shot(name: String) { captureScreenRoboImage(File(System.getProperty("sahara.render.dir") ?: "build/outputs/symptoms", "$name.png").path) }
 
     @Test fun logOneSymptomAndReadTheTrends() {

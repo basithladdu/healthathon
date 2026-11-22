@@ -161,7 +161,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
         colors = TopAppBarDefaults.topAppBarColors(containerColor = DoctorBand, titleContentColor = SaharaColors.OnHeader, navigationIconContentColor = SaharaColors.OnHeader, actionIconContentColor = SaharaColors.OnHeader))
         HorizontalDivider(color = SaharaColors.HeaderLine) } }, bottomBar = {
         NavigationBar(Modifier.saharaNavIndicator(if (selection != null || shared || isolatedDemo) 1 else tab, 4, DoctorTones.Rust.solid, gap = 8.dp), containerColor = Paper) { listOf(t("Home", "होम") to Icons.Default.Home,t("Patients", "मरीज़") to Icons.Default.People,t("Schedule", "शेड्यूल") to Icons.Default.CalendarMonth,t("Account", "खाता") to Icons.Default.Person).forEachIndexed { index, (label, icon) -> NavigationBarItem(selected = if (selection != null || shared || isolatedDemo) index == 1 else tab == index, enabled = !navigationBlocked, onClick = { navigate { tab = index; selection = null; shared = false; isolatedDemo = false; nestedBack = null } }, icon = { Icon(icon, null) }, label = { Text(label, maxLines = 1, softWrap = false) },
-            colors = NavigationBarItemDefaults.colors(selectedIconColor = Color.White, selectedTextColor = DoctorTones.Rust.ink, indicatorColor = DoctorTones.Rust.solid, unselectedIconColor = DoctorCardSub, unselectedTextColor = DoctorCardSub)) } }
+            colors = NavigationBarItemDefaults.colors(selectedIconColor = SaharaColors.NavOnPill, selectedTextColor = SaharaColors.NavOnPill, indicatorColor = SaharaColors.NavPill, unselectedIconColor = DoctorCardSub, unselectedTextColor = DoctorCardSub)) } }
     }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
             if (busy) SaharaProgressBar(null)
@@ -214,7 +214,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                     }
                 }
             } else SaharaScreenHost(tab, Modifier.fillMaxSize(), label = "doctorTabs", direction = { from, to -> if (to > from) SaharaMotion.Direction.Forward else SaharaMotion.Direction.Back }) { shownTab -> when(shownTab) {
-                0 -> CompositionLocalProvider(LocalSaharaStagger provides remember { SaharaStagger() }) { SaharaPullRefresh(vm.refreshing, { vm.refresh(); checkClinician() }, enabled = !earlierWorkspace) { LazyColumn(Modifier.fillMaxSize().testTag("doctor-home"), state = homeList, contentPadding = PaddingValues(start = 16.dp, top = 12.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                0 -> CompositionLocalProvider(LocalSaharaStagger provides remember { SaharaStagger() }) { SaharaPullRefresh(vm.refreshing, { vm.refresh(); checkClinician() }, enabled = !earlierWorkspace) { LazyColumn(Modifier.fillMaxSize().background(SaharaBackdrop).testTag("doctor-home"), state = homeList, contentPadding = PaddingValues(start = 16.dp, top = 12.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Text(LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, d MMMM", careLocale(hindi))), Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
                         if (!earlierWorkspace) IconButton(onClick = { vm.refresh(); checkClinician() }, enabled = !realRefreshing, modifier = Modifier.size(48.dp).testTag("doctor-home-refresh")) { if (realRefreshing) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp, color = DoctorAccent) else Icon(Icons.Default.Refresh, t("Refresh records", "रिकॉर्ड रिफ़्रेश करें"), tint = DoctorAccent) } } }
                     if (earlierWorkspace) {
@@ -345,14 +345,15 @@ private fun connectedTopicLabel(status: WorkflowTopicStatus, t: (String, String)
             t("Last check-in: ", "आख़िरी हालचाल: ") + checkInMoodLabel(check.title, hindi) + " · " + DateTimeFormatter.ofPattern("d MMM", careLocale(hindi)).withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(check.created)) to DoctorTones.Teal
         }
     } ?: (t("No check-ins yet", "अभी कोई हालचाल नहीं") to DoctorTones.Teal)
-    // The patient's header band: their colour as a solid strip with a white initial disc, name and facts in white; status, allergies and ID below on white.
-    Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.5.dp, tone.solid), modifier = Modifier.fillMaxWidth().saharaAppear().testTag("doctor-patient-header")) { Column {
+    // The patient's header (22 Nov premium pass): a light wash of their colour with a solid initial disc, name in dark ink and facts in
+    // the sub tier; status, allergies and ID below on paper. One hairline edge in their colour and a soft warm lift.
+    Surface(shape = RoundedCornerShape(SaharaRadius.Lg), color = Paper, border = BorderStroke(1.dp, tone.solid), shadowElevation = SaharaElevation.Card, modifier = Modifier.fillMaxWidth().saharaAppear().testTag("doctor-patient-header")) { Column {
             Row(Modifier.fillMaxWidth().background(tone.wash).padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.size(48.dp).background(Paper, CircleShape), contentAlignment = Alignment.Center) { Text(person.name.trim().take(1).uppercase(), color = tone.ink, fontFamily = SaharaTitleFont, fontWeight = FontWeight.Bold, fontSize = 22.sp) }
-                Spacer(Modifier.width(12.dp))
+                Box(Modifier.size(48.dp).background(tone.band, CircleShape), contentAlignment = Alignment.Center) { Text(person.name.trim().take(1).uppercase(), color = tone.onSolid, fontFamily = SaharaTitleFont, fontWeight = FontWeight.Bold, fontSize = 22.sp) }
+                Spacer(Modifier.width(14.dp))
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text(person.name, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = if (pane) 20.sp else 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Bold, color = tone.ink, style = DoctorWholeWords)
-                    if (facts.isNotBlank()) Text(facts, fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.SemiBold, color = tone.ink, style = DoctorWholeWords, modifier = Modifier.testTag("doctor-patient-facts"))
+                    Text(person.name, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = if (pane) 20.sp else 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.SemiBold, color = SaharaColors.Ink, style = DoctorWholeWords)
+                    if (facts.isNotBlank()) Text(facts, fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, color = SaharaColors.InkSub, style = DoctorWholeWords, modifier = Modifier.testTag("doctor-patient-facts"))
                 }
             }
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
