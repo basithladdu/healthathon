@@ -80,7 +80,9 @@ class CareFlowTest {
     }
     @Test fun realUsersHaveNoRoleMenuAndKeepDraftAndComputedRoleAfterRecreation() {
         val words = "Please keep my questions while I change views."
-        ui.runOnIdle { vm.edit(vm.draft.value.copy(source = words)) }
+        // setUp switches to the Doctor role; go back to the person's own computed role (Patient or Family) for this check.
+        // The role lives only in the CareModel ViewModel, so a recreation must keep it and nothing may save "Doctor".
+        ui.runOnIdle { vm.role(false); vm.edit(vm.draft.value.copy(source = words)) }
         ui.onNodeWithTag("choose-role").assertDoesNotExist()
         ui.onNodeWithTag("walkthrough-user-menu").assertDoesNotExist()
         screenshot("no-role-menu")

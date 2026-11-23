@@ -35,7 +35,9 @@ Almost all are UI tests written before the doctor and patient redesigns. They lo
 | `CarePainHistoryUiTest` | 2 | Empty-state text and history label changed. |
 | `CarePainWebViewRuntimeTest` | 1 | The 3D body map (WebGL) didn't answer within 15 s. Possibly the emulator's graphics; check on a real phone. |
 
-**One to check as a possible real bug:** `CareFlowTest.realUsersHaveNoRoleMenuAndKeepDraftAndComputedRoleAfterRecreation` (line 95). After the screen is recreated (for example on rotation), the view role is "Doctor" where the test expects "Patient". It fails the same way on a fresh install. Either the role isn't restored correctly after recreation, or the test's set-up is out of date.
+**The "Doctor instead of Patient" role failure is not an app bug (checked 23 Nov).** `CareFlowTest.realUsersHaveNoRoleMenuAndKeepDraftAndComputedRoleAfterRecreation` failed at line 95 because the shared `setUp` calls `vm.role(true)` (Doctor) before every test. Since `509e652` (role menu removed), the role lives only in the `CareModel` ViewModel, so it rightly survives a recreation. Real patients never get "Doctor": only the doctor workspace sets it, and `EmbeddedPatientCare` restores the previous role when it closes. Awaiz's fix: the test calls `vm.role(false)` first, and the role check now passes.
+
+The test then stops at the shared helper `consentEveryoneAndContinue()` (`CareFlowTest.kt` line 61). It looks for the "Continue to recording" and "Continue to written text" buttons, which the Before → Conversation → Note redesign removed. Every `CareFlowTest` test that records goes through this helper, so rewriting it for the new steps should fix several at once. That's Basith's, since it follows his new flow.
 
 **How to rerun** (from `android/`, emulator running, about 10 minutes):
 ```bash
