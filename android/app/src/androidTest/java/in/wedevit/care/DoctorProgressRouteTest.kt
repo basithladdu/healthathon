@@ -2,7 +2,9 @@ package `in`.wedevit.care
 
 import android.content.Context
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -27,14 +29,13 @@ class DoctorProgressRouteTest {
         val demo=DoctorDemoStore(context,preferencesName=demoName)
         val workflow=DoctorWorkflowStore(context,preferencesName=workflowName)
         val fontScale=mutableFloatStateOf(1f)
+        // The Patients tab now lists the walkthrough people; each demo record opens directly (initialPatientId), one patient at a time.
+        val shown=mutableStateOf("demo-leela")
         try {
             ui.setContent {
                 val density=LocalDensity.current
-                CompositionLocalProvider(LocalDensity provides Density(density.density,fontScale.floatValue)) {CareTheme {DoctorDemo({},demo,workflow)}}
+                CompositionLocalProvider(LocalDensity provides Density(density.density,fontScale.floatValue)) {CareTheme {key(shown.value) {DoctorDemo({},demo,workflow,initialPatientId=shown.value)}}}
             }
-            ui.onNodeWithTag("demo-login").performScrollTo().performClick()
-            ui.onNodeWithTag("demo-nav-Patients").performClick()
-            openPatient("Leela","demo-leela")
             openProgress()
             val oldest="progress-report-demo-leela-check-1"
             ui.onNodeWithTag("demo-patient-detail").performScrollToNode(hasTestTag(oldest))
@@ -54,8 +55,8 @@ class DoctorProgressRouteTest {
             Espresso.pressBack()
             ui.onNodeWithTag("demo-patient-hub").assertExists()
             Espresso.pressBack()
-            ui.onNodeWithTag("demo-patients-list").assertExists()
-            openPatient("Ravi","demo-ravi")
+            ui.onNodeWithTag("walkthrough-patients-list").assertExists()
+            ui.runOnIdle {shown.value="demo-ravi"}
             openProgress()
             ui.onNodeWithTag("progress-detail-page").assertDoesNotExist()
             ui.onNodeWithTag("progress-report-detail-demo-leela-check-1").assertDoesNotExist()
@@ -72,11 +73,6 @@ class DoctorProgressRouteTest {
             context.getSharedPreferences(demoName,Context.MODE_PRIVATE).edit().clear().commit()
             context.getSharedPreferences(workflowName,Context.MODE_PRIVATE).edit().clear().commit()
         }
-    }
-    private fun openPatient(name:String,id:String) {
-        ui.onNodeWithTag("demo-patient-search").performTextReplacement(name)
-        Espresso.closeSoftKeyboard()
-        ui.onNodeWithTag("demo-patient-$id").performClick()
     }
     private fun openProgress() {
         ui.onNodeWithTag("demo-patient-hub").performScrollToNode(hasTestTag("demo-record-Progress"))

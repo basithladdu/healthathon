@@ -18,7 +18,15 @@ class OnboardingFlowTest {
         assertEquals(OnboardingStep.Intro, OnboardingFlow.back(OnboardingStep.Role, signedIn = false, introShown = true))
         assertEquals(OnboardingStep.Account, OnboardingFlow.back(OnboardingStep.Name, signedIn = false, introShown = false))
         assertEquals(OnboardingStep.Role, OnboardingFlow.back(OnboardingStep.Name, signedIn = true, introShown = false))
-        assertEquals(OnboardingStep.Illness, OnboardingFlow.back(OnboardingStep.Finish, signedIn = false, introShown = false))
+        assertEquals(OnboardingStep.Treatment, OnboardingFlow.back(OnboardingStep.Finish, signedIn = false, introShown = false))
+        assertEquals(OnboardingStep.CareDoctor, OnboardingFlow.back(OnboardingStep.Treatment, signedIn = false, introShown = false))
+        assertEquals(OnboardingStep.Illness, OnboardingFlow.back(OnboardingStep.CareDoctor, signedIn = false, introShown = false))
+    }
+
+    @Test fun careNowAnswersBecomeProfileFields() {
+        val p = OnboardingFlow.profile("", "", illnessSince = " Mar 2025 ", doctorName = " Dr Shirin ", treatments = listOf("chemotherapy", "laser", "chemotherapy"), treatmentNote = " ")
+        assertEquals(CarePatientProfile(illnessSince = "Mar 2025", doctorName = "Dr Shirin", treatments = listOf("chemotherapy")), p)
+        assertEquals(listOf("surgery", "none_now"), OnboardingFlow.codes("surgery,,unknown,none_now"))
     }
 
     @Test fun progressGrowsAlongTheProfilePathAndIsHiddenOnTheIntroAndDoctorSignIn() {

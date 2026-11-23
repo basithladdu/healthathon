@@ -147,6 +147,23 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
     }
     val patient = dataset?.patients?.firstOrNull { it.id == patientId }
     val realPatient = realPeople.firstOrNull { it.id == realPatientId }
+    // Emergency card web link opened by another health professional (Dr Sujay, 23 Nov): an in-app notice when the
+    // doctor opens the app or a patient. There is no background sync, so nothing is shown while the app is closed.
+    val viewMemory = remember(vm.storageNamespace) { EmergencyViewMemory(context, vm.storageNamespace) }
+    val cardLinks = remember(cloud) { EmergencyLinkClient(cloud) }
+    var cardNotice by remember { mutableStateOf<String?>(null) }
+    suspend fun checkCardViews(people: List<Person>) {
+        val now = System.currentTimeMillis()
+        val fresh = people.filterNot { DoctorTestProfiles.contains(it.id) }.take(40).mapNotNull { person ->
+            val views = try { cardLinks.views(person.id).takeIf { it.live }?.recentViews } catch (e: Exception) { if (e is CancellationException) throw e; null } ?: return@mapNotNull null
+            EmergencyViewRules.newSince(views, viewMemory.lastSeen(person.id), now).firstOrNull()?.let { person to it }
+        }.sortedByDescending { it.second.at }
+        if (fresh.isEmpty()) return
+        fresh.forEach { (person, view) -> viewMemory.markSeen(person.id, view.at) }
+        cardNotice = (listOfNotNull(cardNotice) + fresh.map { (person, view) -> emergencyViewNotice(person.name, view, hindi) }).distinct().takeLast(4).joinToString("\n")
+    }
+    LaunchedEffect(userId, realPeople.map { it.id }.sorted().joinToString(",")) { if (realPeople.isNotEmpty()) checkCardViews(realPeople) }
+    LaunchedEffect(realPatientId) { realPeople.firstOrNull { it.id == realPatientId }?.let { checkCardViews(listOf(it)) } }
     val selectedRealId by vm.selected.collectAsStateWithLifecycle()
     val realDraft by vm.draft.collectAsStateWithLifecycle()
     val realRefreshing by vm.refreshing.collectAsStateWithLifecycle()
@@ -165,6 +182,11 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
     }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
             if (busy) SaharaProgressBar(null)
+            cardNotice?.let { message -> Surface(color = DoctorCardVisit) { Row(Modifier.fillMaxWidth().padding(start = 16.dp, top = 4.dp, bottom = 4.dp).testTag("doctor-emergency-card-notice"), verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.QrCode, null, Modifier.size(20.dp), tint = DoctorCardInk); Spacer(Modifier.width(10.dp))
+                Text(message, Modifier.weight(1f).announce(), fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardInk)
+                IconButton(onClick = { cardNotice = null }, modifier = Modifier.size(48.dp).testTag("doctor-emergency-card-notice-close")) { Icon(Icons.Default.Close, t("Dismiss", "हटाएँ"), tint = DoctorCardInk) }
+            } } }
             error?.let { message -> Surface(color = Peach) { Row(Modifier.fillMaxWidth().padding(12.dp)) { Text(message, Modifier.weight(1f).announce()); TextButton(onClick = ::refresh, enabled = !busy) { Text(t("Retry", "फिर कोशिश करें"), color = RustText) } } } }
             if (isolatedDemo) DoctorCareDemoHost(onExit = { isolatedDemo = false; nestedBack = null; navigationBlocked = false;testInitialSection="Hub" }, onNavigationBlockedChange = { navigationBlocked = it }, onHeaderBackChange = { nestedBack = it },initialPersonId=testCarePerson,initialSection=testInitialSection)
             else if (shared) EmbeddedSharedCare(vm, onAccount, { shared = false }, onNavigationBlockedChange = { navigationBlocked = it })
@@ -181,7 +203,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                         }
                     }
                 } else DoctorPatientWorkspace(vm, realPatientId, section, { next -> navigate { section = next } },
-                    hub = { pane, open -> GocSurpriseQuestionPrompt(vm, realPatientId) { navigate { section = "GoalsOfCare" } }; DoctorSharedPatientHub(realPatient!!, onSection = { next -> navigate { section = next } }, items = vm.items, pane = pane, selected = open) },
+                    hub = { pane, open -> DoctorPatientOpenPrompts(vm, realPatientId, onOpenSymptoms = { navigate { section = "Progress" } }) { navigate { section = "GoalsOfCare" } }; DoctorSharedPatientHub(realPatient!!, onSection = { next -> navigate { section = next } }, items = vm.items, pane = pane, selected = open) },
                     care = { shown -> key(selection!!.stateKey) {
                         editorStates.SaveableStateProvider("${selection!!.stateKey}:care") {
                             EmbeddedPatientCare(vm, realPatientId, shown, { next -> section = next }, onAccount, { selection = null }, onNavigationBlockedChange = { navigationBlocked = it }, onHeaderBackChange = { nestedBack = it })

@@ -54,8 +54,8 @@ class DoctorConversationsUiTest {
         ui.onNodeWithTag("conversation-source-demo-leela-latest").assertTextEquals(source("demo-leela-latest"))
         read("demo-leela-prior")
         ui.onNodeWithTag("conversation-source-demo-leela-prior").assertTextEquals(state.value.priorSample!!.sourceText)
-        ui.onNodeWithText("Date not recorded").assertExists()
-        ui.onNodeWithText("Author not recorded").assertExists()
+        // The earlier sample has neither: its card says so on one line under the title.
+        ui.onNode(hasText("Date not recorded · Author not recorded") and hasAnyAncestor(hasTestTag("conversation-card-demo-leela-prior"))).assertExists()
     }
 
     @Test fun largeTextExactReaderStaysVisibleAndFollowsPatientAndSnapshotChanges() {
@@ -87,11 +87,8 @@ class DoctorConversationsUiTest {
         val draft=WorkflowDraft("demo-leela",sourceText="Unchanged workspace source.",topics="Workspace topic.")
         assertNull(workflow.saveDraft(draft))
         try {
-            ui.setContent {CareTheme {DoctorDemo({},demo,workflow)}}
-            ui.onNodeWithTag("demo-login").performScrollTo().performClick()
-            ui.onNodeWithTag("demo-nav-Patients").performClick()
-            ui.onNodeWithTag("demo-patient-search").performTextReplacement("Leela");Espresso.closeSoftKeyboard()
-            ui.onNodeWithTag("demo-patient-demo-leela").performClick()
+            // The Patients tab now lists the walkthrough people; the demo record (Leela) opens directly, as the walkthrough does.
+            ui.setContent {CareTheme {DoctorDemo({},demo,workflow,initialPatientId="demo-leela")}}
             ui.onNodeWithTag("demo-patient-hub").performScrollToNode(hasTestTag("demo-record-Conversations"))
             ui.onNodeWithTag("demo-record-Conversations").performClick()
             ui.onNodeWithTag("conversation-latest").assertDoesNotExist()

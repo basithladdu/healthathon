@@ -36,6 +36,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.graphicsLayer
@@ -71,7 +72,8 @@ import kotlinx.coroutines.withTimeoutOrNull
 /*
  * First run (22 Nov redesign). One thing per screen instead of one big form:
  *   Intro (3 calm pages, Skip) -> Who are you? -> Account (create / sign in / keep on this phone) -> Name -> Age (optional)
- *   -> Illness (optional) -> You're all set. The doctor card goes to the doctor sign-in and the doctor practice, as before.
+ *   -> About the illness (optional) -> Doctor now (optional) -> Treatment now (optional) -> You're all set (Dr Shirin, 23 Nov:
+ *   the care details come before the home page). The doctor card goes to the doctor sign-in and the doctor practice, as before.
  * The account comes before the profile on purpose: a person added on this phone stays in the guest records, so someone who wants
  * an account makes it first and the profile is then saved into the account. Progress (intro seen, role) is kept on the phone,
  * because signing in recreates the care screens and the flow then resumes at the name question.
@@ -80,12 +82,15 @@ import kotlinx.coroutines.withTimeoutOrNull
 
 /** The steps; [panel] is the old welcome panel name each one replaces, still reported to CareRoot (it watches for "doctor"). */
 internal enum class OnboardingStep(val panel: String) {
-    Intro(""), Role(""), Account("family"), SignIn("account"), SignUp("account"), Doctor("doctor"), Name("person"), Age("person"), Illness("person"), Finish("person")
+    Intro(""), Role(""), Account("family"), SignIn("account"), SignUp("account"), Doctor("doctor"), Name("person"), Age("person"), Illness("person"),
+    /** The doctor the patient sees now (not the doctor sign-in, which is [Doctor]). */
+    CareDoctor("person"), Treatment("person"), Finish("person")
 }
 
 internal object OnboardingFlow {
     /** The patient and family path the thin progress bar measures. */
-    private val path = listOf(OnboardingStep.Role, OnboardingStep.Account, OnboardingStep.Name, OnboardingStep.Age, OnboardingStep.Illness, OnboardingStep.Finish)
+    private val path = listOf(OnboardingStep.Role, OnboardingStep.Account, OnboardingStep.Name, OnboardingStep.Age, OnboardingStep.Illness,
+        OnboardingStep.CareDoctor, OnboardingStep.Treatment, OnboardingStep.Finish)
 
     /** 0..1 along [path]; null where no bar is shown (the intro and the doctor sign-in). Sign-in and sign-up sit at the account step. */
     fun progress(step: OnboardingStep): Float? = when (step) {
@@ -110,15 +115,22 @@ internal object OnboardingFlow {
         OnboardingStep.Name -> if (signedIn) OnboardingStep.Role else OnboardingStep.Account
         OnboardingStep.Age -> OnboardingStep.Name
         OnboardingStep.Illness -> OnboardingStep.Age
-        OnboardingStep.Finish -> OnboardingStep.Illness
+        OnboardingStep.CareDoctor -> OnboardingStep.Illness
+        OnboardingStep.Treatment -> OnboardingStep.CareDoctor
+        OnboardingStep.Finish -> OnboardingStep.Treatment
     }
 
-    /** The optional profile details, or null when both were skipped (then only the name is saved, as before). */
-    fun profile(ageText: String, illness: String): CarePatientProfile? {
-        val age = CarePatientProfileRules.age(ageText).first
-        val text = illness.trim()
-        return if (age == null && text.isEmpty()) null else CarePatientProfile(age = age, illness = text)
+    /** The optional profile details, or null when every one was skipped (then only the name is saved, as before). */
+    fun profile(ageText: String, illness: String, illnessSince: String = "", doctorName: String = "", doctorPlace: String = "", doctorPhone: String = "",
+        treatments: List<String> = emptyList(), treatmentNote: String = ""): CarePatientProfile? {
+        val p = CarePatientProfile(age = CarePatientProfileRules.age(ageText).first, illness = illness.trim(), illnessSince = illnessSince.trim(),
+            doctorName = doctorName.trim(), doctorPlace = doctorPlace.trim(), doctorPhone = doctorPhone.trim(),
+            treatments = treatments.filter { it in CarePatientProfile.TREATMENTS }.distinct(), treatmentNote = treatmentNote.trim())
+        return if (p == CarePatientProfile()) null else p
     }
+
+    /** The saved treatment codes travel as one comma-joined string, so they survive rotation in a saveable state. */
+    fun codes(joined: String): List<String> = joined.split(',').filter { it in CarePatientProfile.TREATMENTS }
 }
 
 /** First-run progress on this phone (not per account, since it is read before anyone signs in). */
@@ -173,6 +185,14 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
     var name by rememberSaveable { mutableStateOf("") }
     var age by rememberSaveable { mutableStateOf("") }
     var illness by rememberSaveable { mutableStateOf("") }
+    var illnessSince by rememberSaveable { mutableStateOf("") }
+    var doctorName by rememberSaveable { mutableStateOf("") }
+    var doctorPlace by rememberSaveable { mutableStateOf("") }
+    var doctorPhone by rememberSaveable { mutableStateOf("") }
+    var treatmentCodes by rememberSaveable { mutableStateOf("") }
+    var treatmentNote by rememberSaveable { mutableStateOf("") }
+    val treatments = OnboardingFlow.codes(treatmentCodes)
+    fun answers() = OnboardingFlow.profile(age, illness, illnessSince, doctorName, doctorPlace, doctorPhone, treatments, treatmentNote)
     var formBusy by remember { mutableStateOf(false) }
     var direction by remember { mutableStateOf(SaharaMotion.Direction.Forward) }
     var walkthroughChooser by rememberSaveable { mutableStateOf(false) }
@@ -271,13 +291,34 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
                         KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next), error = ageError?.let { t(it.en, it.hi) }) { if (ageError == null) go(OnboardingStep.Illness) }
                 }
                 OnboardingStep.Illness -> OnboardingPage {
-                    StepHeading(if (family) t("What illness are they living with?", "उन्हें कौन-सी बीमारी है?") else t("What illness are you living with?", "आपको कौन-सी बीमारी है?"),
+                    StepHeading(t("About the illness", "बीमारी के बारे में"),
                         t("Optional", "ज़रूरी नहीं") + " · " + if (signedIn) t("Shared only with the family and doctors you invite.", "सिर्फ़ उन्हीं परिवार वालों और डॉक्टरों के साथ साझा होगा जिन्हें आप बुलाएँ।") else t("Kept on this phone.", "इसी फ़ोन पर रहेगा।"))
-                    OnboardingField(illness, { illness = it.take(200) }, t("Illness", "बीमारी"), "onboarding-illness",
-                        KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, keyboardType = KeyboardType.Text, imeAction = ImeAction.Done),
-                        placeholder = t("For example: breast cancer, heart failure", "जैसे: स्तन कैंसर, हृदय की कमज़ोरी")) { go(OnboardingStep.Finish) }
+                    OnboardingField(illness, { illness = it.take(200) }, if (family) t("What illness are they living with?", "उन्हें कौन-सी बीमारी है?") else t("What illness are you living with?", "आपको कौन-सी बीमारी है?"), "onboarding-illness",
+                        KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, keyboardType = KeyboardType.Text, imeAction = ImeAction.Next),
+                        placeholder = t("For example: breast cancer, heart failure", "जैसे: स्तन कैंसर, हृदय की कमज़ोरी")) { focus.moveFocus(FocusDirection.Down) }
+                    OnboardingField(illnessSince, { illnessSince = it.take(20) }, t("Since when", "कब से"), "onboarding-illness-since",
+                        KeyboardOptions(capitalization = KeyboardCapitalization.Words, keyboardType = KeyboardType.Text, imeAction = ImeAction.Done),
+                        placeholder = t("Month and year, for example Mar 2025", "महीना और साल, जैसे मार्च 2025"), autoFocus = false) { go(OnboardingStep.CareDoctor) }
                 }
-                OnboardingStep.Finish -> OnboardingFinish(name.trim(), CarePatientProfileRules.age(age).first, illness.trim(), profileError)
+                OnboardingStep.CareDoctor -> OnboardingPage {
+                    StepHeading(if (family) t("Which doctor are they seeing now?", "वे अभी किस डॉक्टर को दिखा रहे हैं?") else t("Which doctor are you seeing now?", "आप अभी किस डॉक्टर को दिखा रहे हैं?"), t("Optional", "ज़रूरी नहीं"))
+                    OnboardingField(doctorName, { doctorName = it.take(100) }, t("Doctor's name", "डॉक्टर का नाम"), "onboarding-doctor-name",
+                        KeyboardOptions(capitalization = KeyboardCapitalization.Words, keyboardType = KeyboardType.Text, imeAction = ImeAction.Next)) { focus.moveFocus(FocusDirection.Down) }
+                    OnboardingField(doctorPlace, { doctorPlace = it.take(120) }, t("Hospital or clinic", "अस्पताल या क्लिनिक"), "onboarding-doctor-place",
+                        KeyboardOptions(capitalization = KeyboardCapitalization.Words, keyboardType = KeyboardType.Text, imeAction = ImeAction.Next), autoFocus = false) { focus.moveFocus(FocusDirection.Down) }
+                    OnboardingField(doctorPhone, { value -> doctorPhone = value.filter { it.isDigit() || it in "+ -" }.take(20) }, t("Doctor's phone", "डॉक्टर का फ़ोन"), "onboarding-doctor-phone",
+                        KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Done), autoFocus = false) { go(OnboardingStep.Treatment) }
+                }
+                OnboardingStep.Treatment -> OnboardingPage {
+                    StepHeading(t("What treatment is going on now?", "अभी कौन-सा इलाज चल रहा है?"), t("Choose all that apply. Optional.", "जो भी लागू हों, सब चुनें। ज़रूरी नहीं।"))
+                    TreatmentChips(treatments, enabled = !locked) { code ->
+                        haptic.performHapticFeedback(HapticFeedbackType.SegmentTick)
+                        treatmentCodes = CarePatientProfile.toggleTreatment(treatments, code).joinToString(",")
+                    }
+                    OnboardingField(treatmentNote, { treatmentNote = it.take(200) }, t("Anything else (optional)", "कुछ और (ज़रूरी नहीं)"), "onboarding-treatment-note",
+                        KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, keyboardType = KeyboardType.Text, imeAction = ImeAction.Done), autoFocus = false) { go(OnboardingStep.Finish) }
+                }
+                OnboardingStep.Finish -> OnboardingFinish(name.trim(), answers(), profileError)
             }
         }
         OnboardingDock(step) { dockStep ->
@@ -303,11 +344,25 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
                 OnboardingStep.Doctor -> SaharaPracticeEntry(t("Try a demo account", "डेमो खाता आज़माएँ"), t("Log in to a demo account", "डेमो खाते में लॉग इन करें"),
                     enabled = !locked, onClick = onDoctorDemo, modifier = Modifier.testTag("doctor-demo-entry"))
                 OnboardingStep.Name -> DockButton(t("Next", "आगे"), Modifier.testTag("onboarding-next"), enabled = name.isNotBlank() && !locked) { go(OnboardingStep.Age) }
-                OnboardingStep.Age, OnboardingStep.Illness -> Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    val filled = if (dockStep == OnboardingStep.Age) age.isNotBlank() && ageError == null else illness.isNotBlank()
-                    val next = if (dockStep == OnboardingStep.Age) OnboardingStep.Illness else OnboardingStep.Finish
+                OnboardingStep.Age, OnboardingStep.Illness, OnboardingStep.CareDoctor, OnboardingStep.Treatment -> Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    val filled = when (dockStep) {
+                        OnboardingStep.Age -> age.isNotBlank() && ageError == null
+                        OnboardingStep.Illness -> illness.isNotBlank() || illnessSince.isNotBlank()
+                        OnboardingStep.CareDoctor -> doctorName.isNotBlank() || doctorPlace.isNotBlank() || doctorPhone.isNotBlank()
+                        else -> treatments.isNotEmpty() || treatmentNote.isNotBlank()
+                    }
+                    val next = when (dockStep) { OnboardingStep.Age -> OnboardingStep.Illness; OnboardingStep.Illness -> OnboardingStep.CareDoctor; OnboardingStep.CareDoctor -> OnboardingStep.Treatment; else -> OnboardingStep.Finish }
                     DockButton(t("Next", "आगे"), Modifier.testTag("onboarding-next"), enabled = filled && !locked) { go(next) }
-                    TextButton(onClick = { if (dockStep == OnboardingStep.Age) age = "" else illness = ""; go(next) }, enabled = !locked,
+                    // Skipping clears what this step holds, so a half-typed answer is never saved by accident.
+                    TextButton(onClick = {
+                        when (dockStep) {
+                            OnboardingStep.Age -> age = ""
+                            OnboardingStep.Illness -> { illness = ""; illnessSince = "" }
+                            OnboardingStep.CareDoctor -> { doctorName = ""; doctorPlace = ""; doctorPhone = "" }
+                            else -> { treatmentCodes = ""; treatmentNote = "" }
+                        }
+                        go(next)
+                    }, enabled = !locked,
                         modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("onboarding-skip-step"), colors = ButtonDefaults.textButtonColors(contentColor = SaharaColors.OnBand)) {
                         Text(t("Skip for now", "अभी छोड़ें"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
                     }
@@ -316,7 +371,7 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
                     enabled = name.isNotBlank(), busy = entryBusy) {
                     haptic.performHapticFeedback(HapticFeedbackType.Confirm)
                     val save = onSaveProfile
-                    if (save == null) onStart() else save(name.trim(), OnboardingFlow.profile(age, illness))
+                    if (save == null) onStart() else save(name.trim(), answers())
                 }
                 OnboardingStep.SignIn, OnboardingStep.SignUp -> Unit
             }
@@ -386,9 +441,10 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
 
 /** A large single-line answer field; the keyboard opens on it, and the keyboard's own Next/Done moves on. */
 @Composable private fun OnboardingField(value: String, onValueChange: (String) -> Unit, label: String, tag: String, keyboard: KeyboardOptions,
-    error: String? = null, placeholder: String? = null, onSubmit: () -> Unit) {
+    error: String? = null, placeholder: String? = null, autoFocus: Boolean = true, onSubmit: () -> Unit) {
     val focus = remember { FocusRequester() }
-    LaunchedEffect(Unit) { delay(SaharaMotion.ms(SaharaMotion.ENTER_MS).toLong()); runCatching { focus.requestFocus() } }
+    // Only the first field of a page takes the keyboard on arrival; the keyboard's Next moves on to the others.
+    if (autoFocus) LaunchedEffect(Unit) { delay(SaharaMotion.ms(SaharaMotion.ENTER_MS).toLong()); runCatching { focus.requestFocus() } }
     OutlinedTextField(value, onValueChange, singleLine = true, label = { Text(label) }, isError = error != null,
         placeholder = placeholder?.let { { Text(it, color = SaharaColors.InkFaint) } },
         supportingText = error?.let { { Text(it, Modifier.announce()) } },
@@ -470,9 +526,34 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
     }
 }
 
-/** "You're all set": the success mark, one calm line and the answers given, before the final button saves them. */
-@Composable private fun OnboardingFinish(name: String, age: Int?, illness: String, error: String?) {
+/**
+ * Treatment now as big tickable chips (52 dp, wrap at large text). "Pain and symptom care only", "No treatment now" and "Not sure"
+ * stand alone (see [CarePatientProfile.toggleTreatment]). A ticked chip settles in with a soft spring; still when motion is off.
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable private fun TreatmentChips(selected: List<String>, enabled: Boolean, onToggle: (String) -> Unit) {
     val t = careText()
+    FlowRow(Modifier.fillMaxWidth().testTag("onboarding-treatments"), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        CarePatientProfile.TREATMENTS.forEachIndexed { index, code ->
+            val on = code in selected
+            val tone = if (code in CarePatientProfile.TREATMENTS_ALONE) SaharaTone.Leaf else SaharaTone.Plum
+            val scale by animateFloatAsState(if (on) 1.03f else 1f, if (SaharaMotion.enabled) spring(dampingRatio = .5f, stiffness = Spring.StiffnessMedium) else snap(), label = "treatment chip")
+            Surface(checked = on, onCheckedChange = { onToggle(code) }, enabled = enabled, shape = RoundedCornerShape(SaharaRadius.Pill),
+                color = if (on) tone.wash else SaharaColors.Surface, contentColor = SaharaColors.Ink, border = BorderStroke(if (on) 2.dp else 1.5.dp, if (on) tone.solid else SaharaColors.Edge),
+                modifier = Modifier.heightIn(min = 52.dp).saharaStagger(index).graphicsLayer { scaleX = scale; scaleY = scale }.testTag("onboarding-treatment-$code")) {
+                Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    if (on) { Icon(Icons.Default.Check, null, Modifier.size(20.dp), tint = tone.ink); Spacer(Modifier.width(6.dp)) }
+                    Text(careTreatmentLabel(code, t), fontSize = 16.sp, fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal, color = if (on) tone.ink else SaharaColors.Ink)
+                }
+            }
+        }
+    }
+}
+
+/** "You're all set": the success mark, one calm line and the answers given, before the final button saves them. */
+@Composable private fun OnboardingFinish(name: String, profile: CarePatientProfile?, error: String?) {
+    val t = careText()
+    val p = profile ?: CarePatientProfile()
     OnboardingPage {
         Spacer(Modifier.height(12.dp))
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
@@ -487,8 +568,30 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
                 Spacer(Modifier.width(14.dp))
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Text(name, fontSize = 19.sp, fontWeight = FontWeight.SemiBold, color = SaharaColors.Ink)
-                    val details = listOfNotNull(age?.let { t("Age", "उम्र") + " " + it }, illness.ifBlank { null })
-                    if (details.isNotEmpty()) Text(details.joinToString(" · "), fontSize = 15.sp, color = SaharaColors.InkSub)
+                    p.age?.let { Text(t("Age", "उम्र") + " " + it, fontSize = 15.sp, color = SaharaColors.InkSub) }
+                }
+            }
+        }
+        // The care details, one row each, only for what was filled in; the doctor and family see the same on the profile card.
+        val illnessLine = p.illness
+        val doctorLine = listOf(p.doctorName, p.doctorPlace, p.doctorPhone).filter(String::isNotBlank).joinToString(" · ")
+        val treatmentLine = careTreatmentLine(p, t)
+        val rows = listOfNotNull(
+            Triple(Icons.Default.MedicalInformation, t("Illness", "बीमारी"), illnessLine).takeIf { illnessLine.isNotBlank() },
+            Triple(Icons.Default.Event, t("Illness since", "बीमारी कब से"), p.illnessSince).takeIf { p.illnessSince.isNotBlank() },
+            Triple(Icons.Default.LocalHospital, t("Doctor now", "अभी के डॉक्टर"), doctorLine).takeIf { doctorLine.isNotBlank() },
+            Triple(Icons.Default.Healing, t("Treatment now", "अभी का इलाज"), treatmentLine).takeIf { treatmentLine.isNotBlank() })
+        if (rows.isNotEmpty()) Surface(shape = RoundedCornerShape(SaharaRadius.Xl), color = SaharaColors.Surface, border = BorderStroke(1.dp, SaharaColors.Line), modifier = Modifier.fillMaxWidth().saharaAppear().testTag("onboarding-summary-care")) {
+            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                rows.forEach { (icon, label, value) ->
+                    Row(verticalAlignment = Alignment.Top) {
+                        Icon(icon, null, Modifier.size(22.dp), tint = RustText)
+                        Spacer(Modifier.width(12.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(label, fontSize = 14.sp, color = SaharaColors.InkSub)
+                            Text(value, fontSize = 16.sp, lineHeight = 22.sp, fontWeight = FontWeight.Medium, color = SaharaColors.Ink)
+                        }
+                    }
                 }
             }
         }

@@ -142,9 +142,35 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                 Icon(if (profile.phone.isNotBlank()) Icons.Default.Phone else Icons.Default.Place, null, Modifier.size(18.dp), tint = Rust); Spacer(Modifier.width(8.dp))
                 Text(contact, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
+            // The care now (Dr Shirin, 23 Nov): since when, the doctor seen now and the treatment now; only what is filled in.
+            if (profile.hasCareNow) ProfileCareNow(profile, Modifier.testTag("$tag-care-now"))
         }
     }
     if (history) ProfileWeightHistoryDialog(profile.weightKg, weights) { history = false }
+}
+
+/** Since when, the doctor now and the treatment now, one quiet row each (wraps rather than cuts, so a doctor reads it all). */
+@Composable private fun ProfileCareNow(profile: CarePatientProfile, modifier: Modifier = Modifier) {
+    val t = careText()
+    val doctor = listOf(profile.doctorName, profile.doctorPlace, profile.doctorPhone).filter(String::isNotBlank).joinToString(" · ")
+    val treatment = careTreatmentLine(profile, t)
+    Surface(shape = RoundedCornerShape(12.dp), color = Cream, modifier = modifier.fillMaxWidth()) {
+        Column(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOfNotNull(
+                Triple(Icons.Default.Event, t("Illness since", "बीमारी कब से"), profile.illnessSince).takeIf { profile.illnessSince.isNotBlank() },
+                Triple(Icons.Default.LocalHospital, t("Doctor now", "अभी के डॉक्टर"), doctor).takeIf { doctor.isNotBlank() },
+                Triple(Icons.Default.Healing, t("Treatment now", "अभी का इलाज"), treatment).takeIf { treatment.isNotBlank() },
+            ).forEach { (icon, label, value) ->
+                Row(verticalAlignment = Alignment.Top) {
+                    Icon(icon, null, Modifier.size(18.dp), tint = DoctorAccent); Spacer(Modifier.width(8.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(label, fontSize = 13.sp, color = DoctorCardSub)
+                        Text(value, fontSize = 15.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+                    }
+                }
+            }
+        }
+    }
 }
 
 /** Current weight with a trend badge (change since the weight before it) and a small line of the last few weights. A tap opens the history. */
@@ -252,6 +278,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
     var allergies by remember { mutableStateOf(initial.allergies) }
     var phone by remember { mutableStateOf(initial.phone) }
     var address by remember { mutableStateOf(initial.address) }
+    var illnessSince by remember { mutableStateOf(initial.illnessSince) }
+    var doctorName by remember { mutableStateOf(initial.doctorName) }
+    var doctorPlace by remember { mutableStateOf(initial.doctorPlace) }
+    var doctorPhone by remember { mutableStateOf(initial.doctorPhone) }
+    var treatments by remember { mutableStateOf(initial.treatments) }
+    var treatmentNote by remember { mutableStateOf(initial.treatmentNote) }
+    var showDoctor by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<ProfileError?>(null) }
     var showAllergies by remember { mutableStateOf(false) }; var showPhone by remember { mutableStateOf(false) }; var showAddress by remember { mutableStateOf(false) }
     fun sexLabel(v: String) = when (v) { "Female" -> t("Female", "महिला"); "Male" -> t("Male", "पुरुष"); else -> t("Other", "अन्य") }
@@ -276,6 +309,19 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
             }
             ProfileStep(3, t("Health", "सेहत")) {
                 ProfileField(illness, { illness = it.take(120) }, t("Main illness / diagnosis", "मुख्य बीमारी / निदान"), Icons.Default.MedicalInformation)
+                ProfileField(illnessSince, { illnessSince = it.take(20) }, t("Since when (for example Mar 2025)", "कब से (जैसे मार्च 2025)"), Icons.Default.Event, KeyboardType.Text,
+                    Modifier.fillMaxWidth().testTag("patient-profile-illness-since"), singleLine = true)
+                // The doctor seen now: three fields behind one "+ Add" chip until any of them is filled in.
+                if (showDoctor || doctorName.isNotBlank() || doctorPlace.isNotBlank() || doctorPhone.isNotBlank()) {
+                    ProfileField(doctorName, { doctorName = it.take(100) }, t("Doctor's name", "डॉक्टर का नाम"), Icons.Default.LocalHospital, KeyboardType.Text, Modifier.fillMaxWidth().testTag("patient-profile-doctor-name"), singleLine = true)
+                    ProfileField(doctorPlace, { doctorPlace = it.take(120) }, t("Hospital or clinic", "अस्पताल या क्लिनिक"), Icons.Default.Place, KeyboardType.Text, Modifier.fillMaxWidth().testTag("patient-profile-doctor-place"), singleLine = true)
+                    ProfileField(doctorPhone, { v -> doctorPhone = v.filter { it.isDigit() || it in "+ -" }.take(20) }, t("Doctor's phone", "डॉक्टर का फ़ोन"), Icons.Default.Phone, KeyboardType.Phone, Modifier.fillMaxWidth().testTag("patient-profile-doctor-phone"))
+                } else SaharaAddChip(t("Add doctor now", "अभी के डॉक्टर जोड़ें"), { showDoctor = true }, Modifier.testTag("patient-profile-add-doctor"), tone = SaharaTone.Indigo)
+                Text(t("Treatment now", "अभी का इलाज"), fontSize = 14.sp, color = DoctorCardSub)
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.testTag("patient-profile-treatments")) {
+                    CarePatientProfile.TREATMENTS.forEach { code -> ProfileChip(code in treatments, careTreatmentLabel(code, t)) { treatments = CarePatientProfile.toggleTreatment(treatments, code) } }
+                }
+                ProfileField(treatmentNote, { treatmentNote = it.take(200) }, t("Anything else (optional)", "कुछ और (ज़रूरी नहीं)"), Icons.Default.Healing, modifier = Modifier.fillMaxWidth().testTag("patient-profile-treatment-note"))
                 // Optional fields that are still empty wait behind a "+ Add" chip; anything already filled stays open.
                 if (showAllergies || allergies.isNotBlank()) ProfileField(allergies, { allergies = it.take(200) }, t("Allergies (optional)", "एलर्जी (ज़रूरी नहीं)"), Icons.Default.WarningAmber)
                 else SaharaAddChip(t("Add allergies", "एलर्जी जोड़ें"), { showAllergies = true }, Modifier.testTag("patient-profile-add-allergies"), tone = SaharaTone.Plum)
@@ -296,7 +342,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
               val a = CarePatientProfileRules.age(age); val w = CarePatientProfileRules.weight(weight); val h = CarePatientProfileRules.height(height)
               val bad = a.second ?: w.second ?: h.second
               if (bad != null) error = bad
-              else onSave(CarePatientProfile(a.first, sex, w.first, h.first, blood, illness.trim(), allergies.trim(), phone.trim(), address.trim(), CareWeightHistory.afterSave(initial, w.first, java.time.LocalDate.now())))
+              // copy() keeps any field this sheet does not show, so a newer key is never lost on edit.
+              else onSave(initial.copy(age = a.first, sex = sex, weightKg = w.first, heightCm = h.first, bloodGroup = blood, illness = illness.trim(), allergies = allergies.trim(), phone = phone.trim(), address = address.trim(),
+                  weights = CareWeightHistory.afterSave(initial, w.first, java.time.LocalDate.now()),
+                  illnessSince = illnessSince.trim(), doctorName = doctorName.trim(), doctorPlace = doctorPlace.trim(), doctorPhone = doctorPhone.trim(), treatments = treatments, treatmentNote = treatmentNote.trim()))
           }, busy = busy, modifier = Modifier.fillMaxWidth().testTag("patient-profile-save"))
         }
     }
@@ -313,9 +362,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 }
 
 /** A rounded text field with a small leading icon. */
-@Composable private fun ProfileField(value: String, onChange: (String) -> Unit, label: String, icon: ImageVector, keyboard: KeyboardType = KeyboardType.Text, modifier: Modifier = Modifier.fillMaxWidth()) {
+@Composable private fun ProfileField(value: String, onChange: (String) -> Unit, label: String, icon: ImageVector, keyboard: KeyboardType = KeyboardType.Text, modifier: Modifier = Modifier.fillMaxWidth(),
+    singleLine: Boolean = keyboard != KeyboardType.Text) {
     OutlinedTextField(value, onChange, modifier, label = { Text(label) }, leadingIcon = { Icon(icon, null, Modifier.size(20.dp), tint = DoctorAccent) },
-        singleLine = keyboard != KeyboardType.Text, keyboardOptions = KeyboardOptions(keyboardType = keyboard), shape = RoundedCornerShape(12.dp),
+        singleLine = singleLine, keyboardOptions = KeyboardOptions(keyboardType = keyboard), shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper))
 }
 

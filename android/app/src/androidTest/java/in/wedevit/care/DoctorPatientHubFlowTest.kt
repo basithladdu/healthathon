@@ -58,12 +58,9 @@ class DoctorPatientHubFlowTest {
         val account = context.getSharedPreferences("care-account-kjnhtakqzboayqorrlue", Context.MODE_PRIVATE)
         val before = account.all.toMap()
         try {
-            ui.setContent { CareTheme { DoctorDemo({}, demo, workflow) } }
-            ui.onNodeWithTag("demo-login").performScrollTo().performClick()
-            ui.onNodeWithTag("demo-nav-Patients").performClick()
-            ui.onNodeWithTag("demo-patient-search").performTextInput("Asha")
-            androidx.test.espresso.Espresso.closeSoftKeyboard()
-            ui.onNodeWithTag("demo-patient-demo-asha").performClick()
+            // The Patients tab now lists the walkthrough people; a demo record (Asha) opens directly, as the walkthrough does.
+            ui.setContent { CareTheme { DoctorDemo({}, demo, workflow, initialPatientId = "demo-asha") } }
+            ui.onNodeWithTag("demo-patient-hub").assertExists()
             sections.forEach { section ->
                 openTile(section)
                 ui.onNodeWithTag("demo-patient-detail").assertExists()
@@ -87,7 +84,7 @@ class DoctorPatientHubFlowTest {
             pressBack()
             ui.onNodeWithTag("demo-patient-hub").assertExists()
             pressBack()
-            ui.onNodeWithTag("demo-patients-list").assertExists()
+            ui.onNodeWithTag("walkthrough-patients-list").assertExists()
             assertTrue(workflow.versions("demo-asha").isEmpty())
             assertEquals(before, account.all)
         } finally {

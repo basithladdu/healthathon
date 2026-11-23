@@ -49,8 +49,8 @@ class DoctorMedicineReportUiTest {
                 }}
             }
         }
-        listOf("Current","Past").forEach{ui.onNodeWithTag("medicine-tab-$it").assertIsDisplayed().assertHasClickAction()}
-        ui.onNodeWithTag("medicine-tab-Intake history").assertDoesNotExist()
+        // Current, Past and the doctor's Intake history tab all stay visible and tappable at 1.5x text.
+        listOf("Current","Past","Intake history").forEach{ui.onNodeWithTag("medicine-tab-$it").assertIsDisplayed().assertHasClickAction()}
         ui.onNodeWithText("Plan followed by a report").assertExists()
         ui.onNodeWithText("Not logged").assertDoesNotExist()
         ui.waitForIdle()

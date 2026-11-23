@@ -36,7 +36,9 @@ class TodayRenderTest {
     private fun enter(user: String) {
         compose.waitForIdle()
         runCatching { compose.onNode(tagged("care-language-en")).performSemanticsAction(SemanticsActions.OnClick); settle() }
-        click("welcome-patient-family"); click("patient-walkthrough-entry"); click("patient-walkthrough-$user")
+        click("welcome-patient-family"); runCatching { shot("d1-after-role-$user") }
+        click("patient-walkthrough-entry"); runCatching { shot("d2-after-entry-$user") }
+        click("patient-walkthrough-$user"); runCatching { shot("d3-after-pick-$user") }
         compose.waitUntil(60_000) { compose.onAllNodes(tagged("nav-Today")).fetchSemanticsNodes().isNotEmpty() }
         settle()
     }

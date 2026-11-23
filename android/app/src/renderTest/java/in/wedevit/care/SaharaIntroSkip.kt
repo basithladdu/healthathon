@@ -1,16 +1,26 @@
 package `in`.wedevit.care
 
 import androidx.compose.ui.semantics.SemanticsActions
-import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.performSemanticsAction
 
 private val roleTags = setOf("welcome-patient-family", "welcome-family", "doctor-workspace-entry")
 
-/** A fresh MainActivity opens on the first-run intro pages (CareOnboarding.kt); flows that start at a role card skip them first. No-op once skipped. */
-internal fun SemanticsNodeInteractionsProvider.skipSaharaIntroFor(tag: String) {
+/**
+ * A fresh MainActivity opens on the first-run intro pages (CareOnboarding.kt); flows that start at a role card skip them first.
+ * The welcome screen appears only once the care records have loaded, so this first waits (up to 20 s) for either the intro's Skip
+ * or the role card itself, then presses Skip if it is there and lets the step change settle. No-op once the intro is gone.
+ */
+internal fun ComposeTestRule.skipSaharaIntroFor(tag: String) {
     if (tag !in roleTags) return
-    val skip = onAllNodes(hasTestTag("onboarding-skip"))
-    if (skip.fetchSemanticsNodes().isNotEmpty()) runCatching { skip.onFirst().performSemanticsAction(SemanticsActions.OnClick) }
+    fun present(t: String) = onAllNodes(hasTestTag(t)).fetchSemanticsNodes().isNotEmpty()
+    // The first-launch brand moment (~1.8 s) sits on top of everything; the test clock may not advance by itself, so step it past.
+    repeat(10) { if (present("sahara-brand-moment")) { mainClock.advanceTimeBy(500); waitForIdle() } }
+    runCatching { waitUntil(20_000) { present("onboarding-skip") || present(tag) } }
+    if (present("onboarding-skip")) {
+        runCatching { onAllNodes(hasTestTag("onboarding-skip")).onFirst().performSemanticsAction(SemanticsActions.OnClick) }
+        mainClock.advanceTimeBy(1500); waitForIdle()
+    }
 }

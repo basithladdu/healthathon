@@ -6,6 +6,7 @@ import android.widget.TimePicker
 import android.widget.DatePicker
 import android.graphics.Bitmap
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalDensity
@@ -38,33 +39,39 @@ class DoctorDemoFlowTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val preferencesName = "doctor-demo-large-text-${UUID.randomUUID()}"
         val store = DoctorDemoStore(context, preferencesName = preferencesName)
+        // The Patients tab lists the walkthrough people now; a demo record (Asha) opens directly (initialPatientId), as the walkthrough does.
+        val record = mutableStateOf<String?>(null)
         try {
             ui.setContent {
                 val density = LocalDensity.current
                 CompositionLocalProvider(LocalDensity provides Density(density.density, 1.5f)) {
-                    CareTheme { DoctorDemo(onExit = {}, store = store) }
+                    CareTheme { key(record.value) { DoctorDemo(onExit = {}, store = store, initialPatientId = record.value) } }
                 }
             }
             ui.onNodeWithTag("demo-email").performScrollTo().assertIsDisplayed()
             ui.onNodeWithTag("demo-password").performScrollTo().assertIsDisplayed()
             screenshot("doctor-login-large-text")
             ui.onNodeWithTag("demo-login").performScrollTo().assertIsDisplayed().performClick()
+            ui.onNodeWithTag("demo-home-list").assertExists()
             screenshot("doctor-home-large-text")
             ui.onNodeWithTag("demo-nav-Patients").assertIsDisplayed().performClick()
-            ui.onNodeWithTag("demo-patient-search").performTextInput("Asha")
-            ui.onNodeWithTag("demo-patient-demo-asha").assertIsDisplayed().performClick()
+            ui.onNodeWithTag("walkthrough-patients-list").assertExists()
+            ui.onNodeWithTag("doctor-patient-search").assertIsDisplayed()
+            ui.onNodeWithTag("demo-nav-Schedule").assertIsDisplayed().performClick()
+            ui.onNodeWithTag("doctor-schedule").assertExists()
+            screenshot("doctor-schedule-large-text")
+            ui.onNodeWithTag("demo-nav-Account").assertIsDisplayed().performClick()
+            ui.onNodeWithTag("demo-exit").performScrollTo().assertIsDisplayed()
+            screenshot("doctor-account-large-text")
+            ui.runOnIdle { record.value = "demo-asha" }
+            ui.onNodeWithTag("demo-patient-hub").assertExists()
             listOf("Summary", "Progress", "Medicines", "Conversations", "Visits", "Reports").forEach {
                 openRecordSection(it)
             }
             screenshot("doctor-record-large-text")
             openRecordSection("Visits")
-            ui.onNodeWithTag("demo-schedule-visit").performScrollTo().assertIsDisplayed()
-            ui.onNodeWithTag("demo-nav-Schedule").assertIsDisplayed().performClick()
-            ui.onNodeWithTag("demo-add-visit").performScrollTo().assertIsDisplayed()
-            screenshot("doctor-schedule-large-text")
-            ui.onNodeWithTag("demo-nav-Account").assertIsDisplayed().performClick()
-            ui.onNodeWithTag("demo-exit").performScrollTo().assertIsDisplayed()
-            screenshot("doctor-account-large-text")
+            ui.onNodeWithTag("demo-patient-detail").performScrollToNode(hasTestTag("demo-schedule-visit"))
+            ui.onNodeWithTag("demo-schedule-visit").assertIsDisplayed()
         } finally {
             context.getSharedPreferences(preferencesName, Context.MODE_PRIVATE).edit().clear().commit()
         }
@@ -82,8 +89,10 @@ class DoctorDemoFlowTest {
         val completeFixture = DoctorDemoAppointment("demo-ui-complete", "demo-asha", tomorrow.atTime(14, 0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(), 30, "Phone")
         assertNull(store.save(completeFixture))
         val exited = mutableStateOf(false)
+        // After signing in, Asha's demo record opens directly (initialPatientId): the Patients tab lists the walkthrough people now.
+        val record = mutableStateOf<String?>(null)
         try {
-            ui.setContent { CareTheme { if (!exited.value) DoctorDemo(onExit = { exited.value = true }, store = store) } }
+            ui.setContent { CareTheme { if (!exited.value) key(record.value) { DoctorDemo(onExit = { exited.value = true }, store = store, initialPatientId = record.value) } } }
             ui.onNodeWithText("Demo only").assertDoesNotExist()
             ui.onNodeWithContentDescription("Show password").performScrollTo().performClick()
             ui.onNodeWithContentDescription("Hide password").assertIsDisplayed().performClick()
@@ -96,17 +105,21 @@ class DoctorDemoFlowTest {
             screenshot("doctor-login")
             ui.onNodeWithTag("demo-login").performScrollTo().performClick()
             screenshot("doctor-demo-home")
+            ui.onNodeWithTag("demo-home-list").assertExists()
             ui.onNodeWithTag("demo-nav-Patients").performClick()
+            ui.onNodeWithTag("walkthrough-patients-list").assertExists()
             screenshot("doctor-patients")
-            ui.onNodeWithTag("demo-patient-search").performTextInput("Asha")
-            ui.onNodeWithTag("demo-patient-demo-asha").assertIsDisplayed().performClick()
+            ui.runOnIdle { record.value = "demo-asha" }
+            ui.onNodeWithTag("demo-patient-hub").assertExists()
             screenshot("doctor-demo-patient")
             listOf("Summary", "Progress", "Medicines", "Conversations", "Visits", "Reports").forEach {
                 openRecordSection(it)
                 screenshot("doctor-record-${it.lowercase().replace(' ', '-')}")
             }
+            // Visits are booked and managed from the patient's Visits section (the Schedule tab is the practice calendar now).
             openRecordSection("Visits")
-            ui.onNodeWithTag("demo-schedule-visit").performScrollTo().performClick()
+            ui.onNodeWithTag("demo-patient-detail").performScrollToNode(hasTestTag("demo-schedule-visit"))
+            ui.onNodeWithTag("demo-schedule-visit").performClick()
             ui.onNodeWithTag("demo-appointment-note").performScrollTo().performTextInput("Fictional UI test visit")
             saveVisit()
             ui.waitForIdle()
@@ -117,7 +130,6 @@ class DoctorDemoFlowTest {
             val booked = store.appointments().single { it.note == "Fictional UI test visit" }
             assertEquals("demo-asha", booked.patientId)
             assertEquals("Scheduled", booked.status)
-            ui.onNodeWithTag("demo-nav-Schedule").performClick()
             visitAction(booked.id, "Reschedule")
             ui.onNodeWithTag("demo-visit-time").performScrollTo().performClick()
             onView(isAssignableFrom(TimePicker::class.java)).perform(object : ViewAction {
@@ -136,7 +148,8 @@ class DoctorDemoFlowTest {
             assertEquals("Fictional rescheduled visit", store.appointments().single { it.id == booked.id }.note)
             assertEquals(booked.startMillis + 3_600_000L, store.appointments().single { it.id == booked.id }.startMillis)
             // Explicitly choose the same day/time to exercise overlap validation through the UI.
-            ui.onNodeWithTag("demo-add-visit").performScrollTo().performClick()
+            ui.onNodeWithTag("demo-patient-detail").performScrollToNode(hasTestTag("demo-schedule-visit"))
+            ui.onNodeWithTag("demo-schedule-visit").performClick()
             ui.onNodeWithTag("demo-visit-date").performScrollTo().performClick()
             onView(isAssignableFrom(DatePicker::class.java)).perform(object : ViewAction {
                 override fun getConstraints(): Matcher<View> = isAssignableFrom(DatePicker::class.java)
@@ -173,6 +186,7 @@ class DoctorDemoFlowTest {
         }
     }
     private fun visitAction(id: String, label: String) {
+        ui.onNodeWithTag("demo-patient-detail").performScrollToNode(hasTestTag("demo-appointment-$id"))
         ui.onNode(hasText(label) and hasAnyAncestor(hasTestTag("demo-appointment-$id"))).performScrollTo().performClick()
     }
     private fun openRecordSection(section: String) {

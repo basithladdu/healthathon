@@ -312,6 +312,8 @@ fun noteSectionLabel(label: String, hindi: Boolean): String = careTr(hindi, labe
 
 /** Hindi for reminder checks and alerts (the English stays in CareReminderRules and CareReminders, which tests rely on). */
 internal val ReminderTextHindi = mapOf(
+    "Visit tomorrow" to "कल विज़िट है",
+    "Open Sahara to see the time and what to bring." to "समय और साथ क्या लाना है, यह देखने के लिए सहारा खोलें।",
     "Use up to six reminder times." to "ज़्यादा से ज़्यादा छह रिमाइंडर समय रखें।",
     "Use HH:mm, such as 08:30." to "HH:mm लिखें, जैसे 08:30।",
     "Use a start date as YYYY-MM-DD." to "शुरू की तारीख़ YYYY-MM-DD में लिखें।",

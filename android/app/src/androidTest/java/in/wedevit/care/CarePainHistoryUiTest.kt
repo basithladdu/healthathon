@@ -20,23 +20,26 @@ class CarePainHistoryUiTest {
         val records = listOf(old, recent, old.copy(id = "not-this-person", personId = "another-person"))
         val originalDetails = records.map { it.detail }
         ui.setContent { CareTheme { PainBodyHistoryContent(records, "fixture-history", false, initialId = old.id, onClose = {}) } }
-        ui.onNodeWithTag("pain-history-observation").assertTextEquals("$day 10:00 · 7/10")
+        // Dates read as friendly words ("21 Nov, 10:00 AM"); a rated note adds its band word.
+        ui.onNodeWithTag("pain-history-observation").assertTextEquals("${friendlyWhen(day, "10:00", false)} · 7/10 · Severe")
+        ui.onNodeWithTag("pain-history-location").assertTextEquals("Left knee")
         ui.onNodeWithTag("pain-history-entry-not-this-person").assertDoesNotExist()
         ui.onNodeWithTag("pain-body-clear").assertDoesNotExist()
         ui.onNodeWithTag("pain-body-site-left-leg").assertDoesNotExist()
         ui.onNodeWithTag("pain-body-back").performScrollTo().performClick()
         ui.onNodeWithTag("pain-body-selected").performScrollTo().assertTextContains("Left leg / foot")
         ui.onNodeWithTag("pain-history-newer").performScrollTo().performClick()
-        ui.onNodeWithTag("pain-history-observation").assertTextEquals("$recentDay 10:00 · Not rated")
+        ui.onNodeWithTag("pain-history-observation").assertTextEquals("Yesterday, 10:00 AM · Not rated")
         ui.onNodeWithTag("pain-history-context").assertTextContains("Worst in 24 hours · Seen by family or carer · Fixture observer")
-        ui.onNodeWithText("This entry has a written location only; no point is added to the body.").assertExists()
+        // A written location only: the words are shown and no point is added to the body.
+        ui.onNodeWithTag("pain-history-location").assertTextEquals("Left knee")
         ui.onNodeWithTag("pain-body-selected").assertDoesNotExist()
         ui.runOnIdle { assertEquals(originalDetails, records.map { it.detail }) }
     }
     @Test fun noHistoryShowsAnHonestEmptyStateAndHindiCloseWorks() {
         var closed = false
         ui.setContent { CareTheme { PainBodyHistoryContent(emptyList(), "fixture-empty", true, onClose = { closed = true }) } }
-        ui.onNodeWithText("अभी दर्द का कोई नोट नहीं है").assertExists()
+        ui.onNodeWithTag("pain-history-empty").assertTextEquals("अभी कोई नोट नहीं")
         ui.onNodeWithTag("pain-body-3d").assertDoesNotExist()
         ui.onNodeWithTag("pain-history-close").assertTextContains("बंद करें").performClick()
         ui.runOnIdle { assertTrue(closed) }
