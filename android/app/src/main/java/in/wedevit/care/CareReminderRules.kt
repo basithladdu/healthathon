@@ -25,7 +25,17 @@ object CareReminderRules {
         if (ends.isNotBlank()) require(runCatching { LocalDate.parse(ends).toString() == ends }.getOrDefault(false)) { "Use an end date as YYYY-MM-DD." }
         require(starts.isBlank() || ends.isBlank() || ends >= starts) { "The end date must follow the start date." }
     }
+    /** Visits also alert the evening before (Dr Shirin, 23 Nov: "the notification should go one day prior"), at [DAY_BEFORE_TIME]. */
+    const val DAY_BEFORE_TIME = "18:00"
+    const val DAY_BEFORE_SUFFIX = ":daybefore"
     fun next(plan: CareReminderPlan, after: Long, zone: ZoneId): List<CareReminderOccurrence> {
+        val base = onTheDay(plan, after, zone)
+        if (plan.kind != "visit" || plan.finished || plan.itemId.isBlank() || plan.personId.isBlank() || plan.due <= 0 || plan.doneOn.isNotBlank()) return base
+        val day = Instant.ofEpochMilli(plan.due).atZone(zone).toLocalDate().minusDays(1)
+        val at = day.atTime(LocalTime.parse(DAY_BEFORE_TIME)).atZone(zone).toInstant().toEpochMilli()
+        return if (at > after) listOf(CareReminderOccurrence("${plan.itemId}$DAY_BEFORE_SUFFIX", plan.itemId, at, day.toString(), DAY_BEFORE_TIME)) + base else base
+    }
+    private fun onTheDay(plan: CareReminderPlan, after: Long, zone: ZoneId): List<CareReminderOccurrence> {
         if (plan.finished || plan.itemId.isBlank() || plan.personId.isBlank()) return emptyList()
         if (plan.kind != "medicine" && plan.dateOnly) {
             if (plan.doneOn.isNotBlank() || plan.due <= 0) return emptyList()

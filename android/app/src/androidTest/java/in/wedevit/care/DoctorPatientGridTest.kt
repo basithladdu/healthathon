@@ -28,7 +28,9 @@ class DoctorPatientGridTest {
     @Test fun normalGridKeepsSixPatientsInOrderAndEveryCardOpensItsOwnPatient() {
         val opened = mutableListOf<String>()
         content { DemoPatients(DoctorDemoData.patients) { opened += it } }
-        ui.onNodeWithText("6 patient records").assertIsDisplayed()
+        // The grid no longer prints a record count above the cards; every patient still has its own card.
+        assertEquals(6, DoctorDemoData.patients.size)
+        ui.onNodeWithTag("demo-patient-search").assertIsDisplayed()
         val first = card("demo-asha").fetchSemanticsNode().boundsInRoot
         val second = card("demo-ravi").fetchSemanticsNode().boundsInRoot
         assertEquals(first.top, second.top, 1f)
@@ -44,7 +46,7 @@ class DoctorPatientGridTest {
     @Test fun nameAndCareContextSearchUpdateCountAndEmptyResultCanBeCleared() {
         content { DemoPatients(DoctorDemoData.patients) {} }
         ui.onNodeWithTag("demo-patient-search").performTextInput("  rAvI  ")
-        ui.onNodeWithText("1 patient records").assertExists()
+        ui.onAllNodes(hasTestTagPrefix("demo-patient-demo-")).assertCountEquals(1)
         card("demo-ravi").assertExists()
         card("demo-asha").assertDoesNotExist()
         ui.onNodeWithTag("demo-patient-search").performTextReplacement("caregiver handover")
@@ -52,14 +54,16 @@ class DoctorPatientGridTest {
         card("demo-ravi").assertDoesNotExist()
         ui.onNodeWithTag("demo-patient-search").performTextReplacement("no such fictional patient")
         androidx.test.espresso.Espresso.closeSoftKeyboard()
-        ui.onNodeWithText("0 patient records").assertExists()
+        ui.onAllNodes(hasTestTagPrefix("demo-patient-demo-")).assertCountEquals(0)
         ui.onNodeWithTag("demo-patients-list").performScrollToNode(hasText("No matching patients"))
         ui.onNodeWithText("No matching patients").assertIsDisplayed()
         ui.onNodeWithTag("demo-patients-list").performScrollToNode(hasText("Clear search"))
         ui.onNodeWithText("Clear search").performClick()
-        ui.onNodeWithText("6 patient records").assertExists()
+        ui.onNodeWithTag("demo-patients-list").performScrollToNode(hasTestTag("demo-patient-demo-asha"))
         card("demo-asha").assertExists()
+        card("demo-ravi").assertExists()
     }
+    private fun hasTestTagPrefix(prefix: String) = SemanticsMatcher("tag starts with $prefix") { it.config.getOrElseNullable(androidx.compose.ui.semantics.SemanticsProperties.TestTag) { null }?.startsWith(prefix) == true }
 
     @Test fun narrowWidthAndLargeTextUseOneColumnWithoutTruncatingPatientIdentity() {
         val width = mutableStateOf(320.dp)

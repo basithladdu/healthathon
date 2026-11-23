@@ -29,3 +29,14 @@
 .section { animation: emergency-rise 260ms cubic-bezier(.22, 1, .36, 1) both; }
 @keyframes emergency-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .section { animation: none; } }
+
+/* "Your hospital or clinic (optional)" before the card: one line, a main button and a quiet skip. */
+.ask { margin-top: 24px; padding: 20px 16px; border: 1px solid var(--care-line, #e6ddd1); border-radius: 20px; background: var(--care-surface, #fffdf9); display: flex; flex-direction: column; gap: 10px; }
+.ask label { font-size: 17px; font-weight: 700; }
+.input { min-height: 48px; padding: 0 14px; border: 1.5px solid var(--care-line, #d8ccbd); border-radius: 12px; background: #fff; color: var(--care-ink, #382e29); font: inherit; font-size: 17px; width: 100%; box-sizing: border-box; }
+.input:focus-visible { outline: 3px solid #335f50; outline-offset: 1px; }
+.askActions { display: flex; flex-wrap: wrap; gap: 8px; }
+.primary, .skip { min-height: 48px; padding: 0 18px; border-radius: 12px; font: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
+.primary { border: 0; background: #335f50; color: #fff; }
+.skip { border: 1.5px solid var(--care-line, #d8ccbd); background: transparent; color: var(--care-ink, #382e29); }
+.primary:focus-visible, .skip:focus-visible { outline: 3px solid #8a3a22; outline-offset: 2px; }

@@ -5603,3 +5603,18 @@ Add doctor now	ابھی کے ڈاکٹر شامل کریں
 Hormone or targeted therapy	ہارمون یا ٹارگٹڈ تھراپی
 Pain and symptom care only	صرف درد اور علامات کی دیکھ بھال
 No treatment now	ابھی کوئی علاج نہیں
+Severe pain or distress this week	اس ہفتے شدید درد یا پریشانی
+Recorded for this patient in the last 7 days:	پچھلے 7 دنوں میں اس مریض کے لیے درج:
+Pain $score/10 on $day	درد $score/10، $day
+Distress $score/10 on $day	پریشانی $score/10، $day
+Open Symptoms & distress	علامات اور پریشانی کھولیں
+Emergency card for $name opened at $place, $time	$name کا ہنگامی کارڈ $place میں کھولا گیا، $time
+Emergency card for $name opened (place not given), $time	$name کا ہنگامی کارڈ کھولا گیا (جگہ نہیں بتائی)، $time
+Opened at $place on $time	$place میں $time کو کھولا گیا
+Opened on $time (place not given)	$time کو کھولا گیا (جگہ نہیں بتائی)
+Only web link opens are shown. Scans of the offline code on a printed card can't be seen.	صرف ویب لنک سے کھولنا دکھتا ہے۔ چھپے کارڈ کے آف لائن کوڈ کا اسکین نظر نہیں آتا۔
+Last opened at $place on $at	آخری بار $place میں $at کو کھولا گیا
+Last opened on $at	آخری بار $at کو کھولا گیا
+Emergency card web link	ہنگامی کارڈ ویب لنک
+Visit tomorrow	کل وزٹ ہے
+Open Sahara to see the time and what to bring.	وقت اور کیا ساتھ لانا ہے دیکھنے کے لیے سہارا کھولیں۔

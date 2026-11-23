@@ -48,16 +48,19 @@ class DoctorEmbeddedNavigationTest {
                 CareTheme { Box(Modifier.width(360.dp).fillMaxSize().safeDrawingPadding()) { DoctorSharedPatientHub(Person("fixture-person", "Test Person"), { opened += it }) } }
             }
         }
-        ui.onNodeWithText("Test Person's care").assertExists()
-        listOf("Progress", "Labs", "Conversations", "Visits", "Medicines", "Reports").forEach {
-            ui.onNodeWithTag("doctor-shared-$it").performScrollTo().assertIsDisplayed().assertHeightIsAtLeast(48.dp).performClick()
+        // The patient's header names them; Goals of care leads the section list, then the care plan and the record sections.
+        ui.onNode(hasText("Test Person") and hasAnyAncestor(hasTestTag("doctor-patient-header"))).assertExists()
+        val sections = listOf("GoalsOfCare", "CarePlan", "Progress", "Labs", "Conversations", "Visits", "Medicines", "Reports")
+        sections.forEach {
+            ui.onNodeWithTag("doctor-shared-patient-hub").performScrollToNode(hasTestTag("doctor-shared-$it"))
+            ui.onNodeWithTag("doctor-shared-$it").assertIsDisplayed().assertHeightIsAtLeast(48.dp).performClick()
         }
         // "Daily care" (the whole patient app) is no longer offered to the doctor (Dr Sujay, 22 Nov).
         ui.onNodeWithTag("doctor-shared-tools").assertDoesNotExist()
-        ui.onNodeWithTag("doctor-shared-patient-hub").performScrollToNode(hasText("Sharing & access"))
-        ui.onNodeWithTag("doctor-shared-access-detail").assertExists()
-        ui.onNodeWithText("Sharing & access").performClick()
-        assertEquals(listOf("Progress", "Labs", "Conversations", "Visits", "Medicines", "Reports", "Shared"), opened)
+        ui.onNodeWithTag("doctor-shared-patient-hub").performScrollToNode(hasTestTag("doctor-shared-access"))
+        ui.onNodeWithTag("doctor-shared-access-detail", useUnmergedTree = true).assertExists()
+        ui.onNodeWithTag("doctor-shared-access").performClick()
+        assertEquals(sections + "Shared", opened)
         listOf("Today", "Talk", "Care", "Nearby", "More").forEach { ui.onNodeWithText(it).assertDoesNotExist() }
     }
 

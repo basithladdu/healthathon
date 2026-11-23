@@ -1,0 +1,411 @@
+{
+"2026-08-25": {
+"total": 39,
+"clin": 29,
+"p_sujay": 24,
+"eng": 10,
+"p_basith": 10,
+"kw_meet": 1,
+"p_sharada": 5
+},
+"2026-08-26": {
+"total": 2,
+"clin": 1,
+"p_sujay": 1,
+"eng": 1,
+"p_basith": 1
+},
+"2026-08-27": {
+"total": 6,
+"clin": 5,
+"p_sujay": 5,
+"kw_meet": 1,
+"eng": 1,
+"p_basith": 1
+},
+"2026-08-29": {
+"total": 5,
+"clin": 5,
+"p_sujay": 5
+},
+"2026-08-30": {
+"total": 20,
+"clin": 13,
+"p_sujay": 6,
+"p_sharada": 7,
+"eng": 7,
+"p_basith": 6,
+"kw_meet": 4,
+"p_awaiz": 1,
+"kw_link": 1,
+"kw_callmark": 1
+},
+"2026-08-31": {
+"total": 7,
+"clin": 6,
+"p_sujay": 3,
+"p_sharada": 3,
+"eng": 1,
+"p_basith": 1
+},
+"2026-09-02": {
+"total": 6,
+"clin": 5,
+"p_sujay": 5,
+"eng": 1,
+"p_basith": 1
+},
+"2026-09-06": {
+"total": 7,
+"eng": 3,
+"p_basith": 3,
+"clin": 4,
+"p_sujay": 4
+},
+"2026-09-08": {
+"total": 18,
+"clin": 13,
+"p_sujay": 13,
+"kw_meet": 2,
+"eng": 5,
+"p_awaiz": 2,
+"p_basith": 3
+},
+"2026-09-12": {
+"total": 5,
+"clin": 5,
+"p_sujay": 5,
+"kw_meet": 1
+},
+"2026-09-13": {
+"total": 13,
+"clin": 4,
+"p_sujay": 4,
+"eng": 9,
+"p_basith": 9
+},
+"2026-09-14": {
+"total": 16,
+"clin": 12,
+"p_sujay": 12,
+"eng": 4,
+"p_basith": 4
+},
+"2026-09-17": {
+"total": 11,
+"clin": 8,
+"p_sujay": 6,
+"eng": 3,
+"p_basith": 3,
+"p_sharada": 2
+},
+"2026-09-18": {
+"total": 26,
+"clin": 17,
+"p_sujay": 17,
+"eng": 9,
+"p_basith": 9,
+"kw_meet": 1
+},
+"2026-09-20": {
+"total": 8,
+"clin": 4,
+"p_sujay": 3,
+"eng": 4,
+"p_basith": 3,
+"kw_meet": 1,
+"p_awaiz": 1,
+"p_sharada": 1
+},
+"2026-09-21": {
+"total": 19,
+"clin": 15,
+"p_shirin": 2,
+"p_sujay": 11,
+"p_sharada": 2,
+"eng": 4,
+"p_awaiz": 1,
+"p_basith": 3,
+"kw_meet": 3,
+"kw_link": 1
+},
+"2026-09-23": {
+"total": 41,
+"clin": 28,
+"p_sujay": 16,
+"eng": 13,
+"p_basith": 13,
+"p_sharada": 1,
+"kw_meet": 3,
+"kw_link": 1,
+"p_shirin": 11
+},
+"2026-09-24": {
+"total": 21,
+"clin": 15,
+"p_sujay": 11,
+"eng": 6,
+"p_basith": 6,
+"p_sharada": 2,
+"kw_meet": 1,
+"p_shirin": 2
+},
+"2026-09-25": {
+"total": 84,
+"clin": 64,
+"p_sujay": 36,
+"eng": 20,
+"p_basith": 20,
+"p_shirin": 14,
+"p_sharada": 14,
+"kw_meet": 1
+},
+"2026-09-26": {
+"total": 8,
+"clin": 8,
+"p_sujay": 5,
+"p_sharada": 3
+},
+"2026-09-30": {
+"total": 3,
+"clin": 2,
+"p_sujay": 2,
+"eng": 1,
+"p_basith": 1
+},
+"2026-10-02": {
+"total": 17,
+"clin": 13,
+"p_sujay": 9,
+"eng": 4,
+"p_basith": 4,
+"p_sharada": 4
+},
+"2026-10-03": {
+"total": 4,
+"clin": 3,
+"p_sujay": 3,
+"eng": 1,
+"p_basith": 1
+},
+"2026-10-05": {
+"total": 7,
+"clin": 7,
+"p_sharada": 5,
+"p_shirin": 2
+},
+"2026-10-08": {
+"total": 19,
+"clin": 11,
+"p_sharada": 3,
+"p_sujay": 8,
+"eng": 8,
+"p_basith": 8
+},
+"2026-10-09": {
+"total": 69,
+"clin": 49,
+"p_sharada": 16,
+"p_sujay": 27,
+"eng": 20,
+"p_basith": 20,
+"p_shirin": 6,
+"kw_mentor": 1
+},
+"2026-10-10": {
+"total": 79,
+"clin": 58,
+"p_shirin": 6,
+"p_sharada": 15,
+"eng": 21,
+"p_basith": 17,
+"p_sujay": 37,
+"p_awaiz": 4
+},
+"2026-10-11": {
+"total": 3,
+"clin": 3,
+"p_sujay": 3
+},
+"2026-10-12": {
+"total": 5,
+"eng": 3,
+"p_basith": 3,
+"clin": 2,
+"p_sujay": 2
+},
+"2026-10-13": {
+"total": 2,
+"eng": 1,
+"p_basith": 1,
+"clin": 1,
+"p_sujay": 1
+},
+"2026-10-15": {
+"total": 2,
+"eng": 1,
+"p_basith": 1,
+"clin": 1,
+"p_sujay": 1
+},
+"2026-10-16": {
+"total": 7,
+"eng": 4,
+"p_basith": 4,
+"clin": 3,
+"p_sujay": 3,
+"kw_mentor": 1,
+"kw_meet": 1
+},
+"2026-10-19": {
+"total": 9,
+"eng": 5,
+"p_basith": 5,
+"clin": 4,
+"p_sharada": 3,
+"p_sujay": 1,
+"kw_mentor": 1
+},
+"2026-10-20": {
+"total": 7,
+"eng": 5,
+"p_basith": 3,
+"kw_meet": 2,
+"p_awaiz": 2,
+"kw_link": 1,
+"clin": 2,
+"p_sharada": 2
+},
+"2026-10-21": {
+"total": 5,
+"eng": 2,
+"p_awaiz": 1,
+"clin": 3,
+"p_sujay": 2,
+"kw_meet": 2,
+"p_basith": 1,
+"p_sharada": 1
+},
+"2026-10-22": {
+"total": 7,
+"clin": 5,
+"p_sujay": 5,
+"eng": 2,
+"p_basith": 2
+},
+"2026-10-23": {
+"total": 16,
+"clin": 14,
+"p_sujay": 9,
+"kw_meet": 2,
+"eng": 2,
+"p_basith": 1,
+"p_awaiz": 1,
+"p_sharada": 2,
+"p_shirin": 3
+},
+"2026-10-24": {
+"total": 69,
+"clin": 56,
+"p_shirin": 31,
+"eng": 13,
+"p_basith": 11,
+"p_awaiz": 2,
+"p_sujay": 14,
+"p_sharada": 11
+},
+"2026-10-26": {
+"total": 5,
+"clin": 4,
+"p_sujay": 4,
+"eng": 1,
+"p_basith": 1
+},
+"2026-10-27": {
+"total": 31,
+"eng": 7,
+"p_awaiz": 1,
+"clin": 24,
+"p_sujay": 14,
+"p_basith": 6,
+"p_sharada": 9,
+"p_shirin": 1
+},
+"2026-10-28": {
+"total": 13,
+"clin": 9,
+"p_sujay": 7,
+"eng": 4,
+"p_basith": 4,
+"p_sharada": 2,
+"kw_link": 1,
+"kw_meet": 1
+},
+"2026-10-29": {
+"total": 47,
+"clin": 36,
+"p_sujay": 26,
+"p_sharada": 10,
+"eng": 11,
+"p_basith": 11,
+"kw_meet": 1
+},
+"2026-10-30": {
+"total": 17,
+"clin": 13,
+"p_sujay": 9,
+"kw_meet": 1,
+"p_sharada": 4,
+"eng": 4,
+"p_basith": 4
+},
+"2026-10-31": {
+"total": 16,
+"eng": 2,
+"p_basith": 1,
+"clin": 14,
+"p_sujay": 9,
+"p_sharada": 5,
+"kw_meet": 2,
+"p_awaiz": 1
+},
+"2026-11-01": {
+"total": 41,
+"eng": 9,
+"p_basith": 5,
+"p_awaiz": 4,
+"clin": 32,
+"p_sujay": 29,
+"p_sharada": 3,
+"kw_meet": 3
+},
+"2026-11-02": {
+"total": 3,
+"eng": 1,
+"p_awaiz": 1,
+"clin": 2,
+"p_sujay": 2
+},
+"2026-11-03": {
+"total": 43,
+"eng": 16,
+"p_basith": 14,
+"clin": 27,
+"p_sujay": 23,
+"kw_meet": 1,
+"p_sharada": 2,
+"p_awaiz": 2,
+"kw_link": 1,
+"p_shirin": 2
+},
+"2026-11-04": {
+"total": 17,
+"clin": 15,
+"p_sharada": 11,
+"eng": 2,
+"p_awaiz": 2,
+"p_sujay": 4,
+"kw_meet": 1,
+"kw_link": 1
+}
+}

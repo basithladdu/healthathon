@@ -5603,3 +5603,18 @@ Add doctor now	ಈಗಿನ ವೈದ್ಯರನ್ನು ಸೇರಿಸಿ
 Hormone or targeted therapy	ಹಾರ್ಮೋನ್ ಅಥವಾ ಟಾರ್ಗೆಟೆಡ್ ಥೆರಪಿ
 Pain and symptom care only	ನೋವು ಮತ್ತು ಲಕ್ಷಣಗಳ ಆರೈಕೆ ಮಾತ್ರ
 No treatment now	ಈಗ ಚಿಕಿತ್ಸೆ ಇಲ್ಲ
+Severe pain or distress this week	ಈ ವಾರ ತೀವ್ರ ನೋವು ಅಥವಾ ಸಂಕಟ
+Recorded for this patient in the last 7 days:	ಕಳೆದ 7 ದಿನಗಳಲ್ಲಿ ಈ ರೋಗಿಗೆ ದಾಖಲಾದವು:
+Pain $score/10 on $day	ನೋವು $score/10, $day
+Distress $score/10 on $day	ಸಂಕಟ $score/10, $day
+Open Symptoms & distress	ಲಕ್ಷಣಗಳು & ಸಂಕಟ ತೆರೆಯಿರಿ
+Emergency card for $name opened at $place, $time	$name ಅವರ ತುರ್ತು ಕಾರ್ಡ್ $place ನಲ್ಲಿ ತೆರೆಯಲಾಗಿದೆ, $time
+Emergency card for $name opened (place not given), $time	$name ಅವರ ತುರ್ತು ಕಾರ್ಡ್ ತೆರೆಯಲಾಗಿದೆ (ಸ್ಥಳ ತಿಳಿಸಿಲ್ಲ), $time
+Opened at $place on $time	$place ನಲ್ಲಿ $time ರಂದು ತೆರೆಯಲಾಗಿದೆ
+Opened on $time (place not given)	$time ರಂದು ತೆರೆಯಲಾಗಿದೆ (ಸ್ಥಳ ತಿಳಿಸಿಲ್ಲ)
+Only web link opens are shown. Scans of the offline code on a printed card can't be seen.	ವೆಬ್ ಲಿಂಕ್ ಮೂಲಕ ತೆರೆದದ್ದು ಮಾತ್ರ ಕಾಣುತ್ತದೆ. ಮುದ್ರಿತ ಕಾರ್ಡ್‌ನ ಆಫ್‌ಲೈನ್ ಕೋಡ್ ಸ್ಕ್ಯಾನ್‌ಗಳು ಕಾಣುವುದಿಲ್ಲ.
+Last opened at $place on $at	ಕೊನೆಯದಾಗಿ $place ನಲ್ಲಿ $at ರಂದು ತೆರೆಯಲಾಗಿದೆ
+Last opened on $at	ಕೊನೆಯದಾಗಿ $at ರಂದು ತೆರೆಯಲಾಗಿದೆ
+Emergency card web link	ತುರ್ತು ಕಾರ್ಡ್ ವೆಬ್ ಲಿಂಕ್
+Visit tomorrow	ನಾಳೆ ಭೇಟಿ ಇದೆ
+Open Sahara to see the time and what to bring.	ಸಮಯ ಮತ್ತು ಏನು ತರಬೇಕು ಎಂದು ನೋಡಲು ಸಹಾರಾ ತೆರೆಯಿರಿ.

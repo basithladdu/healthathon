@@ -58,8 +58,9 @@ class CareReminderRulesTest {
         val day = java.time.LocalDate.parse("2026-10-21").atStartOfDay(zone).toInstant().toEpochMilli()
         val plan = CareReminderPlan("visit", "person", "visit", day, emptyList(), "", false, dateOnly = true)
         val before = epoch("2026-10-19T00:00:00Z")
-        assertTrue(CareReminderRules.next(plan, before, zone).isEmpty())
-        val chosen = CareReminderRules.next(plan.copy(times = listOf("09:30")), before, zone).single()
+        // Never at midnight: with no chosen time, a date-only visit only has its evening-before alert (18:00 the day before).
+        assertEquals(listOf("visit:daybefore"), CareReminderRules.next(plan, before, zone).map { it.key })
+        val chosen = CareReminderRules.next(plan.copy(times = listOf("09:30")), before, zone).single { it.key != "visit:daybefore" }
         assertEquals(epoch("2026-10-21T04:00:00Z"), chosen.at)
         assertEquals("visit:09:30", chosen.key)
         assertTrue(CareReminderRules.next(plan.copy(times = listOf("09:30")), chosen.at, zone).isEmpty())
@@ -90,5 +91,18 @@ class CareReminderRulesTest {
         // Every bell turned off stays off; no saved times keeps this phone's own choice.
         assertEquals(emptyList<String>(), CareReminderRules.currentOptionTimes(emptyList(), listOf("09:00")))
         assertEquals(listOf("13:00"), CareReminderRules.currentOptionTimes(listOf("13:00"), emptyList()))
+    }
+
+    @Test fun visitsAlsoAlertTheEveningBefore() {
+        // Visit on 25 Oct at 10:00 IST (Dr Shirin: "the notification should go one day prior").
+        val visit = CareReminderPlan("v1", "p1", "visit", epoch("2026-10-25T04:30:00Z"), emptyList(), "", false)
+        val next = CareReminderRules.next(visit, epoch("2026-10-23T00:00:00Z"), zone)
+        assertEquals(listOf("v1:daybefore", "v1:once"), next.map { it.key })
+        assertEquals("2026-10-24", next.first().localDate); assertEquals("18:00", next.first().time)
+        // After the evening-before slot, only the visit itself is left; a done visit gives nothing.
+        assertEquals(listOf("v1:once"), CareReminderRules.next(visit, epoch("2026-10-24T13:00:00Z"), zone).map { it.key })
+        assertTrue(CareReminderRules.next(visit.copy(doneOn = "2026-10-25"), epoch("2026-10-23T00:00:00Z"), zone).isEmpty())
+        // Tasks and tests keep a single alert.
+        assertEquals(listOf("t1:once"), CareReminderRules.next(visit.copy(itemId = "t1", kind = "task"), epoch("2026-10-23T00:00:00Z"), zone).map { it.key })
     }
 }

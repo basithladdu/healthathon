@@ -1,5 +1,6 @@
 // Read-only emergency card page. The Android app makes the link; the owner applies
-// android/supabase/migrations/20261027190000_emergency_card_links.sql before it works.
+// android/supabase/migrations/20261027190000_emergency_card_links.sql before it works, and
+// 20261123120000_emergency_card_view_places.sql so the patient's doctor sees where it was opened.
 // Same Supabase project and public (publishable) key the Android app uses (CareCloud.kt).
 export const EMERGENCY_PROJECT_URL = 'https://kjnhtakqzboayqorrlue.supabase.co';
 export const EMERGENCY_PUBLIC_KEY = 'sb_publishable_bheyh26N5MKpXNEJDQgq8w_oDRhW8Xe';
@@ -23,16 +24,33 @@ export function tokenFromHash(hash: string): string | null {
   return value.length === 1 && /^[a-f0-9]{64}$/.test(value[0]) ? value[0] : null;
 }
 
-export async function loadEmergencyCard(hash: string, fetcher: typeof fetch = fetch): Promise<EmergencyResult> {
+/** Longest hospital or clinic name kept with an open (the server cuts at the same length). */
+export const PLACE_MAX = 80;
+
+/** One plain line: control characters and runs of spaces become one space, trimmed, at most [PLACE_MAX] characters. */
+export function cleanPlace(value: unknown): string {
+  if (typeof value !== 'string') return '';
+  return value.replace(/[\u0000-\u001f\u007f-\u009f\s]+/g, ' ').trim().slice(0, PLACE_MAX).trim();
+}
+
+/**
+ * Opens the card for the token in [hash]. [place] is the optional "Your hospital or clinic" line, sent only when
+ * it is not blank. If the server is older (the place migration not applied yet) it answers 404 for the two-argument
+ * call; the card is then opened again without the place, so the link never breaks because of the new field.
+ */
+export async function loadEmergencyCard(hash: string, fetcher: typeof fetch = fetch, place = ''): Promise<EmergencyResult> {
   const token = tokenFromHash(hash);
   if (!token) return { status: 'missing' };
+  const where = cleanPlace(place);
+  const call = (body: Record<string, string>) => fetcher(`${EMERGENCY_PROJECT_URL}/rest/v1/rpc/healthathon_emergency_view`, {
+    method: 'POST', cache: 'no-store', referrerPolicy: 'no-referrer',
+    headers: { apikey: EMERGENCY_PUBLIC_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
   let response: Response;
   try {
-    response = await fetcher(`${EMERGENCY_PROJECT_URL}/rest/v1/rpc/healthathon_emergency_view`, {
-      method: 'POST', cache: 'no-store', referrerPolicy: 'no-referrer',
-      headers: { apikey: EMERGENCY_PUBLIC_KEY, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ p_token: token }),
-    });
+    response = await call(where ? { p_token: token, p_place: where } : { p_token: token });
+    if (response.status === 404 && where) response = await call({ p_token: token });
   } catch { return { status: 'unreachable' }; }
   // PostgREST answers 404 while the function does not exist yet (migration not applied).
   if (response.status === 404) return { status: 'not-set-up' };

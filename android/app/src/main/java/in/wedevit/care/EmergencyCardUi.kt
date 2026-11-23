@@ -208,6 +208,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
     var linkProblem by remember(selected) { mutableStateOf<EmergencyLinkProblem?>(null) }
     var linkBusy by remember(selected) { mutableStateOf(false) }
     var linkStatus by remember(selected) { mutableStateOf<EmergencyLinkStatus?>(null) }
+    var doctorViews by remember(selected) { mutableStateOf<List<EmergencyCardView>?>(null) }
     var busy by remember(selected) { mutableStateOf(false) }
     // Failures open a small dialog instead of a passing toast; routine "saved" lines stay as the quiet tick.
     var alert by remember(selected) { mutableStateOf<String?>(null) }
@@ -250,6 +251,14 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
         linkProblem = null
         linkStatus = runCatching { api.status(c.personId) }.getOrNull()
         return next
+    }
+
+    // Someone else's profile (the patient's doctor): read where the web link was opened. Errors leave it hidden.
+    LaunchedEffect(selected, owner, client) {
+        doctorViews = null
+        val api = client ?: return@LaunchedEffect
+        if (owner || selected.isBlank()) return@LaunchedEffect
+        doctorViews = try { api.views(selected).takeIf { it.live }?.recentViews } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; null }
     }
 
     // A card without a link gets one as soon as the owner can make it; a live link shows how often it was opened.
@@ -336,6 +345,9 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
                 QrImage(shownQr, if (link != null) t("Emergency web link QR code", "आपातकालीन वेब लिंक QR कोड") else t("Emergency card offline QR code", "आपातकालीन कार्ड ऑफ़लाइन QR कोड"), Modifier.fillMaxWidth().widthIn(max = 240.dp).clickable(onClickLabel = t("Show full screen", "पूरी स्क्रीन पर दिखाएँ")) { fullScreen = true }.testTag("emergency-card-qr"))
                 if (name.isNotBlank()) Text(name, fontWeight = FontWeight.Bold, fontSize = 22.sp, color = Ink, textAlign = TextAlign.Center, modifier = Modifier.testTag("emergency-card-name"))
                 Text(t("Scan in an emergency", "आपातकाल में स्कैन करें"), fontSize = 16.sp, color = DoctorCardSub, textAlign = TextAlign.Center)
+                // Where the web link was last opened, when the person opening it said (offline-code scans can't be seen).
+                if (link != null) linkStatus?.takeIf { it.live }?.recentViews?.firstOrNull()?.let { v -> val at = cardDay(v.at); val place = v.place
+                    Text(if (place.isNotBlank()) t("Last opened at $place on $at", "आख़िरी बार $place में $at को खोला गया") else t("Last opened on $at", "आख़िरी बार $at को खोला गया"), fontSize = 14.sp, color = DoctorCardSub, textAlign = TextAlign.Center, modifier = Modifier.testTag("emergency-card-last-opened")) }
                 val problem = linkProblem
                 // Which code the QR carries, as a pill: the live web link or the offline code only.
                 if (!linkBusy) FamilyPill(when { link != null && problem == null -> t("Web link on", "वेब लिंक चालू"); stale -> t("Out of date", "पुराना है"); else -> t("Offline code", "ऑफ़लाइन कोड") },
@@ -398,10 +410,19 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
             dismissButton = { TextButton(onClick = { confirmNewLink = false }) { Text(t("Cancel", "रद्द करें")) } })
         lockFor?.let { _ -> PdfPasswordDialog(onDismiss = { lockFor = null }, onSave = { password -> lockFor = password; saveLocked.launch("Sahara-emergency-card-${card.number}-locked.pdf") }, onShare = { password -> lockFor = null; share(card, password) }) }
     }
+    // The patient's doctor (not the profile owner) sees where the family's web link was opened. Fetched from the server;
+    // nothing shows if this account may not read it or the link is off.
+    val otherViews = doctorViews
+    if (!owner && otherViews != null) Column(Modifier.fillMaxWidth().padding(top = 12.dp).testTag("emergency-card-doctor-views"), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(t("Emergency card web link", "आपातकालीन कार्ड वेब लिंक"), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Ink)
+        if (otherViews.isEmpty()) Text(t("Not opened yet", "अभी तक नहीं खोला गया"), fontSize = 14.sp, color = DoctorCardSub)
+        EmergencyCardOpenedList(otherViews)
+    }
     if (setup) EmergencyCardSetup(source, name, ready && !busy, card, blocked, onDismiss = { setup = false }, onMake = { sections -> remake(sections, card) }) {
         val c = card
         if (c != null) Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             if (c.link != null) linkStatus?.takeIf { it.live }?.let { s -> Text(if (s.views == 0) t("Not opened yet", "अभी तक नहीं खोला गया") else { val views = s.views; val last = s.lastViewedAt?.let { val day = cardDay(it); t(", last on $day", ", आख़िरी बार $day") }.orEmpty(); if (views == 1) t("Opened once$last", "एक बार खोला गया$last") else t("Opened $views times$last", "$views बार खोला गया$last") }, fontSize = 14.sp, color = DoctorCardSub) }
+            if (c.link != null) linkStatus?.takeIf { it.live && it.recentViews.isNotEmpty() }?.let { EmergencyCardOpenedList(it.recentViews) }
             // Everything else for the card in one named list, one row each.
             SaharaSectionHeader(t("Card file", "कार्ड की फ़ाइल"), tone = SaharaTone.Marigold, icon = Icons.Default.Description)
             SaharaRegister {

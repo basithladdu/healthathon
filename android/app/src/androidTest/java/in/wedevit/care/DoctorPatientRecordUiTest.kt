@@ -30,7 +30,7 @@ class DoctorPatientRecordUiTest {
         select("Medicines")
         listOf("Taken reported", "Late reported", "Skipped reported", "Not logged", "Upcoming").forEach { status ->
             ui.onNodeWithTag("demo-patient-detail").performScrollToNode(hasText(status))
-            ui.onNodeWithText(status).assertIsDisplayed()
+            ui.onAllNodesWithText(status).onFirst().assertIsDisplayed() // several doses can share a status (e.g. more than one Not logged)
         }
         ui.onNodeWithTag("demo-schedule-visit").assertDoesNotExist()
         ui.onNodeWithTag("workflow-open-conversation").assertDoesNotExist()
@@ -46,7 +46,11 @@ class DoctorPatientRecordUiTest {
         ui.onNodeWithTag("demo-schedule-visit").assertIsDisplayed()
         ui.onNodeWithTag("workflow-open-conversation").assertDoesNotExist()
         select("Reports")
-        ui.onNodeWithText("1 summary · 0 attached files").assertExists()
+        // The browser no longer prints a "summaries · attached files" count line; the one summary is its own card.
+        val reports = DoctorReportsData.reports(DoctorDemoData.patients.first().id)
+        assertEquals(1, reports.size)
+        ui.onNodeWithTag("demo-patient-detail").performScrollToNode(hasTestTag("report-open-${reports.single().id}"))
+        ui.onNodeWithTag("report-open-${reports.single().id}").assertIsDisplayed()
         ui.onNodeWithTag("demo-dose-demo-asha-dose-1").assertDoesNotExist()
     }
 

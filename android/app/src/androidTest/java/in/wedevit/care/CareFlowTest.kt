@@ -25,6 +25,7 @@ class CareFlowTest {
         runCatching { instrumentation.uiAutomation.grantRuntimePermission(instrumentation.targetContext.packageName, android.Manifest.permission.ACCESS_COARSE_LOCATION) }
     }
     @Before fun setUp() {
+        ui.skipSaharaBrandMoment()
         val account = ui.activity.careModel.cloud
         if (account != null) {
             val args = androidx.test.platform.app.InstrumentationRegistry.getArguments()
@@ -47,9 +48,18 @@ class CareFlowTest {
     private val attendeeConsent = SemanticsMatcher("doctor attendee consent checkbox") { node ->
         node.config.getOrNull(androidx.compose.ui.semantics.SemanticsProperties.TestTag)?.startsWith("doctor-attendee-consent-") == true
     }
-    private fun clickContinue(label: String) {
-        ui.onNodeWithTag("conversation-list").performScrollToNode(hasText(label))
-        ui.onNodeWithText(label).assertIsEnabled().performClick()
+    /** Documents moved from the bottom bar into All care tools (the Care tab). */
+    private fun openDocuments() {
+        ui.onNodeWithTag("nav-Care").performClick()
+        ui.onNodeWithTag("care-list").performScrollToNode(hasTestTag("care-tool-documents"))
+        ui.onNodeWithTag("care-tool-documents").performClick()
+        ui.onNodeWithTag("documents-list").assertExists()
+    }
+    /** Each conversation page has one "Continue" button at its foot (the step names left the button labels). */
+    private val continueButton = hasText("Continue") and hasClickAction()
+    private fun clickContinue() {
+        ui.onNodeWithTag("conversation-list").performScrollToNode(continueButton)
+        ui.onNode(continueButton).assertIsEnabled().performClick()
     }
     /** Step 0 "Who's here": tick every attendee's consent box (the gate is satisfied, never bypassed), then continue. */
     private fun consentEveryoneAndContinue() {
@@ -58,18 +68,20 @@ class CareFlowTest {
         val total = ui.onAllNodes(attendeeConsent).fetchSemanticsNodes().size
         // Consent is never pre-ticked, so recording must be unreachable until every person is ticked.
         assertEquals(total, ui.onAllNodes(attendeeConsent and isOff()).fetchSemanticsNodes().size)
-        ui.onNodeWithText("Continue to recording").assertIsNotEnabled()
+        ui.onNodeWithTag("conversation-list").performScrollToNode(continueButton)
+        ui.onNode(continueButton).assertIsNotEnabled()
+        ui.onNodeWithTag("conversation-list").performScrollToNode(hasTestTag("doctor-attendees"))
         repeat(total) {
             ui.onAllNodes(attendeeConsent and isOff())[0].performScrollTo().performClick()
             ui.waitForIdle()
         }
         ui.waitUntil(15000) { ui.onAllNodes(attendeeConsent and isOff()).fetchSemanticsNodes().isEmpty() }
-        clickContinue("Continue to recording")
+        clickContinue() // to Record
     }
-    /** Step 0 to Step 3 "Transcript". */
+    /** "Who's here" → Record → Transcript. */
     private fun openTranscriptStep() {
         consentEveryoneAndContinue()
-        clickContinue("Continue to written text")
+        clickContinue() // to Transcript
     }
     private fun screenshot(name: String) {
         ui.waitForIdle()
@@ -80,7 +92,9 @@ class CareFlowTest {
     }
     @Test fun realUsersHaveNoRoleMenuAndKeepDraftAndComputedRoleAfterRecreation() {
         val words = "Please keep my questions while I change views."
-        ui.runOnIdle { vm.edit(vm.draft.value.copy(source = words)) }
+        // setUp opens the doctor view (role(true)); a real user has no role menu, so go back to the computed role first
+        // (this replaces the old "Patient" role tap). The view role is in-memory model state, so it survives recreation as set.
+        ui.runOnIdle { vm.role(false); vm.edit(vm.draft.value.copy(source = words)) }
         ui.onNodeWithTag("choose-role").assertDoesNotExist()
         ui.onNodeWithTag("walkthrough-user-menu").assertDoesNotExist()
         screenshot("no-role-menu")
@@ -104,6 +118,7 @@ class CareFlowTest {
         ui.onNode(hasSetTextAction() and hasText("Conversation in writing")).assertTextContains(words)
     }
     @Test fun reportPickerPersistsSearchesSharesAndRemovesOnlyItsCopy() {
+        ui.runOnIdle { vm.role(false) } // "Add document" is the patient's or family's action, not the doctor view's
         val source = CareReport(personId = personId, name = "Clinic report.pdf", mime = "application/pdf", fileName = "source.pdf", bytes = 0)
         val original = vm.reportFiles.file(source).apply { parentFile!!.mkdirs() }
         val pdf = android.graphics.pdf.PdfDocument()
@@ -117,7 +132,7 @@ class CareFlowTest {
         val filter = android.content.IntentFilter(android.content.Intent.ACTION_OPEN_DOCUMENT).apply { addCategory(android.content.Intent.CATEGORY_OPENABLE); addDataType("*/*") }
         val monitor = instrumentation.addMonitor(filter, android.app.Instrumentation.ActivityResult(android.app.Activity.RESULT_OK, android.content.Intent().setData(uri)), true)
         try {
-            ui.onNodeWithContentDescription("Documents").performClick()
+            openDocuments()
             ui.onNodeWithTag("document-add").performClick(); ui.onNodeWithTag("document-upload").performClick()
             ui.waitUntil(15000) { vm.reports.value.size == 1 }
             assertEquals(1, monitor.hits)
@@ -130,7 +145,7 @@ class CareFlowTest {
         ui.onNodeWithTag("document-search").performTextInput("no such document")
         ui.onNodeWithText("No documents found").assertIsDisplayed()
         ui.onNodeWithTag("nav-Today").performClick()
-        ui.onNodeWithContentDescription("Documents").performClick()
+        openDocuments()
         ui.onNodeWithTag("document-search").assertTextContains("no such document")
         ui.activityRule.scenario.recreate(); ui.waitForIdle()
         ui.runOnIdle { vm = ui.activity.careModel }
@@ -146,7 +161,7 @@ class CareFlowTest {
         ui.onNodeWithTag("report-share-${report.id}").performScrollTo().assertIsDisplayed()
         ui.onNodeWithTag("report-menu-${report.id}").performScrollTo().performClick()
         ui.onNodeWithTag("report-remove-${report.id}").performClick()
-        ui.onNodeWithText("Remove report", useUnmergedTree = true).performClick()
+        ui.onNode(hasText("Remove") and hasClickAction()).performClick() // the dialog's confirm button
         ui.waitUntil(15000) { vm.reports.value.isEmpty() && !vm.busy.value }
         assertFalse(vm.reportFiles.file(report).exists())
         assertTrue(original.exists())
@@ -155,7 +170,7 @@ class CareFlowTest {
         val note = NoteRules.publish(vm.people.value.first { it.id == personId }, Conversation(personId, source = "What matters: More time with family.", priorities = "More time with family."), "Test Doctor", true, 1)
         CareDatabase.get(ui.activity).care().insertVersion(note)
         ui.waitUntil(15000) { vm.versions.value.any { it.id == note.id } }
-        ui.onNodeWithContentDescription("Documents").performClick()
+        openDocuments()
         ui.onNodeWithText("Goals of care").performClick()
         ui.onNodeWithText("Save copy").assertIsDisplayed()
         ui.onNodeWithText("Share", useUnmergedTree = true).assertIsDisplayed()
@@ -174,38 +189,45 @@ class CareFlowTest {
         } finally { instrumentation.removeMonitor(monitor) }
     }
     @Test fun conversationReviewSavesExactVersionAndSurvivesRecreation() {
-        ui.onNodeWithText("Start talking").assertIsDisplayed()
+        // setUp opens the doctor view: Today leads with the "Let's talk" card, and the bottom bar has Talk.
+        ui.onNodeWithTag("today-goals-of-care").assertIsDisplayed()
+        ui.onNodeWithContentDescription("Start talking").assertExists()
         screenshot("today")
-        ui.onNodeWithText("Talk", useUnmergedTree = true).performClick()
+        ui.onNodeWithTag("nav-Talk").performClick()
         val original = "What matters: I want to spend time with family.\nStill to discuss: I have not decided about hospital care.\nNext steps: Bring my questions to the next visit."
         openTranscriptStep()
         ui.onNodeWithTag("conversation-list").performScrollToNode(hasSetTextAction() and hasText("Conversation in writing"))
         ui.onNode(hasSetTextAction() and hasText("Conversation in writing")).performTextInput(original)
-        clickContinue("Continue to answers")
-        // The five note sections are off the main path now; open them from the Answers step.
-        ui.onNodeWithTag("conversation-list").performScrollToNode(hasText("Edit the five note sections"))
-        ui.onNodeWithText("Edit the five note sections").performClick()
-        ui.onNodeWithTag("conversation-list").performScrollToNode(hasText("Organise using section headings"))
-        ui.onNodeWithText("Organise using section headings").performClick()
-        ui.onNodeWithTag("conversation-list").performScrollToNode(hasSetTextAction() and hasText("What matters"))
-        ui.onNode(hasSetTextAction() and hasText("What matters")).assertTextContains("I want to spend time with family.")
-        // Build shows one section per screen; step through all five, the last "Next" reads "Review note".
-        repeat(NoteRules.labels.size - 1) {
+        androidx.test.espresso.Espresso.closeSoftKeyboard()
+        clickContinue() // to Answers
+        // The five note sections open from Answers ("Edit note"), one section per screen. "Who was there" is already filled from
+        // Who's here, so the sections are written here rather than organised from headings (that only replaces an empty note).
+        ui.onNodeWithTag("conversation-list").performScrollToNode(hasText("Edit note") and hasClickAction())
+        ui.onNode(hasText("Edit note") and hasClickAction()).performClick()
+        fun section(label: String) = hasSetTextAction() and hasText(label)
+        ui.onNodeWithTag("conversation-list").performScrollToNode(section("What matters"))
+        ui.onNode(section("What matters")).performTextReplacement("I want to spend time with family.")
+        repeat(NoteRules.labels.size - 1) { index ->
+            if (index == 3) { // "Still to discuss" is the fourth section
+                ui.onNodeWithTag("conversation-list").performScrollToNode(section("Still to discuss"))
+                ui.onNode(section("Still to discuss")).performTextReplacement("I have not decided about hospital care.")
+            }
+            androidx.test.espresso.Espresso.closeSoftKeyboard()
             ui.onNodeWithTag("conversation-list").performScrollToNode(hasTestTag("build-next"))
             ui.onNodeWithTag("build-next").performClick()
         }
         ui.onNodeWithTag("conversation-list").performScrollToNode(hasTestTag("build-next"))
         ui.onNodeWithTag("build-next").assertTextContains("Review note").performClick()
-        ui.onNodeWithTag("conversation-list").performScrollToNode(hasText("Continue to publish"))
-        ui.onNodeWithText("Continue to publish").performClick()
+        clickContinue() // Review to Publish
         ui.onNodeWithTag("conversation-list").performScrollToNode(hasSetTextAction() and hasText("Doctor's name"))
         ui.onNode(hasSetTextAction() and hasText("Doctor's name")).performTextInput("Test Doctor")
-        ui.onNodeWithTag("conversation-list").performScrollToNode(hasText("Publish reviewed version"))
-        ui.onNodeWithText("Publish reviewed version").assertIsNotEnabled()
+        androidx.test.espresso.Espresso.closeSoftKeyboard()
+        ui.onNodeWithTag("conversation-list").performScrollToNode(hasTestTag("conversation-publish"))
+        ui.onNodeWithTag("conversation-publish").assertIsNotEnabled()
         ui.onNodeWithTag("conversation-list").performScrollToNode(hasText("I checked every section against the conversation.", substring = true))
         ui.onNodeWithText("I checked every section against the conversation.", substring = true).performClick()
-        ui.onNodeWithTag("conversation-list").performScrollToNode(hasText("Publish reviewed version"))
-        ui.onNodeWithText("Publish reviewed version").performClick()
+        ui.onNodeWithTag("conversation-list").performScrollToNode(hasTestTag("conversation-publish"))
+        ui.onNodeWithTag("conversation-publish").performClick()
         ui.waitUntil(15000) { vm.versions.value.size == 1 }
         val first = vm.versions.value.single()
         assertEquals(original, first.source)
@@ -248,8 +270,8 @@ class CareFlowTest {
         assertEquals("Other person's words.", vm.draft.value.source)
     }
     @Test fun directoryFiltersRecoverFromNoResults() {
-        ui.onNodeWithText("Nearby", useUnmergedTree = true).performClick()
-        ui.onNodeWithText("All India · ${vm.centres.size} centres").assertIsDisplayed()
+        ui.onNodeWithTag("nav-Help").performClick() // the Help tab holds emergency numbers and care nearby
+        ui.onNodeWithTag("nearby-count").assertTextContains("${vm.centres.size} centres") // the count is a badge beside the title now
         // State is a searchable picker inside the one Filters sheet (6 Nov), not a sideways row of chips.
         ui.onNodeWithTag("nearby-filters").performClick()
         ui.onNodeWithTag("nearby-state-picker").performClick()
@@ -257,7 +279,7 @@ class CareFlowTest {
         ui.onNodeWithTag("nearby-option-Karnataka").performClick()
         ui.onNodeWithTag("nearby-filters-done").performClick()
         ui.onNodeWithTag("nearby-list").performScrollToIndex(0)
-        ui.onNodeWithText("Karnataka · ${vm.centres.count { it.state == "Karnataka" }} centres").assertIsDisplayed()
+        ui.onNodeWithTag("nearby-count").assertTextContains("${vm.centres.count { it.state == "Karnataka" }} centres")
         ui.onNodeWithTag("nearby-filters").performClick()
         ui.onNodeWithTag("nearby-state-picker").performClick()
         ui.onNodeWithTag("nearby-option-${NearbyHelp.ALL_INDIA}").performClick()
@@ -269,7 +291,7 @@ class CareFlowTest {
         ui.onNodeWithTag("nav-Help").performClick()
         ui.onNode(hasSetTextAction()).assertTextContains("No such hospital xyz")
         ui.onNodeWithText("Clear filters").performClick()
-        ui.onNodeWithText("All India · ${vm.centres.size} centres").assertIsDisplayed()
+        ui.onNodeWithTag("nearby-count").assertTextContains("${vm.centres.size} centres") // the count is a badge beside the title now
         ui.onNode(hasSetTextAction()).performTextInput("Aster")
         ui.onNodeWithTag("nearby-list").performScrollToNode(hasTestTag("centre-map"))
         ui.waitUntil(30000) { ui.onAllNodes(SemanticsMatcher.expectValue(androidx.compose.ui.semantics.SemanticsProperties.StateDescription, "Map ready")).fetchSemanticsNodes().isNotEmpty() }
@@ -283,7 +305,7 @@ class CareFlowTest {
         ui.onNodeWithTag("nav-Care").performClick()
         ui.onAllNodesWithTag("care-add-button").onFirst().performClick()
         ui.onNodeWithTag("care-add-task").performClick()
-        ui.onNode(hasSetTextAction() and hasText("What needs doing?")).performTextInput("Bring questions")
+        ui.onNode(hasSetTextAction() and hasText("What needs doing? *")).performTextInput("Bring questions")
         ui.onNodeWithText("Save", useUnmergedTree = true).performScrollTo().performClick()
         ui.waitUntil(15000) { vm.items.value.any { it.title == "Bring questions" } }
         val entryId = vm.items.value.single { it.title == "Bring questions" }.id
@@ -295,7 +317,7 @@ class CareFlowTest {
         ui.onNodeWithTag("care-list").performScrollToNode(hasTestTag("care-menu-$entryId"))
         ui.onNodeWithTag("care-menu-$entryId").performClick()
         ui.onNodeWithTag("care-edit-$entryId").performClick()
-        ui.onNode(hasSetTextAction() and hasText("What needs doing?")).performTextReplacement("Bring the prescription")
+        ui.onNode(hasSetTextAction() and hasText("What needs doing? *")).performTextReplacement("Bring the prescription")
         ui.onNodeWithText("Save", useUnmergedTree = true).performScrollTo().performClick()
         ui.waitUntil(15000) { vm.items.value.any { it.title == "Bring the prescription" } }
         ui.onNodeWithTag("care-list").performScrollToNode(hasText("Bring the prescription"))
@@ -306,7 +328,7 @@ class CareFlowTest {
         ui.onNodeWithTag("care-remove-$entryId").performClick()
         ui.onNodeWithText("Remove", useUnmergedTree = true).performClick()
         ui.waitUntil(15000) { vm.items.value.none { it.title == "Bring the prescription" } }
-        ui.onNodeWithText("Nothing added yet").assertIsDisplayed()
+        ui.onNodeWithText("No tasks yet.").assertIsDisplayed() // the To do screen's empty state
     }
     @Test fun prescriptionScannerKeepsManualFallbackAndRequiresReviewBeforeSaving() {
         ui.onNodeWithTag("nav-Care").performClick()
@@ -368,8 +390,10 @@ class CareFlowTest {
         ui.onNodeWithTag("feedback-save").performScrollTo().performClick()
         ui.waitUntil(15000) { vm.items.value.any { it.kind == "checkin" } }
         assertEquals("Spent time with family", vm.items.value.single { it.kind == "checkin" }.detail)
-        ui.onNodeWithTag("today-list").performScrollToNode(hasText("An okay day"))
-        ui.onNodeWithText("An okay day").assertIsDisplayed()
+        // Today's check-in card shows the saved mood as the selected one of its three mood buttons ("An okay day" is the middle one).
+        ui.onNodeWithTag("nav-Today").performClick()
+        ui.onNodeWithTag("today-list").performScrollToNode(hasTestTag("today-checkin-1"))
+        ui.onNodeWithTag("today-checkin-1").assertIsSelected().assertTextContains("An okay day")
         screenshot("today-saved")
         // A fresh save snackbar overlaps the first visible Privacy header.
         // Wait for its actual dismissal before testing the next touch target.
@@ -461,13 +485,13 @@ class CareFlowTest {
         ui.onAllNodesWithTag("care-add-button").onFirst().performClick()
         ui.onNodeWithTag("care-add-task").performClick()
         val title = "Questions belonging to the first person"
-        ui.onNode(hasSetTextAction() and hasText("What needs doing?")).performTextInput(title)
+        ui.onNode(hasSetTextAction() and hasText("What needs doing? *")).performTextInput(title)
         ui.runOnIdle { vm.select(other) }
         ui.waitUntil(15000) {
             vm.selected.value == other && vm.draft.value.personId == other &&
-                ui.onAllNodes(hasSetTextAction() and hasText("What needs doing?")).fetchSemanticsNodes().isEmpty()
+                ui.onAllNodes(hasSetTextAction() and hasText("What needs doing? *")).fetchSemanticsNodes().isEmpty()
         }
-        ui.onNode(hasSetTextAction() and hasText("What needs doing?")).assertDoesNotExist()
+        ui.onNode(hasSetTextAction() and hasText("What needs doing? *")).assertDoesNotExist()
         val dao = CareDatabase.get(ui.activity).care()
         val newPersonItems = runBlocking { dao.items(other).first() }
         val oldPersonItems = runBlocking { dao.items(personId).first() }

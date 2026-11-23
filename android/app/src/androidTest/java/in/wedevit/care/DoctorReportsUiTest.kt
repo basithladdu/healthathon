@@ -2,6 +2,8 @@ package `in`.wedevit.care
 
 import android.content.Context
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.text.AnnotatedString
@@ -26,14 +28,13 @@ class DoctorReportsUiTest {
         val workflowName="doctor-workflow-reports-$suffix"
         val demo=DoctorDemoStore(context,preferencesName=demoName)
         val workflow=DoctorWorkflowStore(context,preferencesName=workflowName)
+        // The Patients tab now lists the walkthrough people; each demo record opens directly (initialPatientId), one patient at a time.
+        val shown=mutableStateOf("demo-leela")
         try {
             ui.setContent {
                 val density=LocalDensity.current
-                CompositionLocalProvider(LocalDensity provides Density(density.density,1.5f)) {CareTheme {DoctorDemo({},demo,workflow)}}
+                CompositionLocalProvider(LocalDensity provides Density(density.density,1.5f)) {CareTheme {key(shown.value) {DoctorDemo({},demo,workflow,initialPatientId=shown.value)}}}
             }
-            ui.onNodeWithTag("demo-login").performScrollTo().performClick()
-            ui.onNodeWithTag("demo-nav-Patients").performClick()
-            patient("Leela","demo-leela")
             reports()
             ui.onNodeWithTag("reports-search").performScrollTo().performTextReplacement("no-such-summary")
             Espresso.closeSoftKeyboard()
@@ -62,7 +63,8 @@ class DoctorReportsUiTest {
             Espresso.pressBack()
             ui.onNodeWithTag("demo-patient-hub").assertExists()
             Espresso.pressBack()
-            patient("Ravi","demo-ravi")
+            ui.onNodeWithTag("walkthrough-patients-list").assertExists()
+            ui.runOnIdle {shown.value="demo-ravi"}
             reports()
             ui.onNodeWithTag("reports-search").assert(SemanticsMatcher.expectValue(SemanticsProperties.EditableText,AnnotatedString("")))
             ui.onNodeWithTag("reports-detail-page").assertDoesNotExist()
@@ -75,10 +77,6 @@ class DoctorReportsUiTest {
             context.getSharedPreferences(demoName,Context.MODE_PRIVATE).edit().clear().commit()
             context.getSharedPreferences(workflowName,Context.MODE_PRIVATE).edit().clear().commit()
         }
-    }
-    private fun patient(name:String,id:String) {
-        ui.onNodeWithTag("demo-patient-search").performTextReplacement(name);Espresso.closeSoftKeyboard()
-        ui.onNodeWithTag("demo-patient-$id").performClick()
     }
     private fun reports() {
         ui.onNodeWithTag("demo-patient-hub").performScrollToNode(hasTestTag("demo-record-Reports"))

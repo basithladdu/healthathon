@@ -1,0 +1,539 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Sahara Collaboration Calendar</title>
+<style>@page { size: A4 landscape; margin: 0; }
+:root {
+  --cream: #FFF8EE; --sage: #3B7562; --sage-d: #2A5A4A; --ink: #23312C; --muted: #6B7A73;
+  --line: #E6DCCB; --wash: #F3EDE0; --indigo: #4B4FA8; --rose: #C2557A; --gold: #C9952B;
+  --h1: #E3EEE7; --h2: #B9D6C6; --h3: #7FB39C; --h4: #3B7562;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--cream); color: var(--ink);
+  font-family: "Inter", "Noto Sans", "Segoe UI", Arial, sans-serif;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.page { width: 297mm; height: 210mm; padding: 10mm 12mm 8mm; overflow: hidden; position: relative;
+  page-break-after: always; break-after: page; background: var(--cream); display: flex; flex-direction: column; }
+.page:last-child { page-break-after: auto; break-after: auto; }
+.muted { color: var(--muted); } .small { font-size: 7pt; margin-top: 3mm; line-height: 1.35; }
+.tag { display: inline-block; background: var(--sage); color: #fff; border-radius: 99px; padding: .4mm 2.6mm;
+  font-size: 7.5pt; font-weight: 700; letter-spacing: .02em; margin-right: 2mm; vertical-align: 1px; }
+.tag.rose { background: var(--rose); }
+
+/* cover */
+.cover { background: linear-gradient(160deg, #FFF8EE 0%, #F4EEDF 60%, #E8F0EA 100%); }
+.brand { font-size: 9pt; color: var(--sage); font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.cover h1 { font-size: 38pt; color: var(--sage-d); margin-top: 6mm; letter-spacing: -.01em; line-height: 1.05; }
+.cover .sub { font-size: 15pt; color: var(--muted); margin-top: 2mm; }
+.tiles { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; grid-template-rows: auto auto; gap: 4mm; margin-top: 8mm; }
+.tile { background: #fff; border: .3mm solid var(--line); border-radius: 4mm; padding: 4mm 5mm; display: flex; flex-direction: column; }
+.tile b { font-size: 26pt; color: var(--sage); line-height: 1; }
+.tile span { font-size: 9.5pt; font-weight: 700; margin-top: 1.5mm; }
+.tile i { font-style: normal; font-size: 8pt; color: var(--muted); margin-top: 1mm; }
+.tile.big { grid-row: span 2; background: var(--sage); border-color: var(--sage); justify-content: center; }
+.tile.big b { font-size: 50pt; color: #fff; } .tile.big span { color: #fff; font-size: 13pt; } .tile.big i { color: #D7E8DE; font-size: 10pt; }
+.tile.rose b { color: var(--rose); } .tile.gold b { color: var(--gold); }
+.story { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; margin-top: 7mm; }
+.step { display: flex; gap: 3mm; font-size: 9.5pt; line-height: 1.4; }
+.step .n { flex: none; width: 7mm; height: 7mm; border-radius: 50%; background: var(--sage); color: #fff;
+  font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 10pt; }
+.team { margin-top: auto; display: flex; gap: 10mm; font-size: 10pt; border-top: .3mm solid var(--line); padding-top: 4mm; }
+
+/* month */
+.mhead { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: .4mm solid var(--sage); padding-bottom: 3mm; }
+.kicker { font-size: 8pt; color: var(--sage); font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+.mhead h2 { font-size: 24pt; color: var(--sage-d); line-height: 1.1; }
+.mnote { font-size: 9pt; color: var(--muted); margin-top: .5mm; }
+.mstats { display: flex; gap: 2.5mm; }
+.mstats div { background: #fff; border: .3mm solid var(--line); border-radius: 2.5mm; padding: 1.6mm 3mm; text-align: center; min-width: 19mm; }
+.mstats b { display: block; font-size: 14pt; color: var(--sage); line-height: 1.1; }
+.mstats span { font-size: 6.5pt; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; }
+.mbody { display: flex; gap: 5mm; margin-top: 3mm; flex: 1; min-height: 0; }
+.grid { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 1fr; grid-template-rows: 5mm; gap: 1.2mm; }
+.wd { font-size: 7pt; font-weight: 700; color: var(--muted); text-transform: uppercase; text-align: center; align-self: end; }
+.cell { border-radius: 2mm; padding: 1.2mm 1.5mm; display: flex; flex-direction: column; border: .25mm solid var(--line);
+  background: #fff; min-height: 0; overflow: hidden; position: relative; }
+.cell.out { background: transparent; border: none; }
+.cell.h1 { background: var(--h1); } .cell.h2 { background: var(--h2); } .cell.h3 { background: var(--h3); color: #fff; }
+.cell.h4 { background: var(--h4); color: #fff; }
+.cell.future { background: var(--wash); border-style: dashed; }
+.top { display: flex; justify-content: space-between; align-items: center; }
+.dn { font-size: 8.5pt; font-weight: 700; }
+.marks { display: flex; gap: .8mm; }
+.mid { display: flex; align-items: baseline; gap: .8mm; margin-top: .3mm; }
+.cnum { font-size: 12pt; font-weight: 800; line-height: 1; }
+.cu { font-size: 6pt; opacity: .8; }
+.lab { font-size: 6.3pt; font-weight: 700; line-height: 1.15; margin-top: .5mm; }
+.h3 .lab, .h4 .lab { color: #fff; }
+.lab.k-review { color: var(--rose); } .lab.k-meet, .lab.k-mentor { color: var(--indigo); }
+.lab.k-release { color: #9A6E14; } .lab.k-milestone { color: var(--sage-d); }
+.h3 .lab, .h4 .lab { color: #fff !important; }
+.meta { margin-top: auto; display: flex; gap: 1.8mm; font-size: 6.3pt; font-weight: 600; }
+.meta span, .lg.chat, .lg.ai { display: inline-flex; align-items: center; gap: .5mm; }
+.ic { width: 2.4mm; height: 2.4mm; }
+.chat { color: #5E6C66; } .ai { color: #7A5AA6; }
+.h3 .chat, .h4 .chat, .h3 .ai, .h4 .ai { color: #fff; }
+.mk { display: inline-block; width: 2.4mm; height: 2.4mm; flex: none; }
+.mk.dot { border-radius: 50%; } .mk.sq { border-radius: .4mm; } .mk.dia { transform: rotate(45deg) scale(.85); border-radius: .3mm; }
+.mk.meet { background: var(--indigo); } .mk.review { background: var(--rose); } .mk.release { background: var(--gold); }
+.mk.mile { background: #fff; border: .5mm solid var(--sage-d); }
+.h3 .mk, .h4 .mk { box-shadow: 0 0 0 .35mm #fff; }
+.cell.dday { background: var(--sage-d); color: #fff; border: .8mm solid var(--gold); box-shadow: 0 0 0 .6mm #fff, 0 0 0 1.2mm var(--gold); }
+.ddbig { font-size: 15pt; font-weight: 900; letter-spacing: .04em; color: #FFE7A8; margin-top: .5mm; line-height: 1; }
+.ddsub { font-size: 6.5pt; font-weight: 700; margin-top: .6mm; line-height: 1.2; }
+.side { width: 64mm; flex: none; background: var(--wash); border-radius: 3mm; padding: 3.5mm 4mm; overflow: hidden; }
+.side h3 { font-size: 10pt; color: var(--sage-d); margin-bottom: 2mm; }
+.evl { list-style: none; }
+.evl li { display: flex; gap: 1.8mm; align-items: flex-start; font-size: 7.4pt; line-height: 1.25; padding: 1.2mm 0; border-bottom: .2mm solid var(--line); }
+.evl .mk { margin-top: .6mm; }
+.ed { flex: none; width: 10mm; font-weight: 700; color: var(--muted); }
+.edt { color: var(--muted); font-size: 6.8pt; }
+.legend { display: flex; flex-wrap: wrap; gap: 1.5mm 4.5mm; align-items: center; font-size: 7pt; color: var(--muted); margin-top: 3mm; }
+.lg { display: inline-flex; align-items: center; gap: 1mm; }
+.sw { display: inline-block; width: 3.4mm; height: 3.4mm; border-radius: .6mm; }
+.sw.h1 { background: var(--h1); } .sw.h2 { background: var(--h2); } .sw.h3 { background: var(--h3); } .sw.h4 { background: var(--h4); }
+.src { margin-left: auto; font-style: italic; }
+
+/* last */
+.timeline { display: flex; justify-content: space-between; position: relative; margin: 6mm 0 2mm; padding-top: 1mm; }
+.timeline::before { content: ""; position: absolute; left: 2mm; right: 2mm; top: 3.2mm; height: .6mm; background: var(--sage); opacity: .35; }
+.ti { width: 18mm; text-align: center; position: relative; }
+.tdot { width: 4.4mm; height: 4.4mm; border-radius: 50%; margin: 0 auto; border: .7mm solid var(--cream); }
+.tdot.k-meet, .tdot.k-mentor { background: var(--indigo); } .tdot.k-review { background: var(--rose); }
+.tdot.k-release { background: var(--gold); } .tdot.k-milestone { background: var(--sage); } .tdot.k-dday { background: var(--sage-d); box-shadow: 0 0 0 .7mm var(--gold); }
+.td { font-size: 7pt; font-weight: 700; margin-top: 1.5mm; color: var(--muted); }
+.tt { font-size: 7pt; line-height: 1.2; margin-top: .5mm; }
+.ti.dd .td, .ti.dd .tt { color: var(--sage-d); font-weight: 800; }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; margin-top: 5mm; }
+.col { background: #fff; border: .3mm solid var(--line); border-radius: 4mm; padding: 4mm 5mm; }
+.col.clin { border-top: 1.2mm solid var(--rose); } .col.eng { border-top: 1.2mm solid var(--sage); }
+.col h3 { font-size: 11pt; color: var(--ink); margin-bottom: 2.5mm; }
+.col ul { list-style: none; } .col li { font-size: 8.6pt; line-height: 1.38; margin-bottom: 1.5mm; padding-left: 3mm; position: relative; }
+.col li::before { content: ""; position: absolute; left: 0; top: 1.8mm; width: 1.3mm; height: 1.3mm; border-radius: 50%; background: var(--muted); }
+.bars { margin-top: 3mm; }
+.bh { font-size: 7pt; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: .04em; margin: 1.8mm 0 1mm; }
+.bar { display: flex; align-items: center; gap: 2mm; font-size: 8pt; margin-bottom: 1mm; }
+.bl { width: 32mm; flex: none; } .bt { flex: 1; height: 3.2mm; background: var(--wash); border-radius: 99px; overflow: hidden; }
+.bf { display: block; height: 100%; border-radius: 99px; } .bf.rose { background: var(--rose); } .bf.sage { background: var(--sage); }
+.bn { width: 10mm; text-align: right; font-weight: 700; }
+.together { margin-top: 4mm; font-size: 9.5pt; background: var(--sage); color: #fff; border-radius: 3mm; padding: 3mm 5mm; }
+.foot { margin-top: auto; font-size: 7pt; color: var(--muted); }
+.pulsebox { margin-top: 4mm; background: #fff; border: .3mm solid var(--line); border-radius: 4mm; padding: 2.5mm 5mm 2mm; }
+.ph { display: flex; gap: 4mm; align-items: center; font-size: 7pt; color: var(--muted); }
+.ph b { font-size: 9pt; color: var(--ink); }
+.pulse { width: 100%; height: auto; display: block; margin-top: 1.5mm; }
+.pv { font-size: 9px; fill: #2A5A4A; text-anchor: middle; font-weight: 700; }
+.wl { display: flex; } .wl span { flex: 1; text-align: center; font-size: 6pt; color: var(--muted); }
+.cover .tiles { margin-top: 10mm; gap: 5mm; } .cover .tile { padding: 5.5mm 6mm; }
+.cover .story { margin-top: 12mm; gap: 7mm; } .cover .step { font-size: 11pt; }
+
+/* ===== deck-style calendar (matches the final-submission "Build Sprint Journey" slide) ===== */
+:root { --dgreen: #173F33; --dmuted: #53655C; --rust: #B75E43; --teal: #157B68; --purple: #7353AC; --blue: #4357C7;
+  --sand: #F6EFE2; --cellline: #DDD5C6; --outcell: #EFEAE0;
+  --h1: #F0F7F3; --h2: #DCEEE4; --h3: #C2E2D1; --h4: #A3D3BA; }
+.page.month { background: var(--sand); }
+.month .mhead h2 { color: var(--dgreen); }
+.grid { gap: 0; grid-template-columns: 13mm repeat(7, 1fr); grid-template-rows: 5.5mm; border: none; }
+.grid .wd { color: var(--dmuted); font-size: 7.5pt; align-self: center; }
+.wk { font-size: 6.8pt; font-weight: 700; color: var(--dmuted); text-align: center; padding-top: 1.5mm; }
+.cell { border-radius: 0; border: .25mm solid var(--cellline); margin: 0 -.25mm -.25mm 0; padding: 1mm 1.2mm; background: #fff; color: var(--dgreen); }
+.cell.out { background: var(--outcell); border: .25mm solid var(--cellline); }
+.cell.out .dn { color: #9A9486; font-weight: 400; }
+.cell.h1 { background: var(--h1); } .cell.h2 { background: var(--h2); } .cell.h3 { background: var(--h3); color: var(--dgreen); } .cell.h4 { background: var(--h4); color: var(--dgreen); }
+.cell.future { background: #FBF8F2; border-style: solid; }
+.cell .dn { font-size: 8.5pt; color: var(--dgreen); }
+.cc { font-size: 6.6pt; font-weight: 800; color: var(--teal); }
+.h4 .cc, .h3 .cc { color: var(--dgreen); }
+.chips { display: flex; flex-direction: column; gap: .8mm; margin-top: .8mm; }
+.chip { border-radius: 99px; color: #fff; font-weight: 700; font-size: 6.1pt; line-height: 1.1; text-align: center;
+  padding: .7mm 1mm; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.chip.c-meet { background: var(--blue); } .chip.c-review { background: var(--purple); }
+.chip.c-mile { background: var(--rust); } .chip.c-built { background: var(--teal); }
+.chip.mini { display: inline-block; font-size: 6pt; padding: .3mm 2mm; margin-right: .8mm; }
+.meta { color: var(--dmuted); }
+.h3 .chat, .h4 .chat { color: var(--dmuted); } .h3 .ai, .h4 .ai { color: #6A4E99; }
+.cell.dday { background: var(--dgreen); border: .9mm solid #E0A93B; color: #fff; box-shadow: none; z-index: 2; margin: -.4mm; }
+.ddc { display: inline-flex; width: 5mm; height: 5mm; border-radius: 50%; background: #1A73E8; color: #fff; font-weight: 800;
+  font-size: 8pt; align-items: center; justify-content: center; }
+.cell.dday .ddbig { font-size: 16pt; color: #FFD98A; margin-top: 1mm; }
+.cell.dday .ddsub { font-size: 6.5pt; }
+.side { background: transparent; padding: 0; width: 66mm; display: flex; flex-direction: column; gap: 2mm; }
+.scard { background: #fff; border-radius: 3mm; padding: 3mm 3.5mm; }
+.scard h3 { color: var(--dgreen); }
+.legend .chip.mini { vertical-align: middle; }
+
+/* ===== impact sheets ===== */
+.impact { background: var(--cream); }
+.igrid { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr 1fr; gap: 6mm; margin-top: 6mm; }
+.itile { background: #fff; border: .4mm solid var(--line); border-radius: 5mm; padding: 6mm 7mm; display: flex; flex-direction: column; justify-content: center; }
+.itile b { font-size: 60pt; line-height: .95; color: var(--sage); font-weight: 900; letter-spacing: -.02em; }
+.itile span { font-size: 16pt; font-weight: 800; margin-top: 3mm; color: var(--dgreen); }
+.itile i { font-style: normal; font-size: 9.5pt; color: var(--muted); margin-top: 2mm; line-height: 1.35; }
+.itile.solid { background: var(--sage); border-color: var(--sage); } .itile.solid b, .itile.solid span { color: #fff; } .itile.solid i { color: #D7E8DE; }
+.itile.rose b { color: var(--purple); } .itile.gold b { color: var(--rust); }
+.ifoot { font-size: 8pt; color: var(--muted); margin-top: 4mm; }
+
+/* ===== medical team ===== */
+.medical { background: var(--sand); }
+.mcols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; margin-top: 5mm; }
+.mcard { background: #fff; border-radius: 4mm; padding: 4mm 5mm; border-top: 1.4mm solid var(--purple); }
+.mcard h3 { font-size: 13pt; color: var(--purple); margin-bottom: 2mm; }
+.mcard ul, .lcard ul { list-style: none; }
+.mcard li { font-size: 8.6pt; line-height: 1.35; padding: 1.1mm 0; border-bottom: .2mm solid var(--line); }
+.mcard li:last-child { border-bottom: none; }
+.mcard li b { color: var(--dgreen); display: inline-block; min-width: 15mm; }
+.mrow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4mm; margin-top: 5mm; }
+.mbox { background: #fff; border-radius: 3mm; padding: 3mm 4mm; border-left: 1.2mm solid var(--teal); }
+.mbox h4 { font-size: 9.5pt; color: var(--dgreen); margin-bottom: 1mm; }
+.mbox p { font-size: 8pt; line-height: 1.38; }
+.tbc { color: var(--rust); font-weight: 700; }
+
+/* ===== legal ===== */
+.legal { background: var(--cream); }
+.legal .lh { font-size: 34pt; font-weight: 900; color: var(--dgreen); letter-spacing: -.01em; }
+.lgrid { display: grid; grid-template-columns: 1fr 1fr 0.8fr; grid-template-rows: auto 1fr; gap: 5mm; margin-top: 5mm; flex: 1; min-height: 0; }
+.lcard { background: #fff; border: .3mm solid var(--line); border-radius: 4mm; padding: 4mm 5mm; }
+.lcard.wide { grid-column: 1 / 4; border-top: 1.4mm solid var(--purple); }
+.lcard h3 { font-size: 11.5pt; color: var(--dgreen); margin-bottom: 2.5mm; display: flex; align-items: center; gap: 2mm; }
+.lcard .date { margin-left: auto; font-size: 8pt; color: var(--muted); font-weight: 600; }
+.ln { width: 6mm; height: 6mm; border-radius: 50%; background: var(--purple); color: #fff; font-size: 9pt; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
+.lcard li { font-size: 8.8pt; line-height: 1.38; margin-bottom: 1.6mm; padding-left: 3.5mm; position: relative; }
+.lcard li::before { content: ""; position: absolute; left: 0; top: 1.7mm; width: 1.5mm; height: 1.5mm; border-radius: 50%; background: var(--purple); }
+.lcard.tbcbox { background: #FFF4E5; border: .4mm dashed var(--rust); }
+.lcard.tbcbox h3 { color: var(--rust); } .lcard.tbcbox li::before { background: var(--rust); }
+/* round 2 fixes */
+.chip { white-space: normal; text-overflow: clip; max-height: 6mm; }
+.mk.meet { background: var(--blue); } .mk.review { background: var(--purple); } .mk.mile { background: var(--rust); border: none; }
+.itile.long b { font-size: 44pt; }
+.mcols { flex: 1; } .mcard { display: flex; flex-direction: column; }
+.mcard li { display: grid; grid-template-columns: 20mm 1fr; font-size: 9.6pt; padding: 1.6mm 0; }
+.mcard li b { min-width: 0; }
+.mcard h3 { font-size: 14pt; }
+.mbox h4 { font-size: 10.5pt; } .mbox p { font-size: 9pt; }
+.medical .foot, .legal .foot { margin-top: 4mm; }
+.lgrid { flex: 1; grid-template-rows: auto 1fr; }
+.lcard li { font-size: 10pt; margin-bottom: 2.2mm; } .lcard li::before { top: 2mm; }
+.lcard h3 { font-size: 13pt; }
+.tdot.k-meet, .tdot.k-mentor { background: var(--blue); } .tdot.k-review { background: var(--purple); }
+.tdot.k-release { background: var(--rust); } .tdot.k-milestone { background: var(--teal); }
+.tile.rose b { color: var(--purple); } .tile.gold b { color: var(--rust); }
+.tag.rose, .bf.rose { background: var(--purple); } .col.clin { border-top-color: var(--purple); }
+.last .timeline { margin-top: 4mm; } .last .split { margin-top: 3mm; } .last .pulsebox { margin-top: 3mm; }
+.last .together { margin-top: 3mm; } .last .foot { margin-top: 2mm; }
+.last .col li { margin-bottom: 1mm; }
+</style></head><body>
+
+<section class="page cover">
+  <div class="brand">Team Zeros and Ones · Health-a-thon 2026 Grand Finale · IIT Bombay · 28 Nov 2026</div>
+  <h1>How we built Sahara together</h1>
+  <div class="sub">Doctors and engineers, 7 Aug to 28 Nov 2026</div>
+  <div class="tiles">
+    <div class="tile big"><b>634</b><span>code commits</span><i>49 active build days</i></div>
+    <div class="tile"><b>7</b><span>team meetings</span><i>doctors and engineers together</i></div>
+    <div class="tile"><b>3</b><span>mentor and organiser sessions</span><i>webinar, mentor review, finale briefing</i></div>
+    <div class="tile rose"><b>10</b><span>logged doctor and legal reviews</span><i>concept, specs, survey, legal form, device tests</i></div>
+    <div class="tile"><b>925</b><span>group-chat messages</span><i>48 days, 25 Aug to 4 Nov</i></div>
+    <div class="tile"><b>176</b><span>AI-assisted build sessions</span><i>on 16 days, incl. agent sub-tasks</i></div>
+    <div class="tile gold"><b>3</b><span>Play Store releases</span><i>closed test, production, 0.8.0</i></div>
+  </div>
+  <div class="story">
+    <div class="step"><span class="n">1</span><div><b>Idea from the bedside.</b> Dr Sujay's goals-of-care concept and two August team meetings set the problem: a family's wishes never reach the emergency room.</div></div>
+    <div class="step"><span class="n">2</span><div><b>Clinician-led reviews.</b> Dr Sharada, Dr Shirin and Dr Sujay wrote the clinical reference, specs and survey, and reviewed every pitch and screen.</div></div>
+    <div class="step"><span class="n">3</span><div><b>Build sprints to field testing.</b> The engineers turned each review into builds, from closed testing in October to production in November and doctors testing on their own phones.</div></div>
+  </div>
+  <div class="team">
+    <div><span class="tag rose">Clinicians</span>Dr Sujay H S · Dr Sharada Vinod Kutty · Dr Shirin Ayub</div>
+    <div><span class="tag">Engineers</span>Shaik Abdul Basith (tech lead) · Shaik Awaiz</div>
+  </div>
+</section>
+<section class="page impact">
+  <header class="mhead"><div><div class="kicker">Impact in numbers · 1 of 2</div><h2>What the collaboration produced</h2></div></header>
+  <div class="igrid">
+    <div class="itile solid"><b>634</b><span>code commits</span><i>587 Basith · 47 Awaiz · 7 Aug to 23 Nov</i></div>
+    <div class="itile "><b>49</b><span>active build days</span><i>437,521 lines of code and docs added</i></div>
+    <div class="itile "><b>7</b><span>team meetings</span><i>doctors and engineers together</i></div>
+    <div class="itile "><b>3</b><span>mentor and organiser sessions</span><i>webinar 6 Sep · mentor 20 Oct · briefing 23 Nov</i></div>
+    <div class="itile "><b>925</b><span>team conversations</span><i>group-chat messages, 674 from the doctors</i></div>
+    <div class="itile rose"><b>10</b><span>doctor and legal reviews</span><i>concept, specs, survey, legal form, device tests</i></div>
+  </div>
+  <div class="ifoot">Counts from git (all branches), the team group-chat export (counts only), saved minutes and review notes.</div>
+</section>
+<section class="page impact">
+  <header class="mhead"><div><div class="kicker">Impact in numbers · 2 of 2</div><h2>What patients, families and doctors get</h2></div></header>
+  <div class="igrid">
+    <div class="itile solid"><b>LIVE</b><span>on Google Play in India</span><i>closed test 14 Oct · production 0.7.1 on 9 Nov · 0.8.0 in review 23 Nov</i></div>
+    <div class="itile gold"><b>3</b><span>Play Store releases</span><i>0.4.1 · 0.7.1 · 0.8.0</i></div>
+    <div class="itile long"><b>22 + English</b><span>languages for speech</span><i>goals-of-care recordings and note translation (Sarvam); app screens in English and Hindi, with Telugu, Urdu and Kannada</i></div>
+    <div class="itile "><b>974</b><span>Android unit tests passing</span><i>team's latest run [team to confirm]; plus web checks</i></div>
+    <div class="itile rose"><b>3</b><span>tools based on validated scales</span><i>ESAS-style symptom diary · ZBI-4 carer check · NCCN distress thermometer</i></div>
+    <div class="itile rose"><b>30</b><span>fixes from 2 doctor video reviews</span><i>15 patient-app + 15 doctor-portal points, 22 Nov</i></div>
+  </div>
+  <div class="ifoot">"Based on" validated tools: the scales are not yet validated in every Indian language. Language count is for speech transcription and translation, not every screen.</div>
+</section>
+<section class="page month">
+  <header class="mhead">
+    <div><div class="kicker">How we built Sahara together</div><h2>August 2026</h2><div class="mnote">The idea phase: two team meetings and the first clinical notes.</div></div>
+    <div class="mstats">
+      <div><b>1</b><span>commits</span></div>
+      <div><b>1</b><span>build days</span></div>
+      <div><b>2</b><span>meetings</span></div>
+      <div><b>2</b><span>doctor inputs</span></div>
+      <div><b>79</b><span>chat messages</span></div>
+      <div><b>1</b><span>AI sessions</span></div>
+    </div>
+  </header>
+  <div class="mbody">
+    <div class="grid rows6"><div class="wk"></div><div class="wd">MON</div><div class="wd">TUE</div><div class="wd">WED</div><div class="wd">THU</div><div class="wd">FRI</div><div class="wd">SAT</div><div class="wd">SUN</div><div class="wk">Week 0</div><div class="cell out"><span class="dn">27</span></div><div class="cell out"><span class="dn">28</span></div><div class="cell out"><span class="dn">29</span></div><div class="cell out"><span class="dn">30</span></div><div class="cell out"><span class="dn">31</span></div><div class="cell h0"><div class="top"><span class="dn">1</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">2</span></div><div class="chips"></div><div class="meta"></div></div><div class="wk">Week 1</div><div class="cell h0"><div class="top"><span class="dn">3</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">4</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">5</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">6</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h1"><div class="top"><span class="dn">7</span><span class="cc">1 commit</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">8</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">9</span></div><div class="chips"></div><div class="meta"></div></div><div class="wk">Week 2</div><div class="cell h0"><div class="top"><span class="dn">10</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">11</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">12</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">13</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">14</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">15</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">16</span></div><div class="chips"></div><div class="meta"></div></div><div class="wk">Week 3</div><div class="cell h0"><div class="top"><span class="dn">17</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">18</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">19</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">20</span></div><div class="chips"><div class="chip c-review">Goals-of-care idea</div></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">21</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">22</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">23</span></div><div class="chips"></div><div class="meta"></div></div><div class="wk">Week 4</div><div class="cell h0"><div class="top"><span class="dn">24</span></div><div class="chips"><div class="chip c-meet">Team meeting 1</div></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">25</span></div><div class="chips"><div class="chip c-mile">Team group starts</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>39</span></div></div><div class="cell h0"><div class="top"><span class="dn">26</span></div><div class="chips"></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>2</span></div></div><div class="cell h0"><div class="top"><span class="dn">27</span></div><div class="chips"></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>6</span></div></div><div class="cell h0"><div class="top"><span class="dn">28</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">29</span></div><div class="chips"></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>5</span></div></div><div class="cell h0"><div class="top"><span class="dn">30</span></div><div class="chips"><div class="chip c-meet">Team meeting 2</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>20</span><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>1</span></div></div><div class="wk">Week 5</div><div class="cell h0"><div class="top"><span class="dn">31</span></div><div class="chips"><div class="chip c-review">Clinician feature list</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>7</span></div></div><div class="cell out"><span class="dn">1</span></div><div class="cell out"><span class="dn">2</span></div><div class="cell out"><span class="dn">3</span></div><div class="cell out"><span class="dn">4</span></div><div class="cell out"><span class="dn">5</span></div><div class="cell out"><span class="dn">6</span></div></div>
+    <aside class="side">
+      <div class="scard"><h3>Key days</h3>
+      <ul class="evl"><li><span class="ed">20 Aug</span><span class="mk dot review"></span><span class="et"><b>Goals-of-care idea</b><br><span class="edt">Dr Sujay&#x27;s one-page concept (doc creation date)</span></span></li><li><span class="ed">24 Aug</span><span class="mk dot meet"></span><span class="et"><b>Team meeting 1</b><br><span class="edt">First team meeting, transcript saved</span></span></li><li><span class="ed">25 Aug</span><span class="mk dot mile"></span><span class="et"><b>Team group starts</b><br><span class="edt">Doctors and engineers start the group chat</span></span></li><li><span class="ed">30 Aug</span><span class="mk dot meet"></span><span class="et"><b>Team meeting 2</b><br><span class="edt">Online team call</span></span></li><li><span class="ed">31 Aug</span><span class="mk dot review"></span><span class="et"><b>Clinician feature list</b><br><span class="edt">Dr Sujay&#x27;s list of patient needs</span></span></li></ul></div>
+      <div class="small muted">Chat counts cover the exported group chat (25 Aug to 4 Nov).</div>
+    </aside>
+  </div>
+  <footer class="legend">
+  <span class="lg"><span class="sw h1"></span><span class="sw h2"></span><span class="sw h3"></span><span class="sw h4"></span>&nbsp;commits per day (1–3, 4–8, 9–20, 21+)</span>
+  <span class="lg"><span class="chip c-meet mini">Meeting</span>team / mentor / organisers</span>
+  <span class="lg"><span class="chip c-review mini">Doctor</span>doctor or legal review</span>
+  <span class="lg"><span class="chip c-mile mini">Milestone</span>release or milestone</span>
+  <span class="lg"><span class="chip c-built mini">Built</span>built that day</span>
+  <span class="lg chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>&nbsp;group-chat messages</span>
+  <span class="lg ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>&nbsp;AI-assisted build sessions</span>
+  <span class="src">Sources: git history, chat message counts, meeting minutes, review notes, Play Console dates</span>
+</footer>
+</section>
+<section class="page month">
+  <header class="mhead">
+    <div><div class="kicker">How we built Sahara together</div><h2>September 2026</h2><div class="mnote">Clinicians shape the product; the Round 1 pitch comes out of two review meetings.</div></div>
+    <div class="mstats">
+      <div><b>66</b><span>commits</span></div>
+      <div><b>14</b><span>build days</span></div>
+      <div><b>3</b><span>meetings</span></div>
+      <div><b>3</b><span>doctor inputs</span></div>
+      <div><b>286</b><span>chat messages</span></div>
+      <div><b>1</b><span>AI sessions</span></div>
+    </div>
+  </header>
+  <div class="mbody">
+    <div class="grid rows5"><div class="wk"></div><div class="wd">MON</div><div class="wd">TUE</div><div class="wd">WED</div><div class="wd">THU</div><div class="wd">FRI</div><div class="wd">SAT</div><div class="wd">SUN</div><div class="wk">Week 5</div><div class="cell out"><span class="dn">31</span></div><div class="cell h0"><div class="top"><span class="dn">1</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">2</span></div><div class="chips"></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>6</span></div></div><div class="cell h0"><div class="top"><span class="dn">3</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">4</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">5</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">6</span></div><div class="chips"><div class="chip c-meet">Organisers&#x27; webinar</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>7</span></div></div><div class="wk">Week 6</div><div class="cell h0"><div class="top"><span class="dn">7</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h1"><div class="top"><span class="dn">8</span><span class="cc">1 commit</span></div><div class="chips"></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>18</span></div></div><div class="cell h1"><div class="top"><span class="dn">9</span><span class="cc">1 commit</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">10</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">11</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">12</span></div><div class="chips"><div class="chip c-review">Clinical draft shared</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>5</span></div></div><div class="cell h1"><div class="top"><span class="dn">13</span><span class="cc">1 commit</span></div><div class="chips"></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>13</span></div></div><div class="wk">Week 7</div><div class="cell h1"><div class="top"><span class="dn">14</span><span class="cc">2 commits</span></div><div class="chips"></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>16</span></div></div><div class="cell h1"><div class="top"><span class="dn">15</span><span class="cc">3 commits</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h4"><div class="top"><span class="dn">16</span><span class="cc">22 commits</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">17</span></div><div class="chips"></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>11</span></div></div><div class="cell h1"><div class="top"><span class="dn">18</span><span class="cc">3 commits</span></div><div class="chips"></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>26</span><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>1</span></div></div><div class="cell h0"><div class="top"><span class="dn">19</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">20</span></div><div class="chips"><div class="chip c-review">Dr Shirin&#x27;s review</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>8</span></div></div><div class="wk">Week 8</div><div class="cell h3"><div class="top"><span class="dn">21</span><span class="cc">9 commits</span></div><div class="chips"><div class="chip c-meet">Product review call</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>19</span></div></div><div class="cell h1"><div class="top"><span class="dn">22</span><span class="cc">1 commit</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h1"><div class="top"><span class="dn">23</span><span class="cc">2 commits</span></div><div class="chips"><div class="chip c-meet">Round 1 pitch call</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>41</span></div></div><div class="cell h3"><div class="top"><span class="dn">24</span><span class="cc">16 commits</span></div><div class="chips"><div class="chip c-review">Dr Sujay&#x27;s feedback</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>21</span></div></div><div class="cell h1"><div class="top"><span class="dn">25</span><span class="cc">2 commits</span></div><div class="chips"><div class="chip c-mile">Round 1 answers</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>84</span></div></div><div class="cell h1"><div class="top"><span class="dn">26</span><span class="cc">1 commit</span></div><div class="chips"></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>8</span></div></div><div class="cell h1"><div class="top"><span class="dn">27</span><span class="cc">2 commits</span></div><div class="chips"></div><div class="meta"></div></div><div class="wk">Week 9</div><div class="cell h0"><div class="top"><span class="dn">28</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">29</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">30</span></div><div class="chips"></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>3</span></div></div><div class="cell out"><span class="dn">1</span></div><div class="cell out"><span class="dn">2</span></div><div class="cell out"><span class="dn">3</span></div><div class="cell out"><span class="dn">4</span></div></div>
+    <aside class="side">
+      <div class="scard"><h3>Key days</h3>
+      <ul class="evl"><li><span class="ed">6 Sep</span><span class="mk dot meet"></span><span class="et"><b>Organisers&#x27; webinar</b><br><span class="edt">Health-a-thon Connect session</span></span></li><li><span class="ed">12 Sep</span><span class="mk dot review"></span><span class="et"><b>Clinical draft shared</b><br><span class="edt">Dr Sharada&#x27;s clinical reference and Dr Sujay&#x27;s form</span></span></li><li><span class="ed">20 Sep</span><span class="mk dot review"></span><span class="et"><b>Dr Shirin&#x27;s review</b><br><span class="edt">One care calendar, fewer clicks</span></span></li><li><span class="ed">21 Sep</span><span class="mk dot meet"></span><span class="et"><b>Product review call</b><br><span class="edt">Team meeting, minutes saved</span></span></li><li><span class="ed">23 Sep</span><span class="mk dot meet"></span><span class="et"><b>Round 1 pitch call</b><br><span class="edt">Team meeting, minutes saved</span></span></li><li><span class="ed">24 Sep</span><span class="mk dot review"></span><span class="et"><b>Dr Sujay&#x27;s feedback</b><br><span class="edt">Morning feedback on the deck</span></span></li><li><span class="ed">25 Sep</span><span class="mk dot mile"></span><span class="et"><b>Round 1 answers</b><br><span class="edt">Revised portal answers saved</span></span></li></ul></div>
+      
+    </aside>
+  </div>
+  <footer class="legend">
+  <span class="lg"><span class="sw h1"></span><span class="sw h2"></span><span class="sw h3"></span><span class="sw h4"></span>&nbsp;commits per day (1–3, 4–8, 9–20, 21+)</span>
+  <span class="lg"><span class="chip c-meet mini">Meeting</span>team / mentor / organisers</span>
+  <span class="lg"><span class="chip c-review mini">Doctor</span>doctor or legal review</span>
+  <span class="lg"><span class="chip c-mile mini">Milestone</span>release or milestone</span>
+  <span class="lg"><span class="chip c-built mini">Built</span>built that day</span>
+  <span class="lg chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>&nbsp;group-chat messages</span>
+  <span class="lg ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>&nbsp;AI-assisted build sessions</span>
+  <span class="src">Sources: git history, chat message counts, meeting minutes, review notes, Play Console dates</span>
+</footer>
+</section>
+<section class="page month">
+  <header class="mhead">
+    <div><div class="kicker">How we built Sahara together</div><h2>October 2026</h2><div class="mnote">Shortlisted. The first test build reaches real phones; mentor review; hospital survey.</div></div>
+    <div class="mstats">
+      <div><b>354</b><span>commits</span></div>
+      <div><b>22</b><span>build days</span></div>
+      <div><b>2</b><span>meetings</span></div>
+      <div><b>3</b><span>doctor inputs</span></div>
+      <div><b>456</b><span>chat messages</span></div>
+      <div><b>47</b><span>AI sessions</span></div>
+    </div>
+  </header>
+  <div class="mbody">
+    <div class="grid rows5"><div class="wk"></div><div class="wd">MON</div><div class="wd">TUE</div><div class="wd">WED</div><div class="wd">THU</div><div class="wd">FRI</div><div class="wd">SAT</div><div class="wd">SUN</div><div class="wk">Week 9</div><div class="cell out"><span class="dn">28</span></div><div class="cell out"><span class="dn">29</span></div><div class="cell out"><span class="dn">30</span></div><div class="cell h0"><div class="top"><span class="dn">1</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h1"><div class="top"><span class="dn">2</span><span class="cc">1 commit</span></div><div class="chips"></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>17</span></div></div><div class="cell h0"><div class="top"><span class="dn">3</span></div><div class="chips"></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>4</span></div></div><div class="cell h0"><div class="top"><span class="dn">4</span></div><div class="chips"></div><div class="meta"></div></div><div class="wk">Week 10</div><div class="cell h1"><div class="top"><span class="dn">5</span><span class="cc">1 commit</span></div><div class="chips"></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>7</span></div></div><div class="cell h0"><div class="top"><span class="dn">6</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">7</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">8</span></div><div class="chips"></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>19</span></div></div><div class="cell h1"><div class="top"><span class="dn">9</span><span class="cc">3 commits</span></div><div class="chips"><div class="chip c-mile">Top 120 shortlist</div><div class="chip c-built">Native Android + map</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>69</span></div></div><div class="cell h2"><div class="top"><span class="dn">10</span><span class="cc">8 commits</span></div><div class="chips"><div class="chip c-built">Safe account deletion</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>79</span></div></div><div class="cell h1"><div class="top"><span class="dn">11</span><span class="cc">3 commits</span></div><div class="chips"><div class="chip c-built">Prescription organiser</div><div class="chip c-built">Web features on Android</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>3</span></div></div><div class="wk">Week 11</div><div class="cell h0"><div class="top"><span class="dn">12</span></div><div class="chips"></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>5</span></div></div><div class="cell h1"><div class="top"><span class="dn">13</span><span class="cc">2 commits</span></div><div class="chips"><div class="chip c-built">Scanner verified</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>2</span></div></div><div class="cell h2"><div class="top"><span class="dn">14</span><span class="cc">5 commits</span></div><div class="chips"><div class="chip c-mile">Closed testing 0.4.1</div><div class="chip c-built">Testers invited</div></div><div class="meta"></div></div><div class="cell h1"><div class="top"><span class="dn">15</span><span class="cc">1 commit</span></div><div class="chips"></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>2</span></div></div><div class="cell h3"><div class="top"><span class="dn">16</span><span class="cc">18 commits</span></div><div class="chips"><div class="chip c-built">Sahara 0.5 alpha</div><div class="chip c-built">Privacy and safety</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>7</span></div></div><div class="cell h0"><div class="top"><span class="dn">17</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">18</span></div><div class="chips"></div><div class="meta"></div></div><div class="wk">Week 12</div><div class="cell h3"><div class="top"><span class="dn">19</span><span class="cc">14 commits</span></div><div class="chips"><div class="chip c-built">On-device processing</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>9</span></div></div><div class="cell h1"><div class="top"><span class="dn">20</span><span class="cc">2 commits</span></div><div class="chips"><div class="chip c-meet">Mentor meeting</div><div class="chip c-built">National care directory</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>7</span></div></div><div class="cell h2"><div class="top"><span class="dn">21</span><span class="cc">4 commits</span></div><div class="chips"><div class="chip c-built">Release verified</div><div class="chip c-built">Research archive</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>5</span></div></div><div class="cell h1"><div class="top"><span class="dn">22</span><span class="cc">1 commit</span></div><div class="chips"><div class="chip c-built">Daily health workflow</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>7</span></div></div><div class="cell h2"><div class="top"><span class="dn">23</span><span class="cc">4 commits</span></div><div class="chips"><div class="chip c-review">Hospital survey</div><div class="chip c-built">Phase 2 deck</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>16</span></div></div><div class="cell h3"><div class="top"><span class="dn">24</span><span class="cc">19 commits</span></div><div class="chips"></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>69</span></div></div><div class="cell h1"><div class="top"><span class="dn">25</span><span class="cc">1 commit</span></div><div class="chips"><div class="chip c-built">Symptom tracker</div><div class="chip c-built">Navigation, feedback</div></div><div class="meta"></div></div><div class="wk">Week 13</div><div class="cell h3"><div class="top"><span class="dn">26</span><span class="cc">18 commits</span></div><div class="chips"><div class="chip c-built">Pain body map</div><div class="chip c-built">Motion and loading</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>5</span></div></div><div class="cell h4"><div class="top"><span class="dn">27</span><span class="cc">158 commits</span></div><div class="chips"><div class="chip c-built">Hindi + offline speech</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>31</span></div></div><div class="cell h4"><div class="top"><span class="dn">28</span><span class="cc">45 commits</span></div><div class="chips"><div class="chip c-meet">Team meeting</div><div class="chip c-built">Ask your documents</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>13</span><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>1</span></div></div><div class="cell h4"><div class="top"><span class="dn">29</span><span class="cc">26 commits</span></div><div class="chips"><div class="chip c-review">Dr Sharada&#x27;s specs</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>47</span><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>32</span></div></div><div class="cell h3"><div class="top"><span class="dn">30</span><span class="cc">18 commits</span></div><div class="chips"><div class="chip c-built">Goals of care + QR</div><div class="chip c-built">Telugu, Urdu, Kannada</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>17</span><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>14</span></div></div><div class="cell h1"><div class="top"><span class="dn">31</span><span class="cc">2 commits</span></div><div class="chips"><div class="chip c-review">Legal review</div><div class="chip c-built">Patient summary</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>16</span></div></div><div class="cell out"><span class="dn">1</span></div></div>
+    <aside class="side">
+      <div class="scard"><h3>Key days</h3>
+      <ul class="evl"><li><span class="ed">9 Oct</span><span class="mk dot mile"></span><span class="et"><b>Top 120 shortlist</b><br><span class="edt">Shortlisted from 450+ submissions</span></span></li><li><span class="ed">14 Oct</span><span class="mk dot mile"></span><span class="et"><b>Closed testing 0.4.1</b><br><span class="edt">Play Store closed testing</span></span></li><li><span class="ed">20 Oct</span><span class="mk dot meet"></span><span class="et"><b>Mentor meeting</b><br><span class="edt">Mentor session with test APK</span></span></li><li><span class="ed">23 Oct</span><span class="mk dot review"></span><span class="et"><b>Hospital survey</b><br><span class="edt">Dr Sujay&#x27;s survey follow-up</span></span></li><li><span class="ed">28 Oct</span><span class="mk dot meet"></span><span class="et"><b>Team meeting</b><br><span class="edt">Goals-of-care sign-off decisions</span></span></li><li><span class="ed">29 Oct</span><span class="mk dot review"></span><span class="et"><b>Dr Sharada&#x27;s specs</b><br><span class="edt">Clinical and tech specifications</span></span></li><li><span class="ed">31 Oct</span><span class="mk dot review"></span><span class="et"><b>Legal review</b><br><span class="edt">Legal comments on the form</span></span></li></ul></div>
+      <div class="small muted">Teal chips: what was built that day, from the git history (as on the final-submission sprint calendar).</div>
+    </aside>
+  </div>
+  <footer class="legend">
+  <span class="lg"><span class="sw h1"></span><span class="sw h2"></span><span class="sw h3"></span><span class="sw h4"></span>&nbsp;commits per day (1–3, 4–8, 9–20, 21+)</span>
+  <span class="lg"><span class="chip c-meet mini">Meeting</span>team / mentor / organisers</span>
+  <span class="lg"><span class="chip c-review mini">Doctor</span>doctor or legal review</span>
+  <span class="lg"><span class="chip c-mile mini">Milestone</span>release or milestone</span>
+  <span class="lg"><span class="chip c-built mini">Built</span>built that day</span>
+  <span class="lg chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>&nbsp;group-chat messages</span>
+  <span class="lg ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>&nbsp;AI-assisted build sessions</span>
+  <span class="src">Sources: git history, chat message counts, meeting minutes, review notes, Play Console dates</span>
+</footer>
+</section>
+<section class="page month">
+  <header class="mhead">
+    <div><div class="kicker">How we built Sahara together</div><h2>November 2026</h2><div class="mnote">Final submission, production release, doctors' device reviews, then the finale.</div></div>
+    <div class="mstats">
+      <div><b>213</b><span>commits</span></div>
+      <div><b>12</b><span>build days</span></div>
+      <div><b>3</b><span>meetings</span></div>
+      <div><b>2</b><span>doctor inputs</span></div>
+      <div><b>104</b><span>chat messages</span></div>
+      <div><b>127</b><span>AI sessions</span></div>
+    </div>
+  </header>
+  <div class="mbody">
+    <div class="grid rows6"><div class="wk"></div><div class="wd">MON</div><div class="wd">TUE</div><div class="wd">WED</div><div class="wd">THU</div><div class="wd">FRI</div><div class="wd">SAT</div><div class="wd">SUN</div><div class="wk">Week 13</div><div class="cell out"><span class="dn">26</span></div><div class="cell out"><span class="dn">27</span></div><div class="cell out"><span class="dn">28</span></div><div class="cell out"><span class="dn">29</span></div><div class="cell out"><span class="dn">30</span></div><div class="cell out"><span class="dn">31</span></div><div class="cell h2"><div class="top"><span class="dn">1</span><span class="cc">7 commits</span></div><div class="chips"><div class="chip c-built">Recording to text</div><div class="chip c-built">Today / Care redesign</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>41</span><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>4</span></div></div><div class="wk">Week 14</div><div class="cell h1"><div class="top"><span class="dn">2</span><span class="cc">2 commits</span></div><div class="chips"><div class="chip c-built">Doctor schedule</div><div class="chip c-built">Patient profile</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>3</span></div></div><div class="cell h0"><div class="top"><span class="dn">3</span></div><div class="chips"><div class="chip c-meet">Team meeting</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>43</span></div></div><div class="cell h2"><div class="top"><span class="dn">4</span><span class="cc">5 commits</span></div><div class="chips"><div class="chip c-built">Clinical document</div><div class="chip c-built">8 practice talks pass</div></div><div class="meta"><span class="chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>17</span><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>17</span></div></div><div class="cell h3"><div class="top"><span class="dn">5</span><span class="cc">19 commits</span></div><div class="chips"><div class="chip c-built">AI + backup models</div><div class="chip c-built">Offline Whisper</div></div><div class="meta"><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>45</span></div></div><div class="cell h4"><div class="top"><span class="dn">6</span><span class="cc">111 commits</span></div><div class="chips"><div class="chip c-built">Community groups</div><div class="chip c-built">910 tests pass</div></div><div class="meta"></div></div><div class="cell h4"><div class="top"><span class="dn">7</span><span class="cc">38 commits</span></div><div class="chips"><div class="chip c-mile">Final submission pack</div><div class="chip c-built">Caregiver wellbeing</div></div><div class="meta"><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>21</span></div></div><div class="cell h3"><div class="top"><span class="dn">8</span><span class="cc">12 commits</span></div><div class="chips"></div><div class="meta"><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>6</span></div></div><div class="wk">Week 15</div><div class="cell h2"><div class="top"><span class="dn">9</span><span class="cc">6 commits</span></div><div class="chips"><div class="chip c-mile">Production 0.7.1</div></div><div class="meta"><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>6</span></div></div><div class="cell h1"><div class="top"><span class="dn">10</span><span class="cc">2 commits</span></div><div class="chips"></div><div class="meta"><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>6</span></div></div><div class="cell h0"><div class="top"><span class="dn">11</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">12</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">13</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">14</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">15</span></div><div class="chips"></div><div class="meta"></div></div><div class="wk">Week 16</div><div class="cell h0"><div class="top"><span class="dn">16</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">17</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">18</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">19</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">20</span></div><div class="chips"></div><div class="meta"><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>4</span></div></div><div class="cell h1"><div class="top"><span class="dn">21</span><span class="cc">1 commit</span></div><div class="chips"><div class="chip c-review">Dr Sujay&#x27;s photo review</div></div><div class="meta"><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>2</span></div></div><div class="cell h1"><div class="top"><span class="dn">22</span><span class="cc">3 commits</span></div><div class="chips"><div class="chip c-review">Video reviews</div><div class="chip c-meet">Team meeting</div></div><div class="meta"><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>13</span></div></div><div class="wk">Week 17</div><div class="cell h2"><div class="top"><span class="dn">23</span><span class="cc">7 commits</span></div><div class="chips"><div class="chip c-meet">Organisers&#x27; briefing</div><div class="chip c-mile">0.8.0 in review</div></div><div class="meta"><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>3</span></div></div><div class="cell h0 future"><div class="top"><span class="dn">24</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0 future"><div class="top"><span class="dn">25</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0 future"><div class="top"><span class="dn">26</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0 future"><div class="top"><span class="dn">27</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell dday"><span class="ddc">28</span><div class="ddbig">D-DAY</div><div class="ddsub">Grand Finale · IIT Bombay</div></div><div class="cell h0 future"><div class="top"><span class="dn">29</span></div><div class="chips"></div><div class="meta"></div></div><div class="wk">Week 18</div><div class="cell h0 future"><div class="top"><span class="dn">30</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell out"><span class="dn">1</span></div><div class="cell out"><span class="dn">2</span></div><div class="cell out"><span class="dn">3</span></div><div class="cell out"><span class="dn">4</span></div><div class="cell out"><span class="dn">5</span></div><div class="cell out"><span class="dn">6</span></div></div>
+    <aside class="side">
+      <div class="scard"><h3>Key days</h3>
+      <ul class="evl"><li><span class="ed">3 Nov</span><span class="mk dot meet"></span><span class="et"><b>Team meeting</b><br><span class="edt">Transcript saved, changes built 4 Nov</span></span></li><li><span class="ed">7 Nov</span><span class="mk dot mile"></span><span class="et"><b>Final submission pack</b><br><span class="edt">Brief and deck with Dr Sujay&#x27;s edits</span></span></li><li><span class="ed">9 Nov</span><span class="mk dot mile"></span><span class="et"><b>Production 0.7.1</b><br><span class="edt">Live on the Play Store</span></span></li><li><span class="ed">21 Nov</span><span class="mk dot review"></span><span class="et"><b>Dr Sujay&#x27;s photo review</b><br><span class="edt">Device test, six screens</span></span></li><li><span class="ed">22 Nov</span><span class="mk dot review"></span><span class="et"><b>Video reviews</b><br><span class="edt">Dr Sujay&#x27;s two videos; notes from Dr Shirin and Dr Sharada</span></span></li><li><span class="ed">22 Nov</span><span class="mk dot meet"></span><span class="et"><b>Team meeting</b><br><span class="edt">Pitch plan and field-test plan</span></span></li><li><span class="ed">23 Nov</span><span class="mk dot meet"></span><span class="et"><b>Organisers&#x27; briefing</b><br><span class="edt">Finale format and jury</span></span></li><li><span class="ed">23 Nov</span><span class="mk dot mile"></span><span class="et"><b>0.8.0 in review</b><br><span class="edt">Sent to Play Store review</span></span></li><li><span class="ed">28 Nov</span><span class="mk dot mile"></span><span class="et"><b>D-DAY: Grand Finale</b><br><span class="edt">IIT Bombay</span></span></li></ul></div>
+      <div class="small muted">Chat counts cover the exported group chat (25 Aug to 4 Nov).</div><div class="small muted">Teal chips: what was built that day, from the git history (as on the final-submission sprint calendar).</div>
+    </aside>
+  </div>
+  <footer class="legend">
+  <span class="lg"><span class="sw h1"></span><span class="sw h2"></span><span class="sw h3"></span><span class="sw h4"></span>&nbsp;commits per day (1–3, 4–8, 9–20, 21+)</span>
+  <span class="lg"><span class="chip c-meet mini">Meeting</span>team / mentor / organisers</span>
+  <span class="lg"><span class="chip c-review mini">Doctor</span>doctor or legal review</span>
+  <span class="lg"><span class="chip c-mile mini">Milestone</span>release or milestone</span>
+  <span class="lg"><span class="chip c-built mini">Built</span>built that day</span>
+  <span class="lg chat"><svg viewBox="0 0 12 12" class="ic"><path d="M2 2h8a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5l-3 2V9H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>&nbsp;group-chat messages</span>
+  <span class="lg ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>&nbsp;AI-assisted build sessions</span>
+  <span class="src">Sources: git history, chat message counts, meeting minutes, review notes, Play Console dates</span>
+</footer>
+</section>
+<section class="page medical">
+  <header class="mhead"><div><div class="kicker">Clinician-led from day one</div><h2>What the medical team did</h2>
+  <div class="mnote">The doctors set the problem, wrote the clinical content and tested every build on their own phones.</div></div></header>
+  <div class="mcols">
+    <div class="mcard">
+      <h3>Dr Sujay H S</h3>
+      <ul>
+        <li><b>20 Aug</b> One-page goals-of-care concept: the idea Sahara grew from.</li>
+        <li><b>12 Sep</b> Distilled clinical form that guided the Round 1 answers.</li>
+        <li><b>23–29 Oct</b> Hospital survey: follow-up and sending it to doctors.</li>
+        <li><b>3 Nov</b> Walked through the whole app in a team meeting; changes built the next day.</li>
+        <li><b>7 Nov</b> His 13 topics and edits shaped the final submission.</li>
+        <li><b>21–22 Nov</b> Field review on his phone: 6 photographed screens, 2 videos, 30 issues logged.</li>
+      </ul>
+    </div>
+    <div class="mcard">
+      <h3>Dr Sharada Vinod Kutty</h3>
+      <ul>
+        <li><b>Sep</b> Wrote the full clinical reference: values, home support, named people, readable copies.</li>
+        <li><b>27 Sep</b> Reviewed the Round 1 deck.</li>
+        <li><b>20 Oct</b> Explained the problem to the mentor.</li>
+        <li><b>24 Oct</b> Symptom list, with Dr Shirin.</li>
+        <li><b>29 Oct</b> Clinical and technical specifications for the emergency care plan and living will.</li>
+        <li><b>22 Nov</b> Feedback on doctor invite links; with Dr Sujay, the finale pitch outline.</li>
+      </ul>
+    </div>
+    <div class="mcard">
+      <h3>Dr Shirin Ayub</h3>
+      <ul>
+        <li><b>20 Sep</b> One calendar for medicines, visits and tests; fewer clicks; past treatments in the history.</li>
+        <li><b>20 Sep</b> Keep the doctor's instructions beside each appointment.</li>
+        <li><b>24 Oct</b> Symptom list, with Dr Sharada.</li>
+        <li><b>Nov</b> Caregiver-burnout evidence for the final submission.</li>
+        <li><b>22 Nov</b> Clearer capacity step, medicine and visit alarms, guardian's phone on the SOS QR.</li>
+        <li><b>23 Nov</b> First-run care details (illness, current doctor, current treatment), built the same day.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="mrow">
+    <div class="mbox"><h4>Goals-of-care content and form</h4><p>The clinical form, the clinical reference and the specifications define every section of the doctor's note. The note now prints the lawyer-reviewed form word for word.</p></div>
+    <div class="mbox"><h4>Emergency care plan</h4><p>Dr Sharada's specification of the emergency care plan and living will (29 Oct) drives the plan, the pocket card and the offline QR.</p></div>
+    <div class="mbox"><h4>Symptom and carer tools</h4><p>Symptom list from Dr Shirin and Dr Sharada; the diary is based on ESAS, with ZBI-4 for carers and the NCCN distress thermometer. <span class="tbc">[team to confirm who chose each scale]</span></p></div>
+    <div class="mbox"><h4>Field testing</h4><p>Doctors tested the Play Store build on their own phones (21–22 Nov). Next: the new build tested on real phones with at least 5 goals-of-care conversations (agreed 22 Nov).</p></div>
+  </div>
+  <div class="foot">Sources: meeting minutes (21 and 23 Sep, 22 Nov), the 3 Nov meeting transcript, team-review notes (21–22 Nov), dated team documents and git history.</div>
+</section>
+<section class="page legal">
+  <header class="mhead"><div><div class="kicker">Built inside Indian law</div><h2 class="lh">Legal review</h2>
+  <div class="mnote">A legal reviewer checked our goals-of-care form, and the app follows India's data and end-of-life law.</div></div></header>
+  <div class="lgrid">
+    <div class="lcard wide">
+      <h3><span class="ln">1</span>The lawyer's review of the goals-of-care form <span class="date">31 Oct 2026</span></h3>
+      <div class="two">
+        <ul>
+          <li><b>Ask both sex and gender</b> in the patient details.</li>
+          <li><b>Family includes</b> live-in and queer relationships.</li>
+          <li><b>Record who was tried</b> but could not be reached.</li>
+          <li><b>Primary and secondary</b> decision makers, each reachable 24 hours.</li>
+        </ul>
+        <ul>
+          <li><b>Capacity:</b> add guidance on how, and when, to assess it.</li>
+          <li><b>Withdrawal and withholding</b> follows <i>Common Cause v Union of India</i> (2018, 2023): board dates, members, decisions.</li>
+          <li><b>Witnesses</b> for a thumb impression or limited literacy, at home and in hospital.</li>
+          <li><b>Result:</b> the app's note prints this form word for word on Android and web, and a test checks every line.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="lcard">
+      <h3><span class="ln">2</span>Advance directive law</h3>
+      <ul>
+        <li>The note records a conversation. It is <b>not</b> an advance directive or a DNAR order.</li>
+        <li>The living-will section helps people prepare one: under the 2023 simplification it needs two witnesses and a notary or gazetted officer.</li>
+        <li>Only adults (18+) can make an advance directive.</li>
+      </ul>
+    </div>
+    <div class="lcard">
+      <h3><span class="ln">3</span>DPDP Act 2023: consent and data</h3>
+      <ul>
+        <li><b>Two consent ticks</b> before recording: the patient (or legal representative) and the family in the room.</li>
+        <li><b>18+</b> to create an account; for a child patient, a parent or lawful guardian consents.</li>
+        <li><b>Data minimisation:</b> report files and photos stay on the phone; recordings leave only with consent.</li>
+        <li><b>Morphine reports</b> are not linked to anyone's account.</li>
+        <li>Withdraw consent, delete a person's records or the account.</li>
+      </ul>
+    </div>
+    <div class="lcard tbcbox">
+      <h3>For the team to confirm</h3>
+      <ul>
+        <li>Reviewer's name and title for print (the form review is credited to Rituparna P).</li>
+        <li>Whether the lawyer also advised on the DPDP points (the saved review covers the form only).</li>
+        <li>Server region (records say Mumbai), grievance contact and how long data is kept.</li>
+        <li>Nominee under DPDP s.14: not built yet.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot">Sources: legal reviewer's tracked changes and comments on the goals-of-care form (31 Oct), the form coverage note, the privacy-policy draft (DPDP Act 2023), the app's consent screen and the emergency care plan references.</div>
+</section>
+<section class="page last">
+  <header class="mhead"><div><div class="kicker">How we built Sahara together</div><h2>Milestones and who did what</h2></div></header>
+  <div class="timeline"><div class="ti "><div class="tdot k-review"></div><div class="td">20 Aug</div><div class="tt">Goals-of-care concept</div></div><div class="ti "><div class="tdot k-meet"></div><div class="td">24 Aug</div><div class="tt">First team meeting</div></div><div class="ti "><div class="tdot k-review"></div><div class="td">12 Sep</div><div class="tt">Clinical reference shared</div></div><div class="ti "><div class="tdot k-meet"></div><div class="td">21–23 Sep</div><div class="tt">Two review meetings</div></div><div class="ti "><div class="tdot k-milestone"></div><div class="td">25 Sep</div><div class="tt">Round 1 answers</div></div><div class="ti "><div class="tdot k-milestone"></div><div class="td">9 Oct</div><div class="tt">Top 120 shortlist</div></div><div class="ti "><div class="tdot k-release"></div><div class="td">14 Oct</div><div class="tt">Closed testing 0.4.1</div></div><div class="ti "><div class="tdot k-mentor"></div><div class="td">20 Oct</div><div class="tt">Mentor meeting</div></div><div class="ti "><div class="tdot k-review"></div><div class="td">29 Oct</div><div class="tt">Dr Sharada&#x27;s specs</div></div><div class="ti "><div class="tdot k-milestone"></div><div class="td">7 Nov</div><div class="tt">Final submission pack</div></div><div class="ti "><div class="tdot k-release"></div><div class="td">9 Nov</div><div class="tt">Production 0.7.1</div></div><div class="ti "><div class="tdot k-review"></div><div class="td">21–22 Nov</div><div class="tt">Doctors&#x27; device reviews</div></div><div class="ti "><div class="tdot k-release"></div><div class="td">23 Nov</div><div class="tt">0.8.0 in review</div></div><div class="ti dd"><div class="tdot k-dday"></div><div class="td">28 Nov</div><div class="tt">D-DAY: Grand Finale</div></div></div>
+  <div class="split">
+    <div class="col clin">
+      <h3><span class="tag rose">Clinicians</span> set the direction and checked the work</h3>
+      <ul>
+        <li><b>Reviews and inputs:</b> 9 logged doctor inputs plus 1 legal review, from the first concept (20 Aug) to device and video reviews (21–22 Nov).</li>
+        <li><b>Questionnaires and survey:</b> the clinical form that guided Round 1 (Sep) and the hospital survey the doctors ran (Oct).</li>
+        <li><b>Goals-of-care content:</b> the clinical reference, the specifications and the wording of the doctor's note.</li>
+        <li><b>Field tests:</b> testing the Play Store build on their own phones, with photo and video reviews.</li>
+      </ul>
+      <div class="bars">
+        <div class="bh">Group-chat messages</div>
+        <div class="bar"><span class="bl">Dr Sujay H S</span><span class="bt"><span class="bf rose" style="width:100%"></span></span><span class="bn">446</span></div>
+        <div class="bar"><span class="bl">Dr Sharada</span><span class="bt"><span class="bf rose" style="width:33%"></span></span><span class="bn">148</span></div>
+        <div class="bar"><span class="bl">Dr Shirin Ayub</span><span class="bt"><span class="bf rose" style="width:18%"></span></span><span class="bn">80</span></div>
+      </div>
+    </div>
+    <div class="col eng">
+      <h3><span class="tag">Engineers</span> turned each review into a build</h3>
+      <ul>
+        <li><b>Builds:</b> 634 commits on 49 days, 7 Aug to 23 Nov; 437,521 lines added.</li>
+        <li><b>Releases:</b> closed testing 0.4.1 (14 Oct), production 0.7.1 (9 Nov), 0.8.0 sent for review (23 Nov).</li>
+        <li><b>Acting on feedback:</b> the 21 Sep, 28 Oct and 3 Nov meetings were each followed by recorded changes; 16 commit messages name a doctor's feedback.</li>
+        <li><b>AI-assisted build sessions:</b> 176 sessions on 16 days (main working sessions plus their agent sub-tasks).</li>
+      </ul>
+      <div class="bars">
+        <div class="bh">Commits</div>
+        <div class="bar"><span class="bl">Shaik Abdul Basith</span><span class="bt"><span class="bf sage" style="width:93%"></span></span><span class="bn">587</span></div>
+        <div class="bar"><span class="bl">Shaik Awaiz</span><span class="bt"><span class="bf sage" style="width:7%"></span></span><span class="bn">47</span></div>
+        <div class="bh">Group-chat messages</div>
+        <div class="bar"><span class="bl">Shaik Abdul Basith</span><span class="bt"><span class="bf sage" style="width:50%"></span></span><span class="bn">225</span></div>
+        <div class="bar"><span class="bl">Shaik Awaiz</span><span class="bt"><span class="bf sage" style="width:6%"></span></span><span class="bn">26</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="pulsebox"><div class="ph"><b>Week by week</b>
+<span class="lg"><span class="sw" style="background:#3B7562"></span>commits</span>
+<span class="lg"><span class="sw" style="background:#7353AC"></span>chat: clinicians</span>
+<span class="lg"><span class="sw" style="background:#8FA89C"></span>chat: engineers</span>
+<span class="lg"><span class="mk dot meet"></span>meeting</span><span class="lg"><span class="mk dot review"></span>doctor review</span>
+<span class="muted" style="margin-left:auto">weeks starting Monday; chat export ends 4 Nov</span></div>
+<svg viewBox="0 0 1000 122" class="pulse"><rect x="10.6" y="61.8" width="37.6" height="0.2" rx="2" fill="#3B7562"/><text x="29.4" y="58.8" class="pv">1</text><rect x="10.6" y="66.0" width="37.6" height="0.0" fill="#7353AC"/><rect x="10.6" y="66.0" width="37.6" height="0.0" fill="#8FA89C"/><rect x="69.4" y="62.0" width="37.6" height="0.0" rx="2" fill="#3B7562"/><rect x="69.4" y="66.0" width="37.6" height="0.0" fill="#7353AC"/><rect x="69.4" y="66.0" width="37.6" height="0.0" fill="#8FA89C"/><rect x="128.2" y="62.0" width="37.6" height="0.0" rx="2" fill="#3B7562"/><rect x="128.2" y="66.0" width="37.6" height="0.0" fill="#7353AC"/><rect x="128.2" y="66.0" width="37.6" height="0.0" fill="#8FA89C"/><circle cx="147.1" cy="117" r="4" fill="#7353AC"/><rect x="187.1" y="62.0" width="37.6" height="0.0" rx="2" fill="#3B7562"/><rect x="187.1" y="66.0" width="37.6" height="9.6" fill="#7353AC"/><rect x="187.1" y="75.6" width="37.6" height="3.4" fill="#8FA89C"/><circle cx="200.9" cy="107" r="4" fill="#4357C7"/><circle cx="210.9" cy="107" r="4" fill="#4357C7"/><rect x="245.9" y="62.0" width="37.6" height="0.0" rx="2" fill="#3B7562"/><rect x="245.9" y="66.0" width="37.6" height="2.7" fill="#7353AC"/><rect x="245.9" y="68.7" width="37.6" height="0.9" fill="#8FA89C"/><circle cx="264.7" cy="107" r="4" fill="#4357C7"/><circle cx="264.7" cy="117" r="4" fill="#7353AC"/><rect x="304.7" y="61.5" width="37.6" height="0.5" rx="2" fill="#3B7562"/><text x="323.5" y="58.5" class="pv">3</text><rect x="304.7" y="66.0" width="37.6" height="4.0" fill="#7353AC"/><rect x="304.7" y="70.0" width="37.6" height="2.5" fill="#8FA89C"/><circle cx="323.5" cy="117" r="4" fill="#7353AC"/><rect x="363.5" y="56.5" width="37.6" height="5.5" rx="2" fill="#3B7562"/><text x="382.4" y="53.5" class="pv">30</text><rect x="363.5" y="66.0" width="37.6" height="7.4" fill="#7353AC"/><rect x="363.5" y="73.4" width="37.6" height="3.6" fill="#8FA89C"/><circle cx="382.4" cy="117" r="4" fill="#7353AC"/><rect x="422.4" y="56.0" width="37.6" height="6.0" rx="2" fill="#3B7562"/><text x="441.2" y="53.0" class="pv">33</text><rect x="422.4" y="66.0" width="37.6" height="23.5" fill="#7353AC"/><rect x="422.4" y="89.5" width="37.6" height="7.8" fill="#8FA89C"/><circle cx="436.2" cy="107" r="4" fill="#4357C7"/><circle cx="446.2" cy="107" r="4" fill="#4357C7"/><circle cx="441.2" cy="117" r="4" fill="#7353AC"/><rect x="481.2" y="61.8" width="37.6" height="0.2" rx="2" fill="#3B7562"/><text x="500.0" y="58.8" class="pv">1</text><rect x="481.2" y="66.0" width="37.6" height="3.3" fill="#7353AC"/><rect x="481.2" y="69.3" width="37.6" height="1.1" fill="#8FA89C"/><rect x="540.0" y="59.3" width="37.6" height="2.7" rx="2" fill="#3B7562"/><text x="558.8" y="56.3" class="pv">15</text><rect x="540.0" y="66.0" width="37.6" height="23.1" fill="#7353AC"/><rect x="540.0" y="89.1" width="37.6" height="8.9" fill="#8FA89C"/><rect x="598.8" y="57.3" width="37.6" height="4.7" rx="2" fill="#3B7562"/><text x="617.6" y="54.3" class="pv">26</text><rect x="598.8" y="66.0" width="37.6" height="1.3" fill="#7353AC"/><rect x="598.8" y="67.3" width="37.6" height="1.6" fill="#8FA89C"/><rect x="657.6" y="53.8" width="37.6" height="8.2" rx="2" fill="#3B7562"/><text x="676.5" y="50.8" class="pv">45</text><rect x="657.6" y="66.0" width="37.6" height="15.2" fill="#7353AC"/><rect x="657.6" y="81.2" width="37.6" height="5.2" fill="#8FA89C"/><circle cx="676.5" cy="107" r="4" fill="#4357C7"/><circle cx="676.5" cy="117" r="4" fill="#7353AC"/><rect x="716.5" y="12.0" width="37.6" height="50.0" rx="2" fill="#3B7562"/><text x="735.3" y="9.0" class="pv">274</text><rect x="716.5" y="66.0" width="37.6" height="23.9" fill="#7353AC"/><rect x="716.5" y="89.9" width="37.6" height="6.9" fill="#8FA89C"/><circle cx="735.3" cy="107" r="4" fill="#4357C7"/><circle cx="730.3" cy="117" r="4" fill="#7353AC"/><circle cx="740.3" cy="117" r="4" fill="#7353AC"/><rect x="775.3" y="27.9" width="37.6" height="34.1" rx="2" fill="#3B7562"/><text x="794.1" y="24.9" class="pv">187</text><rect x="775.3" y="66.0" width="37.6" height="8.0" fill="#7353AC"/><rect x="775.3" y="74.0" width="37.6" height="3.4" fill="#8FA89C"/><circle cx="794.1" cy="107" r="4" fill="#4357C7"/><rect x="834.1" y="60.5" width="37.6" height="1.5" rx="2" fill="#3B7562"/><text x="852.9" y="57.5" class="pv">8</text><rect x="834.1" y="66.0" width="37.6" height="0.0" fill="#7353AC"/><rect x="834.1" y="66.0" width="37.6" height="0.0" fill="#8FA89C"/><rect x="892.9" y="61.3" width="37.6" height="0.7" rx="2" fill="#3B7562"/><text x="911.8" y="58.3" class="pv">4</text><rect x="892.9" y="66.0" width="37.6" height="0.0" fill="#7353AC"/><rect x="892.9" y="66.0" width="37.6" height="0.0" fill="#8FA89C"/><circle cx="911.8" cy="107" r="4" fill="#4357C7"/><circle cx="906.8" cy="117" r="4" fill="#7353AC"/><circle cx="916.8" cy="117" r="4" fill="#7353AC"/><rect x="951.8" y="60.7" width="37.6" height="1.3" rx="2" fill="#3B7562"/><text x="970.6" y="57.7" class="pv">7</text><rect x="951.8" y="66.0" width="37.6" height="0.0" fill="#7353AC"/><rect x="951.8" y="66.0" width="37.6" height="0.0" fill="#8FA89C"/><circle cx="970.6" cy="107" r="4" fill="#4357C7"/><line x1="0" x2="1000" y1="64" y2="64" stroke="#6B7A73" stroke-width="1"/></svg><div class="wl"><span>3 Aug</span><span>10 Aug</span><span>17 Aug</span><span>24 Aug</span><span>31 Aug</span><span>7 Sep</span><span>14 Sep</span><span>21 Sep</span><span>28 Sep</span><span>5 Oct</span><span>12 Oct</span><span>19 Oct</span><span>26 Oct</span><span>2 Nov</span><span>9 Nov</span><span>16 Nov</span><span>23 Nov</span></div></div>
+  <div class="together"><b>Together:</b> 7 team meetings and 3 mentor and organiser sessions; 925 chat messages (674 from clinicians, 251 from engineers); activity on 69 of the days from 1 Aug to 23 Nov.</div>
+  <div class="foot">Counts from git history (all branches), the team's group-chat export (counts only, no messages shown), saved meeting minutes and review notes, and Play Console release dates. Prepared 23 Nov 2026.</div>
+</section>
+</body></html>

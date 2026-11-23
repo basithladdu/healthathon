@@ -11,7 +11,7 @@ class CareReminderHindiTest {
     @Test fun everyReminderCheckAndAlertTextHasHindi() {
         val rules = Regex("\\) \\{ \"([^\"]+)\" \\}").findAll(File(dir, "CareReminderRules.kt").readText()).map { it.groupValues[1] }.toSet()
         val alerts = Regex("reminderText\\(\"([^\"]+)\"\\)").findAll(File(dir, "CareReminders.kt").readText()).map { it.groupValues[1] }.toSet()
-        assertTrue(rules.size >= 5); assertEquals(6, alerts.size)
+        assertTrue(rules.size >= 5); assertEquals(8, alerts.size)
         assertEquals(emptySet<String>(), rules + alerts - ReminderTextHindi.keys)
         ReminderTextHindi.values.forEach { assertTrue(it, HindiScan.hasHindi(it)) }
     }

@@ -8,7 +8,34 @@ import java.time.OffsetDateTime
 data class EmergencyLink(val token: String, val createdAt: Long, val expiresAt: Long) {
     val url: String get() = EmergencyLinkRules.url(token)
 }
-data class EmergencyLinkStatus(val live: Boolean, val expiresAt: Long?, val views: Int, val lastViewedAt: Long?)
+data class EmergencyLinkStatus(val live: Boolean, val expiresAt: Long?, val views: Int, val lastViewedAt: Long?, val recentViews: List<EmergencyCardView> = emptyList())
+
+/** One open of the web link: when, and the hospital or clinic the person typed (blank when they skipped it). */
+data class EmergencyCardView(val at: Long, val place: String)
+
+/**
+ * Where the web link was opened (Dr Sujay, 23 Nov). Only the web link can be counted: the offline code printed on the
+ * card holds the card text itself and never calls the server, so scans of it cannot be seen.
+ */
+object EmergencyViewRules {
+    const val PLACE_MAX = 80
+    const val RECENT = 10
+    /** How far back a doctor is told about an open they have not seen yet. */
+    const val NOTICE_DAYS = 7L
+    private const val DAY = 86_400_000L
+
+    /** Same cleaning as the web page and the server: one line, trimmed, at most [PLACE_MAX] characters. */
+    fun cleanPlace(raw: String): String = raw.map { if (it.isISOControl() || it.isWhitespace()) ' ' else it }.joinToString("")
+        .replace(Regex(" +"), " ").trim().take(PLACE_MAX).trim()
+
+    fun decode(array: JSONArray?): List<EmergencyCardView> = array?.let { a ->
+        (0 until a.length()).mapNotNull { i -> a.optJSONObject(i)?.let { o -> EmergencyLinkRules.time(o.optString("at"))?.let { at -> EmergencyCardView(at, cleanPlace(if (o.isNull("place")) "" else o.optString("place"))) } } }
+    }.orEmpty().sortedByDescending { it.at }.take(RECENT)
+
+    /** Opens newer than [lastSeen] and from the last [NOTICE_DAYS] days, newest first. */
+    fun newSince(views: List<EmergencyCardView>, lastSeen: Long, now: Long): List<EmergencyCardView> =
+        views.filter { it.at > lastSeen && it.at >= now - NOTICE_DAYS * DAY && it.at <= now + 5 * 60_000L }.sortedByDescending { it.at }
+}
 
 /** Why there is no live link yet. Each one is said plainly on Today. */
 enum class EmergencyLinkProblem(val en: String, val hi: String) {
@@ -48,7 +75,7 @@ object EmergencyLinkRules {
 
     fun decodeStatus(json: String): EmergencyLinkStatus {
         val j = JSONObject(json)
-        return EmergencyLinkStatus(j.optBoolean("live", false), time(j.optString("expires_at")), j.optInt("views", 0), time(j.optString("last_viewed_at")))
+        return EmergencyLinkStatus(j.optBoolean("live", false), time(j.optString("expires_at")), j.optInt("views", 0), time(j.optString("last_viewed_at")), EmergencyViewRules.decode(j.optJSONArray("recent_views")))
     }
 
     /**
@@ -108,4 +135,7 @@ class EmergencyLinkClient(private val cloud: CareCloud) {
     suspend fun revoke(personId: String) { call("healthathon_emergency_link_revoke", JSONObject().put("p_person", personId)) }
 
     suspend fun status(personId: String): EmergencyLinkStatus = EmergencyLinkRules.decodeStatus(call("healthathon_emergency_link_status", JSONObject().put("p_person", personId)))
+
+    /** Counts and the last 10 opens, for the profile owner or the patient's approved doctor (no card content). */
+    suspend fun views(personId: String): EmergencyLinkStatus = EmergencyLinkRules.decodeStatus(call("healthathon_emergency_link_views", JSONObject().put("p_person", personId)))
 }

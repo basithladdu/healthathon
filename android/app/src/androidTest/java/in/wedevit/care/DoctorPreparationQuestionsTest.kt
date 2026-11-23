@@ -13,16 +13,20 @@ class DoctorPreparationQuestionsTest {
         val disk=mutableMapOf<String,String>()
         val store=DoctorPreparationStore({disk[it]},{key,value->disk[key]=value;true})
         compose.setContent { CareTheme { DoctorPreparationQuestions(store,"isolated-test",true,{true},{}) } }
-        compose.onNodeWithTag("doctor-add-preparation-question").performClick()
+        // One field: type the question, then the + inside it adds it. Each saved question is its own editable field with Save and Remove.
+        compose.onNodeWithTag("doctor-add-preparation-question").assertIsNotEnabled()
         compose.onNodeWithTag("doctor-preparation-question-input").performTextInput("Who should join?")
-        compose.onNodeWithText("Save").performClick()
-        compose.onNodeWithText("Who should join?").assertIsDisplayed()
-        compose.onNodeWithText("Edit").performClick()
-        compose.onNodeWithTag("doctor-preparation-question-input").performTextReplacement("What matters?")
-        compose.onNodeWithText("Save").performClick()
-        compose.onNodeWithText("Remove",useUnmergedTree=true).performClick()
+        compose.onNodeWithTag("doctor-add-preparation-question").performClick()
+        val id=compose.runOnIdle { store.load("isolated-test").single().also { assertEquals("Who should join?",it.text) }.id }
+        compose.onNodeWithTag("doctor-preparation-question-input-$id").assertTextContains("Who should join?")
+        compose.onNodeWithTag("doctor-preparation-save-$id").assertDoesNotExist() // nothing to save until it is edited
+        compose.onNodeWithTag("doctor-preparation-question-input-$id").performTextReplacement("What matters?")
+        compose.onNodeWithTag("doctor-preparation-save-$id").performClick()
+        compose.runOnIdle { assertEquals(listOf("What matters?"),store.load("isolated-test").map { it.text }) }
+        compose.onNodeWithTag("doctor-preparation-remove-$id").performClick()
         compose.onNodeWithText("Remove question").performClick()
         compose.runOnIdle { assertEquals(emptyList<DoctorPreparationQuestion>(),store.load("isolated-test")) }
+        compose.onNodeWithTag("doctor-preparation-empty",useUnmergedTree=true).assertExists()
     }
     @Test fun answerSavedByAnotherCardIsReloadedAndNotOverwrittenByTheNextSave() {
         val disk=mutableMapOf<String,String>()

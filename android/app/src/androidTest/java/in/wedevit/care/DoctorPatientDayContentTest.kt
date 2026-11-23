@@ -55,7 +55,8 @@ class DoctorPatientDayContentTest {
         listOf("Find care", "To do", "Journal", "Let's talk").forEach { ui.onNodeWithText(it).assertDoesNotExist() }
         screenshot("doctor-only-overview-large-text")
         ui.onNodeWithTag("doctor-medicine-summary").assertDoesNotExist()
-        ui.onNodeWithText("Medicines today").assertDoesNotExist()
+        // Medicines appear only as the at-a-glance tile (taken today), not as a separate medicine summary card.
+        ui.onNodeWithTag("doctor-glance-medicines").assertIsDisplayed()
         listOf("doctor-care-overview" to "overview", "doctor-condition-today" to "checkins", "doctor-add-visit" to "visit").forEach { (tag, _) ->
             ui.onNodeWithTag("doctor-patient-day").performScrollToNode(hasTestTag(tag))
             ui.onNodeWithTag(tag).assertIsDisplayed().assertHasClickAction().performClick()
@@ -88,7 +89,7 @@ class DoctorPatientDayContentTest {
         ui.onNodeWithTag("doctor-checkin-count").assertTextContains("Showing 1 of 3 updates")
         ui.onNodeWithTag("doctor-checkin-okay").assertDoesNotExist()
         ui.onNodeWithTag("doctor-checkin-search").performTextReplacement("zzz")
-        ui.onNodeWithTag("doctor-checkin-empty").assertExists()
+        ui.onNodeWithTag("doctor-checkin-empty", useUnmergedTree = true).assertExists()
         ui.onNodeWithTag("doctor-checkin-history").performScrollToNode(hasTestTag("doctor-checkin-clear-filters"))
         ui.onNodeWithTag("doctor-checkin-clear-filters").performClick()
         ui.onNodeWithTag("doctor-checkin-history").performScrollToNode(hasTestTag("doctor-checkin-filter-hard"))

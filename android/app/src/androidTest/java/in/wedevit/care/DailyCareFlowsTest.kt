@@ -22,6 +22,7 @@ class DailyCareFlowsTest {
     private val createdPeople = mutableListOf<String>()
 
     @Before fun setUp() {
+        ui.skipSaharaBrandMoment()
         val cloud = ui.activity.careModel.cloud
         if (cloud != null) {
             val args = androidx.test.platform.app.InstrumentationRegistry.getArguments()
@@ -51,13 +52,18 @@ class DailyCareFlowsTest {
         ui.onNodeWithTag("care-list").performScrollToNode(hasTestTag(tag))
         ui.onNodeWithTag(tag).performClick()
     }
-    /** The Care team page left the patient's Today (2 Nov redesign). A family member reaches it from the Goals of care card: Talk, then "Ask for a conversation". */
+    /**
+     * The Care team page left the patient and family Today and Talk in the redesigns (family Talk opens goals of care directly);
+     * it is still the "Care team" shortcut on the doctor view's Today. Open it there, then come back to the family view on the same page.
+     */
     private fun openCareTeam() {
+        ui.runOnIdle { vm.role("Doctor") }
         ui.onNodeWithTag("nav-Today").performClick()
-        ui.onNodeWithTag("today-list").performScrollToNode(hasTestTag("today-goals-of-care"))
-        ui.onNodeWithTag("today-goals-of-care").performClick()
-        ui.onAllNodesWithText("Ask to talk").onFirst().performScrollTo().performClick()
+        ui.onNodeWithTag("today-list").performScrollToNode(hasTestTag("shortcut-workflows"))
+        ui.onNodeWithTag("shortcut-workflows").performClick()
         ui.onNodeWithTag("workflow-list").assertIsDisplayed()
+        ui.runOnIdle { vm.role("Family") }
+        ui.onNodeWithText("Care team").assertIsDisplayed()
     }
     private fun enter(label: String, text: String) {
         val field = ui.onNode(hasSetTextAction() and hasText(label))
@@ -83,7 +89,7 @@ class DailyCareFlowsTest {
 
     @Test fun familyRequestAppearsInDoctorQueueAndCanOpenConversation() {
         openCareTeam()
-        ui.onNodeWithText("Ask to talk").performClick()
+        ui.onAllNodesWithText("Ask to talk").onFirst().performClick() // the header button; the empty state offers the same
         enter("What would you like to discuss?", "Comfort at home")
         enter("Doctor or care team", "Dr Test")
         hideKeyboard()
@@ -152,13 +158,13 @@ class DailyCareFlowsTest {
             ui.waitUntil(15000) { !vm.busy.value && vm.items.value.count { CareEntryCodec.decode(it.detail)?.type == "lab" } == oldCount + 1 }
         }
         addLab("12.4", true); addLab("13.1", false)
-        ui.onNodeWithText("2 results", substring = true).assertIsDisplayed()
+        ui.onNodeWithText("2 results").assertIsDisplayed() // the count pill; the trend line also ends "· 2 results"
         ui.onNodeWithTag("lab-history").performScrollToNode(hasText("Printed range: 12–16 g/dL"))
         ui.onNodeWithText("Printed range: 12–16 g/dL").assertIsDisplayed()
         ui.onAllNodesWithText("12.4 g/dL").onFirst().assertExists()
         screenshot("lab-history-series")
         recreate(); openShortcut("shortcut-labs")
-        ui.onNodeWithText("2 results", substring = true).assertIsDisplayed()
+        ui.onNodeWithText("2 results").assertIsDisplayed() // the count pill; the trend line also ends "· 2 results"
         val first = vm.items.value.first { CareEntryCodec.decode(it.detail)?.value == "12.4" }
         assertEquals("g/dL", CareEntryCodec.decode(first.detail)!!.unit)
         assertEquals(LocalDate.now(), careDay(first.due))

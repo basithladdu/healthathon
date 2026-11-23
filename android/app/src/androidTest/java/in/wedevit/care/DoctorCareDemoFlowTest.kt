@@ -79,12 +79,14 @@ class DoctorCareDemoFlowTest {
                 ui.onNodeWithTag("doctor-conversation-card-2").performScrollTo().performClick();ui.onNodeWithText("Conversation history").assertExists();screenshot("doctor-demo-conversation-history-filters");ui.onNodeWithContentDescription("Back to patient care").performClick();waitFor("doctor-conversations")
             }
             if(section=="Reports") {
-                ui.waitUntil(15_000){ui.onAllNodesWithText("2 care notes · 4 reports").fetchSemanticsNodes().isNotEmpty()}
+                // The count line left the Documents page; "Ask documents" appears once the sample reports have loaded.
+                waitFor("document-ask-open")
                 ui.onNode(hasText("Reports") and hasClickAction()).performClick()
                 ui.onNodeWithTag("documents-list").performScrollToNode(hasText("Rahul care planning notes.png"))
             }
             if(section=="Visits") ui.waitUntil(15_000){ui.onAllNodesWithText("Dr Vikram Rao",substring=true).fetchSemanticsNodes().isNotEmpty()}
-            ui.onNodeWithText("Test record").assertExists()
+            // The sample person's name heads every screen (the old "Test record" banner is gone).
+            ui.onAllNodesWithText("Rahul",substring=true).onFirst().assertExists()
             ui.onNodeWithTag("demo-nav-Patients").assertIsSelected()
             screenshot("doctor-demo-${section.lowercase()}")
             if(section=="Visits") {
@@ -101,10 +103,10 @@ class DoctorCareDemoFlowTest {
         }
         ui.onNodeWithContentDescription("Back to patient care").performClick()
         waitFor("walkthrough-patients-list")
-        ui.onNodeWithText("Test workspace").assertExists()
+        ui.onNodeWithText("People in your care").assertExists()
         ui.onNodeWithText("Explore sample care").assertDoesNotExist()
     }
-    private fun waitFor(tag:String) {ui.waitUntil(20_000){ui.onAllNodesWithTag(tag).fetchSemanticsNodes().isNotEmpty()};ui.waitForIdle()}
+    private fun waitFor(tag:String) {ui.waitUntil(20_000){ui.onAllNodesWithTag(tag).fetchSemanticsNodes().isNotEmpty()};ui.waitForIdle();ui.closeDoctorPatientPopups()}
     private fun screenshot(name:String) {
         ui.mainClock.advanceTimeBy(600);ui.waitForIdle()
         val instrumentation=InstrumentationRegistry.getInstrumentation()

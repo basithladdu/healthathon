@@ -5603,3 +5603,18 @@ Add doctor now	ప్రస్తుత డాక్టర్‌ను చేర
 Hormone or targeted therapy	హార్మోన్ లేదా టార్గెటెడ్ థెరపీ
 Pain and symptom care only	నొప్పి మరియు లక్షణాల సంరక్షణ మాత్రమే
 No treatment now	ఇప్పుడు చికిత్స లేదు
+Severe pain or distress this week	ఈ వారం తీవ్రమైన నొప్పి లేదా బాధ
+Recorded for this patient in the last 7 days:	గత 7 రోజుల్లో ఈ రోగికి నమోదైనవి:
+Pain $score/10 on $day	నొప్పి $score/10, $day
+Distress $score/10 on $day	బాధ $score/10, $day
+Open Symptoms & distress	లక్షణాలు & బాధ తెరవండి
+Emergency card for $name opened at $place, $time	$name అత్యవసర కార్డు $place లో తెరవబడింది, $time
+Emergency card for $name opened (place not given), $time	$name అత్యవసర కార్డు తెరవబడింది (స్థలం చెప్పలేదు), $time
+Opened at $place on $time	$place లో $time న తెరవబడింది
+Opened on $time (place not given)	$time న తెరవబడింది (స్థలం చెప్పలేదు)
+Only web link opens are shown. Scans of the offline code on a printed card can't be seen.	వెబ్ లింక్ ద్వారా తెరిచినవి మాత్రమే కనిపిస్తాయి. ముద్రించిన కార్డుపై ఆఫ్‌లైన్ కోడ్ స్కాన్‌లు కనిపించవు.
+Last opened at $place on $at	చివరిసారి $place లో $at న తెరవబడింది
+Last opened on $at	చివరిసారి $at న తెరవబడింది
+Emergency card web link	అత్యవసర కార్డు వెబ్ లింక్
+Visit tomorrow	రేపు విజిట్ ఉంది
+Open Sahara to see the time and what to bring.	సమయం, ఏమి తీసుకురావాలో చూడటానికి సహారా తెరవండి.
