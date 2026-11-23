@@ -244,7 +244,7 @@ cover = f'''
     <div class="tile big"><b>{fmt(s["commits"])}</b><span>code commits</span><i>{s["build_days"]} active build days</i></div>
     <div class="tile"><b>{s["team_meetings"]}</b><span>team meetings</span><i>doctors and engineers together</i></div>
     <div class="tile"><b>{s["mentor"]}</b><span>mentor and organiser sessions</span><i>webinar, mentor review, finale briefing</i></div>
-    <div class="tile rose"><b>{s["reviews"]}</b><span>logged doctor and legal reviews</span><i>concept, specs, survey, legal form, device tests</i></div>
+    <div class="tile rose"><b>{s["reviews"]}</b><span>logged doctor and legal reviews</span><i>concept, specs, survey, legal advice, device tests</i></div>
     <div class="tile"><b>{fmt(s["chat"])}</b><span>group-chat messages</span><i>{s["chat_days"]} days, 25 Aug to 4 Nov</i></div>
     <div class="tile"><b>{s["ai_sessions"]}</b><span>AI-assisted build sessions</span><i>on {s["ai_days"]} days, incl. agent sub-tasks</i></div>
     <div class="tile gold"><b>{s["releases"]}</b><span>Play Store releases</span><i>closed test, production, 0.8.0</i></div>
@@ -370,7 +370,7 @@ impact1 = f'''
     {tile(s["team_meetings"], "team meetings", "doctors and engineers together")}
     {tile(s["mentor"], "mentor and organiser sessions", "webinar 6 Sep · mentor 20 Oct · briefing 23 Nov")}
     {tile(fmt(s["chat"]), "team conversations", f'group-chat messages, {fmt(s["chat_clin"])} from the doctors')}
-    {tile(s["reviews"], "doctor and legal reviews", "concept, specs, survey, legal form, device tests", "rose")}
+    {tile(s["reviews"], "doctor and legal reviews", "concept, specs, survey, legal advice, device tests", "rose")}
   </div>
   <div class="ifoot">Counts from git (all branches), the team group-chat export (counts only), saved minutes and review notes.</div>
 </section>'''
@@ -382,7 +382,7 @@ impact2 = f'''
     {tile("LIVE", "on Google Play in India", "closed test 14 Oct · production 0.7.1 on 9 Nov · 0.8.0 in review 23 Nov", "solid")}
     {tile(s["releases"], "Play Store releases", "0.4.1 · 0.7.1 · 0.8.0", "gold")}
     {tile("22 + English", "languages for speech", "goals-of-care recordings and note translation (Sarvam); app screens in English and Hindi, with Telugu, Urdu and Kannada", "long")}
-    {tile("974", "Android unit tests passing", "team's latest run [team to confirm]; plus web checks")}
+    {tile("981", "Android unit tests passing", "plus the website's checks")}
     {tile("3", "tools based on validated scales", "ESAS-style symptom diary · ZBI-4 carer check · NCCN distress thermometer", "rose")}
     {tile("30", "fixes from 2 doctor video reviews", "15 patient-app + 15 doctor-portal points, 22 Nov", "rose")}
   </div>
@@ -413,7 +413,7 @@ medical = '''
         <li><b>27 Sep</b> Reviewed the Round 1 deck.</li>
         <li><b>20 Oct</b> Explained the problem to the mentor.</li>
         <li><b>24 Oct</b> Symptom list, with Dr Shirin.</li>
-        <li><b>29 Oct</b> Clinical and technical specifications for the emergency care plan and living will.</li>
+        <li><b>29 Oct</b> Clinical and technical specifications for the emergency care plan and advance care planning.</li>
         <li><b>22 Nov</b> Feedback on doctor invite links; with Dr Sujay, the finale pitch outline.</li>
       </ul>
     </div>
@@ -431,8 +431,8 @@ medical = '''
   </div>
   <div class="mrow">
     <div class="mbox"><h4>Goals-of-care content and form</h4><p>The clinical form, the clinical reference and the specifications define every section of the doctor's note. The note now prints the lawyer-reviewed form word for word.</p></div>
-    <div class="mbox"><h4>Emergency care plan</h4><p>Dr Sharada's specification of the emergency care plan and living will (29 Oct) drives the plan, the pocket card and the offline QR.</p></div>
-    <div class="mbox"><h4>Symptom and carer tools</h4><p>Symptom list from Dr Shirin and Dr Sharada; the diary is based on ESAS, with ZBI-4 for carers and the NCCN distress thermometer. <span class="tbc">[team to confirm who chose each scale]</span></p></div>
+    <div class="mbox"><h4>Emergency care plan</h4><p>Dr Sharada's specification of the emergency care plan and advance care planning (29 Oct) drives the plan, the pocket card and the offline QR.</p></div>
+    <div class="mbox"><h4>Symptom and carer tools</h4><p>Symptom list from Dr Shirin, modelled on ESAS-r and IPOS (agreed with Dr Sharada and Dr Sujay, 24 Oct); ZBI-4 for carers and the NCCN distress thermometer.</p></div>
     <div class="mbox"><h4>Field testing</h4><p>Doctors tested the Play Store build on their own phones (21–22 Nov). Next: the new build tested on real phones with at least 5 goals-of-care conversations (agreed 22 Nov).</p></div>
   </div>
   <div class="foot">Sources: meeting minutes (21 and 23 Sep, 22 Nov), the 3 Nov meeting transcript, team-review notes (21–22 Nov), dated team documents and git history.</div>
@@ -442,10 +442,10 @@ medical = '''
 legal = '''
 <section class="page legal">
   <header class="mhead"><div><div class="kicker">Built inside Indian law</div><h2 class="lh">Legal review</h2>
-  <div class="mnote">A legal reviewer checked our goals-of-care form, and the app follows India's data and end-of-life law.</div></div></header>
+  <div class="mnote">We sought legal advice on the wording and format of the goals-of-care discussion, and the app follows India's data and end-of-life law.</div></div></header>
   <div class="lgrid">
     <div class="lcard wide">
-      <h3><span class="ln">1</span>The lawyer's review of the goals-of-care form <span class="date">31 Oct 2026</span></h3>
+      <h3><span class="ln">1</span>Legal advice on the goals-of-care discussion <span class="date">31 Oct 2026</span></h3>
       <div class="two">
         <ul>
           <li><b>Ask both sex and gender</b> in the patient details.</li>
@@ -455,7 +455,7 @@ legal = '''
         </ul>
         <ul>
           <li><b>Capacity:</b> add guidance on how, and when, to assess it.</li>
-          <li><b>Withdrawal and withholding</b> follows <i>Common Cause v Union of India</i> (2018, 2023): board dates, members, decisions.</li>
+          <li><b>Withholding or withdrawing life support</b> is kept out of the document; in India it follows the <i>Common Cause v Union of India</i> (2018, 2023) board process.</li>
           <li><b>Witnesses</b> for a thumb impression or limited literacy, at home and in hospital.</li>
           <li><b>Result:</b> the app's note prints this form word for word on Android and web, and a test checks every line.</li>
         </ul>
@@ -465,31 +465,30 @@ legal = '''
       <h3><span class="ln">2</span>Advance directive law</h3>
       <ul>
         <li>The note records a conversation. It is <b>not</b> an advance directive or a DNAR order.</li>
-        <li>The living-will section helps people prepare one: under the 2023 simplification it needs two witnesses and a notary or gazetted officer.</li>
+        <li>The advance care planning section helps people prepare an advance directive: under the 2023 simplification it needs two witnesses and a notary or gazetted officer.</li>
         <li>Only adults (18+) can make an advance directive.</li>
       </ul>
     </div>
     <div class="lcard">
       <h3><span class="ln">3</span>DPDP Act 2023: consent and data</h3>
       <ul>
-        <li><b>Two consent ticks</b> before recording: the patient (or legal representative) and the family in the room.</li>
+        <li><b>Consent before recording</b> from the patient (or legal representative) or the family in the room; either is enough, and the app records who agreed.</li>
         <li><b>18+</b> to create an account; for a child patient, a parent or lawful guardian consents.</li>
         <li><b>Data minimisation:</b> report files and photos stay on the phone; recordings leave only with consent.</li>
         <li><b>Morphine reports</b> are not linked to anyone's account.</li>
         <li>Withdraw consent, delete a person's records or the account.</li>
       </ul>
     </div>
-    <div class="lcard tbcbox">
-      <h3>For the team to confirm</h3>
+    <div class="lcard">
+      <h3>Next steps</h3>
       <ul>
-        <li>Reviewer's name and title for print (the form review is credited to Rituparna P).</li>
-        <li>Whether the lawyer also advised on the DPDP points (the saved review covers the form only).</li>
-        <li>Server region (records say Mumbai), grievance contact and how long data is kept.</li>
-        <li>Nominee under DPDP s.14: not built yet.</li>
+        <li>Name a nominee under DPDP s.14.</li>
+        <li>Publish the data-retention period and a grievance contact in the privacy policy.</li>
+        <li>Validate the symptom and carer scales in more Indian languages.</li>
       </ul>
     </div>
   </div>
-  <div class="foot">Sources: legal reviewer's tracked changes and comments on the goals-of-care form (31 Oct), the form coverage note, the privacy-policy draft (DPDP Act 2023), the app's consent screen and the emergency care plan references.</div>
+  <div class="foot">Sources: legal advice on the goals-of-care discussion wording and format (31 Oct), the form coverage note, the privacy-policy draft (DPDP Act 2023), the app's consent screen and the emergency care plan references.</div>
 </section>'''
 
 css = open(os.path.join(HERE, "style.css"), encoding="utf-8").read()

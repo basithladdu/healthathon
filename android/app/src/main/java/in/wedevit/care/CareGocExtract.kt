@@ -497,8 +497,29 @@ data class GocTranscript(
     val signOff: GocSignOffSummary? = null,
     /** Which engine wrote the machine draft, shown as "Transcribed by …". */
     val transcribedBy: String = "",
+    /** Who agreed to the recording ([GocRecordingConsent.encode]): "PATIENT", "FAMILY" or both. Blank on talks saved before 23 Nov 2026, when both were required. */
+    val consentBy: String = "",
 ) {
     companion object { const val SOURCE_TYPED = "TYPED"; const val SOURCE_RECORDED = "RECORDED" }
+}
+
+/**
+ * Recording consent (SVK and Dr Sujay, 23 Nov 2026): the patient's agreement OR the family's agreement is enough; both are not required.
+ * Sometimes the patient, or the family, does not want the diagnosis shared with the other. Both ticks stay on screen; which one(s) were given is recorded.
+ */
+object GocRecordingConsent {
+    const val PATIENT = "PATIENT"; const val FAMILY = "FAMILY"
+    /** At least one of the two agreed. */
+    fun given(patient: Boolean, family: Boolean): Boolean = patient || family
+    /** The time consent was given, or 0 when neither has agreed. */
+    fun at(patient: Boolean, family: Boolean, now: Long = System.currentTimeMillis()): Long = if (given(patient, family)) now else 0L
+    /** "PATIENT", "FAMILY", "PATIENT,FAMILY", or blank when neither agreed. */
+    fun encode(patient: Boolean, family: Boolean): String = listOfNotNull(PATIENT.takeIf { patient }, FAMILY.takeIf { family }).joinToString(",")
+    /** Which ticks a saved talk had: (patient, family). A talk saved before this rule with a consent time had both (both were required then). */
+    fun decode(consentBy: String, consentAt: Long): Pair<Boolean, Boolean> {
+        val parts = consentBy.split(',').map(String::trim).toSet()
+        return if (consentBy.isBlank()) (consentAt > 0) to (consentAt > 0) else (PATIENT in parts) to (FAMILY in parts)
+    }
 }
 
 /** The same shape as GocTranscript in prototype/app/ectpr-model.ts, so a record reads on the web and back. planVersion, participants, noteKind, guessed and key are extras the web ignores. */
@@ -519,7 +540,7 @@ object GocTranscriptJson {
             .put("accepted", JSONArray(g.topics.filter { it.status == GocTopicStatus.CONFIRMED }.map { t -> JSONObject().put("field", FIELDS[t.decision]).put("value", t.optionId ?: JSONObject.NULL).put("quote", t.quote).put("at", t.at) }))
             .put("topics", marks).put("note", g.note)
             .put("planVersion", g.planVersion).put("participants", g.participants).put("noteKind", g.noteKind.name)
-            .put("transcribedBy", g.transcribedBy)
+            .put("transcribedBy", g.transcribedBy).put("consentBy", g.consentBy)
             .also { o -> g.signOff?.let { so -> o.put("signOff", JSONObject().put("id", so.id).put("status", "LOCKED").put("sealSha256", so.sealSha256).put("lockedAt", so.lockedAt).put("signers", JSONArray(so.signers.mapIndexed { i, name -> JSONObject().put("name", name).put("role", so.roles.getOrNull(i).orEmpty()).put("registrationNo", so.registrations.getOrNull(i).orEmpty()).put("method", so.methods.getOrNull(i).orEmpty()).put("signedAt", so.signedAt.getOrNull(i).orEmpty()) }))) } }
     }
 
@@ -543,7 +564,7 @@ object GocTranscriptJson {
                 val people = o.optJSONArray("signers")?.let { a -> (0 until a.length()).mapNotNull { a.optJSONObject(it)?.takeIf { p -> p.optString("name").isNotBlank() } } }.orEmpty()
                 GocSignOffSummary(o.optString("id"), o.optString("sealSha256"), o.optString("lockedAt"), people.map { it.optString("name") },
                     people.map { it.optString("role") }.takeIf { r -> r.all(String::isNotBlank) }.orEmpty(), people.map { it.optString("registrationNo") }, people.map { it.optString("method") }, people.map { it.optString("signedAt") })
-            }, j.optString("transcribedBy"))
+            }, j.optString("transcribedBy"), j.optString("consentBy"))
     }
 }
 
@@ -791,7 +812,7 @@ object GocForm {
         )
         val dir = r.existingDirective; val amd = dir?.takeIf { it.kind == DirectiveKind.VALID_AMD }
         val directiveTicks = listOf(
-            tk(amd != null, Bi("There is a valid written Advance Medical Directive / living will. Executed on ____. Location of original: ____", "वैध लिखित एडवांस मेडिकल डायरेक्टिव / लिविंग विल है। कब बनी: ____। मूल कहाँ है: ____"), amd?.let { listOf(it.date, it.location).filter(String::isNotBlank).joinToString(" · ") }),
+            tk(amd != null, Bi("There is a valid written Advance care planning document. Executed on ____. Location of original: ____", "वैध लिखित अग्रिम देखभाल योजना दस्तावेज़ है। कब बनी: ____। मूल कहाँ है: ____"), amd?.let { listOf(it.date, it.location).filter(String::isNotBlank).joinToString(" · ") }),
             tk(amd?.attestor?.contains("notary", true) == true, indent(Bi("Attested by Notary", "नोटरी ने सत्यापित किया"))),
             tk(amd?.attestor?.contains("gazett", true) == true, indent(Bi("Attested by Gazetted Officer", "राजपत्रित अधिकारी ने सत्यापित किया")), amd?.attestor?.takeIf { !it.contains("notary", true) && !it.contains("gazett", true) }),
             tk(amd?.twoWitnesses == true, indent(Bi("With two witnesses? Yes. If yes, this ECTPR must be read as subordinate to it — the directive governs; this record operationalises it.", "दो गवाहों के साथ? हाँ। अगर हाँ, तो यह ECTPR उसके अधीन है — डायरेक्टिव ही मान्य है; यह रिकॉर्ड उसे लागू करता है।"))),
@@ -909,12 +930,13 @@ object GocForm {
             )),
             GocFormSection("IV", Bi("Section IV – Signatures and declarations", "भाग IV – हस्ताक्षर और घोषणाएँ"), listOf(
                 GocFormGroup(Bi("Patient", "मरीज़"), table = GocFormTable(listOf(
-                    cell(listOf(tk(cap.status == Capacity.HAS, Bi("I have made these choices myself.", "ये फ़ैसले मैंने ख़ुद लिए।")), tk(cap.status == Capacity.HAS_DELEGATED, Bi("I have chosen not to be involved in detail and have delegated to my surrogate.", "मैंने विस्तार में शामिल न होने का फ़ैसला किया और अपने प्रतिनिधि को सौंपा।")))),
+                    // The declaration box is ticked by signing (SVK, 23 Nov 2026: "unable to tick this, but I'm able to sign"): the drawn box is not a control.
+                    cell(listOf(tk(cap.status == Capacity.HAS || ((patientSig != null || patientDev != null) && cap.status != Capacity.HAS_DELEGATED), Bi("I have made these choices myself.", "ये फ़ैसले मैंने ख़ुद लिए।")), tk(cap.status == Capacity.HAS_DELEGATED, Bi("I have chosen not to be involved in detail and have delegated to my surrogate.", "मैंने विस्तार में शामिल न होने का फ़ैसला किया और अपने प्रतिनिधि को सौंपा।")))),
                     Bi("Signature / thumb impression", "हस्ताक्षर / अँगूठे का निशान"), Bi("Name in capitals", "बड़े अक्षरों में नाम"), Bi("Date", "तारीख़")),
                     listOf(listOf(blank, if (patientSig != null) how(patientSig.thumbImpression) else if (patientDev != null) how(patientDev.thumb) else blank,
                         Bi.plain((patientSig?.name ?: patientDev?.name.orEmpty()).uppercase()), Bi.plain((patientSig?.signedAt ?: patientDev?.signedAt.orEmpty()).take(10)))))),
                 GocFormGroup(Bi("Surrogate / healthcare proxy (primary and secondary surrogate decision-makers)", "प्रतिनिधि / हेल्थकेयर प्रॉक्सी (मुख्य और द्वितीय फ़ैसला लेने वाले)"), table = GocFormTable(listOf(
-                    cell(listOf(tk(r.surrogateDeclaration.confirmed, Bi("I confirm I am conveying what the patient would have wanted, so far as I can judge.", "मैं पुष्टि करता/करती हूँ कि जितना मैं समझ सकता/सकती हूँ, मैं वही बता रहा/रही हूँ जो मरीज़ चाहते।")))),
+                    cell(listOf(tk(r.surrogateDeclaration.confirmed || primary != null || familyDev != null, Bi("I confirm I am conveying what the patient would have wanted, so far as I can judge.", "मैं पुष्टि करता/करती हूँ कि जितना मैं समझ सकता/सकती हूँ, मैं वही बता रहा/रही हूँ जो मरीज़ चाहते।")))),
                     Bi("Signature", "हस्ताक्षर"), Bi("Name & relationship", "नाम और रिश्ता"), Bi("Date", "तारीख़")), listOf(
                     listOf(Bi("Primary", "मुख्य"), if (primary != null) how(primary.thumbImpression) else if (familyDev != null) how(familyDev.thumb) else blank,
                         Bi.plain(primary?.name ?: familyDev?.let { f -> f.name + f.relation.takeIf(String::isNotBlank)?.let { " ($it)" }.orEmpty() }.orEmpty()), Bi.plain((primary?.signedAt ?: familyDev?.signedAt.orEmpty()).take(10))),
@@ -958,6 +980,14 @@ object GocForm {
             g.table?.let { t -> (listOf(t.head) + t.rows).forEach { cells -> add(Bi.join("", listOf(Bi.plain("| "), Bi.join(" | ", cells.map { c -> Bi(c.en.replace("\n", " / "), c.hi.replace("\n", " / "), c.pick(false).replace("\n", " / ")) }), Bi.plain(" |")))) } }
         }
     }
+}
+
+/** The line on every printed goals-of-care note: "Version 3, made on 2026-11-23. Check Sahara for a newer version before using a printed copy." */
+object GocPrintVersion {
+    /** When this version's note was locked, else when the plan version was last saved (yyyy-mm-dd). */
+    fun madeOn(r: EctprRecord): String = (r.gocTranscript?.takeIf { it.planVersion == r.version }?.signOff?.lockedAt?.takeIf(String::isNotBlank) ?: r.updatedAt).take(10)
+    fun line(r: EctprRecord): Bi = Bi.join("", listOf(Bi("Version", "संस्करण"), Bi.plain(" ${r.version}, "), Bi("made on", "बनाया गया"), Bi.plain(" ${madeOn(r)}. "),
+        Bi("Check Sahara for a newer version before using a printed copy.", "छपी प्रति इस्तेमाल करने से पहले सहारा में नया संस्करण देखें।")))
 }
 
 /** Carry-forward: a review draft is a copy of the last signed plan, so its transcript belongs to an earlier version until a new talk replaces it. */

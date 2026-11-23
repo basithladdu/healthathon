@@ -137,7 +137,9 @@ internal enum class FeedbackSendState { NONE, LOCAL, SENDING, SENT, QUEUED }
             Spacer(Modifier.weight(1f))
             CareLanguageMenu(compact = true)
         }
-        Text(if (checkIn) t("How was your day?", "आज का दिन कैसा रहा?") else t("How was Sahara?", "सहारा कैसा रहा?"), color = Ink, fontFamily = SaharaTitleFont, fontSize = 26.sp, lineHeight = 32.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.a11yHeading())
+        // A family member or carer answers about the patient, not about themselves (Shirin, 6 Nov: "How are you feeling" is misleading).
+        val familyAbout = if (checkIn && careModel?.viewRole?.value == "Family") careModel.people.value.firstOrNull { it.id == personId }?.name?.trim().orEmpty().ifBlank { t("the patient", "मरीज़") } else null
+        Text(when { familyAbout != null -> t("How is $familyAbout feeling today?", "$familyAbout आज कैसा महसूस कर रहे हैं?"); checkIn -> t("How was your day?", "आज का दिन कैसा रहा?"); else -> t("How was Sahara?", "सहारा कैसा रहा?") }, color = Ink, fontFamily = SaharaTitleFont, fontSize = 26.sp, lineHeight = 32.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.a11yHeading())
         Spacer(Modifier.height(8.dp))
         // The big face floats gently a few times and answers each new choice with a small spring.
         CareMoodFace(expression, Modifier.saharaFloat(3.dp, cycles = 3).saharaPop(label).size(120.dp).clearAndSetSemantics { })

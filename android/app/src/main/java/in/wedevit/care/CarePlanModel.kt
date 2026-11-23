@@ -188,9 +188,9 @@ object EctprRules {
         // L1 / scope: adults only.
         // Children (Dr Shirin, 22 Nov): a plan is allowed under 18. A parent or legal guardian decides with the doctor; the child's own wishes are recorded too.
         PlanDates.age(r.patient.dob, today)?.let { if (it < 18) {
-            add(issue("MINOR", IssueSeverity.WARN, "patient.dob", "The patient is under 18. A parent or legal guardian makes these decisions with the doctor. Ask the child what matters to them too, in words they understand, and write it in their own words.",
-                "मरीज़ 18 साल से कम के हैं। ये फ़ैसले माता-पिता या कानूनी अभिभावक डॉक्टर के साथ लेते हैं। बच्चे से भी, उनकी समझ के शब्दों में, पूछें कि उनके लिए क्या ज़रूरी है, और उन्हीं के शब्दों में लिखें।"))
-            if (r.decisionMakers.primary?.name.isNullOrBlank()) add(issue("MINOR_GUARDIAN", IssueSeverity.BLOCK, "decisionMakers", "Add the parent or legal guardian as the main decision-maker.", "माता-पिता या कानूनी अभिभावक को मुख्य फ़ैसला लेने वाले के रूप में जोड़ें।"))
+            add(issue("MINOR", IssueSeverity.WARN, "patient.dob", "The patient is under 18. A parent or guardian makes these decisions with the doctor. Ask the child what matters to them too, in words they understand, and write it in their own words.",
+                "मरीज़ 18 साल से कम के हैं। ये फ़ैसले माता-पिता या अभिभावक डॉक्टर के साथ लेते हैं। बच्चे से भी, उनकी समझ के शब्दों में, पूछें कि उनके लिए क्या ज़रूरी है, और उन्हीं के शब्दों में लिखें।"))
+            if (r.decisionMakers.primary?.name.isNullOrBlank()) add(issue("MINOR_GUARDIAN", IssueSeverity.BLOCK, "decisionMakers", "Add the parent or guardian as the main decision-maker.", "माता-पिता या अभिभावक को मुख्य फ़ैसला लेने वाले के रूप में जोड़ें।"))
         } }
         if (r.createdInEd) add(issue("ED_START", IssueSeverity.WARN, "createdInEd", "Started in the emergency department. A plan made for the first time in the resuscitation bay records panic, not preference; review it when the patient is stable.", "यह आपातकालीन विभाग में शुरू हुई। पहली बार इमरजेंसी में बनी योजना घबराहट दर्ज करती है, पसंद नहीं; हालत स्थिर होने पर इसे दोबारा देखें।"))
         // Decision-makers: last 4 of an ID only.
@@ -458,7 +458,7 @@ object PlanText {
 /** Draft annexure from the legal review, shown on the capacity step and printed in the PDF. */
 object CapacityGuide {
     val TITLE = Bi("How to assess decision-making capacity", "निर्णय लेने की क्षमता कैसे जाँचें")
-    val NOTE = Bi("Draft annexure. A clinician and the legal team must approve this wording before the pilot.", "मसौदा अनुलग्नक। पायलट से पहले डॉक्टर और क़ानूनी टीम को यह भाषा मंज़ूर करनी होगी।")
+    val NOTE = Bi("Draft annexure. The clinical team must approve this wording before the pilot.", "मसौदा अनुलग्नक। पायलट से पहले क्लिनिकल टीम को यह भाषा मंज़ूर करनी होगी।")
     val POINTS = listOf(
         Bi("Start by assuming the patient has capacity. Age, diagnosis or disagreeing with the doctor does not remove it.", "पहले मानें कि मरीज़ में क्षमता है। उम्र, बीमारी या डॉक्टर से असहमति से यह ख़त्म नहीं होती।"),
         Bi("Assess this one decision, at this time. Do not rely on old notes.", "इसी एक फ़ैसले के लिए, अभी जाँचें। पुराने नोट पर भरोसा न करें।"),

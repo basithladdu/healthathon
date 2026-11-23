@@ -5618,3 +5618,110 @@ Last opened on $at	ಕೊನೆಯದಾಗಿ $at ರಂದು ತೆರೆಯ�
 Emergency card web link	ತುರ್ತು ಕಾರ್ಡ್ ವೆಬ್ ಲಿಂಕ್
 Visit tomorrow	ನಾಳೆ ಭೇಟಿ ಇದೆ
 Open Sahara to see the time and what to bring.	ಸಮಯ ಮತ್ತು ಏನು ತರಬೇಕು ಎಂದು ನೋಡಲು ಸಹಾರಾ ತೆರೆಯಿರಿ.
+Is $about in any distress today?	ಇಂದು $about ಯಾವುದಾದರೂ ತೊಂದರೆಯಲ್ಲಿದ್ದಾರೆಯೇ?
+How much distress has $about felt in the past week, including today?	ಇಂದು ಸೇರಿ ಕಳೆದ ವಾರದಲ್ಲಿ $about ಎಷ್ಟು ತೊಂದರೆ ಅನುಭವಿಸಿದ್ದಾರೆ?
+This is one number for overall distress. Each symptom (pain, sleep and others) has its own 0–10 score in Symptoms.	ಇದು ಒಟ್ಟು ತೊಂದರೆಗೆ ಒಂದೇ ಸಂಖ್ಯೆ. ಪ್ರತಿ ಲಕ್ಷಣಕ್ಕೂ (ನೋವು, ನಿದ್ರೆ ಮತ್ತು ಇತರ) ಲಕ್ಷಣಗಳು ವಿಭಾಗದಲ್ಲಿ ತನ್ನದೇ 0–10 ಅಂಕ ಇರುತ್ತದೆ.
+What is adding to it? Tick any (no scores here)	ಯಾವುದರಿಂದ? ಅನ್ವಯಿಸುವುದನ್ನು ಟಿಕ್ ಮಾಡಿ (ಇಲ್ಲಿ ಅಂಕ ಇಲ್ಲ)
+The thermometer is one overall distress score. The problem list (physical, emotional, social, practical, spiritual) only shows what is adding to it; it is not scored. Each symptom has its own separate 0–10 score in Symptoms.	ಥರ್ಮಾಮೀಟರ್ ಒಟ್ಟು ತೊಂದರೆಯ ಒಂದೇ ಅಂಕ. ಸಮಸ್ಯೆಗಳ ಪಟ್ಟಿ (ದೈಹಿಕ, ಭಾವನಾತ್ಮಕ, ಸಾಮಾಜಿಕ, ಪ್ರಾಯೋಗಿಕ, ಆಧ್ಯಾತ್ಮಿಕ) ತೊಂದರೆಗೆ ಕಾರಣಗಳನ್ನು ಮಾತ್ರ ತೋರಿಸುತ್ತದೆ; ಅದಕ್ಕೆ ಅಂಕ ಇಲ್ಲ. ಪ್ರತಿ ಲಕ್ಷಣಕ್ಕೂ ಲಕ್ಷಣಗಳು ವಿಭಾಗದಲ್ಲಿ ಪ್ರತ್ಯೇಕ 0–10 ಅಂಕ ಇರುತ್ತದೆ.
+One overall score, 0–10, for this past week	ಕಳೆದ ವಾರಕ್ಕೆ ಒಟ್ಟು ಒಂದೇ ಅಂಕ, 0–10
+Each symptom gets its own 0–10 score. The distress thermometer is one overall score.	ಪ್ರತಿ ಲಕ್ಷಣಕ್ಕೂ ತನ್ನದೇ 0–10 ಅಂಕ. ತೊಂದರೆ ಥರ್ಮಾಮೀಟರ್ ಒಟ್ಟು ತೊಂದರೆಯ ಒಂದೇ ಅಂಕ.
+How is $familyAbout feeling today?	ಇಂದು $familyAbout ಹೇಗಿದ್ದಾರೆ?
+Who are they?	ಇವರು ಯಾರು?
+Nurse / paid carer	ನರ್ಸ್ / ಸಂಬಳದ ಆರೈಕೆದಾರರು
+Invite family or a carer	ಕುಟುಂಬ ಅಥವಾ ಆರೈಕೆದಾರರನ್ನು ಆಹ್ವಾನಿಸಿ
+Are you still caring for $personName?	ನೀವು ಇನ್ನೂ $personName ಅವರ ಆರೈಕೆ ಮಾಡುತ್ತಿದ್ದೀರಾ?
+Nothing has been added for a few days. Has anything changed?	ಕೆಲವು ದಿನಗಳಿಂದ ಏನೂ ಸೇರಿಸಿಲ್ಲ. ಏನಾದರೂ ಬದಲಾಗಿದೆಯೇ?
+Yes, things are steady	ಹೌದು, ಎಲ್ಲವೂ ಎಂದಿನಂತೆಯೇ ಇದೆ
+Our care needs or routine have changed	ನಮ್ಮ ಆರೈಕೆ ಅಗತ್ಯಗಳು ಅಥವಾ ದಿನಚರಿ ಬದಲಾಗಿವೆ
+I'm no longer actively caregiving	ನಾನು ಈಗ ಆರೈಕೆ ಮಾಡುತ್ತಿಲ್ಲ
+Remind me later	ನಂತರ ನೆನಪಿಸಿ
+What changed? (optional)	ಏನು ಬದಲಾಯಿತು? (ಐಚ್ಛಿಕ)
+This only changes what Sahara shows you. Nothing is deleted.	ಇದರಿಂದ ಸಹಾರಾ ನಿಮಗೆ ಏನು ತೋರಿಸುತ್ತದೆ ಎಂಬುದು ಮಾತ್ರ ಬದಲಾಗುತ್ತದೆ. ಏನನ್ನೂ ಅಳಿಸಲಾಗುವುದಿಲ್ಲ.
+$personName has passed away	$personName ನಿಧನರಾಗಿದ್ದಾರೆ
+$personName moved to a care facility or hospice	$personName ಆರೈಕೆ ಕೇಂದ್ರ ಅಥವಾ ಹಾಸ್ಪಿಸ್‌ಗೆ ಹೋಗಿದ್ದಾರೆ
+Someone else has taken over care	ಈಗ ಬೇರೆಯವರು ಆರೈಕೆ ಮಾಡುತ್ತಿದ್ದಾರೆ
+I'd prefer not to say	ಹೇಳಲು ಇಷ್ಟವಿಲ್ಲ
+Pause reminders?	ಜ್ಞಾಪನೆಗಳನ್ನು ನಿಲ್ಲಿಸಬೇಕೇ?
+Reminders for $personName stop for the time you choose, then start again. Records stay as they are.	$personName ಅವರ ಜ್ಞಾಪನೆಗಳು ನೀವು ಆರಿಸಿದ ಸಮಯದವರೆಗೆ ನಿಲ್ಲುತ್ತವೆ, ನಂತರ ಮತ್ತೆ ಶುರುವಾಗುತ್ತವೆ. ದಾಖಲೆಗಳು ಹಾಗೆಯೇ ಇರುತ್ತವೆ.
+Pause for $days days	$days ದಿನ ನಿಲ್ಲಿಸಿ
+Keep reminders on	ಜ್ಞಾಪನೆಗಳನ್ನು ಆನ್‌ನಲ್ಲಿಡಿ
+Reminders are off	ಜ್ಞಾಪನೆಗಳು ಆಫ್ ಆಗಿವೆ
+All reminders for $personName are off on this phone. The records are kept, not deleted. Others in the care circle can still add to them.	ಈ ಫೋನ್‌ನಲ್ಲಿ $personName ಅವರ ಎಲ್ಲಾ ಜ್ಞಾಪನೆಗಳು ಆಫ್ ಆಗಿವೆ. ದಾಖಲೆಗಳನ್ನು ಇರಿಸಲಾಗಿದೆ, ಅಳಿಸಿಲ್ಲ. ಆರೈಕೆ ವಲಯದ ಇತರರು ಇನ್ನೂ ಅವುಗಳಿಗೆ ಸೇರಿಸಬಹುದು.
+Reminders paused until $until	$until ರವರೆಗೆ ಜ್ಞಾಪನೆಗಳು ನಿಂತಿವೆ
+Records stay as they are. Others in the care circle can still add to them.	ದಾಖಲೆಗಳು ಹಾಗೆಯೇ ಇರುತ್ತವೆ. ಆರೈಕೆ ವಲಯದ ಇತರರು ಇನ್ನೂ ಅವುಗಳಿಗೆ ಸೇರಿಸಬಹುದು.
+Turn reminders back on	ಜ್ಞಾಪನೆಗಳನ್ನು ಮತ್ತೆ ಆನ್ ಮಾಡಿ
+Not actively caregiving	ಈಗ ಆರೈಕೆ ಮಾಡುತ್ತಿಲ್ಲ
+Reminders for $personName are off. The records are kept and can be opened from All care tools.	$personName ಅವರ ಜ್ಞಾಪನೆಗಳು ಆಫ್ ಆಗಿವೆ. ದಾಖಲೆಗಳನ್ನು ಇರಿಸಲಾಗಿದೆ, ಎಲ್ಲಾ ಆರೈಕೆ ಸಾಧನಗಳಿಂದ ತೆರೆಯಬಹುದು.
+Support	ಸಹಾಯ
+I'm caring for $personName again	ನಾನು ಮತ್ತೆ $personName ಅವರ ಆರೈಕೆ ಮಾಡುತ್ತಿದ್ದೇನೆ
+Has your caregiving changed?	ನಿಮ್ಮ ಆರೈಕೆಯಲ್ಲಿ ಏನಾದರೂ ಬದಲಾಗಿದೆಯೇ?
+Pause reminders, or stop them if you are no longer caregiving	ಜ್ಞಾಪನೆಗಳನ್ನು ತಡೆಯಿರಿ, ಅಥವಾ ನೀವು ಆರೈಕೆ ಮಾಡದಿದ್ದರೆ ಅವುಗಳನ್ನು ನಿಲ್ಲಿಸಿ
+Tele-MANAS is free, any time, in your language.	ಟೆಲಿ-ಮಾನಸ್ ಉಚಿತ, ಯಾವಾಗ ಬೇಕಾದರೂ, ನಿಮ್ಮ ಭಾಷೆಯಲ್ಲಿ.
+What to do after a death	ಸಾವಿನ ನಂತರ ಏನು ಮಾಡಬೇಕು
+All marked	ಎಲ್ಲವೂ ದಾಖಲಾಗಿದೆ
+$left to take	$left ತೆಗೆದುಕೊಳ್ಳಬೇಕು
+Sound off	ಧ್ವನಿ ಆಫ್
+Sound on	ಧ್ವನಿ ಆನ್
+Say it again	ಮತ್ತೆ ಹೇಳಿ
+What would you like to do? Tap a big button.	ನೀವು ಏನು ಮಾಡಲು ಬಯಸುತ್ತೀರಿ? ಒಂದು ದೊಡ್ಡ ಬಟನ್ ಒತ್ತಿ.
+How are you today?	ಇಂದು ನೀವು ಹೇಗಿದ್ದೀರಿ?
+My medicines	ನನ್ನ ಔಷಧಿಗಳು
+Read to me	ನನಗೆ ಓದಿ ಹೇಳಿ
+Full app	ಪೂರ್ಣ ಆ್ಯಪ್
+Leave simple mode	ಸರಳ ಮೋಡ್ ಬಿಡಿ
+Leave simple mode?	ಸರಳ ಮೋಡ್ ಬಿಡಬೇಕೇ?
+The full app has more buttons. Simple mode can be switched on again in More.	ಪೂರ್ಣ ಆ್ಯಪ್‌ನಲ್ಲಿ ಹೆಚ್ಚು ಬಟನ್‌ಗಳಿವೆ. ಸರಳ ಮೋಡ್ ಅನ್ನು "ಇನ್ನಷ್ಟು" ನಲ್ಲಿ ಮತ್ತೆ ಆನ್ ಮಾಡಬಹುದು.
+Stay in simple mode	ಸರಳ ಮೋಡ್‌ನಲ್ಲೇ ಇರಿ
+Open full app	ಪೂರ್ಣ ಆ್ಯಪ್ ತೆರೆಯಿರಿ
+Chosen	ಆಯ್ಕೆ ಮಾಡಲಾಗಿದೆ
+Where does it hurt? Touch the place on the body.	ಎಲ್ಲಿ ನೋವಾಗುತ್ತಿದೆ? ದೇಹದ ಮೇಲೆ ಆ ಜಾಗವನ್ನು ಮುಟ್ಟಿ.
+Body picture. Nothing marked yet.	ದೇಹದ ಚಿತ್ರ. ಇನ್ನೂ ಏನೂ ಗುರುತಿಸಿಲ್ಲ.
+No pain	ನೋವಿಲ್ಲ
+Touch the body	ದೇಹವನ್ನು ಮುಟ್ಟಿ
+How much does it hurt? None, a little, a lot, or the worst?	ಎಷ್ಟು ನೋವಿದೆ? ಇಲ್ಲವೇ ಇಲ್ಲ, ಸ್ವಲ್ಪ, ತುಂಬಾ, ಅಥವಾ ಅತಿ ಹೆಚ್ಚು?
+How much does it hurt?	ಎಷ್ಟು ನೋವಿದೆ?
+Thank you. It is saved, and your care team can see it.	ಧನ್ಯವಾದಗಳು. ಇದನ್ನು ಉಳಿಸಲಾಗಿದೆ, ನಿಮ್ಮ ಆರೈಕೆ ತಂಡ ಇದನ್ನು ನೋಡಬಹುದು.
+Thank you. It is saved.	ಧನ್ಯವಾದಗಳು. ಉಳಿಸಲಾಗಿದೆ.
+Marked as taken.	ತೆಗೆದುಕೊಂಡಂತೆ ದಾಖಲಿಸಲಾಗಿದೆ.
+There are no medicines for today.	ಇಂದಿಗೆ ಯಾವುದೇ ಔಷಧಿ ಇಲ್ಲ.
+Taken ${times.size} times today	ಇಂದು ${times.size} ಬಾರಿ ತೆಗೆದುಕೊಂಡಿದ್ದೀರಿ
+Not taken	ತೆಗೆದುಕೊಂಡಿಲ್ಲ
+Who do you want to call?	ನೀವು ಯಾರಿಗೆ ಕರೆ ಮಾಡಲು ಬಯಸುತ್ತೀರಿ?
+Ambulance 108	ಆಂಬ್ಯುಲೆನ್ಸ್ 108
+Family can add phone numbers for the care team in the full app.	ಆರೈಕೆ ತಂಡದ ಫೋನ್ ಸಂಖ್ಯೆಗಳನ್ನು ಕುಟುಂಬ ಪೂರ್ಣ ಆ್ಯಪ್‌ನಲ್ಲಿ ಸೇರಿಸಬಹುದು.
+Call $name	$name ಅವರಿಗೆ ಕರೆ ಮಾಡಿ
+Here are today's medicines and your next visit.	ಇವು ಇಂದಿನ ಔಷಧಿಗಳು ಮತ್ತು ನಿಮ್ಮ ಮುಂದಿನ ಭೇಟಿ.
+Read it again	ಮತ್ತೆ ಓದಿ
+Simple mode is on. Open Today to see it.	ಸರಳ ಮೋಡ್ ಆನ್ ಆಗಿದೆ. ನೋಡಲು "ಇಂದು" ತೆರೆಯಿರಿ.
+Simple mode	ಸರಳ ಮೋಡ್
+Four big buttons that speak, for ${person.name}	${person.name} ಅವರಿಗಾಗಿ ಮಾತನಾಡುವ ನಾಲ್ಕು ದೊಡ್ಡ ಬಟನ್‌ಗಳು
+These are your medicines for this morning	ಇವು ಈ ಬೆಳಿಗ್ಗೆ ನಿಮ್ಮ ಔಷಧಿಗಳು
+These are your medicines for this afternoon	ಇವು ಈ ಮಧ್ಯಾಹ್ನ ನಿಮ್ಮ ಔಷಧಿಗಳು
+These are your medicines for this evening	ಇವು ಈ ಸಂಜೆ ನಿಮ್ಮ ಔಷಧಿಗಳು
+These are your medicines for tonight	ಇವು ಇಂದು ರಾತ್ರಿ ನಿಮ್ಮ ಔಷಧಿಗಳು
+These medicines can be taken at any time of day	ಈ ಔಷಧಿಗಳನ್ನು ದಿನದ ಯಾವಾಗ ಬೇಕಾದರೂ ತೆಗೆದುಕೊಳ್ಳಬಹುದು
+Today's medicines:	ಇಂದಿನ ಔಷಧಿಗಳು:
+No visit is planned yet.	ಇನ್ನೂ ಯಾವುದೇ ಭೇಟಿ ನಿಗದಿಯಾಗಿಲ್ಲ.
+Your next visit:	ನಿಮ್ಮ ಮುಂದಿನ ಭೇಟಿ:
+A little	ಸ್ವಲ್ಪ
+A lot	ತುಂಬಾ
+Worst	ಅತಿ ಹೆಚ್ಚು
+The patient agrees to this conversation being recorded and written down	ಈ ಸಂಭಾಷಣೆಯನ್ನು ರೆಕಾರ್ಡ್ ಮಾಡಿ ಬರೆಯಲು ರೋಗಿ ಒಪ್ಪುತ್ತಾರೆ
+The family members in the room agree	ಕೋಣೆಯಲ್ಲಿರುವ ಕುಟುಂಬದ ಸದಸ್ಯರು ಒಪ್ಪುತ್ತಾರೆ
+Either one is enough.	ಇಬ್ಬರಲ್ಲಿ ಒಬ್ಬರ ಒಪ್ಪಿಗೆ ಸಾಕು.
+Signing below also ticks the declaration in Section IV of the form.	ಕೆಳಗೆ ಸಹಿ ಮಾಡಿದರೆ ಫಾರ್ಮ್‌ನ ವಿಭಾಗ IV ರ ಘೋಷಣೆಗೂ ಗುರುತು ಬೀಳುತ್ತದೆ.
+Show in the guide	ಮಾರ್ಗದರ್ಶಿಯಲ್ಲಿ ತೋರಿಸಿ
+ECOG performance status (optional)	ECOG ಕಾರ್ಯಕ್ಷಮತೆ ಸ್ಥಿತಿ (ಐಚ್ಛಿಕ)
+With the ECOG performance status	ECOG ಕಾರ್ಯಕ್ಷಮತೆ ಸ್ಥಿತಿಯೊಂದಿಗೆ
+Version	ಆವೃತ್ತಿ
+made on	ತಯಾರಾದ ದಿನಾಂಕ
+Check Sahara for a newer version before using a printed copy.	ಮುದ್ರಿತ ಪ್ರತಿಯನ್ನು ಬಳಸುವ ಮೊದಲು, ಹೊಸ ಆವೃತ್ತಿ ಇದೆಯೇ ಎಂದು ಸಹಾರಾದಲ್ಲಿ ನೋಡಿ.
+There is a valid written Advance care planning document. Executed on ____. Location of original: ____	ಮಾನ್ಯವಾದ ಲಿಖಿತ ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ ದಾಖಲೆ ಇದೆ. ಕಾರ್ಯಗತಗೊಳಿಸಿದ ದಿನಾಂಕ ____. ಮೂಲ ಪ್ರತಿಯ ಸ್ಥಳ: ____
+ADVANCE CARE PLANNING	ಮುಂಗಡ ಆರೈಕೆ ಯೋಜನೆ
+Medical Board process	ವೈದ್ಯಕೀಯ ಮಂಡಳಿಯ ಪ್ರಕ್ರಿಯೆ
+For a patient who cannot decide, withholding or withdrawing life-sustaining treatment may need the Medical Board process (Common Cause 2023; Harish Rana 2026). This plan records wishes and clinical limits; it does not by itself authorise withholding treatment.	ತೀರ್ಮಾನ ತೆಗೆದುಕೊಳ್ಳಲಾಗದ ರೋಗಿಗೆ, ಜೀವರಕ್ಷಕ ಚಿಕಿತ್ಸೆಯನ್ನು ಆರಂಭಿಸದಿರಲು ಅಥವಾ ನಿಲ್ಲಿಸಲು ವೈದ್ಯಕೀಯ ಮಂಡಳಿಯ ಪ್ರಕ್ರಿಯೆ ಬೇಕಾಗಬಹುದು (ಕಾಮನ್ ಕಾಸ್ 2023; ಹರೀಶ್ ರಾಣಾ 2026). ಈ ಯೋಜನೆ ಇಚ್ಛೆಗಳನ್ನು ಮತ್ತು ಚಿಕಿತ್ಸೆಯ ಮಿತಿಗಳನ್ನು ದಾಖಲಿಸುತ್ತದೆ; ಇದು ತನ್ನಷ್ಟಕ್ಕೆ ತಾನೇ ಚಿಕಿತ್ಸೆಯನ್ನು ತಡೆಹಿಡಿಯಲು ಅನುಮತಿ ನೀಡುವುದಿಲ್ಲ.
+Withholding or withdrawing life-sustaining treatment for a patient who cannot decide follows the board process below. This app only shows it as information. It never starts, stops or decides any treatment.	ತೀರ್ಮಾನ ತೆಗೆದುಕೊಳ್ಳಲಾಗದ ರೋಗಿಗೆ ಜೀವರಕ್ಷಕ ಚಿಕಿತ್ಸೆಯನ್ನು ಆರಂಭಿಸದಿರುವುದು ಅಥವಾ ನಿಲ್ಲಿಸುವುದು ಕೆಳಗಿನ ಮಂಡಳಿ ಪ್ರಕ್ರಿಯೆಯನ್ನು ಅನುಸರಿಸುತ್ತದೆ. ಈ ಆ್ಯಪ್ ಇದನ್ನು ಮಾಹಿತಿಯಾಗಿ ಮಾತ್ರ ತೋರಿಸುತ್ತದೆ. ಇದು ಯಾವ ಚಿಕಿತ್ಸೆಯನ್ನೂ ಎಂದಿಗೂ ಆರಂಭಿಸುವುದಿಲ್ಲ, ನಿಲ್ಲಿಸುವುದಿಲ್ಲ, ತೀರ್ಮಾನಿಸುವುದಿಲ್ಲ.
+I have read this version. This is not a formal signature, consent for treatment or a treatment decision. I can ask my doctor to change it later.	ನಾನು ಈ ಆವೃತ್ತಿಯನ್ನು ಓದಿದ್ದೇನೆ. ಇದು ಔಪಚಾರಿಕ ಸಹಿ, ಚಿಕಿತ್ಸೆಗೆ ಒಪ್ಪಿಗೆ ಅಥವಾ ಚಿಕಿತ್ಸೆಯ ನಿರ್ಧಾರ ಅಲ್ಲ. ನಂತರ ಇದನ್ನು ಬದಲಿಸಲು ನಾನು ಡಾಕ್ಟರ್‌ಗೆ ಕೇಳಬಹುದು.
+The patient is under 18. A parent or guardian makes these decisions with the doctor. Ask the child what matters to them too, in words they understand, and write it in their own words.	ರೋಗಿಯ ವಯಸ್ಸು 18 ಕ್ಕಿಂತ ಕಡಿಮೆ. ಈ ನಿರ್ಧಾರಗಳನ್ನು ಪೋಷಕರು ಅಥವಾ ರಕ್ಷಕರು ವೈದ್ಯರೊಂದಿಗೆ ತೆಗೆದುಕೊಳ್ಳುತ್ತಾರೆ. ಮಗುವಿಗೆ ಅರ್ಥವಾಗುವ ಮಾತುಗಳಲ್ಲಿ ಅವರಿಗೆ ಯಾವುದು ಮುಖ್ಯ ಎಂದೂ ಕೇಳಿ, ಅವರ ಮಾತುಗಳಲ್ಲೇ ಬರೆಯಿರಿ.
+Add the parent or guardian as the main decision-maker.	ಪೋಷಕರು ಅಥವಾ ರಕ್ಷಕರನ್ನು ಮುಖ್ಯ ನಿರ್ಧಾರಕರಾಗಿ ಸೇರಿಸಿ.
+Draft annexure. The clinical team must approve this wording before the pilot.	ಕರಡು ಅನುಬಂಧ. ಪೈಲಟ್‌ಗೆ ಮೊದಲು ಕ್ಲಿನಿಕಲ್ ತಂಡ ಈ ಪದಗಳನ್ನು ಅನುಮೋದಿಸಬೇಕು.

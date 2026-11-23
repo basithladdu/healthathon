@@ -108,4 +108,12 @@ object CaregiverWellbeingRules {
     const val MAX_NOTE_CHARS = 2000
 
     fun storeKey(storageNamespace: String, person: String) = "$storageNamespace|$person"
+
+    /**
+     * "You matter, and your health matters too" after a family member logs a symptom: at most once a week
+     * (Sujay, 7 Nov: it appeared every time a symptom was added). [lastShown] null means never shown.
+     */
+    const val YOU_MATTER_EVERY_DAYS = 7L
+    fun youMatterDue(lastShown: LocalDate?, today: LocalDate): Boolean =
+        lastShown == null || lastShown.isAfter(today) || !today.isBefore(lastShown.plusDays(YOU_MATTER_EVERY_DAYS))
 }

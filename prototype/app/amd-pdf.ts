@@ -290,7 +290,7 @@ export async function buildAmdPdf(input: AmdPdfInput, fonts: AmdPdfFonts): Promi
   }
   y -= 6;
   heading('Section 1: Personal details');
-  paragraph('This advance medical directive (living will) and the designation of healthcare representative(s) is made by me:');
+  paragraph('This advance care planning document and the designation of healthcare representative(s) is made by me:');
   table([
     ['Full name', ex.name],
     ['Gender', ex.gender],

@@ -160,6 +160,8 @@ internal object CarePlanPdf {
         d.text(p(Bi("Emergency care and treatment plan: goals of care", "आपातकालीन देखभाल और इलाज की योजना: देखभाल के लक्ष्य")), h1, 22f)
         d.text(listOf(r.patient.name, p(Bi("Goals-of-care conversation note, in the order of the clinical document", "देखभाल के लक्ष्यों की बातचीत का नोट, क्लिनिकल दस्तावेज़ के क्रम में"))).filter(String::isNotBlank).joinToString(" · "), body)
         if (status.isNotBlank()) d.text(status, paint(9.5f, true))
+        // An old printed copy must not pass for the current one (Dr Sujay, 21 Nov; "failsafe for older physical QR codes", 22 Nov minutes).
+        d.text(p(GocPrintVersion.line(r)), paint(9.5f, true, android.graphics.Color.rgb(122, 59, 38)))
         GocForm.sections(r, topics, signers).forEach { section ->
             d.space(6f); d.box(sand, "${section.id}   " + p(section.title) to h2)
             section.groups.forEach { g ->
@@ -208,7 +210,7 @@ internal object CarePlanPdf {
         } }
         val small = serif(8f, color = grey); val name = a.content.executant.name.ifBlank { "—" }; val version = a.version; val form = a.formVersion.substringBefore(" (")
         render(file, d) { c, page, pages ->
-            c.drawText("Advance Medical Directive of $name · Version $version", LEFT + offset, 30f, small)
+            c.drawText("Advance care planning of $name · Version $version", LEFT + offset, 30f, small)
             c.drawText(form, LEFT + WIDTH - offset - small.measureText(form), 30f, small)
             val label = "Page $page of $pages"; val nine = serif(9f)
             c.drawText(label, (W - nine.measureText(label)) / 2, 806f, nine)

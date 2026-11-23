@@ -5618,3 +5618,110 @@ Last opened on $at	చివరిసారి $at న తెరవబడిం�
 Emergency card web link	అత్యవసర కార్డు వెబ్ లింక్
 Visit tomorrow	రేపు విజిట్ ఉంది
 Open Sahara to see the time and what to bring.	సమయం, ఏమి తీసుకురావాలో చూడటానికి సహారా తెరవండి.
+Is $about in any distress today?	ఈ రోజు $about ఏదైనా బాధలో ఉన్నారా?
+How much distress has $about felt in the past week, including today?	ఈ రోజుతో కలిపి గత వారంలో $about ఎంత బాధ పడ్డారు?
+This is one number for overall distress. Each symptom (pain, sleep and others) has its own 0–10 score in Symptoms.	ఇది మొత్తం బాధకు ఒకే సంఖ్య. ప్రతి లక్షణానికి (నొప్పి, నిద్ర మొదలైనవి) లక్షణాలు విభాగంలో దాని సొంత 0–10 స్కోరు ఉంటుంది.
+What is adding to it? Tick any (no scores here)	దేని వల్ల? వర్తించేవి టిక్ చేయండి (ఇక్కడ స్కోరు లేదు)
+The thermometer is one overall distress score. The problem list (physical, emotional, social, practical, spiritual) only shows what is adding to it; it is not scored. Each symptom has its own separate 0–10 score in Symptoms.	థర్మామీటర్ మొత్తం బాధకు ఒకే స్కోరు. సమస్యల జాబితా (శారీరక, భావోద్వేగ, సామాజిక, ఆచరణాత్మక, ఆధ్యాత్మిక) బాధకు కారణాలను మాత్రమే చూపిస్తుంది; దానికి స్కోరు ఉండదు. ప్రతి లక్షణానికి లక్షణాలు విభాగంలో వేరే 0–10 స్కోరు ఉంటుంది.
+One overall score, 0–10, for this past week	ఈ గత వారానికి మొత్తం ఒకే స్కోరు, 0–10
+Each symptom gets its own 0–10 score. The distress thermometer is one overall score.	ప్రతి లక్షణానికి దాని సొంత 0–10 స్కోరు ఉంటుంది. బాధ థర్మామీటర్ మొత్తం బాధకు ఒకే స్కోరు.
+How is $familyAbout feeling today?	ఈ రోజు $familyAbout ఎలా ఉన్నారు?
+Who are they?	వీరు ఎవరు?
+Nurse / paid carer	నర్సు / జీతం తీసుకునే సంరక్షకులు
+Invite family or a carer	కుటుంబాన్ని లేదా సంరక్షకుడిని ఆహ్వానించండి
+Are you still caring for $personName?	మీరు ఇంకా $personName సంరక్షణ చూస్తున్నారా?
+Nothing has been added for a few days. Has anything changed?	కొన్ని రోజులుగా ఏమీ చేర్చలేదు. ఏమైనా మారిందా?
+Yes, things are steady	అవును, అంతా మామూలుగానే ఉంది
+Our care needs or routine have changed	మా సంరక్షణ అవసరాలు లేదా దినచర్య మారాయి
+I'm no longer actively caregiving	నేను ఇప్పుడు సంరక్షణ చూడటం లేదు
+Remind me later	తర్వాత గుర్తు చేయండి
+What changed? (optional)	ఏమి మారింది? (ఐచ్ఛికం)
+This only changes what Sahara shows you. Nothing is deleted.	దీనితో సహారా మీకు ఏమి చూపిస్తుందో మాత్రమే మారుతుంది. ఏదీ తొలగించబడదు.
+$personName has passed away	$personName మరణించారు
+$personName moved to a care facility or hospice	$personName సంరక్షణ కేంద్రానికి లేదా హాస్పిస్‌కు వెళ్లారు
+Someone else has taken over care	ఇప్పుడు వేరొకరు సంరక్షణ చూస్తున్నారు
+I'd prefer not to say	చెప్పకూడదనుకుంటున్నాను
+Pause reminders?	రిమైండర్లు ఆపాలా?
+Reminders for $personName stop for the time you choose, then start again. Records stay as they are.	$personName రిమైండర్లు మీరు ఎంచుకున్న సమయం వరకు ఆగి, తర్వాత మళ్లీ మొదలవుతాయి. రికార్డులు అలాగే ఉంటాయి.
+Pause for $days days	$days రోజులు ఆపండి
+Keep reminders on	రిమైండర్లు ఆన్‌లో ఉంచండి
+Reminders are off	రిమైండర్లు ఆఫ్‌లో ఉన్నాయి
+All reminders for $personName are off on this phone. The records are kept, not deleted. Others in the care circle can still add to them.	ఈ ఫోన్‌లో $personName అన్ని రిమైండర్లు ఆఫ్ అయ్యాయి. రికార్డులు ఉంచబడ్డాయి, తొలగించబడలేదు. సంరక్షణ బృందంలోని ఇతరులు ఇంకా వాటిలో చేర్చవచ్చు.
+Reminders paused until $until	$until వరకు రిమైండర్లు ఆగాయి
+Records stay as they are. Others in the care circle can still add to them.	రికార్డులు అలాగే ఉంటాయి. సంరక్షణ బృందంలోని ఇతరులు ఇంకా వాటిలో చేర్చవచ్చు.
+Turn reminders back on	రిమైండర్లు మళ్లీ ఆన్ చేయండి
+Not actively caregiving	ప్రస్తుతం సంరక్షణ చూడటం లేదు
+Reminders for $personName are off. The records are kept and can be opened from All care tools.	$personName రిమైండర్లు ఆఫ్‌లో ఉన్నాయి. రికార్డులు ఉంచబడ్డాయి, అన్ని సంరక్షణ సాధనాల నుండి తెరవవచ్చు.
+Support	సహాయం
+I'm caring for $personName again	నేను మళ్లీ $personName సంరక్షణ చూస్తున్నాను
+Has your caregiving changed?	మీ సంరక్షణలో ఏమైనా మారిందా?
+Pause reminders, or stop them if you are no longer caregiving	రిమైండర్లు ఆపండి, లేదా మీరు సంరక్షణ చూడకపోతే వాటిని నిలిపివేయండి
+Tele-MANAS is free, any time, in your language.	టెలి-మానస్ ఉచితం, ఎప్పుడైనా, మీ భాషలో.
+What to do after a death	మరణం తర్వాత ఏమి చేయాలి
+All marked	అన్నీ నమోదయ్యాయి
+$left to take	$left తీసుకోవాలి
+Sound off	శబ్దం ఆపు
+Sound on	శబ్దం ఆన్
+Say it again	మళ్ళీ చెప్పండి
+What would you like to do? Tap a big button.	మీరు ఏమి చేయాలనుకుంటున్నారు? ఒక పెద్ద బటన్‌ను తాకండి.
+How are you today?	ఈ రోజు మీరు ఎలా ఉన్నారు?
+My medicines	నా మందులు
+Read to me	నాకు చదివి వినిపించండి
+Full app	పూర్తి యాప్
+Leave simple mode	సులభ మోడ్ నుండి బయటకు
+Leave simple mode?	సులభ మోడ్ నుండి బయటకు వెళ్ళాలా?
+The full app has more buttons. Simple mode can be switched on again in More.	పూర్తి యాప్‌లో ఎక్కువ బటన్లు ఉంటాయి. సులభ మోడ్‌ను "మరిన్ని"లో మళ్ళీ ఆన్ చేయవచ్చు.
+Stay in simple mode	సులభ మోడ్‌లోనే ఉండండి
+Open full app	పూర్తి యాప్ తెరవండి
+Chosen	ఎంచుకున్నారు
+Where does it hurt? Touch the place on the body.	ఎక్కడ నొప్పిగా ఉంది? శరీరంపై ఆ చోటును తాకండి.
+Body picture. Nothing marked yet.	శరీర చిత్రం. ఇంకా ఏదీ గుర్తించలేదు.
+No pain	నొప్పి లేదు
+Touch the body	శరీరాన్ని తాకండి
+How much does it hurt? None, a little, a lot, or the worst?	ఎంత నొప్పిగా ఉంది? అసలు లేదు, కొంచెం, చాలా, లేదా అత్యంత ఎక్కువ?
+How much does it hurt?	ఎంత నొప్పిగా ఉంది?
+Thank you. It is saved, and your care team can see it.	ధన్యవాదాలు. ఇది సేవ్ అయింది, మీ సంరక్షణ బృందం దీన్ని చూడగలదు.
+Thank you. It is saved.	ధన్యవాదాలు. సేవ్ అయింది.
+Marked as taken.	తీసుకున్నట్టు నమోదు చేశాం.
+There are no medicines for today.	ఈ రోజుకు మందులు ఏవీ లేవు.
+Taken ${times.size} times today	ఈ రోజు ${times.size} సార్లు తీసుకున్నారు
+Not taken	తీసుకోలేదు
+Who do you want to call?	మీరు ఎవరికి ఫోన్ చేయాలనుకుంటున్నారు?
+Ambulance 108	అంబులెన్స్ 108
+Family can add phone numbers for the care team in the full app.	సంరక్షణ బృందం ఫోన్ నంబర్లను కుటుంబం పూర్తి యాప్‌లో చేర్చవచ్చు.
+Call $name	$name కి ఫోన్ చేయండి
+Here are today's medicines and your next visit.	ఇవి ఈ రోజు మందులు, మీ తదుపరి విజిట్.
+Read it again	మళ్ళీ చదవండి
+Simple mode is on. Open Today to see it.	సులభ మోడ్ ఆన్‌లో ఉంది. చూడటానికి "ఈ రోజు" తెరవండి.
+Simple mode	సులభ మోడ్
+Four big buttons that speak, for ${person.name}	${person.name} కోసం మాట్లాడే నాలుగు పెద్ద బటన్లు
+These are your medicines for this morning	ఇవి ఈ ఉదయం మీ మందులు
+These are your medicines for this afternoon	ఇవి ఈ మధ్యాహ్నం మీ మందులు
+These are your medicines for this evening	ఇవి ఈ సాయంత్రం మీ మందులు
+These are your medicines for tonight	ఇవి ఈ రాత్రి మీ మందులు
+These medicines can be taken at any time of day	ఈ మందులను రోజులో ఎప్పుడైనా తీసుకోవచ్చు
+Today's medicines:	ఈ రోజు మందులు:
+No visit is planned yet.	ఇంకా ఏ విజిట్ నిర్ణయించలేదు.
+Your next visit:	మీ తదుపరి విజిట్:
+A little	కొంచెం
+A lot	చాలా
+Worst	అత్యంత ఎక్కువ
+The patient agrees to this conversation being recorded and written down	ఈ సంభాషణను రికార్డ్ చేసి రాయడానికి రోగి అంగీకరిస్తున్నారు
+The family members in the room agree	గదిలో ఉన్న కుటుంబ సభ్యులు అంగీకరిస్తున్నారు
+Either one is enough.	ఇద్దరిలో ఒకరి అంగీకారం చాలు.
+Signing below also ticks the declaration in Section IV of the form.	కింద సంతకం చేస్తే ఫారమ్‌లోని విభాగం IV లోని ప్రకటనకు కూడా టిక్ పడుతుంది.
+Show in the guide	గైడ్‌లో చూపించు
+ECOG performance status (optional)	ECOG పనితీరు స్థితి (ఐచ్ఛికం)
+With the ECOG performance status	ECOG పనితీరు స్థితితో పాటు
+Version	వెర్షన్
+made on	తయారైన తేదీ
+Check Sahara for a newer version before using a printed copy.	ముద్రించిన ప్రతిని వాడే ముందు, కొత్త వెర్షన్ ఉందేమో సహారాలో చూడండి.
+There is a valid written Advance care planning document. Executed on ____. Location of original: ____	చెల్లుబాటు అయ్యే లిఖిత ముందస్తు సంరక్షణ ప్రణాళిక పత్రం ఉంది. అమలు చేసిన తేదీ ____. అసలు ప్రతి ఉన్న స్థలం: ____
+ADVANCE CARE PLANNING	ముందస్తు సంరక్షణ ప్రణాళిక
+Medical Board process	మెడికల్ బోర్డ్ ప్రక్రియ
+For a patient who cannot decide, withholding or withdrawing life-sustaining treatment may need the Medical Board process (Common Cause 2023; Harish Rana 2026). This plan records wishes and clinical limits; it does not by itself authorise withholding treatment.	నిర్ణయం తీసుకోలేని రోగి విషయంలో, ప్రాణాధార చికిత్సను ప్రారంభించకపోవడం లేదా ఆపడం కోసం మెడికల్ బోర్డ్ ప్రక్రియ అవసరం కావచ్చు (కామన్ కాజ్ 2023; హరీష్ రాణా 2026). ఈ ప్రణాళిక కోరికలను, వైద్య పరిమితులను నమోదు చేస్తుంది; చికిత్సను నిలిపివేయడానికి ఇది స్వయంగా అనుమతి ఇవ్వదు.
+Withholding or withdrawing life-sustaining treatment for a patient who cannot decide follows the board process below. This app only shows it as information. It never starts, stops or decides any treatment.	నిర్ణయం తీసుకోలేని రోగి విషయంలో ప్రాణాధార చికిత్సను ప్రారంభించకపోవడం లేదా ఆపడం కింద ఇచ్చిన బోర్డ్ ప్రక్రియ ప్రకారం జరుగుతుంది. ఈ యాప్ దీన్ని కేవలం సమాచారంగా మాత్రమే చూపుతుంది. ఇది ఏ చికిత్సనూ ఎప్పుడూ ప్రారంభించదు, ఆపదు, నిర్ణయించదు.
+I have read this version. This is not a formal signature, consent for treatment or a treatment decision. I can ask my doctor to change it later.	నేను ఈ వెర్షన్ చదివాను. ఇది అధికారిక సంతకం కాదు, చికిత్సకు అంగీకారం కాదు, చికిత్స నిర్ణయం కాదు. తర్వాత దీన్ని మార్చమని నా డాక్టర్‌ను అడగవచ్చు.
+The patient is under 18. A parent or guardian makes these decisions with the doctor. Ask the child what matters to them too, in words they understand, and write it in their own words.	రోగి వయసు 18 కంటే తక్కువ. ఈ నిర్ణయాలు తల్లిదండ్రులు లేదా సంరక్షకులు డాక్టర్‌తో కలిసి తీసుకుంటారు. పిల్లలకు అర్థమయ్యే మాటల్లో వారికి ఏది ముఖ్యమో కూడా అడగండి, వారి మాటల్లోనే రాయండి.
+Add the parent or guardian as the main decision-maker.	తల్లిదండ్రులు లేదా సంరక్షకులను ప్రధాన నిర్ణయకర్తగా చేర్చండి.
+Draft annexure. The clinical team must approve this wording before the pilot.	ముసాయిదా అనుబంధం. పైలట్‌కు ముందు క్లినికల్ బృందం ఈ మాటలను ఆమోదించాలి.

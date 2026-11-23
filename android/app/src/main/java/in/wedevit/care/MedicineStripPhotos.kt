@@ -12,6 +12,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.animation.AnimatedVisibility
@@ -317,6 +318,14 @@ class MedicineStripPhotos(context: Context, storage: String) {
     }
 }
 
+/** Folding Today's doses when there are many: pure so it can be unit tested. */
+internal object TodayDoseCompact {
+    /** More doses than this in a day and the time groups fold, so 20 medicines do not make Today very long. */
+    const val COMPACT_ABOVE = 8
+    /** The group left open: the first time with a dose still to take, else none (-1) when everything is marked. */
+    fun nextOpen(pendingPerGroup: List<Int>): Int = pendingPerGroup.indexOfFirst { it > 0 }
+}
+
 /**
  * Today's doses grouped by time ("Morning · 08:00 · 3 medicines"), each with its strip photo in the pillbox, so a family
  * member can match strips by sight. Every dose is its own tick: tap a pillbox to mark that dose taken or missed.
@@ -341,6 +350,7 @@ class MedicineStripPhotos(context: Context, storage: String) {
     var working by remember { mutableStateOf(false) }
     var problem by remember { mutableStateOf("") }
     var whichNight by remember { mutableStateOf<Pair<String, (LocalDate) -> Unit>?>(null) }
+    var openTimes by rememberSaveable(person) { mutableStateOf("") }
     if (groups.isEmpty() && untimed.isEmpty()) return
     val zone = ZoneId.systemDefault(); val today = LocalDate.now(zone)
     val byId = medicines.associateBy { it.id }
@@ -382,12 +392,26 @@ class MedicineStripPhotos(context: Context, storage: String) {
             if (canEdit && taken < total && held?.personId != person) Text(t("Tap a dose when taken. Hold it for Missed.", "दवा लेने पर उसे छुएँ। छूटी हो तो दबाकर रखें।"), fontSize = 14.sp, color = DoctorCardSub)
             // "Marked taken · Undo" sits right under the count, in the first screenful, while a one-tap tick waits.
             DoseUndoRow(person)
-            groups.forEach { group ->
+            // Many doses (20+ medicines is common, Sujay 7 and 21 Nov): only the next time still due is open; other times fold to one line each.
+            val compact = total > TodayDoseCompact.COMPACT_ABOVE
+            val groupPending = groups.map { g -> g.medicines.count { m -> val item = byId[m.itemId]; val dose = doses[m.itemId].orEmpty().firstOrNull { it.time == g.time }
+                item != null && dose != null && MedicineDoses.state(item, dose, events, today, zone) == MedicineDoseState.PENDING } }
+            val nextOpen = TodayDoseCompact.nextOpen(groupPending)
+            groups.forEachIndexed { index, group ->
+                val open = !compact || index == nextOpen || group.time in openTimes.split('|')
                 Column(Modifier.testTag("today-doses-${group.time}"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     HorizontalDivider(color = SaharaSection.Medicines.solid.copy(alpha = .35f))
-                    Text(MedicineDoseRules.title(group, hindi), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = SaharaSection.Medicines.ink, modifier = Modifier.padding(top = 4.dp))
+                    if (!compact) Text(MedicineDoseRules.title(group, hindi), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = SaharaSection.Medicines.ink, modifier = Modifier.padding(top = 4.dp))
+                    else Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button, enabled = index != nextOpen) {
+                        val set = openTimes.split('|').filter(String::isNotBlank).toSet(); openTimes = (if (group.time in set) set - group.time else set + group.time).joinToString("|")
+                    }.testTag("today-doses-toggle-${group.time}"), verticalAlignment = Alignment.CenterVertically) {
+                        Text(MedicineDoseRules.title(group, hindi), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = SaharaSection.Medicines.ink, modifier = Modifier.weight(1f))
+                        val left = groupPending[index]
+                        Text(if (left == 0) t("All marked", "सब दर्ज") else t("$left to take", "$left लेनी हैं"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub)
+                        if (index != nextOpen) Icon(if (open) Icons.Default.ExpandLess else Icons.Default.ExpandMore, if (open) t("Hide", "छिपाएँ") else t("Show", "दिखाएँ"), Modifier.padding(start = 4.dp), tint = SaharaSection.Medicines.ink)
+                    }
                     // Wraps onto new lines instead of hiding doses off the side of the screen.
-                    FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    if (open) FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         group.medicines.forEach { medicine ->
                             val item = byId[medicine.itemId]; val dose = doses[medicine.itemId].orEmpty().firstOrNull { it.time == group.time }
                             if (item != null && dose != null) key(item.id, dose.key) {

@@ -223,10 +223,13 @@ class CareLivingWillTest {
         assertEquals("Section 1: Personal details", hindi.text); assertEquals("खंड 1: व्यक्तिगत विवरण", hindi.translated)
     }
 
-    @Test fun boardPathwayHasTheReconsiderationPeriodAndLegalReviewWording() {
+    @Test fun boardPathwayHasTheReconsiderationPeriodAndNoLegalWording() {
         assertTrue(AmdText.RECONSIDERATION.en.contains("30 days")); assertTrue(AmdText.RECONSIDERATION.en.contains("para 322(vi)"))
         assertTrue(AmdText.BOARD_PATHWAY.any { it.en.contains("30-day reconsideration period") })
-        assertEquals("Legal review pending", AmdText.LEGAL_PENDING_TITLE.en); assertTrue(AmdText.BOARD_PATHWAY.first().en.contains("(Legal review pending.)"))
+        // Dr Sujay, 7 Nov 2026: no "legal" or "living will" in what users see.
+        assertEquals("Medical Board process", AmdText.LEGAL_PENDING_TITLE.en)
+        (AmdText.BOARD_PATHWAY + AmdText.LEGAL_PENDING_TITLE + AmdText.LEGAL_PENDING).forEach { assertFalse(it.en, it.en.contains("legal", ignoreCase = true)) }
+        assertFalse(VidhiText.S1_INTRO.contains("living will", ignoreCase = true))
     }
 
     @Test fun sha256OfScan() {

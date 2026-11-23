@@ -307,6 +307,6 @@ object NoteRules {
             .sortedWith(compareBy<Acknowledgement> { it.relationship != "Patient" }.thenBy { it.at }).forEach { ack ->
                 appendLine("\nRead and confirmed by ${ack.name} (${ack.relationship}) • ${java.time.Instant.ofEpochMilli(ack.at)}")
             }
-        appendLine("\nNames are self-entered. This is a record of a discussion, not a treatment order or legal directive.")
+        appendLine("\nNames are self-entered. This is a record of a discussion, not a treatment order or advance directive.")
     }
 }

@@ -167,6 +167,12 @@ internal object DistressCodec {
     }
 }
 
+/** The patient's name when a family member or carer is answering for them, else null (the patient answers about themselves). */
+@Composable internal fun distressAboutName(vm: CareModel, personId: String): String? {
+    val role by vm.viewRole.collectAsStateWithLifecycle(); val people by vm.people.collectAsStateWithLifecycle(); val t = careText()
+    return if (role == "Family") people.firstOrNull { it.id == personId }?.name?.trim().orEmpty().ifBlank { t("the patient", "मरीज़") } else null
+}
+
 /** "Are you in any distress today?" under the mood buttons: one tap saves "No"; "Yes" opens the thermometer screen. */
 @Composable fun DistressQuestion(vm: CareModel, onYes: () -> Unit) {
     val t = careText(); val hindi = careHindi()
@@ -175,7 +181,8 @@ internal object DistressCodec {
     val today = DistressRules.today(items, person, dayStart); val answer = today?.let { DistressCodec.decode(it.detail) }
     val capturedAccount = remember(person) { vm.accountNamespace }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.testTag("distress-question")) {
-        Text(t("Are you in any distress today?", "क्या आज आप किसी परेशानी में हैं?"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+        val about = distressAboutName(vm, person)
+        Text(if (about != null) t("Is $about in any distress today?", "क्या आज $about किसी परेशानी में हैं?") else t("Are you in any distress today?", "क्या आज आप किसी परेशानी में हैं?"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             // A saved score shows on the Yes chip itself ("Yes · 7/10"); tapping it again opens the thermometer to change it.
             FilterChip(selected = answer?.distress == true, enabled = !busy, onClick = onYes, label = { Text(t("Yes", "हाँ") + (answer?.takeIf { it.distress }?.score?.let { " · $it/10" } ?: ""), textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()) }, modifier = Modifier.weight(1f).heightIn(min = 56.dp).testTag("distress-yes"))
@@ -219,7 +226,12 @@ internal object DistressCodec {
             CareChartInfoButton(t("About this", "इसके बारे में"), distressAbout(t), "distress")
             CareLanguageMenu(compact = true)
         }
-        Text(t("How much distress have you felt in the past week, including today?", "पिछले एक हफ़्ते में, आज समेत, आपको कितनी परेशानी रही है?"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk)
+        val about = distressAboutName(vm, person)
+        Text(if (about != null) t("How much distress has $about felt in the past week, including today?", "पिछले एक हफ़्ते में, आज समेत, $about को कितनी परेशानी रही है?")
+            else t("How much distress have you felt in the past week, including today?", "पिछले एक हफ़्ते में, आज समेत, आपको कितनी परेशानी रही है?"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk)
+        // Distress vs symptoms (SVK and Sujay, 23 Nov): this is one overall number; each symptom keeps its own 0–10 in the symptom notes.
+        Text(t("This is one number for overall distress. Each symptom (pain, sleep and others) has its own 0–10 score in Symptoms.", "यह कुल परेशानी का एक अंक है। हर लक्षण (दर्द, नींद आदि) का अपना 0–10 अंक लक्षणों में अलग से दिया जाता है।"),
+            fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardSub, modifier = Modifier.testTag("distress-overall-explainer"))
         // The chosen number, large, with a plain instruction: nobody should have to guess that the thermometer slides.
         Row(Modifier.fillMaxWidth().animateContentSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(if (score in 0..10) "$score" else "–", fontFamily = SaharaTitleFont, fontSize = 56.sp, lineHeight = 60.sp, fontWeight = FontWeight.Bold, color = if (score in 0..10) distressBandText(score) else DoctorCardSub, modifier = Modifier.testTag("distress-big-number"))
@@ -232,6 +244,7 @@ internal object DistressCodec {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             DistressThermometer(score, Modifier.width(112.dp)) { score = it }
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(t("What is adding to it? Tick any (no scores here)", "किस वजह से? जो लागू हो चुनें (यहाँ अंक नहीं)"), fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.testTag("distress-problems-hint"))
                 DistressRules.categories.forEachIndexed { index, category ->
                     val step = index + 1
                     val (icon, colour) = distressGroupStyle(category.en)
@@ -276,6 +289,8 @@ internal object DistressCodec {
 /** What the "i" button on the thermometer says: the scale's ends and where the questions come from. */
 private fun distressAbout(t: (String, String) -> String): String =
     t("0 = No distress, 10 = Extreme distress", "0 = कोई परेशानी नहीं, 10 = बहुत ज़्यादा परेशानी") + "\n\n" +
+        t("The thermometer is one overall distress score. The problem list (physical, emotional, social, practical, spiritual) only shows what is adding to it; it is not scored. Each symptom has its own separate 0–10 score in Symptoms.",
+            "थर्मामीटर कुल परेशानी का एक अंक है। समस्याओं की सूची (शारीरिक, भावनात्मक, सामाजिक, व्यावहारिक, आध्यात्मिक) बस बताती है कि परेशानी किस वजह से है; इसका अंक नहीं होता। हर लक्षण का अपना अलग 0–10 अंक लक्षणों में होता है।") + "\n\n" +
         t("Source: NCCN Distress Thermometer and Problem List, NCCN Guidelines Version 1.2026 (Distress Management).", "स्रोत: NCCN Distress Thermometer and Problem List, NCCN Guidelines संस्करण 1.2026। हिंदी अनुवाद Sahara का है, NCCN का नहीं।")
 
 @Composable private fun DistressSource() {
@@ -324,7 +339,7 @@ private val DistressRowHeight = 24.dp
     val level by androidx.compose.animation.core.animateFloatAsState(if (picked) score + 1f else 0f, SaharaMotion.tween(SaharaMotion.FILL_MS, easing = SaharaMotion.Emphasized), label = "distress-level")
     val fillColour by androidx.compose.animation.animateColorAsState(if (picked) distressBand(score) else empty, SaharaMotion.tween(SaharaMotion.VALUE_MS), label = "distress-colour")
     Column(modifier.testTag("distress-thermometer"), horizontalAlignment = Alignment.Start) {
-        Text(t("Extreme distress", "बहुत ज़्यादा परेशानी"), fontSize = 13.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub, modifier = Modifier.padding(bottom = 4.dp))
+        Text(t("Extreme distress", "बहुत ज़्यादा परेशानी"), fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub, modifier = Modifier.padding(bottom = 4.dp))
         Column(Modifier.selectableGroup().pointerInput(Unit) {
             val row = DistressRowHeight.toPx()
             detectVerticalDragGestures { change, _ -> pick(10 - (change.position.y / row).toInt().coerceIn(0, 10)) }
@@ -352,7 +367,7 @@ private val DistressRowHeight = 24.dp
         Box(Modifier.padding(start = 24.dp).offset(y = (-10).dp).saharaPop(score.takeIf { picked }).size(44.dp).background(fillColour, CircleShape).testTag("distress-chosen"), contentAlignment = Alignment.Center) {
             Text(if (picked) "$score" else "–", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = if (picked) distressOnBand(score) else DoctorCardSub)
         }
-        Text(t("No distress", "कोई परेशानी नहीं"), fontSize = 13.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub)
+        Text(t("No distress", "कोई परेशानी नहीं"), fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub)
     }
 }
 

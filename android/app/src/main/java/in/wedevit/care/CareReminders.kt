@@ -69,11 +69,15 @@ class CareReminderScheduler(private val context: Context, private val account: S
         }
         reschedule()
     }
+    /** After "Pause reminders" or "I'm no longer actively caregiving" (or turning them back on): clear what is showing and reschedule without that patient. */
+    @Synchronized fun refreshAfterCaregivingChange() { cancelVisibleNotifications(); reschedule() }
     private fun plans(): List<CareReminderPlan> = runCatching {
         val array = JSONArray(prefs.getString("items", "[]"))
+        // A patient whose family member paused reminders or is no longer caregiving gets none on this phone (CaregivingStatusRules).
+        val stopped = runCatching { CaregivingStatusStore(context).stoppedPeople(account) }.getOrDefault(emptySet())
         (0 until array.length()).mapNotNull { index ->
             val j = array.getJSONObject(index); val option = option(j.getString("id"))
-            if (option?.muted == true) null else CareReminderPlan(j.getString("id"), j.getString("person"), j.getString("kind"), j.optLong("due"), option?.times ?: j.getJSONArray("times").let { a -> (0 until a.length()).map(a::getString) }, j.optString("doneOn"), j.optBoolean("finished"), option?.starts.orEmpty(), option?.ends.orEmpty(), j.optBoolean("dateOnly"))
+            if (option?.muted == true || j.getString("person") in stopped) null else CareReminderPlan(j.getString("id"), j.getString("person"), j.getString("kind"), j.optLong("due"), option?.times ?: j.getJSONArray("times").let { a -> (0 until a.length()).map(a::getString) }, j.optString("doneOn"), j.optBoolean("finished"), option?.starts.orEmpty(), option?.ends.orEmpty(), j.optBoolean("dateOnly"))
         }
     }.getOrDefault(emptyList())
     private fun pending(key: String, at: Long, create: Boolean): PendingIntent? = PendingIntent.getBroadcast(context, 0,

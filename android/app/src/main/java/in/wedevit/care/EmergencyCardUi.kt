@@ -157,7 +157,7 @@ internal object EmergencyCardPdf {
             line("")
             paragraph(record.text)
             line("")
-            paragraph("Made on the family's phone from what they recorded in Sahara. Names are self-entered. This is not a treatment order, legal directive or hospital record.", small)
+            paragraph("Made on the family's phone from what they recorded in Sahara. Names are self-entered. This is not a treatment order, advance directive or hospital record.", small)
             finish()
             file.outputStream().use { pdf.writeTo(it) }
         } finally { pdf.close() }

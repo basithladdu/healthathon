@@ -114,13 +114,13 @@ object AmdText {
     val GOVERNS = Bi("The AMD governs over this plan.", "AMD इस योजना से ऊपर मान्य है।")
     val PAPER = Bi("Sahara prints the paper. It becomes valid only when you sign it by hand in front of two witnesses and a notary or gazetted officer attests it. Then you add a photo or scan here.", "सहारा काग़ज़ प्रिंट करता है। यह तभी वैध होता है जब आप दो गवाहों के सामने हाथ से हस्ताक्षर करें और नोटरी या राजपत्रित अधिकारी इसे सत्यापित करें। फिर आप यहाँ फ़ोटो या स्कैन जोड़ें।")
     /** LegalPending in prototype/app/ectpr-plan-screen.tsx. */
-    val LEGAL_PENDING_TITLE = Bi("Legal review pending", "क़ानूनी समीक्षा बाक़ी")
-    val LEGAL_PENDING = Bi("For a patient who cannot decide, withholding or withdrawing life-sustaining treatment may need the Medical Board process (Common Cause 2023; Harish Rana 2026). This plan records wishes and clinical limits; it does not by itself legally authorise withholding treatment.", "जो मरीज़ फ़ैसला नहीं ले सकते, उनके लिए जीवन-रक्षक इलाज शुरू न करने या रोकने के लिए मेडिकल बोर्ड की प्रक्रिया ज़रूरी हो सकती है (कॉमन कॉज़ 2023; हरीश राणा 2026)। यह योजना इच्छाएँ और इलाज की सीमाएँ दर्ज करती है; यह अपने आप में इलाज रोकने की क़ानूनी अनुमति नहीं देती।")
+    val LEGAL_PENDING_TITLE = Bi("Medical Board process", "मेडिकल बोर्ड की प्रक्रिया")
+    val LEGAL_PENDING = Bi("For a patient who cannot decide, withholding or withdrawing life-sustaining treatment may need the Medical Board process (Common Cause 2023; Harish Rana 2026). This plan records wishes and clinical limits; it does not by itself authorise withholding treatment.", "जो मरीज़ फ़ैसला नहीं ले सकते, उनके लिए जीवन-रक्षक इलाज शुरू न करने या रोकने के लिए मेडिकल बोर्ड की प्रक्रिया ज़रूरी हो सकती है (कॉमन कॉज़ 2023; हरीश राणा 2026)। यह योजना इच्छाएँ और इलाज की सीमाएँ दर्ज करती है; यह अपने आप में इलाज रोकने की अनुमति नहीं देती।")
     /** boardReconsiderationNotice in prototype/app/ectpr-labels.ts. */
     val RECONSIDERATION = Bi("After both boards agree, nothing is done for 30 days. In this reconsideration period, anyone affected may go to court (Harish Rana, 2026 INSC 222, para 322(vi)).", "दोनों बोर्ड सहमत होने के बाद 30 दिन तक कुछ नहीं किया जाता। इस पुनर्विचार अवधि में कोई भी प्रभावित व्यक्ति अदालत जा सकता है (हरीश राणा, 2026 INSC 222, पैरा 322(vi))।")
     /** L8, AMD_BOARD_PATHWAY in amd-rules.ts: information only. The app has no "withdraw" action. */
     val BOARD_PATHWAY = listOf(
-        Bi("Withholding or withdrawing life-sustaining treatment for a patient who cannot decide follows the board process below. This app only shows it as information. It never starts, stops or decides any treatment. (Legal review pending.)", "जो मरीज़ ख़ुद निर्णय नहीं ले सकता, उसके लिए जीवन-रक्षक इलाज न शुरू करना या रोकना नीचे दी गई बोर्ड प्रक्रिया से होता है। यह ऐप इसे केवल जानकारी के रूप में दिखाता है। यह कभी कोई इलाज शुरू, बंद या तय नहीं करता। (क़ानूनी समीक्षा बाक़ी।)"),
+        Bi("Withholding or withdrawing life-sustaining treatment for a patient who cannot decide follows the board process below. This app only shows it as information. It never starts, stops or decides any treatment.", "जो मरीज़ ख़ुद निर्णय नहीं ले सकता, उसके लिए जीवन-रक्षक इलाज न शुरू करना या रोकना नीचे दी गई बोर्ड प्रक्रिया से होता है। यह ऐप इसे केवल जानकारी के रूप में दिखाता है। यह कभी कोई इलाज शुरू, बंद या तय नहीं करता।"),
         Bi("1. Primary Medical Board (hospital): the treating doctor and at least two experts with 5+ years of experience. It meets the patient with the named representatives and gives its opinion, preferably within 48 hours.", "1. प्राथमिक मेडिकल बोर्ड (अस्पताल): इलाज करने वाले डॉक्टर और कम से कम दो विशेषज्ञ जिन्हें 5+ साल का अनुभव हो। यह नामित प्रतिनिधियों के साथ मरीज़ से मिलता है और हो सके तो 48 घंटे में राय देता है।"),
         Bi("2. Secondary Medical Board: a doctor nominated by the district Chief Medical Officer (from a panel reviewed at least every 12 months; nomination preferably within 48 hours of the hospital’s request) and at least two other experts, none from the first board. Opinion preferably within 48 hours.", "2. द्वितीयक मेडिकल बोर्ड: ज़िला मुख्य चिकित्सा अधिकारी द्वारा नामित डॉक्टर (ऐसे पैनल से जिसकी समीक्षा कम से कम हर 12 महीने हो; नामांकन हो सके तो अस्पताल के अनुरोध के 48 घंटे में) और कम से कम दो अन्य विशेषज्ञ, जो पहले बोर्ड में न हों। राय हो सके तो 48 घंटे में।"),
         Bi("3. Consent: the named representatives (DHRs) consent in writing; without an AMD, the next of kin’s written consent, reflecting the patient’s own wishes. The hospital then informs the Judicial Magistrate First Class (JMFC).", "3. सहमति: नामित प्रतिनिधि (DHR) लिखित सहमति देते हैं; AMD न हो तो निकट संबंधी की लिखित सहमति, जो मरीज़ की अपनी इच्छा दिखाए। फिर अस्पताल न्यायिक मजिस्ट्रेट प्रथम श्रेणी (JMFC) को सूचित करता है।"),
@@ -483,7 +483,7 @@ sealed interface AmdBlock {
 }
 
 object VidhiText {
-    const val S1_INTRO = "This advance medical directive (living will) and the designation of healthcare representative(s) is made by me:"
+    const val S1_INTRO = "This advance care planning document and the designation of healthcare representative(s) is made by me:"
     const val FINAL_EXPRESSION = "If and when the time comes that I can no longer participate in decision-making regarding my own health and medical treatment, this directive should be treated as the final expression of my wishes."
     const val VALUES_INTRO = "Why I am making this directive, and the beliefs and values I wish to be respected during decision-making on my behalf:"
     const val PRIMARY_BASIS = "I request that all concerned (including my designated healthcare representative(s), my treating team, and the others involved) must treat my wishes in this document as the primary basis for any decision regarding my medical treatment, particularly decisions relating to life-sustaining treatment."
@@ -514,7 +514,7 @@ object VidhiText {
     const val VALID_REVISE = "In any case, I reserve the right to execute a revised version of this document, which makes changes to my directions/wishes, or revoke this document in its entirety. I shall also share copies of the revised version with:"
     const val WITNESS_NOTE = "[Witnesses should preferably be independent, i.e. not a designated healthcare representative named above.]"
     const val WITNESS_RECORD = "I, as a witness, record my satisfaction that the document has been executed voluntarily and without any coercion, duress, inducement, or compulsion."
-    const val RECORD_NOTE = "This paper is valid only when signed by hand by the executor before two witnesses and attested by a notary or gazetted officer. Sahara does not sign, e-sign or validate advance medical directives. If any part of this paper is changed by hand, make a new version instead."
+    const val RECORD_NOTE = "This paper is valid only when signed by hand by the executor before two witnesses and attested by a notary or gazetted officer. Sahara does not sign, e-sign or validate advance care planning documents. If any part of this paper is changed by hand, make a new version instead."
     val ALL = listOf(S1_INTRO, FINAL_EXPRESSION, VALUES_INTRO, PRIMARY_BASIS, ATTRIBUTION, S2_LEAD, S2_PROLONG, S2_DIRECT, S2_ANTICIPATED, S2_REFUSE, S2_ACCEPT, S2_ORAL, S2_UNCLEAR, END_STAGE_NOTE, VEGETATIVE_NOTE, S4_DISCUSSED, S4_POWERS, S4_INFO, S4_DECIDE, S4_RESPECT, S4_NEXT, ORGAN, DECL_LEAD, DECL_READ, DECL_THOUGHT, DECL_WILLING, SC_ORDER, VALID_LIFETIME, VALID_REVISE, WITNESS_NOTE, WITNESS_RECORD, RECORD_NOTE)
 
     /** AMD_TREATMENT_PDF_TEXT in amd-rules.ts: (refuse, accept). */
@@ -546,7 +546,7 @@ object AmdDocument {
         "Signature of the executor" to "निर्देश बनाने वाले के हस्ताक्षर",
         "Signature of witnesses" to "गवाहों के हस्ताक्षर",
         "Notarisation / Attestation" to "नोटरी / राजपत्रित अधिकारी द्वारा सत्यापन",
-        "ADVANCE MEDICAL DIRECTIVE" to "अग्रिम चिकित्सा निर्देश (लिविंग विल)",
+        "ADVANCE CARE PLANNING" to "अग्रिम देखभाल योजना",
     ).associate { (en, hi) -> en to careTr(lang, en, hi) }
     val TRANSLATION_NOTE = Bi("The English text is the valid text. The headings in this language are only to help reading.", "अंग्रेज़ी पाठ ही मान्य है। हिंदी शीर्षक केवल समझने के लिए हैं।")
 
@@ -559,7 +559,7 @@ object AmdDocument {
         fun heading(text: String) = add(AmdBlock.Heading(text, heads[text]))
         fun para(text: String, bold: Boolean = false, italic: Boolean = false, size: Float = 10.5f, indent: Float = 0f, prefix: String = "", after: Float = 7f) = add(AmdBlock.Para(text, bold, italic, size, indent, prefix, after))
         fun bullet(text: String) = para(text, indent = 14f, prefix = "•", after = 4f)
-        add(AmdBlock.Title("ADVANCE MEDICAL DIRECTIVE", heads["ADVANCE MEDICAL DIRECTIVE"]))
+        add(AmdBlock.Title("ADVANCE CARE PLANNING", heads["ADVANCE CARE PLANNING"]))
         if (lang != CareLang.EN) para(careTr(lang, TRANSLATION_NOTE.en, TRANSLATION_NOTE.hi), size = 9f)
         heading("Section 1: Personal details")
         para(VidhiText.S1_INTRO)

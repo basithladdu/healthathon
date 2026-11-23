@@ -53,6 +53,12 @@ internal class CaregiverWellbeingStore(context: Context) {
         prefs.edit().putString("$key|journal", CaregiverWellbeingRules.encodeJournal(next)).apply()
         return next
     }
+    /** The day "You matter" was last shown on this phone, for the once-a-week rule. */
+    fun youMatterShown(key: String): LocalDate? = prefs.getString("$key|youMatter", null)?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+    fun markYouMatterShown(key: String, day: LocalDate) { prefs.edit().putString("$key|youMatter", day.toString()).apply() }
+    /** True (and recorded as shown today) when "You matter" may show now: at most once every 7 days. */
+    fun takeYouMatter(key: String, today: LocalDate = LocalDate.now()): Boolean =
+        CaregiverWellbeingRules.youMatterDue(youMatterShown(key), today).also { if (it) markYouMatterShown(key, today) }
 }
 
 private val zbiAnswerEn = listOf("Never", "Rarely", "Sometimes", "Quite often", "Nearly always")
@@ -175,7 +181,7 @@ private val zbiAnswerHi = listOf("कभी नहीं", "शायद ही 
                 journal.take(5).forEach { n ->
                     Surface(shape = RoundedCornerShape(14.dp), color = Paper, modifier = Modifier.fillMaxWidth()) {
                         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text(java.time.Instant.ofEpochMilli(n.at).atZone(java.time.ZoneId.systemDefault()).format(fmt), fontSize = 13.sp, color = DoctorCardSub)
+                            Text(java.time.Instant.ofEpochMilli(n.at).atZone(java.time.ZoneId.systemDefault()).format(fmt), fontSize = 14.sp, color = DoctorCardSub)
                             Text(n.text, fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk)
                         }
                     }

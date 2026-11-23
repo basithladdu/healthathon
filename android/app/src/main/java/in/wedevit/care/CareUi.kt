@@ -191,6 +191,9 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
     val openDoctorWorkspace = { if (onDoctorWorkspace != null) onDoctorWorkspace() else sharedWorkspaceOpen = true }
     val snackbar = remember { SnackbarHostState() }
     val person = people.firstOrNull { it.id == selected }
+    // Simple Mode (CareSimpleMode.kt, switched in More per person on this phone): Today becomes four big spoken buttons, without the header and tabs.
+    val simpleOn = rememberSimpleModeOn(vm.storageNamespace, selected) && !clinician && walkthrough == null
+    val simpleShown = simpleOn && person != null && tab == 0 && !medicineScanner
     // The language name stays beside the icon on the welcome screen up to 1.3x text, so the choice is easy to find before sign-in.
     val compactWelcomeHeader = LocalConfiguration.current.screenWidthDp < 340 || LocalDensity.current.fontScale > 1.3f
     LaunchedEffect(selected) {
@@ -246,7 +249,7 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
     val headerLift by animateFloatAsState(if (person != null && headerScroll < -8f) 1f else 0f, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "header-lift")
     Scaffold(Modifier.nestedScroll(headerScrollWatch), containerColor = Cream, snackbarHost = { CareToastHost(snackbar) }, topBar = {
         // Inside a person's care the top bar is the calm cream header (ink text, hairline below); the welcome screen keeps its own ground.
-        if (!medicineScanner) Surface(Modifier.then(if (person != null) Modifier.shadow(SaharaElevation.Raised * headerLift, RectangleShape, clip = false, ambientColor = SaharaColors.Shadow, spotColor = SaharaColors.Shadow) else Modifier),
+        if (!medicineScanner && !simpleShown) Surface(Modifier.then(if (person != null) Modifier.shadow(SaharaElevation.Raised * headerLift, RectangleShape, clip = false, ambientColor = SaharaColors.Shadow, spotColor = SaharaColors.Shadow) else Modifier),
             color = if (person != null) androidx.compose.ui.graphics.lerp(SaharaColors.Header, SaharaColors.Surface, headerLift) else Color.Transparent, contentColor = if (person != null) SaharaColors.OnHeader else Ink) { Column {
         if (person != null) SaharaStatusBarIcons(lightIcons = false)
         Row(Modifier.statusBarsPadding().fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -271,7 +274,7 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
         }
         }
     }, bottomBar = {
-        if (person != null && !medicineScanner) CareNavigation(CareNavTrail.rootTab(tabTrail, tab), clinician) { next ->
+        if (person != null && !medicineScanner && !simpleShown) CareNavigation(CareNavTrail.rootTab(tabTrail, tab), clinician) { next ->
             if (activeRecording && next != 1) vm.stopRecording()
             switchTab(next)
         }
@@ -285,7 +288,7 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
                 entryBusy = busy || refreshing, signedIn = vm.cloud != null, profileError = actionError, onSaveProfile = { name, profile -> vm.addPersonWithProfile(name, profile) })
             else SaharaScreenHost(person.id to tab, Modifier.fillMaxSize(), label = "Care tab", direction = { from, _ -> if (from.first == person.id) tabDirection else SaharaMotion.Direction.Switch }) { (shownId, shownTab) -> screens.SaveableStateProvider("$shownId:$shownTab") {
                 Box(Modifier.fillMaxSize()) { when (shownTab) {
-                    0 -> Today(vm, clinician, onTalk = { go(1) }, onCare = { careFilter = it; go(2) }, onNearby = { go(3) }, onAdd = { if (canEdit) dialog = it else vm.message.value = askOwner }, onRead = { reading = it }, onCalendar = { openCalendar() }, onWorkflow = { go(7) }, onLabs = { go(8) }, onSharedWorkspace = { go(7) }, onSymptoms = { go(9) }, onInviteFamily = { inviteFamilyOpen = true }, onCalendarAt = ::openCalendar,
+                    0 -> if (simpleOn) CareSimpleMode(vm) else Today(vm, clinician, onTalk = { go(1) }, onCare = { careFilter = it; go(2) }, onNearby = { go(3) }, onAdd = { if (canEdit) dialog = it else vm.message.value = askOwner }, onRead = { reading = it }, onCalendar = { openCalendar() }, onWorkflow = { go(7) }, onLabs = { go(8) }, onSharedWorkspace = { go(7) }, onSymptoms = { go(9) }, onInviteFamily = { inviteFamilyOpen = true }, onCalendarAt = ::openCalendar,
                         onCheckInWords = { if (canEdit) dialog = "checkin" else vm.message.value = askOwner }, onDistress = { if (canEdit) dialog = "distress" else vm.message.value = askOwner }, onSymptomNote = { symptomAddPending = true; go(9) }, onCarePlan = { go(10) }, viewerName = walkthrough?.takeIf { it.role == "Family" }?.name.orEmpty(),
                         onCarePlanFromSos = { go(10, reopen = "sos") }, sosReopen = sosReopen, onSosReopened = { sosReopen = false }, onCommunity = { go(11) })
                     1 -> Talk(vm, clinician && canEdit, onRead = { reading = it }, onRequestConversation = { go(7) }, onLeave = { back() })
@@ -373,6 +376,17 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         }
     }
     if (afterDeathOpen) AfterDeathGuideSheet { afterDeathOpen = false }
+    // Caregiving changes (SVK, 23 Nov), family and carers only: the quiet check-in, pause, or "no longer caregiving" (records kept).
+    val caregiving = if (family && selectedPerson.isNotBlank()) rememberCaregivingStatus(vm, selectedPerson) else null
+    val caregivingDue = caregiving != null && loaded && caregiving.due(caregivingLastLogged(items, selectedPerson))
+    var caregivingCheckIn by rememberSaveable(selectedPerson) { mutableStateOf(false) }
+    var caregivingSheet by rememberSaveable(selectedPerson) { mutableStateOf(false) }
+    LaunchedEffect(caregivingDue) { if (caregivingDue) caregivingCheckIn = true }
+    val archived = caregiving != null && CaregivingStatusRules.archived(caregiving.status)
+    val caregivingName = personName.ifBlank { t("the patient", "मरीज़") }
+    if (caregivingSheet && caregiving != null) SaharaScreenSheet(onDismissRequest = { caregivingSheet = false }, containerColor = Cream) {
+        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp)) { CaregivingCheckInCard(caregiving, caregivingName, asked = false) { caregivingSheet = false } }
+    }
     val hour = java.time.LocalTime.now().hour
     val medicines = CareDailyFlow.medicinesForToday(items, today)
     val visits = CareTodayRules.upcomingVisits(items, dayStart)
@@ -397,6 +411,8 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             if (vm.cloud != null) TextButton(onClick = vm::refresh, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Icon(Icons.Default.Refresh, null, Modifier.size(20.dp)); Spacer(Modifier.width(6.dp)); Text(t("Refresh", "रिफ़्रेश करें")) }
         } }
         if (!clinician) item(key = "today-sos") { Box(Modifier.saharaStagger(1)) { CareSosBar(onSos = { sosOpen = true }) } }
+        if (caregiving != null && caregivingCheckIn) item(key = "caregiving-checkin") { CaregivingCheckInCard(caregiving, caregivingName, asked = true) { caregivingCheckIn = false } }
+        else if (caregiving != null && caregiving.status.state != CaregivingState.ACTIVE) item(key = "caregiving-status") { CaregivingStatusCard(caregiving, caregivingName) }
         // Patient: SOS, the check-in (the one main action), today's medicines, the at-a-glance register, then All care tools.
         // Family: SOS, how the patient is doing, medicines, to-dos, their own check, then All care tools. Everything else is in the Care tab.
         val summary: androidx.compose.foundation.lazy.LazyListScope.() -> Unit = {
@@ -411,7 +427,8 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             item(key = "medicines-open") { SaharaSecondaryButton(t("Open medicines", "दवाइयाँ खोलें"), { onCare("Medicines") }, Modifier.fillMaxWidth().saharaStagger(4).testTag("today-medicines-title"), icon = careIcon("medicine"), tone = SaharaTone.Plum, navigates = true) }
             if (medicines.isEmpty() && loaded && canEdit) item { SaharaSecondaryButton(t("Add a medicine", "दवा जोड़ें"), { onAdd("medicine") }, Modifier.fillMaxWidth(), icon = Icons.Default.Add, tone = SaharaTone.Plum) }
         }
-        if (!clinician) medicineSection()
+        // No longer caregiving: Today goes quiet (no doses or to-dos); the records stay and open from All care tools.
+        if (!clinician && !archived) medicineSection()
         if (!clinician && !family) summary()
         if (!clinician) {
             // View-only family see the patient's own check-in for today (they cannot change it).
@@ -419,7 +436,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                 CareTodayRules.todayCheckIn(items, dayStart)?.let { item(key = "today-checkin-seen") { CareRow(it, vm) } }
                 DistressRules.today(items, selectedPerson, dayStart)?.let { item(key = "today-distress-seen") { CareRow(it, vm) } }
             }
-            if (family) {
+            if (family && !archived) {
                 item(key = "todo-title") { SaharaSectionHeader(t("To do", "करने के काम"), Modifier.testTag("today-todo-title"), tone = SaharaTone.Leaf, actionLabel = t("Open to do", "काम खोलें"), onAction = { onCare("To do") }, icon = careIcon("task")) }
                 if (tasks.isEmpty() && loaded) item { SurfaceCard { Text(CareTodayRules.emptyText("tasks", canEdit, hindi), color = DoctorCardSub) } }
                 itemsIndexed(tasks.take(3), key = { _, it -> it.id }) { i, it -> Box(Modifier.saharaStagger(5 + i)) { CareRow(it, vm) } }
@@ -427,6 +444,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                 item(key = "family-check") { FamilyCaregiverCheckCard(vm, personName.ifBlank { t("the patient", "मरीज़") }) }
             }
             item(key = "all-care-tools") { Box(Modifier.saharaStagger(6)) { TodayAllCareTools { onCare("All") } } }
+            if (caregiving != null && caregiving.status.state == CaregivingState.ACTIVE && !caregivingCheckIn) item(key = "caregiving-change") { CaregivingChangeRow { caregivingSheet = true } }
             return@LazyColumn
         }
         // Doctor view (clinician) below: unchanged.
@@ -926,7 +944,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                 item { HorizontalDivider(); Spacer(Modifier.height(12.dp)); Heading(if (patientConfirmation == null) t("Patient's review", "मरीज़ की जाँच") else t("Family's review", "परिवार की जाँच"), 26) }
                 item { CareField(value = name, onValueChange = { name = it.take(100) }, label = t("Your name", "आपका नाम"), singleLine = true) }
                 item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("Patient", "Family / carer").forEach { role -> FilterChip(selected = relationship == role, onClick = { relationship = role }, enabled = (vm.cloud == null || (role == "Patient") == owner) && !(familyOnly && role == "Patient") && if (role == "Patient") patientConfirmation == null else patientConfirmation != null, label = { Text(if (role == "Patient") t("Patient", "मरीज़") else t("Family / carer", "परिवार / देखभाल करने वाले")) }) } } }
-                item { CheckLine(reviewed, { reviewed = it }, t("I have read this version. This is not a legal signature, consent for treatment or a treatment decision. I can ask my doctor to change it later.", "मैंने यही संस्करण पढ़ा है। यह क़ानूनी हस्ताक्षर, इलाज की सहमति या इलाज का फ़ैसला नहीं है। मैं बाद में डॉक्टर से इसे बदलवा सकता/सकती हूँ।")) }
+                item { CheckLine(reviewed, { reviewed = it }, t("I have read this version. This is not a formal signature, consent for treatment or a treatment decision. I can ask my doctor to change it later.", "मैंने यही संस्करण पढ़ा है। यह औपचारिक हस्ताक्षर, इलाज की सहमति या इलाज का फ़ैसला नहीं है। मैं बाद में डॉक्टर से इसे बदलवा सकता/सकती हूँ।")) }
                 // No signing pad for the patient or family (Dr Sujay, 22 Nov: "I can sign here also, I don't think that is right"): a read receipt only. The doctor signs in Goals of care.
                 val alreadyConfirmed = confirmations.any { it.relationship == relationship && it.name.equals(name.trim(), ignoreCase = true) && (vm.cloud == null || it.id in authenticatedAcks) }
                 item { Button(onClick = {
@@ -1134,6 +1152,7 @@ private class CareToolRow(val label: String, val icon: ImageVector, val tone: Sa
                 Text(t("Language", "भाषा"), Modifier.weight(1f), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
                 CareLanguageMenu(contentColor = RustText)
             }
+            if (!doctorEmbedded && !clinicianView && !walkthrough) SimpleModeSwitchRow(vm, person)
             if (!walkthrough) MoreRow(Icons.Default.NotificationsNone, FamilyAccent.Marigold, t("Notifications", "सूचनाएँ"), t("Medicine and visit reminders", "दवा और मुलाक़ात के रिमाइंडर"), Modifier.saharaStagger(9).testTag("more-reminders"), onReminders)
             MoreRow(Icons.Default.Lock, FamilyAccent.Plum, t("Privacy and data", "निजता और डेटा"), "", Modifier.saharaStagger(10).testTag("more-privacy"), { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url)))) })
             if (shortcutsElsewhere) MoreRow(Icons.Default.Share, FamilyAccent.Brick, t("Export care notes", "देखभाल नोट भेजें"), t("${versions.size} saved", "${versions.size} सहेजे गए"), Modifier.saharaStagger(11).testTag("more-export-notes"), enabled = versions.isNotEmpty(), onClick = exportNotes)

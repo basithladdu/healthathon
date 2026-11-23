@@ -116,7 +116,10 @@ internal object GoalsScreening {
     Surface(shape = RoundedCornerShape(20.dp), color = DoctorCardReport, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("goals-screening")) {
         Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button, onClickLabel = if (open) t("Collapse", "बंद करें") else t("Expand", "खोलें")) { open = !open }, verticalAlignment = Alignment.CenterVertically) {
-                Text(t("Would you be surprised if this patient died in the next 12 months?", "अगर यह मरीज़ अगले 12 महीनों में गुज़र जाए, तो क्या आपको हैरानी होगी?"), Modifier.weight(1f), fontSize = 16.sp, lineHeight = 22.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+                Column(Modifier.weight(1f)) {
+                    Text(t("Would you be surprised if this patient died in the next 12 months?", "अगर यह मरीज़ अगले 12 महीनों में गुज़र जाए, तो क्या आपको हैरानी होगी?"), fontSize = 16.sp, lineHeight = 22.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+                    Text(t("With the ECOG performance status", "ECOG कार्य-क्षमता के साथ"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.testTag("goals-screening-ecog-line"))
+                }
                 Icon(if (open) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, null, tint = RustText, modifier = Modifier.size(48.dp).padding(12.dp))
             }
             if (open) {
@@ -190,6 +193,8 @@ internal class GocSurpriseMemory(context: android.content.Context, namespace: St
     val memory = remember(namespace, personId) { GocSurpriseMemory(context, namespace, personId) }
     var show by remember(namespace, personId) { mutableStateOf(false) }
     var answer by rememberSaveable(personId) { mutableStateOf("") }
+    // ECOG sits beside the surprise question (SVK, 23 Nov 2026): optional, and it changes the suggestion (SPICT).
+    var ecog by rememberSaveable(personId) { mutableStateOf("") }
     LaunchedEffect(namespace, personId) {
         if (personId.isBlank()) return@LaunchedEffect
         val notes = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
@@ -201,7 +206,8 @@ internal class GocSurpriseMemory(context: android.content.Context, namespace: St
     if (!show) return
     val tool = SurpriseQuestionEcog
     val question = tool.questions.first { it.id == SurpriseQuestionEcog.SURPRISE }
-    val suggestion = if (answer.isEmpty()) null else tool.suggest(mapOf(SurpriseQuestionEcog.SURPRISE to answer))
+    val ecogQuestion = tool.questions.first { it.id == SurpriseQuestionEcog.ECOG }
+    val suggestion = if (answer.isEmpty()) null else tool.suggest(mapOf(SurpriseQuestionEcog.SURPRISE to answer) + (if (ecog.isEmpty()) emptyMap() else mapOf(SurpriseQuestionEcog.ECOG to ecog)))
     fun close() { if (answer.isEmpty()) memory.snoozed() else memory.answered(); show = false }
     AlertDialog(onDismissRequest = ::close, modifier = Modifier.testTag("goc-surprise-dialog"),
         title = { Text(t(question.en, question.hi), fontWeight = FontWeight.SemiBold) },
@@ -215,6 +221,15 @@ internal class GocSurpriseMemory(context: android.content.Context, namespace: St
                         }
                     }
                 } else suggestion?.let { Text(t(it.en, it.hi), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk, modifier = Modifier.announce().testTag("goc-surprise-suggestion")) }
+                HorizontalDivider(color = DoctorHairline)
+                Text(t("ECOG performance status (optional)", "ECOG कार्य-क्षमता (वैकल्पिक)"), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    ecogQuestion.options.filter { it.selectable }.forEach { option ->
+                        FilterChip(selected = ecog == option.value, onClick = { ecog = if (ecog == option.value) "" else option.value }, label = { Text(option.value, modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center) },
+                            modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("goc-surprise-ecog-${option.value}"))
+                    }
+                }
+                ecogQuestion.options.firstOrNull { it.value == ecog }?.let { Text(t(it.en, it.hi), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.testTag("goc-surprise-ecog-meaning")) }
             }
         },
         confirmButton = {

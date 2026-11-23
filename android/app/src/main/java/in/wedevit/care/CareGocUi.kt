@@ -28,6 +28,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -153,8 +154,10 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
         }
         if (canRecord) Surface(color = if (agreedAt > 0) GocTickSoft else Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(if (agreedAt > 0) 1.5.dp else 1.dp, if (agreedAt > 0) DoctorStatusGood else DoctorCardSub.copy(alpha = .5f)), modifier = Modifier.fillMaxWidth().testTag("goc-card-consent-box")) {
             Column(Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
-                Box(Modifier.testTag("goc-card-consent")) { Column { CheckLine(agreedAtPatient, { agreedAtPatient = it; agreedAt = if (it && agreedAtFamily) System.currentTimeMillis() else 0L }, t("The patient agrees to this conversation being recorded and written down (or their legal representative, if the patient cannot decide)", "मरीज़ इस बातचीत को रिकॉर्ड करने और लिखने के लिए सहमत हैं (या, अगर मरीज़ फ़ैसला नहीं कर सकते, तो उनके कानूनी प्रतिनिधि)"))
-                    CheckLine(agreedAtFamily, { agreedAtFamily = it; agreedAt = if (it && agreedAtPatient) System.currentTimeMillis() else 0L }, t("The family members in the room agree too", "कमरे में मौजूद परिवार के सदस्य भी सहमत हैं")) } }
+                // Either the patient's or the family's agreement is enough (SVK and Dr Sujay, 23 Nov 2026); which one(s) is recorded with the talk.
+                Box(Modifier.testTag("goc-card-consent")) { Column { CheckLine(agreedAtPatient, { agreedAtPatient = it; agreedAt = GocRecordingConsent.at(it, agreedAtFamily) }, t("The patient agrees to this conversation being recorded and written down", "मरीज़ इस बातचीत को रिकॉर्ड करने और लिखने के लिए सहमत हैं"))
+                    CheckLine(agreedAtFamily, { agreedAtFamily = it; agreedAt = GocRecordingConsent.at(agreedAtPatient, it) }, t("The family members in the room agree", "कमरे में मौजूद परिवार के सदस्य सहमत हैं")) } }
+                Text(t("Either one is enough.", "दोनों में से एक की सहमति काफ़ी है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.padding(start = 12.dp, end = 8.dp, bottom = 6.dp).testTag("goc-card-consent-either"))
                 if (gemini) Text(t("Audio is sent to a secure AI service to transcribe.", "ऑडियो लिखने के लिए एक सुरक्षित AI सेवा को भेजा जाता है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.padding(start = 12.dp, end = 8.dp, bottom = 10.dp))
             }
         }
@@ -164,7 +167,7 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
         }
     }
     if (open) Dialog(onDismissRequest = { open = false }, properties = DialogProperties(usePlatformDefaultWidth = false, dismissOnClickOutside = false)) {
-        Surface(color = Cream, modifier = Modifier.fillMaxSize().imePadding()) { GocConversationPage(d, update, LocalGocFolder.current, mic::request, agreedAt = agreedAt, startRecording = startNow, onClose = { open = false; startNow = false }) }
+        Surface(color = Cream, modifier = Modifier.fillMaxSize().imePadding()) { GocConversationPage(d, update, LocalGocFolder.current, mic::request, agreedAt = agreedAt, agreedBy = GocRecordingConsent.encode(agreedAtPatient, agreedAtFamily), startRecording = startNow, onClose = { open = false; startNow = false }) }
     }
 }
 
@@ -338,7 +341,7 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
     }
 }
 
-@Composable private fun GocConversationPage(d: EctprRecord, update: ((EctprRecord) -> EctprRecord) -> Unit, folder: File?, withMic: (() -> Unit) -> Unit, agreedAt: Long = 0L, startRecording: Boolean = false, onClose: () -> Unit, onFullPlan: (() -> Unit)? = null, onNewVersion: (() -> Unit)? = null) {
+@Composable private fun GocConversationPage(d: EctprRecord, update: ((EctprRecord) -> EctprRecord) -> Unit, folder: File?, withMic: (() -> Unit) -> Unit, agreedAt: Long = 0L, agreedBy: String = "", startRecording: Boolean = false, onClose: () -> Unit, onFullPlan: (() -> Unit)? = null, onNewVersion: (() -> Unit)? = null) {
     val t = careText(); val hindi = careHindi(); val context = LocalContext.current; val scope = rememberCoroutineScope(); val owner = LocalLifecycleOwner.current; val view = LocalView.current
     val recorder = remember(folder, d.patientId) { folder?.let { GocRecorder(context, it, d.patientId, scope) } }
     val engine = remember { GocSpeechEngine(context) }
@@ -351,8 +354,10 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
     // The signed-in doctor is in the room; their name is not asked again (still editable).
     LaunchedEffect(d.id, signedInDoctor?.name) { if (participants.isBlank() && initial == null && signedInDoctor != null) participants = signedInDoctor.name }
     var consentAt by rememberSaveable(d.id) { mutableStateOf(initial?.consentAt?.takeIf { it > 0 } ?: agreedAt) }
-    var consentAtPatient by rememberSaveable(d.id) { mutableStateOf(consentAt > 0) }
-    var consentAtFamily by rememberSaveable(d.id) { mutableStateOf(consentAt > 0) }
+    // Which of the two ticks were given: from the saved talk, else from the card's ticks (a talk saved before 23 Nov had both).
+    val consentTicks = remember(d.id) { initial?.takeIf { it.consentAt > 0 }?.let { GocRecordingConsent.decode(it.consentBy, it.consentAt) } ?: GocRecordingConsent.decode(agreedBy, agreedAt) }
+    var consentAtPatient by rememberSaveable(d.id) { mutableStateOf(consentTicks.first) }
+    var consentAtFamily by rememberSaveable(d.id) { mutableStateOf(consentTicks.second) }
     var lines by remember { mutableStateOf(initial?.lines.orEmpty()) }
     var note by remember { mutableStateOf(initial?.note.orEmpty()) }
     var topics by remember { mutableStateOf(initial?.topics.orEmpty().associateBy { it.decision }) }
@@ -393,7 +398,7 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
     val signStore = remember(d.patientId) { GocSignOffStore(context, "goc-" + d.patientId.filter { it.isLetterOrDigit() }.ifBlank { "guest" }) }
 
     val names = RecordingConsentRules.names(participants)
-    // Everyone in the room agreed on one tick; names are optional, so the consent sidecar records "Everyone present" when none were typed.
+    // The patient or the family agreed (either is enough); names are optional, so the consent sidecar records "Everyone present" when none were typed.
     val consentNames = names.ifEmpty { listOf(t("Everyone present", "सभी मौजूद लोग")) }
     val text = GocLines.text(lines)
     // Gemini's reading of the whole talk onto the legal form wins while the transcript is unchanged; otherwise (offline, Gemini failed, or lines edited) the on-phone reading is used.
@@ -409,7 +414,7 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
         source = if (model.isNotBlank()) GocTranscript.SOURCE_RECORDED else GocTranscript.SOURCE_TYPED,
         model = model, participants = names.joinToString("\n"), consentAt = consentAt, planVersion = d.version,
         topics = topics.values.sortedBy { it.decision.ordinal }, note = note, noteKind = GocNote.kind(topics.values), reviewedAt = now, reviewedBy = if (now.isBlank()) "" else signedInDoctor?.name?.takeIf { it.isNotBlank() } ?: d.createdBy, audioKept = false,
-        signOff = signOff, transcribedBy = transcribedBy,
+        signOff = signOff, transcribedBy = transcribedBy, consentBy = if (consentAt > 0) GocRecordingConsent.encode(consentAtPatient, consentAtFamily) else "",
     )
     LaunchedEffect(Unit) { gemini = gocOnlineEngines().gemini }
     // Choices this talk confirmed that the plan no longer holds (the app was closed before the plan saved, or the plan's rules blocked it) come back.
@@ -531,11 +536,12 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
 
         if (shown == GocStage.CAPTURE) item(key = "capture") {
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                // Consent: the patient's own tick and the family's tick, both needed; the record button stays off until it is ticked. Hidden while recording (it was given).
+                // Consent: the patient's tick or the family's tick, either is enough (23 Nov); the record button stays off until one is ticked. Hidden while recording (it was given).
                 if (!recorderState.recording && !busy) Surface(color = if (consentAt > 0) GocTickSoft else Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(if (consentAt > 0) 1.5.dp else 1.dp, if (consentAt > 0) DoctorStatusGood else DoctorCardSub.copy(alpha = .5f)), modifier = Modifier.fillMaxWidth().testTag("goc-consent")) {
                     Column(Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
-                        CheckLine(consentAtPatient, { consentAtPatient = it; consentAt = if (it && consentAtFamily) System.currentTimeMillis() else 0L }, t("The patient agrees to this conversation being recorded and written down (or their legal representative, if the patient cannot decide)", "मरीज़ इस बातचीत को रिकॉर्ड करने और लिखने के लिए सहमत हैं (या, अगर मरीज़ फ़ैसला नहीं कर सकते, तो उनके कानूनी प्रतिनिधि)"))
-                        CheckLine(consentAtFamily, { consentAtFamily = it; consentAt = if (it && consentAtPatient) System.currentTimeMillis() else 0L }, t("The family members in the room agree too", "कमरे में मौजूद परिवार के सदस्य भी सहमत हैं"))
+                        CheckLine(consentAtPatient, { consentAtPatient = it; consentAt = GocRecordingConsent.at(it, consentAtFamily) }, t("The patient agrees to this conversation being recorded and written down", "मरीज़ इस बातचीत को रिकॉर्ड करने और लिखने के लिए सहमत हैं"))
+                        CheckLine(consentAtFamily, { consentAtFamily = it; consentAt = GocRecordingConsent.at(consentAtPatient, it) }, t("The family members in the room agree", "कमरे में मौजूद परिवार के सदस्य सहमत हैं"))
+                        Text(t("Either one is enough.", "दोनों में से एक की सहमति काफ़ी है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.padding(start = 12.dp, end = 8.dp, bottom = 6.dp).testTag("goc-consent-either"))
                         if (gemini) Text(t("Audio is sent to a secure AI service to transcribe.", "ऑडियो लिखने के लिए एक सुरक्षित AI सेवा को भेजा जाता है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.padding(start = 12.dp, end = 8.dp, bottom = 10.dp).testTag("goc-gemini-line"))
                     }
                 }
@@ -561,6 +567,8 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
                     }
                     recorderState.error?.let { Text(it.pick(hindi), color = MaterialTheme.colorScheme.error, fontSize = 15.sp, textAlign = TextAlign.Center, modifier = Modifier.announce()) }
                     if (recorderState.recording && !guideMe) guidePanel()
+                    // The whole checklist stays in view while recording, not only after typing (SVK, 23 Nov 2026). Tap a topic to bring it up in the guide above.
+                    if (recorderState.recording && guideMe) GocRecordChecklist(guideState.discussed, guideCur) { guideCur = it }
                 }
                 if (!recorderState.recording && !busy) GocPeoplePresent(d, update, participants, signedInDoctor?.name.orEmpty()) { participants = it }
                 if (!recorderState.recording && !busy) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -803,6 +811,30 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
         }
         HorizontalDivider(color = SaharaColors.HeaderLine)
     } }
+}
+
+/** The goals-of-care checklist while recording: every topic, ticked once the guide marks it discussed. [current] is the topic shown in the guide. */
+@Composable private fun GocRecordChecklist(discussed: Set<Int>, current: Int, onPick: (Int) -> Unit) { val t = careText(); val hindi = careHindi()
+    val rows = GocChecklist.ROWS
+    Surface(color = Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("goc-record-checklist")) {
+        Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+            Row(Modifier.fillMaxWidth().padding(vertical = 4.dp).semantics(mergeDescendants = true) {}, verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Checklist, null, tint = RustText); Spacer(Modifier.width(8.dp))
+                Text(t("Checklist", "सूची"), fontWeight = FontWeight.Bold, fontSize = 17.sp, modifier = Modifier.weight(1f).a11yHeading())
+                Text("${rows.indices.count { it in discussed }} / ${rows.size}", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = DoctorCardInk)
+            }
+            rows.forEachIndexed { index, row ->
+                val on = index in discussed; val now = index == current
+                if (index > 0) HorizontalDivider(color = DoctorHairline)
+                Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button, onClickLabel = t("Show in the guide", "गाइड में दिखाएँ")) { onPick(index) }.padding(vertical = 4.dp).testTag("goc-record-checklist-$index"), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(if (on) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked, if (on) t("Discussed", "बात हुई") else null, tint = if (on) DoctorStatusGood else if (now) RustText else DoctorCardFaint, modifier = Modifier.size(22.dp))
+                    Spacer(Modifier.width(12.dp))
+                    Text(row.title.pick(hindi), fontSize = 15.sp, lineHeight = 20.sp, fontWeight = if (now || on) FontWeight.SemiBold else FontWeight.Normal, color = if (on || now) DoctorCardInk else DoctorCardSub, modifier = Modifier.weight(1f))
+                    Surface(color = GocSand, shape = CircleShape) { Text(row.section, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = RustText, modifier = Modifier.padding(horizontal = 10.dp, vertical = 2.dp)) }
+                }
+            }
+        }
+    }
 }
 
 /** The tick on a locked note: it pops in once (no motion when animations are off). */

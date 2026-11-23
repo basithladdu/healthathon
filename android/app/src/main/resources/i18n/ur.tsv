@@ -5618,3 +5618,110 @@ Last opened on $at	آخری بار $at کو کھولا گیا
 Emergency card web link	ہنگامی کارڈ ویب لنک
 Visit tomorrow	کل وزٹ ہے
 Open Sahara to see the time and what to bring.	وقت اور کیا ساتھ لانا ہے دیکھنے کے لیے سہارا کھولیں۔
+Is $about in any distress today?	کیا آج $about کسی پریشانی میں ہیں؟
+How much distress has $about felt in the past week, including today?	آج سمیت پچھلے ایک ہفتے میں $about کو کتنی پریشانی رہی ہے؟
+This is one number for overall distress. Each symptom (pain, sleep and others) has its own 0–10 score in Symptoms.	یہ مجموعی پریشانی کا ایک نمبر ہے۔ ہر علامت (درد، نیند وغیرہ) کا علامات میں اپنا الگ 0–10 نمبر ہوتا ہے۔
+What is adding to it? Tick any (no scores here)	کس وجہ سے؟ جو لاگو ہو اس پر نشان لگائیں (یہاں نمبر نہیں)
+The thermometer is one overall distress score. The problem list (physical, emotional, social, practical, spiritual) only shows what is adding to it; it is not scored. Each symptom has its own separate 0–10 score in Symptoms.	تھرمامیٹر مجموعی پریشانی کا ایک نمبر ہے۔ مسائل کی فہرست (جسمانی، جذباتی، سماجی، عملی، روحانی) صرف یہ بتاتی ہے کہ پریشانی کس وجہ سے ہے؛ اس کا نمبر نہیں ہوتا۔ ہر علامت کا علامات میں اپنا الگ 0–10 نمبر ہوتا ہے۔
+One overall score, 0–10, for this past week	پچھلے ہفتے کا ایک مجموعی نمبر، 0–10
+Each symptom gets its own 0–10 score. The distress thermometer is one overall score.	ہر علامت کا اپنا 0–10 نمبر ہوتا ہے۔ پریشانی تھرمامیٹر مجموعی پریشانی کا ایک نمبر ہے۔
+How is $familyAbout feeling today?	آج $familyAbout کیسا محسوس کر رہے ہیں؟
+Who are they?	یہ کون ہیں؟
+Nurse / paid carer	نرس / تنخواہ دار دیکھ بھال کرنے والے
+Invite family or a carer	خاندان یا دیکھ بھال کرنے والے کو بلائیں
+Are you still caring for $personName?	کیا آپ اب بھی $personName کی دیکھ بھال کر رہے ہیں؟
+Nothing has been added for a few days. Has anything changed?	کچھ دنوں سے کچھ شامل نہیں کیا گیا۔ کیا کچھ بدلا ہے؟
+Yes, things are steady	جی ہاں، سب پہلے جیسا ہے
+Our care needs or routine have changed	دیکھ بھال کی ضروریات یا معمول بدل گیا ہے
+I'm no longer actively caregiving	میں اب دیکھ بھال نہیں کر رہا/رہی
+Remind me later	بعد میں یاد دلائیں
+What changed? (optional)	کیا بدلا؟ (اختیاری)
+This only changes what Sahara shows you. Nothing is deleted.	اس سے صرف یہ بدلتا ہے کہ سہارا آپ کو کیا دکھائے۔ کچھ بھی حذف نہیں ہوتا۔
+$personName has passed away	$personName کا انتقال ہو گیا ہے
+$personName moved to a care facility or hospice	$personName کسی نگہداشت مرکز یا ہاسپس میں چلے گئے ہیں
+Someone else has taken over care	اب کوئی اور دیکھ بھال کر رہا ہے
+I'd prefer not to say	میں نہیں بتانا چاہتا/چاہتی
+Pause reminders?	یاد دہانیاں روکیں؟
+Reminders for $personName stop for the time you choose, then start again. Records stay as they are.	$personName کی یاد دہانیاں آپ کے چنے وقت تک رکیں گی، پھر خود شروع ہو جائیں گی۔ ریکارڈ جیسے ہیں ویسے رہیں گے۔
+Pause for $days days	$days دن کے لیے روکیں
+Keep reminders on	یاد دہانیاں چالو رکھیں
+Reminders are off	یاد دہانیاں بند ہیں
+All reminders for $personName are off on this phone. The records are kept, not deleted. Others in the care circle can still add to them.	اس فون پر $personName کی تمام یاد دہانیاں بند ہیں۔ ریکارڈ رکھے گئے ہیں، حذف نہیں کیے گئے۔ دیکھ بھال سے جڑے دوسرے لوگ اب بھی ان میں شامل کر سکتے ہیں۔
+Reminders paused until $until	$until تک یاد دہانیاں رکی ہیں
+Records stay as they are. Others in the care circle can still add to them.	ریکارڈ جیسے ہیں ویسے رہیں گے۔ دیکھ بھال سے جڑے دوسرے لوگ اب بھی ان میں شامل کر سکتے ہیں۔
+Turn reminders back on	یاد دہانیاں دوبارہ چالو کریں
+Not actively caregiving	ابھی دیکھ بھال نہیں کر رہے
+Reminders for $personName are off. The records are kept and can be opened from All care tools.	$personName کی یاد دہانیاں بند ہیں۔ ریکارڈ رکھے گئے ہیں اور تمام دیکھ بھال کے ٹولز سے کھولے جا سکتے ہیں۔
+Support	مدد
+I'm caring for $personName again	میں پھر سے $personName کی دیکھ بھال کر رہا/رہی ہوں
+Has your caregiving changed?	کیا آپ کی دیکھ بھال میں کچھ بدلا ہے؟
+Pause reminders, or stop them if you are no longer caregiving	یاد دہانیاں روکیں، یا اگر آپ دیکھ بھال نہیں کر رہے تو بند کریں
+Tele-MANAS is free, any time, in your language.	ٹیلی مانس مفت ہے، کسی بھی وقت، آپ کی زبان میں۔
+What to do after a death	موت کے بعد کیا کریں
+All marked	سب درج ہو گیا
+$left to take	$left لینی ہیں
+Sound off	آواز بند
+Sound on	آواز چالو
+Say it again	دوبارہ سنائیں
+What would you like to do? Tap a big button.	آپ کیا کرنا چاہیں گے؟ کسی بڑے بٹن کو چھوئیں۔
+How are you today?	آج آپ کیسے ہیں؟
+My medicines	میری دوائیں
+Read to me	مجھے پڑھ کر سنائیں
+Full app	پوری ایپ
+Leave simple mode	آسان موڈ چھوڑیں
+Leave simple mode?	آسان موڈ چھوڑیں؟
+The full app has more buttons. Simple mode can be switched on again in More.	پوری ایپ میں زیادہ بٹن ہیں۔ آسان موڈ کو "مزید" میں دوبارہ چالو کیا جا سکتا ہے۔
+Stay in simple mode	آسان موڈ میں رہیں
+Open full app	پوری ایپ کھولیں
+Chosen	منتخب
+Where does it hurt? Touch the place on the body.	درد کہاں ہے؟ جسم پر اس جگہ کو چھوئیں۔
+Body picture. Nothing marked yet.	جسم کی تصویر۔ ابھی کچھ نشان زد نہیں۔
+No pain	درد نہیں
+Touch the body	جسم کو چھوئیں
+How much does it hurt? None, a little, a lot, or the worst?	کتنا درد ہے؟ بالکل نہیں، تھوڑا، بہت، یا سب سے زیادہ؟
+How much does it hurt?	کتنا درد ہے؟
+Thank you. It is saved, and your care team can see it.	شکریہ۔ یہ محفوظ ہو گیا ہے، اور آپ کی دیکھ بھال کی ٹیم اسے دیکھ سکتی ہے۔
+Thank you. It is saved.	شکریہ۔ محفوظ ہو گیا۔
+Marked as taken.	لی ہوئی درج کر دی گئی۔
+There are no medicines for today.	آج کے لیے کوئی دوا نہیں ہے۔
+Taken ${times.size} times today	آج ${times.size} بار لی
+Not taken	نہیں لی
+Who do you want to call?	آپ کس کو فون کرنا چاہتے ہیں؟
+Ambulance 108	ایمبولینس 108
+Family can add phone numbers for the care team in the full app.	گھر والے پوری ایپ میں دیکھ بھال کی ٹیم کے فون نمبر جوڑ سکتے ہیں۔
+Call $name	$name کو فون کریں
+Here are today's medicines and your next visit.	یہ ہیں آج کی دوائیں اور آپ کی اگلی ملاقات۔
+Read it again	دوبارہ پڑھیں
+Simple mode is on. Open Today to see it.	آسان موڈ چالو ہے۔ دیکھنے کے لیے "آج" کھولیں۔
+Simple mode	آسان موڈ
+Four big buttons that speak, for ${person.name}	${person.name} کے لیے بولنے والے چار بڑے بٹن
+These are your medicines for this morning	یہ آج صبح کی آپ کی دوائیں ہیں
+These are your medicines for this afternoon	یہ آج دوپہر کی آپ کی دوائیں ہیں
+These are your medicines for this evening	یہ آج شام کی آپ کی دوائیں ہیں
+These are your medicines for tonight	یہ آج رات کی آپ کی دوائیں ہیں
+These medicines can be taken at any time of day	یہ دوائیں دن میں کبھی بھی لی جا سکتی ہیں
+Today's medicines:	آج کی دوائیں:
+No visit is planned yet.	ابھی کوئی ملاقات طے نہیں ہے۔
+Your next visit:	آپ کی اگلی ملاقات:
+A little	تھوڑا
+A lot	بہت
+Worst	سب سے زیادہ
+The patient agrees to this conversation being recorded and written down	مریض اس بات چیت کو ریکارڈ کرنے اور لکھنے پر متفق ہیں
+The family members in the room agree	کمرے میں موجود خاندان کے افراد متفق ہیں
+Either one is enough.	دونوں میں سے ایک کی رضامندی کافی ہے۔
+Signing below also ticks the declaration in Section IV of the form.	نیچے دستخط کرنے سے فارم کے حصہ IV کے اعلان پر بھی نشان لگ جاتا ہے۔
+Show in the guide	گائیڈ میں دکھائیں
+ECOG performance status (optional)	ECOG کارکردگی کی حالت (اختیاری)
+With the ECOG performance status	ECOG کارکردگی کی حالت کے ساتھ
+Version	ورژن
+made on	بنانے کی تاریخ
+Check Sahara for a newer version before using a printed copy.	چھپی ہوئی کاپی استعمال کرنے سے پہلے سہارا میں نیا ورژن دیکھیں۔
+There is a valid written Advance care planning document. Executed on ____. Location of original: ____	پیشگی نگہداشت کی منصوبہ بندی کی ایک درست تحریری دستاویز موجود ہے۔ تکمیل کی تاریخ ____۔ اصل دستاویز کی جگہ: ____
+ADVANCE CARE PLANNING	پیشگی نگہداشت کی منصوبہ بندی
+Medical Board process	میڈیکل بورڈ کا عمل
+For a patient who cannot decide, withholding or withdrawing life-sustaining treatment may need the Medical Board process (Common Cause 2023; Harish Rana 2026). This plan records wishes and clinical limits; it does not by itself authorise withholding treatment.	جو مریض خود فیصلہ نہیں لے سکتا، اس کے لیے جان بچانے والا علاج شروع نہ کرنے یا روکنے کے لیے میڈیکل بورڈ کا عمل ضروری ہو سکتا ہے (کامن کاز 2023؛ ہریش رانا 2026)۔ یہ منصوبہ خواہشات اور علاج کی حدیں درج کرتا ہے؛ یہ بذاتِ خود علاج روکنے کی اجازت نہیں دیتا۔
+Withholding or withdrawing life-sustaining treatment for a patient who cannot decide follows the board process below. This app only shows it as information. It never starts, stops or decides any treatment.	جو مریض خود فیصلہ نہیں لے سکتا، اس کے لیے جان بچانے والا علاج شروع نہ کرنا یا روکنا نیچے دیے گئے بورڈ کے عمل سے ہوتا ہے۔ یہ ایپ اسے صرف معلومات کے طور پر دکھاتی ہے۔ یہ کبھی کوئی علاج شروع، بند یا طے نہیں کرتی۔
+I have read this version. This is not a formal signature, consent for treatment or a treatment decision. I can ask my doctor to change it later.	میں نے یہی ورژن پڑھا ہے۔ یہ باضابطہ دستخط، علاج کی رضامندی یا علاج کا فیصلہ نہیں ہے۔ میں بعد میں ڈاکٹر سے اسے بدلوا سکتا/سکتی ہوں۔
+The patient is under 18. A parent or guardian makes these decisions with the doctor. Ask the child what matters to them too, in words they understand, and write it in their own words.	مریض کی عمر 18 سال سے کم ہے۔ یہ فیصلے والدین یا سرپرست ڈاکٹر کے ساتھ کرتے ہیں۔ بچے سے بھی، اس کی سمجھ کے الفاظ میں، پوچھیں کہ اس کے لیے کیا اہم ہے، اور اسی کے الفاظ میں لکھیں۔
+Add the parent or guardian as the main decision-maker.	والدین یا سرپرست کو مرکزی فیصلہ کرنے والے کے طور پر شامل کریں۔
+Draft annexure. The clinical team must approve this wording before the pilot.	مسودہ ضمیمہ۔ پائلٹ سے پہلے کلینیکل ٹیم کو یہ الفاظ منظور کرنے ہوں گے۔

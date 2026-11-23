@@ -84,7 +84,7 @@ import java.time.format.DateTimeFormatter
     val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     // Recently noted symptoms first, then the common ones, so the usual note is one tap away.
     val quickKeys = remember(notes) { (notes.mapNotNull { SymptomNoteCodec.decode(it.detail)?.symptom?.trim() } + SymptomQuickDefaults)
-        .filter { it in SymptomDiaryRules.symptoms && it != "Other" }.distinct().take(5) }
+        .filter { it in SymptomDiaryRules.symptoms && it != "Other" }.distinct().take(6) }
     val largeText = LocalDensity.current.fontScale > 1.15f
     BackHandler(onBack = onBack)
     LazyColumn(Modifier.fillMaxSize().testTag("symptom-diary"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -95,7 +95,8 @@ import java.time.format.DateTimeFormatter
         if (canEdit && person != null) item(key = "quick-grid") {
             Column(Modifier.saharaAppear(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(t("Log a symptom", "लक्षण दर्ज करें"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = SaharaSection.Symptoms.ink, modifier = Modifier.a11yHeading())
-                val tiles = quickKeys.map { it to SymptomDiaryRules.symptomLabel(it, hindi) } + ("Other" to t("All symptoms", "सभी लक्षण"))
+                // "All symptoms" is its own full-width button with an arrow under the tiles, not one more tile (Sujay, 7 Nov: "not able to realise that's a more button").
+                val tiles = quickKeys.map { it to SymptomDiaryRules.symptomLabel(it, hindi) }
                 tiles.chunked(if (largeText) 1 else 2).forEach { row ->
                     Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         row.forEach { (key, label) ->
@@ -106,9 +107,14 @@ import java.time.format.DateTimeFormatter
                         if (row.size == 1 && !largeText) Spacer(Modifier.weight(1f))
                     }
                 }
+                SaharaSecondaryButton(t("All symptoms", "सभी लक्षण"), { quickStart = ""; adding = true }, Modifier.fillMaxWidth().testTag("symptom-add"),
+                    icon = Icons.Default.Add, tone = SaharaTone.Rust, navigates = true)
                 val dayStart = remember { LocalDate.now().atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli() }
                 val distressToday = DistressRules.today(entries, person.id, dayStart)?.let { DistressCodec.decode(it.detail) }
                 DistressEntryTile(distressToday, hindi) { distressOpen = true }
+                // Distress vs symptoms (SVK and Sujay, 23 Nov): say plainly which number is which.
+                Text(t("Each symptom gets its own 0–10 score. The distress thermometer is one overall score.", "हर लक्षण का अपना 0–10 अंक होता है। परेशानी थर्मामीटर कुल परेशानी का एक अंक है।"),
+                    fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardSub, modifier = Modifier.testTag("symptom-vs-distress"))
                 Text(t("Symptom ratings use a 0–10 scale in the style of ESAS-r (Edmonton Symptom Assessment System). This is a personal diary, not a scored ESAS-r.", "लक्षणों के अंक ESAS-r (Edmonton Symptom Assessment System) की तरह 0–10 के पैमाने पर हैं। यह निजी डायरी है, अंकित ESAS-r नहीं।"),
                     fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint, modifier = Modifier.padding(top = 2.dp).testTag("symptom-scale-source"))
             }
@@ -170,7 +176,7 @@ import java.time.format.DateTimeFormatter
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(t("Distress thermometer", "परेशानी थर्मामीटर"), fontSize = 17.sp, lineHeight = 22.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk, style = SymptomWords)
             val line = when {
-                today == null -> t("How much distress this past week? 0–10", "इस हफ़्ते कितनी परेशानी? 0–10")
+                today == null -> t("One overall score, 0–10, for this past week", "इस हफ़्ते की कुल परेशानी का एक अंक, 0–10")
                 today.distress -> t("Today", "आज") + ": ${today.score ?: 0}/10 · " + t("Tap to change", "बदलने के लिए दबाएँ")
                 else -> t("Today: no distress", "आज: कोई परेशानी नहीं") + " · " + t("Tap to change", "बदलने के लिए दबाएँ")
             }
@@ -205,8 +211,8 @@ import java.time.format.DateTimeFormatter
     }
 }
 
-/** Shown on the tracker's quick tiles when the person has fewer than five recent symptoms. */
-internal val SymptomQuickDefaults = listOf("Pain", "Tiredness", "Breathlessness", "Nausea", "Mood")
+/** Shown on the tracker's quick tiles when the person has fewer than six recent symptoms. */
+internal val SymptomQuickDefaults = listOf("Pain", "Tiredness", "Breathlessness", "Nausea", "Mood", "Poor appetite")
 
 /** Severity ordering for the tracker list; pure so it can be unit tested. */
 object SymptomSort {
@@ -340,6 +346,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
     val busy by vm.busy.collectAsStateWithLifecycle()
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     val actionError by vm.actionError.collectAsStateWithLifecycle()
+    val context = LocalContext.current
     val capturedPerson = rememberSaveable(initial?.id, followup?.id) { initial?.personId ?: followup?.personId ?: selected }
     val expectedToken by rememberSaveable(initial?.id) { mutableStateOf(initial?.let(SymptomDiaryRules::editToken)) }
     LaunchedEffect(initial?.id) { vm.actionError.value = null }
@@ -350,8 +357,11 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
     var saveTick by rememberSaveable { mutableIntStateOf(0) }
     if (youMatter) { CaregiverYouMatter(onDone = onClose, onCheck = onClose); return }
     // A brand-new note from "Note a symptom" is one session: several symptoms, then "Add another symptom" or "Done". The family kind word shows once, at Done.
-    val afterSave: () -> Unit = { if (multi) saveTick += 1 else if (vm.viewRole.value == "Family" && initial == null) youMatter = true else onClose() }
-    val finishSession: (Int) -> Unit = { saved -> if (saved > 0 && vm.viewRole.value == "Family") youMatter = true else onClose() }
+    // At most once a week (Sujay, 7 Nov: it showed every time a symptom was added).
+    val wellbeingStore = remember(context) { CaregiverWellbeingStore(context) }
+    fun youMatterNow(): Boolean = vm.viewRole.value == "Family" && wellbeingStore.takeYouMatter(CaregiverWellbeingRules.storeKey(vm.storageNamespace, capturedPerson))
+    val afterSave: () -> Unit = { if (multi) saveTick += 1 else if (initial == null && youMatterNow()) youMatter = true else onClose() }
+    val finishSession: (Int) -> Unit = { saved -> if (saved > 0 && youMatterNow()) youMatter = true else onClose() }
     SymptomNoteForm(personId = capturedPerson, personName = people.firstOrNull { it.id == capturedPerson }?.name.orEmpty(), entries = entries,
         hindi = hindi, initial = initial, followup = followup, busy = busy, canEdit = canEdit && selected == capturedPerson, actionError = actionError, sharedOnline = vm.cloud != null,
         viewRole = vm.viewRole.value, startSymptom = startSymptom, onSave = { id, value -> vm.saveSymptomNote(capturedPerson, id, value, expectedToken, afterSave) }, onClose = onClose,
@@ -804,7 +814,8 @@ internal fun symptomTreatmentMarkers(entries: List<CareItem>, personId: String):
         val eyeY = c.y - r * .18f; val eyeDx = r * .34f; val eyeR = r * .12f
         listOf(-1f, 1f).forEach { side -> drawCircle(ink, eyeR, androidx.compose.ui.geometry.Offset(c.x + side * eyeDx, eyeY)) }
         // Mouth: one smooth curve whose bend follows the score.
-        val bend = (v - .5f) * r * .55f
+        // A clear sad face at the low end (SVK, 23 Nov: "probably needs a sad face"); the smile side is unchanged.
+        val bend = (v - .5f) * r * (if (v < .5f) .8f else .55f)
         val y = c.y + r * .34f
         val mouth = androidx.compose.ui.graphics.Path().apply { moveTo(c.x - r * .38f, y); quadraticBezierTo(c.x, y + bend * 2f, c.x + r * .38f, y) }
         drawPath(mouth, ink, style = androidx.compose.ui.graphics.drawscope.Stroke(width = w * .06f, cap = androidx.compose.ui.graphics.StrokeCap.Round))

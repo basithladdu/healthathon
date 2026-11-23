@@ -41,6 +41,21 @@ internal val CareRelations = listOf("Son", "Daughter", "Spouse", "Brother", "Sis
 /** Shown in place of the saved English relation when Hindi is chosen. */
 internal val CareRelationsHindi = mapOf("Son" to "बेटा", "Daughter" to "बेटी", "Spouse" to "पति/पत्नी", "Brother" to "भाई", "Sister" to "बहन", "Parent" to "माता/पिता", "Other" to "कोई और")
 
+/**
+ * Who is being added (Shirin, 6 Nov: "an option to pick between family member or nurse"). Stored in the existing care-team
+ * contact role field with its existing values, so the server and older apps need nothing new: "family" or "caregiver".
+ */
+internal object CareCaregiverKind {
+    const val FAMILY = "family"
+    const val PAID_CARER = "caregiver"
+    const val PAID_CARER_RELATION = "Nurse / paid carer"
+    val kinds = listOf(FAMILY, PAID_CARER)
+    /** The care-team contact role for a chosen kind; anything unknown is family. */
+    fun contactRole(kind: String): String = if (kind == PAID_CARER) PAID_CARER else FAMILY
+    /** The relationship saved with the contact and the invite log: the chosen relation for family, a fixed label for a paid carer. */
+    fun relationship(kind: String, relation: String): String = if (kind == PAID_CARER) PAID_CARER_RELATION else relation.ifBlank { "Family" }
+}
+
 /** Opens WhatsApp (or WhatsApp Business) with the text ready to send; falls back to the share sheet. */
 internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) {
     val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text)
@@ -55,6 +70,7 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
     val patient = people.firstOrNull { it.id == selected }?.name.orEmpty()
     val context = LocalContext.current; val scope = rememberCoroutineScope()
     var name by rememberSaveable { mutableStateOf("") }; var relation by rememberSaveable { mutableStateOf("") }
+    var kind by rememberSaveable { mutableStateOf(CareCaregiverKind.FAMILY) }
     var canAdd by rememberSaveable { mutableStateOf(false) }; var careTeam by rememberSaveable { mutableStateOf(false) }
     var code by rememberSaveable { mutableStateOf("") }; var moreOptions by rememberSaveable { mutableStateOf(false) }
     var busy by remember { mutableStateOf(false) }; var error by remember { mutableStateOf<String?>(null) }
@@ -73,7 +89,10 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
                     require(CareInviteLink.isCode(invite)) { t("The invitation didn't look right. Please try again.", "निमंत्रण ठीक नहीं बना। कृपया फिर कोशिश करें।") }
                     if (vm.selected.value == person && service.session.value?.userId == account && vm.isOwner.value) {
                         code = invite
-                        careInviteStore(context).logCreated(service, account, person, label, relation, "family", before)
+                        val relationship = CareCaregiverKind.relationship(kind, relation)
+                        careInviteStore(context).logCreated(service, account, person, label, relationship, "family", before)
+                        // Also kept as a care-team contact, so "Family member" or "Nurse / paid carer" is on record.
+                        runCatching { vm.saveCareContact(CareContact(newId(), person, label, relationship, CareCaregiverKind.contactRole(kind)), vm.accountNamespace) {} }
                         onInvited()
                     }
                 }
@@ -90,7 +109,7 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 SaharaIconChip(Icons.Default.PersonAdd, SaharaTone.Leaf)
                 Spacer(Modifier.width(12.dp))
-                Text(t("Invite family", "परिवार को बुलाएँ"), Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 22.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+                Text(t("Invite family or a carer", "परिवार या देखभाल करने वाले को बुलाएँ"), Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 22.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
                 IconButton(onClick = onDismiss, enabled = !busy, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Close, t("Close", "बंद करें"), tint = DoctorCardSub) }
             }
             Spacer(Modifier.height(12.dp))
@@ -112,7 +131,15 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
                         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words, imeAction = ImeAction.Send), keyboardActions = KeyboardActions(onSend = { if (canSend) send(true) }),
                         colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper, focusedLabelColor = RustText, unfocusedLabelColor = DoctorCardSub),
                         modifier = Modifier.fillMaxWidth().focusRequester(focus).testTag("invite-name"))
-                    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { CareRelations.forEach { r ->
+                    // Family member or a nurse / paid carer (Shirin, 6 Nov). The relation chips are for family only.
+                    Text(t("Who are they?", "ये कौन हैं?"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+                    SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().testTag("invite-kind")) {
+                        SegmentedButton(selected = kind == CareCaregiverKind.FAMILY, onClick = { kind = CareCaregiverKind.FAMILY; code = "" }, shape = SegmentedButtonDefaults.itemShape(0, 2), modifier = Modifier.heightIn(min = 52.dp).testTag("invite-kind-family"),
+                            icon = { Icon(Icons.Default.People, null, Modifier.size(18.dp)) }) { Text(t("Family member", "परिवार के सदस्य")) }
+                        SegmentedButton(selected = kind == CareCaregiverKind.PAID_CARER, onClick = { kind = CareCaregiverKind.PAID_CARER; relation = ""; code = "" }, shape = SegmentedButtonDefaults.itemShape(1, 2), modifier = Modifier.heightIn(min = 52.dp).testTag("invite-kind-carer"),
+                            icon = { Icon(Icons.Default.MedicalServices, null, Modifier.size(18.dp)) }) { Text(t("Nurse / paid carer", "नर्स / वेतन पर देखभाल करने वाले")) }
+                    }
+                    if (kind == CareCaregiverKind.FAMILY) FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { CareRelations.forEach { r ->
                         FilterChip(selected = relation == r, onClick = { relation = if (relation == r) "" else r }, modifier = Modifier.heightIn(min = 48.dp), shape = RoundedCornerShape(50),
                             label = { Text(careTr(hindi, r, CareRelationsHindi[r] ?: r), softWrap = false) }, leadingIcon = if (relation == r) { { Icon(Icons.Default.Check, null, Modifier.size(16.dp)) } } else null,
                             colors = FilterChipDefaults.filterChipColors(containerColor = Paper, selectedContainerColor = FamilyAccent.Leaf, selectedLabelColor = Color.White, selectedLeadingIconColor = Color.White))

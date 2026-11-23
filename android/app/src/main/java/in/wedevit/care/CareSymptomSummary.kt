@@ -67,7 +67,7 @@ object SymptomSummaryRules {
         Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
             Text(SymptomDiaryRules.symptomLabel(summary.symptom, hindi), color = DoctorCardInk, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, lineHeight = 20.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
             if (note != null) Text(friendlyWhen(note.observedDate, note.observedTime, hindi) + if (summary.notes.size > 1) " · ${summary.notes.size} ${t("notes", "नोट")}" else "",
-                color = DoctorCardSub, fontSize = 13.sp, lineHeight = 17.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.testTag("symptom-summary-when"))
+                color = DoctorCardSub, fontSize = 14.sp, lineHeight = 18.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.testTag("symptom-summary-when"))
         }
         if (note?.symptom == SymptomDiaryRules.MOOD) {
             summary.latestScore?.let { Text("$it/10", color = DoctorCardInk, fontSize = 13.sp, fontWeight = FontWeight.Bold) }

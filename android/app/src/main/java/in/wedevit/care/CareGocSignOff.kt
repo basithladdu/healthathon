@@ -488,6 +488,8 @@ private fun gocRoleText(t: (String, String) -> String, role: String): String = w
                 Surface(color = Cream, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
                     Text(t("I have read or heard this note and it records what we discussed", "मैंने यह नोट पढ़ा या सुना है और इसमें वही लिखा है जिस पर हमने बात की"), fontFamily = SaharaTitleFont, fontSize = 17.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.padding(16.dp).testTag("goc-signer-consent"))
                 }
+                // The declaration boxes in Section 4 of the form are drawn, not tapped: signing here ticks them (SVK, 23 Nov 2026).
+                Text(t("Signing below also ticks the declaration in Section IV of the form.", "नीचे साइन करने से फ़ॉर्म के भाग IV की घोषणा पर भी निशान लग जाता है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.testTag("goc-signer-declaration-hint"))
                 // Signing under that line is the agreement: one tap, "Agree and sign".
                 GocSignaturePad(doneLabel = t("Agree and sign", "सहमत हूँ, साइन करें"), onDone = { p -> sign(GocSignatureInput(signerRole, signerName, relation = relation, consent = true, canRead = canRead, method = p.method, png = p.png, strokeCount = p.strokeCount)) })
             }

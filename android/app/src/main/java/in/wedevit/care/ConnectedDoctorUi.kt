@@ -331,8 +331,9 @@ private fun connectedTopicLabel(status: WorkflowTopicStatus, t: (String, String)
     CompositionLocalProvider(LocalSaharaStagger provides remember(person.id) { SaharaStagger() }) {
     LazyColumn(Modifier.fillMaxSize().testTag("doctor-shared-patient-hub"), contentPadding = PaddingValues(start = 16.dp, top = 12.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { DoctorPatientHeader(person, entries, showId = !deviceLocal && !DoctorTestProfiles.contains(person.id), pane = pane) }
-        item { DoctorPatientNavigationTiles(onSection, selected = selected) }
+        // The surprise question sits above the Goals of care row (Basith, 20 Nov; SVK, 23 Nov 2026): it is the step before that conversation.
         if (!pane) item { GoalsScreeningHelper("hub-${person.id}", onStartGoalsOfCare = { onSection("GoalsOfCare") }) }
+        item { DoctorPatientNavigationTiles(onSection, selected = selected) }
         if (entries != null && !pane) item { DoctorSymptomSummary(entries, person.id, limit = 3) }
         item { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             SaharaSectionHeader(t("More for this patient", "इस मरीज़ के लिए और"), Modifier.padding(top = 4.dp), tone = DoctorTones.Indigo, icon = Icons.Default.MoreHoriz)
