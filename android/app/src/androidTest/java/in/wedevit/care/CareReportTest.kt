@@ -61,7 +61,7 @@ class CareReportTest {
         }
         var db = Room.databaseBuilder(context, CareDatabase::class.java, filename).addMigrations(ReportsMigration, CombinedCareMigration3To6, CombinedCareMigration4To6, CombinedCareMigration5To6,CombinedCareMigration6To7,CareSyncMigration7To8).build()
         try {
-            assertEquals(6, db.openHelper.readableDatabase.version)
+            assertEquals(8, db.openHelper.readableDatabase.version)
             assertEquals(person, db.care().people().first().single())
             assertEquals(task, db.care().items(person.id).first().single())
             val report = CareReport(personId = person.id, name = "Saved scan.pdf", mime = "application/pdf", fileName = "test.pdf", bytes = 123)
