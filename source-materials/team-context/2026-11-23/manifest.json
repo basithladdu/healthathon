@@ -1,0 +1,50 @@
+{
+  "packageDate": "2026-11-23",
+  "authorization": "User asked in chat to update the team chat in the repository with the new export and to write a document on the new messages.",
+  "source": "WhatsApp export 'WhatsApp Chat - Internal Zeros and Ones.zip' (_chat.txt). Media, documents and APKs in the zip are not copied into Git.",
+  "sourceChat": {
+    "sha256": "20ad519c579baa705a8a5884c93270851f61a98836abf996b16d74d596e1ab6a",
+    "bytes": 195691,
+    "records": 1645,
+    "firstDate": "2026-08-25",
+    "lastDate": "2026-11-23"
+  },
+  "previousPackage": {
+    "path": "../2026-10-23/latest-export/_chat.txt",
+    "records": 614,
+    "lastRecord": "23/10/26 9:58:55 AM"
+  },
+  "continuation": {
+    "path": "continuation-2026-10-23-to-2026-11-23.txt",
+    "records": 1031,
+    "from": "23/10/26 6:10:19 PM",
+    "to": "23/11/26 7:35:40 PM",
+    "bySender": {
+      "Sujay H S": 438,
+      "SVK": 198,
+      "Shirin": 124,
+      "Abdul Basith": 237,
+      "Shaik Awaiz": 33,
+      "Muqeeth": 1
+    },
+    "sha256": "a365bb79dff2669029f5c13f282e7debff9879335191d9e3cf9311b8caffa0f7",
+    "bytes": 115654
+  },
+  "publishedFullChat": {
+    "path": "latest-export/_chat.txt",
+    "sha256": "21a00ae6590c3adb820c170682da61358515229ee9253788e3c6e0d8abbe4b65",
+    "bytes": 195365,
+    "status": "cleaned-copy"
+  },
+  "redactions": {
+    "[private WhatsApp group invitation link removed]": 2,
+    "[private Teams meeting link removed]": 7,
+    "[private Google Meet link removed]": 4,
+    "[meeting dial-in link removed]": 1,
+    "[meeting dial-in number and PIN removed]": 1,
+    "[private Google Drive folder link removed]": 2,
+    "[personal email removed]": 4,
+    "[password removed] (survey admin)": 1
+  },
+  "privacy": "Not fully anonymized. Participant names, hotel/booking links and public app links remain. Meeting links, dial-in, group invite, Drive folder, an admin password and personal emails are replaced with visible labels."
+}

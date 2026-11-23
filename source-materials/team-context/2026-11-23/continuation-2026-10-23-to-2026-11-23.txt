@@ -1,0 +1,1373 @@
+[23/10/26, 6:10:19 PM] ~ Sujay H S: The survey is really good guys. I really appreciate how you put this up. Came out exactly as I had imagined it. It is insane.
+
+Regarding survey
+Page 1
+- Help patients find *palliative* care
+- ....palliative-care services *at hospitals you work with* 
+- Remove mobile number
+Page 2
+- Hospital search - I have put the state of the hospital as Karnataka but when I searched hospital name, the first hits were from Maharashtra and the hospital I wanted to put up did not show up - I had to be very specific about the name and then it could find it
+- It should be hospital name and address I feel
+- Right now it looks like the map is optional - I think you should make it compulsary - Like they check the hospital pin on the map after the address tags it on the map (I like that the address directly tags it on the map)
+Page 3
+- Do you think we should have a text field to request for names of palliative physicians there? For example, the hospital I have mentioned, does not advertise palliative care, but one of the doctors there in the Pulmonary department practices palliative care - I have mentioned that in the note that she practices but in the department of Pulmonary Medicine (Not sure how to tackle this) - But may be nice to have a text field for that
+
+I have put in an entry, @⁨Abdul Basith⁩ @⁨Shaik Awaiz⁩ can you check if the output is showing up as you guys want on your end?
+
+I think once these changes are made, we can send it out
+[23/10/26, 6:12:34 PM] ~ Sujay H S: So the discussion we had, we thought we should work on each tool.
+@⁨~Shirin⁩ - Is there a specific tool you want to work on? I would be happy to discuss your thoughts and help you out with it.
+
+If you do not have a choice right now, I think the symptom tracker can be worked on from a clinical standpoint to make it both patient friendly and also give out clinically relevant information.
+
+Please do let me know
+[23/10/26, 6:13:29 PM] ~ Sujay H S: ....hospital name "and" address instead of "or"
+[23/10/26, 6:14:03 PM] ~ SVK: Hey where is the survey? Didn't find it
+[23/10/26, 6:14:15 PM] ~ Sujay H S: Ye wala
+[23/10/26, 6:14:53 PM] ~ Sujay H S: @⁨~SVK⁩ @⁨~Shirin⁩ 
+Please do try out the survey today before these guys work on it more. Your inputs can be incorporated side by side
+[23/10/26, 6:16:27 PM] ~ Shirin: Yes sure what work do you want me to put on it? Like you want me to come up w a list of symptoms they can choose from as a set of options?
+[23/10/26, 6:19:24 PM] ~ Shirin: Okay ill ask my hospital people about the morphine and fill this out
+[23/10/26, 6:21:22 PM] ~ SVK: I'll go through in a while. Traveling
+[23/10/26, 6:23:45 PM] ~ Sujay H S: Correct. As I am thinking through it, I feel this part is going to be a little hard. You will have to really think through it 
+
+Maybe go through some palliative specific resources and see what symptoms are commonly tracked 
+
+Then I think for each symptom, at baseline, you will have to have a clinically relevant scale that the patient can use to quantify how bad it is. Then for follow up we can continue that scale and add if it is better than yesterday or worse than yesterday and by how much 
+
+
+See what you can come up with, and then we can talk about how to refine it. Because this is something subjective that we are trying to make a little objective - it’ll be hard
+
+Like pain - can use a VAS scale to quantify. But we might want to know what makes it worse - like movement and so on
+[23/10/26, 6:24:37 PM] ~ Shirin: Okay sure
+‎[24/10/26, 11:23:11 AM] ~ Shirin: @⁨Abdul Basith⁩ can we incorporate this into our app for symptom tracking? ‎<attached: 00003624-VIDEO-2026-10-24-11-23-11.mp4>
+[24/10/26, 11:24:50 AM] Abdul Basith: we have this actually already
+
+@⁨Shaik Awaiz⁩ share a small recording snippet
+[24/10/26, 11:26:09 AM] Shaik Awaiz: Okay give me min
+[24/10/26, 11:28:20 AM] ~ Shirin: Okay
+‎[24/10/26, 11:33:13 AM] Shaik Awaiz: ‎<attached: 00003628-VIDEO-2026-10-24-11-33-13.mov>
+[24/10/26, 11:33:52 AM] Abdul Basith: so we can do this for symptoms
+[24/10/26, 11:34:10 AM] ~ Shirin: But theres no clinical notes we can get out of this, if we incorporate this under the symptom tracker it’ll be better instead of just generally feeling good or not
+[24/10/26, 11:34:13 AM] ~ Shirin: Yeah
+[24/10/26, 11:34:27 AM] ~ Shirin: Or are we doing this for mental health assessment?
+[24/10/26, 11:34:40 AM] ~ Shirin: For the caretaker?
+[24/10/26, 11:36:33 AM] Abdul Basith: this is from patient interface so you guys tell us where to implement this and what symptoms to ask for
+
+such as pain nausea etc and we will put the tracker but i think this should be on patient side
+[24/10/26, 11:36:55 AM] ~ Shirin: Okay
+[24/10/26, 4:53:05 PM] ~ Sujay H S: @⁨Abdul Basith⁩ @⁨Shaik Awaiz⁩ 
+
+Can you share the CARE thing?
+[24/10/26, 5:07:57 PM] Abdul Basith: Sujay, your SS Sparsh entry is saved. The survey changes you mentioned are live 
+
+https://sahara.wedevit.in/hospital-survey
+[24/10/26, 5:08:08 PM] Abdul Basith: Sending wait
+[24/10/26, 5:21:27 PM] ~ Sujay H S: Perfect
+@⁨~SVK⁩  @⁨~Shirin⁩ 
+
+Please check this before we can send it out
+[24/10/26, 5:21:55 PM] ~ SVK: When do we plan to send this out?
+[24/10/26, 5:21:58 PM] ~ SVK: Tonight?
+‎[24/10/26, 5:23:47 PM] ~ Shirin: @⁨~Sujay H S⁩ @⁨~SVK⁩ do you guys have anything to add to this/ remove any from this? ‎<attached: 00003642-PHOTO-2026-10-24-17-23-47.jpg>
+[24/10/26, 5:24:31 PM] ~ Shirin: Or are these too many
+[24/10/26, 5:25:16 PM] ~ SVK: Headache
+[24/10/26, 5:25:50 PM] ~ SVK: When we already have point 10, then point 11 is vague
+[24/10/26, 5:26:05 PM] ~ Shirin: Okay
+[24/10/26, 5:26:20 PM] ~ SVK: 11 can instead be insomnia
+[24/10/26, 5:26:34 PM] ~ Shirin: Yes
+[24/10/26, 5:30:07 PM] Abdul Basith: https://ohc.network/solutions/palliative-care
+[24/10/26, 5:30:07 PM] Abdul Basith: CARE is an existing healthcare platform that we can build on. It gives hospitals and care teams shared patient records, visits, forms, staff permissions and follow-ups. We can reuse that foundation and build the particular workflow Sahara needs. CARE overview⁠￼
+
+Imagine a patient receiving care at home. A nurse records a visit, a doctor reviews the patient’s needs, and someone is assigned the next follow-up. CARE keeps those people and records connected.
+
+Its palliative-care platform already includes:
+
+* Patient and caregiver records.
+* Care-team assignments and home visits.
+* Symptoms, medicine needs and caregiver concerns.
+* Referrals, care plans and follow-ups.
+* Dashboards showing overdue visits and service gaps.
+
+So there is substantial overlap with our work already. We need to identify what Sahara adds beyond another patient register. CARE’s palliative-care platform⁠￼
+[24/10/26, 5:58:17 PM] ~ Sujay H S: Can remove 2, 11, 13, 17
+Add diarrhea
+Add sore mouth to dry mouth 
+Add overall well-being 
+
+There are two scores that you can model this on 
+ESAS-r
+IPOS
+[24/10/26, 5:59:26 PM] ~ Shirin: Why not pain? I think its needed na
+[24/10/26, 5:59:54 PM] ~ Shirin: Ill remove the rest👍
+‎[24/10/26, 6:00:45 PM] ~ Sujay H S: frm-07903.pdf • ‎2 pages ‎<attached: 00003654-frm-07903.pdf>
+‎[24/10/26, 6:01:37 PM] ~ Sujay H S: 7POS-Questionnaire-v1-Patient-EN-22-08-2011.pdf • ‎2 pages ‎<attached: 00003655-7POS-Questionnaire-v1-Patient-EN-22-08-2011.pdf>
+‎[24/10/26, 6:01:57 PM] ~ Sujay H S: nccn_distress_thermometer.pdf • ‎1 page ‎<attached: 00003656-nccn_distress_thermometer.pdf>
+[24/10/26, 6:02:25 PM] ~ Sujay H S: Sorry. I meant 3. Weight loss
+[24/10/26, 6:02:36 PM] ~ Shirin: Okay ill remove that
+[24/10/26, 6:02:54 PM] ~ Sujay H S: This we can use to model the mood journal tool that we have or something like that. Others can weigh in
+[24/10/26, 6:03:01 PM] ~ Sujay H S: Thanks. Will check it out
+‎[24/10/26, 6:20:03 PM] ~ Shirin: Symptom tracking.pages ‎<attached: 00003661-Symptom tracking.pages>
+[24/10/26, 6:20:11 PM] ~ Shirin: What I’ve come up with so far
+[24/10/26, 6:20:26 PM] ~ Shirin: I’ve reduced the number of symptoms for it to not seem like a big task
+[24/10/26, 6:20:35 PM] ~ Shirin: Please lmk if any changes
+[24/10/26, 6:25:13 PM] Abdul Basith: these look good.   how frequently should we take this?  daily? weekly? or only when the symptoms show up ‎<This message was edited>
+[24/10/26, 6:25:54 PM] Abdul Basith: got it.  will have a mix of it ‎<This message was edited>
+[24/10/26, 6:26:23 PM] ~ Shirin: I actually dont know. Daily would be good but doesnt that seem like a big task?
+[24/10/26, 6:26:38 PM] ~ SVK: Weekly would be good
+[24/10/26, 6:26:50 PM] Abdul Basith: @⁨Shaik Awaiz⁩ check 2nd page 
+
+lets put the human body anatomy so that users can tap and show where the pain is and we will log it
+[24/10/26, 6:27:03 PM] ~ Shirin: Weekly twice?
+[24/10/26, 6:27:04 PM] ~ SVK: Or it could open to the patient. Whenever they feel like they can update
+[24/10/26, 6:27:23 PM] ~ SVK: It doesn't burden any patient. They can decide na
+[24/10/26, 6:27:30 PM] ~ Shirin: Yeah but there should be a minimum time period right before which they should update
+[24/10/26, 6:27:39 PM] ~ SVK: Once daily in that case
+[24/10/26, 6:27:45 PM] Abdul Basith: lmk final decision of frequency and which form 
+
+sujay sent 3
+shirin sent 1 form
+
+or do we mix all
+
+symptoms are overlapping so i guess we append all forms?
+[24/10/26, 6:28:46 PM] ~ Shirin: Use mine, the ones sujay sent were examples of how we can put it in and measure it so you can use those as examples and use mine as a skeleton
+[24/10/26, 6:29:59 PM] ~ Shirin: We need to decide how often we require them to fill it up though
+[24/10/26, 6:32:15 PM] ~ SVK: I think it should be optional and up to the patient
+[24/10/26, 6:32:27 PM] ~ SVK: Minimum duration 24 hours
+[24/10/26, 6:33:31 PM] ~ Shirin: Okay
+[24/10/26, 6:36:55 PM] ~ Sujay H S: Great work
+Can it be made that initially it logs all the details and every day we don’t need all the details so just the severity would be every day and the rest of it can be a optional details under toggle headings which the patient can use if needed (compulsory only at baseline)
+
+We should also make sure the system logs the date at which each symptom was logged. So we can track when new symptoms come up 
+
+We should also be able to graphically trend the severity over time so the doctor can adjust meds
+[24/10/26, 6:37:12 PM] ~ Shirin: Yess
+[24/10/26, 6:37:22 PM] ~ Shirin: I was thinking the doctor can get a graph of it
+[24/10/26, 6:37:25 PM] ~ Shirin: Something like
+[24/10/26, 6:37:36 PM] ~ Sujay H S: Exactly
+‎[24/10/26, 6:37:48 PM] ~ Shirin: ‎<attached: 00003686-PHOTO-2026-10-24-18-37-48.jpg>
+[24/10/26, 6:37:55 PM] ~ Shirin: Something like this
+[24/10/26, 6:38:10 PM] ~ Sujay H S: Can add anxiety to the depression thing I feel. As a similar column. Then can separate out as two different severity scales
+[24/10/26, 6:38:15 PM] ~ Shirin: Idk if thats possible though the tech guys should let us know about that
+[24/10/26, 6:38:17 PM] ~ Sujay H S: As subheading or whatever
+[24/10/26, 6:38:24 PM] ~ Sujay H S: Agreed
+[24/10/26, 6:38:46 PM] ~ Shirin: Okay fair
+[26/10/26, 5:08:04 AM] ~ Sujay H S: I went through this. I think this is perfect. So Sahara can act as a patient facing extension of CARE. The GOCD discussion acts as bridge between physician side and patient facing side. So the symptom tracking on CARE is done during a home visit and we give the patient autonomy to do that. I think we can position ourselves this way and it strengthens Sahara that way
+[26/10/26, 5:08:08 AM] ~ Sujay H S: What do you all think?
+[26/10/26, 5:08:40 AM] ~ Sujay H S: CARE is the hospital side of it. It is mainly to deal with patient workflows and home visits from the hospital side
+[26/10/26, 5:13:53 AM] Abdul Basith: sounds good, will look into how we can build on CARE
+[26/10/26, 5:18:38 AM] ~ Sujay H S: Cool
+‎[27/10/26, 5:58:44 PM] Shaik Awaiz: Gmail - Health-a-thon 2026 _ Build Sprint Final Deliverables and Submission Guidelines.pdf • ‎2 pages ‎<attached: 00003698-Gmail - Health-a-thon 2026 _ Build Sprint Final Deliverables and Submission Guidelines.pdf>
+[27/10/26, 6:01:46 PM] ~ Sujay H S: Yes. Got it
+[27/10/26, 6:02:08 PM] ~ Sujay H S: What’s the next step guys?
+[27/10/26, 6:02:37 PM] ~ Sujay H S: We need to go through each app and modify right?
+[27/10/26, 6:02:47 PM] ~ Sujay H S: I’m back in India
+[27/10/26, 6:02:51 PM] ~ Sujay H S: When can we start doing this?
+[27/10/26, 6:03:21 PM] ~ Sujay H S: We need to be done by this weekend. Then we will have a week for mock conversations and things like that
+[27/10/26, 6:19:28 PM] Abdul Basith: https://docs.ohc.network/flows/clinical/consent/verify-a-consent/
+[27/10/26, 6:19:45 PM] Abdul Basith: they dont havea  consent vertification.  We need to do this
+[27/10/26, 6:51:55 PM] ~ Sujay H S: Okay
+[27/10/26, 6:52:15 PM] ~ Sujay H S: Should we do daily meetings this week? Maybe at 9.30pm every day?
+[27/10/26, 7:04:15 PM] Abdul Basith: yes i think.  and im looking into the CARE thing.  it’s mostly staff side.   im preparing a doc to compare what we have built vs what care has so as to see what can be added or removed and what fits what
+[27/10/26, 7:12:30 PM] ~ Sujay H S: Perfect. Others?
+[27/10/26, 7:15:27 PM] ~ SVK: Ok
+‎[27/10/26, 7:16:04 PM] ~ Sujay H S: ‎<attached: 00003712-Rituparna P Vidhi Legal.vcf>
+[27/10/26, 7:16:41 PM] ~ Sujay H S: Got this contact for Vidhi centre for legal policy. Dr. Sharada and I will connect to run our GOCD format with them to make sure we aren’t touching any legal aspects
+[27/10/26, 7:18:41 PM] ~ Sujay H S: I think the other major thing is identifying patient support groups. Even that is very thin and difficult to find databases. Not sure how to go about it. Any ideas will be helpful
+[27/10/26, 7:19:22 PM] ~ Sujay H S: @⁨~SVK⁩ @⁨~Shirin⁩ 
+If you both are okay with the survey, we can send it out. Otherwise we won’t have much time
+[27/10/26, 8:46:05 PM] ~ Shirin: Yes im good
+[27/10/26, 8:52:46 PM] ~ Sujay H S: Can you share the latest Sahara link?
+‎[27/10/26, 8:58:07 PM] ~ SVK: What is other here? ‎<attached: 00003718-PHOTO-2026-10-27-20-58-07.jpg>
+‎[27/10/26, 8:59:32 PM] ~ SVK: If we say other, follow up question? ‎<attached: 00003719-PHOTO-2026-10-27-20-59-32.jpg>
+[27/10/26, 9:01:32 PM] ~ SVK: I just did a dummy fill
+[27/10/26, 9:44:23 PM] Abdul Basith: this is fixed
+[27/10/26, 9:45:24 PM] ~ SVK: O sorry. It was already mentioned ? 😅
+[27/10/26, 9:45:47 PM] Abdul Basith: no nooo.  i fixed it now
+[27/10/26, 9:45:52 PM] ~ SVK: Haha ok
+[27/10/26, 9:46:00 PM] ~ SVK: Now I feel less ujeless
+[27/10/26, 9:46:17 PM] ~ SVK: This has been discussed?
+[27/10/26, 9:47:46 PM] Abdul Basith: This, we havent but we still put the Others thing. I think it was in the survey form provided to us
+[27/10/26, 9:49:22 PM] ~ SVK: @⁨~Sujay H S⁩ what would make sense here?
+[28/10/26, 3:29:48 AM] ~ Sujay H S: Other hospital staff if it reaches them. Like nutritionist, billing and so on
+[28/10/26, 5:43:15 AM] ~ Sujay H S: Are we good to disseminate?
+[28/10/26, 8:07:14 PM] ~ Sujay H S: Share emails?
+[28/10/26, 8:07:20 PM] ~ Sujay H S: I’ll create teams link
+[28/10/26, 8:07:38 PM] Abdul Basith: [personal email removed]
+[28/10/26, 8:07:45 PM] ~ SVK: [personal email removed]
+[28/10/26, 8:08:14 PM] Abdul Basith: added a custom thing so they can type whatever if chosen others
+[28/10/26, 8:08:31 PM] ~ Sujay H S: Sounds good
+[28/10/26, 9:26:51 PM] Abdul Basith: give me 10.  driving
+[28/10/26, 9:26:59 PM] ~ Sujay H S: [private Teams meeting link removed]
+[28/10/26, 9:31:13 PM] ~ SVK: Joining in 5 mins
+[28/10/26, 9:43:04 PM] Abdul Basith: it kicked me out
+[28/10/26, 10:14:27 PM] ~ Sujay H S: This
+[29/10/26, 9:53:48 AM] ~ Sujay H S: Dear colleagues,
+
+We're building *Sahara*, a free tool to help patients find palliative care and oral morphine near them. The data available online for India has gaps, so we need your help.
+
+If you work at or refer to a hospital, please take *1 minute* to tell us:
+• Whether palliative care is available (OPD / IPD / home care)
+• Whether oral morphine was dispensed there in the last 3 months
+
+👉 https://sahara.wedevit.in/hospital-survey
+
+Your details are used only for verification and are not shown publicly.
+
+Please forward this to oncology and palliative care colleagues!
+[29/10/26, 9:54:03 AM] ~ Sujay H S: Is this message fine? We can disseminate if everyone agrees
+[29/10/26, 9:54:22 AM] ~ SVK: Looks good.
+[29/10/26, 9:55:12 AM] ~ Sujay H S: (optional)
+
+@⁨Abdul Basith⁩ - This word shows up against every question in the survey. Can we remove it?
+[29/10/26, 9:56:05 AM] ~ Sujay H S: Palliative-care physicians and departments (optional)
+14. Anything useful for families? (optional)
+
+Only for these questions and email address it should be there
+[29/10/26, 9:56:32 AM] ~ Sujay H S: Maybe also remove all the serial numbers from the questions
+[29/10/26, 9:58:46 AM] ~ Sujay H S: Once @⁨Abdul Basith⁩ and @⁨Shaik Awaiz⁩ okay it from their side, we can disseminate
+[29/10/26, 10:00:48 AM] Abdul Basith: doing the changes.
+[29/10/26, 10:27:18 AM] ~ Sujay H S: Cool
+[29/10/26, 11:30:10 AM] ~ Sujay H S: @⁨~SVK⁩ @⁨~Shirin⁩ - They have made all the changes, please share it among your colleagues
+[29/10/26, 11:31:21 AM] ~ SVK: Will do.
+[29/10/26, 11:31:57 AM] ~ SVK: Pls share the gocd also?
+[29/10/26, 11:32:30 AM] ~ Sujay H S: Yes. Sharing
+[29/10/26, 11:32:38 AM] ~ SVK: Ok
+‎[29/10/26, 11:33:46 AM] ~ Sujay H S: Healthathon form.docx ‎<attached: 00003756-Healthathon form.docx>
+‎[29/10/26, 11:33:46 AM] ~ Sujay H S: Saanthvana v 1.0.docx ‎<attached: 00003757-Saanthvana v 1.0.docx>
+‎[29/10/26, 11:33:52 AM] ~ Sujay H S: Vidhi_EOLC_Sample-Advance-Medical-Directive.pdf ‎<attached: 00003758-Vidhi_EOLC_Sample-Advance-Medical-Directive.pdf>
+[29/10/26, 11:35:47 AM] ~ Sujay H S: This is the distilled form
+[29/10/26, 11:42:36 AM] Abdul Basith: Yes the changes were in.  I forgot to remind yall
+[29/10/26, 11:53:45 AM] ~ Sujay H S: No worries
+[29/10/26, 2:03:27 PM] ~ SVK: @⁨Abdul Basith⁩ do we have responses on the survey ?
+[29/10/26, 2:03:35 PM] ~ SVK: We have informed most of our colleagues
+[29/10/26, 2:39:54 PM] Abdul Basith: https://sahara.wedevit.in/admin
+
+password: [password removed]
+[29/10/26, 2:41:12 PM] ~ SVK: Pls delete svk. That's me. It's sham response only
+[29/10/26, 2:44:28 PM] Abdul Basith: should I also delete sujay's respont or is it valid
+[29/10/26, 2:57:34 PM] ~ Sujay H S: Mine is valid
+[29/10/26, 3:00:27 PM] ~ Sujay H S: People are just not writing their name only LOL
+[29/10/26, 3:06:11 PM] ~ SVK: Haha
+[29/10/26, 3:06:21 PM] ~ SVK: It should not be optional i guess
+[29/10/26, 3:08:19 PM] Abdul Basith: yeah making it required
+[29/10/26, 3:08:22 PM] ~ SVK: Or like me people just mentioning initials
+[29/10/26, 6:02:42 PM] ~ Sujay H S: People are not tagging it on the map. That’s fine right?
+[29/10/26, 6:41:22 PM] Abdul Basith: Yeah,  thats fine.  We will scrape it
+[29/10/26, 6:49:22 PM] ~ Sujay H S: Lol
+[29/10/26, 6:49:30 PM] ~ Sujay H S: I’ve heard that phrase too much now
+[29/10/26, 6:49:34 PM] ~ Sujay H S: Scrape it 🤣
+[29/10/26, 7:32:30 PM] Abdul Basith: all we do is scrape (legally ofcourse)
+[29/10/26, 9:38:00 PM] ~ Sujay H S: Anyone joining?
+‎[29/10/26, 9:40:07 PM] ~ Sujay H S: Saanthvana – Clinical Specification.docx ‎<attached: 00003780-Saanthvana – Clinical Specification.docx>
+‎[29/10/26, 9:40:08 PM] ~ Sujay H S: Advance Medical Directive Platform – Tech Spec.docx ‎<attached: 00003781-Advance Medical Directive Platform – Tech Spec.docx>
+[29/10/26, 9:40:20 PM] ~ Sujay H S: This is what @⁨~SVK⁩ has shared
+[29/10/26, 9:40:34 PM] ~ Sujay H S: Does this make sense to you @⁨Abdul Basith⁩ @⁨Shaik Awaiz⁩ ?
+[29/10/26, 9:41:40 PM] ~ Sujay H S: I think is more for you guys
+[29/10/26, 9:47:53 PM] Abdul Basith: on a crunch to submit a proposal.  love hate relationship with the government of andhra pradesh 😭
+[29/10/26, 9:48:18 PM] Abdul Basith: will look into it
+‎[29/10/26, 11:01:19 PM] Abdul Basith: ‎<attached: 00003787-PHOTO-2026-10-29-23-01-19.jpg>
+[29/10/26, 11:01:19 PM] Abdul Basith: ui revamp
+[30/10/26, 7:20:14 AM] ~ Sujay H S: Nice
+[30/10/26, 8:48:30 AM] ~ Sujay H S: Can you share link so we can see the whole thing?
+[30/10/26, 6:00:33 PM] ~ Sujay H S: I will not be able to attend today’s meeting
+[30/10/26, 6:00:42 PM] ~ Sujay H S: Please carry on
+[30/10/26, 6:00:48 PM] ~ Sujay H S: Please help with this
+[30/10/26, 6:00:54 PM] ~ Sujay H S: Need to start seeing the GOCD tool
+[30/10/26, 6:03:10 PM] ~ SVK: I'm sorry I won't be able to make it either. Been a bit unwell since last evening.
+[30/10/26, 6:03:24 PM] ~ SVK: I'll work on the link.
+[30/10/26, 6:03:37 PM] ~ Sujay H S: I think we need to finalize the app by Sunday evening right?
+[30/10/26, 6:03:47 PM] ~ Sujay H S: Then we can do test conversations till Wednesday
+[30/10/26, 6:04:13 PM] ~ SVK: Were these documents useful?
+[30/10/26, 6:04:23 PM] Abdul Basith: yes.  last few tweaks
+[30/10/26, 6:04:29 PM] Abdul Basith: yes
+[30/10/26, 6:04:35 PM] Abdul Basith: yes
+[30/10/26, 6:04:59 PM] ~ SVK: Such succinct answers basith 😂
+[30/10/26, 6:05:13 PM] ~ Sujay H S: He’s a busy man
+[30/10/26, 6:20:50 PM] Abdul Basith: i reply like i got places to be.  (i dont)
+[31/10/26, 1:32:47 PM] Abdul Basith: @⁨Shaik Awaiz⁩ i have pushed the latest commit.  Please facilitate sending the APK here so that feedback can be given
+‎[31/10/26, 6:12:17 PM] ~ Sujay H S: Healthathon form_Rituparna.docx • ‎5 pages ‎<attached: 00003807-Healthathon form_Rituparna.docx>
+[31/10/26, 6:12:35 PM] ~ Sujay H S: This is with comments from the legal team
+[31/10/26, 6:51:33 PM] ~ SVK: @⁨Abdul Basith⁩ when could we see the final-ish version?
+[31/10/26, 6:51:49 PM] ~ SVK: With the GOC?
+[31/10/26, 9:28:56 PM] ~ SVK: Are we meeting today.
+[31/10/26, 9:35:53 PM] ~ Sujay H S: I’m outside. It’ll take me about 10 min more
+[31/10/26, 9:35:57 PM] ~ Sujay H S: Others?
+[31/10/26, 9:36:02 PM] ~ Sujay H S: I’m sorry. This was unplanned
+[31/10/26, 9:53:22 PM] ~ Sujay H S: Are we meeting?
+[31/10/26, 9:53:34 PM] ~ Sujay H S: Can do 10pm?
+[31/10/26, 9:55:44 PM] Shaik Awaiz: Basith is in Bangalore can we postpone later like tomorrow
+[31/10/26, 9:55:55 PM] ~ Sujay H S: Sure
+[31/10/26, 9:56:07 PM] ~ SVK: Ok
+[31/10/26, 9:56:18 PM] ~ Sujay H S: Please share the link atleast
+[31/10/26, 9:56:41 PM] ~ SVK: Yes pls
+[01/11/26, 10:05:56 AM] Abdul Basith: pushing the legal changes in the repo with the comments feedback right now
+
+@⁨Shaik Awaiz⁩ will provide the APK today afternoon.  
+
+sorry, have been straying off due to some important personal obligations.
+[01/11/26, 10:06:36 AM] Abdul Basith: can you also forecast what else tasks we have til D-Day @⁨~Sujay H S⁩ @⁨~SVK⁩ need help with the to-do lists,
+
+
+me n awaiz:
+one is PPT
+one is play store updation
+one is CARE plugin exploration ‎<This message was edited>
+[01/11/26, 10:07:32 AM] Shaik Awaiz: Yeah there some changes needed to be done i will send in the ASAP by noon
+[01/11/26, 10:11:27 AM] ~ Sujay H S: No worries
+[01/11/26, 10:11:47 AM] ~ Sujay H S: PPT is the thing. The rest of it we will let you know after playing around with it
+[01/11/26, 10:15:39 AM] Abdul Basith: we have done the ask documents thing where you can ask your uploaded documents and it will fetch whatever you need.   
+
+
+this was a hard one but we got it
+[01/11/26, 10:16:37 AM] Abdul Basith: we are focusing on the multi lingual translation so that hindi english telugu can be switched in one goals of care conversation.   and then transcribe it
+[01/11/26, 10:16:51 AM] Abdul Basith: ppt i will do.
+‎[01/11/26, 3:56:09 PM] Shaik Awaiz: Sahara-0.6.2-dev-2026-11-01.apk ‎<attached: 00003830-Sahara-0.6.2-dev-2026-11-01.apk>
+[01/11/26, 3:56:12 PM] Shaik Awaiz: i have the send the apk download it and test it out once
+[01/11/26, 7:17:07 PM] ~ Sujay H S: Thank you
+[01/11/26, 8:34:45 PM] ~ Sujay H S: We will have to speak about the GOC thing. I’m not able to find the outline we had provided
+[01/11/26, 8:35:07 PM] ~ Sujay H S: The new iteration of the app is fantastic guys. You all have done a great great job
+[01/11/26, 8:35:27 PM] ~ Sujay H S: Big things to discuss is the GOC thing and patient care support groups
+[01/11/26, 8:35:40 PM] ~ Sujay H S: I’ll put up small issues here in some time
+‎[01/11/26, 8:49:56 PM] ~ Sujay H S: The text is coming really light. Not able to read anything 
+
+Better if the distress thermometer fit into one screen ‎<attached: 00003837-PHOTO-2026-11-01-20-49-56.jpg>
+‎[01/11/26, 8:50:13 PM] ~ Sujay H S: Maybe collapse under toggle headings so it is not too long ‎<attached: 00003838-PHOTO-2026-11-01-20-50-13.jpg>
+[01/11/26, 8:50:39 PM] Shaik Awaiz: Okay i see through it
+‎[01/11/26, 8:50:47 PM] ~ Sujay H S: Better to have a calendar view like week or month and each thing like visit and chemo and all colour coded so it’s easy to see. Now I cannot see beyond a month ‎<attached: 00003840-PHOTO-2026-11-01-20-50-47.jpg>
+‎[01/11/26, 8:51:18 PM] ~ Sujay H S: The paragraph should start with “If” ‎<attached: 00003841-PHOTO-2026-11-01-20-51-18.jpg>
+‎[01/11/26, 8:51:50 PM] ~ Sujay H S: A graph for the trend would be great. As a connected line plot. Not bad graph ‎<attached: 00003842-PHOTO-2026-11-01-20-51-50.jpg>
+‎[01/11/26, 8:52:20 PM] ~ Sujay H S: Better to have these as connected dot and line plot rather than bar grapj ‎<attached: 00003843-PHOTO-2026-11-01-20-52-20.jpg>
+‎[01/11/26, 8:53:29 PM] ~ Sujay H S: The most severe symptom should appear first irrespective of the timeline of appearance of symptoms. 
+
+Or can have a button to order it based on severity vs newest to oldest ‎<attached: 00003844-PHOTO-2026-11-01-20-53-29.jpg>
+‎[01/11/26, 8:53:57 PM] ~ Sujay H S: Maybe this part doesn’t come as a separate window? It’s an unnecessary click ‎<attached: 00003845-PHOTO-2026-11-01-20-53-57.jpg>
+‎[01/11/26, 8:54:34 PM] ~ Sujay H S: The previous record gets saved forever or something like that is mentioned. If the pain goes away, will it go to zero? Or how does it track? ‎<attached: 00003846-PHOTO-2026-11-01-20-54-34.jpg>
+‎[01/11/26, 8:54:50 PM] ~ Sujay H S: How did you get a list of adverse effects? ‎<attached: 00003847-PHOTO-2026-11-01-20-54-50.jpg>
+‎[01/11/26, 8:55:22 PM] ~ Sujay H S: So these cards can become really long if we display it like this. Maybe we need to find a way to compress it ‎<attached: 00003848-PHOTO-2026-11-01-20-55-22.jpg>
+‎[01/11/26, 8:55:57 PM] ~ Sujay H S: Need to compress ‎<attached: 00003849-PHOTO-2026-11-01-20-55-57.jpg>
+‎[01/11/26, 8:56:23 PM] ~ Sujay H S: Maybe we don’t have side effects for each drug on the home page? Cause some may be on 20 drugs and it can get problematic ‎<attached: 00003850-PHOTO-2026-11-01-20-56-23.jpg>
+‎[01/11/26, 8:56:46 PM] ~ Sujay H S: These timelines can also get very very long. We need to find a way to compress ‎<attached: 00003851-PHOTO-2026-11-01-20-56-46.jpg>
+‎[01/11/26, 8:57:03 PM] ~ Sujay H S: We don’t need side effects in the journal part also ‎<attached: 00003852-PHOTO-2026-11-01-20-57-03.jpg>
+‎[01/11/26, 8:57:27 PM] ~ Sujay H S: Do we need to have the pregnant ambulance and old people ambulance? Question for all ‎<attached: 00003853-PHOTO-2026-11-01-20-57-27.jpg>
+[01/11/26, 8:57:40 PM] ~ Sujay H S: I need to review the doctor part still
+[01/11/26, 9:11:57 PM] ~ SVK: Can u pls share the link with me once again.
+[01/11/26, 9:12:06 PM] ~ SVK: My phone crashed and I've lost all stuff
+‎[01/11/26, 9:13:38 PM] ~ Sujay H S: Sahara-0.6.2-dev-2026-11-01.apk ‎document omitted
+[01/11/26, 9:24:02 PM] ~ SVK: Traveling. Just landed in Chennai. I'll join in..downloading
+[01/11/26, 9:32:01 PM] ~ Sujay H S: Okay
+[01/11/26, 9:32:07 PM] ~ Sujay H S: Are we meeting today?
+[01/11/26, 9:32:10 PM] ~ Sujay H S: I’ve joined
+[01/11/26, 9:53:04 PM] ~ Sujay H S: Could download the app, it looks great, like the colour scheme, soothing. User interface is really smooth. Went through the walkthrough part of it. All the things don't seem to be getting translated into the different languages, only some parts of it. Reading aloud is working only in English whichever language you press. The map with hospitals is good. Care team and family tabs open the same page, not sure if that's intentional. I liked that the doctor and patient charts were connected in some way. Is there some home page where they can just mention like general details age, weight and stuff? Like a profile page?
+‎[02/11/26, 2:08:26 AM] Shaik Awaiz: Sahara-0.6.2-dev-2026-11-02.apk ‎<attached: 00003863-Sahara-0.6.2-dev-2026-11-02.apk>
+[02/11/26, 8:29:47 AM] ~ Sujay H S: Thanks. Will go through and get back
+[02/11/26, 9:49:40 AM] ~ Sujay H S: The update looks good! 
+I really feel we need to have meetings so we can talk about each step. I think the thinking is a little different for some of the features. Need to see which works best
+
+I know you all are busy. But please do let me know if we can possibly meet sometime 
+
+I don’t know how but I would like to share screen while we are doing it and show you some of the minor issues
+[03/11/26, 9:23:35 AM] Abdul Basith: hi im alive.  
+
+can we have a meet today in first half? 
+
+are you guys free
+
+ @⁨~Sujay H S⁩ @⁨~SVK⁩
+[03/11/26, 9:24:27 AM] ~ Sujay H S: All okay? I know you had some stuff going on
+[03/11/26, 9:24:27 AM] Abdul Basith: anytime before 2 is just fine for me
+[03/11/26, 9:25:05 AM] Abdul Basith: haha, yes.  thank you for asking.  we keep moving
+[03/11/26, 9:25:22 AM] ~ Sujay H S: 11am works for me
+[03/11/26, 9:25:52 AM] Abdul Basith: done.   we can just do whatsapp call and screen share and ill write down the changes
+[03/11/26, 9:26:06 AM] ~ SVK: Hi. I'm at a training program. Would be good if we can meet in the evening
+[03/11/26, 9:26:10 AM] ~ Sujay H S: Do you have any recommendations for an android emulator that I can download on my MacBook so I could potentially open the app on my laptop when we share screen?
+[03/11/26, 9:26:24 AM] Abdul Basith: looking into it.
+[03/11/26, 9:26:55 AM] Abdul Basith: evening wouldnt do for me.  me n sujay can go on with this one.   we can have a all members meet tomorrow
+[03/11/26, 9:27:02 AM] ~ Sujay H S: Also, we can discuss small things at 11 when Dr. Sharada is unavailable. But we need her to be there for bigger discussions like the GOCD
+[03/11/26, 9:27:10 AM] Abdul Basith: yes that we will
+[03/11/26, 9:29:17 AM] ~ SVK: Ok
+[03/11/26, 10:50:15 AM] Abdul Basith: install bluestacks Air.  and then drop the apk that awaiz sent into bluestack
+[03/11/26, 10:52:42 AM] ~ Sujay H S: Okay
+[03/11/26, 11:02:30 AM] ~ Sujay H S: I’ve installed. Let’s Mee?
+[03/11/26, 11:02:32 AM] ~ Sujay H S: Meet?
+[03/11/26, 11:02:53 AM] Shaik Awaiz: Yeah i will put the link give me min
+[03/11/26, 11:03:07 AM] ~ Sujay H S: Teams pls
+[03/11/26, 11:05:15 AM] Shaik Awaiz: [private Teams meeting link removed]
+[03/11/26, 11:05:45 AM] ~ Sujay H S: Cool 
+Will join
+[03/11/26, 11:09:46 AM] Abdul Basith: can you guys hear me
+[03/11/26, 12:00:50 PM] ~ Sujay H S: So
+These palliative care patients sometimes have lines and tubes. Like chemo port, feeding tube, chest tube, colostomy bags and all
+
+These are an important part of their care. We don’t have anything for that because it’ll get too complicated for each device to be added 
+
+But you guys need to somehow show that we are planning this for v2.0. That we are thinking about this
+[03/11/26, 12:02:02 PM] Abdul Basith: elaborate
+[03/11/26, 12:04:15 PM] ~ Shirin: Hi everyone, sorry for being inactive lately, i got a surgery in my eyes done and couldn’t use devices much. Im okay now and if there’s anything i can do to help pls do let me know:)
+[03/11/26, 12:05:17 PM] ~ Sujay H S: Take care
+[03/11/26, 12:05:25 PM] ~ Sujay H S: Wait
+[03/11/26, 12:08:18 PM] Abdul Basith: rest.   will send an updated apk by tonight.   test that rigorously.  thats all
+[03/11/26, 12:08:47 PM] Abdul Basith: like press as many buttons as you could
+[03/11/26, 12:08:59 PM] ~ Sujay H S:
+‎[03/11/26, 12:09:00 PM] ~ Sujay H S: ‎<attached: 00003896-PHOTO-2026-11-03-12-09-00.jpg>
+‎[03/11/26, 12:09:01 PM] ~ Sujay H S: ‎<attached: 00003897-PHOTO-2026-11-03-12-09-01.jpg>
+‎[03/11/26, 12:09:01 PM] ~ Sujay H S: ‎<attached: 00003898-PHOTO-2026-11-03-12-09-01.jpg>
+[03/11/26, 12:09:10 PM] ~ Sujay H S: Cancer patients have multiple devices like this
+[03/11/26, 12:09:14 PM] ~ Sujay H S: That they live with at home
+[03/11/26, 12:10:05 PM] ~ Sujay H S: Each device needs to be cared for daily and they have their own complications
+[03/11/26, 12:10:14 PM] ~ Sujay H S: But there is no way we can do for these
+[03/11/26, 12:11:16 PM] Abdul Basith: uhm.   like centralize the data in our app is what you're suggesting? ‎<This message was edited>
+[03/11/26, 12:11:16 PM] ~ Shirin: For now we can add an option about some redness or signs of infection around the tubes?
+[03/11/26, 12:11:52 PM] ~ Sujay H S: As in, like symptoms, these also need daily check in type thing
+[03/11/26, 12:11:58 PM] Abdul Basith: oh no.  those are for electronic devices.  these are not electronic devices right
+[03/11/26, 12:12:12 PM] ~ Sujay H S: Can be. We will have to think about it
+[03/11/26, 12:12:20 PM] ~ Sujay H S: These are not
+[03/11/26, 1:35:53 PM] ~ Sujay H S: Can have a basic thing like date of insertion, required date of change, centre where it was inserted, and complication as free text. Then we can say we will build on it or something 
+
+I don’t know. I’m just putting my thoughts out there
+[04/11/26, 12:47:53 PM] ~ SVK: Hi guys. 
+We seem to have reached some sort of an impasse. We are nearing the deadline and we seem to have stopped our meetings and check ins
+[04/11/26, 12:50:16 PM] ~ SVK: @⁨Abdul Basith⁩  @⁨Shaik Awaiz⁩ would appreciate a check in.
+[04/11/26, 12:57:11 PM] Shaik Awaiz: lets have a meet in the evening
+[04/11/26, 12:57:52 PM] ~ SVK: 9-9.30?
+[04/11/26, 12:58:05 PM] ~ SVK: Is everyone good with this
+[04/11/26, 12:58:28 PM] Shaik Awaiz: okay let have a meet at 9:30
+[04/11/26, 12:58:33 PM] ~ SVK: Ok
+[04/11/26, 12:58:40 PM] ~ SVK: @⁨‎all⁩ pls confirm
+[04/11/26, 1:03:51 PM] ~ Sujay H S: I have a meeting from 9.30 to 10.30. Can do before or after that
+[04/11/26, 1:04:20 PM] ~ SVK: Let's do 9 theb
+[04/11/26, 1:04:39 PM] ~ Sujay H S: 8.30? Might take more than half an hour na
+[04/11/26, 1:04:49 PM] ~ SVK: Ok sure
+[04/11/26, 1:04:51 PM] ~ SVK: Works
+[04/11/26, 1:05:21 PM] ~ Sujay H S: Cool
+[04/11/26, 6:22:05 PM] ~ SVK: @⁨~Sujay H S⁩ can you please share the teams link for 8.30
+[04/11/26, 6:35:54 PM] ~ Sujay H S: [private Teams meeting link removed]
+[04/11/26, 6:36:01 PM] ~ SVK: Thanks
+[04/11/26, 6:48:49 PM] ~ SVK: @⁨Shaik Awaiz⁩ you will be joining correct?
+[04/11/26, 6:48:52 PM] ~ SVK: @⁨~Shirin⁩ ?
+[04/11/26, 6:49:05 PM] Shaik Awaiz: yeah i will be there
+[04/11/26, 7:32:21 PM] ~ Sujay H S: Any lead on the updated APK?
+[04/11/26, 8:01:33 PM] Shaik Awaiz: yeah we are working on it once we make those changes you said in earlier meet we will get to you
+[04/11/26, 8:52:16 PM] Abdul Basith: @everyone tomorrow 8 PM meet
+
+final sprint
+[04/11/26, 9:00:08 PM] Shaik Awaiz: can you reshare the final GOCD format to be followed ‎<This message was edited>
+[04/11/26, 9:05:14 PM] ~ Sujay H S: This
+[04/11/26, 9:05:57 PM] Abdul Basith: Yeah these changes are in already on my branch.   will share the APK
+[05/11/26, 6:06:38 PM] ~ SVK: @⁨Abdul Basith⁩ and @⁨Shaik Awaiz⁩ would you pls share the app link to see status of gocd prior to our meeting
+[05/11/26, 7:15:22 PM] Abdul Basith: We are working on it,  will try to share the moment it's done.  Android/iOS app builds take time as compared to website deployments
+[05/11/26, 8:00:19 PM] ~ SVK: Pls share link for today's meeting
+[05/11/26, 8:06:32 PM] Abdul Basith: Can we postpone this meet?  The overhead is on us and there really is nothing to do for us in the meet unless until we send you guys the APK and you test out the GOCD thing.  So, i will try to send then APK by 9 PM Tonight.  If before that it works then we can have the meet or we will push it to 10 PM
+[05/11/26, 8:08:09 PM] ~ Shirin: Thats okay for me
+[05/11/26, 8:09:25 PM] ~ SVK: I won't be able to attend a later meeting.  Please share the apk once it's ready. In case @⁨~Sujay H S⁩ is free to join, please plan the meeting and I'll test it out at my end.
+[05/11/26, 8:12:33 PM] ~ Sujay H S: Send the apk. Let’s see
+[05/11/26, 8:12:44 PM] ~ Sujay H S: I should be able to do 10. But I’m not sure
+[05/11/26, 8:12:58 PM] ~ Shirin: Me neither actually
+[05/11/26, 8:13:21 PM] ~ Shirin: How about we just check it individually tonight and do the meeting tomr?
+[05/11/26, 8:13:33 PM] ~ Shirin: We can have more inputs if we spend some time with it
+[05/11/26, 8:13:41 PM] Abdul Basith: individual feedback is also fine.  if you guys can do that
+[05/11/26, 8:13:50 PM] ~ Shirin: Yeah
+[05/11/26, 8:14:09 PM] ~ Sujay H S: Sounds good
+[05/11/26, 8:16:27 PM] Abdul Basith: there are asking us to upload
+
+
+1. app/website
+2. ⁠PPT (working on it)
+3. ⁠two page solution (working on it)
+4. ⁠6-8 min demo video
+[05/11/26, 8:16:51 PM] Abdul Basith: how to go about the demo video cause 1,2,3 you guys will give feedback when we send them to you
+[05/11/26, 8:18:21 PM] ~ Sujay H S: Sounds good
+[05/11/26, 8:19:07 PM] Abdul Basith: i kinda wanna raise the bar and make a cinematic video like a shoot an actual video rather than just recording the app screen  and adding a voiceover
+[05/11/26, 8:19:25 PM] Abdul Basith: so any suggestions? scriptwriters? budding filmmakers?
+[05/11/26, 8:20:27 PM] Abdul Basith: this.   we will do on the last day once the app, PPT and two page solution is finalized
+[05/11/26, 8:22:45 PM] ~ Sujay H S: We can outsource it lol
+[05/11/26, 8:23:04 PM] ~ Sujay H S: You mean like a walkthrough with a movie trailer type right
+[05/11/26, 8:25:39 PM] Abdul Basith: hahaha,  yes maybe like first 30seconds just showing the problem and then we could switch to screen recording and showing the app i guess if that makes sense but like what would we put it in these 30seconds
+[05/11/26, 8:28:59 PM] ~ Sujay H S: Will think about it
+‎[06/11/26, 7:35:41 AM] Abdul Basith: Sahara-2026-11-05-final.apk ‎document omitted
+[06/11/26, 7:37:44 AM] Abdul Basith: want all four of you to try the doctor login and the GOCD and let me know what's up
+
+especially @⁨~SVK⁩ @⁨~Sujay H S⁩ 
+
+@⁨~Shirin⁩ we know there's a lot of unnecessary stuff here,  I tried to trim out a lot yesterday but there's still some so if any screens have those unnecessary just send those screenshots here please so test out both the screens patient and doctor side for this
+[06/11/26, 7:38:50 AM] ~ Sujay H S: Were you up all night?
+[06/11/26, 7:39:29 AM] Abdul Basith: Haha, no.  i prioritise my 8 hours of sleep
+[06/11/26, 7:41:03 AM] ~ Sujay H S: Nice
+Seems like millennials are the only generation that missed this notice 🥲
+[06/11/26, 8:57:00 AM] ~ Sujay H S: Preliminarily looks good Basith. Will have to go into a lot of detail. Will need an hour or so
+[06/11/26, 8:58:14 AM] Abdul Basith: did the gocd discussion recording and summarization work?
+[06/11/26, 8:58:34 AM] Abdul Basith: with the checklist.
+[06/11/26, 8:58:38 AM] ~ Sujay H S: Just went through the UI right now. Haven’t tried anything
+[06/11/26, 8:58:49 AM] Abdul Basith: no worries
+[06/11/26, 8:58:54 AM] ~ Sujay H S: I’ve got OPD. Will do it in the evening
+[06/11/26, 8:58:57 AM] Abdul Basith: please try thst at the earliest
+[06/11/26, 2:26:22 PM] ~ Shirin:
+‎[06/11/26, 2:26:24 PM] ~ Shirin: Is this meant to be patient’s symptoms or the caretakers? ‎<attached: 00003973-PHOTO-2026-11-06-14-26-24.jpg>
+‎[06/11/26, 2:26:24 PM] ~ Shirin: ‎<attached: 00003974-PHOTO-2026-11-06-14-26-24.jpg>
+[06/11/26, 2:26:40 PM] ~ Shirin: Its the patients symptoms im guessing?
+[06/11/26, 2:26:48 PM] Abdul Basith: yes
+[06/11/26, 2:27:15 PM] ~ Shirin: Then is it possible to edit the title to “how is the patient feeling?” In the caretaker’s profile?
+[06/11/26, 2:27:28 PM] ~ Shirin: How are you feeling is misleading
+[06/11/26, 2:47:40 PM] Abdul Basith: no this is patient side only shirin
+[06/11/26, 2:48:13 PM] Abdul Basith: caretaker we havent done any login for them also can you guys elaborate on what or who a caretaker is.   
+
+
+is it a hired nurse or just a family member or what are they
+[06/11/26, 2:48:27 PM] ~ Shirin: It was under the family members profile
+[06/11/26, 2:48:54 PM] Abdul Basith: okay will change.  thanks for input
+[06/11/26, 2:48:58 PM] ~ Shirin: There should be an option to pick between family member or nurse i think so its clearer
+[06/11/26, 2:49:05 PM] ~ Shirin: While creating profile
+[06/11/26, 2:49:08 PM] Abdul Basith: can u also check any extra unnecessary explanation text is there
+[06/11/26, 2:49:11 PM] ~ Shirin: It could be either
+[06/11/26, 2:49:22 PM] Abdul Basith: makes sense.  will do
+[06/11/26, 2:49:31 PM] ~ Shirin: Okay
+[06/11/26, 4:16:33 PM] Abdul Basith: ‎This message was deleted.
+[06/11/26, 4:16:34 PM] Abdul Basith: ‎This message was deleted.
+‎[06/11/26, 5:17:57 PM] ~ SVK: ‎<attached: 00003991-PHOTO-2026-11-06-17-17-57.jpg>
+[06/11/26, 5:18:04 PM] ~ SVK: I barely spoke for 10 secs
+[06/11/26, 5:18:18 PM] ~ SVK: The rest of it I've input as text
+[06/11/26, 5:18:53 PM] ~ SVK: ‎This message was deleted.
+[06/11/26, 5:18:57 PM] ~ SVK: ‎This message was deleted.
+[06/11/26, 5:19:13 PM] ~ SVK: ‎This message was deleted.
+[06/11/26, 5:19:59 PM] ~ SVK: And can't move forward unless I've input this conversation as text. Will be tough if the entire thing has to be typed
+[06/11/26, 5:22:48 PM] Abdul Basith: which phone are you currently using
+[06/11/26, 5:22:55 PM] Abdul Basith: no it wont be
+[06/11/26, 5:23:03 PM] Abdul Basith: cus nothing will be typed ‎<This message was edited>
+[06/11/26, 5:23:44 PM] ~ SVK: I typed the options in other windows.
+[06/11/26, 5:23:48 PM] ~ SVK: OPPO
+‎[06/11/26, 6:46:33 PM] Abdul Basith: Sahara-team-test.apk ‎document omitted
+‎[06/11/26, 6:54:53 PM] ~ SVK: Worked this time ‎<attached: 00004004-PHOTO-2026-11-06-18-54-53.jpg>
+[06/11/26, 7:33:03 PM] ~ Sujay H S: Should I do with this or the previous one?
+[06/11/26, 8:12:43 PM] ~ SVK: I did this one
+[06/11/26, 8:12:48 PM] ~ SVK: This time
+[06/11/26, 8:20:31 PM] Abdul Basith: Try it.  It works really well
+[06/11/26, 8:22:36 PM] ~ Shirin: Yes it does
+[06/11/26, 8:22:59 PM] ~ Shirin: Truly fine work @⁨Abdul Basith⁩ @⁨Shaik Awaiz⁩ 👏🏻👏🏻
+[06/11/26, 9:22:27 PM] ~ Sujay H S: I’m not getting the checklist thing
+[06/11/26, 10:04:47 PM] Abdul Basith: wdym how
+[06/11/26, 10:32:39 PM] ~ Sujay H S: Don’t know
+[06/11/26, 10:33:21 PM] ~ Sujay H S: It’s showing the old one only for me
+[06/11/26, 10:34:13 PM] Abdul Basith: im recording a video
+[06/11/26, 10:44:35 PM] ~ Sujay H S: Okay
+[06/11/26, 10:44:37 PM] ~ Sujay H S: Thank you
+‎[06/11/26, 10:47:08 PM] Abdul Basith: Sahara-Final-Presentation.pdf • ‎13 pages ‎<attached: 00004018-Sahara-Final-Presentation.pdf>
+‎[06/11/26, 10:47:15 PM] Abdul Basith: Sahara-Two-Page-Solution-Brief.pdf • ‎2 pages ‎<attached: 00004019-Sahara-Two-Page-Solution-Brief.pdf>
+[06/11/26, 10:47:50 PM] Abdul Basith: based on our repo and stuff,  we used the template provided by the healthaton team to make these PPT n two solution brief.  FEEL FREEEEEEEEEEEEEEEEEEEEEEEEEEE to make as many changes as you want ‎<This message was edited>
+[06/11/26, 11:23:28 PM] Abdul Basith: okay i forgot to record it and started working on the UI.   adhd gets the better of me.  ill just send you the APK when its done
+[06/11/26, 11:33:19 PM] ~ Sujay H S: Okay
+[07/11/26, 10:25:42 AM] ~ Sujay H S: Did you guys work on the CARE plugin as well?
+[07/11/26, 11:19:01 AM] ~ Sujay H S: Users and setting: Patients receiving palliative care and their families - at home; their palliative care physician, oncologist or pulmonologist - in the clinic (as an extension plugin to their electronic medical records system); and the emergency physician, who has only minutes to decide and needs the patient’s wishes immediately.
+
+Just a small modification on the statement
+[07/11/26, 11:24:22 AM] ~ Sujay H S: ‎This message was deleted.
+[07/11/26, 11:24:27 AM] ~ Sujay H S: ‎This message was deleted.
+[07/11/26, 11:25:01 AM] ~ Sujay H S: Rituparna P, a lawyer, checked our form against India’sadvance-directive (“livingwill”) format. - Not sure if we should write this part
+
+If you want to have it, you need to mention that she advised on the advance care planning format 
+
+Rituparna P, a lawyer, reviewed our goals of care discussion format (a clinical document). She confirmed it is consistent with India’s advance-directive (“living will”) framework and does not conflict with it.
+‎[07/11/26, 11:38:21 AM] Abdul Basith: Sahara-2026-11-07.apk ‎document omitted
+‎[07/11/26, 11:38:21 AM] Abdul Basith: Sahara-Final-Presentation.pdf • ‎13 pages ‎<attached: 00004029-Sahara-Final-Presentation.pdf>
+‎[07/11/26, 11:38:22 AM] Abdul Basith: Sahara-Two-Page-Solution-Brief.pdf • ‎2 pages ‎<attached: 00004030-Sahara-Two-Page-Solution-Brief.pdf>
+[07/11/26, 11:41:13 AM] ~ Sujay H S: Chill Basith 🤣 Lots more edits to come from me. I'll tell you when I am done. Thank you for the new APK. I am going through the documents and then through the APK.
+
+Hope everyone has their day free today to work on this
+[07/11/26, 1:03:17 PM] ~ Sujay H S: Week 4 (30 Oct–5 Nov): advance directive (living will) and emergency QR code;
+Telugu, Urdu, Kannada; legal review 31 Oct; Dr Sujay tested the whole app 3 Nov;
+goals-of-care recording with Gemini onto the legal form; signed, locked PDF.
+
+How it changed: in Round 1 the AI drafted a “Care Note”; our doctors asked that thedoctor lead and the AI only write it down, on the legal form.
+---------------
+
+Advance directive (living will) - to be changed to goals of care document
+
+....on the legal form - to be changed to .... on the clinical document
+[07/11/26, 1:04:40 PM] ~ Sujay H S: Rituparna P, lawyer, 31 Oct: use the form’s exact legal wording → copied word for
+word.
+
+Just mention: Inputs and refining the goals of care wording and format
+[07/11/26, 1:04:52 PM] ~ Sujay H S: I have not asked her permission to be named
+[07/11/26, 1:06:54 PM] ~ Sujay H S: Deployment thing - Currently we allow phone recording only, need to mention some plan for ambient listening mikes or whatever?
+‎[07/11/26, 1:07:41 PM] ~ Sujay H S: Problem Statement.docx ‎<attached: 00004036-Problem Statement.docx>
+[07/11/26, 1:08:00 PM] ~ Sujay H S: The current wording on the first page does not highlight all features
+[07/11/26, 1:08:13 PM] ~ Sujay H S: I have included that. Please check and provide thoughts. It may be a little long
+[07/11/26, 1:08:52 PM] ~ Sujay H S: You guys have not mentioned devit anywhere. You may want to add that? Up to you
+[07/11/26, 1:09:19 PM] ~ Sujay H S: Best to remove Rituparna's name. Can just keep it as legal advise was sought or something
+[07/11/26, 1:37:31 PM] ~ Sujay H S: Will have this ready in by 3.30pm mostly
+[07/11/26, 2:00:18 PM] ~ Sujay H S: How did the app size come down from 300mb to 120mb?
+[07/11/26, 2:00:49 PM] Abdul Basith: oh it'll be even more shorter.  these are debug apps so we know the errors
+[07/11/26, 2:01:36 PM] ~ Sujay H S: Ah okay
+[07/11/26, 2:11:06 PM] ~ SVK: @⁨~Sujay H S⁩ i tried the newest version with my tv running in the background
+[07/11/26, 2:11:13 PM] ~ SVK: The transcription was accurate.
+[07/11/26, 2:11:30 PM] ~ SVK: Apologies for the scattered responses. My whatsapp has been acting up
+[07/11/26, 2:11:45 PM] ~ SVK: Great news version @⁨Abdul Basith⁩  and
+‎[07/11/26, 2:38:17 PM] ~ Sujay H S: @⁨Abdul Basith⁩ ​@⁠⁨⁠S⁠h⁠a⁠i⁠k⁠ ⁠A⁠w⁠a⁠i⁠z⁠⁩ 
+
+We need to remove the word legal from everywhere. I am flagging it in the decks. But please do it in the app ‎<attached: 00004049-PHOTO-2026-11-07-14-38-17.jpg>
+[07/11/26, 2:38:29 PM] ~ Sujay H S: It has to be very clear that it is a clinical document
+[07/11/26, 2:38:38 PM] ~ Sujay H S: Change legal form to clinical document everywhere
+[07/11/26, 2:48:21 PM] ~ Sujay H S: Everyone please keep in mind that our evaluation panel will have two doctors and one tech person
+‎[07/11/26, 3:02:53 PM] ~ Sujay H S: Sahara-Final-Presentation.pdf • ‎13 pages ‎<attached: 00004053-Sahara-Final-Presentation.pdf>
+[07/11/26, 3:02:55 PM] ~ Sujay H S: My edits
+[07/11/26, 6:34:49 PM] ~ Sujay H S: In the new edits, the distress thermometer is getting buried 
+
+Only if they click the button to write more, they can even see an option of distress thermometer. I think that should be changed
+[07/11/26, 6:35:14 PM] ~ Sujay H S: Earlier versions had the reference to the clinical tools that were used for some of the features. I think that’s good to keep in mind
+[07/11/26, 6:36:33 PM] ~ Sujay H S: I’m kind of getting confused. There is a goals of care thing and there is an emergency care plan and there is a living will 
+
+Each is a different thing?
+[07/11/26, 6:37:01 PM] ~ Sujay H S: Living will should not appear anywhere. That is a legal document. It should always be goals of care discussion or advance care planning
+‎[07/11/26, 6:41:59 PM] ~ Sujay H S: If I am a doctor who uses Sahara for the first time, I have no idea what the template for the GOCD or the checklist looks like before I do my first conversation with the patient
+
+Like I don’t understand what “Going to hospital” or “if ambulance arrives” even means 
+
+Maybe we can have a static checklist in the record screen also which the doctor can use to guide their own conversation 
+
+I can provide an updated checklist which would make more sense to the doctor 
+
+For example “Going to hospital” can be changed to “Decision to visit a hospital vs home care during emergency”. It’s longer, I know. Just thinking out loud ‎<attached: 00004059-PHOTO-2026-11-07-18-41-59.jpg>
+‎[07/11/26, 6:44:20 PM] ~ Sujay H S: Something happened to the map. It’s now not able to pick up some palliative care centres. For example, some of these mention inpatient and outpatient care which is palliative care services but these centres vanish if I choose just palliative care and unselect morphine ‎<attached: 00004060-PHOTO-2026-11-07-18-44-20.jpg>
+‎[07/11/26, 6:46:00 PM] ~ Sujay H S: All symptoms is getting lost. Like I’m not able to realise that that’s a more button. Don’t know how to change that ‎<attached: 00004061-PHOTO-2026-11-07-18-46-00.jpg>
+[07/11/26, 6:47:19 PM] ~ Sujay H S:
+‎[07/11/26, 6:47:20 PM] ~ Sujay H S: ‎<attached: 00004063-PHOTO-2026-11-07-18-47-20.jpg>
+‎[07/11/26, 6:47:21 PM] ~ Sujay H S: ‎<attached: 00004064-PHOTO-2026-11-07-18-47-21.jpg>
+‎[07/11/26, 6:47:21 PM] ~ Sujay H S: ‎<attached: 00004065-PHOTO-2026-11-07-18-47-21.jpg>
+[07/11/26, 6:49:14 PM] ~ Sujay H S: I cannot explain it. But the colours are too contrasting and very deep. Lots of reds as well
+
+This UI is not invoking the same calmness that the previous one used to
+
+The layout itself is much better. But the colour scheme 
+
+I know it doesn’t seem important. But the mood for a cancer patient is very important. They need to feel calm and at ease
+[07/11/26, 6:50:51 PM] ~ Sujay H S: Let me know if you want me to send the checklist which can map onto sections in the GOCD
+[07/11/26, 6:53:26 PM] Abdul Basith: yes.  do send
+[07/11/26, 6:53:28 PM] ~ Sujay H S: I think even the app icon became red from green
+[07/11/26, 6:53:50 PM] Abdul Basith: it does kinda is too vibrant
+[07/11/26, 7:32:01 PM] ~ Sujay H S: ‎This message was deleted.
+[07/11/26, 7:35:55 PM] ~ Sujay H S: Patient details
+Caregiver details
+Patient capacity
+Existing medical directives
+Patient's understanding of disease
+Patient values
+Goals of care
+Home care vs hospital transfer
+CPR preference
+ICU care
+Ventilatory support
+Dialysis preference
+Nutritional support ‎<This message was edited>
+[07/11/26, 7:35:59 PM] ~ Sujay H S: Is this okay?
+[07/11/26, 7:37:22 PM] Abdul Basith: okay with me, i mean idk if you're asking me or @⁨~SVK⁩
+[07/11/26, 7:37:42 PM] ~ Sujay H S: I'm asking everyone
+‎[07/11/26, 7:38:32 PM] ~ Sujay H S: I spoke to claude and it suggested something nice
+There should be an initial thing under the recording button - free flow vs guide me ‎<attached: 00004076-PHOTO-2026-11-07-19-38-32.jpg>
+‎[07/11/26, 7:39:17 PM] ~ Sujay H S: If they select guide me, they get cards of different sections of the conversations. And they can select it to get more information. (Right panel first followed by left panel) ‎<attached: 00004077-PHOTO-2026-11-07-19-39-17.jpg>
+[07/11/26, 7:39:51 PM] ~ Sujay H S: So people who do not know, they can be guided and people who know, can do it on their own. Doctor does their own clicks to guide themselves through the conversation. No AI needed
+[07/11/26, 7:40:23 PM] Abdul Basith: makes sense will implement
+[07/11/26, 7:41:54 PM] ~ SVK: U have enumerated what is already existing na?
+[07/11/26, 7:42:18 PM] ~ Sujay H S: Yeah. But please just go through once and see if I have missed something
+[07/11/26, 7:42:42 PM] ~ Sujay H S: Rituparna suggested withholding life support. We are not including that. That’s a whole different conversation on its own
+[07/11/26, 7:43:20 PM] ~ SVK: Ok
+[07/11/26, 7:46:20 PM] Abdul Basith: ‎This message was deleted.
+‎[07/11/26, 7:49:57 PM] Abdul Basith: Sahara-Final-Presentation.pdf • ‎13 pages ‎<attached: 00004085-Sahara-Final-Presentation.pdf>
+‎[07/11/26, 7:49:57 PM] Abdul Basith: Sahara-Two-Page-Solution-Brief.pdf • ‎2 pages ‎<attached: 00004086-Sahara-Two-Page-Solution-Brief.pdf>
+[07/11/26, 8:18:32 PM] ~ Sujay H S: You haven’t included the word file I sent?
+[07/11/26, 8:18:53 PM] ~ Sujay H S: Okay. These are the old ones only
+[07/11/26, 8:44:55 PM] Abdul Basith: oh wait
+[07/11/26, 8:44:59 PM] Abdul Basith: forgot to send the new
+[07/11/26, 9:01:16 PM] ~ Sujay H S: Is the survey admin disabled @⁨Abdul Basith⁩
+[07/11/26, 9:01:29 PM] Abdul Basith: should we)
+[07/11/26, 9:03:34 PM] ~ Sujay H S: I’m not able to access it
+[07/11/26, 9:38:49 PM] ~ Sujay H S: We good to submit? Do we need to have a meeting before final submission?
+[07/11/26, 9:39:07 PM] ~ SVK: Today is the last day
+[07/11/26, 9:39:14 PM] ~ SVK: I think it should be submitted
+[07/11/26, 9:39:57 PM] ~ Sujay H S: Okay. I would like to see the ppts before submission
+[07/11/26, 10:06:04 PM] Abdul Basith: Will provide,  any other changes?
+[07/11/26, 10:06:16 PM] ~ Sujay H S: Nah
+[07/11/26, 10:06:22 PM] ~ Sujay H S: Submit it off. It’s good as it is now
+[07/11/26, 10:06:34 PM] ~ Sujay H S: Can work on it later if we advance
+[07/11/26, 10:09:03 PM] Abdul Basith: in the video,  we will make.  what do you want to showcase
+[07/11/26, 10:09:49 PM] ~ Sujay H S: You have less than two hour lol
+[07/11/26, 10:10:07 PM] Abdul Basith: no, we are putting a drive link so we can upload it whenever we want
+[07/11/26, 10:10:18 PM] Abdul Basith: they are not gonna start evaluating tomorrow.  it's diwali
+[07/11/26, 10:10:33 PM] Abdul Basith: we have til monday morning and then as well we can still do things
+[07/11/26, 10:11:38 PM] ~ Sujay H S: Top tools 
+- GOCD - must 
+- ⁠Patient and doctor profiles must 
+- ⁠Can put couple of the other tools based on your preference - Symptoms/distress, clinical documents and meds, maps
+[07/11/26, 10:11:55 PM] ~ Sujay H S: I need to try the meds thing. I’ll take a picture of some sheet and see
+[07/11/26, 10:14:29 PM] Abdul Basith: the new app is so much more calmer.  lemme send
+‎[07/11/26, 10:15:13 PM] ~ Sujay H S: ‎<attached: 00004110-PHOTO-2026-11-07-22-15-13.jpg>
+[07/11/26, 10:15:25 PM] ~ Sujay H S: Clicking open medicines opens all care tools rather than med
+[07/11/26, 10:15:29 PM] ~ Sujay H S: Just saying lol
+[07/11/26, 10:15:33 PM] ~ Sujay H S: I can’t stop myself
+[07/11/26, 10:16:01 PM] Abdul Basith: yes.  i fixed it alr
+[07/11/26, 10:17:12 PM] Abdul Basith: Ill share PPT and two page solution in a few mins.  Everyone sign off and we will upload.  If they give an extension, we improve again.  Else, no worries.  WE will just do the video
+[07/11/26, 10:17:24 PM] ~ Sujay H S: Okay
+[07/11/26, 10:26:44 PM] Abdul Basith: We have also included @⁨~Shirin⁩ suggestion to add caregiver wellbeing section
+
+Everyone feels seen
+‎[07/11/26, 10:29:57 PM] Abdul Basith: Sahara-2026-11-07-v3.apk ‎document omitted
+[07/11/26, 10:30:08 PM] Abdul Basith: final drag of feedback guys,  go crazy
+[07/11/26, 10:41:34 PM] Abdul Basith: the guide me, free flow thing is added
+[07/11/26, 10:50:06 PM] ~ Shirin: The colour grading looks much better now
+[07/11/26, 10:51:04 PM] Abdul Basith: yeah the UI is also less confusing
+[07/11/26, 10:51:55 PM] ~ SVK: Looks great to me.
+[07/11/26, 10:52:00 PM] ~ SVK: Fabulous work 👏
+[07/11/26, 10:54:39 PM] ~ SVK: Where do i find the caregiver burden thing
+[07/11/26, 10:55:01 PM] ~ Shirin: After logging in the symptoms from the family profile
+[07/11/26, 10:55:08 PM] ~ SVK: Ohk
+[07/11/26, 10:58:12 PM] ~ SVK: Got it
+[07/11/26, 10:58:22 PM] ~ Shirin: How does it look?
+[07/11/26, 10:58:40 PM] ~ SVK: Looks good. And very thoughtful
+[07/11/26, 10:59:34 PM] ~ Shirin: Okay thats nice
+[07/11/26, 11:05:37 PM] ~ Sujay H S: Great work guys
+[07/11/26, 11:05:39 PM] ~ Sujay H S: It’s nice
+[07/11/26, 11:06:56 PM] ~ Sujay H S: Small things to correct. Whenever possible 
+
+In the GOCD document, the numbering is off. 4.2 then 5.3 and 6.1 and so on. Can remove it all or fix it 
+
+I signed a GOCD for Rahul. Now it’s locked. Which is great. But I’m not able to create another document for him. How do I do that?
+‎[07/11/26, 11:07:42 PM] ~ Sujay H S: The never and extreme can be confused because 0 and 10 are not in the same line. I don’t know if I was able to communicate that right ‎<attached: 00004135-PHOTO-2026-11-07-23-07-42.jpg>
+[07/11/26, 11:08:14 PM] ~ SVK: The transcription is getting hung when it's a longer period of recording
+‎[07/11/26, 11:08:31 PM] ~ Sujay H S: Not able to see the diagnosis completely unless I click on edit and go to that page. 
+
+The weight graph looks great. But the distress and symptom tracker graphs look better. But this is just me nitpicking ‎<attached: 00004137-PHOTO-2026-11-07-23-08-31.jpg>
+[07/11/26, 11:09:35 PM] ~ Sujay H S: Can add source for the caregiver assessment
+[07/11/26, 11:11:05 PM] ~ Sujay H S: Do you guys think the medicine tab can get very long and crowded? What if someone is on 20 meds? It’s very common
+‎[07/11/26, 11:14:04 PM] ~ Sujay H S: How frequently does this pop up? It’s happening Everytime I add a symptom ‎<attached: 00004140-PHOTO-2026-11-07-23-14-04.jpg>
+[07/11/26, 11:14:12 PM] ~ Sujay H S: On caregiver portal
+‎[07/11/26, 11:19:15 PM] ~ Sujay H S: ‎<attached: 00004142-PHOTO-2026-11-07-23-19-15.jpg>
+[07/11/26, 11:20:02 PM] ~ Sujay H S: Remove this section from GOCD. From everywhere. Document and template and recording. We don’t want this. I know Rituparna sent it. But don’t add it. It’s very complicated
+[07/11/26, 11:20:24 PM] ~ Sujay H S: Now I’m done lol
+‎[07/11/26, 11:29:53 PM] ~ Sujay H S: goals-of-care-285143d118d6dbf7.pdf • ‎6 pages ‎<attached: 00004145-goals-of-care-285143d118d6dbf7.pdf>
+[07/11/26, 11:29:58 PM] ~ Sujay H S: I meant in this
+[07/11/26, 11:34:42 PM] Abdul Basith: didnt get it
+[07/11/26, 11:56:58 PM] ~ Sujay H S: This part needs to be removed from the pdf
+[07/11/26, 11:57:18 PM] ~ Sujay H S: Submitted?
+[07/11/26, 11:58:17 PM] Abdul Basith: yes
+[07/11/26, 11:58:47 PM] ~ Sujay H S: Congratulations!
+Fingers crossed now
+[08/11/26, 12:02:15 AM] Abdul Basith: [private Google Drive folder link removed]
+
+We can do changes til Monday/Tuesday, sleep on it and let me know any changes in PPT and Two-Page solution.  We will do the video tomorrow, no worries.
+[08/11/26, 12:02:35 AM] Abdul Basith: Cause we gave them drive links and in that all of it is there
+[08/11/26, 12:05:58 AM] ~ Sujay H S: I saw this. They look great
+[08/11/26, 12:06:10 AM] ~ Sujay H S: Yeah. You’ll do great. Make your video
+‎[08/11/26, 9:23:45 PM] Shaik Awaiz: t5nnBzjTWKfZIEJQiuqAIQ.mp4 ‎<attached: 00004156-t5nnBzjTWKfZIEJQiuqAIQ.mp4>
+[08/11/26, 9:24:17 PM] Shaik Awaiz: i made this can we just someone voice over this video
+[08/11/26, 9:24:26 PM] Abdul Basith: Too good
+[08/11/26, 9:26:46 PM] Abdul Basith: I think it covers all points that Sujay wanted to boldly portray in the video.
+[08/11/26, 9:26:54 PM] Abdul Basith: But let us know raw feedback
+[08/11/26, 9:27:00 PM] ~ Shirin: Do we need a voiceover? Isnt the video good on itself?
+[08/11/26, 9:33:33 PM] Abdul Basith: good on its own but will do a voiceover and also this just shows the features.  this doesnt show what we have been doing and how we put it on playstore and how we approached a legal entity and also attented a technical meet and all 
+
+it will be nice to show the behind the scenes effort
+[08/11/26, 9:33:56 PM] Abdul Basith: and how we thought about the caregivers also
+[08/11/26, 9:34:07 PM] Abdul Basith: letting them into our thought process will do us wonders i feel like
+[08/11/26, 9:34:52 PM] ~ Shirin: Okay then sounds good
+[08/11/26, 9:38:51 PM] ~ Sujay H S: This is beautiful guys
+[08/11/26, 9:40:56 PM] ~ Sujay H S: Maybe the doctor part can come before the caregiver. Right now it is coming in between some patient side features. Or I’m not understanding it 
+
+@⁨Abdul Basith⁩ - This video has Gemini. Just thinking about the chat we had today 
+
+Caregiver part needs to showcase the caregiver burden- can replace the “sees different things” part while keeping the chatting with others part
+[08/11/26, 9:42:45 PM] Abdul Basith: oh yeah.  awaiz didnt know about that.   i updated the PPT to put sarvam
+[08/11/26, 9:43:20 PM] ~ Sujay H S: Just a thought. Can the judges see when we update the drive? Timestamp? Lol
+[08/11/26, 9:44:18 PM] Abdul Basith: i think so yeah.   but they wont mind im sure
+[08/11/26, 9:44:31 PM] ~ Sujay H S: I hope you’re right
+[08/11/26, 9:45:16 PM] Abdul Basith: they cant see unless they inspect the details of the file so should be more than fine
+[08/11/26, 9:45:48 PM] ~ Sujay H S: They can see modification time on drive na
+[10/11/26, 4:12:15 PM] Abdul Basith: ‎This message was deleted.
+[10/11/26, 4:20:10 PM] Abdul Basith: re-encoding background music.  too much
+[10/11/26, 7:26:37 PM] ~ Sujay H S: Send na. Want to see
+[10/11/26, 7:31:22 PM] Abdul Basith: oh i thought i sent.  wait.   recommend changes in script n stuff
+‎[10/11/26, 7:31:27 PM] Abdul Basith: ‎<attached: 00004178-VIDEO-2026-11-10-19-31-27.mp4>
+[10/11/26, 7:35:37 PM] Abdul Basith: is it only me or did the audio fuck up again at the end of the thing ‎<This message was edited>
+[10/11/26, 7:36:31 PM] ~ Sujay H S: It fucked up
+[10/11/26, 7:40:22 PM] ~ Sujay H S: I love the video
+[10/11/26, 7:40:25 PM] ~ Sujay H S: It's really cute
+[10/11/26, 7:50:00 PM] ~ Shirin: The video is amazingg
+[10/11/26, 7:50:25 PM] ~ Shirin: The subtitles glitch a lot up until the middle and after that the voice fades away randomly
+[12/11/26, 11:10:35 AM] Abdul Basith: 16th nov results
+[12/11/26, 11:11:05 AM] ~ Sujay H S: Oh nice. How do you kno3w
+[12/11/26, 11:11:58 AM] Abdul Basith: sudhansu kumar ja from healthaton responded
+[12/11/26, 11:12:12 AM] ~ Sujay H S: nice
+‎[12/11/26, 11:12:16 AM] ~ SVK: ‎<attached: 00004189-STICKER-2026-11-12-11-12-16.webp>
+[12/11/26, 11:12:28 AM] ~ SVK: Stress
+‎[12/11/26, 11:12:28 AM] ~ SVK: ‎<attached: 00004191-STICKER-2026-11-12-11-12-28.webp>
+[13/11/26, 9:45:38 PM] Abdul Basith: ‎This message was deleted.
+[16/11/26, 9:43:16 PM] ~ SVK: Tick tick one. What is status?
+[16/11/26, 9:51:21 PM] ~ SVK: Date changed to nov 21.?
+[16/11/26, 9:51:55 PM] Abdul Basith: They said “tomorrow probably” when asked about the results
+[16/11/26, 9:52:08 PM] ~ SVK: Acha ok
+[16/11/26, 9:52:21 PM] Abdul Basith: Is this on the website?
+‎[16/11/26, 9:52:30 PM] ~ SVK: ‎<attached: 00004198-PHOTO-2026-11-16-21-52-30.jpg>
+‎[18/11/26, 6:07:52 PM] Abdul Basith: ‎<attached: 00004199-PHOTO-2026-11-18-18-07-52.jpg>
+‎[18/11/26, 6:07:53 PM] Abdul Basith: ‎<attached: 00004200-PHOTO-2026-11-18-18-07-53.jpg>
+[18/11/26, 6:08:11 PM] ~ SVK: Fuckkkkkk
+‎[18/11/26, 6:08:38 PM] Abdul Basith: ‎<attached: 00004202-PHOTO-2026-11-18-18-08-38.jpg>
+‎[18/11/26, 6:08:39 PM] Abdul Basith: ‎<attached: 00004203-PHOTO-2026-11-18-18-08-39.jpg>
+[18/11/26, 6:08:40 PM] ~ Shirin: WOAH
+[18/11/26, 6:10:17 PM] ~ SVK: Congratulations!!
+[18/11/26, 6:11:05 PM] ~ Shirin: Congratulations everyone🥳🥳🥳🥳
+‎[18/11/26, 6:11:12 PM] ~ Shirin: ‎<attached: 00004207-GIF-2026-11-18-18-11-12.mp4>
+[18/11/26, 6:12:18 PM] Shaik Awaiz: Congrats 🥂 everyone
+[18/11/26, 6:12:18 PM] ~ Muqeeth: ‎Abdul Basith added ~ Muqeeth
+[18/11/26, 6:12:20 PM] Abdul Basith:
+[18/11/26, 6:38:02 PM] ~ SVK: What are next steps?
+[18/11/26, 6:44:54 PM] ~ Sujay H S: Oh wow
+[18/11/26, 6:44:55 PM] ~ Sujay H S: Lol
+[18/11/26, 6:45:03 PM] ~ Sujay H S: Congratulations guys!!
+[18/11/26, 6:45:07 PM] ~ Sujay H S: Good work everyone
+[18/11/26, 6:47:44 PM] ~ Sujay H S: Some things 
+- Get a logo for the team
+- ⁠Print on T-shirts 
+- ⁠Find out where to eat Vada Pav near IIT Bombay
+[18/11/26, 6:48:09 PM] ~ SVK: Vada paav anywhere in mumbai is fine only
+[18/11/26, 6:48:21 PM] ~ Sujay H S: We don’t want fine. We want fantastic
+[18/11/26, 6:48:29 PM] ~ SVK: But u gonna have to come down from ur south delhi/mumbai/bangalore perch
+[18/11/26, 6:48:50 PM] ~ Sujay H S: Lolol
+‎[18/11/26, 6:50:24 PM] Abdul Basith: jobs not finished. ‎<attached: 00004221-VIDEO-2026-11-18-18-50-24.mp4>
+‎[18/11/26, 6:50:27 PM] Abdul Basith: jobs not finished. ‎video omitted
+[18/11/26, 6:51:12 PM] ~ Sujay H S: Love the attitude
+[18/11/26, 6:54:01 PM] ~ SVK: Ok guys. I'm going to be happy 😆
+[18/11/26, 6:54:20 PM] ~ Sujay H S: Please do
+[18/11/26, 6:54:48 PM] ~ Sujay H S: I think first we book tickets to Bombay. Find a Hotel. We ideally reach there one day prior to practice our pitch
+[18/11/26, 6:55:13 PM] ~ SVK: Ah yes I need to know this. Dates. Have to take leave accordingly
+[18/11/26, 6:55:31 PM] ~ Shirin: So 27th morning flight?
+[18/11/26, 6:59:16 PM] Abdul Basith: me shirin awaiz will come from hyd
+[18/11/26, 7:01:58 PM] Abdul Basith: send out hotel options closer to IIT B
+[18/11/26, 7:08:10 PM] ~ Sujay H S: Will check
+[18/11/26, 7:18:28 PM] ~ Sujay H S: Sounds good. Morning around what time do we want to be there? I think if we land by like 10 or 11 it should be fine right?
+[18/11/26, 7:31:10 PM] Abdul Basith: yeah it should be good
+[18/11/26, 7:46:06 PM] ~ Sujay H S: Cool
+[18/11/26, 7:53:38 PM] ~ Sujay H S: https://lnkd.in/p/dwnGkjTT
+[18/11/26, 8:01:21 PM] ~ Sujay H S: This is the team that got selected as well. They do a lot of stuff lol
+[18/11/26, 8:07:31 PM] Abdul Basith: not quite our tempo
+[18/11/26, 8:07:57 PM] Abdul Basith: yeah they’re loaded.  youve been mentioning them since the start😭
+[18/11/26, 8:08:06 PM] ~ Sujay H S: Oh yeah. I forgot lol
+[18/11/26, 8:08:11 PM] ~ Sujay H S: Mmhmm
+[18/11/26, 8:13:46 PM] ~ Sujay H S: https://share.google/C3AL8tJfSDwXKVrXN
+[18/11/26, 8:13:54 PM] ~ Sujay H S: We can just stay here
+[18/11/26, 8:14:05 PM] ~ Sujay H S: But we gotta book quickly
+‎[18/11/26, 8:18:53 PM] Abdul Basith: ‎<attached: 00004244-PHOTO-2026-11-18-20-18-53.jpg>
+‎[18/11/26, 8:18:56 PM] Abdul Basith: ‎<attached: 00004245-PHOTO-2026-11-18-20-18-56.jpg>
+[18/11/26, 8:18:57 PM] Abdul Basith: which one
+‎[18/11/26, 8:19:36 PM] ~ Shirin: ‎<attached: 00004247-PHOTO-2026-11-18-20-19-36.jpg>
+[18/11/26, 8:19:43 PM] ~ Shirin: These are the two
+[18/11/26, 8:22:09 PM] ~ Sujay H S: They’re next to each other. 2K per night
+[18/11/26, 8:22:21 PM] ~ Sujay H S: Maybe we can book Jalvihar
+[18/11/26, 8:22:43 PM] ~ Shirin: Yeah sounds better
+[18/11/26, 8:28:03 PM] ~ Sujay H S: Let me know if you’re able to book
+[18/11/26, 8:28:08 PM] ~ Sujay H S: I’m not finding how
+[18/11/26, 8:36:18 PM] ~ Shirin: Try contacting them
+[18/11/26, 8:42:47 PM] Abdul Basith: Jal Vihar can only be booked by a host at IIT Bombay
+[18/11/26, 8:43:20 PM] ~ Sujay H S: The other one?
+[18/11/26, 8:43:28 PM] ~ Sujay H S: We need 5 rooms?
+[18/11/26, 8:43:56 PM] ~ Shirin: They’re double bedded itseems na
+[18/11/26, 8:44:32 PM] Abdul Basith: ill check after goin home ‎<This message was edited>
+[18/11/26, 8:45:33 PM] ~ Sujay H S: Yes
+[18/11/26, 9:10:34 PM] ~ SVK: For the on campus guest houses generally we need someone from the campus
+[18/11/26, 9:10:44 PM] ~ SVK: @⁨~Sujay H S⁩ we needed the same at aiims as well
+[18/11/26, 9:10:47 PM] ~ SVK: Jipmer is the same
+[18/11/26, 9:17:54 PM] ~ Sujay H S: Oh lol
+[18/11/26, 9:17:59 PM] ~ Sujay H S: Then we fucked
+[18/11/26, 9:18:03 PM] ~ SVK: Haha
+[18/11/26, 9:18:27 PM] ~ SVK: Maybe our designated mentor or @⁨Abdul Basith⁩ will know someone in IIT?
+[18/11/26, 9:38:26 PM] ~ Sujay H S: Interesting. They took down the post lol
+[18/11/26, 9:38:43 PM] ~ SVK: Hey bhagwan
+[18/11/26, 9:38:49 PM] ~ SVK: Cant deal with this stress
+[18/11/26, 9:39:27 PM] Abdul Basith: oh i know alumni.  would that work?
+[18/11/26, 9:39:36 PM] ~ Sujay H S: Not sure
+[18/11/26, 10:01:34 PM] ~ SVK: Can check. Many of the alumni can reach out to current folks and make it happen
+[18/11/26, 10:02:02 PM] ~ SVK: Usually these institutes need an application from a current employee/faculty/student to book rooms
+‎[18/11/26, 10:35:07 PM] Abdul Basith: Congratulations on Being Shortlisted for the Grand Finale  Health-a-thon 2026.pdf • ‎2 pages ‎<attached: 00004275-Congratulations on Being Shortlisted for the Grand Finale  Health-a-thon 2026.pdf>
+[18/11/26, 10:35:23 PM] ~ SVK: Received the same
+[18/11/26, 10:46:32 PM] ~ Sujay H S: Not bad
+[18/11/26, 10:46:36 PM] ~ Sujay H S: We get at least a lakh
+[18/11/26, 10:46:39 PM] ~ Sujay H S: Lol
+‎[18/11/26, 10:47:19 PM] ~ Sujay H S: ‎<attached: 00004280-PHOTO-2026-11-18-22-47-19.jpg>
+[18/11/26, 10:48:36 PM] Abdul Basith: wait actually? lmaoooo
+[18/11/26, 10:48:42 PM] ~ Sujay H S: Should we have a meeting tomorrow to discuss next steps?
+[18/11/26, 10:49:50 PM] Abdul Basith: yeah done
+[18/11/26, 10:55:28 PM] ~ Sujay H S: Name is “Sujay Halkur Shankar”
+For the Google Form
+
+It has to be according to government ID
+I’m guessing @⁨Abdul Basith⁩ will fill it up
+[18/11/26, 10:58:14 PM] Abdul Basith: ‎Open this link to join my WhatsApp Group: [private WhatsApp group invitation link removed]
+[18/11/26, 11:00:53 PM] Abdul Basith: everyone send me their full govt names, this may or may not be used against you in the foreseeable future.   i am completely normal and can be trusted with this information 👀
+[18/11/26, 11:01:21 PM] Shaik Awaiz: Shaik Muhammad awaiz
+[18/11/26, 11:01:22 PM] ~ Shirin: Shirin Ayub
+[19/11/26, 7:21:45 AM] ~ Sujay H S: I think we need to quickly polish the app in two days. Then we should deploy it in a place and see. We need to show output of the app otherwise we won’t win. To demo on stage we can do it with a prerecorded simulated conversation and not actual patient data
+[19/11/26, 8:02:40 AM] ~ SVK: Kutty Sharada Vinod
+[19/11/26, 11:53:30 AM] ~ Sujay H S: Hello Dr  Sujay, Thank you for reaching out, Thank you for the wishes and Congratulations to you too for the finals!
+
+We are working and submited our solution reg AI Agent Framework for Supporting Tumor Board Preparations and Meetings and Post Meeting works. This is not replacing the tumor board but assisting the treating doctors with all the related summary creation with all the reports from the HIMS or PACS (it integrated with the HIMS to fetch all the reports automatically), connects supporting departments like radiologist, pathologist, etc if tests are not done and then a meeting feature where the MDT coordinator can manage all the meetings and handle multiple tumor boards in the hospital accordginly in one go. So this is the whole thing of what we have developed and submited.
+[19/11/26, 11:53:39 AM] ~ Sujay H S: This is what TANUH has submitted
+[19/11/26, 11:55:39 AM] Abdul Basith: Everyone use the app and let us know about any changes such as colors or UI or any functionality not working etc etc any bugs
+[19/11/26, 11:56:13 AM] ~ SVK: U are doing insider information trading 😂
+[19/11/26, 11:56:27 AM] Abdul Basith: They are also using AI to summarize stuff and manage meetings.  Very similar use-case.  Technically we are also summarizing a “meeting”
+[19/11/26, 11:57:52 AM] ~ Sujay H S: Correct. See. Most people will have similar use cases right? That’s my understanding. I think if we show a strong integration between tech and doctors, it would be nice
+‎[19/11/26, 11:59:29 AM] ~ SVK: ‎<attached: 00004297-STICKER-2026-11-19-11-59-29.webp>
+[19/11/26, 11:59:52 AM] ~ Sujay H S: https://youtube.com/watch?v=U9O35MpFNXU&si=ttRXicXSp9DCmvVM
+[19/11/26, 12:00:54 PM] ~ Sujay H S: I wish someone did this to me 😭😭
+[19/11/26, 12:01:11 PM] ~ SVK: Next meeting when?
+[19/11/26, 12:01:22 PM] ~ SVK: And i think we should have a clear agenda for the next few meetings
+[19/11/26, 12:01:56 PM] ~ Sujay H S: Yes
+[19/11/26, 1:12:38 PM] Abdul Basith: 28th 7:00 AM We need to be at IIT BOMBAY to check if our presentations look perfect on the screen and etc
+
+It will be a closed room pitch
+
+Event will end at around 5 PM
+
+I have filled the RSVP form
+
+We need to book hotel and flight tickets
+
+lets forget about Guest House thing, theres nothing the healthathon team can do ‎<This message was edited>
+[19/11/26, 1:15:47 PM] Abdul Basith: Today Meeting Agenda:
+
+-Hotel decision on call
+-Changes about APP
+-Rigorous Usage of Android App in meeting itself so that we know what to improve 
+-There will be a 10 min call with healthaton team this week they will guide our PITCH
+[19/11/26, 1:25:01 PM] ~ Sujay H S: Time?
+[19/11/26, 2:53:51 PM] Abdul Basith: 6?
+[19/11/26, 3:01:08 PM] ~ Sujay H S: Let’s do 6.30
+[19/11/26, 3:01:19 PM] ~ SVK: Is 7 possible pls
+[19/11/26, 3:01:23 PM] ~ SVK: 😭
+[19/11/26, 3:03:52 PM] ~ Sujay H S: Okay
+[19/11/26, 3:06:29 PM] ~ SVK: Thanks
+‎[19/11/26, 4:44:50 PM] Abdul Basith: Request for Team Details & High-Resolution Profile Pictures  Health-a-thon 2026.pdf • ‎1 page ‎<attached: 00004312-Request for Team Details & High-Resolution Profile Pictures  Health-a-thon 2026.pdf>
+[19/11/26, 4:45:27 PM] ~ SVK: Photo you have na..
+[19/11/26, 4:46:20 PM] ~ SVK: Dr. Kutty Sharada Vinod
+MD, DM 
+Associate Professor, Dept of General Medicine
+AIIMS Mangalagiri, Andhra Pradesh
+[19/11/26, 4:50:22 PM] ~ Shirin: Shirin Ayub 
+MBBS (final year) 
+Bhaskar medical college 
+Hyderabad
+[19/11/26, 6:48:39 PM] ~ Sujay H S: Guys. I’m going to be late
+[19/11/26, 6:48:42 PM] ~ Sujay H S: Just leaving work
+[19/11/26, 6:53:54 PM] ~ SVK: Join on mobile.?
+[19/11/26, 7:23:39 PM] ~ Sujay H S: Just reached home
+[19/11/26, 7:23:45 PM] ~ Sujay H S: Have you guys started?
+[19/11/26, 7:27:05 PM] Abdul Basith: No nooo.  we havent
+[19/11/26, 7:27:26 PM] Abdul Basith: is everyone available at 8?
+[19/11/26, 7:27:40 PM] ~ Sujay H S: Okay
+[19/11/26, 7:27:43 PM] ~ Sujay H S: I’m available
+[19/11/26, 7:30:20 PM] Shaik Awaiz: Yeah
+[19/11/26, 7:33:31 PM] ~ SVK: I'm heading into another meeting.
+[19/11/26, 7:33:46 PM] ~ SVK: Won't be able to attend at 8 🥲
+[19/11/26, 7:33:56 PM] ~ SVK: Can we fix 8 pm for the next couple of days?
+[19/11/26, 7:34:02 PM] ~ SVK: Or another time that we fix?
+[19/11/26, 7:34:19 PM] ~ SVK: It will help organize other responsibilities
+[19/11/26, 7:36:01 PM] ~ SVK: @⁨~Sujay H S⁩ regarding the hostel at IIT. I did find a contact. However, the condition of the rooms on campus is bad i believe
+[19/11/26, 7:36:35 PM] ~ SVK: Hence i think a hotel will be best
+[19/11/26, 7:36:37 PM] ~ Sujay H S: Oh dam
+[19/11/26, 7:36:40 PM] ~ Sujay H S: Damn
+[19/11/26, 7:37:03 PM] ~ Sujay H S: When can you join today @⁨~SVK⁩
+[19/11/26, 7:37:05 PM] ~ Sujay H S: ?
+[19/11/26, 7:37:20 PM] Abdul Basith: so total 4 rooms?
+
+me and awaiz will get a double sharing
+[19/11/26, 7:37:24 PM] ~ SVK: Tonight is busy moving on suju
+[19/11/26, 7:37:37 PM] ~ Sujay H S: Okay
+[19/11/26, 7:37:43 PM] ~ Sujay H S: Yeah. Sounds good
+[19/11/26, 7:38:25 PM] ~ SVK: I will be doing single occupancy
+[19/11/26, 7:38:55 PM] ~ Sujay H S: Same
+[19/11/26, 7:39:21 PM] ~ Sujay H S: Do you guys want to do the T-shirt thing? Lol
+[19/11/26, 7:39:40 PM] ~ Sujay H S: Why don’t we all look at hotels and put up preferences here tonight and approximate flight timings
+[19/11/26, 7:39:51 PM] ~ Sujay H S: We can come to consensus without a meeting today
+[19/11/26, 7:40:19 PM] ~ Shirin: Check out this hotel I saw on MakeMyTrip -Anantha Executive Suites https://www.makemytrip.com/hotels/hotel-details/?Campaign=21406564992&_uCurrency=INR&checkin=11272026&checkout=11282026&city=CTBOM&cmp=googlehoteldfinder_Old_DH_META_Paid_type%3Dbl_RateRule%3Dmobile_usernolist_aud%3D_21406564992_selected_IN_mob_localuniversal_201410211150087280&country=IN&gad_campaignid=21406564992&gad_source=1&gbraid=0AAAAACwdfVUP7_boU_9GIV4m15WgHrKLx&locusId=CTBOM&locusType=city&mtkeys=ffbb14db-9095-4e24-925d-766451a4e8cb_312167_2&rank=1&roomCount=1&roomStayQualifier=2e0e&rsc=1e2e0e&searchText=Mumbai%2C+India&topHtlId=201410211150087280&totalGuestCount=2&hotelId=201410211150087280&isPropSearch=T
+[19/11/26, 7:40:28 PM] ~ Shirin: I found this relatively decent
+[19/11/26, 7:42:55 PM] ~ Shirin: Check out this hotel I saw on MakeMyTrip -Hotel Lake View Residency https://www.makemytrip.com/hotels/hotel-details?_uCurrency=INR&checkin=11272026&checkout=11292026&city=CTBOM&country=IN&isFks=false&isPf=false&locusId=CTBOM&locusType=city&mmAreaTag=Powai%7CARPOW&rank=5&roomStayQualifier=2e0e&rsc=1e2e0e&searchText=Powai&topHtlId=201410211150087280&hotelId=202502251140535359
+[19/11/26, 7:43:56 PM] ~ Shirin: Check out this hotel I saw on MakeMyTrip -The Caliph Hotel https://www.makemytrip.com/hotels/hotel-details?_uCurrency=INR&checkin=11272026&checkout=11292026&city=CTBOM&country=IN&isFks=false&isPf=false&locusId=CTBOM&locusType=city&mmAreaTag=Powai%7CARPOW&rank=7&roomStayQualifier=2e0e&rsc=1e2e0e&searchText=Powai&topHtlId=201410211150087280&hotelId=200908240941285605
+[19/11/26, 7:43:56 PM] ~ Shirin: Check out this hotel I saw on MakeMyTrip -Treebo Vro Boutique, Andheri East https://www.makemytrip.com/hotels/hotel-details?_uCurrency=INR&checkin=11272026&checkout=11292026&city=CTBOM&country=IN&isFks=false&isPf=false&locusId=CTBOM&locusType=city&mmAreaTag=Powai%7CARPOW&rank=1&roomStayQualifier=2e0e&rsc=1e2e0e&searchText=Powai&topHtlId=201410211150087280&hotelId=202504130854442753
+[19/11/26, 7:44:27 PM] ~ Shirin: These are all in and around powai (the area iit is in)
+[19/11/26, 7:52:21 PM] ~ SVK: Treebo is generally reliable i think
+[19/11/26, 7:52:42 PM] ~ Shirin: Its 3.7 kms from campus
+[19/11/26, 8:00:58 PM] Abdul Basith: this is also aight.  closer to the campus
+[19/11/26, 8:01:22 PM] ~ Shirin: Yeah
+[19/11/26, 8:07:58 PM] ~ Sujay H S: Lol
+[19/11/26, 8:08:08 PM] ~ Sujay H S: Literally every link is opening Anantha suites for me
+[19/11/26, 8:10:24 PM] Abdul Basith: guys just join a 10 min meet we will decide all that on call
+[19/11/26, 8:11:20 PM] Abdul Basith: we can do lakeview or the beatle both look good
+[19/11/26, 8:11:34 PM] Abdul Basith: closer to iit bombay as well
+[19/11/26, 8:13:06 PM] ~ Sujay H S: Yeah. Let’s do that
+[19/11/26, 8:14:59 PM] ~ Sujay H S: [private Teams meeting link removed]
+[19/11/26, 8:40:31 PM] ~ SVK: Check out Zenith Homes - Powai Central Suites on Booking.com!  https://www.booking.com/Share-eybjktC
+[19/11/26, 8:40:42 PM] ~ SVK: These are serviced apartments. Take a look
+‎[19/11/26, 8:54:32 PM] ~ Shirin: https://apps.apple.com/in/app/panha-palliative-care/id6739414169 ‎<attached: 00004365-PHOTO-2026-11-19-20-54-32.jpg>
+[19/11/26, 9:22:22 PM] ~ Sujay H S: This was hilarious
+[19/11/26, 9:27:01 PM] ~ SVK: Why? I can't see anything
+[19/11/26, 9:27:49 PM] Abdul Basith: Is this vouched for?
+[19/11/26, 9:28:17 PM] ~ Sujay H S: The app is basically what we built. But 8 months ago
+[19/11/26, 9:31:33 PM] ~ SVK: Oh gosh. Is this a bad thing
+[19/11/26, 9:31:38 PM] ~ SVK: Why are u laughing suju
+[19/11/26, 9:32:02 PM] ~ SVK: Only issue i find with this is "unmarried couple" not allowed.
+[19/11/26, 9:32:09 PM] ~ SVK: Have to call and check with the hotel.
+[19/11/26, 9:32:23 PM] Abdul Basith: Well good thing im divorced
+[19/11/26, 9:33:51 PM] ~ Sujay H S: Cause we found it now
+[19/11/26, 9:35:10 PM] ~ SVK: Dude.
+[19/11/26, 9:54:32 PM] ~ Shirin: Guys dont you think a hotel is better than a service apt?
+[19/11/26, 9:54:41 PM] ~ Shirin: Look up anantha suites its pretty good
+[19/11/26, 9:54:46 PM] Abdul Basith: shud we just take anantha
+[19/11/26, 9:55:00 PM] ~ Shirin: On Goibibo its 3k change per night
+[19/11/26, 9:55:07 PM] ~ Shirin: Does this sound good for everyone?
+‎[19/11/26, 10:02:28 PM] Abdul Basith: im booking it ‎<attached: 00004382-PHOTO-2026-11-19-22-02-28.jpg>
+‎[19/11/26, 10:02:29 PM] Abdul Basith: im booking it ‎<attached: 00004383-PHOTO-2026-11-19-22-02-29.jpg>
+[19/11/26, 10:03:36 PM] ~ Shirin: I will too
+[19/11/26, 10:54:07 PM] Abdul Basith: me awaiz n shirin have booked
+[19/11/26, 10:54:34 PM] Abdul Basith: use goibibo if its ur first time on goibibo ‎<This message was edited>
+[20/11/26, 7:41:17 AM] ~ Sujay H S: I’ve also booked
+[20/11/26, 1:16:16 PM] ~ Sujay H S: Latest APK guys?
+[20/11/26, 1:18:59 PM] Abdul Basith: its on the play store
+[20/11/26, 2:42:56 PM] Abdul Basith: wait i forgot you cant install the app. @⁨Shaik Awaiz⁩
+
+ can you build the apk on local machine and send it in this group
+[20/11/26, 2:43:46 PM] Shaik Awaiz: Okay 👌
+‎[20/11/26, 2:55:47 PM] Shaik Awaiz: Sahara-0.7.1-debug.apk ‎document omitted
+‎[20/11/26, 6:03:51 PM] ~ SVK: Panha vs sahara.xlsx ‎<attached: 00004393-Panha vs sahara.xlsx>
+‎[20/11/26, 6:21:59 PM] ~ SVK: Palliative_app_comparison.xlsx ‎<attached: 00004394-Palliative_app_comparison.xlsx>
+[20/11/26, 6:22:21 PM] ~ Sujay H S: Ours is clearly better right?
+[20/11/26, 6:22:31 PM] ~ Sujay H S: And today we are meeting at 8?
+[20/11/26, 6:22:37 PM] ~ SVK: have specifically done an interrogation against pinkshield AI and tanuh
+[20/11/26, 6:22:43 PM] ~ SVK: yes
+[20/11/26, 6:23:01 PM] ~ SVK: I thought if we had the spreadsheet we can discuss that against our app
+[20/11/26, 6:23:15 PM] ~ SVK: we have to believe in ourselves to make an impact at the pitch
+[20/11/26, 6:24:21 PM] ~ SVK: @⁨‎all⁩ please do go through both the spreadsheets. Would be a good thing to discuss i think.
+[20/11/26, 6:24:27 PM] ~ SVK: Yes meeting at 8
+[20/11/26, 6:27:35 PM] ~ SVK: Zeros and ones
+Friday 20 Nov  •  20:00–21:00
+Google Meet joining info
+Video call link: [private Google Meet link removed]
+[20/11/26, 8:01:56 PM] ~ Sujay H S: Can someone let me in?
+[20/11/26, 8:02:28 PM] Abdul Basith: Not someone, Dr Sharada has to
+[20/11/26, 8:02:33 PM] Abdul Basith: im also waiting
+[20/11/26, 8:02:50 PM] Abdul Basith: travelling havent had the time to look at the second sheet
+[20/11/26, 8:15:57 PM] Abdul Basith: Self updated thing directory
+
+Morphine- Yes then ask for the centre
+[20/11/26, 8:21:30 PM] Abdul Basith: Suprise
+
+Would you be suprised if the patient died in the next 12 months? ‎<This message was edited>
+[20/11/26, 8:24:03 PM] Abdul Basith: death certificate and how to procure
+[20/11/26, 8:26:39 PM] Abdul Basith: SOS is somebody death thing
+[20/11/26, 8:37:12 PM] ~ Sujay H S: Sheet 1 of excel to be converted to a slide in the pitch deck to look at our competitors
+[20/11/26, 8:37:53 PM] ~ Sujay H S: Give the thousand edits by Sunday and then put it on the play store
+[20/11/26, 8:38:18 PM] ~ Sujay H S: Logo for the team
+[20/11/26, 8:38:40 PM] ~ Sujay H S: Put Sarvam AI into the app
+[20/11/26, 8:39:35 PM] ~ Sujay H S: How to know if someone has died?
+[20/11/26, 8:41:34 PM] ~ Sujay H S: @⁨Shaik Awaiz⁩ 
+
+Black T-shirt
+
+4x4 mathematical matrix - 2 zeros and 2 ones (Over the pocket area) 
+Back has team name
+
+This is for the logo for the team - Please help
+[20/11/26, 8:42:36 PM] Shaik Awaiz: Yeah i will see through send you the design you guys tell me on that
+[20/11/26, 8:43:03 PM] ~ Sujay H S: Okay thanks. Earlier the better. I guess I need to give it for print. Have to buy T-shirts also LOL
+[20/11/26, 8:43:43 PM] ~ Sujay H S: I guess plain round neck black half armed Tshirt is fine right? Or you want collared?
+[20/11/26, 8:45:56 PM] ~ Shirin: Collared is too formal. Are we going for that look?
+[20/11/26, 8:46:15 PM] ~ Shirin: But then again round neck seems too casual are we going for that?
+[20/11/26, 8:49:45 PM] ~ Sujay H S: I dont know what look we are going for. I am only good at big picture idea
+I do not even mind if we dont do the Tshirts.
+
+I just believe that if we all wear the same thing, it shows unity or team spirit and all that non-sense.
+Individuality is a great thing, but sometimes, showing teamwork is great as well
+[20/11/26, 8:50:55 PM] ~ Sujay H S: I feel old for thinking like this and saying it
+[20/11/26, 8:51:13 PM] ~ Shirin: A small question .
+When are we gonna work on the presentation? The order of saying things and all of the things we need to cover in the small amount of time?
+[20/11/26, 8:51:23 PM] ~ Shirin: We should do the collared i think then
+[20/11/26, 8:51:26 PM] ~ Sujay H S: Friday
+[20/11/26, 8:51:40 PM] ~ Shirin: One day is gonna be enough?
+[20/11/26, 8:52:46 PM] ~ SVK: U shoulf
+[20/11/26, 8:52:55 PM] ~ Sujay H S: I do not think so. We ideally have the PPT already done by Friday. 
+Then on Friday we just decide what to say and in what order. Background work should already be done by Friday.
+
+Deciding what to say on Friday only because I think there will be a lot of back and forth and it will be better if we do it in person
+[20/11/26, 8:53:22 PM] ~ Sujay H S: I can send a list of slides that I feel is necessary from my side. Everyone else can do the same lol
+[20/11/26, 8:53:30 PM] ~ Shirin: Okay
+[20/11/26, 8:53:57 PM] ~ Shirin: Are we gonna be using the ppt we already made for the presentation there or making a new one?
+[20/11/26, 8:54:06 PM] ~ Sujay H S: New one I hope
+[20/11/26, 8:54:15 PM] ~ Shirin: Okayy
+‎[20/11/26, 9:33:17 PM] Shaik Awaiz: ‎<attached: 00004436-PHOTO-2026-11-20-21-33-17.jpg>
+[20/11/26, 9:37:28 PM] ~ Sujay H S: & ONES can be in a different line but both should not be centred. I don’t know if I am making sense
+
+Like
+ZEROS
+     & ONES
+[20/11/26, 9:37:39 PM] ~ Sujay H S: Happy to hear other ideas
+[20/11/26, 9:38:46 PM] ~ Sujay H S: Sab log T-shirt size Batao
+Lol
+[20/11/26, 9:41:11 PM] ~ Shirin: L for me
+[20/11/26, 9:48:49 PM] Abdul Basith: L
+[20/11/26, 9:49:01 PM] Shaik Awaiz: L
+[20/11/26, 9:49:47 PM] Abdul Basith: shud we add the sahara logo
+[20/11/26, 9:49:50 PM] Abdul Basith: 🤔🤔
+‎[20/11/26, 9:58:45 PM] Shaik Awaiz: ‎<attached: 00004445-PHOTO-2026-11-20-21-58-45.jpg>
+‎[20/11/26, 9:58:45 PM] Shaik Awaiz: ‎<attached: 00004446-PHOTO-2026-11-20-21-58-45.jpg>
+‎[20/11/26, 9:58:46 PM] Shaik Awaiz: ‎<attached: 00004447-PHOTO-2026-11-20-21-58-46.jpg>
+[20/11/26, 9:58:52 PM] Abdul Basith: this lowkey looks like engine oil advertisement tshirts ‎<This message was edited>
+[20/11/26, 9:59:30 PM] ~ Sujay H S: 😂😂😂
+[20/11/26, 9:59:43 PM] ~ Sujay H S: We can
+‎[20/11/26, 10:17:53 PM] Shaik Awaiz: ‎<attached: 00004451-PHOTO-2026-11-20-22-17-53.jpg>
+[20/11/26, 10:18:06 PM] Abdul Basith: i love this
+[20/11/26, 10:18:22 PM] Abdul Basith: white color tshirt would be even better
+[20/11/26, 10:26:14 PM] ~ Sujay H S: So hard to maintain lol
+[20/11/26, 10:31:20 PM] ~ Sujay H S: Guys
+[20/11/26, 10:31:28 PM] ~ Sujay H S: Do you have any pictures from our journey?
+[20/11/26, 10:31:52 PM] ~ Sujay H S: Any of our meetings or something like that? I need to give a write up to the institute
+[20/11/26, 10:43:02 PM] Abdul Basith: I dont think so
+[20/11/26, 11:41:15 PM] ~ Sujay H S: Okay
+[20/11/26, 11:42:35 PM] ~ Sujay H S: Everyone else let me know guys. Black or white. Will be buying tomorrow
+[20/11/26, 11:43:16 PM] Shaik Awaiz: black is better
+[20/11/26, 11:45:36 PM] ~ Sujay H S: This is Bea
+[20/11/26, 11:45:40 PM] ~ Sujay H S: Utiful
+[21/11/26, 7:26:31 PM] ~ Sujay H S: Putting up patient portal issues I found
+[21/11/26, 7:26:52 PM] Abdul Basith: yes send em
+‎[21/11/26, 7:26:59 PM] ~ Sujay H S: Colours are too dark and scary ‎<attached: 00004466-PHOTO-2026-11-21-19-26-59.jpg>
+‎[21/11/26, 7:28:04 PM] ~ Sujay H S: This care note says if a new version is available, the old one is invalid. If they have printed one version, how to make sure that they show a new version? What if one GOCD happens and it is changed but the family out of some evil reason shows the old GOCD? Who is at fault? ‎<attached: 00004467-PHOTO-2026-11-21-19-28-04.jpg>
+‎[21/11/26, 7:29:45 PM] ~ Sujay H S: I’m getting very confused. The GOCD appears everywhere. Even if I open emergency planning and even if I open advance care planning. I’m able to do the whole doctor portal part of following each step and filling it up from the patient side as well. We need to remove all of this extra stuff ‎<attached: 00004468-PHOTO-2026-11-21-19-29-45.jpg>
+‎[21/11/26, 7:30:37 PM] ~ Sujay H S: If I select multiple symptoms, I have to enter the score for each symptom one by one. But the name of the symptom is very small and difficult to find ‎<attached: 00004469-PHOTO-2026-11-21-19-30-37.jpg>
+‎[21/11/26, 7:31:02 PM] ~ Sujay H S: The faces we had in the video are better than this ‎<attached: 00004470-PHOTO-2026-11-21-19-31-02.jpg>
+‎[21/11/26, 7:32:25 PM] ~ Sujay H S: The top part of it is too close to the top of the screen. This happens in multiple parts. Ideally the text should appear in white when we put the yellow colour also. We shouldn’t have the thermometer with both green and yellow when we select yellow. There is a gap between the bulb and the first reading and that should go ‎<attached: 00004471-PHOTO-2026-11-21-19-32-25.jpg>
+[21/11/26, 7:33:22 PM] Abdul Basith: sujay you can screen record the thing in english
+‎[21/11/26, 7:33:35 PM] ~ Sujay H S: If there are 20 meds, this will become too long. We should have a feature where these anytime or SOS medicines can be logged multiple times a day. Each time it is entered, the date and time is noted. The doctor should be able to see how many times SOS meds have been taken. To help adjust dosage medicines ‎<attached: 00004473-PHOTO-2026-11-21-19-33-35.jpg>
+[21/11/26, 7:33:36 PM] Abdul Basith: it will make your inputs easier    and we will transcribe and use those
+[21/11/26, 7:33:47 PM] ~ Sujay H S: I’m old. I don’t know how to do that
+‎[21/11/26, 7:34:14 PM] Abdul Basith: ‎<attached: 00004476-AUDIO-2026-11-21-19-34-14.opus>
+[21/11/26, 7:34:57 PM] ~ Sujay H S: I’m just going to record the other phone with my phone and point at things. Is that okay?
+[21/11/26, 7:35:24 PM] Abdul Basith: thats fine as well
+[21/11/26, 7:35:28 PM] ~ Sujay H S: Okay thanks
+‎[21/11/26, 7:47:28 PM] ~ Sujay H S: ‎<attached: 00004480-VIDEO-2026-11-21-19-47-28.mp4>
+[21/11/26, 7:47:53 PM] ~ Sujay H S: This one I have not done in video. Please note
+[21/11/26, 7:49:40 PM] ~ Sujay H S: Issues are same on the care givers portal
+‎[21/11/26, 7:50:11 PM] ~ SVK: ‎<attached: 00004483-PHOTO-2026-11-21-19-50-11.jpg>
+[21/11/26, 7:50:40 PM] ~ SVK: Does each symptom get a distressometer or its overall
+[21/11/26, 7:51:02 PM] ~ Sujay H S: This is distressometer. Each symptom has its own 1 to 10 grading
+[21/11/26, 7:53:32 PM] ~ Sujay H S: This is also a genuine doubt
+[21/11/26, 7:55:14 PM] ~ Sujay H S: Can we have meeting at 8.30? I can finish doing the doctors part also by then
+[21/11/26, 8:00:19 PM] ~ SVK: Ok
+‎[21/11/26, 8:18:47 PM] ~ Sujay H S: ‎<attached: 00004489-VIDEO-2026-11-21-20-18-47.mp4>
+[21/11/26, 8:18:52 PM] ~ Sujay H S: Doctors portal
+[21/11/26, 8:19:24 PM] ~ Sujay H S: Do we have one app download for all 3 profiles or one app for doctors and one app for patient/care givers? Which do you think will be better?
+‎[21/11/26, 8:23:20 PM] ~ Shirin: Why is gender and sex different?😭 ‎<attached: 00004492-PHOTO-2026-11-21-20-23-20.jpg>
+[21/11/26, 8:23:47 PM] ~ Sujay H S: The lawyer said this
+[21/11/26, 8:23:54 PM] Abdul Basith: i have a really good joke but ill save it for now
+[21/11/26, 8:23:59 PM] ~ Shirin: Also in the DOB the year is not changeable without swiping through the months can we fix that?
+[21/11/26, 8:24:24 PM] ~ Shirin: Oh? Okay
+[21/11/26, 8:25:02 PM] ~ Sujay H S: I am unable to explicitly say why without being offensive to some people
+[21/11/26, 8:26:16 PM] ~ Shirin: Alright lol
+‎[21/11/26, 8:30:32 PM] ~ Shirin: Can you guys add multiple entries for medicines with separate plan timelines for each? Or atleast a (+) option to add as many possible ‎<attached: 00004499-PHOTO-2026-11-21-20-30-32.jpg>
+[21/11/26, 8:34:08 PM] Abdul Basith: send any changes without any hesitation whatsoever.  we will do all of them.
+[21/11/26, 8:34:29 PM] Abdul Basith: if you wanna record a video as well screen recording do it
+[21/11/26, 8:34:42 PM] Abdul Basith: and just start saying the changes like how sujay did
+[21/11/26, 8:35:42 PM] ~ SVK: I don't know if there is a point to meeting today?
+[21/11/26, 8:35:51 PM] ~ SVK: After the changes we can meet tomo?
+[21/11/26, 8:35:59 PM] ~ Sujay H S: Sounds good
+‎[21/11/26, 8:37:34 PM] ~ Shirin: This part is very vague no? Maybe an introduction about what capacity we’re talking about would help? ‎<attached: 00004506-PHOTO-2026-11-21-20-37-34.jpg>
+[21/11/26, 10:12:15 PM] ~ Shirin: Do we have alarm notifications for medicines and appointments? If we dont then its good if we incorporate it, and so that the timing can be customised plus it only goes away when the option taken/ noted is clicked
+[21/11/26, 10:14:47 PM] ~ Shirin: And when we scan the qr in sos, along with names of family members, can the number of reliable guardian also be provided?
+[22/11/26, 12:42:47 PM] ~ Sujay H S: Send this design to me na. I need to place order with Printo
+‎[22/11/26, 12:56:31 PM] ~ Sujay H S: ‎<attached: 00004510-PHOTO-2026-11-22-12-56-31.jpg>
+[22/11/26, 1:00:43 PM] Abdul Basith: oh waittt
+‎[22/11/26, 2:06:14 PM] Abdul Basith: front-sahara-logo-for-black-shirt.svg ‎<attached: 00004512-front-sahara-logo-for-black-shirt.svg>
+‎[22/11/26, 2:06:15 PM] Abdul Basith: preview-on-black.png ‎<attached: 00004513-preview-on-black.png>
+[22/11/26, 2:09:00 PM] ~ Sujay H S: Want to give front and back separately without background? Front 3x3in or 4x4in and back is max A4 sixe
+[22/11/26, 2:10:28 PM] Abdul Basith: 4x4 is fine
+[22/11/26, 2:11:00 PM] Abdul Basith: back.  should we do only front?
+[22/11/26, 2:11:51 PM] Shaik Awaiz: Sahara logo on the backside??
+[22/11/26, 2:13:29 PM] ~ Sujay H S: I thought only Sahara logo on front and team logo on the back
+[22/11/26, 2:13:39 PM] ~ Sujay H S: Like this
+[22/11/26, 2:15:05 PM] Shaik Awaiz: Also font of the of 1 and 0 to be monstserrat bold
+[22/11/26, 2:16:39 PM] Abdul Basith: if we gonna do backside 12x12 then we can put our names asw
+[22/11/26, 2:37:51 PM] Abdul Basith: @⁨~Sujay H S⁩ check email for files
+‎[22/11/26, 2:41:20 PM] ~ Sujay H S: ‎<attached: 00004523-PHOTO-2026-11-22-14-41-20.jpg>
+[22/11/26, 2:41:33 PM] Abdul Basith: L
+[22/11/26, 2:41:33 PM] ~ Sujay H S: Got it. Gonna use the one with & in it
+[22/11/26, 2:42:00 PM] ~ Sujay H S: Printing the front logo as 4x4 and not 3x3. That's fine?
+[22/11/26, 2:42:15 PM] Abdul Basith: thats fine
+[22/11/26, 2:42:48 PM] Abdul Basith: and back side since we can utilize the whole space.  shud we wanna print the names ‎<This message was edited>
+[22/11/26, 2:42:50 PM] Abdul Basith: or no
+[22/11/26, 2:42:58 PM] ~ Sujay H S: I think no?
+[22/11/26, 5:29:40 PM] ~ Sujay H S: T-shirt order given. Should be done by tomorrow
+‎[22/11/26, 5:30:19 PM] ~ SVK: ‎<attached: 00004532-STICKER-2026-11-22-17-30-19.webp>
+[22/11/26, 8:01:39 PM] ~ SVK: Are we meeting?
+[22/11/26, 8:05:32 PM] ~ Sujay H S: I was just about to ask the same thing
+[22/11/26, 8:07:13 PM] ~ SVK: My link was active omly for two dayy
+[22/11/26, 8:08:06 PM] ~ Sujay H S: Ah okay
+[22/11/26, 8:08:10 PM] ~ Sujay H S: Let others reply
+[22/11/26, 8:09:50 PM] ~ SVK: Ok
+‎[22/11/26, 8:13:33 PM] ~ Sujay H S: Validated_Tools_Slide.pptx ‎<attached: 00004539-Validated_Tools_Slide.pptx>
+[22/11/26, 8:16:15 PM] Abdul Basith: 8:30 we can do if u want we will push the changes today on play store
+[22/11/26, 8:16:43 PM] ~ Sujay H S: Okay. Wanna share the APK before doing that in case some other changes need to be made?
+[22/11/26, 8:18:51 PM] Abdul Basith: then we will push the meet to 9.  i can give the apk hopefully before that
+[22/11/26, 8:19:04 PM] ~ Sujay H S: Okay cool
+[22/11/26, 8:20:58 PM] ~ Sujay H S: I like that the patient can request to create a goals of care document with the doctor
+[22/11/26, 8:21:45 PM] ~ SVK: Is this new?
+[22/11/26, 8:22:19 PM] ~ Sujay H S: I think this was there. But it appears only on the doctor side. Not sure how to raise a request for this from the patient side
+[22/11/26, 8:59:05 PM] ~ Sujay H S: [private Teams meeting link removed]
+[22/11/26, 9:15:59 PM] ~ Sujay H S: ‎This message was deleted.
+[22/11/26, 9:18:44 PM] ~ Sujay H S: Minutes:
+- Dr. Sharada and Sujay to create a pitch deck outline
+- Basith to check on the mentor for ppt outline and details of upcoming meeting
+- Everyone to think about how to address death of the patient
+- Failsafe for older physical QR codes to be built
+- Surprise question to be designed as per discussed algorithm
+- New APK to be shared
+- New APK to be physically tested with at least 5 conversations - I think we should allow logins if possible. It would be good.
+
+Not sure if I have missed anything
+[23/11/26, 11:12:26 AM] Abdul Basith: Health-a-thon 2026 Grand Finale Briefing
+Monday, 23 November · 12:00 – 12:10pm
+Time zone: Asia/Kolkata
+Google Meet joining info
+Video call link: [private Google Meet link removed]
+Or dial: [meeting dial-in number and PIN removed]
+More phone numbers: [meeting dial-in link removed]
+[23/11/26, 11:12:53 AM] Abdul Basith: this is the 10 minute meeting.   healthaton team will explain the agenda of the whole day
+[23/11/26, 11:27:21 AM] ~ SVK: I will be doing patient rounds at this time
+[23/11/26, 11:28:05 AM] ~ SVK: Pls excuse me and let me know the details
+[23/11/26, 12:04:44 PM] ~ Sujay H S: Oh. This is very short notice
+[23/11/26, 12:04:44 PM] ~ Sujay H S: Please attend and let me know Basith. I’m in a meeting
+[23/11/26, 12:26:40 PM] Abdul Basith: The announced jury members include Dr. Harit Chhaturvedi, who leads the clinical oncology network at Apollo Hospital, Dr. Joy Manin from CMC Vellore, Mr. Kil Sakenna, who heads technology and AI at AIG Hospital groups, and a representative from the healthcare venture capitalist ecosystem.
+[23/11/26, 12:26:57 PM] Abdul Basith: And an OpenAI India team head
+[23/11/26, 12:27:55 PM] Abdul Basith: -10 min pitch only
+-it will be a closed room pitch but other track teams will watch us pitch 😂
+
+-top 3 will pitch on the stage to everyone in event.  top 3 is just showcase, no evaluation metric to pitch on the stage
+‎[23/11/26, 12:29:26 PM] Abdul Basith: HHH==ELTHON%20%E2%80%93%202026-11-23%2012-04%20IST%20%E2%80%93%20Notes%20by%20Ge.pdf • ‎2 pages ‎<attached: 00004559-HHH==ELTHON%20%E2%80%93%202026-11-23%2012-04%20IST%20%E2%80%93%20Notes%20by%20Ge.pdf>
+‎[23/11/26, 12:30:03 PM] Abdul Basith: Health-a-thon 2026 Grand Finale Agenda.pdf • ‎1 page ‎<attached: 00004560-Health-a-thon 2026 Grand Finale Agenda.pdf>
+[23/11/26, 12:31:59 PM] ~ Sujay H S: Sounds good
+[23/11/26, 12:32:01 PM] ~ Sujay H S: Let’s kill it
+[23/11/26, 12:32:09 PM] ~ Sujay H S: Please share the APK @⁨Abdul Basith⁩
+[23/11/26, 12:35:47 PM] Abdul Basith: i am sharing it in a bit
+[23/11/26, 12:35:53 PM] ~ Sujay H S: Thanks
+[23/11/26, 12:36:48 PM] Abdul Basith: @⁨~Sujay H S⁩ @⁨~SVK⁩ @⁨~Shirin⁩ They repeatedly highlighted so many times that jury is very senior and they WILL ask you clinical questions so they said to be prepared for it
+[23/11/26, 12:38:31 PM] ~ Sujay H S: Okay
+[23/11/26, 12:39:00 PM] ~ Sujay H S: We will read keep up to date
+[23/11/26, 12:43:24 PM] ~ Sujay H S: What clinical questions can they ask 😭😭
+[23/11/26, 12:59:48 PM] ~ Shirin: Is there any way we can make the app more fit for elderly/ technology wise less aware patients?
+[23/11/26, 1:01:09 PM] ~ Shirin: Idk about clinical but they might ask ethical concern questions
+[23/11/26, 1:01:27 PM] ~ Shirin: And stuff about this
+[23/11/26, 1:04:11 PM] ~ Shirin: We need a constant verification of the care directory( the hospitals, caregivers, help groups or any other contacts we’re providing in the app) because what if they go temporarily offline or shut down
+[23/11/26, 1:04:53 PM] ~ Shirin: When the patient logs severe pain or severe distress does it alert any sos alarm?
+[23/11/26, 1:35:22 PM] ~ Sujay H S: All good thoughts Shirin
+[23/11/26, 1:42:02 PM] Abdul Basith: is there any sos system alr in place for this except 102
+[23/11/26, 1:42:31 PM] ~ Shirin: But we cant call a helpline everytime they feel extreme distress right?
+[23/11/26, 1:42:46 PM] ~ Shirin: Will it be better to notify the doctor?
+[23/11/26, 1:43:02 PM] Abdul Basith: We can do that
+[23/11/26, 1:43:27 PM] ~ Shirin: Also here i have another question, everytime the symptoms update, the doctor sees it right?
+[23/11/26, 1:43:56 PM] ~ Shirin: Does the doctor get notified or they only see it when they open the patients log?
+[23/11/26, 1:46:15 PM] ~ Sujay H S: This
+[23/11/26, 1:46:34 PM] ~ Shirin: Okay
+[23/11/26, 1:46:46 PM] ~ Shirin: Will it be better if the severe distresses are notified?
+[23/11/26, 1:46:56 PM] ~ Shirin: We can create notifications right? @⁨Abdul Basith⁩
+[23/11/26, 1:51:23 PM] ~ Sujay H S: I personally do not think that having a severe distress notification is right. Because these patients are sick. They will be in a lot of distress. The doctor should not be burdened with that. Alternately, we can probably send the doctor a notification if the QR code has been scanned and GOCD has been accessed by another healthcare professional
+[23/11/26, 1:52:01 PM] ~ Shirin: Yeah sounds better
+[23/11/26, 1:53:33 PM] Abdul Basith: so what changes?
+[23/11/26, 1:54:19 PM] ~ Shirin: We can do something like pop up notifs withing the app when the doctor sees the patient file
+[23/11/26, 1:54:31 PM] ~ Shirin: Only regarding severe pain/ sever distress
+‎[23/11/26, 1:54:33 PM] Abdul Basith: Sahara-0.8.0-test-arm64.apk ‎document omitted
+[23/11/26, 2:05:22 PM] ~ Sujay H S: Okay. Also a notification on the doctors end that the QR code was scanned at a particular hospital or something
+[23/11/26, 2:05:27 PM] ~ Sujay H S: Thanks
+‎[23/11/26, 5:59:53 PM] ~ SVK: This doesn't sound right ‎<attached: 00004594-PHOTO-2026-11-23-17-59-53.jpg>
+‎[23/11/26, 6:00:30 PM] ~ SVK: ‎<attached: 00004595-PHOTO-2026-11-23-18-00-30.jpg>
+[23/11/26, 6:00:31 PM] ~ SVK: This too
+‎[23/11/26, 6:02:36 PM] ~ SVK: ‎<attached: 00004597-PHOTO-2026-11-23-18-02-36.jpg>
+[23/11/26, 6:02:42 PM] ~ SVK: Probably needs a sad face
+‎[23/11/26, 6:04:44 PM] ~ SVK: ‎<attached: 00004599-PHOTO-2026-11-23-18-04-44.jpg>
+[23/11/26, 6:04:54 PM] ~ SVK: Where do I get to see the filled distressometer
+‎[23/11/26, 6:07:43 PM] ~ SVK: ‎<attached: 00004601-VIDEO-2026-11-23-18-07-43.mp4>
+[23/11/26, 6:08:20 PM] ~ SVK: So is the physical concerns a computed total on distressometer? @⁨~Sujay H S⁩
+[23/11/26, 6:14:27 PM] ~ Sujay H S: No no
+[23/11/26, 6:14:35 PM] ~ Sujay H S: Distress is how much the patient is feeling
+[23/11/26, 6:14:49 PM] ~ Sujay H S: Physical concerns is the number of concerns they have that need to be adde
+[23/11/26, 6:14:52 PM] ~ Sujay H S: Addressed
+‎[23/11/26, 6:15:17 PM] ~ SVK: ‎<attached: 00004607-VIDEO-2026-11-23-18-15-17.mp4>
+[23/11/26, 6:15:29 PM] ~ SVK: Why do patients relatives have to consent? Is it needed for us to record? If patient can't consent only then family needs ?
+[23/11/26, 6:16:08 PM] ~ SVK: I understand. But each symptom is being given an individual number on the distressometer. The final number is different
+‎[23/11/26, 6:19:32 PM] ~ SVK: Does this need to be along with an ecog? ‎<attached: 00004610-PHOTO-2026-11-23-18-19-32.jpg>
+‎[23/11/26, 6:22:14 PM] ~ SVK: Surprise question on top , above goals of care card? ‎<attached: 00004611-PHOTO-2026-11-23-18-22-14.jpg>
+‎[23/11/26, 6:32:43 PM] ~ SVK: Unable to tick this ‎<attached: 00004612-PHOTO-2026-11-23-18-32-43.jpg>
+‎[23/11/26, 6:33:45 PM] ~ SVK: But I'm able to sign at the end ‎<attached: 00004613-VIDEO-2026-11-23-18-33-45.mp4>
+‎[23/11/26, 6:36:57 PM] ~ SVK: This conversation note that gives prompts or checkboxes while manually entering, it doesn't provide this checklist when we are recording ‎<attached: 00004614-PHOTO-2026-11-23-18-36-57.jpg>
+[23/11/26, 6:37:26 PM] ~ SVK: If there is a way to do so, I think it would make it better. Because that is the AI transcription part na.
+[23/11/26, 6:38:58 PM] ~ Sujay H S: Sometimes patients don’t want diagnosis to be disclosed or the family doesn’t want diagnosis to be disclosed to the patient
+[23/11/26, 6:39:13 PM] ~ Sujay H S: Oh
+[23/11/26, 6:40:34 PM] ~ SVK: So it should be either or, not both required for recording
+[23/11/26, 6:49:23 PM] ~ SVK: Designing for caregivers of   caregiving prompts 
+
+
+1. Passive Behavioral Signals 
+ 
+ * Sudden Engagement Drop-Off: If a caregiver who logs medications, symptoms, or appointments daily suddenly stops opening the app for 3–5 consecutive days, trigger a "quiet mode" 
+
+ * Abrupt Cessation of Specific Tasks: If medication tracking stops entirely while the user still opens the app to view notes or messages, this is a strong indicator that active caregiving has paused or ended.
+
+ * Integration Signals (I think we can pitch this as a later thing to do while working with hospitals or palliative care networks): If the app syncs with a patient portal, hospice care team, or shared family calendar, look for status changes (e.g., discharge to hospice, cancellation of recurring specialist appointments) to adjust the app's tone proactively
+
+2. Gentle Check-In Copy & Framing
+ low-friction options.
+Instead of asking "How is [Patient Name] doing today?", use a soft status check after a period of inactivity:
+> "We haven't checked in for a few days, and we're thinking of you. Has anything changed in your caregiving routine?"
+>  * Things are steady, just taking a break from the app
+>  * Our care needs or routine have shifted
+>  * I'm no longer actively caregiving
+>  * Remind me later
+> 
+ Selecting "I'm no longer actively caregiving" is accurate, dignified, and emotionally protective. It covers bereavement, transition to a full-time facility, or passing caregiving duties to someone else, without forcing the word "death" onto the screen before the user is ready.
+
+3. Progressive Disclosure
+
+If the user selects "I'm no longer actively caregiving" or "Our care needs have shifted", transition gently into a compassionate follow-up screen that lets them define what happened—or skip defining it altogether.
+> "Thank you for letting us know. Caregiving transitions can carry a lot of weight, and we want to make sure this space supports you properly. Would you like to share what changed so we can adjust your experience?"
+>  * [Patient Name] has passed away
+>  * [Patient Name] moved to a care facility / hospice
+>  * Someone else has taken over care
+>  * I'd prefer not to say right now
+> 
+4. Designing the "After" Experience
+
+ Notification Freeze: The millisecond they indicate they are no longer caregiving—or that the patient has passed—immediately cancel all queued reminders, medication alerts, and upbeat "streak" notifications.
+ * Preserve, Don't Delete: Never wipe the patient’s profile or logs automatically. Caregivers often find comfort in looking back at notes, photos, or milestones. Archive the caregiving dashboard into a quiet "Memory / Archive" tab that they can access only when they choose to.
+ * Pivot to Grief & Recovery Support: Offer an optional toggle to shift the app's focus from caregiving logistics to caregiver recovery and bereavement resources—or give them a one-tap option to pause their account for 30, 60, or 90 days without losing their data.
+
+ * Empower Secondary Contacts: If the app allows family members or co-caregivers to share a care circle, allow a secondary member to update the status quietly so the primary caregiver doesn't have to bear the burden of administrative updates while grieving.
+[23/11/26, 6:49:42 PM] ~ SVK: Pls let me know what you'll think of this as a structure to deal with caregiver help
+[23/11/26, 7:02:45 PM] ~ Sujay H S: Sounds good
+[23/11/26, 7:16:25 PM] ~ Sujay H S: I think we can have a long meeting today. Go through each screen during the call and decide together what changes need to happen once and for all. What say?
+[23/11/26, 7:16:30 PM] ~ Sujay H S: What time is everyone okay with?
+[23/11/26, 7:16:50 PM] ~ Sujay H S: We can literally click every button
+[23/11/26, 7:17:08 PM] ~ Sujay H S: Suffering for a day will help us
+[23/11/26, 7:17:19 PM] ~ SVK: Tomo morning?
+[23/11/26, 7:17:27 PM] ~ SVK: It's a gazetted holiday
+[23/11/26, 7:17:56 PM] ~ Sujay H S: I have a meeting from 10.30 to 12 tomorrow
+[23/11/26, 7:18:18 PM] ~ SVK: After that?
+[23/11/26, 7:18:22 PM] ~ SVK: @⁨‎all⁩
+[23/11/26, 7:18:38 PM] ~ Sujay H S: I’m okay after that
+‎[23/11/26, 7:18:44 PM] ~ SVK: ‎<attached: 00004632-STICKER-2026-11-23-19-18-44.webp>
+‎[23/11/26, 7:18:58 PM] ~ Sujay H S: ‎<attached: 00004633-PHOTO-2026-11-23-19-18-58.jpg>
+[23/11/26, 7:19:15 PM] ~ Sujay H S: Got bluestacks. We can do a share screen and work this during the meetinf
+[23/11/26, 7:20:32 PM] ~ Shirin: 🥲i cant tomr but lmk if theres anything i can do and are we not meeting tonight?
+[23/11/26, 7:21:15 PM] ~ Sujay H S: We can meet tonight. I’m okay with tonight also
+[23/11/26, 7:21:20 PM] ~ Sujay H S: Whatever everyone wants
+[23/11/26, 7:25:06 PM] ~ SVK: @⁨~Shirin⁩ pls see if this works ?
+[23/11/26, 7:25:32 PM] ~ SVK: I am requesting for tomo cos I'm sitting with a splitting headache
+[23/11/26, 7:26:06 PM] ~ Shirin: Ofc we’ll do tomr i might join in the later half of the meeting 
+Tc 🫶🏻
+[23/11/26, 7:27:19 PM] ~ SVK: Thanks
+[23/11/26, 7:27:32 PM] ~ Shirin: Yes this sounds good
+[23/11/26, 7:30:33 PM] ~ Shirin: Along with all the other options can we add “has the patient passed away”? Or a lesser insensitive version of that maybe?
+[23/11/26, 7:31:39 PM] ~ SVK: I think the I'm not an active care giver addresses that
+‎[23/11/26, 7:32:08 PM] ~ SVK: ‎<attached: 00004645-PHOTO-2026-11-23-19-32-08.jpg>
+[23/11/26, 7:32:18 PM] ~ SVK: It's also there in the sub sections
+[23/11/26, 7:35:40 PM] ~ Shirin: Oh yeah sorry i didnt notice that
