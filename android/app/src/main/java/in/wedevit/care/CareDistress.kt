@@ -195,9 +195,12 @@ internal object DistressCodec {
     }
 }
 
-/** One screen: the 0–10 thermometer (the only required answer), the problem list as tick boxes, and "Any other concern". */
+/**
+ * Two screens in sequence (clinical team, 24 Nov 2026): first the 0–10 thermometer (the only required answer), then Next to what is
+ * adding to it (the NCCN problem list as tick boxes, and "Any other concern"), then Save. Back on the second screen returns to the first.
+ * The saved answer is the same one check-in as before ([DistressCodec]).
+ */
 @Composable fun DistressScreen(vm: CareModel, onClose: () -> Unit) {
-    val t = careText()
     val items by vm.items.collectAsStateWithLifecycle(); val person by vm.selected.collectAsStateWithLifecycle(); val busy by vm.busy.collectAsStateWithLifecycle()
     val modelError by vm.actionError.collectAsStateWithLifecycle()
     val dayStart = remember { LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() }
@@ -209,23 +212,39 @@ internal object DistressCodec {
     var other by rememberSaveable { mutableStateOf(previous?.other.orEmpty()) }
     val capturedAccount = remember(person) { vm.accountNamespace }
     val chosen = ticked.split("\n").filter { it.isNotEmpty() }.toSet()
-    val hindi = careHindi()
-    // Which group is open (-1 none; 1..5 the NCCN groups, 6 "Any other concern"). Nothing opens by itself: only a tap opens a group.
-    var open by rememberSaveable { mutableStateOf(-1) }
-    var doneSteps by rememberSaveable { mutableStateOf("") }
-    val finished = doneSteps.split(",").mapNotNull { it.toIntOrNull() }.toSet()
-    fun markDone(step: Int) { doneSteps = (finished + step).joinToString(",") }
-    // Moving on counts as done: closing a group, or opening the next one, marks the one that was open; no "Done" tap needed.
-    fun toggle(step: Int) { if (open > 0) markDone(open); open = if (open == step) -1 else step }
+    // 1 = the thermometer, 2 = what is adding to it.
+    var step by rememberSaveable { mutableStateOf(1) }
     LaunchedEffect(Unit) { vm.actionError.value = null }
-    BackHandler { onClose() }
-    Column(Modifier.fillMaxSize().background(Cream).safeDrawingPadding().imePadding().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(top = 12.dp, bottom = 16.dp).testTag("distress-screen"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onClose, modifier = Modifier.sizeIn(minWidth = 48.dp, minHeight = 48.dp).testTag("distress-close")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Close", "बंद करें"), tint = Ink) }
-            Box(Modifier.weight(1f)) { Heading(t("Distress Thermometer", "परेशानी थर्मामीटर"), 24) }
-            CareChartInfoButton(t("About this", "इसके बारे में"), distressAbout(t), "distress")
-            CareLanguageMenu(compact = true)
-        }
+    BackHandler { if (step == 2) step = 1 else onClose() }
+    fun save() {
+        val check = DistressCheck(true, score, DistressRules.problems.filter { it in chosen }, other.trim())
+        val change = DistressRules.change(today, check)
+        when { change == null -> onClose(); !canEditCareContext(vm, person, capturedAccount) -> onClose(); today != null -> vm.updateItem(change, onClose); else -> vm.saveItem("checkin", change.title, change.detail, 0, onClose) }
+    }
+    SaharaScreenHost(step, Modifier.fillMaxSize().background(Cream).testTag("distress-screen"), label = "distress-step",
+        direction = { from, to -> if (to < from) SaharaMotion.Direction.Back else SaharaMotion.Direction.Forward }) { shown ->
+        if (shown == 1) DistressScoreStep(vm, person, score, onScore = { score = it }, onClose = onClose, onNext = { step = 2 })
+        else DistressCausesStep(score, chosen, other, busy, modelError, onBack = { step = 1 },
+            onToggle = { id -> ticked = (if (id in chosen) chosen - id else chosen + id).joinToString("\n") }, onOther = { other = it }, onSave = ::save)
+    }
+}
+
+/** The title row both screens share: back arrow, title, the "i" button and the language menu. */
+@Composable private fun DistressHeader(onBack: () -> Unit, backLabel: String, backTag: String) {
+    val t = careText()
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        IconButton(onClick = onBack, modifier = Modifier.sizeIn(minWidth = 48.dp, minHeight = 48.dp).testTag(backTag)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, backLabel, tint = Ink) }
+        Box(Modifier.weight(1f)) { Heading(t("Distress Thermometer", "परेशानी थर्मामीटर"), 24) }
+        CareChartInfoButton(t("About this", "इसके बारे में"), distressAbout(t), "distress")
+        CareLanguageMenu(compact = true)
+    }
+}
+
+/** Screen 1: the question, the thermometer with the chosen number large beside it, then Next. */
+@Composable private fun DistressScoreStep(vm: CareModel, person: String, score: Int, onScore: (Int) -> Unit, onClose: () -> Unit, onNext: () -> Unit) {
+    val t = careText()
+    Column(Modifier.fillMaxSize().safeDrawingPadding().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(top = 12.dp, bottom = 16.dp).testTag("distress-step-score"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        DistressHeader(onClose, t("Close", "बंद करें"), "distress-close")
         val about = distressAboutName(vm, person)
         Text(if (about != null) t("How much distress has $about felt in the past week, including today?", "पिछले एक हफ़्ते में, आज समेत, $about को कितनी परेशानी रही है?")
             else t("How much distress have you felt in the past week, including today?", "पिछले एक हफ़्ते में, आज समेत, आपको कितनी परेशानी रही है?"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk)
@@ -233,54 +252,65 @@ internal object DistressCodec {
         Text(t("This is one number for overall distress. Each symptom (pain, sleep and others) has its own 0–10 score in Symptoms.", "यह कुल परेशानी का एक अंक है। हर लक्षण (दर्द, नींद आदि) का अपना 0–10 अंक लक्षणों में अलग से दिया जाता है।"),
             fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardSub, modifier = Modifier.testTag("distress-overall-explainer"))
         // The chosen number, large, with a plain instruction: nobody should have to guess that the thermometer slides.
-        Row(Modifier.fillMaxWidth().animateContentSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(if (score in 0..10) "$score" else "–", fontFamily = SaharaTitleFont, fontSize = 56.sp, lineHeight = 60.sp, fontWeight = FontWeight.Bold, color = if (score in 0..10) distressBandText(score) else DoctorCardSub, modifier = Modifier.testTag("distress-big-number"))
-            Column {
-                Text("/10", fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub)
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterHorizontally), verticalAlignment = Alignment.CenterVertically) {
+            DistressThermometer(score, Modifier.width(112.dp), onScore)
+            Column(Modifier.animateContentSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Row(verticalAlignment = Alignment.Bottom) {
+                    Text(if (score in 0..10) "$score" else "–", fontFamily = SaharaTitleFont, fontSize = 64.sp, lineHeight = 68.sp, fontWeight = FontWeight.Bold, color = if (score in 0..10) distressBandText(score) else DoctorCardSub, modifier = Modifier.testTag("distress-big-number"))
+                    Text("/10", fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub, modifier = Modifier.padding(start = 4.dp, bottom = 10.dp))
+                }
                 Text(if (score in 0..10) t("Slide to change", "बदलने के लिए सरकाएँ") else t("Slide to rate", "अंक देने के लिए सरकाएँ"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorAccent, maxLines = 1, softWrap = false, modifier = Modifier.testTag("distress-slide-hint"))
             }
         }
-        // The thermometer on the left, the six concern groups beside it, so the whole check fits one screen.
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            DistressThermometer(score, Modifier.width(112.dp)) { score = it }
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(t("What is adding to it? Tick any (no scores here)", "किस वजह से? जो लागू हो चुनें (यहाँ अंक नहीं)"), fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.testTag("distress-problems-hint"))
-                DistressRules.categories.forEachIndexed { index, category ->
-                    val step = index + 1
-                    val (icon, colour) = distressGroupStyle(category.en)
-                    DistressGroupTile(t(category.en, category.hi), category.items.count { it.first in chosen }, step in finished, open == step, icon, colour, "distress-step-$step") { toggle(step) }
-                }
-                DistressGroupTile(t("Any other concern", "कोई और चिंता"), if (other.isNotBlank()) 1 else 0, 6 in finished, open == 6, Icons.Filled.Edit, DoctorCardSub, "distress-step-other") { toggle(6) }
-            }
+        DistressSource()
+        Button(onClick = onNext, enabled = score in 0..10, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust, contentColor = Color.White), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("distress-next")) {
+            Text(t("Next", "आगे"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
         }
+    }
+}
+
+/** Screen 2: what is adding to it, one group at a time (its list opens right under it), any other concern, then Save. */
+@Composable private fun DistressCausesStep(score: Int, chosen: Set<String>, other: String, busy: Boolean, modelError: String?, onBack: () -> Unit, onToggle: (String) -> Unit, onOther: (String) -> Unit, onSave: () -> Unit) {
+    val t = careText()
+    // Which group is open (-1 none; 1..5 the NCCN groups, 6 "Any other concern"). Nothing opens by itself: only a tap opens a group.
+    var open by rememberSaveable { mutableStateOf(-1) }
+    var doneSteps by rememberSaveable { mutableStateOf("") }
+    val finished = doneSteps.split(",").mapNotNull { it.toIntOrNull() }.toSet()
+    fun markDone(step: Int) { doneSteps = (finished + step).joinToString(",") }
+    // Moving on counts as done: closing a group, or opening the next one, marks the one that was open; no "Done" tap needed.
+    fun toggle(step: Int) { if (open > 0) markDone(open); open = if (open == step) -1 else step }
+    Column(Modifier.fillMaxSize().safeDrawingPadding().imePadding().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(top = 12.dp, bottom = 16.dp).testTag("distress-step-causes"), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        DistressHeader(onBack, t("Back", "वापस"), "distress-back")
+        // The score from the first screen, small, so it is clear what these causes belong to.
+        if (score in 0..10) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.testTag("distress-causes-score")) {
+            Box(Modifier.size(36.dp).background(distressBand(score), CircleShape), contentAlignment = Alignment.Center) { Text("$score", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = distressOnBand(score)) }
+            val s = score; Text(t("Distress $s/10", "परेशानी $s/10"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+        }
+        Text(t("What is adding to it? Tick any (no scores here)", "किस वजह से? जो लागू हो चुनें (यहाँ अंक नहीं)"), fontSize = 16.sp, lineHeight = 22.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.testTag("distress-problems-hint"))
         DistressRules.categories.forEachIndexed { index, category ->
             val step = index + 1
-            val (_, colour) = distressGroupStyle(category.en)
+            val (icon, colour) = distressGroupStyle(category.en)
+            DistressGroupTile(t(category.en, category.hi), category.items.count { it.first in chosen }, step in finished, open == step, icon, colour, "distress-step-$step") { toggle(step) }
             AnimatedVisibility(open == step, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(t(category.en, category.hi), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
-                    DistressProblemGroup(category, colour, chosen) { id -> ticked = (if (id in chosen) chosen - id else chosen + id).joinToString("\n") }
+                    DistressProblemGroup(category, colour, chosen, onToggle)
                     OutlinedButton(onClick = { markDone(step); open = -1 }, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("distress-done-$step")) {
                         Text(t("Done", "हो गया"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
                     }
                 }
             }
         }
+        DistressGroupTile(t("Any other concern", "कोई और चिंता"), if (other.isNotBlank()) 1 else 0, 6 in finished, open == 6, Icons.Filled.Edit, DoctorCardSub, "distress-step-other") { toggle(6) }
         AnimatedVisibility(open == 6, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(other, { if (it.length <= DistressRules.OTHER_LIMIT) other = it }, label = { Text(t("Any other concern (optional)", "कोई और चिंता (चाहें तो)")) }, minLines = 2, maxLines = 4, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag("distress-other"))
+                OutlinedTextField(other, { if (it.length <= DistressRules.OTHER_LIMIT) onOther(it) }, label = { Text(t("Any other concern (optional)", "कोई और चिंता (चाहें तो)")) }, minLines = 2, maxLines = 4, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag("distress-other"))
                 OutlinedButton(onClick = { markDone(6); open = -1 }, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("distress-done-6")) {
                     Text(t("Done", "हो गया"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
                 }
             }
         }
-        DistressSource()
         modelError?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
-        Button(onClick = {
-            val check = DistressCheck(true, score, DistressRules.problems.filter { it in chosen }, other.trim())
-            val change = DistressRules.change(today, check)
-            when { change == null -> onClose(); !canEditCareContext(vm, person, capturedAccount) -> onClose(); today != null -> vm.updateItem(change, onClose); else -> vm.saveItem("checkin", change.title, change.detail, 0, onClose) }
-        }, enabled = !busy && score in 0..10, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust, contentColor = Color.White), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("distress-save")) {
+        Button(onClick = onSave, enabled = !busy && score in 0..10, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust, contentColor = Color.White), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("distress-save")) {
             Text(t("Save", "सहेजें"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
         }
     }
@@ -439,7 +469,8 @@ private val DistressRowHeight = 24.dp
                 bands = listOf(ChartBand(0.0, 3.5, Sage, 0.10f), ChartBand(3.5, 6.5, distressBand(5), 0.10f), ChartBand(6.5, 10.0, distressBand(8), 0.10f)),
                 pointText = { it.toInt().toString() })
             // The latest answers as one list with dividers: score chip, date, then any ticked problems.
-            history.take(5).forEachIndexed { i, (item, check) ->
+            val answersShown = rememberShownCount(personId)
+            history.shownOf(answersShown).forEachIndexed { i, (item, check) ->
                 if (i > 0) HorizontalDivider(color = DoctorHairline)
                 Row(Modifier.fillMaxWidth().semantics(mergeDescendants = true) {}, verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     DistressScoreChip(check)
@@ -449,6 +480,7 @@ private val DistressRowHeight = 24.dp
                     }
                 }
             }
+            SaharaShowOlder(history.size, answersShown, tag = "distress-history")
             DistressSource()
         }
     }

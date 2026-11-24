@@ -158,7 +158,9 @@ class DailyCareFlowsTest {
             ui.waitUntil(15000) { !vm.busy.value && vm.items.value.count { CareEntryCodec.decode(it.detail)?.type == "lab" } == oldCount + 1 }
         }
         addLab("12.4", true); addLab("13.1", false)
-        ui.onNodeWithText("2 results").assertIsDisplayed() // the count pill; the trend line also ends "· 2 results"
+        ui.onNodeWithText("2 results").assertIsDisplayed() // the count pill on the test's compact row; the trend line also ends "· 2 results"
+        // Each test is one compact row, closed by default (24 Nov 2026); tapping it opens the graph and results.
+        ui.onNodeWithTag("lab-test-haemoglobin").performClick()
         ui.onNodeWithTag("lab-history").performScrollToNode(hasText("Printed range: 12–16 g/dL"))
         ui.onNodeWithText("Printed range: 12–16 g/dL").assertIsDisplayed()
         ui.onAllNodesWithText("12.4 g/dL").onFirst().assertExists()

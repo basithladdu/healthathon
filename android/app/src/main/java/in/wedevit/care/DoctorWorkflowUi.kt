@@ -10,6 +10,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -50,13 +51,14 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
     var filter by rememberSaveable { mutableStateOf("All") }
     var message by remember { mutableStateOf<String?>(null) }
     val requests = remember(store, revision, refreshToken) { store.requests() }
+    val requestsShown = rememberShownCount(filter)
     LazyColumn(Modifier.fillMaxSize().testTag("workflow-request-list"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { DoctorRequestQueueHeader(onBack) }
         item { DoctorRequestFilters(filter) { filter = it } }
         message?.let { item { WorkflowStatus(it) } }
         val shown = requests.filter { filter == "All" || requestLabel(it.status) == filter }
         if (shown.isEmpty()) item { WorkflowCard { Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) { Icon(Icons.Default.Inbox, null, tint = DoctorAccent, modifier = Modifier.size(24.dp)); Text(t("No requests in this group.", "इस समूह में कोई अनुरोध नहीं।"), fontSize = 16.sp, modifier = Modifier.weight(1f)) }; if (filter != "All") TextButton(onClick = { filter = "All" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Show all", "सभी दिखाएँ"), color = DoctorAccent) } } }
-        items(shown, key = { it.id }) { request ->
+        cappedItems(shown, requestsShown, key = { it.id }, tag = "workflow-requests") { request ->
             val patient = patients.firstOrNull { it.id == request.patientId }
             WorkflowCard {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Text(patient?.name?.removeSuffix(" Demo") ?: "Patient", fontSize = 19.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f)); Spacer(Modifier.width(8.dp)); when (request.status) { WorkflowRequestStatus.COMPLETED -> WorkflowChip(requestLabel(request.status), DoctorStatusGood, DoctorStatusGoodBg); WorkflowRequestStatus.NEW -> WorkflowChip(requestLabel(request.status), DoctorStatusWarn, DoctorStatusWarnBg); else -> WorkflowChip(requestLabel(request.status)) } }
@@ -79,7 +81,7 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
 
 @Composable internal fun DoctorRequestQueueHeader(onBack: () -> Unit) { val t = careText();
     Column(verticalArrangement=Arrangement.spacedBy(12.dp)) {
-        TextButton(onClick=onBack,modifier=Modifier.heightIn(min=48.dp).testTag("workflow-back")) { Icon(Icons.Default.ChevronLeft,null);Text(t("Back", "वापस")) }
+        TextButton(onClick=onBack,modifier=Modifier.heightIn(min=48.dp).testTag("workflow-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack,null);Text(t("Back", "वापस")) }
         WorkflowTitle(t("Requests", "अनुरोध"))
     }
 }
@@ -145,6 +147,8 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
         }
     }
     val versions = remember(revision) { store.versions(patient.id) }
+    // Version history, records and activity each start with the newest five (24 Nov).
+    val versionsShown = rememberShownCount(patient.id); val attachmentsShown = rememberShownCount(patient.id); val timelineShown = rememberShownCount(patient.id); val activityShown = rememberShownCount(patient.id)
     val sources = remember(patient.id) { DoctorWorkflowData.sources(patient.id) }
     fun update(value: WorkflowDraft) { val error = store.saveDraft(value); message = error; if(error == null) { draft = store.draft(patient.id); checked = false; sourceConfirmed = false; revision++ } }
     fun moveStep(value:Int) { if(step!=value) {audio.release();onlineJob?.cancel()};step=value }
@@ -156,7 +160,7 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
         return
     }
     LazyColumn(Modifier.fillMaxSize().imePadding().testTag("workflow-conversation"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { TextButton(onClick = { message = store.saveDraft(draft); if (message == null) onBack() }, modifier = Modifier.heightIn(min = 48.dp).testTag("workflow-back")) { Icon(Icons.Default.ChevronLeft, null); Text(t("Back", "वापस")) }; WorkflowTitle(t("Care conversation", "देखभाल पर बातचीत")); Text(patient.name.removeSuffix(" Demo"), color = RustText, fontSize = 16.sp, fontWeight = FontWeight.Medium); Spacer(Modifier.height(12.dp))
+        item { TextButton(onClick = { message = store.saveDraft(draft); if (message == null) onBack() }, modifier = Modifier.heightIn(min = 48.dp).testTag("workflow-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null); Text(t("Back", "वापस")) }; WorkflowTitle(t("Care conversation", "देखभाल पर बातचीत")); Text(patient.name.removeSuffix(" Demo"), color = RustText, fontSize = 16.sp, fontWeight = FontWeight.Medium); Spacer(Modifier.height(12.dp))
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { listOf("Prepare", "Document", "Review").forEachIndexed { index, title -> FilterChip(step == index, onClick = { moveStep(index) }, label = { Text("${index + 1} $title", fontSize = 15.sp) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp).testTag("workflow-step-$title")) } }
         }
         message?.let { item { WorkflowStatus(it) } }
@@ -223,15 +227,15 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
         }
         item { OutlinedButton(onClick={message=store.saveDraft(draft); if(message==null) onBack()},modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("workflow-finish-later")) { Text(t("Save & finish later", "सहेजें और बाद में पूरा करें")) } }
         if(versions.isNotEmpty()) item { WorkflowSection(t("Version history", "संस्करणों का इतिहास")) }
-        items(versions,key={it.id}) { item -> OutlinedButton(onClick={selectedVersion=item.id},modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("workflow-version-${item.id}")) { Text(t("Version ${item.number} · ${workflowDate(item.publishedAt)}", "संस्करण ${item.number} · ${workflowDate(item.publishedAt)}")) } }
+        cappedItems(versions, versionsShown, key={it.id}, tag="workflow-versions") { item -> OutlinedButton(onClick={selectedVersion=item.id},modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("workflow-version-${item.id}")) { Text(t("Version ${item.number} · ${workflowDate(item.publishedAt)}", "संस्करण ${item.number} · ${workflowDate(item.publishedAt)}")) } }
         item { FlowRow(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
             listOf("Records", "Activity").forEach { section -> FilterChip(selected=historySection==section,onClick={historySection=section},label={Text(if(section=="Records") t("Records", "रिकॉर्ड") else t("Activity", "गतिविधि"),fontSize=15.sp)},shape=RoundedCornerShape(50),modifier=Modifier.heightIn(min=48.dp).testTag(if(section=="Records") "workflow-open-records" else "workflow-open-activity")) }
         } }
         if(historySection=="Records") {
-            items(store.attachments(patient.id),key={it.id}) { attachment -> WorkflowCard { Text(attachment.title,fontWeight=FontWeight.Medium); Text(attachment.text) } }
-            items(store.timeline(patient.id),key={"timeline-${it.id}"}) { entry -> Column(verticalArrangement=Arrangement.spacedBy(2.dp)) { HorizontalDivider(color=DoctorHairline); Spacer(Modifier.height(8.dp)); Text(entry.title,fontWeight=FontWeight.Medium); Text(entry.detail); Text(workflowDate(entry.at),fontSize=14.sp,color=DoctorCardSub) } }
+            cappedItems(store.attachments(patient.id), attachmentsShown, key={it.id}, tag="workflow-attachments") { attachment -> WorkflowCard { Text(attachment.title,fontWeight=FontWeight.Medium); Text(attachment.text) } }
+            cappedItems(store.timeline(patient.id), timelineShown, key={"timeline-${it.id}"}, tag="workflow-timeline") { entry -> Column(verticalArrangement=Arrangement.spacedBy(2.dp)) { HorizontalDivider(color=DoctorHairline); Spacer(Modifier.height(8.dp)); Text(entry.title,fontWeight=FontWeight.Medium); Text(entry.detail); Text(workflowDate(entry.at),fontSize=14.sp,color=DoctorCardSub) } }
         }
-        if(historySection=="Activity") { items(store.activity(patient.id).take(30),key={it.id}) { entry -> Text("${workflowDate(entry.at)}\n${entry.action}",fontSize=14.sp,color=DoctorCardInk) } }
+        if(historySection=="Activity") { cappedItems(store.activity(patient.id).take(30), activityShown, key={it.id}, tag="workflow-activity") { entry -> Text("${workflowDate(entry.at)}\n${entry.action}",fontSize=14.sp,color=DoctorCardInk) } }
     }
 }
 
@@ -247,7 +251,7 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
     val context=LocalContext.current
     val acknowledgements=remember(revision) { store.acknowledgements(version.id) }
     LazyColumn(Modifier.fillMaxSize().testTag("workflow-version-reader"),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
-        item { TextButton(onClick=onBack,modifier=Modifier.heightIn(min=48.dp).testTag("workflow-version-back")) { Icon(Icons.Default.ChevronLeft,null); Text(t("Conversation", "बातचीत")) }; WorkflowTitle(t("Care Note · Version ${version.number}", "केयर नोट · संस्करण ${version.number}")); Text("${patient.name.removeSuffix(" Demo")} · ${workflowDate(version.publishedAt)}",color=RustText,fontSize=16.sp,fontWeight=FontWeight.Medium); Spacer(Modifier.height(4.dp)); FlowRow(horizontalArrangement=Arrangement.spacedBy(8.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) { WorkflowChip(version.reviewLabel); WorkflowChip(t("Reviewer: ${version.reviewerName}", "समीक्षक: ${version.reviewerName}"),DoctorCardSub,Paper) } }
+        item { TextButton(onClick=onBack,modifier=Modifier.heightIn(min=48.dp).testTag("workflow-version-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack,null); Text(t("Conversation", "बातचीत")) }; WorkflowTitle(t("Care Note · Version ${version.number}", "केयर नोट · संस्करण ${version.number}")); Text("${patient.name.removeSuffix(" Demo")} · ${workflowDate(version.publishedAt)}",color=RustText,fontSize=16.sp,fontWeight=FontWeight.Medium); Spacer(Modifier.height(4.dp)); FlowRow(horizontalArrangement=Arrangement.spacedBy(8.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) { WorkflowChip(version.reviewLabel); WorkflowChip(t("Reviewer: ${version.reviewerName}", "समीक्षक: ${version.reviewerName}"),DoctorCardSub,Paper) } }
         item { WorkflowDraftSummary(version.draft) }
         item { WorkflowCard { Text(t("Source", "स्रोत"),fontWeight=FontWeight.SemiBold); Text(version.draft.sourceText); Text(if(version.draft.transcribedAt>0) t("Recorded conversation · ${workflowDate(version.draft.transcribedAt)} · ${version.draft.transcriptModel}", "रिकॉर्ड की गई बातचीत · ${workflowDate(version.draft.transcribedAt)} · ${version.draft.transcriptModel}") else DoctorWorkflowData.sources(patient.id).filter { it.id in version.draft.sourceIds }.joinToString("\n") { it.label }.ifBlank { t("Manually entered source", "हाथ से लिखा स्रोत") },style=MaterialTheme.typography.bodySmall);if(version.draft.aiModel.isNotBlank())Text(t("AI draft: ${version.draft.aiProvider} / ${version.draft.aiModel}", "AI ड्राफ़्ट: ${version.draft.aiProvider} / ${version.draft.aiModel}"),style=MaterialTheme.typography.bodySmall);version.draft.aiWarnings.forEach {Text(it,style=MaterialTheme.typography.bodySmall,color=Rust)} } }
         item { WorkflowSection(t("Record what they told you", "उन्होंने जो बताया वह दर्ज करें")) }

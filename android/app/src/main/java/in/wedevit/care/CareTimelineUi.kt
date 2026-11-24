@@ -93,6 +93,8 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
     val shown = CareTimelineRules.filter(all, filter)
     val months = CareTimelineRules.byMonth(shown)
     val monthFormat = DateTimeFormatter.ofPattern("MMMM yyyy", careLocale(hindi))
+    // Newest months first; older months wait behind "Show older" so the page stays short (24 Nov).
+    val monthsShown = rememberShownCount("$person:$filterName")
     BackHandler { onClose() }
     fun canOpen(e: TimelineEvent) = when (e.source) {
         TimelineSource.REPORT -> reports.any { it.id == e.sourceId }; TimelineSource.CALENDAR -> onCalendarAt != null; TimelineSource.LAB_HISTORY -> onLabs != null
@@ -147,7 +149,7 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
             Text(if (all.isEmpty()) t("Nothing yet", "अभी कुछ नहीं") else t("Nothing here", "यहाँ कुछ नहीं"), fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk)
             if (all.isNotEmpty()) TextButton(onClick = { filterName = TimelineFilter.ALL.name }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Show all", "सब दिखाएँ")) }
         } }
-        items(months, key = { "month-${it.first}" }) { (month, events) ->
+        cappedItems(months, monthsShown, key = { "month-${it.first}" }, tag = "timeline-months") { (month, events) ->
             val key = month.toString(); val newest = months.first().first == month
             val isOpen = newest != (key in toggled.split(',')) // older months start closed; a tap flips the default
             val expandedAll = key in showAllMonths.split(',')

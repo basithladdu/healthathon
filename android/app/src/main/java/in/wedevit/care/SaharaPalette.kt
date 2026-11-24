@@ -123,7 +123,8 @@ internal val DoctorCardMint = SaharaTone.Teal.wash
 internal val DoctorCardInk = SaharaColors.Ink
 internal val DoctorCardSub = SaharaColors.InkSub
 internal val DoctorCardFaint = SaharaColors.InkFaint
-internal val DoctorHairline = SaharaColors.Edge
+// Premium pass (24 Nov, owner: "cards and cards"): card edges are a soft hairline; controls keep the stronger Edge.
+internal val DoctorHairline = SaharaColors.Line
 internal val DoctorAccent = SaharaColors.Primary
 
 /** Status tints for intake, visits and review stages: the text and icon colour is each status tone's ink (>= 5:1 on its wash). */

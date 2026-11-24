@@ -178,7 +178,8 @@ private val zbiAnswerHi = listOf("कभी नहीं", "शायद ही 
             if (journal.isNotEmpty()) {
                 Text(t("Only you can see these, on this phone.", "इन्हें सिर्फ़ आप देख सकते हैं, इसी फ़ोन पर।"), fontSize = 14.sp, color = DoctorCardSub)
                 val fmt = remember(hindi) { DateTimeFormatter.ofPattern("d MMM, h:mm a", if (hindi) Locale("hi", "IN") else Locale.ENGLISH) }
-                journal.take(5).forEach { n ->
+                val journalShown = rememberShownCount()
+                journal.shownOf(journalShown).forEach { n ->
                     Surface(shape = RoundedCornerShape(14.dp), color = Paper, modifier = Modifier.fillMaxWidth()) {
                         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(java.time.Instant.ofEpochMilli(n.at).atZone(java.time.ZoneId.systemDefault()).format(fmt), fontSize = 14.sp, color = DoctorCardSub)
@@ -186,6 +187,7 @@ private val zbiAnswerHi = listOf("कभी नहीं", "शायद ही 
                         }
                     }
                 }
+                SaharaShowOlder(journal.size, journalShown, tag = "journal")
             }
         }
     }

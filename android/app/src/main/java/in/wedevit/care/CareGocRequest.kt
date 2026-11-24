@@ -1,6 +1,7 @@
 package `in`.wedevit.care
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -100,6 +102,10 @@ internal fun gocMillis(at: String?): Long? {
         if (asked != null) FamilyRegisterRow(t("You asked for this conversation", "आपने यह बातचीत माँगी है"), meta = gocDay(asked.first.created),
             pill = asked.second.statusLabel(hindi) to (if (asked.second.status == "accepted") FamilyTone.GOOD else FamilyTone.WAIT), modifier = Modifier.testTag("goc-ask-sent"))
         if (result == "failed") Text(t("Couldn't save that. Please try again.", "यह सहेजा नहीं जा सका। फिर से कोशिश करें।"), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce())
+        // What the conversation is, in plain words, beside the button (clinical team, 24 Nov 2026).
+        if (asked == null) Text(t("A calm talk with your doctor about what matters most to you, so your care follows your wishes. You can bring family.",
+            "अपने डॉक्टर से एक शांत बातचीत, कि आपके लिए सबसे ज़रूरी क्या है, ताकि आपकी देखभाल आपकी इच्छा के अनुसार हो। आप परिवार को साथ ला सकते हैं।"),
+            fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardSub, modifier = Modifier.testTag("goc-ask-explained"))
         if (asked == null) Button(onClick = ::ask, enabled = canEdit && !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("goc-ask-doctor")) {
             Icon(Icons.Default.Forum, null); Spacer(Modifier.width(8.dp)); Text(t("Ask my doctor for a goals of care conversation", "अपने डॉक्टर से देखभाल के लक्ष्यों पर बातचीत माँगें"))
         }
@@ -162,6 +168,34 @@ internal fun gocMillis(at: String?): Long? {
         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.Info, null, tint = DoctorStatusWarn); Spacer(Modifier.width(10.dp))
             Text(t("The patient or family asked for a goals of care conversation on ${gocDay(latest.created)}.", "मरीज़ या परिवार ने ${gocDay(latest.created)} को देखभाल के लक्ष्यों पर बातचीत माँगी।"), fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardInk, modifier = Modifier.weight(1f))
+        }
+    }
+}
+
+/**
+ * The same request, for the doctor's patient page (hub) and the plan home: a calm notice with one way to the Goals of care section,
+ * shown while a request is open and no signed goals-of-care note has answered it. [ectprs] is the plan state when the caller already
+ * holds it; otherwise it is read from this phone's plan store. Draws nothing when there is no unanswered request.
+ */
+@Composable internal fun DoctorGocRequestNotice(vm: CareModel, personId: String, onOpen: (() -> Unit)?, modifier: Modifier = Modifier, ectprs: List<EctprRecord>? = null) {
+    val t = careText(); val context = LocalContext.current
+    val items by vm.items.collectAsStateWithLifecycle()
+    val stored = remember(vm.storageNamespace, personId, ectprs == null, items) {
+        if (ectprs != null || personId.isBlank()) emptyList() else runCatching { CarePlanStore(context.applicationContext, vm.storageNamespace).load(personId).ectprs }.getOrDefault(emptyList())
+    }
+    val records = ectprs ?: stored
+    val latest = remember(items, records, personId) {
+        val signedAt = DoctorGocDiscussions.list(records, personId).filter { it.signed }.mapNotNull { gocMillis(it.at) }.maxOrNull()
+        GocRequestOps.unanswered(GocRequestOps.open(items, personId), signedAt).firstOrNull()?.first
+    } ?: return
+    Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, DoctorStatusWarn.copy(alpha = .3f)),
+        modifier = modifier.fillMaxWidth().then(if (onOpen != null) Modifier.clickable(onClick = onOpen) else Modifier).testTag("goc-request-notice")) {
+        Column(Modifier.padding(horizontal = 14.dp, vertical = 10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Info, null, tint = DoctorStatusWarn); Spacer(Modifier.width(10.dp))
+                Text(t("The patient or family asked for a goals of care conversation on ${gocDay(latest.created)}.", "मरीज़ या परिवार ने ${gocDay(latest.created)} को देखभाल के लक्ष्यों पर बातचीत माँगी।"), fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardInk, modifier = Modifier.weight(1f))
+            }
+            if (onOpen != null) TextButton(onClick = onOpen, modifier = Modifier.align(Alignment.End).heightIn(min = 48.dp).testTag("goc-request-notice-open")) { Text(t("Open Goals of care", "देखभाल के लक्ष्य खोलें"), color = RustText) }
         }
     }
 }

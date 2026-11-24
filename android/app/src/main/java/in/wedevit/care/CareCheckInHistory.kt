@@ -1,11 +1,17 @@
+@file:OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 package `in`.wedevit.care
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
@@ -13,14 +19,21 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
+import java.time.YearMonth
 import java.time.ZoneId
 
 /** One day of check-ins: the day's mood (if any), its symptom notes, its distress answer and every entry of that day, newest first. */
@@ -28,7 +41,7 @@ internal data class CheckInDay(val day: LocalDate, val mood: String?, val sympto
 
 /** The Check-ins page as one compact row per day (Dr Sujay, 22 Nov review: the page was too long). Pure so it can be unit tested. */
 internal object CheckInDays {
-    /** How many days show before "Show older days". */
+    /** The short list: this many days back, today included (clinical team, 24 Nov 2026). Older days are reached on the month calendar. */
     const val RECENT = 7
 
     /** The day an entry belongs to: a symptom note's observed date, otherwise the day it was saved. */
@@ -45,15 +58,57 @@ internal object CheckInDays {
                 symptomNotes = newest.count { SymptomNoteCodec.isStructured(it.detail) },
                 distressScore = distress?.let { if (it.distress) it.score ?: 0 else 0 }, distressAnswered = distress != null, items = newest)
         }
+
+    /** The days of the last [RECENT] days (today and the six before it) that have anything noted, newest first. */
+    fun lastWeek(days: List<CheckInDay>, today: LocalDate): List<CheckInDay> =
+        days.filter { !it.day.isAfter(today) && !it.day.isBefore(today.minusDays(RECENT - 1L)) }
+
+    /** A month as calendar rows, Monday first; null fills the days before the 1st and after the last day. */
+    fun monthGrid(month: YearMonth): List<List<LocalDate?>> {
+        val lead = month.atDay(1).dayOfWeek.value - 1
+        val cells = List(lead) { null } + (1..month.lengthOfMonth()).map { month.atDay(it) }
+        return cells.chunked(7).map { row -> row + List(7 - row.size) { null } }
+    }
+
+    /** What a day's dot means: its mood when one was saved, otherwise "notes only" (a symptom or distress note). */
+    fun dotKind(day: CheckInDay): String = day.mood ?: NOTES_ONLY
+    const val NOTES_ONLY = "notes"
 }
 
-/** The Check-ins page: the distress graph one tap away, then one short row per day; a row opens to show that day's entries. */
+/** One dot colour per kind of day, so the dots, the legend and the list agree. */
+private fun checkInDotColor(kind: String): Color = when (kind) {
+    CheckInMood.GOOD -> SaharaTone.Leaf.solid
+    CheckInMood.OKAY -> SaharaTone.Marigold.solid
+    CheckInMood.HARD -> SaharaTone.Rose.solid
+    else -> SaharaTone.Indigo.solid
+}
+
+/** "A good day · 2 symptom notes · Distress 3/10", or the number of entries when there is nothing else to say. */
+@Composable private fun checkInDayLine(d: CheckInDay): String {
+    val t = careText(); val hindi = careHindi()
+    val parts = listOfNotNull(
+        d.mood?.let { checkInMoodLabel(it, hindi) },
+        d.symptomNotes.takeIf { it > 0 }?.let { n -> if (n == 1) t("1 symptom note", "1 लक्षण नोट") else t("$n symptom notes", "$n लक्षण नोट") },
+        d.distressScore?.takeIf { d.distressAnswered }?.let { s -> t("Distress $s/10", "परेशानी $s/10") })
+    return parts.ifEmpty { listOf(if (d.items.size == 1) t("1 entry", "1 नोट") else t("${d.items.size} entries", "${d.items.size} नोट")) }.joinToString(" · ")
+}
+
+@Composable private fun checkInDayLabel(day: LocalDate): String {
+    val t = careText(); val hindi = careHindi(); val today = LocalDate.now()
+    return when (day) { today -> t("Today", "आज"); today.minusDays(1) -> t("Yesterday", "कल"); else -> day.format(careDateFormat("EEE d MMM", hindi)) }
+}
+
+/**
+ * The Check-ins page (clinical team, 24 Nov 2026): the distress graph one tap away, the last 7 days as a short list (a row opens to
+ * show that day's entries), then a month calendar with one coloured dot per day; tapping a day shows that day under the calendar.
+ */
 @Composable internal fun CheckInHistoryModule(checkins: List<CareItem>, personId: String, vm: CareModel) {
     val t = careText(); val hindi = careHindi()
     val days = remember(checkins) { CheckInDays.group(checkins) }
     var showDistress by rememberSaveable(personId) { mutableStateOf(false) }
-    var showOlder by rememberSaveable(personId) { mutableStateOf(false) }
     var openDay by rememberSaveable(personId) { mutableStateOf("") }
+    var monthText by rememberSaveable(personId) { mutableStateOf(YearMonth.now().toString()) }
+    var picked by rememberSaveable(personId) { mutableStateOf("") }
     val hasDistress = remember(checkins, personId) { DistressRules.history(checkins, personId).isNotEmpty() }
     if (hasDistress) {
         OutlinedButton(onClick = { showDistress = !showDistress }, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, SaharaSection.CheckIns.solid),
@@ -64,24 +119,22 @@ internal object CheckInDays {
         AnimatedVisibility(showDistress, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) { DistressHistoryCard(checkins, personId) }
     }
     if (days.isEmpty()) { SaharaCalmEmpty(t("No check-ins yet.", "अभी कोई हाल नहीं लिखा।")); return }
-    val shown = if (showOlder) days else days.take(CheckInDays.RECENT)
-    val today = LocalDate.now(); val dayFormat = careDateFormat("EEE d MMM", hindi)
-    Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().saharaAppear().testTag("checkin-days")) {
+    val today = LocalDate.now()
+    val week = remember(days, today) { CheckInDays.lastWeek(days, today) }
+    Text(t("Last 7 days", "पिछले 7 दिन"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading().testTag("checkin-week-title"))
+    if (week.isEmpty()) Text(t("No check-ins in the last 7 days.", "पिछले 7 दिनों में कोई हाल नहीं लिखा।"), fontSize = 15.sp, color = DoctorCardSub, modifier = Modifier.testTag("checkin-week-empty"))
+    else Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().saharaAppear().testTag("checkin-days")) {
         Column {
-            shown.forEachIndexed { i, d ->
+            week.forEachIndexed { i, d ->
                 if (i > 0) HorizontalDivider(color = DoctorHairline)
                 val dayKey = d.day.toString(); val open = openDay == dayKey
-                val label = when (d.day) { today -> t("Today", "आज"); today.minusDays(1) -> t("Yesterday", "कल"); else -> d.day.format(dayFormat) }
-                val parts = listOfNotNull(
-                    d.mood?.let { checkInMoodLabel(it, hindi) },
-                    d.symptomNotes.takeIf { it > 0 }?.let { n -> if (n == 1) t("1 symptom note", "1 लक्षण नोट") else t("$n symptom notes", "$n लक्षण नोट") },
-                    d.distressScore?.takeIf { d.distressAnswered }?.let { s -> t("Distress $s/10", "परेशानी $s/10") })
                 Row(Modifier.fillMaxWidth().saharaStagger(i).heightIn(min = 56.dp).clickable(role = Role.Button) { openDay = if (open) "" else dayKey }.padding(horizontal = 14.dp, vertical = 8.dp).testTag("checkin-day-$dayKey"),
                     verticalAlignment = Alignment.CenterVertically) {
+                    Box(Modifier.size(10.dp).background(checkInDotColor(CheckInDays.dotKind(d)), CircleShape))
+                    Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f)) {
-                        Text(label, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
-                        Text(parts.ifEmpty { listOf(if (d.items.size == 1) t("1 entry", "1 नोट") else t("${d.items.size} entries", "${d.items.size} नोट")) }.joinToString(" · "),
-                            fontSize = 14.sp, color = DoctorCardSub, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                        Text(checkInDayLabel(d.day), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
+                        Text(checkInDayLine(d), fontSize = 14.sp, color = DoctorCardSub, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     }
                     SaharaChevron(open, if (open) t("Hide details", "जानकारी छिपाएँ") else t("Show details", "जानकारी देखें"))
                 }
@@ -91,7 +144,70 @@ internal object CheckInDays {
             }
         }
     }
-    if (days.size > CheckInDays.RECENT) TextButton(onClick = { showOlder = !showOlder }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("checkin-show-older")) {
-        Text(if (showOlder) t("Show recent days only", "सिर्फ़ हाल के दिन दिखाएँ") else t("Show older days", "पुराने दिन दिखाएँ"), color = RustText, fontWeight = FontWeight.SemiBold)
+    val month = runCatching { YearMonth.parse(monthText) }.getOrElse { YearMonth.now() }
+    val byDay = remember(days) { days.associateBy { it.day } }
+    CheckInMonthCalendar(month, byDay, picked = runCatching { LocalDate.parse(picked) }.getOrNull(), today = today,
+        onMonth = { monthText = it.toString(); picked = "" }, onPick = { d -> picked = if (picked == d.toString()) "" else d.toString() })
+    // The tapped day, under the calendar: its line, then its entries with their usual actions.
+    runCatching { LocalDate.parse(picked) }.getOrNull()?.let { day ->
+        val d = byDay[day]
+        Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().saharaAppear().testTag("checkin-picked-day")) {
+            Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(checkInDayLabel(day), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.a11yHeading())
+                if (d == null) Text(t("Nothing noted this day.", "इस दिन कुछ नहीं लिखा गया।"), fontSize = 15.sp, color = DoctorCardSub)
+                else {
+                    Text(checkInDayLine(d), fontSize = 14.sp, color = DoctorCardSub)
+                    d.items.forEach { key(it.id) { CareRow(it, vm) } }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * A plain month (Monday first) with one coloured dot under each day that has a check-in: the mood's colour, or indigo for notes only.
+ * The arrows change month; a future month cannot be opened. Tapping a day reports it. Test tags: "checkin-cal-<date>".
+ */
+@Composable private fun CheckInMonthCalendar(month: YearMonth, byDay: Map<LocalDate, CheckInDay>, picked: LocalDate?, today: LocalDate, onMonth: (YearMonth) -> Unit, onPick: (LocalDate) -> Unit) {
+    val t = careText(); val hindi = careHindi()
+    val grid = remember(month) { CheckInDays.monthGrid(month) }
+    val firstMonday = month.atDay(1).with(DayOfWeek.MONDAY)
+    Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("checkin-calendar")) {
+        Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = { onMonth(month.minusMonths(1)) }, modifier = Modifier.size(48.dp).testTag("checkin-cal-previous")) { Icon(Icons.Default.ChevronLeft, t("Previous month", "पिछला महीना"), tint = Rust) }
+                Text(month.atDay(1).format(careDateFormat("MMMM yyyy", hindi)), Modifier.weight(1f), textAlign = TextAlign.Center, fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 1)
+                IconButton(onClick = { onMonth(month.plusMonths(1)) }, enabled = month < YearMonth.from(today), modifier = Modifier.size(48.dp).testTag("checkin-cal-next")) { Icon(Icons.Default.ChevronRight, t("Next month", "अगला महीना"), tint = if (month < YearMonth.from(today)) Rust else DoctorHairline) }
+            }
+            Row(Modifier.fillMaxWidth()) {
+                (0 until 7).forEach { i -> Text(firstMonday.plusDays(i.toLong()).format(careDateFormat("EEE", hindi)), Modifier.weight(1f), textAlign = TextAlign.Center, fontSize = 13.sp, fontWeight = FontWeight.Medium, color = RustText, maxLines = 1) }
+            }
+            grid.forEach { row ->
+                Row(Modifier.fillMaxWidth()) {
+                    row.forEach { d ->
+                        if (d == null) Spacer(Modifier.weight(1f).heightIn(min = 48.dp))
+                        else {
+                            val entry = byDay[d]; val selected = d == picked; val isToday = d == today; val future = d.isAfter(today)
+                            val desc = d.format(careDateFormat("EEE d MMM", hindi)) + (entry?.let { ", " + checkInDayLine(it) } ?: "")
+                            Box(Modifier.weight(1f).padding(1.dp).heightIn(min = 48.dp).clip(RoundedCornerShape(12.dp)).background(if (selected) Rust else Color.Transparent)
+                                .border(if (isToday && !selected) 2.dp else 0.dp, if (isToday && !selected) Rust else Color.Transparent, RoundedCornerShape(12.dp))
+                                .clickable(enabled = !future, role = Role.Button) { onPick(d) }.semantics { contentDescription = desc }.testTag("checkin-cal-$d"), contentAlignment = Alignment.Center) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(d.dayOfMonth.toString(), fontSize = 15.sp, fontWeight = if (selected || isToday) FontWeight.Bold else FontWeight.Normal,
+                                        color = when { selected -> Color.White; future -> DoctorCardSub; else -> DoctorCardInk })
+                                    Box(Modifier.padding(top = 2.dp).size(7.dp).background(when { entry == null -> Color.Transparent; selected -> Color.White; else -> checkInDotColor(CheckInDays.dotKind(entry)) }, CircleShape))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            HorizontalDivider(color = DoctorHairline)
+            FlowRow(Modifier.fillMaxWidth().padding(horizontal = 4.dp).testTag("checkin-cal-legend"), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                (CareDailyFlow.moods.reversed().map { it to checkInMoodLabel(it, hindi) } + (CheckInDays.NOTES_ONLY to t("Notes only", "सिर्फ़ नोट"))).forEach { (kind, label) ->
+                    Row(verticalAlignment = Alignment.CenterVertically) { Box(Modifier.size(10.dp).background(checkInDotColor(kind), CircleShape)); Spacer(Modifier.width(6.dp)); Text(label, fontSize = 14.sp, color = DoctorCardSub) }
+                }
+            }
+        }
     }
 }

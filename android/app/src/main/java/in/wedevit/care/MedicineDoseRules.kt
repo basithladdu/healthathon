@@ -18,15 +18,36 @@ object MedicinePhotoFields {
         instructions = "", durationDays = null,
     )
 
-    /** English form names as saved, with the Hindi shown beside them. */
+    /**
+     * English form names as saved, with the Hindi shown beside them. Clinical team, 24 Nov 2026: no "Oral solution" (it is a Syrup),
+     * "Nebuliser" sits next to Inhaler, and every injection route (subcutaneous, IV, IM) is one "Injection"; the route can go in the name.
+     */
     val forms: List<Pair<String, String>> = listOf(
         "Tablet" to "गोली", "Capsule" to "कैप्सूल", "Syrup" to "सिरप", "Injection" to "इंजेक्शन", "Patch" to "पैच",
-        "Drops" to "ड्रॉप्स", "Oral solution" to "पीने का घोल", "Ointment" to "मरहम", "Inhaler" to "इनहेलर",
+        "Drops" to "ड्रॉप्स", "Ointment" to "मरहम", "Inhaler" to "इनहेलर", "Nebuliser" to "नेबुलाइज़र",
     )
+    /** Checked in this order, so "nebuliser solution", "solution for injection" and "eye drops solution" are not read as Syrup. */
     private val formWords = listOf(
-        "Tablet" to "tab(?:let)?s?", "Capsule" to "caps?(?:ules?)?", "Syrup" to "syrup|syp", "Injection" to "inj(?:ection)?s?",
-        "Patch" to "patch(?:es)?", "Drops" to "drops?", "Oral solution" to "oral solution|solution", "Ointment" to "ointment|oint|cream|gel", "Inhaler" to "inhaler",
+        "Tablet" to "tab(?:let)?s?", "Capsule" to "caps?(?:ules?)?",
+        "Injection" to "inj(?:ection)?s?|subcutaneous|sub-?cut(?:aneous)?|s\\.c\\.|i\\.v\\.|i\\.m\\.|intravenous|intramuscular|infusion|ampoules?|vials?",
+        "Nebuliser" to "nebuli[sz]er|nebuli[sz]ation|nebules?|respules?", "Inhaler" to "inhalers?|puffer",
+        "Patch" to "patch(?:es)?", "Drops" to "drops?", "Ointment" to "ointment|oint|cream|gel",
+        "Syrup" to "syrup|syp|oral solution|oral suspension|solution|suspension",
     ).map { (form, words) -> form to Regex("(?<![A-Za-z])(?:$words)(?![A-Za-z])", RegexOption.IGNORE_CASE) }
+
+    /**
+     * A saved form as one of [forms]: "Oral solution" (an old choice) is a Syrup, any injection route is "Injection", and a listed
+     * form in any case is that form. Anything else (a form typed before the chips existed) comes back as it was saved, so nothing is lost.
+     */
+    fun canonicalForm(saved: String): String {
+        val text = saved.trim()
+        if (text.isEmpty()) return ""
+        forms.firstOrNull { it.first.equals(text, ignoreCase = true) }?.let { return it.first }
+        if (text.equals("Nebulizer", ignoreCase = true)) return "Nebuliser"
+        // A route saved on its own ("IV", "S/C") is an injection too; inside a medicine name these short words are not read as a form.
+        if (text.matches(Regex("(?i)(?:iv|im|sc|s/c|i/v|i/m|sq)(?:\\s+inj(?:ection)?)?"))) return "Injection"
+        return formIn(text).ifBlank { text }
+    }
     private val strength = Regex("(?<![A-Za-z0-9.])\\d+(?:\\.\\d+)?\\s*(?:mg|mcg|µg|g|ml|iu|units?|%)(?:\\s*/\\s*\\d*(?:\\.\\d+)?\\s*(?:ml|g))?(?![A-Za-z])", RegexOption.IGNORE_CASE)
     private val pharmacopoeia = Regex("(?<![A-Za-z])(?:I\\.?P\\.?|B\\.?P\\.?|U\\.?S\\.?P\\.?)(?![A-Za-z])")
     private val notAName = Regex("(?<![A-Za-z])(?:mfg|mfd|manufactured|marketed|batch|b\\.? ?no|exp|expiry|mrp|rs|lic|licen[cs]e|store|schedule|warning|composition|each|contains|dosage|keep|reach|children|protect|light|price|incl|taxes|pharma|ltd|limited|pvt|india|prescription|rx|dr|doctor)(?![A-Za-z])", RegexOption.IGNORE_CASE)
@@ -114,6 +135,26 @@ object MedicineEntryText {
         val valid = CareReminderRules.validTimes(times)
         val kept = detail.lineSequence().filterNot { it.startsWith(TIMES) }.joinToString("\n").trimEnd()
         return if (valid.isEmpty()) kept else (if (kept.isBlank()) "" else "$kept\n") + TIMES + valid.joinToString(", ")
+    }
+}
+
+/**
+ * When a dose counts as late (clinical team, 24 Nov 2026: "late" only from one hour after the dose time; it used to be any time after).
+ * This is the one place the rule lives: the patient's dose chips, the history, the doctor's reports and the reminders all read it.
+ * "Late" is never a choice the patient taps; it is worked out from a Taken report (or an unmarked dose) and the planned time.
+ */
+object MedicineLateRule {
+    const val LATE_AFTER_MINUTES = 60L
+    const val LATE_AFTER_MS = LATE_AFTER_MINUTES * 60_000L
+
+    /** True when a dose planned at [plannedAt] was reported taken at [takenAt], one hour or more after its time. Unknown times are never late. */
+    fun isLate(plannedAt: Long?, takenAt: Long?): Boolean = plannedAt != null && takenAt != null && takenAt - plannedAt >= LATE_AFTER_MS
+
+    /** True when a dose at [time] ("HH:mm") is still unmarked one hour or more after its time today, at [now]. A dose late in the evening never wraps into the next morning. */
+    fun overdue(time: String, now: java.time.LocalTime): Boolean {
+        val dose = runCatching { java.time.LocalTime.parse(time) }.getOrNull() ?: return false
+        val lateFrom = dose.toSecondOfDay() / 60 + LATE_AFTER_MINUTES
+        return lateFrom < 24 * 60 && now.toSecondOfDay() / 60 >= lateFrom
     }
 }
 

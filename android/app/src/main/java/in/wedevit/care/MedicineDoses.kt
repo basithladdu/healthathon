@@ -16,7 +16,53 @@ data class MedicineDose(val key: String, val index: Int, val count: Int, val tim
     val timed: Boolean get() = time.isNotBlank()
 }
 
-enum class MedicineDoseState { PENDING, TAKEN, MISSED }
+/**
+ * A dose's state. MISSED is shown as "Not taken"; SKIPPED is "Skipped" (left out on purpose, for example when the doctor said so).
+ * Both are stored as the "skipped" outcome the server already accepts; a deliberate skip carries [MedicineDoseStatus.SKIP_MARK] in its note.
+ */
+enum class MedicineDoseState { PENDING, TAKEN, MISSED, SKIPPED }
+
+/** The only three choices a patient or family member taps for a dose (Dr Shirin, 24 Nov 2026). "Late" is never a choice. */
+enum class MedicineDoseChoice(val english: String, val hindi: String) {
+    TAKEN("Taken", "ली"), NOT_TAKEN("Not taken", "नहीं ली"), SKIPPED("Skipped", "छोड़ी");
+}
+
+/**
+ * Reads saved reports and older status words as the three choices. Nothing stored changes: "taken" stays "taken", and "skipped"
+ * stays "skipped" (old ones, written as "missed", read as Not taken). An older "late" or "Late reported" is a Taken dose that was late.
+ */
+object MedicineDoseStatus {
+    /** In the note of a deliberate skip: "08:00 dose skipped on purpose." */
+    const val SKIP_MARK = "skipped on purpose"
+
+    fun deliberateSkip(event: MedicineIntakeEvent): Boolean = event.outcome == "skipped" && event.note.contains(SKIP_MARK, ignoreCase = true)
+
+    /** A saved report as one of the three choices; null for reports that are not a dose answer (planned, corrected, course moves). */
+    fun choiceOf(event: MedicineIntakeEvent): MedicineDoseChoice? = when (event.outcome) {
+        "taken" -> MedicineDoseChoice.TAKEN
+        "skipped" -> if (deliberateSkip(event)) MedicineDoseChoice.SKIPPED else MedicineDoseChoice.NOT_TAKEN
+        else -> null
+    }
+
+    /** Older status words and labels ("late", "Late reported", "missed", "Skipped reported", "Not taken") as one of the three. Null when it is none of them. */
+    fun choiceOf(status: String): MedicineDoseChoice? {
+        val s = status.trim().lowercase(java.util.Locale.ROOT)
+        return when {
+            s.isEmpty() -> null
+            s.startsWith("not taken") || s.startsWith("missed") || s == "not_taken" -> MedicineDoseChoice.NOT_TAKEN
+            s.startsWith("skipped") -> MedicineDoseChoice.SKIPPED
+            s.startsWith("late") || s.startsWith("taken") -> MedicineDoseChoice.TAKEN
+            else -> null
+        }
+    }
+
+    fun stateOf(choice: MedicineDoseChoice): MedicineDoseState = when (choice) {
+        MedicineDoseChoice.TAKEN -> MedicineDoseState.TAKEN; MedicineDoseChoice.NOT_TAKEN -> MedicineDoseState.MISSED; MedicineDoseChoice.SKIPPED -> MedicineDoseState.SKIPPED
+    }
+
+    /** True when a Taken report was late by [MedicineLateRule] (a property of the Taken dose, never its own status). */
+    fun late(event: MedicineIntakeEvent): Boolean = event.outcome == "taken" && MedicineLateRule.isLate(event.plannedAt, event.reportedTakenAt)
+}
 
 /** What to save for one dose tap: the reports to append, then the whole-day check-off ([doneOn]) the medicine should end with. */
 data class MedicineDosePlan(val events: List<MedicineIntakeEvent>, val doneOn: String)
@@ -139,7 +185,10 @@ object MedicineDoses {
         (event.reportedDate == day.toString() || (event.reportedDate.isBlank() && localDay(event.loggedAt, zone) == day))
 
     private val reportOutcomes = setOf("taken", "skipped", "unmarked")
-    private fun stateOf(outcome: String): MedicineDoseState = when (outcome) { "taken" -> MedicineDoseState.TAKEN; "skipped" -> MedicineDoseState.MISSED; else -> MedicineDoseState.PENDING }
+    private fun stateOf(event: MedicineIntakeEvent): MedicineDoseState = MedicineDoseStatus.choiceOf(event)?.let(MedicineDoseStatus::stateOf) ?: MedicineDoseState.PENDING
+
+    /** True for an untimed dose's note ("Dose 2 of 4 ..."), which names the dose it belongs to. */
+    fun isDoseNote(note: String): Boolean = untimedNote.containsMatchIn(note)
 
     /**
      * One dose's state on [day]. The newest report for the dose wins. Without one, the whole-day tick counts as taken.
@@ -147,9 +196,9 @@ object MedicineDoses {
      */
     fun state(item: CareItem, dose: MedicineDose, events: List<MedicineIntakeEvent>, day: LocalDate, zone: ZoneId): MedicineDoseState {
         val mine = events.filter { it.medicineId == item.id && it.outcome in reportOutcomes }
-        mine.filter { belongsTo(it, dose, day, zone) }.maxByOrNull { it.loggedAt }?.let { return stateOf(it.outcome) }
+        mine.filter { belongsTo(it, dose, day, zone) }.maxByOrNull { it.loggedAt }?.let { return stateOf(it) }
         if (item.doneOn == day.toString()) return MedicineDoseState.TAKEN
-        if (!dose.timed && dose.count == 1) mine.filter { wholeDay(it, day, zone) }.maxByOrNull { it.loggedAt }?.let { return stateOf(it.outcome) }
+        if (!dose.timed && dose.count == 1) mine.filter { wholeDay(it, day, zone) }.maxByOrNull { it.loggedAt }?.let { return stateOf(it) }
         return MedicineDoseState.PENDING
     }
 
@@ -189,24 +238,28 @@ object MedicineDoses {
 
     fun label(dose: MedicineDose): String = if (dose.timed) "${dose.time} dose" else "Dose ${dose.index} of ${dose.count}"
 
-    /** One report for one dose. No taken time is recorded: a tick says the dose was given, not exactly when. */
-    fun report(item: CareItem, dose: MedicineDose, taken: Boolean, day: LocalDate, zone: ZoneId, now: Long, reporter: String, note: String? = null, id: String = UUID.randomUUID().toString()) =
+    /**
+     * One report for one dose. No taken time is recorded: a tick says the dose was given, not exactly when.
+     * Not taken and Skipped are both the stored "skipped" outcome; [skipped] (on purpose) adds [MedicineDoseStatus.SKIP_MARK] to the note.
+     */
+    fun report(item: CareItem, dose: MedicineDose, taken: Boolean, day: LocalDate, zone: ZoneId, now: Long, reporter: String, note: String? = null, id: String = UUID.randomUUID().toString(),
+               skipped: Boolean = false) =
         MedicineIntakeEvent(id, item.id, item.title, if (taken) "taken" else "skipped", plannedAt = plannedAt(dose, day, zone), loggedAt = now, reporter = reporter,
-            note = note ?: (label(dose) + if (taken) " ticked. Exact taken time was not recorded." else " reported missed from the daily list."), source = "manual")
+            note = note ?: (label(dose) + when { taken -> " ticked. Exact taken time was not recorded."; skipped -> " ${MedicineDoseStatus.SKIP_MARK}."; else -> " reported missed from the daily list." }), source = "manual")
 
     /**
      * What to save when [dose] is marked [taken] or missed on [day]. When the medicine was ticked for the whole day and a dose
      * is now missed, the other doses that only the whole-day tick covered are first written as taken, so they keep showing.
      */
     fun plan(item: CareItem, doses: List<MedicineDose>, events: List<MedicineIntakeEvent>, dose: MedicineDose, taken: Boolean, day: LocalDate, zone: ZoneId, now: Long, reporter: String,
-             makeId: () -> String = { UUID.randomUUID().toString() }): MedicineDosePlan {
+             makeId: () -> String = { UUID.randomUUID().toString() }, skipped: Boolean = false): MedicineDosePlan {
         require(item.kind == "medicine" && doses.any { it.key == dose.key }) { "This dose could not be found. Refresh and try again." }
         val before = states(item, doses, events, day, zone)
-        val after = before + (dose.key to if (taken) MedicineDoseState.TAKEN else MedicineDoseState.MISSED)
+        val after = before + (dose.key to when { taken -> MedicineDoseState.TAKEN; skipped -> MedicineDoseState.SKIPPED; else -> MedicineDoseState.MISSED })
         val keepTicked = if (item.doneOn == day.toString() && !MedicineDoses.allTaken(after)) doses.filter { other ->
             other.key != dose.key && before[other.key] == MedicineDoseState.TAKEN && events.none { it.medicineId == item.id && it.outcome in reportOutcomes && belongsTo(it, other, day, zone) }
         }.map { report(item, it, true, day, zone, now - 1, reporter, label(it) + " was covered by the earlier whole-day tick.", makeId()) } else emptyList()
-        val target = if (before[dose.key] == after[dose.key] && events.any { it.medicineId == item.id && belongsTo(it, dose, day, zone) }) emptyList() else listOf(report(item, dose, taken, day, zone, now, reporter, id = makeId()))
+        val target = if (before[dose.key] == after[dose.key] && events.any { it.medicineId == item.id && belongsTo(it, dose, day, zone) }) emptyList() else listOf(report(item, dose, taken, day, zone, now, reporter, id = makeId(), skipped = skipped && !taken))
         val doneOn = if (allTaken(after)) day.toString() else if (item.doneOn == day.toString()) "" else item.doneOn
         return MedicineDosePlan(keepTicked + target, doneOn)
     }

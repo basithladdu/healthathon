@@ -20,8 +20,8 @@ enum class CareDeviceType(val en: String, val hi: String) {
     CHEST("Chest drain", "छाती की नली (ड्रेन)"),
     STOMA("Colostomy / ileostomy bag", "कोलोस्टॉमी / इलियोस्टॉमी थैली"),
     TRACH("Tracheostomy", "ट्रेकियोस्टॉमी"),
-    STENT("Stent", "स्टेंट"),
     OTHER("Other tube or line", "दूसरी नली या लाइन"),
+    // No "Stent" (clinical team, 24 Nov 2026: stents are not tubes or lines to look after). A stent saved earlier reads as Other (see decode).
 }
 
 /** The daily check. Each is a yes/no question about the tube or the skin around it. */

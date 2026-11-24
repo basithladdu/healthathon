@@ -12,7 +12,8 @@ class DoctorProgressDataTest {
     @Test fun lateMeansTakenAfterPlanNotLoggedAfterPlan() {
         val onTime = SampleMedicineDose("dose", patient, "Sample", 1000, 1000, 5000, SampleDoseOutcome.TAKEN, SampleReportSource.PATIENT)
         assertEquals("Taken reported", DoctorProgressData.historicalDose(onTime, 6000).status)
-        assertEquals("Late reported", DoctorProgressData.historicalDose(onTime.copy(reportedTakenAt = 2000), 6000).status)
+        assertEquals("Taken reported", DoctorProgressData.historicalDose(onTime.copy(reportedTakenAt = 2000), 3_700_000).status)
+        assertEquals("Late reported", DoctorProgressData.historicalDose(onTime.copy(reportedTakenAt = 1000 + 3_600_000), 3_700_000).status)
     }
     @Test fun historicalCutoffHidesLaterLogsAndFutureTakenClaims() {
         val dose = SampleMedicineDose("dose", patient, "Sample", 1000, 2000, 5000, SampleDoseOutcome.TAKEN, SampleReportSource.FAMILY)

@@ -5725,3 +5725,127 @@ I have read this version. This is not a formal signature, consent for treatment 
 The patient is under 18. A parent or guardian makes these decisions with the doctor. Ask the child what matters to them too, in words they understand, and write it in their own words.	రోగి వయసు 18 కంటే తక్కువ. ఈ నిర్ణయాలు తల్లిదండ్రులు లేదా సంరక్షకులు డాక్టర్‌తో కలిసి తీసుకుంటారు. పిల్లలకు అర్థమయ్యే మాటల్లో వారికి ఏది ముఖ్యమో కూడా అడగండి, వారి మాటల్లోనే రాయండి.
 Add the parent or guardian as the main decision-maker.	తల్లిదండ్రులు లేదా సంరక్షకులను ప్రధాన నిర్ణయకర్తగా చేర్చండి.
 Draft annexure. The clinical team must approve this wording before the pilot.	ముసాయిదా అనుబంధం. పైలట్‌కు ముందు క్లినికల్ బృందం ఈ మాటలను ఆమోదించాలి.
+Time	సమయం
+Reminder time	రిమైండర్ సమయం
+Other time	వేరే సమయం
+Remove time	సమయం తీసివేయండి
+Up to six times.	గరిష్ఠంగా ఆరు సమయాలు.
+Cancer	క్యాన్సర్
+Heart failure	గుండె బలహీనత
+Kidney disease	కిడ్నీ వ్యాధి
+Lung disease	ఊపిరితిత్తుల వ్యాధి
+Stroke	పక్షవాతం (స్ట్రోక్)
+Dementia	మతిమరుపు వ్యాధి (డిమెన్షియా)
+Liver disease	కాలేయ వ్యాధి
+Parkinson's disease	పార్కిన్సన్స్ వ్యాధి
+Show older ($remaining more)	పాతవి చూపించు (ఇంకా $remaining)
+Show all ($total)	అన్నీ చూపించు ($total)
+Country code	దేశ కోడ్
+UAE	యూఏఈ
+Saudi Arabia	సౌదీ అరేబియా
+US / Canada	అమెరికా / కెనడా
+UK	యూకే (బ్రిటన్)
+Singapore	సింగపూర్
+Australia	ఆస్ట్రేలియా
+Qatar	ఖతార్
+Oman	ఒమన్
+Kuwait	కువైట్
+1 year	1 సంవత్సరం
+$n years	$n సంవత్సరాలు
+$n months	$n నెలలు
+How long	ఎంత కాలంగా
+Hospital / landline number (optional)	ఆసుపత్రి / ల్యాండ్‌లైన్ నంబర్ (ఐచ్ఛికం)
+Months	నెలలు
+Years	సంవత్సరాలు
+Expand map	మ్యాప్ పెద్దగా చూడండి
+Zoom in	దగ్గరగా చూడండి
+Zoom out	దూరంగా చూడండి
+Close map	మ్యాప్ మూసివేయండి
+India	భారత్
+No QR yet: it needs the web link.	ఇంకా QR లేదు: దీనికి వెబ్ లింక్ కావాలి.
+Valid until $until	$until వరకు చెల్లుతుంది
+No web link	వెబ్ లింక్ లేదు
+Anyone who scans a printed card will see that the family turned this link off. You can make a new link later.	ముద్రించిన కార్డును స్కాన్ చేసేవారికి కుటుంబం ఈ లింక్‌ను ఆపివేసిందని కనిపిస్తుంది. మీరు తర్వాత కొత్త లింక్ చేయవచ్చు.
+Every card printed with the old link will stop opening. Print the new card.	పాత లింక్‌తో ముద్రించిన ప్రతి కార్డు ఇక తెరుచుకోదు. కొత్త కార్డును ముద్రించండి.
+No doctor saved	డాక్టర్ వివరాలు సేవ్ చేయలేదు
+A calm talk with your doctor about what matters most to you, so your care follows your wishes. You can bring family.	మీకు అన్నిటికంటే ఏది ముఖ్యమో దాని గురించి మీ డాక్టర్‌తో ప్రశాంతమైన మాట, తద్వారా మీ సంరక్షణ మీ కోరికల ప్రకారం జరుగుతుంది. మీరు కుటుంబాన్ని తీసుకురావచ్చు.
+Last 7 days	గత 7 రోజులు
+No check-ins in the last 7 days.	గత 7 రోజుల్లో ఏ చెక్-ఇన్ లేదు.
+Nothing noted this day.	ఈ రోజు ఏమీ నమోదు కాలేదు.
+Notes only	నోట్స్ మాత్రమే
+Not daily	రోజూ కాదు
+${doses.size} times a day	రోజుకు ${doses.size} సార్లు
+Once a day	రోజుకు ఒకసారి
+$taken of $total	$total లో $taken
+Not taken reported	తీసుకోలేదని తెలిపారు
+Prescription date	ప్రిస్క్రిప్షన్ తేదీ
+Nebuliser	నెబ్యులైజర్
+Saved as: $current	ఇలా సేవ్ అయింది: $current
+Saved as: $value	ఇలా సేవ్ అయింది: $value
+Written before: $writtenBefore	ఇంతకు ముందు రాసింది: $writtenBefore
+No fixed times. On Today, tap ‘Took a dose now’ each time it is taken.	నిర్ణీత సమయాలు లేవు. తీసుకున్న ప్రతిసారీ ఈరోజు పేజీలో ‘ఇప్పుడే ఒక మోతాదు తీసుకున్నాను’ నొక్కండి.
+units	యూనిట్లు
+drops	చుక్కలు
+puffs	పఫ్‌లు
+Number	సంఖ్య
+Directions as written	రాసిన విధంగా సూచనలు
+Twice a day	రోజుకు రెండుసార్లు
+Three times a day	రోజుకు మూడుసార్లు
+Four times a day	రోజుకు నాలుగుసార్లు
+As needed (SOS)	అవసరమైనప్పుడు (SOS)
+Taken, not taken or skipped	తీసుకున్నారు, తీసుకోలేదు లేదా వదిలేశారు
+Nothing reported on this day.	ఈ రోజు ఏమీ నమోదు కాలేదు.
+All taken	అన్నీ తీసుకున్నారు
+Side effect noted	దుష్ప్రభావం నమోదైంది
+Taken · late	తీసుకున్నారు · ఆలస్యంగా
+For pain	నొప్పి కోసం
+For breakthrough pain	అకస్మాత్తుగా వచ్చే తీవ్ర నొప్పి కోసం
+For background pain	నిరంతరం ఉండే నొప్పి కోసం
+For breakthrough abdominal pain	కడుపులో అకస్మాత్తుగా వచ్చే తీవ్ర నొప్పి కోసం
+For abdominal discomfort	కడుపు అసౌకర్యం కోసం
+For nausea	వికారం కోసం
+Ease nausea	వికారం తగ్గించడానికి
+To ease nausea	వికారం తగ్గించడానికి
+Appetite loss	ఆకలి లేకపోవడం
+For appetite loss	ఆకలి లేకపోవడం కోసం
+For nausea and appetite	వికారం మరియు ఆకలి కోసం
+To ease nausea and appetite loss	వికారం, ఆకలి లేకపోవడం తగ్గించడానికి
+Short course to ease nausea and appetite loss, now finished	వికారం, ఆకలి లేకపోవడం తగ్గించడానికి చిన్న కోర్సు, ఇప్పుడు పూర్తయింది
+For vomiting	వాంతుల కోసం
+For constipation	మలబద్ధకం కోసం
+To keep bowels regular	మలవిసర్జన సక్రమంగా ఉండటానికి
+To keep bowels regular while taking morphine	మార్ఫిన్ తీసుకుంటున్నప్పుడు మలవిసర్జన సక్రమంగా ఉండటానికి
+For breathlessness	ఆయాసం కోసం
+For cough	దగ్గు కోసం
+For fever	జ్వరం కోసం
+For sleep	నిద్ర కోసం
+For anxiety	ఆందోళన కోసం
+For low mood	మనసు బాగోలేనప్పుడు
+For acidity	ఎసిడిటీ కోసం
+For itching	దురద కోసం
+For swelling	వాపు కోసం
+For mouth ulcers	నోటి పుండ్ల కోసం
+Take before food	భోజనానికి ముందు తీసుకోండి
+Take after food	భోజనం తర్వాత తీసుకోండి
+Take with food	భోజనంతో పాటు తీసుకోండి
+Taken with food	భోజనంతో పాటు తీసుకుంటారు
+Take 30 minutes before meals	భోజనానికి 30 నిమిషాల ముందు తీసుకోండి
+Take 30 minutes before meals if nausea is worse then	అప్పుడు వికారం ఎక్కువగా ఉంటే భోజనానికి 30 నిమిషాల ముందు తీసుకోండి
+On an empty stomach	ఖాళీ కడుపుతో
+Oral	నోటి ద్వారా
+Once daily	రోజుకు ఒకసారి
+Twice daily	రోజుకు రెండుసార్లు
+Three times daily	రోజుకు మూడుసార్లు
+Four times daily	రోజుకు నాలుగుసార్లు
+Each morning	ప్రతి ఉదయం
+At night	రాత్రి
+At bedtime	పడుకునే ముందు
+Every 4 hours as needed	అవసరమైనప్పుడు ప్రతి 4 గంటలకు
+Three times daily before meals if nausea persists	వికారం తగ్గకపోతే రోజుకు మూడుసార్లు భోజనానికి ముందు
+Review if more than 3 doses in 24 hours	24 గంటల్లో 3 కంటే ఎక్కువ మోతాదులు అవసరమైతే డాక్టర్‌కు చెప్పండి
+Do not take extra paracetamol from other sources	ఇతర మందుల నుండి అదనంగా పారాసిటమాల్ తీసుకోవద్దు
+Do not crush or chew	నలపవద్దు, నమలవద్దు
+Dissolve in water	నీటిలో కరిగించి తీసుకోండి
+Shake well before use	వాడే ముందు బాగా కలపండి
+Tap a dose when taken. Hold it for Not taken or Skipped.	తీసుకున్నప్పుడు మోతాదును నొక్కండి. తీసుకోకపోతే లేదా వదిలేస్తే నొక్కి పట్టుకోండి.
+Not yet · late	ఇంకా లేదు · ఆలస్యం

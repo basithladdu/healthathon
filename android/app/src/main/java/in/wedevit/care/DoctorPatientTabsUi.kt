@@ -276,7 +276,7 @@ internal fun doctorLabRange(data: CareEntry): Pair<Double?, Double?> {
     if (full) {
         Column(Modifier.fillMaxSize()) {
             TextButton(onClick = { full = false }, modifier = Modifier.padding(horizontal = 12.dp).heightIn(min = 48.dp).testTag("doctor-labs-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null); Spacer(Modifier.width(6.dp)); Text(t("Lab trends", "जाँच के रुझान")) }
-            Box(Modifier.weight(1f).fillMaxWidth()) { CareLabs(vm) }
+            Box(Modifier.weight(1f).fillMaxWidth()) { CareLabs(vm, onBack = null) }
         }
         return
     }

@@ -17,6 +17,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.time.LocalDate
 import java.util.UUID
 
 /** Reviewed rows only: no parsing, provider calls, or guessed medicine directions. */
@@ -34,7 +35,8 @@ import java.util.UUID
     AlertDialog(onDismissRequest={if(!busy)onDismiss()},title={Text(if(replacing)t("New prescription", "नया पर्चा") else t("Edit current list", "अभी की सूची बदलें"))},text={
         Column(Modifier.fillMaxWidth().heightIn(max=560.dp).verticalScroll(rememberScrollState()).saharaContentSize(),verticalArrangement=Arrangement.spacedBy(12.dp)) {
             OutlinedTextField(title,{title=it.take(200)},label={Text(t("Name", "नाम"))},enabled=!busy,singleLine=true,shape=RoundedCornerShape(14.dp),modifier=Modifier.fillMaxWidth())
-            OutlinedTextField(date,{date=it.take(10)},label={Text(t("Date (YYYY-MM-DD)", "तारीख़ (YYYY-MM-DD)"))},enabled=!busy,singleLine=true,shape=RoundedCornerShape(14.dp),modifier=Modifier.fillMaxWidth())
+            // The date is tapped on a calendar, never typed (24 Nov 2026). It may stay empty: an unknown date is never invented.
+            CareDateButton(runCatching{careEpoch(LocalDate.parse(date))}.getOrDefault(0L),t("Prescription date", "पर्चे की तारीख़"),{picked->if(!busy)date=if(picked>0)careDay(picked).toString() else ""},allowClear=true)
             rows.forEachIndexed { index,row ->
                 HorizontalDivider(color=DoctorHairline)
                 Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
@@ -43,7 +45,8 @@ import java.util.UUID
                 }
                 OutlinedTextField(row.name,{value->rows=rows.map {if(it.id==row.id)it.copy(name=value.take(200))else it}},label={Text(t("Medicine name", "दवा का नाम"))},enabled=!busy,shape=RoundedCornerShape(14.dp),modifier=Modifier.fillMaxWidth())
                 MedicineNameSuggestions(row.name,enabled=!busy){value->rows=rows.map {if(it.id==row.id)it.copy(name=value)else it}}
-                OutlinedTextField(row.instructions,{value->rows=rows.map {if(it.id==row.id)it.copy(instructions=value.take(4000))else it}},label={Text(t("Directions", "निर्देश"))},enabled=!busy,shape=RoundedCornerShape(14.dp),modifier=Modifier.fillMaxWidth())
+                // The same pickers as the family form: strength and unit, form, How often with its dose times, then directions.
+                key(row.id){MedicineDetailPickers(row.instructions,{value->rows=rows.map {if(it.id==row.id)it.copy(instructions=value.take(4000))else it}},enabled=!busy)}
             }
             OutlinedButton(onClick={rows=rows+PrescriptionMedicineInput(UUID.randomUUID().toString(),"","")},enabled=!busy&&rows.size<50,shape=RoundedCornerShape(14.dp),modifier=Modifier.fillMaxWidth().heightIn(min=48.dp)){Icon(Icons.Default.Add,null,Modifier.size(18.dp));Spacer(Modifier.width(8.dp));Text(t("Add medicine", "दवा जोड़ें"))}
             if(replacing) OutlinedButton(onClick={onScan(title,date,rows)},enabled=!busy,shape=RoundedCornerShape(14.dp),modifier=Modifier.fillMaxWidth().heightIn(min=48.dp)){Icon(Icons.Default.DocumentScanner,null,Modifier.size(18.dp));Spacer(Modifier.width(8.dp));Text(t("Scan prescription", "पर्चा स्कैन करें"))}

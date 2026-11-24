@@ -13,10 +13,14 @@ data class CarePatientProfile(
     val age: Int? = null, val sex: String = "", val weightKg: Double? = null, val heightCm: Int? = null,
     val bloodGroup: String = "", val illness: String = "", val allergies: String = "", val phone: String = "", val address: String = "",
     val weights: List<CareWeightEntry> = emptyList(),
-    // The care now (Dr Shirin, 23 Nov): since when the illness is known (typed, e.g. "Mar 2025"), the doctor seen now, and the
-    // treatment now as [TREATMENTS] codes plus a free line. All optional; blank / empty means not filled in.
+    // The care now (Dr Shirin, 23 Nov): how long the illness is known, the doctor seen now, and the treatment now as [TREATMENTS]
+    // codes plus a free line. All optional; blank / empty means not filled in. Since 24 Nov [illnessSince] is written as a
+    // [CareIllnessDuration] ("8 months", "2 years"); older profiles keep their typed text ("Mar 2025"), which still shows as typed.
+    // [doctorPhone] and [doctorLandline] are "+91 98765 43210" style ([CarePhone]); older numbers without a code read as +91.
     val illnessSince: String = "", val doctorName: String = "", val doctorPlace: String = "", val doctorPhone: String = "",
     val treatments: List<String> = emptyList(), val treatmentNote: String = "",
+    /** The hospital or clinic landline (24 Nov), beside the doctor's own phone. */
+    val doctorLandline: String = "",
 ) {
     // Still "v": 1: "weights" and the care-now keys are extra keys that older apps ignore; each is written only when filled in,
     // so a profile without them reads exactly as before. (An older app that edits the profile will not keep them.)
@@ -25,19 +29,23 @@ data class CarePatientProfile(
         .also { j -> age?.let { j.put("age", it) }; weightKg?.let { j.put("weight", it) }; heightCm?.let { j.put("height", it) } }
         .also { j -> if (weights.isNotEmpty()) j.put("weights", JSONArray().apply { weights.forEach { put(JSONObject().put("day", it.day.toString()).put("kg", it.kg)) } }) }
         .also { j ->
-            listOf("illnessSince" to illnessSince, "doctorName" to doctorName, "doctorPlace" to doctorPlace, "doctorPhone" to doctorPhone, "treatmentNote" to treatmentNote)
+            listOf("illnessSince" to illnessSince, "doctorName" to doctorName, "doctorPlace" to doctorPlace, "doctorPhone" to doctorPhone, "treatmentNote" to treatmentNote, "doctorLandline" to doctorLandline)
                 .forEach { (key, value) -> if (value.isNotBlank()) j.put(key, value) }
             if (treatments.isNotEmpty()) j.put("treatments", JSONArray().apply { treatments.forEach { put(it) } })
         }
         .toString()
     /** True when any of the care-now details is filled in. */
-    val hasCareNow: Boolean get() = illnessSince.isNotBlank() || doctorName.isNotBlank() || doctorPlace.isNotBlank() || doctorPhone.isNotBlank() || treatments.isNotEmpty() || treatmentNote.isNotBlank()
+    val hasCareNow: Boolean get() = illnessSince.isNotBlank() || doctorName.isNotBlank() || doctorPlace.isNotBlank() || doctorPhone.isNotBlank() || doctorLandline.isNotBlank() || treatments.isNotEmpty() || treatmentNote.isNotBlank()
     companion object {
         val SEX = listOf("Female", "Male", "Other")
         val BLOOD = listOf("A+", "A−", "B+", "B−", "AB+", "AB−", "O+", "O−", "Not known")
-        /** Treatment now, stored as these codes (labels are translated on screen). The last three stand alone: picking one clears the others. */
-        val TREATMENTS = listOf("chemotherapy", "radiotherapy", "surgery", "hormone_targeted", "symptom_care_only", "none_now", "not_sure")
-        val TREATMENTS_ALONE = setOf("symptom_care_only", "none_now", "not_sure")
+        /**
+         * Treatment now, stored as these codes (labels are translated on screen). The last two stand alone: picking one clears the others.
+         * "none_now" ("No treatment now") was taken off on 24 Nov: patients still receive symptom care. A profile saved with it reads
+         * as no treatment chosen, because [decodeOrNull] keeps only the codes in this list.
+         */
+        val TREATMENTS = listOf("chemotherapy", "radiotherapy", "surgery", "hormone_targeted", "symptom_care_only", "not_sure")
+        val TREATMENTS_ALONE = setOf("symptom_care_only", "not_sure")
         fun decode(json: String): CarePatientProfile = decodeOrNull(json) ?: CarePatientProfile()
         fun decodeOrNull(json: String): CarePatientProfile? = runCatching {
             val j = JSONObject(json)
@@ -46,10 +54,10 @@ data class CarePatientProfile(
                 if (j.has("height")) j.getInt("height") else null, j.optString("blood"), j.optString("illness"), j.optString("allergies"), j.optString("phone"), j.optString("address"),
                 CareWeightHistory.decode(j.optJSONArray("weights")),
                 illnessSince = j.optString("illnessSince"), doctorName = j.optString("doctorName"), doctorPlace = j.optString("doctorPlace"), doctorPhone = j.optString("doctorPhone"),
-                treatments = treatments, treatmentNote = j.optString("treatmentNote"))
+                treatments = treatments, treatmentNote = j.optString("treatmentNote"), doctorLandline = j.optString("doctorLandline"))
         }.getOrNull()
 
-        /** Ticks or unticks one treatment; the stand-alone choices (symptom care only, none now, not sure) clear every other one, and any other choice clears them. */
+        /** Ticks or unticks one treatment; the stand-alone choices (symptom care only, not sure) clear every other one, and any other choice clears them. */
         fun toggleTreatment(current: List<String>, code: String): List<String> = when {
             code in current -> current - code
             code in TREATMENTS_ALONE -> listOf(code)
@@ -65,10 +73,48 @@ internal fun careTreatmentLabel(code: String, t: (String, String) -> String): St
     "surgery" -> t("Surgery", "सर्जरी")
     "hormone_targeted" -> t("Hormone or targeted therapy", "हार्मोन या टार्गेटेड थेरेपी")
     "symptom_care_only" -> t("Pain and symptom care only", "सिर्फ़ दर्द और लक्षणों की देखभाल")
-    "none_now" -> t("No treatment now", "अभी कोई इलाज नहीं")
     "not_sure" -> t("Not sure", "पक्का नहीं पता")
     else -> code
 }
+
+/**
+ * How long the illness has been known (24 Nov clinical meeting: "months and years, not unformatted text"): a number and a unit,
+ * stored in [CarePatientProfile.illnessSince] as plain English ("1 month", "8 months", "2 years") so older apps and the doctor
+ * side read it as it is. [parse] also reads "8 mo" and "2 yrs"; anything else (older typed text such as "Mar 2025") is not a duration.
+ */
+data class CareIllnessDuration(val amount: Int, val years: Boolean) {
+    fun encode(): String = "$amount " + when { years && amount == 1 -> "year"; years -> "years"; amount == 1 -> "month"; else -> "months" }
+    companion object {
+        /** The quick numbers on screen. */
+        val AMOUNTS = 1..12
+        /** Largest number read back (a doctor may have typed "15 years" on an older app). */
+        const val MAX = 99
+        private val pattern = Regex("""(\d{1,2})\s*(months?|mos?|years?|yrs?)\.?""", RegexOption.IGNORE_CASE)
+        fun parse(text: String): CareIllnessDuration? = pattern.matchEntire(text.trim())?.let { m ->
+            m.groupValues[1].toIntOrNull()?.takeIf { it in 1..MAX }?.let { CareIllnessDuration(it, m.groupValues[2].lowercase().startsWith("y")) }
+        }
+    }
+}
+
+/** [CarePatientProfile.illnessSince] for the screen: a duration in the chosen language ("8 months"); older typed text as typed. */
+internal fun careIllnessSinceText(stored: String, t: (String, String) -> String): String {
+    val d = CareIllnessDuration.parse(stored) ?: return stored.trim()
+    val n = d.amount
+    return when {
+        d.years && n == 1 -> t("1 year", "1 साल")
+        d.years -> t("$n years", "$n साल")
+        n == 1 -> t("1 month", "1 महीना")
+        else -> t("$n months", "$n महीने")
+    }
+}
+
+/** The label beside it: "How long" for a duration, the older "Illness since" for older typed text such as "Mar 2025". */
+internal fun careIllnessSinceLabel(stored: String, t: (String, String) -> String): String =
+    if (CareIllnessDuration.parse(stored) != null) t("How long", "कितने समय से") else t("Illness since", "बीमारी कब से")
+
+/** The doctor now in one line: name, place, then the phones as stored. */
+internal fun careDoctorLine(p: CarePatientProfile): String =
+    listOf(p.doctorName, p.doctorPlace, p.doctorPhone, p.doctorLandline).filter(String::isNotBlank).joinToString(" · ")
 
 /** One line for cards and summaries: the treatment names, then the free note. */
 internal fun careTreatmentLine(profile: CarePatientProfile, t: (String, String) -> String): String =

@@ -7,8 +7,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.OpenInFull
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material3.*
@@ -50,8 +53,12 @@ import org.maplibre.geojson.Point
  * Every mapped centre, clustered. Tapping a pin selects the centres under it; tapping a cluster zooms in, or lists it when it is all one place.
  * With [userLocation] (latitude to longitude, read on the phone and never sent anywhere) the map opens framed on the person and the
  * closest centres, shows a "you are here" dot, and offers a button to come back to it.
+ * 24 Nov (clinical meeting: "work like Google Maps"): one finger drags and two fingers pinch to zoom inside the box (a double tap
+ * zooms in too), with + / − buttons for anyone who cannot pinch; turning and tilting stay off so the map never ends up sideways.
+ * [onExpand] adds "Expand map" (top left), which opens the full-screen map; [fill] makes the map fill its parent instead of [height].
  */
-@Composable fun CentreMap(centres: List<Centre>, userLocation: Pair<Double, Double>? = null, height: Dp = 260.dp, onLocate: (() -> Unit)? = null, onSelect: (List<Centre>) -> Unit) {
+@Composable fun CentreMap(centres: List<Centre>, userLocation: Pair<Double, Double>? = null, height: Dp = 260.dp, onLocate: (() -> Unit)? = null,
+    onExpand: (() -> Unit)? = null, fill: Boolean = false, tag: String = "centre-map", onSelect: (List<Centre>) -> Unit) {
     val context = LocalContext.current; val t = careText()
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val currentCentres by rememberUpdatedState(centres)
@@ -81,6 +88,15 @@ import org.maplibre.geojson.Point
                 map = ready
                 ready.uiSettings.isLogoEnabled = false
                 ready.uiSettings.isAttributionEnabled = true
+                // Drag, pinch and double-tap zoom like Google Maps; no rotating or tilting, so north stays up for everyone.
+                ready.uiSettings.isScrollGesturesEnabled = true
+                ready.uiSettings.isZoomGesturesEnabled = true
+                ready.uiSettings.isDoubleTapGesturesEnabled = true
+                ready.uiSettings.isQuickZoomGesturesEnabled = true
+                ready.uiSettings.isRotateGesturesEnabled = false
+                ready.uiSettings.isTiltGesturesEnabled = false
+                ready.setMinZoomPreference(3.0)
+                ready.setMaxZoomPreference(18.0)
                 ready.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), zoom))
                 ready.addOnCameraIdleListener {
                     ready.cameraPosition.target?.let { latitude = it.latitude; longitude = it.longitude }
@@ -167,23 +183,37 @@ import org.maplibre.geojson.Point
             if (userLocation != null && !centredOnUser) { centredOnUser = true; map?.moveCamera(centreMapAround(userLocation, centres)) }
         }
     }
-    Box(Modifier.fillMaxWidth().height(height).testTag("centre-map").semantics { stateDescription = if (failed) t("Map unavailable", "नक्शा उपलब्ध नहीं") else if (loaded) t("Map ready", "नक्शा तैयार") else t("Loading map", "नक्शा खुल रहा है") }) {
+    fun move(update: org.maplibre.android.camera.CameraUpdate) { if (ValueAnimator.areAnimatorsEnabled()) map?.animateCamera(update, 300) else map?.moveCamera(update) }
+    Box((if (fill) Modifier.fillMaxSize() else Modifier.fillMaxWidth().height(height)).testTag(tag).semantics { stateDescription = if (failed) t("Map unavailable", "नक्शा उपलब्ध नहीं") else if (loaded) t("Map ready", "नक्शा तैयार") else t("Loading map", "नक्शा खुल रहा है") }) {
         key(retry) { AndroidView(factory = { view }, modifier = Modifier.fillMaxSize()) }
-        if (!loaded && !failed) CircularProgressIndicator(Modifier.size(28.dp).align(Alignment.Center), color = Rust)
+        // Full screen, the buttons keep clear of the status and navigation bars; the map itself runs under them.
+        Box(Modifier.fillMaxSize().then(if (fill) Modifier.systemBarsPadding() else Modifier)) { CentreMapControls(loaded, failed, fill, centres, userLocation, onLocate, onExpand, tag,
+            onRetry = { failed = false; loaded = false; retry++ }, onMove = ::move) }
+    }
+}
+
+/** The buttons over the map: retry, Show all, Expand, the legend, + / − (full screen only: the small box has no room) and locate me. */
+@Composable private fun BoxScope.CentreMapControls(loaded: Boolean, failed: Boolean, fill: Boolean, centres: List<Centre>, userLocation: Pair<Double, Double>?,
+    onLocate: (() -> Unit)?, onExpand: (() -> Unit)?, tag: String, onRetry: () -> Unit, onMove: (org.maplibre.android.camera.CameraUpdate) -> Unit) {
+    val t = careText()
+    if (!loaded && !failed) CircularProgressIndicator(Modifier.size(28.dp).align(Alignment.Center), color = Rust)
         // One plain line and a retry; the list below still works without the map.
         if (failed) Surface(Modifier.align(Alignment.Center).padding(16.dp), shape = RoundedCornerShape(12.dp), color = Paper) {
             Row(Modifier.padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.ErrorOutline, null, Modifier.size(20.dp), tint = RustText); Spacer(Modifier.width(8.dp))
                 Text(t("Couldn't load the map.", "नक्शा नहीं खुल सका।"), color = DoctorCardInk, modifier = Modifier.weight(1f, fill = false))
-                TextButton(onClick = { failed = false; loaded = false; retry++ }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Try again", "फिर कोशिश करें"), color = RustText) }
+                TextButton(onClick = onRetry, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Try again", "फिर कोशिश करें"), color = RustText) }
             }
         }
         val located = centres.filter { it.latitude != null && it.longitude != null }
-        if (loaded && located.isNotEmpty()) FilledTonalButton(onClick = {
-            val update = bounds(located)
-            if (ValueAnimator.areAnimatorsEnabled()) map?.animateCamera(update, 350) else map?.moveCamera(update)
-        }, shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Paper, contentColor = Ink),
+        if (loaded && located.isNotEmpty()) FilledTonalButton(onClick = { onMove(bounds(located)) }, shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Paper, contentColor = Ink),
             modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).heightIn(min = 48.dp)) { Text(t("Show all", "सभी दिखाएँ"), fontWeight = FontWeight.SemiBold) }
+        // "Expand map": the same map full screen, with the same pins and the locate button (shown even while the tiles load or fail).
+        if (onExpand != null) FilledTonalButton(onClick = onExpand, shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Paper, contentColor = Ink),
+            contentPadding = PaddingValues(horizontal = 12.dp), modifier = Modifier.align(Alignment.TopStart).padding(8.dp).heightIn(min = 48.dp).testTag("$tag-expand")) {
+            Icon(Icons.Default.OpenInFull, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp))
+            Text(t("Expand map", "बड़ा नक्शा"), fontWeight = FontWeight.SemiBold, maxLines = 1)
+        }
         // Legend: the pin colours, because the layer tiles now sit in the Filters sheet.
         if (loaded) Surface(Modifier.align(Alignment.BottomStart).padding(8.dp).testTag("centre-map-legend"), shape = RoundedCornerShape(12.dp), color = Paper.copy(alpha = .94f)) {
             Column(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -195,14 +225,23 @@ import org.maplibre.geojson.Point
                 }
             }
         }
-        if (loaded && (userLocation != null || onLocate != null)) SmallFloatingActionButton(onClick = {
-            if (userLocation == null) onLocate?.invoke() else {
-                val update = centreMapAround(userLocation, centres)
-                if (ValueAnimator.areAnimatorsEnabled()) map?.animateCamera(update, 350) else map?.moveCamera(update)
+        Column(Modifier.align(Alignment.BottomEnd).padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            if (loaded && fill) {
+                CentreMapRoundButton(Icons.Default.Add, t("Zoom in", "पास से देखें"), "$tag-zoom-in") { onMove(CameraUpdateFactory.zoomIn()) }
+                CentreMapRoundButton(Icons.Default.Remove, t("Zoom out", "दूर से देखें"), "$tag-zoom-out") { onMove(CameraUpdateFactory.zoomOut()) }
             }
-        }, containerColor = Paper, contentColor = Ink, modifier = Modifier.align(Alignment.BottomEnd).padding(12.dp).testTag("centre-map-locate")) {
-            Icon(Icons.Default.MyLocation, t("Show where I am", "मैं कहाँ हूँ, दिखाएँ"))
+            if (loaded && (userLocation != null || onLocate != null)) SmallFloatingActionButton(onClick = {
+                if (userLocation == null) onLocate?.invoke() else onMove(centreMapAround(userLocation, centres))
+            }, containerColor = Paper, contentColor = Ink, modifier = Modifier.sizeIn(minWidth = 48.dp, minHeight = 48.dp).testTag("centre-map-locate")) {
+                Icon(Icons.Default.MyLocation, t("Show where I am", "मैं कहाँ हूँ, दिखाएँ"))
+            }
         }
+}
+
+/** A round 48 dp map button (zoom in / out) in the locate button's colours. */
+@Composable private fun CentreMapRoundButton(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, tag: String, onClick: () -> Unit) {
+    Surface(onClick = onClick, shape = CircleShape, color = Paper, contentColor = Ink, shadowElevation = 3.dp, modifier = Modifier.size(48.dp).testTag(tag)) {
+        Box(contentAlignment = Alignment.Center) { Icon(icon, label, Modifier.size(24.dp)) }
     }
 }
 

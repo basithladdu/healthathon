@@ -3,6 +3,10 @@ package `in`.wedevit.care
 
 import android.content.Context
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.animation.AnimatedContent
@@ -32,6 +36,9 @@ import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -56,6 +63,8 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.Instant
+import java.time.DayOfWeek
+import java.time.YearMonth
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -85,11 +94,14 @@ import java.time.format.DateTimeFormatter
     val zone = ZoneId.systemDefault(); val today = LocalDate.now(zone)
     val allTaken = MedicineDoses.allTaken(MedicineDoses.states(item, doses, events, today, zone))
     val entry = remember(item.detail) { MedicineEntryText.parse(item.detail) }
-    val purpose = remember(item.detail) { MedicineCardText.purpose(item.detail) }
-    val rest = remember(item.detail) { MedicineCardText.rest(item.detail) }
+    // Known phrases ("For pain.", "Take with food.") show in the reader's language; the saved words never change (MedicinePhrases).
+    val lang = careLanguage()
+    val purpose = remember(item.detail, lang) { MedicinePhrases.shown(MedicineCardText.purpose(item.detail), lang) }
+    val rest = remember(item.detail, lang) { MedicinePhrases.shown(MedicineCardText.rest(item.detail), lang) }
     val summary = entry?.let { e ->
         val food = when (e.food) { MedicineMealTiming.BEFORE_FOOD -> t("Before food", "खाने से पहले"); MedicineMealTiming.WITH_FOOD -> t("With food", "खाने के साथ"); MedicineMealTiming.AFTER_FOOD -> t("After food", "खाने के बाद"); else -> "" }
-        listOf(e.strength, e.howMuch, e.howOften, food).filter(String::isNotBlank).joinToString(" · ")
+        val often = MedicineFrequencyRules.fromText(e.howOften)?.takeIf { it.english.equals(e.howOften.trim(), true) }?.let { t(it.english, it.hindi) } ?: MedicinePhrases.shown(e.howOften, lang)
+        listOf(e.strength, e.howMuch, often, food).filter(String::isNotBlank).joinToString(" · ")
     }.orEmpty()
     // Medicines plum wash (green once every dose today is taken), so each medicine reads as part of its section.
     SurfaceCard(if (allTaken) DoctorStatusGoodBg else SaharaSection.Medicines.wash) {
@@ -133,10 +145,11 @@ import java.time.format.DateTimeFormatter
  * Saves one dose tap: the dose's report (and, when a whole-day tick is being split, the doses it covered), then the
  * whole-day tick when it changes. Returns false when nothing could be saved.
  */
-internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: CareItem, doses: List<MedicineDose>, dose: MedicineDose, taken: Boolean, day: LocalDate = LocalDate.now(ZoneId.systemDefault())): Boolean {
+internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: CareItem, doses: List<MedicineDose>, dose: MedicineDose, taken: Boolean, day: LocalDate = LocalDate.now(ZoneId.systemDefault()),
+                                        skipped: Boolean = false): Boolean {
     val zone = ZoneId.systemDefault(); val today = LocalDate.now(zone)
     val current = vm.allItems.value.firstOrNull { it.id == item.id } ?: item
-    val plan = MedicineDoses.plan(current, doses, vm.medicineEvents.value, dose, taken, day, zone, System.currentTimeMillis(), MedicineDoses.reporter(vm.viewRole.value))
+    val plan = MedicineDoses.plan(current, doses, vm.medicineEvents.value, dose, taken, day, zone, System.currentTimeMillis(), MedicineDoses.reporter(vm.viewRole.value), skipped = skipped && !taken)
     val repo = MedicineHistoryRepo(context.applicationContext, vm.cloud, vm.storageNamespace)
     var snapshot: MedicineHistorySnapshot? = null
     plan.events.forEach { snapshot = repo.append(current.personId, it) }
@@ -161,12 +174,13 @@ internal suspend fun recordAsNeededDose(context: Context, vm: CareModel, item: C
 
 /**
  * Saves one dose tap. A one-tap Taken ([quick]) is held for a few seconds with "Marked taken · Undo" ([DoseUndoWindow]);
- * Undo then writes nothing. A choice from the Taken / Missed menu is written at once, after any held tick.
+ * Undo then writes nothing. A choice from the Taken / Not taken / Skipped menu is written at once, after any held tick.
+ * [skipped] (with [taken] false) saves Skipped, left out on purpose, instead of Not taken.
  */
 internal suspend fun markMedicineDose(context: Context, vm: CareModel, item: CareItem, doses: List<MedicineDose>, dose: MedicineDose, taken: Boolean, quick: Boolean, label: String,
-                                      day: LocalDate = LocalDate.now(ZoneId.systemDefault())) {
+                                      day: LocalDate = LocalDate.now(ZoneId.systemDefault()), skipped: Boolean = false) {
     val window = DoseUndoWindow.app
-    if (!(quick && taken)) { window.flush(); recordMedicineDose(context, vm, item, doses, dose, taken, day); return }
+    if (!(quick && taken)) { window.flush(); recordMedicineDose(context, vm, item, doses, dose, taken, day, skipped); return }
     val zone = ZoneId.systemDefault(); val app = context.applicationContext
     val shown = MedicineDoses.report(item, dose, true, day, zone, System.currentTimeMillis(), MedicineDoses.reporter(vm.viewRole.value))
     window.hold(DoseUndoWindow.Pending(item.personId, item.id, dose.key, item.title, label, shown) { recordMedicineDose(app, vm, item, doses, dose, true, day) })
@@ -257,9 +271,10 @@ internal suspend fun markMedicineDose(context: Context, vm: CareModel, item: Car
     FlowRow(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         doses.forEach { dose ->
             val label = medicineDoseLabel(dose)
-            MedicineDoseChip(item, dose, states[dose.key] ?: MedicineDoseState.PENDING, enabled = editable && !busy && !working) { taken, quick ->
+            MedicineDoseChip(item, dose, states[dose.key] ?: MedicineDoseState.PENDING, enabled = editable && !busy && !working) { choice, quick ->
+                val taken = choice == MedicineDoseChoice.TAKEN
                 val save: (LocalDate) -> Unit = { day -> if (canEditCareContext(vm, item.personId, capturedAccount)) { working = true; problem = ""; scope.launch {
-                    try { markMedicineDose(context, vm, item, doses, dose, taken, quick, label, day) }
+                    try { markMedicineDose(context, vm, item, doses, dose, taken, quick, label, day, skipped = choice == MedicineDoseChoice.SKIPPED) }
                     catch (e: Exception) { if (e is CancellationException) throw e; problem = if (e is IllegalArgumentException) e.message ?: failed else failed }
                     finally { working = false }
                 } } }
@@ -280,29 +295,31 @@ internal suspend fun markMedicineDose(context: Context, vm: CareModel, item: Car
 }
 
 /**
- * One dose. A dose not marked yet is ticked Taken with one tap; a marked dose (or a long press) opens Taken / Missed,
- * so a mistake can be corrected. Green when taken, red-brown when missed, amber once its time has passed unmarked.
+ * One dose. A dose not marked yet is ticked Taken with one tap; a marked dose (or a long press) opens Taken / Not taken / Skipped,
+ * so a mistake can be corrected. Green when taken, red-brown when not taken, grey when skipped, amber once it is an hour past its
+ * time and still unmarked ([MedicineLateRule]).
  */
-@Composable internal fun MedicineDoseChip(item: CareItem, dose: MedicineDose, state: MedicineDoseState, enabled: Boolean, onMark: (taken: Boolean, quick: Boolean) -> Unit) {
+@Composable internal fun MedicineDoseChip(item: CareItem, dose: MedicineDose, state: MedicineDoseState, enabled: Boolean, onMark: (choice: MedicineDoseChoice, quick: Boolean) -> Unit) {
     val t = careText(); var menu by remember { mutableStateOf(false) }
-    val late = state == MedicineDoseState.PENDING && dose.timed && LocalTime.now() > LocalTime.parse(dose.time)
-    // Solid once there is a state (green taken, red missed, amber late) with a white icon and time; white with a plum edge before.
+    val late = state == MedicineDoseState.PENDING && dose.timed && MedicineLateRule.overdue(dose.time, LocalTime.now())
+    // Solid once there is a state (green taken, red not taken, grey skipped, amber late) with a white icon and time; white with a plum edge before.
     val (fg, bgTarget) = when {
         state == MedicineDoseState.TAKEN -> SaharaTone.Success.onSolid to SaharaTone.Success.solid
         state == MedicineDoseState.MISSED -> SaharaTone.Error.onSolid to SaharaTone.Error.solid
+        state == MedicineDoseState.SKIPPED -> SaharaTone.Neutral.onSolid to SaharaTone.Neutral.solid
         late -> SaharaTone.Warning.onSolid to SaharaTone.Warning.solid
         else -> SaharaSection.Medicines.ink to Paper
     }
     val bg by animateColorAsState(bgTarget, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "dose-chip")
     val label = medicineDoseLabel(dose)
-    val stateWord = when (state) { MedicineDoseState.TAKEN -> t("Taken", "ली"); MedicineDoseState.MISSED -> t("Missed", "छूटी"); else -> t("Not yet", "अभी नहीं") }
+    val stateWord = doseStateWord(state)
     val pending = state == MedicineDoseState.PENDING
     val tapLabel = if (pending) t("Mark taken", "ली हुई दर्ज करें") else t("Change", "बदलें")
-    val holdLabel = t("Taken or missed", "ली या छूटी")
+    val holdLabel = t("Taken, not taken or skipped", "ली, नहीं ली या छोड़ी")
     Box {
         Surface(shape = RoundedCornerShape(50), color = bg, border = if (pending && !late) BorderStroke(1.5.dp, SaharaSection.Medicines.solid) else null,
             modifier = Modifier.minimumInteractiveComponentSize().clip(RoundedCornerShape(50))
-                .combinedClickable(enabled = enabled, role = Role.Button, onClickLabel = tapLabel, onLongClickLabel = holdLabel, onLongClick = { menu = true }) { if (pending) onMark(true, true) else menu = true }
+                .combinedClickable(enabled = enabled, role = Role.Button, onClickLabel = tapLabel, onLongClickLabel = holdLabel, onLongClick = { menu = true }) { if (pending) onMark(MedicineDoseChoice.TAKEN, true) else menu = true }
                 .semantics { contentDescription = "${item.title}, $label: $stateWord" }.testTag("medicine-dose-${item.id}-${dose.key}")) {
             // A clear time chip: the dose time in bold; the state shows as icon and colour (the word is in the description).
             Row(Modifier.heightIn(min = 40.dp).padding(start = 10.dp, end = 14.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -311,19 +328,40 @@ internal suspend fun markMedicineDose(context: Context, vm: CareModel, item: Car
                 Text(label, color = if (pending && !late) DoctorCardInk else fg, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
             }
         }
-        DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
-            DropdownMenuItem(text = { Text(t("Taken", "ली"), color = DoctorCardInk) }, leadingIcon = { Icon(Icons.Default.Check, null, tint = DoctorStatusGood) }, onClick = { menu = false; onMark(true, false) }, modifier = Modifier.heightIn(min = 48.dp).testTag("medicine-dose-taken-${item.id}-${dose.key}"))
-            DropdownMenuItem(text = { Text(t("Missed", "छूटी"), color = DoctorCardInk) }, leadingIcon = { Icon(Icons.Default.Close, null, tint = DoctorStatusRest) }, onClick = { menu = false; onMark(false, false) }, modifier = Modifier.heightIn(min = 48.dp).testTag("medicine-dose-missed-${item.id}-${dose.key}"))
+        DoseChoiceMenu(menu, { menu = false }, "medicine-dose", "${item.id}-${dose.key}") { onMark(it, false) }
+    }
+}
+
+/** The word for a dose's state: Taken, Not taken, Skipped or Not yet. */
+@Composable internal fun doseStateWord(state: MedicineDoseState): String { val t = careText()
+    return when (state) { MedicineDoseState.TAKEN -> t("Taken", "ली"); MedicineDoseState.MISSED -> t("Not taken", "नहीं ली"); MedicineDoseState.SKIPPED -> t("Skipped", "छोड़ी"); else -> t("Not yet", "अभी नहीं") }
+}
+
+/**
+ * Taken / Not taken / Skipped: the only three answers for a dose (Dr Shirin, 24 Nov 2026). Each row is 56 dp. Test tags are
+ * "[tagPrefix]-taken-[tagSuffix]", "[tagPrefix]-missed-[tagSuffix]" (Not taken keeps its older tag) and "[tagPrefix]-skipped-[tagSuffix]".
+ */
+@Composable internal fun DoseChoiceMenu(expanded: Boolean, onDismiss: () -> Unit, tagPrefix: String, tagSuffix: String, onChoose: (MedicineDoseChoice) -> Unit) {
+    val t = careText()
+    DropdownMenu(expanded = expanded, onDismissRequest = onDismiss) {
+        MedicineDoseChoice.entries.forEach { choice ->
+            val (icon, tint, word) = when (choice) {
+                MedicineDoseChoice.TAKEN -> Triple(Icons.Default.Check, DoctorStatusGood, "taken")
+                MedicineDoseChoice.NOT_TAKEN -> Triple(Icons.Default.Close, DoctorStatusRest, "missed")
+                MedicineDoseChoice.SKIPPED -> Triple(Icons.Default.Remove, DoctorCardSub, "skipped")
+            }
+            DropdownMenuItem(text = { Text(t(choice.english, choice.hindi), color = DoctorCardInk, fontSize = 16.sp) }, leadingIcon = { Icon(icon, null, tint = tint) },
+                onClick = { onDismiss(); onChoose(choice) }, modifier = Modifier.heightIn(min = 56.dp).testTag("$tagPrefix-$word-$tagSuffix"))
         }
     }
 }
 
-/** The dose's state as an icon that pops in when it changes: a tick once taken, a cross once missed, an empty ring before. */
+/** The dose's state as an icon that pops in when it changes: a tick once taken, a cross once not taken, a dash once skipped, an empty ring before. */
 @Composable internal fun DoseStateIcon(state: MedicineDoseState, tint: androidx.compose.ui.graphics.Color, size: Int) {
     AnimatedContent(state, transitionSpec = {
         (fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)) + scaleIn(SaharaMotion.tween(SaharaMotion.SAVED_MS, easing = SaharaMotion.Emphasized), initialScale = 0.4f)) togetherWith fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS))
     }, label = "dose-state") { shown ->
-        Icon(when (shown) { MedicineDoseState.TAKEN -> Icons.Default.Check; MedicineDoseState.MISSED -> Icons.Default.Close; else -> Icons.Default.RadioButtonUnchecked }, null, Modifier.size(size.dp), tint = tint)
+        Icon(when (shown) { MedicineDoseState.TAKEN -> Icons.Default.Check; MedicineDoseState.MISSED -> Icons.Default.Close; MedicineDoseState.SKIPPED -> Icons.Default.Remove; else -> Icons.Default.RadioButtonUnchecked }, null, Modifier.size(size.dp), tint = tint)
     }
 }
 
@@ -334,31 +372,107 @@ internal suspend fun markMedicineDose(context: Context, vm: CareModel, item: Car
     if (open) AlertDialog(onDismissRequest = { open = false }, title = { Text(title) }, text = { Text(text) }, confirmButton = { TextButton(onClick = { open = false }) { Text(t("OK", "ठीक है")) } })
 }
 
-/** One medicine's reports, newest first, then its side-effect notes. */
+/**
+ * One medicine's history as a month calendar (Dr Sujay, 24 Nov 2026), in place of the long list of every dose: a dot per day
+ * (green all taken, red something not taken, blue a side effect noted; two can show), month arrows (or a swipe), and the chosen
+ * day's dose reports under the grid, with that day's side-effect notes. Opens on today.
+ */
 @Composable private fun MedicineHistorySheet(item: CareItem, vm: CareModel, onDismiss: () -> Unit) {
-    val t = careText()
+    val t = careText(); val hindi = careHindi()
     val events by vm.medicineEvents.collectAsStateWithLifecycle()
     val allItems by vm.allItems.collectAsStateWithLifecycle()
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     var sideEffect by rememberSaveable(item.id) { mutableStateOf(false) }
+    val doses = medicineDosesFor(item, vm)
     SaharaScreenSheet(onDismissRequest = onDismiss, containerColor = Cream) {
-        val zone = ZoneId.systemDefault()
-        val mine = events.filter { it.medicineId == item.id }.let { all -> all.filterNot { MedicineDoses.redundantCheckoff(it, all, zone) } }
+        val zone = ZoneId.systemDefault(); val today = LocalDate.now(zone)
+        var chosen by rememberSaveable(item.id) { mutableStateOf(today.toEpochDay()) }
+        val day = LocalDate.ofEpochDay(chosen)
+        val mine = remember(events, item.id) { events.filter { it.medicineId == item.id } }
+        val sideEffects = remember(allItems, item.id, item.personId) { SideEffectLog.forMedicine(SideEffectLog.entries(allItems, item.personId), item.id) }
+        val sideTimes = remember(sideEffects) { sideEffects.map { it.note.happenedAt } }
+        val dayReports = remember(mine, chosen) { MedicineHistoryCalendar.eventsOn(item.id, mine, day, zone) }
+        val daySideEffects = remember(sideEffects, chosen) { sideEffects.filter { Instant.ofEpochMilli(it.note.happenedAt).atZone(zone).toLocalDate() == day } }
+        val reportsShown = rememberShownCount(item.id to chosen)
         val now = System.currentTimeMillis()
         LazyColumn(Modifier.fillMaxWidth().testTag("care-medicine-history-sheet"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item { SaharaSectionBand("${item.title} · ${t("History", "इतिहास")}", SaharaSection.Medicines) }
-            // Friendly empty state: icon and one line; the Side effect? action sits below.
-            if (mine.isEmpty()) item { Column(Modifier.fillMaxWidth().padding(vertical = 24.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Icon(Icons.Default.History, null, Modifier.size(32.dp), tint = DoctorCardSub)
-                Text(t("No reports yet.", "अभी कोई जानकारी नहीं।"), fontSize = 16.sp, color = DoctorCardInk)
-            } }
-            items(mine, key = { it.id }) { CompactMedicineReport(it, mine, now) }
-            medicineSideEffectItems(SideEffectLog.forMedicine(SideEffectLog.entries(allItems, item.personId), item.id), vm)
+            item(key = "calendar") { MedicineHistoryCalendarCard(item, doses, mine, sideTimes, day, today) { chosen = it.toEpochDay() } }
+            item(key = "day-title") {
+                Text(day.format(careDateFormat("EEEE, d MMMM", hindi)), Modifier.padding(start = 4.dp, top = 4.dp).a11yHeading().testTag("medicine-history-day-title"),
+                    fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+            }
+            // A quiet line for a day without reports; the Side effect? action sits below.
+            if (dayReports.isEmpty() && daySideEffects.isEmpty()) item(key = "day-empty") {
+                Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.History, null, Modifier.size(22.dp), tint = DoctorCardSub); Spacer(Modifier.width(10.dp))
+                    Text(if (mine.isEmpty()) t("No reports yet.", "अभी कोई जानकारी नहीं।") else t("Nothing reported on this day.", "इस दिन कुछ दर्ज नहीं।"), fontSize = 16.sp, color = DoctorCardInk)
+                }
+            }
+            cappedItems(dayReports, reportsShown, key = { it.id }, tag = "medicine-history") { CompactMedicineReport(it, mine, now) }
+            medicineSideEffectItems(daySideEffects, vm)
             if (canEdit) item { OutlinedButton(onClick = { sideEffect = true }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().padding(top = 12.dp).heightIn(min = 48.dp).testTag("care-medicine-history-side-effect")) { Icon(Icons.Default.ErrorOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Side effect?", "कोई दुष्प्रभाव?"), fontSize = 16.sp) } }
             if (vm.cloud != null) item { TextButton(onClick = vm::refreshMedicineHistory, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Refresh history", "इतिहास ताज़ा करें"), fontSize = 15.sp) } }
         }
     }
     if (sideEffect) SideEffectSheet(item, vm, onDismiss = { sideEffect = false })
+}
+
+private val CalendarTaken: Color get() = SaharaTone.Success.solid
+private val CalendarNotTaken: Color get() = SaharaTone.Error.solid
+private val CalendarSideEffect: Color get() = SaharaTone.Info.solid
+
+/** The month grid of one medicine's history (Monday first), reusing the app's swipeable month pager; [onDay] gets the tapped day. */
+@Composable private fun MedicineHistoryCalendarCard(item: CareItem, doses: List<MedicineDose>, events: List<MedicineIntakeEvent>, sideTimes: List<Long>, day: LocalDate, today: LocalDate, onDay: (LocalDate) -> Unit) {
+    val t = careText(); val hindi = careHindi(); val zone = ZoneId.systemDefault()
+    // One calm white surface, no edge: month arrows, weekday names, days and the three-dot key.
+    Surface(shape = RoundedCornerShape(SaharaRadius.Lg), color = Paper, modifier = Modifier.fillMaxWidth().testTag("medicine-history-calendar")) {
+        Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = { onDay(day.minusMonths(1)) }, modifier = Modifier.size(48.dp).testTag("medicine-history-prev-month")) { Icon(Icons.Default.ChevronLeft, t("Previous month", "पिछला महीना"), tint = SaharaSection.Medicines.ink) }
+                Text(day.format(careDateFormat("MMMM yyyy", hindi)), Modifier.weight(1f).testTag("medicine-history-month"), textAlign = TextAlign.Center, fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 1)
+                val later = YearMonth.from(day) < YearMonth.from(today)
+                IconButton(onClick = { onDay(day.plusMonths(1).let { if (it > today) today else it }) }, enabled = later, modifier = Modifier.size(48.dp).testTag("medicine-history-next-month")) {
+                    Icon(Icons.Default.ChevronRight, t("Next month", "अगला महीना"), tint = if (later) SaharaSection.Medicines.ink else DoctorCardFaint)
+                }
+            }
+            val monday = day.with(DayOfWeek.MONDAY)
+            Row(Modifier.fillMaxWidth()) {
+                (0 until 7).forEach { i -> Text(monday.plusDays(i.toLong()).format(careDateFormat("EEE", hindi)), Modifier.weight(1f), textAlign = TextAlign.Center, fontSize = 13.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub, maxLines = 1) }
+            }
+            SaharaMonthPager(day, onDay, Modifier.fillMaxWidth()) { d, inMonth ->
+                val marks = remember(events, sideTimes, doses, d, today) { MedicineHistoryCalendar.marks(item, doses, events, sideTimes, d, zone, today) }
+                MedicineCalendarDay(d, inMonth, d == day, d == today, marks) { onDay(d) }
+            }
+            HorizontalDivider(color = DoctorHairline.copy(alpha = .6f))
+            FlowRow(Modifier.fillMaxWidth().padding(horizontal = 4.dp).testTag("medicine-history-legend"), horizontalArrangement = Arrangement.spacedBy(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                listOf(CalendarTaken to t("All taken", "सब ली"), CalendarNotTaken to t("Not taken", "नहीं ली"), CalendarSideEffect to t("Side effect", "दुष्प्रभाव")).forEach { (color, label) ->
+                    Row(Modifier.heightIn(min = 24.dp), verticalAlignment = Alignment.CenterVertically) { Box(Modifier.size(10.dp).background(color, CircleShape)); Spacer(Modifier.width(6.dp)); Text(label, fontSize = 14.sp, color = DoctorCardSub) }
+                }
+            }
+        }
+    }
+}
+
+/** One day cell: its number and up to two dots (green or red, then blue). The chosen day is filled plum; today is bold. */
+@Composable private fun MedicineCalendarDay(d: LocalDate, inMonth: Boolean, selected: Boolean, isToday: Boolean, marks: MedicineDayMarks, onClick: () -> Unit) {
+    val t = careText(); val hindi = careHindi()
+    val fill by animateColorAsState(if (selected) SaharaSection.Medicines.solid else Color.Transparent, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "medicine-day")
+    val words = listOfNotNull(t("All taken", "सब ली").takeIf { marks.allTaken }, t("Not taken", "नहीं ली").takeIf { marks.notTaken }, t("Side effect noted", "दुष्प्रभाव दर्ज").takeIf { marks.sideEffect })
+    val desc = (listOf(d.format(careDateFormat("EEE d MMM", hindi))) + words).joinToString(", ")
+    Box(Modifier.fillMaxWidth().padding(2.dp).heightIn(min = 48.dp).clip(RoundedCornerShape(12.dp)).background(fill)
+        .clickable(role = Role.Button, onClick = onClick).semantics { contentDescription = desc }.testTag(if (inMonth) "medicine-history-day-$d" else "medicine-history-outday-$d"),
+        contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            Text(d.dayOfMonth.toString(), fontSize = 15.sp, fontWeight = if (selected || isToday) FontWeight.Bold else FontWeight.Normal,
+                color = when { selected -> Color.White; isToday -> SaharaSection.Medicines.ink; inMonth -> DoctorCardInk; else -> DoctorCardFaint })
+            Row(Modifier.height(8.dp), horizontalArrangement = Arrangement.spacedBy(3.dp), verticalAlignment = Alignment.CenterVertically) {
+                val dot = Modifier.size(7.dp).then(if (selected) Modifier.border(1.dp, Color.White, CircleShape) else Modifier)
+                if (marks.notTaken) Box(dot.background(CalendarNotTaken, CircleShape)) else if (marks.allTaken) Box(dot.background(CalendarTaken, CircleShape))
+                if (marks.sideEffect) Box(dot.background(CalendarSideEffect, CircleShape))
+            }
+        }
+    }
 }
 
 /** A small rounded action capsule under a medicine's details. */
@@ -382,12 +496,13 @@ private const val FAMILY_ONLY_NOTE = "Family report only. Not confirmed as taken
 @Composable private fun CompactMedicineReport(event: MedicineIntakeEvent, all: List<MedicineIntakeEvent>, now: Long) {
     val t = careText()
     val status = MedicineHistoryRules.status(event, all, now)
-    // Solid status pills: green taken, amber late, red missed, bold white word.
-    val (word, pillTone) = when {
-        event.outcome == "skipped" -> t("Missed", "छूटी") to SaharaTone.Error
-        status.startsWith("Late") -> t("Late", "देर से") to SaharaTone.Warning
-        event.outcome == "taken" -> t("Taken", "ली") to SaharaTone.Success
-        else -> t(status, MedicineStatusHindi[status] ?: status) to SaharaTone.Warning
+    // Only three answers (Taken / Not taken / Skipped); "late" is shown on a Taken report, never as its own answer.
+    // Solid status pills: green taken, amber taken late, red not taken, grey skipped, bold white word.
+    val (word, pillTone) = when (MedicineDoseStatus.choiceOf(event)) {
+        MedicineDoseChoice.TAKEN -> if (MedicineDoseStatus.late(event)) t("Taken · late", "ली · देर से") to SaharaTone.Warning else t("Taken", "ली") to SaharaTone.Success
+        MedicineDoseChoice.NOT_TAKEN -> t("Not taken", "नहीं ली") to SaharaTone.Error
+        MedicineDoseChoice.SKIPPED -> t("Skipped", "छोड़ी") to SaharaTone.Neutral
+        null -> t(status, MedicineStatusHindi[status] ?: status) to SaharaTone.Warning
     }
     val doseAt = event.plannedAt.takeIf { event.outcome in setOf("taken", "skipped") && event.reportedTakenAt == null }
     val main = when {

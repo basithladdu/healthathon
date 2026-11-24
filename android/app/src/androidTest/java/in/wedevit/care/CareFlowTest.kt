@@ -351,7 +351,8 @@ class CareFlowTest {
         ui.onNodeWithText("Add one manually").performClick()
         ui.onNodeWithTag("medicine-scanner-review").assertIsDisplayed()
         ui.onNode(hasSetTextAction() and hasText("Medicine name")).performTextInput("Test medicine")
-        ui.onNode(hasSetTextAction() and hasText("Strength")).performTextInput("10 mg")
+        // Strength is a number with a unit chip (24 Nov 2026); mg is chosen to start with.
+        ui.onNode(hasSetTextAction() and hasText("Number")).performTextInput("10")
         screenshot("medicine-review")
         ui.onNodeWithTag("medicine-scanner-review").performScrollToNode(hasText("Save 1 medicine"))
         ui.onNodeWithText("Save 1 medicine").assertIsNotEnabled()

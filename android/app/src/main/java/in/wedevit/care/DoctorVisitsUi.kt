@@ -92,6 +92,7 @@ internal fun doctorVisitSources(item: CareItem, entries: List<CareItem>, notes: 
 }
 
 @Composable internal fun DoctorVisitsContent(visits: List<CareItem>, canEdit: Boolean, now: Long, onOpen: (CareItem) -> Unit, onCalendar: () -> Unit, onAdd: () -> Unit, conditionSources: List<CareItem> = emptyList(), discussionSources: List<CareVersion> = emptyList()) { val t = careText();
+    val visitsShown = rememberShownCount(visits.firstOrNull()?.personId)
     CompositionLocalProvider(LocalSaharaStagger provides remember { SaharaStagger() }) { LazyColumn(Modifier.fillMaxSize().testTag("doctor-visits"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         // The section bar above already says "Visits"; only the action stays.
         // How visits get here (Dr Sujay, 22 Nov, doctor video 3:01).
@@ -99,7 +100,7 @@ internal fun doctorVisitSources(item: CareItem, entries: List<CareItem>, notes: 
             fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.testTag("doctor-visits-how")) }
         item { FlowRow(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.End,verticalArrangement=Arrangement.spacedBy(8.dp)) { Button(onClick=onAdd,enabled=canEdit,shape=RoundedCornerShape(14.dp),modifier=Modifier.heightIn(min=48.dp)){Icon(Icons.Default.Add,null,Modifier.size(18.dp));Spacer(Modifier.width(8.dp));Text(t("Plan visit", "विज़िट तय करें"))} } }
         if (visits.isEmpty()) item { SurfaceCard { Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) { Icon(Icons.Default.Event, null, tint = DoctorAccent, modifier = Modifier.size(24.dp)); Text(t("No visits recorded yet", "अभी कोई विज़िट दर्ज नहीं"), fontSize = 16.sp, color = DoctorCardInk) } } }
-        items(visits, key = { "all:${it.id}" }) { VisitListCard(it, now, onOpen, conditionSources, discussionSources, highlighted = it.id == visits.firstOrNull()?.id) }
+        cappedItems(visits, visitsShown, key = { "all:${it.id}" }, tag = "doctor-visits") { VisitListCard(it, now, onOpen, conditionSources, discussionSources, highlighted = it.id == visits.firstOrNull()?.id) }
     } }
 }
 internal val DoctorVisitHighlight = Color(0xFFD97757)

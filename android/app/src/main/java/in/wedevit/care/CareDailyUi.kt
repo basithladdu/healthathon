@@ -230,11 +230,16 @@ internal object CareModules {
     Icon(Icons.Default.KeyboardArrowDown, description, modifier.graphicsLayer { rotationZ = turn }, tint = tint)
 }
 
-/** Every row of one module group, always open (a module already has its own screen, so no "Show all" toggle). [label] adds a small sub-group heading. */
-@Composable fun <T> CareModuleList(key: String, items: List<T>, empty: String, label: String? = null, keyOf: (T) -> Any, row: @Composable (T) -> Unit) {
+/**
+ * The rows of one module group. [label] adds a small sub-group heading. A history ([capped], the default) shows its newest five
+ * rows with "Show older" (24 Nov: history kept growing); lists of what is still ahead pass capped = false.
+ */
+@Composable fun <T> CareModuleList(key: String, items: List<T>, empty: String, label: String? = null, keyOf: (T) -> Any, capped: Boolean = true, row: @Composable (T) -> Unit) {
+    val shown = rememberShownCount(key)
     if (label != null) Text("$label · ${saharaCountUp(items.size)}", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub, modifier = Modifier.padding(start = 4.dp, top = 4.dp).a11yHeading())
     SaharaStateSwitch(items.isEmpty(), Modifier.fillMaxWidth(), label = "care-module-$key") { isEmpty -> if (isEmpty) { if (empty.isBlank()) QuietLine(empty) else SaharaCalmEmpty(empty) } else Column(Modifier.saharaContentSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-    items.forEachIndexed { i, item -> key(keyOf(item)) { Box(Modifier.saharaStagger(i)) { row(item) } } }
+    (if (capped) items.shownOf(shown) else items).forEachIndexed { i, item -> key(keyOf(item)) { Box(Modifier.saharaStagger(i)) { row(item) } } }
+    if (capped) SaharaShowOlder(items.size, shown, tag = "care-module-$key")
     } }
 }
 

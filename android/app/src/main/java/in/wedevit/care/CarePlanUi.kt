@@ -127,10 +127,16 @@ internal fun planStepOf(field: String): Int = when {
     BackHandler(page != "home") { page = "home" }
     if (person == null) { Box(Modifier.fillMaxSize()); return }
     // Patients and families never open the doctor's talk or form (Dr Sujay, 22 Nov): their Goals of care tab is the signed note, read-only, and the way to ask for the conversation.
-    if (!clinician && startAt == "goc") {
-        LazyColumn(Modifier.fillMaxSize().testTag("goc-family-page"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            item { PlanHeader(t("Goals of care", "देखभाल के लक्ष्य"), onBack, "goc-family-header") }
-            item { FamilyTile(t("Goals of care discussion", "देखभाल के लक्ष्यों की चर्चा"), Icons.Default.Forum, FamilyAccent.Indigo) { PatientGocStatus(vm, state.ectprs, person.id) } }
+    // Clinical team, 24 Nov 2026: the patient side keeps only Goals of care. The emergency-room view, the pocket card and advance care planning
+    // pages were duplicates for patients (the SOS sheet has the one emergency card), so they are hidden here; the doctor side keeps them all,
+    // and nothing saved is removed. "Your data" stays only while this phone holds plan or living-will records, so those rights remain reachable.
+    if (!clinician) {
+        val fromCareTab = startAt != "goc"
+        val holdsRecords = fromCareTab && (state.ectprs.any { it.patientId == person.id } || state.amds.any { it.patientId == person.id })
+        LazyColumn(Modifier.fillMaxSize().testTag(if (fromCareTab) "care-plan-home" else "goc-family-page"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            item { PlanHeader(t("Goals of care", "देखभाल के लक्ष्य"), onBack, if (fromCareTab) "care-plan-header" else "goc-family-header") }
+            item { FamilyTile(t("Goals of care discussion", "देखभाल के लक्ष्यों की चर्चा"), Icons.Default.Forum, FamilyAccent.Indigo, Modifier.testTag("care-plan-goc-tile")) { PatientGocStatus(vm, state.ectprs, person.id) } }
+            if (holdsRecords) item { DpdpNoticeCard(DpdpScope.CARE_PLAN, state, person.id, store, actor != "Family", ::commit, actor) }
         }
         return
     }
@@ -294,6 +300,8 @@ internal fun planStepOf(field: String): Int = when {
         if (loadProblem) item { Surface(color = Peach, shape = RoundedCornerShape(12.dp)) { Text(t("Couldn't read the saved plan.", "सहेजी योजना पढ़ी नहीं जा सकी।"), Modifier.padding(12.dp)) } }
         // One family of three clinical documents, each with a one-line plain description.
         item { Text(t("Goals of care discussion, advance care planning and the emergency care plan belong together. All three are clinical documents.", "देखभाल के लक्ष्यों की चर्चा, अग्रिम देखभाल योजना और आपातकालीन देखभाल योजना साथ चलती हैं। तीनों क्लिनिकल दस्तावेज़ हैं।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub, modifier = Modifier.testTag("care-plan-family-intro")) }
+        // D15 on the doctor's plan home too: the patient's or family's open request, until a signed note answers it.
+        if (clinician) item { DoctorGocRequestNotice(vm, person.id, onOpen = onGoc.takeIf { canEdit || draft != null }, ectprs = state.ectprs) }
         item { FamilyTile(t("Goals of care discussion", "देखभाल के लक्ष्यों की चर्चा"), Icons.Default.Forum, FamilyAccent.Indigo, Modifier.testTag("care-plan-goc-tile")) {
             Text(t("The recorded conversation about what matters most and the care to aim for.", "सबसे ज़रूरी क्या है और किस देखभाल का लक्ष्य रखें, इस पर दर्ज की गई बातचीत।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub)
             // One Goals of care place (Dr Sujay, 22 Nov): here the doctor sees the versions and goes there; the family reads the signed note and can ask for the talk.
@@ -781,7 +789,8 @@ private fun LazyListScope.treatmentStep(d: EctprRecord, today: LocalDate, update
             LaunchedEffect(doctor) { if (doctor != null && by.name.isBlank() && by.registrationNo.isBlank()) choices { it.copy(dnacprDecidedBy = (it.dnacprDecidedBy ?: DnacprDecidedBy()).copy(name = doctor.name, registrationNo = doctor.registration)) } }
             PrefilledField(by.name, doctor?.name.orEmpty(), t("Decided by (doctor's name)", "किसने तय किया (डॉक्टर का नाम)"), "dnacpr-by-name") { CareField(by.name, { v -> choices { it.copy(dnacprDecidedBy = by.copy(name = v)) } }, t("Decided by (doctor's name)", "किसने तय किया (डॉक्टर का नाम)"), singleLine = true) }
             PrefilledField(by.registrationNo, doctor?.registration.orEmpty(), t("Registration number", "रजिस्ट्रेशन नंबर"), "dnacpr-by-reg") { CareField(by.registrationNo, { v -> choices { it.copy(dnacprDecidedBy = by.copy(registrationNo = v)) } }, t("Registration number", "रजिस्ट्रेशन नंबर"), singleLine = true) }
-            CareField(by.decidedAt, { v -> choices { it.copy(dnacprDecidedBy = by.copy(decidedAt = v)) } }, t("Date and time decided", "तय करने की तारीख़ और समय"), singleLine = true, placeholder = "2026-10-29 10:30")
+            // Tapped, not typed: a date button and the clock dial; still stored as "2026-10-29 10:30".
+            PlanDateTimeField(by.decidedAt, t("Date and time decided", "तय करने की तारीख़ और समय")) { v -> choices { it.copy(dnacprDecidedBy = by.copy(decidedAt = v)) } }
         }
         if (c.cpr == Cpr.ATTEMPT && (c.goalOfCare == GoalOfCare.C_COMFORT || (c.respCeiling != null && c.respCeiling < 5)))
             CareField(c.cprConflictReason, { v -> choices { it.copy(cprConflictReason = v) } }, t("Reason for CPR with this goal or ceiling", "इस लक्ष्य या सीमा के साथ CPR का कारण"), minLines = 2)
@@ -802,7 +811,8 @@ private fun LazyListScope.treatmentStep(d: EctprRecord, today: LocalDate, update
         PlanNumberField(tr.durationValue.takeIf { it > 0 }, t("Length", "अवधि"), "$tag-duration") { onChange(tr.copy(durationValue = it ?: 0)) }
         ChipGroup(tr.durationUnit, DurationUnit.entries, PlanText::unit, "$tag-unit") { onChange(tr.copy(durationUnit = it ?: defaultUnit)) }
         PlanDateField(date, t("Review date", "समीक्षा की तारीख़"), { v -> onChange(tr.copy(reviewAt = listOf(v, time).filter(String::isNotBlank).joinToString(" "))) })
-        CareField(time, { v -> onChange(tr.copy(reviewAt = listOf(date.ifBlank { LocalDate.now().toString() }, v.take(5)).filter(String::isNotBlank).joinToString(" "))) }, t("Review time", "समीक्षा का समय"), singleLine = true, placeholder = "10:00")
+        // The clock dial instead of typing "10:00"; reviewAt stays "yyyy-MM-dd HH:mm" (or the date alone).
+        CareTimeButton(time.take(5), { v -> onChange(tr.copy(reviewAt = listOf(date.ifBlank { LocalDate.now().toString() }, v.take(5)).filter(String::isNotBlank).joinToString(" "))) }, t("Review time", "समीक्षा का समय"), modifier = Modifier.testTag("$tag-review-time"), allowClear = true)
         CareField(tr.reviewers.joinToString(", "), { v -> onChange(tr.copy(reviewers = v.split(',').map(String::trim))) }, t("Reviewers (names, comma-separated)", "समीक्षा करने वाले (नाम, कॉमा से अलग)"), singleLine = true)
     }
 }
@@ -1072,12 +1082,12 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
     }
 }
 
-/** Entry card for Today (patient, family and doctor). */
+/** Entry card on Today's SOS sheet (patient and family). Since 24 Nov 2026 the patient side of the plan is Goals of care only, so it says so. */
 @Composable fun CarePlanEntryCard(onOpen: () -> Unit) { val t = careText()
     ActionCard(SaharaSoftBlue, Modifier.fillMaxWidth().testTag("care-plan-entry"), onClick = onOpen) {
         Row(Modifier.fillMaxWidth().heightIn(min = 64.dp).padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.LocalHospital, null, tint = Rust); Spacer(Modifier.width(12.dp))
-            Text(t("Care planning", "देखभाल योजना"), Modifier.weight(1f), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Icon(Icons.Default.Forum, null, tint = Rust); Spacer(Modifier.width(12.dp))
+            Text(t("Goals of care", "देखभाल के लक्ष्य"), Modifier.weight(1f), fontWeight = FontWeight.Bold, fontSize = 16.sp)
             Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(19.dp))
         }
     }

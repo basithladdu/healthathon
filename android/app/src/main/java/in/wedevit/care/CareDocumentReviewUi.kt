@@ -31,6 +31,9 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 
+/** The review's "YYYY-MM-DD" date as the date button's day (0 when unreadable, so the button reads "Choose"). */
+private fun documentDay(value: String): Long = runCatching { careEpoch(LocalDate.parse(value.trim())) }.getOrDefault(0L)
+
 @Composable fun CareDocumentReview(vm: CareModel, report: CareReport, startPage: Int = 1, onClose: () -> Unit) {
     val context = LocalContext.current; val t = careText()
     val scope = rememberCoroutineScope()
@@ -136,11 +139,11 @@ import java.time.ZoneId
                                 Box(Modifier.weight(1f)) { CareField(labLow, { labLow = it.take(40); factChecked = false }, t("Printed lower (optional)", "छपी निचली सीमा (ज़रूरी नहीं)"), singleLine = true) }
                                 Box(Modifier.weight(1f)) { CareField(labHigh, { labHigh = it.take(40); factChecked = false }, t("Printed upper (optional)", "छपी ऊपरी सीमा (ज़रूरी नहीं)"), singleLine = true) }
                             } }
-                            item { CareField(dateText, { dateText = it; factChecked = false }, t("Report date · YYYY-MM-DD", "रिपोर्ट की तारीख़ · YYYY-MM-DD"), singleLine = true) }
+                            item { CareDateButton(documentDay(dateText), t("Report date", "रिपोर्ट की तारीख़"), { dateText = careDay(it).toString(); factChecked = false }) }
                         }
                         if (kind in listOf("Follow-up", "Test")) {
-                            item { CareField(dateText, { dateText = it; factChecked = false }, t("Date · YYYY-MM-DD", "तारीख़ · YYYY-MM-DD"), singleLine = true) }
-                            item { CareField(timeText, { timeText = it; factChecked = false }, t("Time · HH:mm", "समय · HH:mm"), singleLine = true) }
+                            item { CareDateButton(documentDay(dateText), t("Date", "तारीख़"), { dateText = careDay(it).toString(); factChecked = false }) }
+                            item { CareTimeButton(timeText, { timeText = it; factChecked = false }, t("Time", "समय"), Modifier.testTag("document-fact-time")) }
                         }
                         item { CheckLine(factChecked, { factChecked = it }, if (kind == "Lab result") t("I checked this against the original.", "मैंने इसे असली फ़ाइल से मिला लिया है।") else if (kind == "Medicine") t("I am copying an existing prescription, including its exact dose and directions. I am not changing treatment.", "मैं पहले से लिखा पर्चा, उसकी सही ख़ुराक और तरीक़े के साथ, कॉपी कर रहा/रही हूँ। मैं इलाज नहीं बदल रहा/रही।") else t("I checked this against the original.", "मैंने इसे असली फ़ाइल से मिला लिया है।")) }
                         item { Button(onClick = {

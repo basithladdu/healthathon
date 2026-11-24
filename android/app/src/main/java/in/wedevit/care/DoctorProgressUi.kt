@@ -10,6 +10,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,12 +31,15 @@ import java.util.Locale
     Column(modifier.fillMaxWidth().testTag("doctor-progress-timeline"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(t("Reported updates", "बताए अपडेट"), Modifier.a11yHeading(), fontSize = 22.sp, fontWeight = FontWeight.Medium, color = Ink, fontFamily = SaharaTitleFont)
         if (reports.isEmpty()) Surface(color = Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) { Icon(Icons.Outlined.Notes, null, tint = Rust, modifier = Modifier.size(24.dp)); Text(t("No updates yet.", "अभी कोई अपडेट नहीं।"), fontSize = 16.sp, color = DoctorCardInk) } }
-        reports.forEachIndexed { index, report ->
+        // Newest five updates, then "Show older" (24 Nov).
+        val reportsShown = rememberShownCount(reports.firstOrNull()?.id)
+        val visibleReports = reports.shownOf(reportsShown)
+        visibleReports.forEachIndexed { index, report ->
             Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Column(Modifier.width(48.dp).fillMaxHeight(), horizontalAlignment = Alignment.CenterHorizontally) {
                     Surface(shape = CircleShape, color = if (report.isLatest) Rust else SaharaApricot, contentColor = if (report.isLatest) Paper else Ink, modifier = Modifier.size(46.dp)) { Box(contentAlignment = Alignment.Center) { Text(report.date.dayOfMonth.toString(), fontSize = 19.sp, fontWeight = FontWeight.SemiBold) } }
                     Text(report.date.format(DateTimeFormatter.ofPattern("MMM", Locale.ENGLISH)), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.padding(top = 5.dp))
-                    if (index != reports.lastIndex) Box(Modifier.padding(top = 8.dp).width(2.dp).weight(1f).background(Rust.copy(alpha = .18f)))
+                    if (index != visibleReports.lastIndex) Box(Modifier.padding(top = 8.dp).width(2.dp).weight(1f).background(Rust.copy(alpha = .18f)))
                 }
                 Surface(onClick = { onOpenReport(report.id) }, shape = RoundedCornerShape(16.dp), color = if (report.isLatest) SaharaSoftGold else if (report.source == SampleReportSource.FAMILY) SaharaLavender else SaharaSoftBlue, contentColor = Ink, modifier = Modifier.weight(1f).testTag("progress-report-${report.id}")) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -63,7 +68,9 @@ import java.util.Locale
         if (report.questions.isNotEmpty()) ProgressDetailCard(t("Questions and concerns", "सवाल और चिंताएँ"), Icons.Outlined.QuestionAnswer, SaharaSoftBlue) { report.questions.forEach { Text(it, lineHeight = 23.sp) } }
         if (report.familySupport.isNotEmpty()) ProgressDetailCard(t("Family coordination", "परिवार का तालमेल"), Icons.Outlined.PeopleOutline, SaharaLavender) { report.familySupport.forEach { Text(it, lineHeight = 23.sp) } }
         if (report.medicineActivity.isNotEmpty()) ProgressDetailCard(t("Medicine activity for this day", "इस दिन की दवा गतिविधि"), Icons.Outlined.Medication, Paper) {
-            report.medicineActivity.forEach { dose ->
+            // The first three doses; "Show all" opens the rest of that day.
+            var allDoses by androidx.compose.runtime.saveable.rememberSaveable(report.id) { androidx.compose.runtime.mutableStateOf(false) }
+            (if (allDoses) report.medicineActivity else report.medicineActivity.take(3)).forEach { dose ->
                 HorizontalDivider(color = DoctorHairline)
                 Text(dose.medicineLabel, fontWeight = FontWeight.SemiBold)
                 Text(dose.status, color = RustText, fontSize = 14.sp, fontWeight = FontWeight.Medium)
@@ -71,6 +78,7 @@ import java.util.Locale
                 Text(t("Reported taken: ", "लेने का बताया समय: ") + "${dose.reportedTakenAt?.let { progressTimestamp(it, report.zoneId) } ?: t("Not reported", "सूचना नहीं")}", fontSize = 14.sp)
                 Text(t("Logged: ", "दर्ज: ") + "${dose.loggedAt?.let { progressTimestamp(it, report.zoneId) } ?: t("Not logged", "दर्ज नहीं")}", fontSize = 14.sp)
             }
+            SaharaShowAllToggle(report.medicineActivity.size, allDoses, { allDoses = !allDoses }, tag = "progress-doses")
         }
         report.linkedDiscussion?.let { discussion -> ProgressDetailCard(t("Linked discussion", "जुड़ी चर्चा"), Icons.Outlined.Forum, SaharaApricot) { Text(discussion.text, lineHeight = 24.sp) } }
         TextButton(onClick = onOpenVisits, modifier = Modifier.heightIn(min = 48.dp).testTag("progress-open-visits")) { Icon(Icons.Outlined.CalendarMonth, null, tint = Rust, modifier = Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Visits", "विज़िट"), color = Rust) }

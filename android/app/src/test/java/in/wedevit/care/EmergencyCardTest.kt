@@ -15,18 +15,20 @@ class EmergencyCardTest {
     private val goals = EmergencyGoals(3, "Rahul (patient)", at, "Stay at home with family; avoid ICU if possible.", "Call Dr Meera if pain is not controlled.")
     private val source = EmergencySource("Rahul Verma", goals,
         listOf(EmergencyContact("Meera", "Sister", "+91 90000 00001"), EmergencyContact("Priya Nair", "Nurse coordinator")),
-        listOf(EmergencyMedicine("Morphine sulfate 10 mg", "Oral, every 4 hours as needed. For breakthrough pain."), EmergencyMedicine("Ondansetron 4 mg")))
+        listOf(EmergencyMedicine("Morphine sulfate 10 mg", "Oral, every 4 hours as needed. For breakthrough pain."), EmergencyMedicine("Ondansetron 4 mg")),
+        doctor = EmergencyDoctor("Dr Anil Rao", "+91 90000 00009", "City Hospital", "+91 40 2345 6789"))
     private val all = EmergencySection.entries.toSet()
 
     @Test fun onlyChosenSectionsAreOnTheCardAndTheRestIsNamed() {
         val card = EmergencyCardRules.build(source, setOf(EmergencySection.NAME, EmergencySection.CONTACTS), 1, "AB12CD34", at, zone)
         assertTrue(card.text.contains("NAME: Rahul Verma"))
-        assertTrue(card.text.contains("- Meera (Sister) +91 90000 00001"))
+        assertTrue(card.text.contains("- Next of kin: Meera (Sister) +91 90000 00001"))
+        assertTrue(card.text.contains("- Doctor: Dr Anil Rao, +91 90000 00009, City Hospital, landline +91 40 2345 6789"))
         assertFalse(card.text.contains("Morphine")); assertFalse(card.text.contains("ICU"))
         assertTrue(card.leftOut.contains("goals of care (family chose not to include)"))
         assertTrue(card.leftOut.contains("current medicines (family chose not to include)"))
         assertTrue(card.text.contains("Card 1 · ID AB12CD34"))
-        assertTrue(card.text.contains("not linked to any hospital system"))
+        assertTrue(card.text.contains("Scan the QR for this card on the Sahara website"))
         assertTrue(card.text.contains("NOT RECORDED IN APP: age, conditions, allergies"))
     }
 
@@ -73,7 +75,7 @@ class EmergencyCardTest {
         assertTrue(card.leftOut.any { it.endsWith("medicines (no room)") })
         assertTrue(card.leftOut.contains("rest of the goals-of-care note (no room)"))
         assertTrue(card.text.contains("NOT ON THIS CARD:"))
-        assertTrue(card.text.contains("- Meera (Sister)"))
+        assertTrue(card.text.contains("- Next of kin: Meera (Sister)"))
         assertTrue(card.text.contains("…"))
     }
 
@@ -104,18 +106,64 @@ class EmergencyCardTest {
         assertEquals(value, EmergencyCardRules.clip(value, 5))
     }
 
-    @Test fun fullestCardStillMakesAScannableQrThatReadsBackExactly() {
-        val hindi = source.copy(name = "राहुल वर्मा", goals = goals.copy(whatMatters = "घर पर परिवार के साथ रहना सबसे ज़रूरी है। ".repeat(40)),
-            medicines = (1..40).map { EmergencyMedicine("दवा $it") })
-        val text = EmergencyCardRules.build(hindi, all, 1, "AB12CD34", at, zone).text
-        val qr = EmergencyCardRules.qr(text)
-        assertTrue("QR version ${qr.version.versionNumber}", qr.version.versionNumber <= 25)
-        assertEquals(text, decode(qr))
-        assertEquals(EmergencyCardRules.build(source, all, 1, "AB12CD34", at, zone).text, decode(EmergencyCardRules.qr(EmergencyCardRules.build(source, all, 1, "AB12CD34", at, zone).text)))
+    @Test fun medicinesBecomeNameStrengthAndWhen() {
+        // Labelled lines saved by the medicine form and the prescription scan.
+        assertEquals(EmergencyMedicineRow("Morphine", "10 mg", "1 tablet, Every 4 hours, 08:00, 12:00, after food"),
+            EmergencyCardRules.medicineRow(EmergencyMedicine("Morphine", "Strength: 10 mg\nForm: tablet\nHow much each time: 1 tablet\nHow often: Every 4 hours\nTimes: 08:00, 12:00\nFood: after food")))
+        assertEquals(EmergencyMedicineRow("Paracetamol", "500 mg · 1 tablet", "Twice daily, 08:00, 20:00"),
+            EmergencyCardRules.medicineRow(EmergencyMedicine("Paracetamol", "Dose: 500 mg · 1 tablet\nFrequency: Twice daily\nTimes: 08:00, 20:00\nCopied source · prescription page 1:\nTab PCM 500")))
+        // Older free text: the strength in the name, the first instruction as "when".
+        assertEquals(EmergencyMedicineRow("Morphine sulfate 10 mg", "10 mg", "Oral, every 4 hours as needed"), EmergencyCardRules.medicineRow(source.medicines[0]))
+        assertEquals(EmergencyMedicineRow("Lactulose", "15 ml", "15 ml at night"), EmergencyCardRules.medicineRow(EmergencyMedicine("Lactulose", "15 ml at night")))
+        assertEquals(EmergencyMedicineRow("Ondansetron 4 mg", "4 mg", ""), EmergencyCardRules.medicineRow(source.medicines[1]))
     }
 
-    @Test fun overLongTextIsRefusedByTheEncoder() {
-        assertThrows(IllegalArgumentException::class.java) { EmergencyCardRules.qr("x".repeat(EmergencyCardRules.MAX_BYTES + 1)) }
+    @Test fun nextOfKinIsTheFirstFamilyContactAndTheDoctorComesFromTheProfile() {
+        val people = listOf(EmergencyContact("Dr Sujay", "Palliative doctor", "+91 90000 00005", "clinician"), EmergencyContact("Ravi", "Son", "+91 90000 00002", "family"))
+        val withoutProfileDoctor = source.copy(contacts = people, doctor = null)
+        assertEquals("Ravi", EmergencyCardRules.nextOfKin(withoutProfileDoctor)?.name)
+        assertEquals(EmergencyDoctor("Dr Sujay", "+91 90000 00005"), EmergencyCardRules.doctorOf(withoutProfileDoctor))
+        assertTrue(EmergencyCardRules.otherContacts(withoutProfileDoctor).isEmpty())
+        assertEquals("Dr Anil Rao", EmergencyCardRules.doctorOf(source.copy(contacts = people))?.name)
+        assertEquals(listOf("Dr Sujay"), EmergencyCardRules.otherContacts(source.copy(contacts = people)).map { it.name })
+        val none = EmergencyCardRules.build(source.copy(contacts = emptyList(), doctor = null), all, 1, "AB12CD34", at, zone)
+        assertTrue(none.leftOut.contains("no contacts saved")); assertTrue(none.leftOut.contains("no treating doctor saved"))
+        val noPhone = EmergencyCardRules.build(source.copy(contacts = listOf(EmergencyContact("Meera", "Sister"))), all, 1, "AB12CD34", at, zone)
+        assertTrue(noPhone.leftOut.contains("no phone number saved for the guardian"))
+    }
+
+    @Test fun printedTablesComeFromTheSameCopyAsTheWebPage() {
+        val record = EmergencyCardRecord.make("p", source.copy(medicines = source.medicines + EmergencyMedicine("Senna", "Strength: 8.6 mg\nHow often: At night")), all, null, at, zone, id = "AB12CD34")
+        val card = org.json.JSONObject(record.snapshot)
+        assertEquals(2, card.getInt("v"))
+        assertEquals(record.madeAt + 90L * 86_400_000L, card.getLong("validUntil"))
+        val rows = EmergencyCardTables.contacts(card)
+        assertEquals(EmergencyCardTables.Row("Next of kin", "Meera (Sister)", "+91 90000 00001"), rows[0])
+        assertEquals(EmergencyCardTables.Row("Treating doctor", "Dr Anil Rao", "+91 90000 00009"), rows[1])
+        assertEquals(EmergencyCardTables.Row("Hospital / clinic", "City Hospital", "+91 40 2345 6789"), rows[2])
+        assertEquals(EmergencyCardTables.Row("Nurse coordinator", "Priya Nair", EmergencyCardTables.NOT_SAVED), rows[3])
+        assertEquals(4, rows.size)
+        val meds = EmergencyCardTables.medicines(card)
+        assertEquals(EmergencyCardTables.MedicineRow("Senna", "8.6 mg", "At night"), meds.last())
+        assertEquals("10 mg", meds[0].strength)
+        // A web copy from before 24 Nov (v1: no next-of-kin, doctor, strength or when keys) still makes the tables.
+        val old = org.json.JSONObject("""{"kind":"sahara-emergency-card","v":1,"sections":["NAME","CONTACTS","MEDICINES"],"contacts":[{"name":"Ravi","relationship":"Son","phone":"+91 1"},{"name":"Asha","relationship":"Daughter","phone":""}],"medicines":[{"name":"Paracetamol 500 mg","detail":"Twice daily"}]}""")
+        assertEquals(listOf(EmergencyCardTables.Row("Next of kin", "Ravi (Son)", "+91 1"), EmergencyCardTables.Row("Daughter", "Asha", EmergencyCardTables.NOT_SAVED)), EmergencyCardTables.contacts(old))
+        assertEquals(listOf(EmergencyCardTables.MedicineRow("Paracetamol 500 mg", "500 mg", "Twice daily")), EmergencyCardTables.medicines(old))
+        assertEquals(setOf(EmergencySection.NAME, EmergencySection.CONTACTS, EmergencySection.MEDICINES), EmergencyCardTables.sections(old))
+    }
+
+    @Test fun theOnlyQrIsTheWebLinkNeverTheCardText() {
+        val token = "ef".repeat(32)
+        val record = EmergencyCardRecord.make("p", source, all, null, at, zone, id = "AB12CD34").copy(link = EmergencyLink(token, at, at + 1000, version = 3))
+        val read = decode(EmergencyLinkQr.encode(record.link!!.url))
+        assertEquals("https://sahara.wedevit.in/emergency#t=$token", read)
+        assertFalse(read.contains("Rahul")); assertFalse(read.contains("Morphine"))
+        // The app code never puts card text in a QR: the Today screen, full screen and PDF encode only link.url.
+        val dir = listOf("src/main/java/in/wedevit/care", "app/src/main/java/in/wedevit/care", "android/app/src/main/java/in/wedevit/care").map { java.io.File(it) }.first { it.isDirectory }
+        val ui = java.io.File(dir, "EmergencyCardUi.kt").readText()
+        assertEquals(listOf("EmergencyLinkQr.encode(link.url)", "EmergencyLinkQr.encode(it.url)"), Regex("EmergencyLinkQr\\.encode\\([^)]*\\)").findAll(ui).map { it.value }.toList())
+        assertFalse(ui.contains("Encoder.encode(text") || ui.contains("EmergencyCardRules.qr"))
     }
 
     @Test fun latestConfirmedNoteNeedsAPatientConfirmationOfThatExactVersion() {
@@ -148,6 +196,11 @@ class EmergencyCardTest {
     @Test fun savedCardRoundTripsAndNoticesChangedRecords() {
         val card = EmergencyCardRecord.make("p", source, all, EmergencyCardRecord.make("p", source, all, null, at, zone, id = "AAAA1111"), at + 5, zone, id = "BBBB2222")
         assertEquals(card, EmergencyCardRecord.decode(card.encode()))
+        assertTrue(card.snapshot.isNotBlank())
+        // A card saved before 24 Nov has no snapshot; it still opens and publishes from today's records.
+        val old = org.json.JSONObject(card.encode()).apply { remove("snapshot") }.toString()
+        assertEquals("", EmergencyCardRecord.decode(old).snapshot)
+        assertEquals("sahara-emergency-card", EmergencyCardRecord.decode(old).webCard(source).getString("kind"))
         assertFalse(card.outOfDate(source, zone))
         assertTrue(card.outOfDate(source.copy(medicines = source.medicines + EmergencyMedicine("Lactulose 15 ml")), zone))
         assertFalse(EmergencyCardRecord.make("p", source, setOf(EmergencySection.NAME), null, at, zone, id = "C").outOfDate(source.copy(medicines = emptyList()), zone))

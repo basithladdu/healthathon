@@ -701,8 +701,11 @@ internal fun symptomTreatmentMarkers(entries: List<CareItem>, personId: String):
  * coloured by band, with 1 week / 1 month / 3 months / All chips and treatment days marked. Same first arguments as DayBarChart,
  * so the doctor screens can swap to it directly.
  */
-@Composable fun SymptomHistoryChart(name: String, points: List<DatedRating>, hindi: Boolean, tag: String, markers: List<ChartMarker> = emptyList(), height: androidx.compose.ui.unit.Dp = 180.dp) {
+@Composable fun SymptomHistoryChart(name: String, points: List<DatedRating>, hindi: Boolean, tag: String, markers: List<ChartMarker> = emptyList(), height: androidx.compose.ui.unit.Dp = 180.dp,
+    showEntries: Boolean = true) {
     val t = { en: String, hi: String -> careTr(hindi, en, hi) }
+    // The entries under the graph: the newest five, then "Show older" (owner, 24 Nov: history short).
+    val entriesShown = rememberShownCount(tag)
     val today = LocalDate.now()
     val days = remember(points) { SymptomDiaryRules.dailyHighs(points) }
     var range by rememberSaveable(tag) { mutableStateOf(ChartRange.ALL.name) }
@@ -730,15 +733,20 @@ internal fun symptomTreatmentMarkers(entries: List<CareItem>, personId: String):
                 bands = listOf(ChartBand(0.0, 3.5, ChartBands.Mild), ChartBand(3.5, 6.5, ChartBands.Moderate), ChartBand(6.5, 10.0, ChartBands.Severe)),
                 range = current, onRangeChange = { range = it.name }, now = now,
             )
-            // Every entry in the chosen range, newest first: when and who, then its number as a band-coloured pill (no show/hide toggle).
+            // The entries in the chosen range, newest first: when and who, then its number as a band-coloured pill.
+            // [showEntries] false where the same notes already follow as cards (the symptom's detail sheet), so the history is not shown twice.
+            if (showEntries) {
+            val newest = shownPoints.asReversed()
             Text("${t("Entries", "नोट")} · ${shownPoints.size}", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.padding(top = 4.dp).testTag("$tag-entries"))
-            shownPoints.asReversed().forEachIndexed { i, p ->
+            newest.shownOf(entriesShown).forEachIndexed { i, p ->
                 if (i > 0) HorizontalDivider(color = DoctorHairline)
                 Row(Modifier.fillMaxWidth().heightIn(min = 40.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text("${friendlyWhen(p.date, p.time, hindi)} · ${SymptomDiaryRules.label(SymptomDiaryRules.respondents, p.respondent, hindi)}", fontSize = 14.sp, color = DoctorCardSub, style = SymptomWords, modifier = Modifier.weight(1f))
                     val band = ChartBands.color(p.value)
                     Text("${p.value} · ${ChartBands.word(p.value, hindi)}", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = readableOn(band), modifier = Modifier.background(band, RoundedCornerShape(50)).padding(horizontal = 10.dp, vertical = 4.dp))
                 }
+            }
+            SaharaShowOlder(newest.size, entriesShown, tag = "$tag-entries")
             }
         }
     }
@@ -767,7 +775,7 @@ internal fun symptomTreatmentMarkers(entries: List<CareItem>, personId: String):
 }
 
 /** Pick one body part; only that part's chart is shown, so parts never overlap on one chart. */
-@Composable internal fun SymptomPartTrendPicker(entries: List<CareItem>, personId: String, hindi: Boolean, preferred: String? = null) {
+@Composable internal fun SymptomPartTrendPicker(entries: List<CareItem>, personId: String, hindi: Boolean, preferred: String? = null, showEntries: Boolean = true) {
     val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     val parts = remember(entries, personId) { SymptomDiaryRules.painPartsWithHistory(entries, personId) }
     if (parts.size < 2) return
@@ -784,16 +792,16 @@ internal fun symptomTreatmentMarkers(entries: List<CareItem>, personId: String):
                 border = FilterChipDefaults.filterChipBorder(enabled = true, selected = id == part, borderColor = DoctorCardSub.copy(alpha = .45f), selectedBorderColor = DoctorAccent, borderWidth = 1.5.dp, selectedBorderWidth = 2.dp),
                 colors = FilterChipDefaults.filterChipColors(containerColor = Paper, labelColor = DoctorCardInk, selectedContainerColor = lerp(Paper, DoctorAccent, .14f), selectedLabelColor = DoctorCardInk), modifier = Modifier.heightIn(min = 48.dp).testTag("pain-part-chip-$id")) }
         }
-        AnimatedContent(part, transitionSpec = { SaharaMotion.crossfade() }, label = "part trend") { shownPart -> SymptomPartTrend(entries, personId, shownPart, hindi, compact = true) }
+        AnimatedContent(part, transitionSpec = { SaharaMotion.crossfade() }, label = "part trend") { shownPart -> SymptomPartTrend(entries, personId, shownPart, hindi, compact = true, showEntries = showEntries) }
     }
 }
 
 /** One body part's own pain from its first note on; a "Pain has gone" note shows as the line dropping to 0. */
-@Composable internal fun SymptomPartTrend(entries: List<CareItem>, personId: String, site: String, hindi: Boolean, compact: Boolean = false) {
+@Composable internal fun SymptomPartTrend(entries: List<CareItem>, personId: String, site: String, hindi: Boolean, compact: Boolean = false, showEntries: Boolean = true) {
     val points = remember(entries, personId, site) { SymptomDiaryRules.painPartSeries(entries, personId, site) }
     val markers = remember(entries, personId) { symptomTreatmentMarkers(entries, personId) }
     val part = PainBodyMapRules.label(site, hindi)
-    SymptomHistoryChart(careTr(hindi, "$part pain", "$part में दर्द"), points, hindi, "pain-part-trend-$site", markers, height = if (compact) 150.dp else 180.dp)
+    SymptomHistoryChart(careTr(hindi, "$part pain", "$part में दर्द"), points, hindi, "pain-part-trend-$site", markers, height = if (compact) 150.dp else 180.dp, showEntries = showEntries)
 }
 
 /**

@@ -101,21 +101,31 @@ internal object EmergencyLinkQr {
     fun encode(url: String): QRCode = Encoder.encode(url, ErrorCorrectionLevel.Q, mapOf(EncodeHintType.CHARACTER_SET to "UTF-8"))
 }
 
-/** Real local PDF of the card, drawn with the same PdfDocument approach as [DoctorWorkflowPdf]. */
+/**
+ * The printed card (clinical team, 24 Nov 2026): ONE A4 page. The QR holds only the web link; beside it the name, card
+ * number and version, the valid-until date (3 months) and allergies; then two tables (who to call, current medicines),
+ * a short goals-of-care note and the footer. Rows that do not fit are counted ("+3 more on the web copy"), never split
+ * onto a second page. Drawn from the card's web copy ([EmergencyCardRecord.snapshot]) so paper and page match.
+ */
 internal object EmergencyCardPdf {
-    fun create(file: File, record: EmergencyCardRecord, qr: QRCode) {
+    private const val W = 595f; private const val H = 842f; private const val M = 36f; private const val RH = 17f
+
+    fun create(file: File, record: EmergencyCardRecord) {
         file.parentFile?.mkdirs()
-        val ink = android.graphics.Color.rgb(56, 46, 41)
-        val text = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = 11f; color = ink }
-        val heading = Paint(text).apply { textSize = 18f; isFakeBoldText = true }
-        val strong = Paint(text).apply { textSize = 12f; isFakeBoldText = true }
-        val small = Paint(text).apply { textSize = 9f }
+        val card = record.snapshot.takeIf(String::isNotBlank)?.let { runCatching { org.json.JSONObject(it) }.getOrNull() }
+        val ink = android.graphics.Color.rgb(40, 33, 29); val red = android.graphics.Color.rgb(160, 32, 32)
+        val text = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = 10.5f; color = ink }
+        val strong = Paint(text).apply { isFakeBoldText = true }
+        val alert = Paint(strong).apply { color = red }
+        val title = Paint(strong).apply { textSize = 17f }
+        val nameP = Paint(strong).apply { textSize = 21f }
+        val section = Paint(strong).apply { textSize = 11.5f }
+        val head = Paint(strong).apply { textSize = 9.5f }
+        val small = Paint(text).apply { textSize = 8.5f }
         val black = Paint().apply { color = android.graphics.Color.BLACK; style = Paint.Style.FILL }
-        val pdf = PdfDocument()
-        var number = 0; var page: PdfDocument.Page? = null; var y = 0f
-        fun start() { number++; page = pdf.startPage(PdfDocument.PageInfo.Builder(595, 842, number).create()); y = 48f }
-        fun finish() { page!!.canvas.drawText("Card ${record.number} · ID ${record.id} · page $number", 42f, 812f, small); pdf.finishPage(page!!) }
-        fun line(value: String, paint: Paint = text, gap: Float = 16f, x: Float = 42f) { if (y > 780f) { finish(); start() }; page!!.canvas.drawText(value, x, y, paint); y += gap }
+        val redFill = Paint().apply { color = red; style = Paint.Style.FILL }
+        val shade = Paint().apply { color = android.graphics.Color.rgb(236, 231, 225); style = Paint.Style.FILL }
+        val rule = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = android.graphics.Color.rgb(150, 140, 130); strokeWidth = .7f; style = Paint.Style.STROKE }
         fun wrap(value: String, paint: Paint, width: Float): List<String> = value.lines().flatMap { original ->
             val out = mutableListOf<String>(); var remaining = original
             if (remaining.isEmpty()) out += ""
@@ -126,39 +136,96 @@ internal object EmergencyCardPdf {
             }
             out
         }
-        fun paragraph(value: String, paint: Paint = text) = wrap(value, paint, 511f).forEach { line(it, paint) }
-        fun drawQr(code: QRCode, left: Float, top: Float, side: Float) {
-            val matrix = code.matrix; val quiet = 4; val cell = side / (matrix.width + 2 * quiet)
-            for (row in 0 until matrix.height) for (col in 0 until matrix.width) if (matrix.get(col, row).toInt() == 1)
-                page!!.canvas.drawRect(left + (col + quiet) * cell, top + (row + quiet) * cell, left + (col + quiet + 1) * cell, top + (row + quiet + 1) * cell, black)
+        fun fit(value: String, paint: Paint, width: Float): String {
+            if (paint.measureText(value) <= width) return value
+            val count = paint.breakText(value, true, width - paint.measureText("…"), null).coerceAtLeast(0)
+            return value.take(count).trimEnd() + "…"
         }
+        fun lines(value: String, paint: Paint, width: Float, max: Int): List<String> {
+            val all = wrap(value, paint, width)
+            return if (all.size <= max) all else all.take(max - 1) + fit(all.drop(max - 1).joinToString(" "), paint, width)
+        }
+        val pdf = PdfDocument()
         try {
-            start()
-            line("Sahara emergency card · आपातकालीन कार्ड", heading, 22f)
-            line("Card ${record.number} · ID ${record.id} · made ${cardDay(record.madeAt)}", strong, 20f)
-            val link = record.link
-            val top = y
+            val page = pdf.startPage(PdfDocument.PageInfo.Builder(W.toInt(), H.toInt(), 1).create()); val c = page.canvas
+            var y = 46f
+            c.drawText("SAHARA EMERGENCY CARD · आपातकालीन कार्ड", M, y, title)
+            c.drawRect(M, y + 6f, W - M, y + 8.5f, redFill); y += 20f
+            // QR (web link only) on the left; who and which card on the right.
+            val link = record.link; val qrSide = 170f; val top = y
             if (link != null) {
-                drawQr(EmergencyLinkQr.encode(link.url), 42f, top, 240f); drawQr(qr, 313f, top, 240f)
-                y = top + 254f
-                val left = wrap("WEB LINK: scan for the latest version (needs internet). Read-only. · नवीनतम संस्करण के लिए स्कैन करें।", strong, 236f) + wrap(link.url, small, 236f) + wrap("Works until ${cardDay(link.expiresAt)} unless the family turns it off.", small, 236f)
-                val right = wrap("OFFLINE CODE: the card text itself, no internet needed. · बिना इंटरनेट के।", strong, 236f) + wrap("This printed copy cannot be switched off: tear up old copies.", small, 236f)
-                val start = y
-                left.forEachIndexed { i, it -> line(it, if (i == 0) strong else small, 13f) }
-                val leftEnd = y; y = start
-                right.forEachIndexed { i, it -> page!!.canvas.drawText(it, 313f, y, if (i == 0) strong else small); y += 13f }
-                y = maxOf(leftEnd, y) + 8f
+                val code = EmergencyLinkQr.encode(link.url); val matrix = code.matrix; val quiet = 4; val cell = qrSide / (matrix.width + 2 * quiet)
+                for (row in 0 until matrix.height) for (col in 0 until matrix.width) if (matrix.get(col, row).toInt() == 1)
+                    c.drawRect(M + (col + quiet) * cell, top + (row + quiet) * cell, M + (col + quiet + 1) * cell, top + (row + quiet + 1) * cell, black)
             } else {
-                drawQr(qr, 42f, top, 300f)
-                y = top + 318f
-                paragraph(EmergencyCardRules.OFFLINE_EN, strong); paragraph(EmergencyCardRules.OFFLINE_HI, strong)
-                paragraph("Scan with any phone camera to read the text below. If the family has a newer card, this one is outdated. A printed card cannot be switched off: tear up old copies.")
+                c.drawRect(M + 6f, top + 6f, M + qrSide - 6f, top + qrSide - 6f, rule)
+                lines("No QR code: the web link was not made. This paper cannot be checked online; call the family or doctor.", small, qrSide - 24f, 6).forEachIndexed { i, l -> c.drawText(l, M + 12f, top + 40f + i * 12f, small) }
             }
-            line("")
-            paragraph(record.text)
-            line("")
-            paragraph("Made on the family's phone from what they recorded in Sahara. Names are self-entered. This is not a treatment order, advance directive or hospital record.", small)
-            finish()
+            val x = M + qrSide + 16f; val colW = W - M - x; var ry = top + 22f
+            fun right(value: String, paint: Paint, max: Int, gap: Float = 13f) = lines(value, paint, colW, max).forEach { c.drawText(it, x, ry, paint); ry += gap }
+            val name = card?.optString("name").orEmpty().ifBlank { record.text.lineSequence().firstOrNull { it.startsWith("NAME: ") }?.removePrefix("NAME: ").orEmpty() }
+            if (name.isNotBlank()) right(name, nameP, 2, 25f)
+            right("Card ${record.number}${link?.let { " · version ${it.version}" }.orEmpty()} · ID ${record.id} · made ${cardDay(record.madeAt)}", strong, 2)
+            right("VALID UNTIL ${cardDay(record.validUntil)}. After this date the card may be out of date: check with the family or doctor.", alert, 3)
+            card?.takeUnless { it.isNull("allergies") }?.optString("allergies")?.takeIf(String::isNotBlank)?.let { ry += 3f; right("ALLERGIES (as listed by family): $it", alert, 3) }
+            ry += 3f
+            if (link != null) right("Scan the QR to open this card on sahara.wedevit.in (needs internet). The page says if a newer card exists. · नवीनतम कार्ड के लिए QR स्कैन करें।", small, 4, 11f)
+            y = maxOf(top + qrSide, ry) + 12f
+
+            // Footer first, so the tables know how much room they have.
+            val notOn = card?.optJSONArray("notIncluded")?.let { a -> (0 until a.length()).map(a::optString) }.orEmpty().ifEmpty { record.leftOut }
+            val footer = buildList {
+                if (notOn.isNotEmpty()) addAll(lines("Not on this card: " + notOn.joinToString("; ") + ".", small, W - 2 * M, 2))
+                addAll(lines("Made on the family's phone from what they recorded in Sahara. Names are self-entered. Not a treatment order, advance directive or hospital record.", small, W - 2 * M, 2))
+            }
+            val footerTop = H - 34f - footer.size * 11f
+            footer.forEachIndexed { i, l -> c.drawText(l, M, footerTop + i * 11f, small) }
+            c.drawText("Card ${record.number} · ID ${record.id} · page 1 of 1", M, H - 24f, small)
+
+            fun table(caption: String, headers: List<String>, widths: List<Float>, rows: List<List<String>>) {
+                c.drawText(caption, M, y + 11f, section); y += 16f
+                val tableTop = y
+                fun row(cells: List<String>, paint: Paint, fill: Boolean) {
+                    if (fill) c.drawRect(M, y, W - M, y + RH, shade)
+                    var cx = M
+                    cells.forEachIndexed { i, v -> c.drawText(fit(v, paint, widths[i] - 8f), cx + 4f, y + 12f, paint); cx += widths[i] }
+                    y += RH; c.drawLine(M, y, W - M, y, rule)
+                }
+                c.drawLine(M, y, W - M, y, rule)
+                row(headers, head, true)
+                rows.forEach { row(it, text, false) }
+                var cx = M; c.drawLine(cx, tableTop, cx, y, rule); widths.forEach { cx += it; c.drawLine(cx, tableTop, cx, y, rule) }
+                y += 10f
+            }
+            if (card != null) {
+                val sections = EmergencyCardTables.sections(card)
+                val goals = card.optJSONObject("goals")?.takeIf { EmergencySection.GOALS in sections }
+                val goalsText = goals?.let { g -> listOf("What matters: " to g.optString("whatMatters"), "Next steps: " to g.optString("nextSteps")).filter { it.second.isNotBlank() }.joinToString("  ") { it.first + it.second.replace(Regex("\\s+"), " ").trim() } }.orEmpty()
+                val goalLines = if (goals == null) emptyList() else lines(goalsText.ifBlank { "No text in the note." }, text, W - 2 * M, 5)
+                val goalsRoom = if (goals == null) 0f else 18f + goalLines.size * 12.5f + 6f
+                if (EmergencySection.CONTACTS in sections) {
+                    val rows = EmergencyCardTables.contacts(card).map { listOf(it.who, it.name, it.phone) }
+                    val shown = if (rows.size <= 7) rows else rows.take(6) + listOf(listOf("+${rows.size - 6} more", "on the web copy (scan the QR)", ""))
+                    table("WHO TO CALL · किसे फ़ोन करें", listOf("Who · कौन", "Name · नाम", "Phone · फ़ोन"), listOf(118f, 232f, 173f),
+                        shown.ifEmpty { listOf(listOf("Next of kin", EmergencyCardTables.NOT_SAVED, "")) })
+                }
+                if (EmergencySection.MEDICINES in sections) {
+                    val rows = EmergencyCardTables.medicines(card).map { listOf(it.name, it.strength, it.whenTaken) }
+                    val room = ((footerTop - 10f - goalsRoom - y - 16f - RH) / RH).toInt().coerceAtLeast(1)
+                    val shown = if (rows.size <= room) rows else rows.take(room - 1) + listOf(listOf("+${rows.size - room + 1} more medicines", "scan the QR for the full list", ""))
+                    table("CURRENT MEDICINES (as listed by family) · अभी की दवाएँ", listOf("Medicine · दवा", "Strength · मात्रा", "When · कब"), listOf(205f, 112f, 206f),
+                        shown.ifEmpty { listOf(listOf("No current medicines listed", "", "")) })
+                }
+                if (goals != null && y + goalsRoom <= footerTop) {
+                    c.drawText(fit("GOALS OF CARE (note v${goals.optInt("version")}, confirmed in app by ${goals.optString("confirmedBy")} on ${cardDay(goals.optLong("confirmedAt"))}) · देखभाल के लक्ष्य", section, W - 2 * M), M, y + 11f, section); y += 18f
+                    goalLines.forEach { c.drawText(it, M, y + 9f, text); y += 12.5f }
+                }
+            } else {
+                // A card saved before 24 Nov: its text, cut to this one page.
+                val room = ((footerTop - 10f - y) / 12.5f).toInt().coerceAtLeast(1)
+                lines(record.body, text, W - 2 * M, room).forEach { c.drawText(it, M, y + 9f, text); y += 12.5f }
+            }
+            pdf.finishPage(page)
             file.outputStream().use { pdf.writeTo(it) }
         } finally { pdf.close() }
     }
@@ -189,7 +256,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
     }
 }
 
-/** Today: a large QR (the web link when it is live, otherwise the offline code), or the way to make one. */
+/** Today: a large QR of the web link (the only code on the card since 24 Nov), or the way to make one. */
 @Composable fun EmergencyCardOnToday(vm: CareModel, onRead: (CareVersion) -> Unit = {}) {
     val context = LocalContext.current; val scope = rememberCoroutineScope(); val t = careText()
     val people by vm.people.collectAsStateWithLifecycle(); val selected by vm.selected.collectAsStateWithLifecycle()
@@ -222,27 +289,32 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
         EmergencySource(
             name = name,
             goals = EmergencyCardRules.latestConfirmed(versions.filter { it.personId == selected }, acknowledgements) { vm.cloud == null || it.id in trustedAcks },
-            contacts = contacts.filter { it.personId == selected }.sortedWith(compareBy({ it.role != "family" }, { it.phone.isBlank() })).map { EmergencyContact(it.name, it.relationship, it.phone) },
+            // Next of kin is the first family contact (with a phone first); clinicians last.
+            contacts = contacts.filter { it.personId == selected }.sortedWith(compareBy({ when (it.role) { "family" -> 0; "caregiver" -> 1; else -> 2 } }, { it.phone.isBlank() })).map { EmergencyContact(it.name, it.relationship, it.phone, it.role) },
             medicines = items.filter { it.kind == "medicine" && it.personId == selected }.map { EmergencyMedicine(it.title, if (CareEntryCodec.isStructured(it.detail)) "" else it.detail) },
             age = profile?.age, conditions = profile?.illness.orEmpty(), allergies = profile?.allergies.orEmpty(),
+            doctor = profile?.let { EmergencyDoctor(it.doctorName.trim(), it.doctorPhone.trim(), it.doctorPlace.trim(), it.doctorLandline.trim()) },
         )
     }
     val ready = loadedFor == selected && !contactsLoading
     val blocked: EmergencyLinkProblem? = when { vm.demoMode -> EmergencyLinkProblem.WALKTHROUGH; client == null -> EmergencyLinkProblem.SIGNED_OUT; !owner -> EmergencyLinkProblem.NOT_OWNER; else -> null }
     val card = record
-    val qr = remember(card?.text) { card?.text?.let { runCatching { EmergencyCardRules.qr(it) }.getOrNull() } }
     val linkQr = remember(card?.link?.token) { card?.link?.let { runCatching { EmergencyLinkQr.encode(it.url) }.getOrNull() } }
     val readNote = source.goals?.let { g -> versions.firstOrNull { it.version == g.version && it.personId == selected } }
 
-    fun keep(next: EmergencyCardRecord) { store.save(next); EmergencyCardPdf.create(store.pdf(next), next, EmergencyCardRules.qr(next.text)) }
-    fun ensurePdf(c: EmergencyCardRecord): File = store.pdf(c).takeIf(File::isFile) ?: run { EmergencyCardPdf.create(store.pdf(c), c, EmergencyCardRules.qr(c.text)); store.pdf(c) }
+    fun keep(next: EmergencyCardRecord) { store.save(next); EmergencyCardPdf.create(store.pdf(next), next) }
+    fun ensurePdf(c: EmergencyCardRecord): File = store.pdf(c).takeIf(File::isFile) ?: run { EmergencyCardPdf.create(store.pdf(c), c); store.pdf(c) }
 
-    /** Puts [c] on the server: same link when one exists ([fresh] = false), otherwise a new one. Returns the saved record. */
+    /**
+     * Puts [c] on the server and returns the saved record with its link. Normally a new published version with its own
+     * token ([EmergencyLinkClient.publish]); [fresh] = true starts a new link series instead ("Replace link", or a link
+     * that was turned off), which stops every older printed QR at once.
+     */
     suspend fun syncLink(c: EmergencyCardRecord, fresh: Boolean): EmergencyCardRecord {
         val api = client ?: return c
-        val payload = EmergencyLinkRules.card(source, c)
+        val payload = c.webCard(source)
         val next = try {
-            if (c.link != null && !fresh) { api.update(c.personId, payload); c } else c.copy(link = api.create(c.personId, payload))
+            if (fresh) c.copy(link = api.create(c.personId, payload)) else c.copy(link = api.publish(c.personId, payload, c.link))
         } catch (e: EmergencyLinkException) {
             if (e.problem == EmergencyLinkProblem.LINK_OFF && c.link != null) withContext(Dispatchers.IO) { keep(c.copy(link = null)) }.also { record = c.copy(link = null) }
             throw e
@@ -267,7 +339,8 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
         if (blocked != null || client == null) return@LaunchedEffect
         linkBusy = true
         try {
-            if (c.link == null) record = syncLink(c, fresh = true)
+            // Not straight after the family turned the link off: a new link then waits for "Make a new link".
+            if (c.link == null) { if (linkProblem != EmergencyLinkProblem.LINK_OFF) record = syncLink(c, fresh = false) }
             else { val s = client.status(c.personId); linkStatus = s; if (!s.live) linkProblem = EmergencyLinkProblem.LINK_OFF }
         } catch (e: EmergencyLinkException) { linkProblem = e.problem }
         catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; linkProblem = EmergencyLinkProblem.OFFLINE }
@@ -311,7 +384,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
         try {
             val made = withContext(Dispatchers.IO) { EmergencyCardRecord.make(selected, source, sections, previous, System.currentTimeMillis()).also(::keep) }
             record = made; setup = false
-            if (blocked == null) try { record = syncLink(made, fresh = made.link == null) } catch (e: EmergencyLinkException) { linkProblem = e.problem } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; linkProblem = EmergencyLinkProblem.OFFLINE }
+            if (blocked == null) try { record = syncLink(made, fresh = false) } catch (e: EmergencyLinkException) { linkProblem = e.problem } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; linkProblem = EmergencyLinkProblem.OFFLINE }
             // A first card appears by itself (the QR is the result); an update is confirmed.
             if (previous != null) done = t("Card updated", "कार्ड अपडेट हुआ")
         } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; alert = e.message ?: t("Couldn't make the card. Try again.", "कार्ड नहीं बना।") }
@@ -325,7 +398,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
     alert?.let { message -> SaharaDialog(message, onDismiss = { alert = null }, tone = SaharaTone.Error, modifier = Modifier.testTag("emergency-card-alert")) }
     done?.let { message -> SaharaDialog(message, onDismiss = { done = null }, tone = SaharaTone.Success, modifier = Modifier.testTag("emergency-card-done")) }
     if (selected.isBlank()) return
-    if (card == null || qr == null) {
+    if (card == null) {
         // Emergency red: the red wash with a solid red QR chip.
         ActionCard(SaharaSection.Emergency.wash, modifier = Modifier.fillMaxWidth().testTag("emergency-card-entry"), onClick = { if (ready && !busy) remake(EmergencySection.entries.toSet(), null) }) {
             Row(Modifier.fillMaxWidth().heightIn(min = 64.dp).padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -337,20 +410,26 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
         }
     } else {
         val stale = ready && runCatching { card.outOfDate(source) }.getOrDefault(false)
-        val shownQr = linkQr ?: qr
         val link = card.link
         // The QR stays on white for scanners; the card's solid red edge says Emergency.
         Surface(shape = RoundedCornerShape(12.dp), color = Paper, border = androidx.compose.foundation.BorderStroke(2.dp, SaharaSection.Emergency.solid), modifier = Modifier.fillMaxWidth().testTag("emergency-card")) {
             Column(Modifier.saharaContentSize().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                QrImage(shownQr, if (link != null) t("Emergency web link QR code", "आपातकालीन वेब लिंक QR कोड") else t("Emergency card offline QR code", "आपातकालीन कार्ड ऑफ़लाइन QR कोड"), Modifier.fillMaxWidth().widthIn(max = 240.dp).clickable(onClickLabel = t("Show full screen", "पूरी स्क्रीन पर दिखाएँ")) { fullScreen = true }.testTag("emergency-card-qr"))
+                // The QR is only ever the web link (24 Nov): the page reads the card from the server.
+                if (linkQr != null) QrImage(linkQr, t("Emergency web link QR code", "आपातकालीन वेब लिंक QR कोड"), Modifier.fillMaxWidth().widthIn(max = 240.dp).clickable(onClickLabel = t("Show full screen", "पूरी स्क्रीन पर दिखाएँ")) { fullScreen = true }.testTag("emergency-card-qr"))
+                else Box(Modifier.fillMaxWidth().widthIn(max = 240.dp).aspectRatio(1f).border(2.dp, DoctorHairline, RoundedCornerShape(12.dp)).padding(16.dp).testTag("emergency-card-no-qr"), contentAlignment = Alignment.Center) {
+                    if (linkBusy) CircularProgressIndicator(Modifier.size(24.dp), strokeWidth = 2.dp, color = Rust)
+                    else Text(t("No QR yet: it needs the web link.", "अभी QR नहीं है: इसके लिए वेब लिंक चाहिए।"), fontSize = 15.sp, color = DoctorCardSub, textAlign = TextAlign.Center)
+                }
                 if (name.isNotBlank()) Text(name, fontWeight = FontWeight.Bold, fontSize = 22.sp, color = Ink, textAlign = TextAlign.Center, modifier = Modifier.testTag("emergency-card-name"))
                 Text(t("Scan in an emergency", "आपातकाल में स्कैन करें"), fontSize = 16.sp, color = DoctorCardSub, textAlign = TextAlign.Center)
-                // Where the web link was last opened, when the person opening it said (offline-code scans can't be seen).
+                val until = cardDay(card.validUntil)
+                Text(t("Valid until $until", "$until तक मान्य"), fontSize = 14.sp, color = if (System.currentTimeMillis() > card.validUntil) DoctorStatusWarn else DoctorCardSub, textAlign = TextAlign.Center, modifier = Modifier.testTag("emergency-card-valid-until"))
+                // Where the web link was last opened, when the person opening it said.
                 if (link != null) linkStatus?.takeIf { it.live }?.recentViews?.firstOrNull()?.let { v -> val at = cardDay(v.at); val place = v.place
                     Text(if (place.isNotBlank()) t("Last opened at $place on $at", "आख़िरी बार $place में $at को खोला गया") else t("Last opened on $at", "आख़िरी बार $at को खोला गया"), fontSize = 14.sp, color = DoctorCardSub, textAlign = TextAlign.Center, modifier = Modifier.testTag("emergency-card-last-opened")) }
                 val problem = linkProblem
-                // Which code the QR carries, as a pill: the live web link or the offline code only.
-                if (!linkBusy) FamilyPill(when { link != null && problem == null -> t("Web link on", "वेब लिंक चालू"); stale -> t("Out of date", "पुराना है"); else -> t("Offline code", "ऑफ़लाइन कोड") },
+                // Whether the QR is live: the web link is on, the card is out of date, or there is no link yet.
+                if (!linkBusy) FamilyPill(when { link != null && problem == null -> t("Web link on", "वेब लिंक चालू"); stale -> t("Out of date", "पुराना है"); else -> t("No web link", "वेब लिंक नहीं") },
                     when { stale -> FamilyTone.WAIT; link != null && problem == null -> FamilyTone.GOOD; else -> FamilyTone.NEUTRAL }, Modifier.testTag("emergency-card-status"))
                 if (linkBusy) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = Rust)
                 else if (problem != null) Column(Modifier.fillMaxWidth().background(DoctorStatusWarnBg, RoundedCornerShape(12.dp)).padding(12.dp).testTag("emergency-link-problem")) {
@@ -358,7 +437,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
                     if (problem == EmergencyLinkProblem.OFFLINE || problem == EmergencyLinkProblem.NOT_SET_UP || problem == EmergencyLinkProblem.LINK_OFF) TextButton(onClick = {
                         scope.launch {
                             linkBusy = true
-                            try { record = syncLink(record ?: return@launch, fresh = problem == EmergencyLinkProblem.LINK_OFF || record?.link == null); done = t("Web link is live", "वेब लिंक चालू है") }
+                            try { record = syncLink(record ?: return@launch, fresh = problem == EmergencyLinkProblem.LINK_OFF); done = t("Web link is live", "वेब लिंक चालू है") }
                             catch (e: EmergencyLinkException) { linkProblem = e.problem; alert = t(e.problem.en, e.problem.hi) }
                             catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; linkProblem = EmergencyLinkProblem.OFFLINE }
                             finally { linkBusy = false }
@@ -373,13 +452,13 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
                     SaharaSecondaryButton(t("Print", "प्रिंट करें"), onClick = { print(card) }, icon = Icons.Default.Print, tone = SaharaTone.Indigo, modifier = Modifier.weight(1f).testTag("emergency-card-print"))
                 }
                 TextButton(onClick = { setup = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp).testTag("emergency-card-replace")) { Text(t("Edit card and PDF", "कार्ड और PDF बदलें"), color = RustText, fontWeight = FontWeight.Bold) }
-                // The family can switch the web link off at any time; printed cards then show only the offline code, and a new link can be made later.
+                // The family can switch the web link off at any time; printed cards then say the link is off, and a new link can be made later.
                 if (link != null && problem == null && client != null && owner && !linkBusy) TextButton(onClick = { confirmLinkOff = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("emergency-link-off")) {
                     Text(t("Turn off the web link", "वेब लिंक बंद करें"), color = DoctorCardSub)
                 }
                 if (confirmLinkOff) AlertDialog(onDismissRequest = { confirmLinkOff = false },
                     title = { Text(t("Turn off the web link?", "वेब लिंक बंद करें?")) },
-                    text = { Text(t("Anyone who scans the printed card will no longer see the online page. The offline code on the card still works. You can make a new link later.", "छपा कार्ड स्कैन करने वाले अब ऑनलाइन पेज नहीं देख पाएँगे। कार्ड का ऑफ़लाइन कोड काम करता रहेगा। आप बाद में नया लिंक बना सकते हैं।")) },
+                    text = { Text(t("Anyone who scans a printed card will see that the family turned this link off. You can make a new link later.", "छपा कार्ड स्कैन करने वाले देखेंगे कि परिवार ने यह लिंक बंद कर दिया है। आप बाद में नया लिंक बना सकते हैं।")) },
                     confirmButton = { TextButton(onClick = {
                         confirmLinkOff = false
                         scope.launch {
@@ -393,10 +472,10 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
                     dismissButton = { TextButton(onClick = { confirmLinkOff = false }) { Text(t("Keep it on", "चालू रखें")) } })
             }
         }
-        if (fullScreen) EmergencyQrFullScreen(linkQr, qr, card) { fullScreen = false }
+        if (fullScreen && linkQr != null) EmergencyQrFullScreen(linkQr, card) { fullScreen = false }
         if (confirmNewLink) AlertDialog(onDismissRequest = { confirmNewLink = false },
             title = { Text(t("Replace the web link?", "लिंक बदलें?")) },
-            text = { Text(t("The old link will stop working.", "पुराना लिंक बंद हो जाएगा।")) },
+            text = { Text(t("Every card printed with the old link will stop opening. Print the new card.", "पुराने लिंक वाले सभी छपे कार्ड खुलना बंद हो जाएँगे। नया कार्ड छापें।")) },
             confirmButton = { TextButton(onClick = {
                 confirmNewLink = false
                 scope.launch {
@@ -454,10 +533,10 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
         dismissButton = { TextButton(onClick = onDismiss) { Text(t("Cancel", "रद्द करें")) } })
 }
 
-/** Full screen for showing hospital staff: white, maximum brightness, a gentle SaharaMotion scale-in, tap to close. */
-@Composable private fun EmergencyQrFullScreen(linkQr: QRCode?, offlineQr: QRCode, card: EmergencyCardRecord, onClose: () -> Unit) {
+/** Full screen for showing hospital staff: the web-link QR only, white, maximum brightness, a gentle SaharaMotion scale-in, tap to close. */
+@Composable private fun EmergencyQrFullScreen(linkQr: QRCode, card: EmergencyCardRecord, onClose: () -> Unit) {
     val shown = remember { MutableTransitionState(false).apply { targetState = true } }
-    var offline by rememberSaveable { mutableStateOf(linkQr == null) }; val t = careText()
+    val t = careText()
     LaunchedEffect(shown.currentState, shown.targetState) { if (!shown.targetState && !shown.currentState && shown.isIdle) onClose() }
     Dialog(onDismissRequest = { shown.targetState = false }, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         val window = (LocalView.current.parent as? DialogWindowProvider)?.window
@@ -465,14 +544,18 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
         AnimatedVisibility(shown,
             enter = fadeIn(tween(SaharaMotion.ENTER_MS - SaharaMotion.FADE_DELAY_MS, delayMillis = SaharaMotion.FADE_DELAY_MS)) + scaleIn(tween(SaharaMotion.ENTER_MS, easing = FastOutSlowInEasing), initialScale = .88f),
             exit = fadeOut(tween(SaharaMotion.EXIT_MS, easing = FastOutSlowInEasing)) + scaleOut(tween(SaharaMotion.EXIT_MS, easing = FastOutSlowInEasing), targetScale = .94f)) {
+            Box(Modifier.fillMaxSize().background(Color.White)) {
             Column(Modifier.fillMaxSize().background(Color.White).clickable(onClickLabel = t("Close", "बंद करें")) { shown.targetState = false }.padding(20.dp).testTag("emergency-card-fullscreen"), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                 Text(t("Emergency card", "आपातकालीन कार्ड"), fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.Black, modifier = Modifier.a11yHeading())
                 Spacer(Modifier.height(16.dp))
-                QrImage(if (offline || linkQr == null) offlineQr else linkQr, if (offline || linkQr == null) t("Emergency card offline QR code", "आपातकालीन कार्ड ऑफ़लाइन QR कोड") else t("Emergency web link QR code", "आपातकालीन वेब लिंक QR कोड"), Modifier.fillMaxWidth().widthIn(max = 480.dp).border(3.dp, Color.Black))
+                QrImage(linkQr, t("Emergency web link QR code", "आपातकालीन वेब लिंक QR कोड"), Modifier.fillMaxWidth().widthIn(max = 480.dp).border(3.dp, Color.Black))
                 Spacer(Modifier.height(16.dp))
                 Text(t("Card ${card.number} · ID ${card.id} · made ${cardDay(card.madeAt)}", "कार्ड ${card.number} · ID ${card.id} · बना ${cardDay(card.madeAt)}"), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black, textAlign = TextAlign.Center)
-                Spacer(Modifier.height(12.dp))
-                if (linkQr != null) OutlinedButton(onClick = { offline = !offline }, shape = RoundedCornerShape(12.dp), border = androidx.compose.foundation.BorderStroke(1.5.dp, RustText), modifier = Modifier.heightIn(min = 48.dp).testTag("emergency-fullscreen-toggle")) { Text(if (offline) t("Web link code", "वेब लिंक कोड") else t("Offline code", "ऑफ़लाइन कोड"), color = RustText) }
+                val until = cardDay(card.validUntil)
+                Text(t("Valid until $until", "$until तक मान्य"), fontSize = 16.sp, color = Color.Black, textAlign = TextAlign.Center)
+            }
+            // A visible way back at the top-left (tapping anywhere still closes it).
+            SaharaBackButton({ shown.targetState = false }, Modifier.align(Alignment.TopStart).padding(8.dp), tag = "emergency-fullscreen-back")
             }
         }
     }
@@ -492,7 +575,8 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
                     val detail = when (section) {
                         EmergencySection.NAME -> name.ifBlank { t("No name saved", "नाम नहीं है") }
                         EmergencySection.GOALS -> goals?.let { t("Note v${it.version}, confirmed ${cardDay(it.confirmedAt)}", "नोट v${it.version}, पुष्टि ${cardDay(it.confirmedAt)}") + (it.newerUnconfirmedVersion?.let { v -> t(" (newer note v$v not confirmed yet)", " (नया नोट v$v अभी पुष्टि नहीं हुआ)") } ?: "") } ?: t("No confirmed note", "पुष्टि किया गया नोट नहीं")
-                        EmergencySection.CONTACTS -> if (source.contacts.isEmpty()) t("No contacts saved", "कोई संपर्क नहीं है") else t("${source.contacts.size} saved", "${source.contacts.size} सहेजे गए")
+                        EmergencySection.CONTACTS -> (if (source.contacts.isEmpty()) t("No contacts saved", "कोई संपर्क नहीं है") else t("${source.contacts.size} saved", "${source.contacts.size} सहेजे गए")) + " · " +
+                            (EmergencyCardRules.doctorOf(source)?.name?.takeIf(String::isNotBlank)?.let { doctor -> t("Doctor: $doctor", "डॉक्टर: $doctor") } ?: t("No doctor saved", "डॉक्टर सहेजा नहीं गया"))
                         EmergencySection.MEDICINES -> if (source.medicines.isEmpty()) t("No current medicines listed", "कोई दवा नहीं है") else t("${source.medicines.size} current", "${source.medicines.size} दवाएँ")
                     }
                     CheckLine(section.name in chosen, { on -> chosen = if (on) chosen + section.name else chosen - section.name }, "${t(section.en, section.hi)}\n$detail")

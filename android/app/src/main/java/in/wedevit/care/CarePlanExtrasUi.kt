@@ -140,12 +140,12 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
 
 // ───────────────────────────── Pilot audit log (doctor only) ─────────────────────────────
 
-/** A date button and a time box; the value stays as the typed local "2026-10-29 10:30". */
-@Composable private fun PlanDateTimeField(value: String, label: String, onChange: (String) -> Unit) { val t = careText()
+/** A date button and a tapped time (clock dial); the value stays the local "2026-10-29 10:30". */
+@Composable internal fun PlanDateTimeField(value: String, label: String, onChange: (String) -> Unit) { val t = careText()
     val date = value.take(10); val time = value.drop(11)
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         PlanDateField(date, label, { v -> onChange(listOf(v, time.ifBlank { "00:00" }).filter(String::isNotBlank).joinToString(" ").takeIf { v.isNotBlank() }.orEmpty()) }, latest = LocalDate.now())
-        if (date.isNotBlank()) CareField(time, { v -> onChange("$date ${v.take(5)}") }, t("Time (24-hour)", "समय (24 घंटे)"), singleLine = true, placeholder = "10:30")
+        if (date.isNotBlank()) CareTimeButton(time.take(5), { v -> onChange("$date ${v.ifBlank { "00:00" }}") }, t("Time", "समय"))
     }
 }
 
@@ -163,6 +163,7 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
     var panel by rememberSaveable { mutableStateOf("") }; var saved by remember { mutableStateOf("") }
     val target = Pilot.RETRIEVAL_TARGET_MINUTES; val notRecorded = NOT_RECORDED.pick(hindi)
     fun yesNo(v: Boolean?) = when (v) { null -> notRecorded; true -> t("Yes", "हाँ"); else -> t("No", "नहीं") }
+    val episodesShown = rememberShownCount("pilot-episodes-$patientId"); val outcomesShown = rememberShownCount("pilot-outcomes-$patientId"); val incidentsShown = rememberShownCount("pilot-incidents-$patientId")
     LazyColumn(Modifier.fillMaxSize().testTag("pilot-log"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { PlanHeader(t("Audit log", "ऑडिट लॉग"), onBack, "pilot-header") }
         item { PlanCard {
@@ -185,7 +186,8 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
         }
         item { SectionTitle(t("ED episodes", "ED के मामले")) }
         if (rows.isEmpty()) item { Text(t("None yet.", "अभी कुछ नहीं।"), style = Small) }
-        rows.reversed().forEach { row -> item { PlanCard {
+        // Short history (owner, 24 Nov): newest five, then "Show older".
+        cappedItems(rows.reversed(), episodesShown, tag = "pilot-episodes") { row -> PlanCard {
             val e = row.episode; val minutes = row.minutes
             Text(e.edArrivalAt.take(16).replace('T', ' '), fontWeight = FontWeight.SemiBold)
             Text(when (row.concordant) { null -> t("Nothing to compare", "तुलना के लिए कुछ नहीं"); true -> t("Matched the plan", "योजना के अनुसार"); else -> t("Differed from the plan", "योजना से अलग") }, color = if (row.concordant == false) RustText else DoctorCardSub, style = MaterialTheme.typography.bodyMedium)
@@ -193,10 +195,10 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
             Text(t("Highest support", "सबसे ज़्यादा मदद") + ": " + (e.highestSupportDelivered?.let { PlanText.ceiling(it).pick(hindi) } ?: notRecorded) + " · CPR: " + yesNo(e.cprGiven), style = MaterialTheme.typography.bodyMedium)
             if (e.discordanceReason.isNotBlank()) Text(t("Why care differed", "इलाज अलग क्यों हुआ") + ": " + e.discordanceReason, style = MaterialTheme.typography.bodyMedium)
             Text(t("Recorded by", "दर्ज किया") + " " + e.recordedBy, style = Small, color = DoctorCardSub)
-        } } }
+        } }
         item { SectionTitle(t("Outcomes", "नतीजे")) }
         if (outcomes.isEmpty()) item { Text(t("None yet.", "अभी कुछ नहीं।"), style = Small) }
-        outcomes.reversed().forEach { o -> item { PlanCard {
+        cappedItems(outcomes.reversed(), outcomesShown, tag = "pilot-outcomes") { o -> PlanCard {
             val match = Pilot.placeMatches(o); val hours = Pilot.hoursToSymptomRx(o)
             Text(o.placeOfDeath?.let { Pilot.place(it).pick(hindi) } ?: notRecorded, fontWeight = FontWeight.SemiBold)
             Text(when (match) { null -> t("Preference not known", "पसंद पता नहीं"); true -> t("Where they preferred", "जहाँ वे चाहते थे"); else -> t("Not where they preferred", "जहाँ वे चाहते थे, वहाँ नहीं") }, style = MaterialTheme.typography.bodyMedium)
@@ -205,16 +207,16 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
             Text(t("Admission to first symptom-control prescription", "भर्ती से लक्षण की पहली दवा तक") + ": " + (hours?.let { h -> t("$h hours", "$h घंटे") } ?: notRecorded), style = MaterialTheme.typography.bodyMedium)
             Text(t("Out-of-pocket spend, last admission", "आख़िरी भर्ती का अपनी जेब से ख़र्च") + ": " + (o.outOfPocketLastAdmissionInr?.let { "₹$it" } ?: notRecorded), style = MaterialTheme.typography.bodyMedium)
             Text(t("Recorded by", "दर्ज किया") + " " + o.recordedBy, style = Small, color = DoctorCardSub)
-        } } }
+        } }
         item { SectionTitle(t("Incidents", "घटनाएँ")) }
         if (incidents.isEmpty()) item { Text(t("None yet.", "अभी कुछ नहीं।"), style = Small) }
-        incidents.reversed().forEach { i -> item { PlanCard {
+        cappedItems(incidents.reversed(), incidentsShown, tag = "pilot-incidents") { i -> PlanCard {
             Text(i.reportedAt.take(16).replace('T', ' '), fontWeight = FontWeight.SemiBold)
             if (i.appliedToReversibleIllness) Text(t("Plan applied to a reversible illness", "ठीक होने वाली बीमारी पर योजना लागू हुई"), fontWeight = FontWeight.SemiBold)
             if (i.familyFeltPushed) Text(t("Family felt pushed", "परिवार को दबाव महसूस हुआ"), fontWeight = FontWeight.SemiBold)
             if (i.details.isNotBlank()) Text(i.details, style = MaterialTheme.typography.bodyMedium)
             Text(t("Reported by", "रिपोर्ट की") + " " + i.reportedBy, style = Small, color = DoctorCardSub)
-        } } }
+        } }
     }
 }
 

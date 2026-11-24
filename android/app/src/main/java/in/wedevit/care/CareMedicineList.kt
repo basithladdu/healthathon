@@ -20,6 +20,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.filled.Check
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import java.time.LocalDate
+import java.time.ZoneId
 
 /** The part of the day a medicine is listed under on the Medicines page. */
 enum class MedicineSlot { MORNING, AFTERNOON, EVENING, NIGHT, AS_NEEDED, OTHER }
@@ -91,7 +95,12 @@ object MedicineTimeGroups {
         else if (groups.isEmpty()) QuietLine(t("No medicine matches that name.", "इस नाम की कोई दवा नहीं मिली।"))
         groups.forEach { (slot, list) ->
             Text("${medicineSlotTitle(slot)} · ${list.size}", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub, modifier = Modifier.padding(start = 4.dp, top = 4.dp).a11yHeading().testTag("medicines-group-${slot.name.lowercase()}"))
-            list.forEach { input -> byId[input.id]?.let { item -> key(item.id) { MedicineCompactRow(item, vm) } } }
+            // One calm surface per time of day with hairlines between rows, instead of a card per medicine.
+            Surface(shape = RoundedCornerShape(16.dp), color = SaharaSection.Medicines.wash, modifier = Modifier.fillMaxWidth().testTag("medicines-group-list-${slot.name.lowercase()}")) {
+                Column(Modifier.padding(vertical = 2.dp)) {
+                    list.forEachIndexed { index, input -> byId[input.id]?.let { item -> key(item.id) { MedicineCompactRow(item, vm, divider = index > 0) } } }
+                }
+            }
         }
         if (past.isNotEmpty()) {
             Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button) { pastOpen = !pastOpen }.padding(horizontal = 4.dp).testTag("medicines-past-toggle"), verticalAlignment = Alignment.CenterVertically) {
@@ -111,30 +120,70 @@ object MedicineTimeGroups {
 }
 
 /**
- * One medicine on one compact row: name and strength on a line, then its dose chips (the tick stays one tap away).
- * Tap the row to open the full card (directions, food, strip photo, the menu); "Show less" folds it again.
+ * One medicine on one dense row (owner, 24 Nov 2026: patients take 10 to 20 medicines, so no big card each): name and strength,
+ * a one-line schedule ("Morning · Night", "As needed"), and a small status for today on the right ("1 of 2", green once all are
+ * taken, red when one was not taken). Tap the row to open the full card (dose ticks, directions, strip photo, the menu); "Show less" folds it.
  */
-@Composable private fun MedicineCompactRow(item: CareItem, vm: CareModel) {
-    val t = careText()
+@Composable private fun MedicineCompactRow(item: CareItem, vm: CareModel, divider: Boolean) {
+    val t = careText(); val lang = careLanguage()
     var open by rememberSaveable(item.id) { mutableStateOf(false) }
-    Box(Modifier.fillMaxWidth().animateContentSize().testTag("medicine-row-${item.id}")) {
-        if (open) Column {
+    Column(Modifier.fillMaxWidth().animateContentSize().testTag("medicine-row-${item.id}")) {
+        if (divider && !open) HorizontalDivider(Modifier.padding(start = 16.dp), color = DoctorHairline.copy(alpha = .6f))
+        if (open) Column(Modifier.padding(vertical = 4.dp)) {
             MedicineCareCard(item, vm)
             TextButton(onClick = { open = false }, modifier = Modifier.heightIn(min = 48.dp).testTag("medicine-collapse-${item.id}")) { Icon(Icons.Default.KeyboardArrowUp, null); Spacer(Modifier.width(4.dp)); Text(t("Show less", "कम दिखाएँ")) }
         } else {
             val entry = remember(item.detail) { MedicineEntryText.parse(item.detail) }
             val strength = entry?.let { e -> listOf(e.strength, e.howMuch).filter { it.isNotBlank() }.joinToString(" · ") }.orEmpty()
-            Surface(shape = RoundedCornerShape(16.dp), color = SaharaSection.Medicines.wash, modifier = Modifier.fillMaxWidth()) {
-                Column(Modifier.padding(horizontal = 14.dp, vertical = 6.dp)) {
-                    Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button, onClickLabel = t("Show details", "ब्यौरा दिखाएँ")) { open = true }.testTag("medicine-expand-${item.id}"), verticalAlignment = Alignment.CenterVertically) {
+            val doses = medicineDosesFor(item, vm)
+            val schedule = medicineScheduleLine(item, doses, lang)
+            val saved by vm.medicineEvents.collectAsStateWithLifecycle()
+            val held by DoseUndoWindow.app.pending.collectAsStateWithLifecycle()
+            val events = DoseUndoWindow.shown(saved, held, item.personId)
+            val zone = ZoneId.systemDefault()
+            val states = MedicineDoses.states(item, doses, events, LocalDate.now(zone), zone)
+            Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).clickable(role = Role.Button, onClickLabel = t("Show details", "ब्यौरा दिखाएँ")) { open = true }
+                .padding(start = 16.dp, end = 8.dp, top = 6.dp, bottom = 6.dp).testTag("medicine-expand-${item.id}"), verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(1.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(item.title, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
                         if (strength.isNotBlank()) Text(" · $strength", fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
-                        Spacer(Modifier.weight(1f))
-                        Icon(Icons.Default.KeyboardArrowDown, t("Show details", "ब्यौरा दिखाएँ"), tint = DoctorCardSub)
                     }
-                    MedicineDoseActions(item, vm, showHistory = false)
+                    if (schedule.isNotBlank()) Text(schedule, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.testTag("medicine-schedule-${item.id}"))
                 }
+                MedicineTodayStatus(item.id, states)
+                Icon(Icons.Default.KeyboardArrowDown, t("Show details", "ब्यौरा दिखाएँ"), Modifier.padding(start = 4.dp), tint = DoctorCardSub)
             }
+        }
+    }
+}
+
+/** "Morning · Night" from the dose times; "As needed", "Not daily", or the chosen How often for a medicine without times. */
+@Composable private fun medicineScheduleLine(item: CareItem, doses: List<MedicineDose>, lang: CareLang): String {
+    val t = careText()
+    val timed = doses.filter { it.timed }
+    return when {
+        timed.isNotEmpty() -> timed.map { MedicineDoseRules.slot(it.time) }.distinct().sortedBy { it.ordinal }.joinToString(" · ") { careTr(lang, it.english, it.hindi) }
+        MedicineDoses.isAsNeededMedicine(item) -> t("As needed", "ज़रूरत पड़ने पर")
+        MedicineDoses.notDaily(item) -> t("Not daily", "रोज़ नहीं")
+        else -> MedicineFrequencyRules.fromText(MedicineDoses.frequencyText(item.detail))?.let { t(it.english, it.hindi) }
+            ?: if (doses.size > 1) t("${doses.size} times a day", "दिन में ${doses.size} बार") else t("Once a day", "दिन में एक बार")
+    }
+}
+
+/** Today's doses as a small pill: "1 of 2" while some are due, a green tick once all are taken, red once one was not taken. Nothing without doses. */
+@Composable private fun MedicineTodayStatus(itemId: String, states: Map<String, MedicineDoseState>) {
+    val t = careText()
+    if (states.isEmpty()) return
+    val total = states.size; val taken = MedicineDoses.takenCount(states)
+    val notTaken = states.values.any { it == MedicineDoseState.MISSED }
+    val all = MedicineDoses.allTaken(states)
+    val tone = when { notTaken -> SaharaTone.Error; all -> SaharaTone.Success; else -> SaharaTone.Neutral }
+    val text = when { all -> t("Taken", "ली"); notTaken -> t("Not taken", "नहीं ली"); else -> t("$taken of $total", "$total में से $taken") }
+    Surface(shape = RoundedCornerShape(50), color = tone.wash, modifier = Modifier.testTag("medicine-status-$itemId")) {
+        Row(Modifier.padding(horizontal = 10.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            if (all) { Icon(Icons.Default.Check, null, Modifier.size(16.dp), tint = tone.ink); Spacer(Modifier.width(4.dp)) }
+            Text(text, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = tone.ink, maxLines = 1, softWrap = false)
         }
     }
 }

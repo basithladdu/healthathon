@@ -89,7 +89,9 @@ internal class SimpleSpeaker(context: Context) {
 internal object SimpleModeStore {
     val revision = MutableStateFlow(0)
     private fun preferences(context: Context, namespace: String) = context.applicationContext.getSharedPreferences("sahara-simple-mode-${namespace.ifBlank { "guest" }}", 0)
-    fun isOn(context: Context, namespace: String, personId: String): Boolean = personId.isNotBlank() && preferences(context, namespace).getBoolean("on:$personId", false)
+    /** On when chosen in More; with no choice yet, [byDefault] decides (on for a patient aged 60+, see [SimpleModeRules.autoOn]). */
+    fun isOn(context: Context, namespace: String, personId: String, byDefault: Boolean = false): Boolean = personId.isNotBlank() &&
+        preferences(context, namespace).let { if (it.contains("on:$personId")) it.getBoolean("on:$personId", false) else byDefault }
     fun setOn(context: Context, namespace: String, personId: String, on: Boolean) {
         if (personId.isBlank()) return
         preferences(context, namespace).edit().putBoolean("on:$personId", on).apply(); revision.value++
@@ -101,10 +103,10 @@ internal object SimpleModeStore {
     }
 }
 
-@Composable internal fun rememberSimpleModeOn(namespace: String, personId: String): Boolean {
+@Composable internal fun rememberSimpleModeOn(namespace: String, personId: String, byDefault: Boolean = false): Boolean {
     val context = LocalContext.current
     val revision by SimpleModeStore.revision.collectAsStateWithLifecycle()
-    return remember(namespace, personId, revision) { SimpleModeStore.isOn(context, namespace, personId) }
+    return remember(namespace, personId, revision, byDefault) { SimpleModeStore.isOn(context, namespace, personId, byDefault) }
 }
 
 @Composable internal fun rememberSimpleMuted(namespace: String, personId: String): Boolean {

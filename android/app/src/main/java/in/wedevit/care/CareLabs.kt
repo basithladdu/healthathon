@@ -3,6 +3,7 @@ package `in`.wedevit.care
 
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -41,7 +42,7 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
 }.groupBy { (item, data) -> item.title.trim().lowercase() to data.unit.trim() }.values
     .map { values -> values.sortedByDescending { labEpoch(it.first) } }.sortedByDescending { labEpoch(it.first().first) }
 
-@Composable fun CareLabs(vm: CareModel) { val t = careText();
+@Composable fun CareLabs(vm: CareModel, onBack: (() -> Unit)? = saharaSystemBack()) { val t = careText();
     val entries by vm.items.collectAsStateWithLifecycle()
     val selected by vm.selected.collectAsStateWithLifecycle()
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
@@ -52,12 +53,13 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
     var editingDay by remember { mutableStateOf<TreatmentDay?>(null) }
     val treatmentDays = TreatmentDayRules.days(entries, selected)
     val groups = labGroups(entries.filter { it.personId == selected && it.title.contains(query.trim(), ignoreCase = true) })
+    val groupsShown = rememberShownCount("$selected:$query")
     LazyColumn(Modifier.fillMaxSize().testTag("lab-history"), contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         // The info-blue Labs band; Add sits on it as a white round button.
-        item { SaharaSectionBand(t("Lab history", "जाँच रिपोर्टें"), SaharaSection.Labs) { if (canEdit) FilledTonalIconButton(onClick = { adding = true }, modifier = Modifier.size(48.dp), colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = Paper, contentColor = SaharaSection.Labs.ink)) { Icon(Icons.Default.Add, t("Add a lab result", "जाँच का नतीजा जोड़ें")) } } }
+        item { SaharaSectionBand(t("Lab history", "जाँच रिपोर्टें"), SaharaSection.Labs, onBack = onBack, backTag = "labs-back") { if (canEdit) FilledTonalIconButton(onClick = { adding = true }, modifier = Modifier.size(48.dp), colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = Paper, contentColor = SaharaSection.Labs.ink)) { Icon(Icons.Default.Add, t("Add a lab result", "जाँच का नतीजा जोड़ें")) } } }
         item { OutlinedTextField(query, { query = it }, placeholder = { Text(t("Find a test", "जाँच खोजें")) }, leadingIcon = { Icon(Icons.Default.Search, null) }, trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { query = "" }) { Icon(Icons.Default.Close, t("Clear search", "खोज मिटाएँ")) } }, singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) }
         if (groups.isEmpty()) item { SurfaceCard(SaharaSection.Labs.wash) { SaharaIconChip(Icons.Default.Science, SaharaSection.Labs, size = 52); Spacer(Modifier.height(12.dp)); Text(if (query.isBlank()) t("No results yet", "अभी कोई नतीजा नहीं") else t("No matching results", "कोई नतीजा नहीं मिला"), fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk); if (query.isBlank()) { if (canEdit) TextButton(onClick = { adding = true }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Add a result", "नतीजा जोड़ें")) } } else TextButton(onClick = { query = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Clear search", "खोज मिटाएँ")) } } }
-        items(groups, key = { values -> "${values.first().first.title.lowercase()}:${values.first().second.unit}" }) { values -> Box(Modifier.animateItem()) { LabHistoryCard(vm, values, treatmentDays, onEdit = { editing = it }) } }
+        cappedItems(groups, groupsShown, key = { values -> "${values.first().first.title.lowercase()}:${values.first().second.unit}" }, tag = "lab-groups") { values -> Box(Modifier.animateItem()) { LabHistoryCard(vm, values, treatmentDays, onEdit = { editing = it }) } }
         // Results first; treatment days, which only mark the charts, come after them.
         item(key = "treatment-days") { SurfaceCard {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -78,21 +80,45 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
     editingDay?.let { day -> TreatmentDayEditor(vm, day) { editingDay = null } }
 }
 
+/**
+ * One test as one compact row (clinical team, 24 Nov 2026): name, latest value and date, a small arrow against the result before it,
+ * and the number of results. Tapping it opens its graph and results below; closed by default, so the page stays short.
+ */
 @Composable private fun LabHistoryCard(vm: CareModel, values: List<Pair<CareItem, CareEntry>>, treatmentDays: List<TreatmentDay>, onEdit: (CareItem) -> Unit) { val t = careText();
     val latest = values.first()
-    // Each test on the info-blue Labs wash, its latest value in the Labs ink.
-    SurfaceCard(SaharaSection.Labs.wash) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
-            Column(Modifier.weight(1f)) {
-                Text(latest.first.title, Modifier.a11yHeading(), fontWeight = FontWeight.Medium, fontSize = 18.sp, fontFamily = SaharaTitleFont, color = DoctorCardInk)
-                Text("${latest.second.value} ${latest.second.unit}", color = SaharaSection.Labs.ink, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                Text(labDateText(latest.first, t), fontSize = 14.sp, color = DoctorCardSub)
+    val key = latest.first.title.trim().lowercase()
+    var open by rememberSaveable(key, latest.second.unit) { mutableStateOf(false) }
+    val now = latest.second.value.toDoubleOrNull(); val before = values.getOrNull(1)?.second?.value?.toDoubleOrNull()
+    val trend = if (now == null || before == null) null else now.compareTo(before).coerceIn(-1, 1)
+    val arrow = when (trend) { 1 -> "↑"; -1 -> "↓"; 0 -> "→"; else -> "" }
+    val arrowWords = when (trend) { 1 -> t("Higher than last time", "पिछली बार से ज़्यादा"); -1 -> t("Lower than last time", "पिछली बार से कम"); 0 -> t("Same as last time", "पिछली बार जितना"); else -> "" }
+    val shape = RoundedCornerShape(16.dp)
+    Surface(shape = shape, color = SaharaSection.Labs.wash, border = androidx.compose.foundation.BorderStroke(1.dp, if (open) SaharaSection.Labs.solid else DoctorHairline), modifier = Modifier.fillMaxWidth().animateContentSize()) {
+        Column {
+            Row(Modifier.fillMaxWidth().heightIn(min = 64.dp).clickable(role = androidx.compose.ui.semantics.Role.Button) { open = !open }.padding(horizontal = 14.dp, vertical = 10.dp).testTag("lab-test-$key"),
+                verticalAlignment = Alignment.CenterVertically) {
+                SaharaIconChip(Icons.Default.Science, SaharaSection.Labs, size = 36)
+                Spacer(Modifier.width(12.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(latest.first.title, Modifier.a11yHeading(), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, lineHeight = 20.sp, color = DoctorCardInk, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("${latest.second.value} ${latest.second.unit}", color = SaharaSection.Labs.ink, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+                        if (arrow.isNotEmpty()) Text(arrow, color = DoctorCardInk, fontSize = 17.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 6.dp).semantics { contentDescription = arrowWords }.testTag("lab-trend-arrow"))
+                    }
+                    Text(labDateText(latest.first, t), fontSize = 14.sp, color = DoctorCardSub, maxLines = 1)
+                }
+                Spacer(Modifier.width(8.dp))
+                LabPill(if (values.size == 1) t("1 result", "1 नतीजा") else t("${values.size} results", "${values.size} नतीजे"), Paper, SaharaSection.Labs.ink)
+                SaharaChevron(open, if (open) t("Hide details", "जानकारी छिपाएँ") else t("Show details", "जानकारी देखें"))
             }
-            Spacer(Modifier.width(8.dp))
-            LabPill(if (values.size == 1) t("1 result", "1 नतीजा") else t("${values.size} results", "${values.size} नतीजे"), SaharaSection.Labs.solid, SaharaSection.Labs.onSolid)
+            if (open) Column(Modifier.fillMaxWidth().padding(start = 14.dp, end = 14.dp, bottom = 12.dp).testTag("lab-test-$key-open")) {
+                if (values.size > 1) LabHistoryPlot(values, treatmentDays)
+                // The newest three results; the rest wait behind "Show older" so one test never fills the screen (24 Nov).
+                val resultsShown = rememberShownCount(latest.first.id, initial = 3)
+                values.shownOf(resultsShown, initial = 3).forEach { (item, data) -> LabResultRow(vm, item, data, showDate = true, onEdit = { onEdit(item) }) }
+                SaharaShowOlder(values.size, resultsShown, initial = 3, tag = "lab-results")
+            }
         }
-        if (values.size > 1) LabHistoryPlot(values, treatmentDays)
-        values.forEach { (item, data) -> LabResultRow(vm, item, data, showDate = true, onEdit = { onEdit(item) }) }
     }
 }
 

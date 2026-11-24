@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.sp
     val interaction = remember { MutableInteractionSource() }
     // A tappable card carries a 3:1 edge so it reads as one control on the cream ground.
     Card(onClick = onClick, interactionSource = interaction, modifier = modifier.saharaAppear().saharaContentSize().saharaPress(interaction), shape = RoundedCornerShape(SaharaRadius.Lg),
-        colors = CardDefaults.cardColors(containerColor = color), border = BorderStroke(1.dp, SaharaColors.Edge), content = content)
+        colors = CardDefaults.cardColors(containerColor = color), border = BorderStroke(1.dp, SaharaColors.Line), content = content)
 }
 
 @Composable fun CareNavigation(selected: Int, clinician: Boolean, onSelect: (Int) -> Unit) {

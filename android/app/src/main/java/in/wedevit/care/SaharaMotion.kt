@@ -289,7 +289,8 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
 }
 
 /** Animated content size for cards that grow or shrink (expanding sections, edited text). */
-fun Modifier.saharaContentSize(): Modifier = animateContentSize(SaharaMotion.tween(SaharaMotion.EXPAND_MS))
+/** Cards no longer animate their size (owner, 24 Nov: cards "keep expanding"); content changes in place. */
+@Suppress("UnusedReceiverParameter") fun Modifier.saharaContentSize(): Modifier = this
 
 /** Crossfades between loading, empty and content states keyed by [state]. */
 @Composable fun <S> SaharaStateSwitch(state: S, modifier: Modifier = Modifier, label: String = "Sahara state", content: @Composable AnimatedContentScope.(S) -> Unit) =

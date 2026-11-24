@@ -49,7 +49,10 @@ private fun conversationDate(at: Long?, hindi: Boolean) = at?.takeIf { it > 0 }?
         if (model.earlierPublished.isNotEmpty()) {
             Column(Modifier.testTag("conversation-earlier"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 ConversationHeading(t("Earlier", "पहले की"))
-                model.earlierPublished.forEach { discussion -> key(model.patientId, discussion.id) { DiscussionReadingCard(discussion, highlighted = false) } }
+                // The newest five earlier talks, then "Show older" (24 Nov).
+                val earlierShown = rememberShownCount(model.patientId)
+                model.earlierPublished.shownOf(earlierShown).forEach { discussion -> key(model.patientId, discussion.id) { DiscussionReadingCard(discussion, highlighted = false) } }
+                SaharaShowOlder(model.earlierPublished.size, earlierShown, tag = "conversation-earlier")
             }
         }
         model.priorSample?.let { discussion ->

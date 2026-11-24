@@ -78,6 +78,8 @@ private fun medicineTime(at: Long?) = at?.let { DateTimeFormatter.ofPattern("d M
     DisposableEffect(account,personId) {onDispose {changedCallback(false)}}
     LaunchedEffect(selected,editable,sessionId) {if(!same(true)){add=false;edit=null;report=null;retire=null;prescriptionEditor=null;pastGroupId=null;scannerOpen=false;prescriptionDraftRows=null}}
     BackHandler(busy||add||edit!=null||report!=null||retire!=null||prescriptionEditor!=null||pastGroupId!=null) {if(!busy){add=false;edit=null;report=null;retire=null;prescriptionEditor=null;pastGroupId=null}}
+    val intakeShown = rememberShownCount(personId)
+    val pastRxShown = rememberShownCount(personId)
     if(!same()) {Text(t("This person's medicine record is unavailable. Return to Patients.", "इस व्यक्ति का दवा रिकॉर्ड उपलब्ध नहीं है। मरीज़ों पर लौटें।"),Modifier.padding(20.dp));return}
     if(scannerOpen) {
         MedicineScanner(vm,onClose={scannerOpen=false},onAccount={},onReviewedMedicines={drafts ->
@@ -103,10 +105,13 @@ private fun medicineTime(at: Long?) = at?.let { DateTimeFormatter.ofPattern("d M
         if(tab=="Intake history") {
             item {Heading(t("Intake history", "दवा लेने का इतिहास"),22)}
             if(loaded&&snapshot.events.isEmpty())item {MedicineEmpty(t("No detailed intake reports yet", "अभी दवा लेने की कोई विस्तृत सूचना नहीं"))}
-            snapshot.events.groupBy {medicineDay(it.plannedAt?:it.reportedTakenAt?:it.loggedAt)}.forEach {(day,dayEvents)->
+            // Newest reports first, five at a time behind "Show older" (24 Nov).
+            val intake=snapshot.events.sortedByDescending {it.plannedAt?:it.reportedTakenAt?:it.loggedAt}
+            intake.shownOf(intakeShown).groupBy {medicineDay(it.plannedAt?:it.reportedTakenAt?:it.loggedAt)}.forEach {(day,dayEvents)->
                 item(key="day-$day") {Text(day,fontSize=14.sp,fontWeight=FontWeight.Medium,color=DoctorCardSub,modifier=Modifier.padding(top=4.dp))}
                 items(dayEvents,key={it.id}) {event->MedicineReportCard(event,snapshot.events,System.currentTimeMillis())}
             }
+            if(intake.size>SaharaShowMore.INITIAL) item(key="intake-show-more") {SaharaShowOlder(intake.size,intakeShown,tag="doctor-intake")}
         } else {
             val excluded=prescriptions?.excludedMedicineIds.orEmpty()
             val groupedIds=prescriptions?.medicines?.map {it.medicineId}?.toSet().orEmpty()
@@ -115,7 +120,7 @@ private fun medicineTime(at: Long?) = at?.let { DateTimeFormatter.ofPattern("d M
                 val removed=prescriptions?.medicines?.filter {it.prescriptionId==prescriptions?.state?.currentId&&it.removedAt>0}.orEmpty()
                 if(removed.isNotEmpty())item {Text(t("Removed from the current list", "अभी की सूची से हटाई गई"),fontSize=20.sp,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont,color=DoctorCardInk)}
                 items(removed,key={"removed-${it.prescriptionId}-${it.medicineId}"}) {row->MedicineSurface(false) {Text(row.name,fontSize=20.sp,fontWeight=FontWeight.Medium,fontFamily=SaharaTitleFont,color=DoctorCardInk);Text(row.instructions,fontSize=15.sp,color=DoctorCardSub);Text(t("Removed ${medicineTime(row.removedAt)}", "${medicineTime(row.removedAt)} को हटाई गई"),fontSize=14.sp,color=DoctorCardFaint);TextButton(onClick={tab="Intake history"},modifier=Modifier.heightIn(min=48.dp)){Text(t("View intake history", "दवा लेने का इतिहास देखें"),color=DoctorAccent)}}}
-                items(prescriptions?.groups?.filter {it.id!=prescriptions?.state?.currentId}.orEmpty(),key={"rx-${it.id}"}) {group ->
+                cappedItems(prescriptions?.groups?.filter {it.id!=prescriptions?.state?.currentId}.orEmpty(),pastRxShown,key={"rx-${it.id}"},tag="doctor-past-prescriptions") {group ->
                     val count=prescriptions!!.members(group.id).size
 
                     Card(onClick={pastGroupId=group.id},colors=CardDefaults.cardColors(containerColor=DoctorCardReport),border=BorderStroke(1.dp,DoctorHairline),shape=RoundedCornerShape(16.dp),modifier=Modifier.fillMaxWidth().heightIn(min=100.dp)) {Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(6.dp)){Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.Top){Text(group.title,fontSize=20.sp,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont,color=DoctorCardInk,modifier=Modifier.weight(1f));Spacer(Modifier.width(8.dp));MedicineChip("$count medicines",DoctorStatusRest,DoctorStatusRestBg)};Text("${if(group.prescribedOn.isBlank())t("Start date not recorded", "शुरू की तारीख़ दर्ज नहीं") else group.prescribedOn}  to  ${if(group.endedAt>0)medicineDay(group.endedAt) else t("end date not recorded", "ख़त्म होने की तारीख़ दर्ज नहीं")}",fontSize=15.sp,color=DoctorCardInk)}}
@@ -124,7 +129,9 @@ private fun medicineTime(at: Long?) = at?.let { DateTimeFormatter.ofPattern("d M
             if(loaded&&shown.isEmpty()&&(tab=="Current"||prescriptions?.groups?.none {it.id!=prescriptions?.state?.currentId}!=false)&&!(tab=="Past"&&prescriptions?.medicines?.any {it.prescriptionId==prescriptions?.state?.currentId&&it.removedAt>0}==true))item {MedicineEmpty(if(tab=="Current")t("No current medicines recorded", "अभी की कोई दवा दर्ज नहीं") else t("No past medicines recorded", "कोई पुरानी दवा दर्ज नहीं"))}
             items(shown,key={it.id}) {medicine->MedicineSurface(tab=="Current") {
                 var menu by remember(medicine.id){mutableStateOf(false)}
-                val lines=medicine.detail.lines().filter {it.isNotBlank()}
+                // Known phrases ("For pain.", "Take with food.") in the reader's language; the saved directions are unchanged (MedicinePhrases).
+                val phraseLang=careLanguage()
+                val lines=medicine.detail.lines().filter {it.isNotBlank()}.map {MedicinePhrases.shown(it,phraseLang)}
                 Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){Text(medicine.title,fontSize=20.sp,fontWeight=FontWeight.Medium,modifier=Modifier.weight(1f), fontFamily = SaharaTitleFont,color=DoctorCardInk);Box {IconButton(onClick={menu=true},modifier=Modifier.size(48.dp)){Icon(Icons.Default.MoreVert,t("Medicine actions", "दवा के विकल्प"),tint=DoctorCardSub)};DropdownMenu(menu,{menu=false}){DropdownMenuItem(text={Text(t("Edit list", "सूची बदलें"))},onClick={menu=false;if(prescriptions!=null)openPrescription(false)else edit=medicine},enabled=editable&&!busy);DropdownMenuItem(text={Text(t("Record report", "सूचना दर्ज करें"))},onClick={menu=false;if(same(true)&&loaded)report=medicine},enabled=editable&&loaded&&!busy);DropdownMenuItem(text={Text(t("Intake history", "दवा लेने का इतिहास"))},onClick={menu=false;tab="Intake history"})}}}
                 Text(lines.firstOrNull()?:t("Directions not recorded", "निर्देश दर्ज नहीं"),fontSize=15.sp,lineHeight=22.sp,color=DoctorCardInk)
                 if(lines.size>1)Text(lines.drop(1).joinToString("\n"),fontSize=14.sp,color=DoctorCardSub)
@@ -235,7 +242,7 @@ private fun medicineDay(at: Long) = DateTimeFormatter.ofPattern("EEE, d MMM yyyy
 @Composable private fun MedicineSurface(current: Boolean, content: @Composable ColumnScope.() -> Unit) { Surface(shape = RoundedCornerShape(16.dp), color = if(current) DoctorCardMedicine else DoctorCardReport, border = if(current) null else BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp), content = content) } }
 
 /** Intake statuses stay English (the chip colour reads them); only the shown label is Hindi. */
-internal val MedicineStatusHindi = mapOf("Late reported" to "देर से लेने की सूचना", "Taken reported" to "लेने की सूचना", "Skipped reported" to "छोड़ने की सूचना", "Check-off corrected" to "टिक ठीक किया गया",
+internal val MedicineStatusHindi = mapOf("Late reported" to "देर से लेने की सूचना", "Taken reported" to "लेने की सूचना", "Skipped reported" to "छोड़ने की सूचना", "Not taken reported" to "न लेने की सूचना", "Check-off corrected" to "टिक ठीक किया गया",
     "Moved to past medicines" to "पुरानी दवाओं में डाली गई", "Returned to current medicines" to "अभी की दवाओं में वापस", "Upcoming" to "आने वाली", "Not logged" to "दर्ज नहीं", "Plan followed by a report" to "योजना के बाद सूचना मिली")
 
 @Composable private fun MedicineChip(label: String, fg: androidx.compose.ui.graphics.Color, bg: androidx.compose.ui.graphics.Color) { val t = careText(); Surface(color = bg, shape = RoundedCornerShape(50)) { Text(t(label, MedicineStatusHindi[label] ?: label), Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = fg) } }

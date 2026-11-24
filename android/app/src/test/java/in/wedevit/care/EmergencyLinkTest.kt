@@ -4,6 +4,7 @@ import com.google.zxing.BinaryBitmap
 import com.google.zxing.RGBLuminanceSource
 import com.google.zxing.common.HybridBinarizer
 import com.google.zxing.qrcode.QRCodeReader
+import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Test
 import java.time.ZoneId
@@ -38,6 +39,12 @@ class EmergencyLinkTest {
         val status = EmergencyLinkRules.decodeStatus("""{"live":true,"views":3,"last_viewed_at":"2026-10-28T01:00:00+05:30","expires_at":"2027-10-27T20:23:21+00:00"}""")
         assertTrue(status.live); assertEquals(3, status.views); assertNotNull(status.lastViewedAt)
         assertFalse(EmergencyLinkRules.decodeStatus("""{"live":false}""").live)
+        // 24 Nov: each published card is a version with its own token.
+        val published = EmergencyLinkRules.decodeCreated("""{"token":"$token","created_at":"2026-10-27T20:23:21+00:00","expires_at":"2027-11-24T00:00:00+00:00","version":4,"published_at":"2026-11-24T10:00:00+00:00"}""", 0)
+        assertEquals(4, published.version); assertEquals(1_795_514_400_000L, published.publishedAt)
+        assertEquals(1, link.version); assertEquals(link.createdAt, link.publishedAt)
+        assertEquals(4, EmergencyLinkRules.decodeStatus("""{"live":true,"views":0,"version":4}""").version)
+        assertNull(EmergencyLinkRules.decodeStatus("""{"live":true,"views":0}""").version)
     }
 
     @Test fun webCopyHasOnlyTheTickedSectionsInFull() {
@@ -72,14 +79,36 @@ class EmergencyLinkTest {
         assertTrue(card.getJSONArray("notIncluded").toString().contains("medicines (no room)"))
     }
 
-    @Test fun linkIsKeptAcrossCardUpdatesAndRestarts() {
-        val first = EmergencyCardRecord.make("p1", source, EmergencySection.entries.toSet(), null, at, zone, "AB12CD34").copy(link = EmergencyLink(token, at, at + 1000))
+    @Test fun linkSurvivesRestartsAndANewCardWaitsForItsOwnVersion() {
+        val first = EmergencyCardRecord.make("p1", source, EmergencySection.entries.toSet(), null, at, zone, "AB12CD34").copy(link = EmergencyLink(token, at, at + 1000, version = 2, publishedAt = at + 7))
         val again = EmergencyCardRecord.decode(first.encode())
         assertEquals(first.link, again.link)
+        // A link saved by an app from before 24 Nov reads as version 1, published when it was made.
+        val legacy = JSONObject(first.encode()).apply { put("link", JSONObject().put("token", token).put("createdAt", at).put("expiresAt", at + 1000)) }.toString()
+        assertEquals(EmergencyLink(token, at, at + 1000, 1, at), EmergencyCardRecord.decode(legacy).link)
+        // The next card is published as a new version with a new token, so it starts without the old link.
         val next = EmergencyCardRecord.make("p1", source, setOf(EmergencySection.NAME), again, at + 5, zone, "CD34EF56")
-        assertEquals(token, next.link?.token)
+        assertNull(next.link)
         assertEquals(2, next.number)
         assertNull(EmergencyCardRecord.decode(first.copy(link = null).encode()).link)
+    }
+
+    @Test fun webCopyCarriesNextOfKinDoctorAndMedicineTable() {
+        val withDoctor = source.copy(doctor = EmergencyDoctor("Dr Shirin", "+91 90000 00007", "Sahara Clinic", "+91 40 1111 2222"),
+            medicines = listOf(EmergencyMedicine("Morphine", "Strength: 5 mg\nHow often: Every 4 hours")))
+        val card = EmergencyLinkRules.card(withDoctor, EmergencyCardRecord.make("p1", withDoctor, EmergencySection.entries.toSet(), null, at, zone, "AB12CD34"))
+        assertEquals(2, card.getInt("v"))
+        assertEquals("Ravi", card.getJSONObject("nextOfKin").getString("name"))
+        assertEquals("+91 90000 00002", card.getJSONObject("nextOfKin").getString("phone"))
+        val doctor = card.getJSONObject("doctor")
+        assertEquals("Dr Shirin", doctor.getString("name")); assertEquals("Sahara Clinic", doctor.getString("place")); assertEquals("+91 40 1111 2222", doctor.getString("landline"))
+        assertEquals(0, card.getJSONArray("otherContacts").length())
+        val medicine = card.getJSONArray("medicines").getJSONObject(0)
+        assertEquals("5 mg", medicine.getString("strength")); assertEquals("Every 4 hours", medicine.getString("when"))
+        // Kept for pages deployed before 24 Nov.
+        assertEquals(1, card.getJSONArray("contacts").length()); assertTrue(medicine.has("detail"))
+        assertFalse(card.getJSONArray("notIncluded").toString().contains("no treating doctor saved"))
+        assertTrue(EmergencyLinkRules.card(source, EmergencyCardRecord.make("p1", source, EmergencySection.entries.toSet(), null, at, zone, "AB12CD35")).getJSONArray("notIncluded").toString().contains("no treating doctor saved"))
     }
 
     @Test fun linkQrScansBackToTheUrl() {

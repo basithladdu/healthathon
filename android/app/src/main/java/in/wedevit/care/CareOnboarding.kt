@@ -60,6 +60,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -122,10 +123,10 @@ internal object OnboardingFlow {
 
     /** The optional profile details, or null when every one was skipped (then only the name is saved, as before). */
     fun profile(ageText: String, illness: String, illnessSince: String = "", doctorName: String = "", doctorPlace: String = "", doctorPhone: String = "",
-        treatments: List<String> = emptyList(), treatmentNote: String = ""): CarePatientProfile? {
+        treatments: List<String> = emptyList(), treatmentNote: String = "", doctorLandline: String = ""): CarePatientProfile? {
         val p = CarePatientProfile(age = CarePatientProfileRules.age(ageText).first, illness = illness.trim(), illnessSince = illnessSince.trim(),
             doctorName = doctorName.trim(), doctorPlace = doctorPlace.trim(), doctorPhone = doctorPhone.trim(),
-            treatments = treatments.filter { it in CarePatientProfile.TREATMENTS }.distinct(), treatmentNote = treatmentNote.trim())
+            treatments = treatments.filter { it in CarePatientProfile.TREATMENTS }.distinct(), treatmentNote = treatmentNote.trim(), doctorLandline = doctorLandline.trim())
         return if (p == CarePatientProfile()) null else p
     }
 
@@ -189,10 +190,11 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
     var doctorName by rememberSaveable { mutableStateOf("") }
     var doctorPlace by rememberSaveable { mutableStateOf("") }
     var doctorPhone by rememberSaveable { mutableStateOf("") }
+    var doctorLandline by rememberSaveable { mutableStateOf("") }
     var treatmentCodes by rememberSaveable { mutableStateOf("") }
     var treatmentNote by rememberSaveable { mutableStateOf("") }
     val treatments = OnboardingFlow.codes(treatmentCodes)
-    fun answers() = OnboardingFlow.profile(age, illness, illnessSince, doctorName, doctorPlace, doctorPhone, treatments, treatmentNote)
+    fun answers() = OnboardingFlow.profile(age, illness, illnessSince, doctorName, doctorPlace, doctorPhone, treatments, treatmentNote, doctorLandline)
     var formBusy by remember { mutableStateOf(false) }
     var direction by remember { mutableStateOf(SaharaMotion.Direction.Forward) }
     var walkthroughChooser by rememberSaveable { mutableStateOf(false) }
@@ -232,6 +234,7 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
             when (shown) {
                 OnboardingStep.Intro -> HorizontalPager(pager, Modifier.fillMaxSize().testTag("onboarding-intro")) { page -> IntroPage(page) }
                 OnboardingStep.Role -> OnboardingPage {
+                    OnboardingHero(SaharaLottieKind.Sprout, SaharaTone.Leaf, compact = true)
                     StepHeading(t("Who are you?", "आप कौन हैं?"), t("Choose the one that fits you best.", "जो आप पर सबसे सही बैठे, वह चुनें।"))
                     val large = !welcomeRolesStacked(LocalConfiguration.current.screenWidthDp, LocalDensity.current.fontScale)
                     listOf(
@@ -241,6 +244,7 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
                     ).forEachIndexed { index, choice -> OnboardingChoiceCard(choice, index, selected = chosen == choice.key, enabled = !locked, large = large) { pick(choice.key) } }
                 }
                 OnboardingStep.Account -> OnboardingPage {
+                    OnboardingHero(SaharaLottieKind.Document, SaharaTone.Indigo, compact = true)
                     StepHeading(t("Do you want an account?", "क्या आप खाता बनाना चाहते हैं?"),
                         t("With an account, your records are kept safe if you change phones, and family and doctors can join you.", "खाते के साथ, फ़ोन बदलने पर भी आपके रिकॉर्ड सुरक्षित रहते हैं, और परिवार व डॉक्टर आपसे जुड़ सकते हैं।"))
                     val choices = buildList {
@@ -271,45 +275,69 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
                     CompositionLocalProvider(LocalSignupIntent provides SignupIntent(create = false, role = SignupRole.DOCTOR)) {
                         if (doctorContent != null) doctorContent.invoke(close) { formBusy = it }
                         else OnboardingPage {
+                            OnboardingHero(SaharaLottieKind.Heart, SaharaTone.Indigo)
                             StepHeading(t("Doctor sign in", "डॉक्टर साइन इन"), null)
                             SaharaPrimaryButton(t("Sign in", "साइन इन"), onClick = onSharedWorkspace, enabled = !locked, modifier = Modifier.fillMaxWidth().testTag("welcome-open-doctor-workspace"))
                         }
                     }
                 }
                 OnboardingStep.Name -> OnboardingPage {
+                    OnboardingHero(if (family) SaharaLottieKind.Hug else SaharaLottieKind.Wave, SaharaTone.Teal)
                     StepHeading(if (family) t("What is the name of the person you care for?", "जिनकी देखभाल करते हैं, उनका नाम क्या है?") else t("What is your name?", "आपका नाम क्या है?"),
                         if (family) t("You can add more people later.", "आप बाद में और लोग जोड़ सकते हैं।") else null)
                     OnboardingField(name, { name = it.take(100) }, t("Name", "नाम"), "onboarding-name",
                         KeyboardOptions(capitalization = KeyboardCapitalization.Words, keyboardType = KeyboardType.Text, imeAction = ImeAction.Next)) { if (name.isNotBlank()) go(OnboardingStep.Age) }
-                    if (signedIn && accountContent != null) TextButton(onClick = { go(OnboardingStep.SignIn) }, enabled = !locked, modifier = Modifier.heightIn(min = 48.dp).testTag("onboarding-your-account")) {
+                    if (signedIn && accountContent != null) TextButton(onClick = { go(OnboardingStep.SignIn) }, enabled = !locked, modifier = Modifier.align(Alignment.CenterHorizontally).heightIn(min = 56.dp).testTag("onboarding-your-account")) {
                         Icon(Icons.Default.AccountCircle, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(t("Your account", "आपका खाता"), fontWeight = FontWeight.SemiBold)
                     }
                 }
                 OnboardingStep.Age -> OnboardingPage {
+                    OnboardingHero(SaharaLottieKind.Calendar, SaharaTone.Marigold)
                     StepHeading(if (family) t("How old are they?", "उनकी उम्र क्या है?") else t("How old are you?", "आपकी उम्र क्या है?"), t("Optional", "ज़रूरी नहीं"))
                     OnboardingField(age, { value -> age = value.filter(Char::isDigit).take(3) }, t("Age in years", "उम्र (साल)"), "onboarding-age",
                         KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next), error = ageError?.let { t(it.en, it.hi) }) { if (ageError == null) go(OnboardingStep.Illness) }
                 }
                 OnboardingStep.Illness -> OnboardingPage {
+                    OnboardingHero(SaharaLottieKind.Breathe, SaharaTone.Plum, compact = true)
                     StepHeading(t("About the illness", "बीमारी के बारे में"),
                         t("Optional", "ज़रूरी नहीं") + " · " + if (signedIn) t("Shared only with the family and doctors you invite.", "सिर्फ़ उन्हीं परिवार वालों और डॉक्टरों के साथ साझा होगा जिन्हें आप बुलाएँ।") else t("Kept on this phone.", "इसी फ़ोन पर रहेगा।"))
+                    // Tap first (24 Nov): the common illnesses as chips; "Other" or the field below for anything else. A tapped chip fills the field.
+                    val illnessFocus = remember { FocusRequester() }
+                    IllnessChips(illness, enabled = !locked, onPick = { label ->
+                        haptic.performHapticFeedback(HapticFeedbackType.SegmentTick)
+                        illness = if (illness.trim() == label) "" else label
+                    }, onOther = { wasChip ->
+                        haptic.performHapticFeedback(HapticFeedbackType.SegmentTick)
+                        if (wasChip) illness = ""
+                        runCatching { illnessFocus.requestFocus() }
+                    })
                     OnboardingField(illness, { illness = it.take(200) }, if (family) t("What illness are they living with?", "उन्हें कौन-सी बीमारी है?") else t("What illness are you living with?", "आपको कौन-सी बीमारी है?"), "onboarding-illness",
-                        KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, keyboardType = KeyboardType.Text, imeAction = ImeAction.Next),
-                        placeholder = t("For example: breast cancer, heart failure", "जैसे: स्तन कैंसर, हृदय की कमज़ोरी")) { focus.moveFocus(FocusDirection.Down) }
-                    OnboardingField(illnessSince, { illnessSince = it.take(20) }, t("Since when", "कब से"), "onboarding-illness-since",
-                        KeyboardOptions(capitalization = KeyboardCapitalization.Words, keyboardType = KeyboardType.Text, imeAction = ImeAction.Done),
-                        placeholder = t("Month and year, for example Mar 2025", "महीना और साल, जैसे मार्च 2025"), autoFocus = false) { go(OnboardingStep.CareDoctor) }
+                        KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, keyboardType = KeyboardType.Text, imeAction = ImeAction.Done),
+                        placeholder = t("For example: breast cancer, heart failure", "जैसे: स्तन कैंसर, हृदय की कमज़ोरी"), autoFocus = false, focusRequester = illnessFocus) { focus.clearFocus() }
+                    // Since when, by tap (24 Nov clinical meeting): Months or Years, then a number from 1 to 12. Nothing to type.
+                    Text(t("Since when", "कब से"), Modifier.fillMaxWidth().padding(top = 4.dp), fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = SaharaColors.Ink)
+                    CareDurationPicker(illnessSince, { picked ->
+                        haptic.performHapticFeedback(HapticFeedbackType.SegmentTick)
+                        focus.clearFocus()
+                        illnessSince = picked
+                    }, "onboarding-illness-since", Modifier.fillMaxWidth(), enabled = !locked, unitHeight = 56.dp)
                 }
                 OnboardingStep.CareDoctor -> OnboardingPage {
+                    OnboardingHero(SaharaLottieKind.Heart, SaharaTone.Rust, compact = true)
                     StepHeading(if (family) t("Which doctor are they seeing now?", "वे अभी किस डॉक्टर को दिखा रहे हैं?") else t("Which doctor are you seeing now?", "आप अभी किस डॉक्टर को दिखा रहे हैं?"), t("Optional", "ज़रूरी नहीं"))
+                    val phoneFocus = remember { FocusRequester() }; val landlineFocus = remember { FocusRequester() }
                     OnboardingField(doctorName, { doctorName = it.take(100) }, t("Doctor's name", "डॉक्टर का नाम"), "onboarding-doctor-name",
                         KeyboardOptions(capitalization = KeyboardCapitalization.Words, keyboardType = KeyboardType.Text, imeAction = ImeAction.Next)) { focus.moveFocus(FocusDirection.Down) }
                     OnboardingField(doctorPlace, { doctorPlace = it.take(120) }, t("Hospital or clinic", "अस्पताल या क्लिनिक"), "onboarding-doctor-place",
-                        KeyboardOptions(capitalization = KeyboardCapitalization.Words, keyboardType = KeyboardType.Text, imeAction = ImeAction.Next), autoFocus = false) { focus.moveFocus(FocusDirection.Down) }
-                    OnboardingField(doctorPhone, { value -> doctorPhone = value.filter { it.isDigit() || it in "+ -" }.take(20) }, t("Doctor's phone", "डॉक्टर का फ़ोन"), "onboarding-doctor-phone",
-                        KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Done), autoFocus = false) { go(OnboardingStep.Treatment) }
+                        KeyboardOptions(capitalization = KeyboardCapitalization.Words, keyboardType = KeyboardType.Text, imeAction = ImeAction.Next), autoFocus = false) { runCatching { phoneFocus.requestFocus() } }
+                    // Country code by tap (India first), the number on the phone keyboard; the hospital's landline is optional beside it.
+                    CarePhoneField(doctorPhone, { doctorPhone = it }, t("Doctor's phone", "डॉक्टर का फ़ोन"), "onboarding-doctor-phone", Modifier.fillMaxWidth(),
+                        large = true, container = SaharaColors.Surface, enabled = !locked, imeAction = ImeAction.Next, focusRequester = phoneFocus) { runCatching { landlineFocus.requestFocus() } }
+                    CarePhoneField(doctorLandline, { doctorLandline = it }, t("Hospital / landline number (optional)", "अस्पताल / लैंडलाइन नंबर (ज़रूरी नहीं)"), "onboarding-doctor-landline", Modifier.fillMaxWidth(),
+                        large = true, container = SaharaColors.Surface, enabled = !locked, imeAction = ImeAction.Done, focusRequester = landlineFocus) { go(OnboardingStep.Treatment) }
                 }
                 OnboardingStep.Treatment -> OnboardingPage {
+                    OnboardingHero(SaharaLottieKind.Pill, SaharaTone.Leaf, compact = true)
                     StepHeading(t("What treatment is going on now?", "अभी कौन-सा इलाज चल रहा है?"), t("Choose all that apply. Optional.", "जो भी लागू हों, सब चुनें। ज़रूरी नहीं।"))
                     TreatmentChips(treatments, enabled = !locked) { code ->
                         haptic.performHapticFeedback(HapticFeedbackType.SegmentTick)
@@ -338,7 +366,7 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
                         Modifier.weight(1f), color = SaharaColors.OnBandSub, fontSize = 14.sp, lineHeight = 20.sp)
                 }
                 OnboardingStep.Account -> TextButton(onClick = { runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url))).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } },
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = SaharaColors.OnBand)) {
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp), colors = ButtonDefaults.textButtonColors(contentColor = SaharaColors.OnBand)) {
                     Icon(Icons.Default.Policy, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(t("Privacy policy", "निजता नीति"), fontWeight = FontWeight.SemiBold)
                 }
                 OnboardingStep.Doctor -> SaharaPracticeEntry(t("Try a demo account", "डेमो खाता आज़माएँ"), t("Log in to a demo account", "डेमो खाते में लॉग इन करें"),
@@ -348,7 +376,7 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
                     val filled = when (dockStep) {
                         OnboardingStep.Age -> age.isNotBlank() && ageError == null
                         OnboardingStep.Illness -> illness.isNotBlank() || illnessSince.isNotBlank()
-                        OnboardingStep.CareDoctor -> doctorName.isNotBlank() || doctorPlace.isNotBlank() || doctorPhone.isNotBlank()
+                        OnboardingStep.CareDoctor -> doctorName.isNotBlank() || doctorPlace.isNotBlank() || doctorPhone.isNotBlank() || doctorLandline.isNotBlank()
                         else -> treatments.isNotEmpty() || treatmentNote.isNotBlank()
                     }
                     val next = when (dockStep) { OnboardingStep.Age -> OnboardingStep.Illness; OnboardingStep.Illness -> OnboardingStep.CareDoctor; OnboardingStep.CareDoctor -> OnboardingStep.Treatment; else -> OnboardingStep.Finish }
@@ -358,12 +386,12 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
                         when (dockStep) {
                             OnboardingStep.Age -> age = ""
                             OnboardingStep.Illness -> { illness = ""; illnessSince = "" }
-                            OnboardingStep.CareDoctor -> { doctorName = ""; doctorPlace = ""; doctorPhone = "" }
+                            OnboardingStep.CareDoctor -> { doctorName = ""; doctorPlace = ""; doctorPhone = ""; doctorLandline = "" }
                             else -> { treatmentCodes = ""; treatmentNote = "" }
                         }
                         go(next)
                     }, enabled = !locked,
-                        modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("onboarding-skip-step"), colors = ButtonDefaults.textButtonColors(contentColor = SaharaColors.OnBand)) {
+                        modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("onboarding-skip-step"), colors = ButtonDefaults.textButtonColors(contentColor = SaharaColors.OnBand)) {
                         Text(t("Skip for now", "अभी छोड़ें"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
                     }
                 }
@@ -389,14 +417,14 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
     val progress = OnboardingFlow.progress(step)
     val barAlpha by animateFloatAsState(if (progress == null) 0f else 1f, SaharaMotion.tween(SaharaMotion.VALUE_MS), label = "onboarding progress alpha")
     Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.size(48.dp)) {
-            if (canBack) IconButton(onClick = onBack, enabled = enabled, modifier = Modifier.size(48.dp).testTag("welcome-panel-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस"), tint = SaharaColors.Ink) }
+        Box(Modifier.size(56.dp)) {
+            if (canBack) IconButton(onClick = onBack, enabled = enabled, modifier = Modifier.size(56.dp).testTag("welcome-panel-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस"), tint = SaharaColors.Ink) }
         }
         Box(Modifier.weight(1f).padding(horizontal = 8.dp).graphicsLayer { alpha = barAlpha }) {
             SaharaProgressBar(progress ?: 0f, Modifier.testTag("onboarding-progress"), tone = SaharaTone.Rust, label = if (progress == null) null else t("Progress", "प्रगति") + " " + (progress * 100).toInt() + "%")
         }
-        Box(Modifier.widthIn(min = 48.dp), contentAlignment = Alignment.CenterEnd) {
-            if (step == OnboardingStep.Intro) TextButton(onClick = onSkip, modifier = Modifier.heightIn(min = 48.dp).testTag("onboarding-skip"), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) {
+        Box(Modifier.widthIn(min = 56.dp), contentAlignment = Alignment.CenterEnd) {
+            if (step == OnboardingStep.Intro) TextButton(onClick = onSkip, modifier = Modifier.heightIn(min = 56.dp).testTag("onboarding-skip"), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) {
                 Text(t("Skip", "छोड़ें"), fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
         }
@@ -408,10 +436,33 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(top = 8.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(14.dp), content = content)
 }
 
+/** The page's title and its one short line, centred under the [OnboardingHero] picture. */
 @Composable private fun StepHeading(title: String, detail: String?) {
-    Text(title, Modifier.fillMaxWidth().a11yHeading().testTag("onboarding-heading"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 28.sp, lineHeight = 34.sp, color = SaharaColors.Ink)
-    if (detail != null) Text(detail, Modifier.fillMaxWidth(), fontSize = 17.sp, lineHeight = 24.sp, color = SaharaColors.InkSub)
+    Text(title, Modifier.fillMaxWidth().a11yHeading().testTag("onboarding-heading"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 28.sp, lineHeight = 34.sp, textAlign = TextAlign.Center, color = SaharaColors.Ink)
+    if (detail != null) Text(detail, Modifier.fillMaxWidth(), fontSize = 17.sp, lineHeight = 24.sp, textAlign = TextAlign.Center, color = SaharaColors.InkSub)
     Spacer(Modifier.height(4.dp))
+}
+
+/**
+ * Every onboarding page opens with one Lottie, centred above its title on a soft round wash (24 Nov: "Lottie animations on
+ * everything"). Looping kinds loop calmly; the play-once kinds play three times and rest; Success and Confetti play once.
+ * With "Remove animations" or Battery Saver on, [SaharaLottie] shows its still frame. [compact] is for pages with choice cards or
+ * several fields, so the first card or field stays on screen; while the keyboard is open the picture shrinks out of its way.
+ */
+@Composable private fun OnboardingHero(kind: SaharaLottieKind, tone: SaharaTone, compact: Boolean = false, tag: String? = null, size: Dp? = null) {
+    val screenHeight = LocalConfiguration.current.screenHeightDp
+    val full = size ?: when {
+        compact -> if (screenHeight < 720) 112.dp else 140.dp
+        screenHeight < 700 -> 140.dp
+        else -> 176.dp
+    }
+    val imeOpen = WindowInsets.ime.getBottom(LocalDensity.current) > 0
+    val shown by animateDpAsState(if (imeOpen) full * .55f else full, SaharaMotion.tween(SaharaMotion.VALUE_MS), label = "onboarding hero")
+    val once = kind == SaharaLottieKind.Success || kind == SaharaLottieKind.Confetti
+    Box(Modifier.fillMaxWidth().height(shown).then(if (tag != null) Modifier.testTag(tag) else Modifier), contentAlignment = Alignment.Center) {
+        Box(Modifier.size(shown * .94f).clip(CircleShape).background(tone.wash))
+        SaharaLottie(kind, Modifier.size(shown * .8f), loop = kind.loops && !once, iterations = if (once) 1 else 3)
+    }
 }
 
 /**
@@ -441,8 +492,9 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
 
 /** A large single-line answer field; the keyboard opens on it, and the keyboard's own Next/Done moves on. */
 @Composable private fun OnboardingField(value: String, onValueChange: (String) -> Unit, label: String, tag: String, keyboard: KeyboardOptions,
-    error: String? = null, placeholder: String? = null, autoFocus: Boolean = true, onSubmit: () -> Unit) {
-    val focus = remember { FocusRequester() }
+    error: String? = null, placeholder: String? = null, autoFocus: Boolean = true, focusRequester: FocusRequester? = null, onSubmit: () -> Unit) {
+    val own = remember { FocusRequester() }
+    val focus = focusRequester ?: own
     // Only the first field of a page takes the keyboard on arrival; the keyboard's Next moves on to the others.
     if (autoFocus) LaunchedEffect(Unit) { delay(SaharaMotion.ms(SaharaMotion.ENTER_MS).toLong()); runCatching { focus.requestFocus() } }
     OutlinedTextField(value, onValueChange, singleLine = true, label = { Text(label) }, isError = error != null,
@@ -487,7 +539,7 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
     }
 }
 
-/** One intro page: a big calm picture with a soft idle float and breathing halo, a short title and two lines. */
+/** One intro page: one calm Lottie on a soft wash, a short title and two lines. */
 @Composable private fun IntroPage(page: Int) {
     val t = careText()
     val (title, body) = when (page) {
@@ -499,7 +551,12 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
         val compact = maxHeight < 520.dp
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).heightIn(min = maxHeight).padding(horizontal = 24.dp, vertical = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterVertically)) {
-            IntroArt(page, if (compact) 170.dp else 240.dp)
+            // One Lottie per page: a wave hello, the pill for medicines, a hug for family and doctors.
+            when (page) {
+                0 -> OnboardingHero(SaharaLottieKind.Wave, SaharaTone.Teal, tag = "welcome-hero-illustration", size = if (compact) 160.dp else 200.dp)
+                1 -> OnboardingHero(SaharaLottieKind.Pill, SaharaTone.Plum, size = if (compact) 160.dp else 200.dp)
+                else -> OnboardingHero(SaharaLottieKind.Hug, SaharaTone.Leaf, size = if (compact) 160.dp else 200.dp)
+            }
             Spacer(Modifier.height(if (compact) 0.dp else 8.dp))
             Text(title, Modifier.fillMaxWidth().a11yHeading().testTag(if (page == 0) "welcome-panel-heading" else "onboarding-intro-title-$page"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium,
                 fontSize = 28.sp, lineHeight = 34.sp, textAlign = TextAlign.Center, color = SaharaColors.Ink)
@@ -508,27 +565,38 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
     }
 }
 
-@Composable private fun IntroArt(page: Int, size: androidx.compose.ui.unit.Dp) {
-    Box(Modifier.fillMaxWidth().height(size), contentAlignment = Alignment.Center) {
-        val halo = when (page) { 0 -> SaharaTone.Teal; 1 -> SaharaTone.Plum; else -> SaharaTone.Leaf }
-        Box(Modifier.size(size * .92f).saharaBreathe(cycles = 5, amount = .05f).clip(CircleShape).background(halo.wash).clearAndSetSemantics { })
-        when (page) {
-            0 -> Box(Modifier.saharaFloat(4.dp, cycles = 5)) { WelcomeHero(Modifier.height(size * .9f)) }
-            1 -> Box(Modifier.size(size * .8f).saharaFloat(5.dp, cycles = 5), contentAlignment = Alignment.Center) {
-                SaharaLottie(SaharaLottieKind.Pill, Modifier.size(size * .62f))
-                SaharaLottie(SaharaLottieKind.Heart, Modifier.align(Alignment.TopEnd).size(size * .2f))
-            }
-            else -> Box(Modifier.size(size * .8f).saharaFloat(5.dp, cycles = 5), contentAlignment = Alignment.Center) {
-                SaharaLottie(SaharaLottieKind.Hug, Modifier.size(size * .66f))
-                SaharaLottie(SaharaLottieKind.Wave, Modifier.align(Alignment.TopStart).size(size * .22f))
-            }
+/** The common illnesses as one-tap chips (56 dp, wrap at large text), then "Other", which opens the field for anything else. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable private fun IllnessChips(value: String, enabled: Boolean, onPick: (String) -> Unit, onOther: (Boolean) -> Unit) {
+    val t = careText()
+    val options = listOf(
+        "cancer" to t("Cancer", "कैंसर"), "heart" to t("Heart failure", "हृदय की कमज़ोरी"), "kidney" to t("Kidney disease", "गुर्दे की बीमारी"),
+        "lung" to t("Lung disease", "फेफड़ों की बीमारी"), "stroke" to t("Stroke", "स्ट्रोक (लकवा)"), "dementia" to t("Dementia", "डिमेंशिया (याददाश्त की बीमारी)"),
+        "liver" to t("Liver disease", "लिवर की बीमारी"), "parkinson" to t("Parkinson's disease", "पार्किंसन रोग"))
+    val current = value.trim()
+    val isChip = options.any { it.second == current }
+    FlowRow(Modifier.fillMaxWidth().testTag("onboarding-illness-chips"), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        options.forEachIndexed { index, (key, label) -> OnboardingChip(label, on = current == label, enabled = enabled, tone = SaharaTone.Plum, index = index, tag = "onboarding-illness-$key") { onPick(label) } }
+        OnboardingChip(t("Other", "अन्य"), on = current.isNotEmpty() && !isChip, enabled = enabled, tone = SaharaTone.Leaf, index = options.size, tag = "onboarding-illness-other") { onOther(isChip) }
+    }
+}
+
+/** One big tickable pill chip (56 dp), as on the treatment step; it settles in with a soft spring when ticked, still when motion is off. */
+@Composable private fun OnboardingChip(label: String, on: Boolean, enabled: Boolean, tone: SaharaTone, index: Int, tag: String, onClick: () -> Unit) {
+    val scale by animateFloatAsState(if (on) 1.03f else 1f, if (SaharaMotion.enabled) spring(dampingRatio = .5f, stiffness = Spring.StiffnessMedium) else snap(), label = "onboarding chip")
+    Surface(checked = on, onCheckedChange = { onClick() }, enabled = enabled, shape = RoundedCornerShape(SaharaRadius.Pill),
+        color = if (on) tone.wash else SaharaColors.Surface, contentColor = SaharaColors.Ink, border = BorderStroke(if (on) 2.dp else 1.5.dp, if (on) tone.solid else SaharaColors.Edge),
+        modifier = Modifier.heightIn(min = 56.dp).saharaStagger(index).graphicsLayer { scaleX = scale; scaleY = scale }.testTag(tag)) {
+        Row(Modifier.padding(horizontal = 18.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+            if (on) { Icon(Icons.Default.Check, null, Modifier.size(20.dp), tint = tone.ink); Spacer(Modifier.width(6.dp)) }
+            Text(label, fontSize = 17.sp, fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal, color = if (on) tone.ink else SaharaColors.Ink)
         }
     }
 }
 
 /**
- * Treatment now as big tickable chips (52 dp, wrap at large text). "Pain and symptom care only", "No treatment now" and "Not sure"
- * stand alone (see [CarePatientProfile.toggleTreatment]). A ticked chip settles in with a soft spring; still when motion is off.
+ * Treatment now as big tickable chips (56 dp, wrap at large text). "Pain and symptom care only" and "Not sure" stand alone
+ * ("No treatment now" was taken off on 24 Nov: patients still receive symptom care) (see [CarePatientProfile.toggleTreatment]). A ticked chip settles in with a soft spring; still when motion is off.
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable private fun TreatmentChips(selected: List<String>, enabled: Boolean, onToggle: (String) -> Unit) {
@@ -540,7 +608,7 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
             val scale by animateFloatAsState(if (on) 1.03f else 1f, if (SaharaMotion.enabled) spring(dampingRatio = .5f, stiffness = Spring.StiffnessMedium) else snap(), label = "treatment chip")
             Surface(checked = on, onCheckedChange = { onToggle(code) }, enabled = enabled, shape = RoundedCornerShape(SaharaRadius.Pill),
                 color = if (on) tone.wash else SaharaColors.Surface, contentColor = SaharaColors.Ink, border = BorderStroke(if (on) 2.dp else 1.5.dp, if (on) tone.solid else SaharaColors.Edge),
-                modifier = Modifier.heightIn(min = 52.dp).saharaStagger(index).graphicsLayer { scaleX = scale; scaleY = scale }.testTag("onboarding-treatment-$code")) {
+                modifier = Modifier.heightIn(min = 56.dp).saharaStagger(index).graphicsLayer { scaleX = scale; scaleY = scale }.testTag("onboarding-treatment-$code")) {
                 Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                     if (on) { Icon(Icons.Default.Check, null, Modifier.size(20.dp), tint = tone.ink); Spacer(Modifier.width(6.dp)) }
                     Text(careTreatmentLabel(code, t), fontSize = 16.sp, fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal, color = if (on) tone.ink else SaharaColors.Ink)
@@ -555,10 +623,10 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
     val t = careText()
     val p = profile ?: CarePatientProfile()
     OnboardingPage {
-        Spacer(Modifier.height(12.dp))
+        // The success tick on its wash, with one burst of confetti over it (played once; left out when animations are off).
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            Box(Modifier.size(150.dp).saharaBreathe(cycles = 3, amount = .05f).clip(CircleShape).background(SaharaTone.Success.wash))
-            SaharaLottie(SaharaLottieKind.Success, Modifier.size(128.dp))
+            OnboardingHero(SaharaLottieKind.Success, SaharaTone.Success)
+            if (remember { SaharaMotion.enabled }) SaharaLottie(SaharaLottieKind.Confetti, Modifier.size(200.dp), loop = false)
         }
         Text(t("You're all set", "सब तैयार है"), Modifier.fillMaxWidth().a11yHeading().testTag("onboarding-heading"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 30.sp, lineHeight = 36.sp, textAlign = TextAlign.Center, color = SaharaColors.Ink)
         Text(t("Sahara is ready. You can add medicines, visits and notes from Today.", "सहारा तैयार है। आज वाले पेज से दवाइयाँ, मुलाक़ातें और नोट जोड़ सकते हैं।"), Modifier.fillMaxWidth(), fontSize = 17.sp, lineHeight = 24.sp, textAlign = TextAlign.Center, color = SaharaColors.InkSub)
@@ -574,11 +642,11 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
         }
         // The care details, one row each, only for what was filled in; the doctor and family see the same on the profile card.
         val illnessLine = p.illness
-        val doctorLine = listOf(p.doctorName, p.doctorPlace, p.doctorPhone).filter(String::isNotBlank).joinToString(" · ")
+        val doctorLine = careDoctorLine(p)
         val treatmentLine = careTreatmentLine(p, t)
         val rows = listOfNotNull(
             Triple(Icons.Default.MedicalInformation, t("Illness", "बीमारी"), illnessLine).takeIf { illnessLine.isNotBlank() },
-            Triple(Icons.Default.Event, t("Illness since", "बीमारी कब से"), p.illnessSince).takeIf { p.illnessSince.isNotBlank() },
+            Triple(Icons.Default.Event, careIllnessSinceLabel(p.illnessSince, t), careIllnessSinceText(p.illnessSince, t)).takeIf { p.illnessSince.isNotBlank() },
             Triple(Icons.Default.LocalHospital, t("Doctor now", "अभी के डॉक्टर"), doctorLine).takeIf { doctorLine.isNotBlank() },
             Triple(Icons.Default.Healing, t("Treatment now", "अभी का इलाज"), treatmentLine).takeIf { treatmentLine.isNotBlank() })
         if (rows.isNotEmpty()) Surface(shape = RoundedCornerShape(SaharaRadius.Xl), color = SaharaColors.Surface, border = BorderStroke(1.dp, SaharaColors.Line), modifier = Modifier.fillMaxWidth().saharaAppear().testTag("onboarding-summary-care")) {
@@ -632,8 +700,12 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
         .pointerInput(Unit) { awaitPointerEventScope { while (true) awaitPointerEvent().changes.forEach { it.consume() } } }
         .clearAndSetSemantics { contentDescription = t("Sahara", "सहारा") }.testTag("sahara-brand-moment"), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Image(painterResource(R.drawable.splash_icon), null, Modifier.size(240.dp).graphicsLayer {
-                val s = 1f - .25f * lift.value; scaleX = s; scaleY = s; translationY = -lift.value * 20.dp.toPx() })
+            // The logo keeps the splash icon's size and place; a Lottie bloom opens behind it once and fades (it ends empty).
+            Box(Modifier.size(240.dp).graphicsLayer {
+                val s = 1f - .25f * lift.value; scaleX = s; scaleY = s; translationY = -lift.value * 20.dp.toPx() }, contentAlignment = Alignment.Center) {
+                SaharaLottie(SaharaLottieKind.Bloom, Modifier.requiredSize(320.dp), loop = false)
+                Image(painterResource(R.drawable.splash_icon), null, Modifier.fillMaxSize())
+            }
             Text(t("Sahara", "सहारा"), Modifier.graphicsLayer { alpha = words.value; translationY = (1f - words.value) * 18.dp.toPx() - 40.dp.toPx() },
                 fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 40.sp, lineHeight = 46.sp, color = SaharaColors.Band)
             Text(t("Palliative care,\ntogether.", "पैलिएटिव देखभाल,\nसाथ मिलकर।"), Modifier.padding(horizontal = 24.dp).graphicsLayer { alpha = words.value; translationY = (1f - words.value) * 24.dp.toPx() - 32.dp.toPx() },

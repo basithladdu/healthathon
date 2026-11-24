@@ -268,7 +268,10 @@ private val DoctorMist = Peach
             else if (carePersonId != null && careModel != null) {
                 if (carePerson == null) Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) { Text(t("This care profile is unavailable", "यह देखभाल प्रोफ़ाइल उपलब्ध नहीं है"), style = MaterialTheme.typography.titleLarge); TextButton(onClick = { carePersonId = null }) { Text(t("Back to patients", "मरीज़ों की सूची पर वापस")) } }
                 else DoctorPatientWorkspace(careModel, carePerson.id, careSection, { next -> navigateCare { careSection = next } },
-                    hub = { pane, open -> DoctorPatientOpenPrompts(careModel, carePerson.id, onOpenSymptoms = { navigateCare { careSection = "Progress" } }); DoctorSharedPatientHub(carePerson, { next -> navigateCare { careSection = next } }, deviceLocal = careModel.cloud == null, items = careModel.items, pane = pane, selected = open) },
+                    hub = { pane, open -> DoctorPatientOpenPrompts(careModel, carePerson.id, onOpenSymptoms = { navigateCare { careSection = "Progress" } }); Column(Modifier.fillMaxSize()) {
+                        DoctorGocRequestNotice(careModel, carePerson.id, onOpen = { navigateCare { careSection = "GoalsOfCare" } }, modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp))
+                        Box(Modifier.weight(1f)) { DoctorSharedPatientHub(carePerson, { next -> navigateCare { careSection = next } }, deviceLocal = careModel.cloud == null, items = careModel.items, pane = pane, selected = open) }
+                    } },
                     care = { shown -> key(careSelection!!.stateKey) { embeddedCareStates.SaveableStateProvider("${careSelection.stateKey}:care") { EmbeddedPatientCare(careModel, carePersonId!!, shown, { next -> careSection = next }, onCareAccount, { carePersonId = null }, onNavigationBlockedChange = { careNavigationBlocked = it }, allowDeviceLocal = careModel.cloud == null, onHeaderBackChange = { careNestedBack = it }) } } })
             }
             else if(workflowRoute == "requests") DoctorRequestQueue(workflow,demoStore.patients,onBack={workflowRoute=null},onOpen={ id -> patientId=id;recordTab="Conversations";workflowRoute=id },onSchedule={ request -> schedulingRequestId=request.id;creatingFor=request.patientId },refreshToken=appointments.hashCode())

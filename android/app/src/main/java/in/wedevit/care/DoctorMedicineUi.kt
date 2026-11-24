@@ -31,7 +31,7 @@ fun doctorMedicinePresentation(dose:SampleMedicineDose,asOf:Long,zone:ZoneId):Do
     val status=when {
         !knownReport -> if(dose.scheduledAt>asOf) "Upcoming" else "Not logged"
         dose.outcome==SampleDoseOutcome.SKIPPED -> "Skipped reported"
-        taken!=null -> if(taken>dose.scheduledAt) "Late reported" else "Taken reported"
+        taken!=null -> if(MedicineLateRule.isLate(dose.scheduledAt,taken)) "Late reported" else "Taken reported"
         dose.outcome==SampleDoseOutcome.TAKEN -> "Taken reported · time not recorded"
         dose.scheduledAt>asOf -> "Upcoming"
         else -> "Not logged"
@@ -47,7 +47,8 @@ fun doctorMedicinePresentation(dose:SampleMedicineDose,asOf:Long,zone:ZoneId):Do
         if(doses.isEmpty()) Surface(color=Paper,shape=RoundedCornerShape(16.dp),border=BorderStroke(1.dp,DoctorHairline),modifier=Modifier.fillMaxWidth()) {
             Row(Modifier.padding(16.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(12.dp)) {Icon(Icons.Outlined.Schedule,null,tint=Rust,modifier=Modifier.size(24.dp));Text(t("No medicine reports recorded.", "दवा की कोई सूचना दर्ज नहीं।"),fontSize=16.sp,color=DoctorCardInk)}
         }
-        doses.forEach {dose ->
+        val dosesShown=rememberShownCount(doses.firstOrNull()?.patientId)
+        doses.shownOf(dosesShown).forEach {dose ->
             val view=doctorMedicinePresentation(dose,asOf,zone)
             val good=view.status=="Taken reported"
             Surface(color=Paper,shape=RoundedCornerShape(16.dp),border=BorderStroke(1.dp,DoctorHairline),modifier=Modifier.fillMaxWidth().testTag("doctor-medicine-${dose.id}")) {
@@ -67,6 +68,7 @@ fun doctorMedicinePresentation(dose:SampleMedicineDose,asOf:Long,zone:ZoneId):Do
                 }
             }
         }
+        SaharaShowOlder(doses.size,dosesShown,tag="doctor-medicine-reports")
     }
 }
 

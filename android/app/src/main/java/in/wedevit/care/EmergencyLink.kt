@@ -4,18 +4,23 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.time.OffsetDateTime
 
-/** A live read-only web copy of the emergency card. The token is shown only once by the server; this phone keeps it. */
-data class EmergencyLink(val token: String, val createdAt: Long, val expiresAt: Long) {
+/**
+ * A live read-only web copy of one published card version. The token (32 random bytes, hex) is shown only once by the
+ * server, which keeps only its SHA-256; this phone keeps it. Each published card has its own token and [version], so
+ * an older printed card's page says "This is not the latest version of this card" (migration 20261124120000).
+ * [expiresAt] is when the whole link series stops working; the card itself is valid for 3 months from [publishedAt].
+ */
+data class EmergencyLink(val token: String, val createdAt: Long, val expiresAt: Long, val version: Int = 1, val publishedAt: Long = createdAt) {
     val url: String get() = EmergencyLinkRules.url(token)
 }
-data class EmergencyLinkStatus(val live: Boolean, val expiresAt: Long?, val views: Int, val lastViewedAt: Long?, val recentViews: List<EmergencyCardView> = emptyList())
+data class EmergencyLinkStatus(val live: Boolean, val expiresAt: Long?, val views: Int, val lastViewedAt: Long?, val recentViews: List<EmergencyCardView> = emptyList(), val version: Int? = null)
 
 /** One open of the web link: when, and the hospital or clinic the person typed (blank when they skipped it). */
 data class EmergencyCardView(val at: Long, val place: String)
 
 /**
- * Where the web link was opened (Dr Sujay, 23 Nov). Only the web link can be counted: the offline code printed on the
- * card holds the card text itself and never calls the server, so scans of it cannot be seen.
+ * Where the web link was opened (Dr Sujay, 23 Nov). Since 24 Nov the printed QR holds only the web link, so every scan
+ * that opens the card is counted (cards printed before then may also carry an older offline text code, which is not).
  */
 object EmergencyViewRules {
     const val PLACE_MAX = 80
@@ -70,23 +75,29 @@ object EmergencyLinkRules {
     fun decodeCreated(json: String, now: Long): EmergencyLink {
         val j = JSONObject(json)
         val token = j.getString("token"); require(TOKEN.matches(token)) { "The server sent an unexpected link." }
-        return EmergencyLink(token, time(j.optString("created_at")) ?: now, time(j.optString("expires_at")) ?: (now + 365L * 86_400_000))
+        val created = time(j.optString("created_at")) ?: now
+        return EmergencyLink(token, created, time(j.optString("expires_at")) ?: (now + 365L * 86_400_000), j.optInt("version", 1).coerceAtLeast(1), time(j.optString("published_at")) ?: created)
     }
 
     fun decodeStatus(json: String): EmergencyLinkStatus {
         val j = JSONObject(json)
-        return EmergencyLinkStatus(j.optBoolean("live", false), time(j.optString("expires_at")), j.optInt("views", 0), time(j.optString("last_viewed_at")), EmergencyViewRules.decode(j.optJSONArray("recent_views")))
+        return EmergencyLinkStatus(j.optBoolean("live", false), time(j.optString("expires_at")), j.optInt("views", 0), time(j.optString("last_viewed_at")), EmergencyViewRules.decode(j.optJSONArray("recent_views")),
+            j.optInt("version", 0).takeIf { it > 0 })
     }
 
     /**
-     * What the web page shows: the same sections the family ticked for the card, in full (the web copy is
-     * not limited by QR size). Medicines are dropped from the end only if the copy would pass the server limit.
+     * What the web page shows and the printed PDF draws (one source for both): the sections the family ticked, in full.
+     * "v": 2 (24 Nov) adds [nextOfKin], [doctor] (name, phone, hospital or clinic, landline), [otherContacts], each
+     * medicine's "strength" and "when", and "validUntil". "contacts" and each medicine's "detail" stay for pages
+     * deployed before then. Medicines are dropped from the end only if the copy would pass the server limit.
      */
     fun card(source: EmergencySource, record: EmergencyCardRecord): JSONObject {
         val sections = record.sections
         var medicines = if (EmergencySection.MEDICINES in sections) source.medicines.take(60) else emptyList()
-        fun build(dropped: Int) = JSONObject().put("kind", "sahara-emergency-card").put("v", 1)
-            .put("cardNumber", record.number).put("cardId", record.id).put("madeAt", record.madeAt)
+        val kin = EmergencyCardRules.nextOfKin(source); val doctor = EmergencyCardRules.doctorOf(source)
+        fun contact(c: EmergencyContact) = JSONObject().put("name", EmergencyCardRules.clip(c.name, 120)).put("relationship", EmergencyCardRules.clip(c.relationship, 80)).put("phone", c.phone.take(40))
+        fun build(dropped: Int) = JSONObject().put("kind", "sahara-emergency-card").put("v", 2)
+            .put("cardNumber", record.number).put("cardId", record.id).put("madeAt", record.madeAt).put("validUntil", record.validUntil)
             .put("sections", JSONArray(sections.map { it.name }))
             .also { j ->
                 if (EmergencySection.NAME in sections) j.put("name", EmergencyCardRules.clip(source.name, 100))
@@ -94,14 +105,22 @@ object EmergencyLinkRules {
                     j.put("goals", JSONObject().put("version", g.version).put("confirmedBy", EmergencyCardRules.clip(g.confirmedBy, 80)).put("confirmedAt", g.confirmedAt)
                         .put("whatMatters", g.whatMatters.take(4000)).put("nextSteps", g.nextSteps.take(4000)).also { o -> g.newerUnconfirmedVersion?.let { o.put("newerUnconfirmedVersion", it) } })
                 }
-                if (EmergencySection.CONTACTS in sections) j.put("contacts", JSONArray(source.contacts.take(20).map { JSONObject().put("name", EmergencyCardRules.clip(it.name, 120)).put("relationship", EmergencyCardRules.clip(it.relationship, 80)).put("phone", it.phone.take(40)) }))
-                if (EmergencySection.MEDICINES in sections) j.put("medicines", JSONArray(medicines.map { JSONObject().put("name", EmergencyCardRules.clip(it.name, 160)).put("detail", it.detail.take(400)) }))
+                if (EmergencySection.CONTACTS in sections) {
+                    j.put("contacts", JSONArray(source.contacts.take(20).map(::contact)))
+                    kin?.let { j.put("nextOfKin", contact(it)) }
+                    doctor?.let { d -> j.put("doctor", JSONObject().put("name", EmergencyCardRules.clip(d.name, 120)).put("phone", d.phone.take(40)).put("place", EmergencyCardRules.clip(d.place, 160)).put("landline", d.landline.take(40))) }
+                    j.put("otherContacts", JSONArray(EmergencyCardRules.otherContacts(source).take(20).map(::contact)))
+                }
+                if (EmergencySection.MEDICINES in sections) j.put("medicines", JSONArray(medicines.map { m -> val row = EmergencyCardRules.medicineRow(m)
+                    JSONObject().put("name", EmergencyCardRules.clip(m.name, 160)).put("strength", EmergencyCardRules.clip(row.strength, 80)).put("when", EmergencyCardRules.clip(row.whenTaken, 200)).put("detail", m.detail.take(400)) }))
                 if (source.allergies.isNotBlank()) j.put("allergies", EmergencyCardRules.clip(source.allergies, 400))
                 j.put("notRecorded", EmergencyCardRules.notRecorded(source))
                 j.put("notIncluded", JSONArray(buildList {
                     EmergencySection.entries.filter { it !in sections }.forEach { add(it.en.substringBefore(" (").lowercase() + " (family chose not to include)") }
                     if (EmergencySection.GOALS in sections && source.goals == null) add("no confirmed goals-of-care note")
-                    if (EmergencySection.CONTACTS in sections && source.contacts.isEmpty()) add("no contacts saved")
+                    if (EmergencySection.CONTACTS in sections && kin == null) add("no contacts saved")
+                    if (EmergencySection.CONTACTS in sections && kin != null && kin.phone.isBlank()) add("no phone number saved for the guardian")
+                    if (EmergencySection.CONTACTS in sections && doctor == null) add("no treating doctor saved")
                     if (EmergencySection.MEDICINES in sections && source.medicines.isEmpty()) add("no current medicines listed")
                     addAll(EmergencyCardRules.recordedNotOnCard(source))
                     val skipped = dropped + (if (EmergencySection.MEDICINES in sections) (source.medicines.size - 60).coerceAtLeast(0) else 0)
@@ -126,10 +145,27 @@ class EmergencyLinkClient(private val cloud: CareCloud) {
         if (e.cause is java.io.IOException) throw EmergencyLinkException(EmergencyLinkProblem.OFFLINE) else throw e
     }
 
+    /** A new link series (first card or "Replace link"): the old series stops working at once. */
     suspend fun create(personId: String, card: JSONObject, now: Long = System.currentTimeMillis()): EmergencyLink =
         EmergencyLinkRules.decodeCreated(call("healthathon_emergency_link_create", JSONObject().put("p_person", personId).put("p_card", card)), now)
 
-    /** Same link, new content: printed cards keep working and show the update. */
+    /**
+     * Publishes [card] as a new version with its own token (24 Nov). Older printed cards keep opening and say they are not
+     * the latest. Before the owner applies 20261124120000_emergency_card_versions.sql the server has no publish function
+     * (404): the old behaviour is used then (same link updated in place, or a new link when there is none).
+     */
+    suspend fun publish(personId: String, card: JSONObject, existing: EmergencyLink?, now: Long = System.currentTimeMillis()): EmergencyLink = try {
+        EmergencyLinkRules.decodeCreated(call("healthathon_emergency_link_publish", JSONObject().put("p_person", personId).put("p_card", card)), now)
+    } catch (e: EmergencyLinkException) {
+        if (e.problem != EmergencyLinkProblem.NOT_SET_UP) throw e
+        if (existing == null) create(personId, card, now)
+        else {
+            try { update(personId, card); existing }
+            catch (off: EmergencyLinkException) { if (off.problem == EmergencyLinkProblem.LINK_OFF) create(personId, card, now) else throw off }
+        }
+    }
+
+    /** Same link, new content (servers and apps from before 24 Nov). */
     suspend fun update(personId: String, card: JSONObject) { call("healthathon_emergency_link_update", JSONObject().put("p_person", personId).put("p_card", card)) }
 
     suspend fun revoke(personId: String) { call("healthathon_emergency_link_revoke", JSONObject().put("p_person", personId)) }

@@ -87,9 +87,44 @@ class CarePatientProfileTest {
     @Test fun standAloneTreatmentsClearTheOthers() {
         assertEquals(listOf("chemotherapy"), CarePatientProfile.toggleTreatment(emptyList(), "chemotherapy"))
         assertEquals(listOf("chemotherapy", "surgery"), CarePatientProfile.toggleTreatment(listOf("surgery"), "chemotherapy"))
-        assertEquals(listOf("none_now"), CarePatientProfile.toggleTreatment(listOf("chemotherapy", "surgery"), "none_now"))
+        assertEquals(listOf("not_sure"), CarePatientProfile.toggleTreatment(listOf("chemotherapy", "surgery"), "not_sure"))
         assertEquals(listOf("radiotherapy"), CarePatientProfile.toggleTreatment(listOf("not_sure"), "radiotherapy"))
         assertEquals(emptyList<String>(), CarePatientProfile.toggleTreatment(listOf("symptom_care_only"), "symptom_care_only"))
+    }
+
+    @Test fun noTreatmentNowIsGoneAndOldProfilesWithItStillRead() {
+        assertFalse(CarePatientProfile.TREATMENTS.contains("none_now"))
+        val old = """{"v":1,"illness":"Cancer","treatments":["none_now"]}"""
+        val decoded = CarePatientProfile.decode(old)
+        assertEquals("Cancer", decoded.illness); assertTrue(decoded.treatments.isEmpty())
+        assertEquals(listOf("surgery"), CarePatientProfile.decode("""{"v":1,"treatments":["none_now","surgery"]}""").treatments)
+    }
+
+    @Test fun illnessDurationIsWrittenAsMonthsOrYearsAndOldTextStillShows() {
+        assertEquals("8 months", CareIllnessDuration(8, years = false).encode())
+        assertEquals("1 month", CareIllnessDuration(1, years = false).encode())
+        assertEquals("2 years", CareIllnessDuration(2, years = true).encode())
+        assertEquals("1 year", CareIllnessDuration(1, years = true).encode())
+        listOf("8 months", "1 month", "2 years", "1 year", " 3 Years ", "8 mo", "2 yrs", "12months").forEach { assertTrue(it, CareIllnessDuration.parse(it) != null) }
+        assertEquals(CareIllnessDuration(12, years = false), CareIllnessDuration.parse("12months"))
+        assertEquals(CareIllnessDuration(3, years = true), CareIllnessDuration.parse(" 3 Years "))
+        // Older typed answers are not durations: they stay as typed.
+        listOf("Mar 2025", "2025", "", "since last year", "0 months", "100 years").forEach { assertEquals(it, null, CareIllnessDuration.parse(it)) }
+        val english: (String, String) -> String = { en, _ -> en }
+        assertEquals("8 months", careIllnessSinceText("8 months", english)); assertEquals("1 year", careIllnessSinceText("1 year", english))
+        assertEquals("Mar 2025", careIllnessSinceText(" Mar 2025 ", english))
+        assertEquals("How long", careIllnessSinceLabel("2 years", english)); assertEquals("Illness since", careIllnessSinceLabel("Mar 2025", english))
+        // Stored in the same key as before, so an older app shows "8 months" as text.
+        val p = CarePatientProfile(illnessSince = "8 months")
+        assertEquals("8 months", JSONObject(p.encode()).getString("illnessSince")); assertEquals(p, CarePatientProfile.decode(p.encode()))
+    }
+
+    @Test fun doctorLandlineRoundTripsAndCountsAsCareNow() {
+        val p = CarePatientProfile(doctorPhone = "+91 98765 43210", doctorLandline = "+91 08023456789")
+        assertEquals(p, CarePatientProfile.decode(p.encode())); assertTrue(p.hasCareNow)
+        assertTrue(CarePatientProfile(doctorLandline = "+971 41234567").hasCareNow)
+        assertFalse(JSONObject(CarePatientProfile(age = 60).encode()).has("doctorLandline"))
+        assertEquals("Dr Rao · +91 98765 43210 · +91 08023456789", careDoctorLine(p.copy(doctorName = "Dr Rao")))
     }
 
     @Test fun uploadRedactsCareNowFreeTextButKeepsTheDoctorPhone() {

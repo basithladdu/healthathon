@@ -90,7 +90,7 @@ fun calendarShows(item: CareItem, showMedicines: Boolean = false): Boolean = sho
     }
 }
 
-@Composable fun CareCalendar(vm: CareModel, onWorkflow: () -> Unit = {}, onAddDoctorVisit: (() -> Unit)? = null, initialDay: Long = 0L, showMedicines: Boolean = false) {
+@Composable fun CareCalendar(vm: CareModel, onWorkflow: () -> Unit = {}, onAddDoctorVisit: (() -> Unit)? = null, initialDay: Long = 0L, showMedicines: Boolean = false, onBack: (() -> Unit)? = saharaSystemBack()) {
     val allEntries by vm.items.collectAsStateWithLifecycle()
     val entries = remember(allEntries, showMedicines) { allEntries.filter { calendarShows(it, showMedicines) } }
     val person by vm.selected.collectAsStateWithLifecycle()
@@ -105,7 +105,7 @@ fun calendarShows(item: CareItem, showMedicines: Boolean = false): Boolean = sho
     val undated = if (showMedicines) entries.filter { it.personId == person && it.kind == "medicine" && it.due == 0L } else emptyList()
     LazyColumn(Modifier.fillMaxSize().testTag("care-calendar"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         // Title first, then the doctor's extra entry link under it.
-        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Heading(t("Calendar", "कैलेंडर")); Spacer(Modifier.weight(1f)); if (canEdit) FilledTonalIconButton(onClick = { if (onAddDoctorVisit != null) onAddDoctorVisit() else adding = true }, modifier = Modifier.size(48.dp), colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = Gold)) { Icon(Icons.Default.Add, t("Add to calendar", "कैलेंडर में जोड़ें")) } } }
+        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { if (onBack != null) { SaharaBackButton(onBack, tag = "calendar-back"); Spacer(Modifier.width(4.dp)) }; Heading(t("Calendar", "कैलेंडर")); Spacer(Modifier.weight(1f)); if (canEdit) FilledTonalIconButton(onClick = { if (onAddDoctorVisit != null) onAddDoctorVisit() else adding = true }, modifier = Modifier.size(48.dp), colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = Gold)) { Icon(Icons.Default.Add, t("Add to calendar", "कैलेंडर में जोड़ें")) } } }
         if (onAddDoctorVisit != null && canEdit) item { TextButton(onClick = { adding = true }, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Add other", "और जोड़ें")) } }
         item { CareCalendarGrid(entries.filter { it.personId == person }, day, weekView, { weekView = it }, { dayString = it.toString() }) }
         // The picked day and "Back to today" share one row.

@@ -78,7 +78,10 @@ object SymptomSummaryRules {
     }
 }
 
-/** A symptom's detail: its graph (Mood shows its two scales, Pain its body parts), then every note of it with the usual card actions. */
+/**
+ * A symptom's detail: its graph (Mood shows its two scales, Pain its body parts), then its newest notes with the usual card actions.
+ * The graph's own entry list is left out here (clinical team, 24 Nov 2026): it repeated the same notes a second time.
+ */
 @Composable fun SymptomDetailSheet(summary: SymptomSummary, entries: List<CareItem>, vm: CareModel, hindi: Boolean, onClose: () -> Unit) {
     val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     val personId = summary.latest.personId
@@ -91,16 +94,19 @@ object SymptomSummaryRules {
             ChartLegend(hindi)
             if (summary.symptom == SymptomDiaryRules.MOOD) SymptomDiaryRules.moodShort.forEach { (key, label) ->
                 val points = remember(entries, personId, key) { SymptomDiaryRules.moodSeries(entries, personId, key) }
-                SymptomHistoryChart(careTr(hindi, label.first, label.second), points, hindi, "mood-trend-$key", markers)
+                SymptomHistoryChart(careTr(hindi, label.first, label.second), points, hindi, "mood-trend-$key", markers, showEntries = false)
             } else {
                 val points = remember(entries, personId, latest?.symptom) { SymptomDiaryRules.symptomSeries(entries, personId, latest?.symptom ?: summary.symptom) }
-                SymptomHistoryChart(name, points, hindi, "symptom-trend", markers)
-                if (summary.symptom == "Pain") SymptomPartTrendPicker(entries, personId, hindi, preferred = latest?.painBodyRatings?.maxByOrNull { it.value }?.key ?: latest?.painBodySites?.firstOrNull())
+                SymptomHistoryChart(name, points, hindi, "symptom-trend", markers, showEntries = false)
+                if (summary.symptom == "Pain") SymptomPartTrendPicker(entries, personId, hindi, preferred = latest?.painBodyRatings?.maxByOrNull { it.value }?.key ?: latest?.painBodySites?.firstOrNull(), showEntries = false)
             }
             Text("${t("Notes", "नोट")} · ${summary.notes.size}", fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = SaharaSection.Symptoms.ink, modifier = Modifier.a11yHeading())
             // Every note of this symptom, newest first; the latest entries come straight from the live list so edits show at once.
             val live = remember(entries, summary) { summary.notes.mapNotNull { n -> entries.firstOrNull { it.id == n.id } } }
-            live.forEach { SymptomNoteCard(it, vm, hindi) }
+            // The newest five notes, then "Show older" (24 Nov).
+            val notesShown = rememberShownCount("$personId:${summary.symptom}")
+            live.shownOf(notesShown).forEach { SymptomNoteCard(it, vm, hindi) }
+            SaharaShowOlder(live.size, notesShown, tag = "symptom-notes")
             TextButton(onClick = onClose, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Close", "बंद करें")) }
         }
     }

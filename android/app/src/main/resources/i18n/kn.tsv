@@ -5725,3 +5725,127 @@ I have read this version. This is not a formal signature, consent for treatment 
 The patient is under 18. A parent or guardian makes these decisions with the doctor. Ask the child what matters to them too, in words they understand, and write it in their own words.	ರೋಗಿಯ ವಯಸ್ಸು 18 ಕ್ಕಿಂತ ಕಡಿಮೆ. ಈ ನಿರ್ಧಾರಗಳನ್ನು ಪೋಷಕರು ಅಥವಾ ರಕ್ಷಕರು ವೈದ್ಯರೊಂದಿಗೆ ತೆಗೆದುಕೊಳ್ಳುತ್ತಾರೆ. ಮಗುವಿಗೆ ಅರ್ಥವಾಗುವ ಮಾತುಗಳಲ್ಲಿ ಅವರಿಗೆ ಯಾವುದು ಮುಖ್ಯ ಎಂದೂ ಕೇಳಿ, ಅವರ ಮಾತುಗಳಲ್ಲೇ ಬರೆಯಿರಿ.
 Add the parent or guardian as the main decision-maker.	ಪೋಷಕರು ಅಥವಾ ರಕ್ಷಕರನ್ನು ಮುಖ್ಯ ನಿರ್ಧಾರಕರಾಗಿ ಸೇರಿಸಿ.
 Draft annexure. The clinical team must approve this wording before the pilot.	ಕರಡು ಅನುಬಂಧ. ಪೈಲಟ್‌ಗೆ ಮೊದಲು ಕ್ಲಿನಿಕಲ್ ತಂಡ ಈ ಪದಗಳನ್ನು ಅನುಮೋದಿಸಬೇಕು.
+Time	ಸಮಯ
+Reminder time	ರಿಮೈಂಡರ್ ಸಮಯ
+Other time	ಬೇರೆ ಸಮಯ
+Remove time	ಸಮಯ ತೆಗೆದುಹಾಕಿ
+Up to six times.	ಗರಿಷ್ಠ ಆರು ಸಮಯಗಳು.
+Cancer	ಕ್ಯಾನ್ಸರ್
+Heart failure	ಹೃದಯ ವೈಫಲ್ಯ
+Kidney disease	ಮೂತ್ರಪಿಂಡದ ಕಾಯಿಲೆ
+Lung disease	ಶ್ವಾಸಕೋಶದ ಕಾಯಿಲೆ
+Stroke	ಪಾರ್ಶ್ವವಾಯು (ಸ್ಟ್ರೋಕ್)
+Dementia	ಮರೆವಿನ ಕಾಯಿಲೆ (ಡಿಮೆನ್ಶಿಯಾ)
+Liver disease	ಯಕೃತ್ತಿನ ಕಾಯಿಲೆ
+Parkinson's disease	ಪಾರ್ಕಿನ್ಸನ್ ಕಾಯಿಲೆ
+Show older ($remaining more)	ಹಳೆಯವನ್ನು ತೋರಿಸಿ (ಇನ್ನೂ $remaining)
+Show all ($total)	ಎಲ್ಲವನ್ನೂ ತೋರಿಸಿ ($total)
+Country code	ದೇಶದ ಕೋಡ್
+UAE	ಯುಎಇ
+Saudi Arabia	ಸೌದಿ ಅರೇಬಿಯಾ
+US / Canada	ಅಮೆರಿಕ / ಕೆನಡಾ
+UK	ಯುಕೆ (ಬ್ರಿಟನ್)
+Singapore	ಸಿಂಗಾಪುರ್
+Australia	ಆಸ್ಟ್ರೇಲಿಯಾ
+Qatar	ಕತಾರ್
+Oman	ಒಮಾನ್
+Kuwait	ಕುವೈತ್
+1 year	1 ವರ್ಷ
+$n years	$n ವರ್ಷಗಳು
+$n months	$n ತಿಂಗಳು
+How long	ಎಷ್ಟು ಕಾಲದಿಂದ
+Hospital / landline number (optional)	ಆಸ್ಪತ್ರೆ / ಲ್ಯಾಂಡ್‌ಲೈನ್ ಸಂಖ್ಯೆ (ಐಚ್ಛಿಕ)
+Months	ತಿಂಗಳುಗಳು
+Years	ವರ್ಷಗಳು
+Expand map	ನಕ್ಷೆಯನ್ನು ದೊಡ್ಡದಾಗಿ ನೋಡಿ
+Zoom in	ಹತ್ತಿರದಿಂದ ನೋಡಿ
+Zoom out	ದೂರದಿಂದ ನೋಡಿ
+Close map	ನಕ್ಷೆ ಮುಚ್ಚಿ
+India	ಭಾರತ
+No QR yet: it needs the web link.	ಇನ್ನೂ QR ಇಲ್ಲ: ಇದಕ್ಕೆ ವೆಬ್ ಲಿಂಕ್ ಬೇಕು.
+Valid until $until	$until ವರೆಗೆ ಮಾನ್ಯ
+No web link	ವೆಬ್ ಲಿಂಕ್ ಇಲ್ಲ
+Anyone who scans a printed card will see that the family turned this link off. You can make a new link later.	ಮುದ್ರಿತ ಕಾರ್ಡ್ ಸ್ಕ್ಯಾನ್ ಮಾಡುವವರಿಗೆ ಕುಟುಂಬ ಈ ಲಿಂಕ್ ಆಫ್ ಮಾಡಿದೆ ಎಂದು ಕಾಣುತ್ತದೆ. ನೀವು ನಂತರ ಹೊಸ ಲಿಂಕ್ ಮಾಡಬಹುದು.
+Every card printed with the old link will stop opening. Print the new card.	ಹಳೆಯ ಲಿಂಕ್‌ನೊಂದಿಗೆ ಮುದ್ರಿಸಿದ ಪ್ರತಿಯೊಂದು ಕಾರ್ಡ್ ಇನ್ನು ತೆರೆಯುವುದಿಲ್ಲ. ಹೊಸ ಕಾರ್ಡ್ ಮುದ್ರಿಸಿ.
+No doctor saved	ವೈದ್ಯರ ವಿವರ ಉಳಿಸಿಲ್ಲ
+A calm talk with your doctor about what matters most to you, so your care follows your wishes. You can bring family.	ನಿಮಗೆ ಯಾವುದು ಹೆಚ್ಚು ಮುಖ್ಯ ಎಂಬುದರ ಬಗ್ಗೆ ನಿಮ್ಮ ವೈದ್ಯರೊಂದಿಗೆ ಶಾಂತವಾದ ಮಾತುಕತೆ, ಇದರಿಂದ ನಿಮ್ಮ ಆರೈಕೆ ನಿಮ್ಮ ಇಚ್ಛೆಯಂತೆ ನಡೆಯುತ್ತದೆ. ನೀವು ಕುಟುಂಬದವರನ್ನು ಕರೆತರಬಹುದು.
+Last 7 days	ಕಳೆದ 7 ದಿನಗಳು
+No check-ins in the last 7 days.	ಕಳೆದ 7 ದಿನಗಳಲ್ಲಿ ಯಾವುದೇ ಚೆಕ್-ಇನ್ ಇಲ್ಲ.
+Nothing noted this day.	ಈ ದಿನ ಏನೂ ದಾಖಲಾಗಿಲ್ಲ.
+Notes only	ಟಿಪ್ಪಣಿಗಳು ಮಾತ್ರ
+Not daily	ಪ್ರತಿದಿನ ಅಲ್ಲ
+${doses.size} times a day	ದಿನಕ್ಕೆ ${doses.size} ಬಾರಿ
+Once a day	ದಿನಕ್ಕೆ ಒಮ್ಮೆ
+$taken of $total	$total ರಲ್ಲಿ $taken
+Not taken reported	ತೆಗೆದುಕೊಂಡಿಲ್ಲ ಎಂದು ತಿಳಿಸಲಾಗಿದೆ
+Prescription date	ಪ್ರಿಸ್ಕ್ರಿಪ್ಷನ್ ದಿನಾಂಕ
+Nebuliser	ನೆಬ್ಯುಲೈಸರ್
+Saved as: $current	ಹೀಗೆ ಉಳಿಸಲಾಗಿದೆ: $current
+Saved as: $value	ಹೀಗೆ ಉಳಿಸಲಾಗಿದೆ: $value
+Written before: $writtenBefore	ಮೊದಲು ಬರೆದದ್ದು: $writtenBefore
+No fixed times. On Today, tap ‘Took a dose now’ each time it is taken.	ನಿಗದಿತ ಸಮಯವಿಲ್ಲ. ತೆಗೆದುಕೊಂಡ ಪ್ರತಿ ಬಾರಿ ಇಂದಿನ ಪುಟದಲ್ಲಿ ‘ಈಗ ಒಂದು ಡೋಸ್ ತೆಗೆದುಕೊಂಡೆ’ ಒತ್ತಿ.
+units	ಯೂನಿಟ್‌ಗಳು
+drops	ಹನಿಗಳು
+puffs	ಪಫ್‌ಗಳು
+Number	ಸಂಖ್ಯೆ
+Directions as written	ಬರೆದಂತೆ ಸೂಚನೆಗಳು
+Twice a day	ದಿನಕ್ಕೆ ಎರಡು ಬಾರಿ
+Three times a day	ದಿನಕ್ಕೆ ಮೂರು ಬಾರಿ
+Four times a day	ದಿನಕ್ಕೆ ನಾಲ್ಕು ಬಾರಿ
+As needed (SOS)	ಅಗತ್ಯವಿದ್ದಾಗ (SOS)
+Taken, not taken or skipped	ತೆಗೆದುಕೊಂಡರು, ತೆಗೆದುಕೊಂಡಿಲ್ಲ ಅಥವಾ ಬಿಟ್ಟರು
+Nothing reported on this day.	ಈ ದಿನ ಏನೂ ದಾಖಲಾಗಿಲ್ಲ.
+All taken	ಎಲ್ಲವನ್ನೂ ತೆಗೆದುಕೊಂಡರು
+Side effect noted	ಅಡ್ಡಪರಿಣಾಮ ದಾಖಲಾಗಿದೆ
+Taken · late	ತೆಗೆದುಕೊಂಡರು · ತಡವಾಗಿ
+For pain	ನೋವಿಗೆ
+For breakthrough pain	ಹಠಾತ್ ತೀವ್ರ ನೋವಿಗೆ
+For background pain	ನಿರಂತರ ನೋವಿಗೆ
+For breakthrough abdominal pain	ಹೊಟ್ಟೆಯ ಹಠಾತ್ ತೀವ್ರ ನೋವಿಗೆ
+For abdominal discomfort	ಹೊಟ್ಟೆಯ ಅಸ್ವಸ್ಥತೆಗೆ
+For nausea	ವಾಕರಿಕೆಗೆ
+Ease nausea	ವಾಕರಿಕೆ ಕಡಿಮೆ ಮಾಡಲು
+To ease nausea	ವಾಕರಿಕೆ ಕಡಿಮೆ ಮಾಡಲು
+Appetite loss	ಹಸಿವು ಇಲ್ಲದಿರುವುದು
+For appetite loss	ಹಸಿವು ಇಲ್ಲದಿರುವುದಕ್ಕೆ
+For nausea and appetite	ವಾಕರಿಕೆ ಮತ್ತು ಹಸಿವಿಗೆ
+To ease nausea and appetite loss	ವಾಕರಿಕೆ ಮತ್ತು ಹಸಿವು ಇಲ್ಲದಿರುವುದನ್ನು ಕಡಿಮೆ ಮಾಡಲು
+Short course to ease nausea and appetite loss, now finished	ವಾಕರಿಕೆ ಮತ್ತು ಹಸಿವು ಇಲ್ಲದಿರುವುದನ್ನು ಕಡಿಮೆ ಮಾಡಲು ಸಣ್ಣ ಕೋರ್ಸ್, ಈಗ ಮುಗಿದಿದೆ
+For vomiting	ವಾಂತಿಗೆ
+For constipation	ಮಲಬದ್ಧತೆಗೆ
+To keep bowels regular	ಮಲವಿಸರ್ಜನೆ ಸರಿಯಾಗಿರಲು
+To keep bowels regular while taking morphine	ಮಾರ್ಫಿನ್ ತೆಗೆದುಕೊಳ್ಳುವಾಗ ಮಲವಿಸರ್ಜನೆ ಸರಿಯಾಗಿರಲು
+For breathlessness	ಉಸಿರಾಟದ ತೊಂದರೆಗೆ
+For cough	ಕೆಮ್ಮಿಗೆ
+For fever	ಜ್ವರಕ್ಕೆ
+For sleep	ನಿದ್ರೆಗೆ
+For anxiety	ಆತಂಕಕ್ಕೆ
+For low mood	ಮನಸ್ಸು ಕುಗ್ಗಿದಾಗ
+For acidity	ಆಮ್ಲೀಯತೆಗೆ
+For itching	ತುರಿಕೆಗೆ
+For swelling	ಊತಕ್ಕೆ
+For mouth ulcers	ಬಾಯಿ ಹುಣ್ಣುಗಳಿಗೆ
+Take before food	ಊಟಕ್ಕೆ ಮೊದಲು ತೆಗೆದುಕೊಳ್ಳಿ
+Take after food	ಊಟದ ನಂತರ ತೆಗೆದುಕೊಳ್ಳಿ
+Take with food	ಊಟದ ಜೊತೆ ತೆಗೆದುಕೊಳ್ಳಿ
+Taken with food	ಊಟದ ಜೊತೆ ತೆಗೆದುಕೊಳ್ಳಲಾಗುತ್ತದೆ
+Take 30 minutes before meals	ಊಟಕ್ಕೆ 30 ನಿಮಿಷ ಮೊದಲು ತೆಗೆದುಕೊಳ್ಳಿ
+Take 30 minutes before meals if nausea is worse then	ಆಗ ವಾಕರಿಕೆ ಹೆಚ್ಚಿದ್ದರೆ ಊಟಕ್ಕೆ 30 ನಿಮಿಷ ಮೊದಲು ತೆಗೆದುಕೊಳ್ಳಿ
+On an empty stomach	ಖಾಲಿ ಹೊಟ್ಟೆಯಲ್ಲಿ
+Oral	ಬಾಯಿಯ ಮೂಲಕ
+Once daily	ದಿನಕ್ಕೆ ಒಮ್ಮೆ
+Twice daily	ದಿನಕ್ಕೆ ಎರಡು ಬಾರಿ
+Three times daily	ದಿನಕ್ಕೆ ಮೂರು ಬಾರಿ
+Four times daily	ದಿನಕ್ಕೆ ನಾಲ್ಕು ಬಾರಿ
+Each morning	ಪ್ರತಿ ಬೆಳಿಗ್ಗೆ
+At night	ರಾತ್ರಿ
+At bedtime	ಮಲಗುವ ಮೊದಲು
+Every 4 hours as needed	ಅಗತ್ಯವಿದ್ದಾಗ ಪ್ರತಿ 4 ಗಂಟೆಗೆ
+Three times daily before meals if nausea persists	ವಾಕರಿಕೆ ಮುಂದುವರಿದರೆ ದಿನಕ್ಕೆ ಮೂರು ಬಾರಿ ಊಟಕ್ಕೆ ಮೊದಲು
+Review if more than 3 doses in 24 hours	24 ಗಂಟೆಗಳಲ್ಲಿ 3 ಕ್ಕಿಂತ ಹೆಚ್ಚು ಡೋಸ್ ಬೇಕಾದರೆ ವೈದ್ಯರಿಗೆ ತಿಳಿಸಿ
+Do not take extra paracetamol from other sources	ಬೇರೆ ಔಷಧಿಗಳಿಂದ ಹೆಚ್ಚುವರಿ ಪ್ಯಾರಸಿಟಮಾಲ್ ತೆಗೆದುಕೊಳ್ಳಬೇಡಿ
+Do not crush or chew	ಪುಡಿ ಮಾಡಬೇಡಿ ಅಥವಾ ಅಗಿಯಬೇಡಿ
+Dissolve in water	ನೀರಿನಲ್ಲಿ ಕರಗಿಸಿ ತೆಗೆದುಕೊಳ್ಳಿ
+Shake well before use	ಬಳಸುವ ಮೊದಲು ಚೆನ್ನಾಗಿ ಕುಲುಕಿ
+Tap a dose when taken. Hold it for Not taken or Skipped.	ತೆಗೆದುಕೊಂಡಾಗ ಡೋಸ್ ಒತ್ತಿ. ತೆಗೆದುಕೊಳ್ಳದಿದ್ದರೆ ಅಥವಾ ಬಿಟ್ಟರೆ ಒತ್ತಿ ಹಿಡಿಯಿರಿ.
+Not yet · late	ಇನ್ನೂ ಇಲ್ಲ · ತಡ

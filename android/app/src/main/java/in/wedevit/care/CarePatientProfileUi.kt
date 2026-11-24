@@ -23,6 +23,8 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -152,12 +154,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 /** Since when, the doctor now and the treatment now, one quiet row each (wraps rather than cuts, so a doctor reads it all). */
 @Composable private fun ProfileCareNow(profile: CarePatientProfile, modifier: Modifier = Modifier) {
     val t = careText()
-    val doctor = listOf(profile.doctorName, profile.doctorPlace, profile.doctorPhone).filter(String::isNotBlank).joinToString(" · ")
+    val doctor = careDoctorLine(profile)
     val treatment = careTreatmentLine(profile, t)
     Surface(shape = RoundedCornerShape(12.dp), color = Cream, modifier = modifier.fillMaxWidth()) {
         Column(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             listOfNotNull(
-                Triple(Icons.Default.Event, t("Illness since", "बीमारी कब से"), profile.illnessSince).takeIf { profile.illnessSince.isNotBlank() },
+                Triple(Icons.Default.Event, careIllnessSinceLabel(profile.illnessSince, t), careIllnessSinceText(profile.illnessSince, t)).takeIf { profile.illnessSince.isNotBlank() },
                 Triple(Icons.Default.LocalHospital, t("Doctor now", "अभी के डॉक्टर"), doctor).takeIf { doctor.isNotBlank() },
                 Triple(Icons.Default.Healing, t("Treatment now", "अभी का इलाज"), treatment).takeIf { treatment.isNotBlank() },
             ).forEach { (icon, label, value) ->
@@ -242,7 +244,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                 val sign = if (total > 0) "+" else if (total < 0) "−" else ""
                 Text(t("Since first", "पहली बार से") + ": $sign${CareWeightHistory.amountText(total)} ${t("kg", "किलो")}", fontWeight = FontWeight.SemiBold, color = DoctorAccent)
             }
-            sorted.indices.reversed().forEach { i ->
+            // The newest five weights, then "Show older" (24 Nov).
+            val weightsShown = rememberShownCount()
+            sorted.indices.reversed().toList().shownOf(weightsShown).forEach { i ->
                 val e = sorted[i]; val before = sorted.getOrNull(i - 1)
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Text(e.day.format(format), Modifier.weight(1f), fontSize = 14.sp, color = DoctorCardSub)
@@ -251,6 +255,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                     Text(when { d == null || d == 0.0 -> ""; d > 0 -> " ▲"; else -> " ▼" }, Modifier.widthIn(min = 24.dp), fontSize = 14.sp, color = DoctorAccent)
                 }
             }
+            SaharaShowOlder(sorted.size, weightsShown, tag = "patient-profile-weights")
             if (sorted.isEmpty() && kg != null) Text("${CarePatientProfileRules.weightText(kg)} ${t("kg", "किलो")} · ${t("Date not recorded", "तारीख़ दर्ज नहीं")}", fontSize = 14.sp)
         }
     }, confirmButton = { TextButton(onClick = onDismiss) { Text(t("Close", "बंद करें")) } })
@@ -282,6 +287,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
     var doctorName by remember { mutableStateOf(initial.doctorName) }
     var doctorPlace by remember { mutableStateOf(initial.doctorPlace) }
     var doctorPhone by remember { mutableStateOf(initial.doctorPhone) }
+    var doctorLandline by remember { mutableStateOf(initial.doctorLandline) }
     var treatments by remember { mutableStateOf(initial.treatments) }
     var treatmentNote by remember { mutableStateOf(initial.treatmentNote) }
     var showDoctor by remember { mutableStateOf(false) }
@@ -309,13 +315,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
             }
             ProfileStep(3, t("Health", "सेहत")) {
                 ProfileField(illness, { illness = it.take(120) }, t("Main illness / diagnosis", "मुख्य बीमारी / निदान"), Icons.Default.MedicalInformation)
-                ProfileField(illnessSince, { illnessSince = it.take(20) }, t("Since when (for example Mar 2025)", "कब से (जैसे मार्च 2025)"), Icons.Default.Event, KeyboardType.Text,
-                    Modifier.fillMaxWidth().testTag("patient-profile-illness-since"), singleLine = true)
-                // The doctor seen now: three fields behind one "+ Add" chip until any of them is filled in.
-                if (showDoctor || doctorName.isNotBlank() || doctorPlace.isNotBlank() || doctorPhone.isNotBlank()) {
+                // How long, by tap (24 Nov): Months or Years, then a number. An older typed answer ("Mar 2025") shows under it until a number is tapped.
+                Text(t("Since when", "कब से"), fontSize = 14.sp, color = DoctorCardSub)
+                CareDurationPicker(illnessSince, { illnessSince = it }, "patient-profile-illness-since", Modifier.fillMaxWidth())
+                // The doctor seen now: the fields wait behind one "+ Add" chip until any of them is filled in.
+                if (showDoctor || doctorName.isNotBlank() || doctorPlace.isNotBlank() || doctorPhone.isNotBlank() || doctorLandline.isNotBlank()) {
                     ProfileField(doctorName, { doctorName = it.take(100) }, t("Doctor's name", "डॉक्टर का नाम"), Icons.Default.LocalHospital, KeyboardType.Text, Modifier.fillMaxWidth().testTag("patient-profile-doctor-name"), singleLine = true)
                     ProfileField(doctorPlace, { doctorPlace = it.take(120) }, t("Hospital or clinic", "अस्पताल या क्लिनिक"), Icons.Default.Place, KeyboardType.Text, Modifier.fillMaxWidth().testTag("patient-profile-doctor-place"), singleLine = true)
-                    ProfileField(doctorPhone, { v -> doctorPhone = v.filter { it.isDigit() || it in "+ -" }.take(20) }, t("Doctor's phone", "डॉक्टर का फ़ोन"), Icons.Default.Phone, KeyboardType.Phone, Modifier.fillMaxWidth().testTag("patient-profile-doctor-phone"))
+                    CarePhoneField(doctorPhone, { doctorPhone = it }, t("Doctor's phone", "डॉक्टर का फ़ोन"), "patient-profile-doctor-phone", Modifier.fillMaxWidth(), leadingIcon = Icons.Default.Phone)
+                    CarePhoneField(doctorLandline, { doctorLandline = it }, t("Hospital / landline number (optional)", "अस्पताल / लैंडलाइन नंबर (ज़रूरी नहीं)"), "patient-profile-doctor-landline", Modifier.fillMaxWidth(), leadingIcon = Icons.Default.Call)
                 } else SaharaAddChip(t("Add doctor now", "अभी के डॉक्टर जोड़ें"), { showDoctor = true }, Modifier.testTag("patient-profile-add-doctor"), tone = SaharaTone.Indigo)
                 Text(t("Treatment now", "अभी का इलाज"), fontSize = 14.sp, color = DoctorCardSub)
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.testTag("patient-profile-treatments")) {
@@ -327,7 +335,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                 else SaharaAddChip(t("Add allergies", "एलर्जी जोड़ें"), { showAllergies = true }, Modifier.testTag("patient-profile-add-allergies"), tone = SaharaTone.Plum)
             }
             ProfileStep(4, t("Contact", "संपर्क")) {
-                if (showPhone || phone.isNotBlank()) ProfileField(phone, { phone = it.take(20) }, t("Phone", "फ़ोन"), Icons.Default.Phone, KeyboardType.Phone)
+                if (showPhone || phone.isNotBlank()) CarePhoneField(phone, { phone = it }, t("Phone", "फ़ोन"), "patient-profile-phone", Modifier.fillMaxWidth(), leadingIcon = Icons.Default.Phone)
                 if (showAddress || address.isNotBlank()) ProfileField(address, { address = it.take(160) }, t("City / address", "शहर / पता"), Icons.Default.Place)
                 SaharaAddChips(listOfNotNull(
                     (t("Add phone", "फ़ोन जोड़ें") to { showPhone = true }).takeIf { !showPhone && phone.isBlank() },
@@ -345,7 +353,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
               // copy() keeps any field this sheet does not show, so a newer key is never lost on edit.
               else onSave(initial.copy(age = a.first, sex = sex, weightKg = w.first, heightCm = h.first, bloodGroup = blood, illness = illness.trim(), allergies = allergies.trim(), phone = phone.trim(), address = address.trim(),
                   weights = CareWeightHistory.afterSave(initial, w.first, java.time.LocalDate.now()),
-                  illnessSince = illnessSince.trim(), doctorName = doctorName.trim(), doctorPlace = doctorPlace.trim(), doctorPhone = doctorPhone.trim(), treatments = treatments, treatmentNote = treatmentNote.trim()))
+                  illnessSince = illnessSince.trim(), doctorName = doctorName.trim(), doctorPlace = doctorPlace.trim(), doctorPhone = doctorPhone.trim(), doctorLandline = doctorLandline.trim(), treatments = treatments, treatmentNote = treatmentNote.trim()))
           }, busy = busy, modifier = Modifier.fillMaxWidth().testTag("patient-profile-save"))
         }
     }
@@ -375,4 +383,47 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
         leadingIcon = if (selected) { { Icon(Icons.Default.Check, null, Modifier.size(16.dp)) } } else null, shape = RoundedCornerShape(50),
         colors = FilterChipDefaults.filterChipColors(containerColor = Cream, labelColor = DoctorCardInk, selectedContainerColor = Mint, selectedLabelColor = DoctorCardInk, selectedLeadingIconColor = DoctorAccent),
         modifier = modifier.heightIn(min = 48.dp))
+}
+
+/**
+ * How long the illness has been known, by tap (24 Nov clinical meeting: "months and years, not unformatted text"): Months or
+ * Years as two segmented buttons, then the numbers 1 to 12 as round chips; tapping the picked number again clears it. [value] is
+ * the stored text ([CareIllnessDuration.encode], e.g. "8 months"); an older typed answer such as "Mar 2025" is shown under the
+ * chips as it was saved, and is replaced only when a number is tapped. Used by onboarding ([unitHeight] 56 dp) and the profile.
+ * Tags: [tag] on the whole picker, "$tag-months" / "$tag-years" on the units, "$tag-1" to "$tag-12" on the numbers.
+ */
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@Composable internal fun CareDurationPicker(value: String, onChange: (String) -> Unit, tag: String, modifier: Modifier = Modifier, enabled: Boolean = true,
+    unitHeight: androidx.compose.ui.unit.Dp = 48.dp, tone: SaharaTone = SaharaTone.Teal) {
+    val t = careText()
+    val current = CareIllnessDuration.parse(value)
+    var chosenYears by androidx.compose.runtime.saveable.rememberSaveable(tag) { mutableStateOf(current?.years ?: false) }
+    val years = current?.years ?: chosenYears
+    Column(modifier.testTag(tag), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+            listOf(false to t("Months", "महीने"), true to t("Years", "साल")).forEachIndexed { index, (unitYears, label) ->
+                SegmentedButton(selected = years == unitYears, enabled = enabled, onClick = {
+                    chosenYears = unitYears
+                    if (current != null && current.years != unitYears) onChange(CareIllnessDuration(current.amount, unitYears).encode())
+                }, shape = SegmentedButtonDefaults.itemShape(index, 2), modifier = Modifier.heightIn(min = unitHeight).testTag("$tag-" + if (unitYears) "years" else "months")) {
+                    Text(label, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                }
+            }
+        }
+        FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            CareIllnessDuration.AMOUNTS.forEach { n ->
+                val on = current != null && current.amount == n
+                val spoken = careIllnessSinceText(CareIllnessDuration(n, years).encode(), t)
+                Surface(checked = on, onCheckedChange = { chosenYears = years; onChange(if (on) "" else CareIllnessDuration(n, years).encode()) }, enabled = enabled, shape = CircleShape,
+                    color = if (on) tone.solid else SaharaColors.Surface, contentColor = if (on) tone.onSolid else SaharaColors.Ink,
+                    border = BorderStroke(if (on) 2.dp else 1.dp, if (on) tone.solid else SaharaColors.Edge),
+                    modifier = Modifier.size(48.dp).testTag("$tag-$n").semantics { contentDescription = spoken }) {
+                    Box(contentAlignment = Alignment.Center) { Text("$n", fontSize = 17.sp, fontWeight = if (on) FontWeight.Bold else FontWeight.Medium) }
+                }
+            }
+        }
+        // What is saved, in words: "How long: 8 months", or an older typed answer as it was written.
+        if (value.isNotBlank()) Text(careIllnessSinceLabel(value, t) + ": " + careIllnessSinceText(value, t), fontSize = 15.sp, fontWeight = FontWeight.Medium,
+            color = DoctorCardInk, modifier = Modifier.fillMaxWidth().testTag("$tag-value"))
+    }
 }

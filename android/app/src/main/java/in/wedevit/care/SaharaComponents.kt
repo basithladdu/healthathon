@@ -132,9 +132,9 @@ internal fun splitsWord(text: String, lineEnds: List<Int>): Boolean {
     // Softer tiles (Dr Sujay, 22 Nov): the section's light wash, a thin section-colour edge, the icon on a solid disc, dark ink text.
     val fill by animateColorAsState(if (pressed) tone.solid.copy(alpha = .22f).compositeOver(tone.wash) else tone.wash, SaharaMotion.tween(SaharaMotion.PRESS_MS), label = "tile-press")
     val shape = RoundedCornerShape(SaharaRadius.Lg)
-    Column(modifier.saharaAppear().saharaPress(interaction).heightIn(min = 112.dp).clip(shape).background(fill).border(1.dp, tone.solid.copy(alpha = .4f), shape)
-        .clickable(interactionSource = interaction, indication = androidx.compose.material3.ripple(color = tone.ink), role = Role.Button, onClick = onClick).a11yCard().padding(14.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(modifier.saharaAppear().saharaPress(interaction).heightIn(min = 92.dp).clip(shape).background(fill).border(1.dp, tone.solid.copy(alpha = .22f), shape)
+        .clickable(interactionSource = interaction, indication = androidx.compose.material3.ripple(color = tone.ink), role = Role.Button, onClick = onClick).a11yCard().padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(40.dp).clip(CircleShape).background(tone.solid), contentAlignment = Alignment.Center) {
                 Icon(icon, null, Modifier.size(24.dp), tint = tone.onSolid)
@@ -184,9 +184,10 @@ internal fun splitsWord(text: String, lineEnds: List<Int>): Boolean {
  * takes that section's wash, a 1.5 dp border in its solid and a solid accent bar down the leading edge.
  */
 @Composable fun SaharaRegister(modifier: Modifier = Modifier, tone: SaharaTone? = null, content: @Composable ColumnScope.() -> Unit) {
-    Surface(modifier.fillMaxWidth().saharaAppear().saharaContentSize(), shape = RoundedCornerShape(SaharaRadius.Lg), color = tone?.wash ?: SaharaColors.Surface,
-        border = BorderStroke(if (tone != null) 1.5.dp else 1.dp, tone?.solid ?: SaharaColors.Edge)) {
-        Column(Modifier.then(if (tone != null) Modifier.saharaAccentBar(tone) else Modifier).padding(vertical = 4.dp), content = content)
+    // Premium pass (24 Nov): one quiet white group with a hairline; the row's icon chip carries the section colour.
+    Surface(modifier.fillMaxWidth().saharaAppear(), shape = RoundedCornerShape(SaharaRadius.Lg), color = SaharaColors.Surface,
+        border = BorderStroke(1.dp, SaharaColors.Line)) {
+        Column(Modifier.padding(vertical = 2.dp), content = content)
     }
 }
 
@@ -206,15 +207,15 @@ fun Modifier.saharaAccentBar(tone: SaharaTone): Modifier = drawWithContent {
     backTag: String? = null, trailing: (@Composable RowScope.() -> Unit)? = null) {
     val t = careText()
     // Softer (Dr Sujay's video, 22 Nov: solid bands felt dark and scary): the section's light wash with its dark ink, a thin edge in the section colour.
-    Surface(modifier.fillMaxWidth().saharaAppear(), shape = RoundedCornerShape(SaharaRadius.Lg + 4.dp), color = tone.wash, contentColor = tone.ink,
-        border = androidx.compose.foundation.BorderStroke(1.dp, tone.solid.copy(alpha = 0.35f))) {
-        Row(Modifier.heightIn(min = 72.dp).padding(start = if (onBack != null) 4.dp else 18.dp, end = 12.dp, top = 10.dp, bottom = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+    // Premium pass (24 Nov, owner: "cards and cards"): a flat page header on the ground, not another box. Back sits first.
+    Surface(modifier.fillMaxWidth().saharaAppear(), color = Color.Transparent, contentColor = tone.ink) {
+        Row(Modifier.heightIn(min = 56.dp).padding(start = if (onBack != null) 0.dp else 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp), verticalAlignment = Alignment.CenterVertically) {
             if (onBack != null) IconButton(onClick = onBack, modifier = Modifier.size(48.dp).then(if (backTag != null) Modifier.testTag(backTag) else Modifier)) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस"), tint = tone.ink)
             }
             Column(Modifier.weight(1f).padding(start = 4.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(title, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Bold, fontSize = 24.sp, lineHeight = 30.sp, color = tone.ink)
-                if (!subtitle.isNullOrBlank()) Text(subtitle, fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.SemiBold, color = SaharaColors.InkSub, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(title, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Bold, fontSize = 22.sp, lineHeight = 28.sp, color = SaharaColors.Ink)
+                if (!subtitle.isNullOrBlank()) Text(subtitle, fontSize = 14.sp, lineHeight = 19.sp, color = SaharaColors.InkSub, maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
             if (trailing != null) { Spacer(Modifier.width(8.dp)); trailing() }
         }
@@ -261,7 +262,7 @@ fun Modifier.saharaAccentBar(tone: SaharaTone): Modifier = drawWithContent {
     val fill by animateColorAsState(if (pressed) tone.ink else tone.solid, SaharaMotion.tween(SaharaMotion.PRESS_MS), label = "button-press")
     Button(onClick = onClick, enabled = enabled && !busy, interactionSource = interaction, shape = RoundedCornerShape(SaharaRadius.Md),
         colors = ButtonDefaults.buttonColors(containerColor = fill, contentColor = tone.onSolid, disabledContainerColor = SaharaColors.Well, disabledContentColor = SaharaColors.InkFaint),
-        elevation = ButtonDefaults.buttonElevation(defaultElevation = 3.dp, pressedElevation = 1.dp, disabledElevation = 0.dp),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp, pressedElevation = 0.dp, disabledElevation = 0.dp),
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp), modifier = modifier.heightIn(min = 56.dp).saharaPress(interaction)) {
         if (busy) { CircularProgressIndicator(Modifier.size(20.dp), color = tone.onSolid, strokeWidth = 2.5.dp); Spacer(Modifier.width(10.dp)) }
         else if (icon != null) { Icon(icon, null, Modifier.size(22.dp)); Spacer(Modifier.width(8.dp)) }
@@ -275,9 +276,10 @@ fun Modifier.saharaAccentBar(tone: SaharaTone): Modifier = drawWithContent {
     tone: SaharaTone = SaharaTone.Rust, navigates: Boolean = false) {
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
-    val fill by animateColorAsState(if (pressed) tone.wash else SaharaColors.Surface, SaharaMotion.tween(SaharaMotion.PRESS_MS), label = "outline-press")
+    // Premium pass (24 Nov): a soft tonal button (the tone's wash, a faint edge) instead of a heavy 2 dp outline.
+    val fill by animateColorAsState(if (pressed) tone.solid.copy(alpha = .18f).compositeOver(tone.wash) else tone.wash, SaharaMotion.tween(SaharaMotion.PRESS_MS), label = "outline-press")
     OutlinedButton(onClick = onClick, enabled = enabled, interactionSource = interaction, shape = RoundedCornerShape(SaharaRadius.Md),
-        border = BorderStroke(2.dp, if (enabled) tone.solid else SaharaColors.Edge),
+        border = BorderStroke(1.dp, if (enabled) tone.solid.copy(alpha = .28f) else SaharaColors.Line),
         colors = ButtonDefaults.outlinedButtonColors(containerColor = fill, contentColor = tone.ink, disabledContentColor = SaharaColors.InkFaint),
         contentPadding = PaddingValues(horizontal = 18.dp, vertical = 10.dp), modifier = modifier.heightIn(min = 56.dp).saharaPress(interaction)) {
         if (icon != null) { Icon(icon, null, Modifier.size(22.dp)); Spacer(Modifier.width(8.dp)) }

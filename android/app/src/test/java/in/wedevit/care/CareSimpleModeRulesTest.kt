@@ -113,4 +113,12 @@ class CareSimpleModeRulesTest {
         listOf("prognosis", "stage", "terminal", "dying", "death", "end of life").forEach { assertTrue(it, !text.lowercase().contains(it)) }
         assertTrue(text.contains("Morning: Paracetamol.") && text.contains("tonight: Morphine."))
     }
+
+    @Test fun simpleModeStartsOnByItselfOnlyForAPatientAged60OrMore() {
+        assertTrue(SimpleModeRules.autoOn(60, patientOwnView = true))
+        assertTrue(SimpleModeRules.autoOn(82, patientOwnView = true))
+        assertTrue(!SimpleModeRules.autoOn(59, patientOwnView = true))
+        assertTrue(!SimpleModeRules.autoOn(null, patientOwnView = true))
+        assertTrue(!SimpleModeRules.autoOn(75, patientOwnView = false))
+    }
 }

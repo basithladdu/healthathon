@@ -9,8 +9,12 @@ class MedicineHistoryRulesTest {
     @Test fun statusesUseOnlyActualScheduledAndReportedTimes() {
         assertEquals("Taken reported",MedicineHistoryRules.status(event(),now))
         assertEquals("Taken reported",MedicineHistoryRules.status(event(planned=100,taken=100),now))
-        assertEquals("Late reported",MedicineHistoryRules.status(event(planned=100,taken=101),now))
-        assertEquals("Skipped reported",MedicineHistoryRules.status(event("skipped"),now))
+        // Late only from one hour after the planned time (MedicineLateRule, clinical team 24 Nov 2026).
+        assertEquals("Taken reported",MedicineHistoryRules.status(event(planned=100,taken=101),now))
+        assertEquals("Late reported",MedicineHistoryRules.status(event(planned=100,taken=100+MedicineLateRule.LATE_AFTER_MS).copy(loggedAt=100+MedicineLateRule.LATE_AFTER_MS),100+MedicineLateRule.LATE_AFTER_MS))
+        // A stored "skipped" is Not taken unless it was skipped on purpose.
+        assertEquals("Not taken reported",MedicineHistoryRules.status(event("skipped"),now))
+        assertEquals("Skipped reported",MedicineHistoryRules.status(event("skipped").copy(note="08:00 dose skipped on purpose."),now))
         assertEquals("Upcoming",MedicineHistoryRules.status(event("planned",planned=now+1),now))
         assertEquals("Not logged",MedicineHistoryRules.status(event("planned",planned=now-1),now))
         assertEquals("Check-off corrected",MedicineHistoryRules.status(event("unmarked"),now))
@@ -58,7 +62,7 @@ class MedicineMissedReportTest {
         assertEquals("Family report", event.reporter); assertEquals("manual", event.source)
         MedicineHistoryRules.validate(event, noon)
         assertEquals("Not recorded", MedicineHistoryRules.missedReport(medicine, "Doctor", noon).reporter)
-        assertEquals("Skipped reported", MedicineHistoryRules.status(event, noon))
+        assertEquals("Not taken reported", MedicineHistoryRules.status(event, noon))
     }
 
     @Test fun todayOutcomeUsesLatestReportOfThatDayAndTheTickedBox() {

@@ -45,7 +45,7 @@ import java.io.File
 /** Last listed prescription originals per account and person, so Documents opens with them instead of popping them in after a file read. */
 private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<String, List<CareReport>>()
 
-@Composable fun CareDocuments(vm: CareModel, onRead: (CareVersion) -> Unit, onTalk: () -> Unit, onCalendarAt: ((Long) -> Unit)? = null, onLabs: (() -> Unit)? = null, onCare: (() -> Unit)? = null) {
+@Composable fun CareDocuments(vm: CareModel, onRead: (CareVersion) -> Unit, onTalk: () -> Unit, onCalendarAt: ((Long) -> Unit)? = null, onLabs: (() -> Unit)? = null, onCare: (() -> Unit)? = null, onBack: (() -> Unit)? = saharaSystemBack()) {
     val savedReports by vm.reports.collectAsStateWithLifecycle()
     val savedNotes by vm.versions.collectAsStateWithLifecycle()
     val person by vm.selected.collectAsStateWithLifecycle()
@@ -132,6 +132,9 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
     val bothLanguages: (String, String) -> String = { en, hi -> "$en $hi" }
     val visibleReports = reports.filter { report -> filter != "Care notes" && (folderFilter.isEmpty() || folderOf(report) == folderFilter) && (filter != "Cancer" || cancerType(report) != null) && DocumentSearchWords.matchesName(search, "${report.name} ${cancerType(report)?.let { CancerDocumentRules.label(it, bothLanguages) }.orEmpty()}") }
     val visibleNotes = notes.filter { filter !in setOf("Reports", "Cancer") && folderFilter.isEmpty() && DocumentSearchWords.matchesName(search, "Goals of care देखभाल के लक्ष्य ${it.personName} ${it.doctor} Version ${it.version}") }
+    // Long lists start short: the newest five, then "Show older" (24 Nov).
+    val notesShown = rememberShownCount("$person:$filter:$search")
+    val reportsShown = rememberShownCount("$person:$filter:$folderFilter:$search")
 
     fun openReport(report: CareReport, share: Boolean) {
         try {
@@ -151,7 +154,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
     }
     LazyColumn(Modifier.fillMaxSize().saharaScreenEnter().testTag("documents-list"), state = listState, contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         // The marigold Documents band, with Add as a white button on it (it glows while there is nothing yet).
-        item { SaharaSectionBand(t("Documents", "कागज़ात"), SaharaSection.Documents) {
+        item { SaharaSectionBand(t("Documents", "कागज़ात"), SaharaSection.Documents, onBack = onBack, backTag = "documents-back") {
             // The doctor reads the patient's documents; adding them stays with the patient and family (Dr Sujay, 22 Nov).
             if (canEdit && !clinician) SaharaBandButton(t("Add document", "कागज़ जोड़ें"), onClick = { addSheet = true }, tone = SaharaSection.Documents, icon = Icons.Default.Add, enabled = !busy, modifier = Modifier.saharaPulseGlow(color = SaharaColors.Surface, corner = SaharaRadius.Md, active = reports.isEmpty()).testTag("document-add"))
         } }
@@ -214,7 +217,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
             else if (filter != "Care notes" && canEdit && !clinician) TextButton(onClick = { addSheet = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Add document", "कागज़ जोड़ें")) }
         } }
         if (visibleNotes.isNotEmpty()) item { SectionTitle(t("Care notes", "देखभाल नोट")) }
-        items(visibleNotes, key = { it.id }) { note ->
+        cappedItems(visibleNotes, notesShown, key = { it.id }, tag = "document-notes") { note ->
             val latest = note.id == notes.firstOrNull()?.id
             // Goals-of-care notes keep their indigo: washed card, solid edge and a solid icon chip.
             Card(onClick = { onRead(note) }, modifier = Modifier.animateItem().saharaStagger(visibleNotes.indexOf(note)).fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = SaharaSection.GoalsOfCare.wash), border = BorderStroke(1.5.dp, SaharaSection.GoalsOfCare.solid)) {
@@ -234,7 +237,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         if (visibleReports.isNotEmpty()) item(key = "reports-title") { SaharaStateSwitch(folderFilter, Modifier.animateItem(), label = "open-folder") { open ->
             if (open.isEmpty()) SectionTitle(t("Reports", "रिपोर्टें")) else SectionTitle(DocumentFolderRules.label(open, t), t("Show all", "सभी दिखाएँ")) { folderFilter = "" }
         } }
-        items(visibleReports, key = { it.id }) { report ->
+        cappedItems(visibleReports, reportsShown, key = { it.id }, tag = "document-reports") { report ->
             // Reports: white card with a marigold edge and accent bar (Documents), the folder's colour on a solid icon chip.
             Surface(Modifier.animateItem().saharaStagger(visibleNotes.size + visibleReports.indexOf(report)).fillMaxWidth(), shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.5.dp, SaharaSection.Documents.solid)) {
                 Column(Modifier.saharaAccentBar(SaharaSection.Documents)) {

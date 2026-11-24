@@ -169,7 +169,7 @@ object CareLabRules {
 }
 
 @OptIn(ExperimentalLayoutApi::class)
-@Composable fun CareWorkflows(vm: CareModel, onTalk: () -> Unit = {}) { val t = careText();
+@Composable fun CareWorkflows(vm: CareModel, onTalk: () -> Unit = {}, onBack: (() -> Unit)? = saharaSystemBack()) { val t = careText();
     val entries by vm.items.collectAsStateWithLifecycle()
     val person by vm.selected.collectAsStateWithLifecycle()
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
@@ -179,9 +179,11 @@ object CareLabRules {
     var adding by rememberSaveable(person) { mutableStateOf("") }
     val workflows = entries.filter { it.personId == person }.mapNotNull { item -> CareEntryCodec.decode(item.detail)?.takeIf { it.type in setOf("task", "conversation") }?.let { item to it } }
     val visible = workflows.filter { (_, data) -> (filter == "All" || data.type == if (filter == "Tasks") "task" else "conversation") && (showFinished || data.status !in setOf("completed", "cancelled")) }
+    val workflowsShown = rememberShownCount("$person:$filter:$showFinished")
+    val sortedVisible = visible
         .sortedWith(compareBy<Pair<CareItem, CareEntry>> { it.second.status in setOf("completed", "cancelled") }.thenBy { it.first.due.takeIf { due -> due > 0 } ?: Long.MAX_VALUE }.thenByDescending { it.first.created })
     LazyColumn(Modifier.fillMaxSize().testTag("workflow-list"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Heading(if (role == "Doctor") t("Care queue", "देखभाल की सूची") else t("Care team", "देखभाल टीम"), 26); Spacer(Modifier.weight(1f)); if (vm.cloud != null) IconButton(onClick = vm::refresh, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Refresh, t("Refresh care team", "देखभाल टीम ताज़ा करें")) } } }
+        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { if (onBack != null) { SaharaBackButton(onBack, tag = "workflow-back"); Spacer(Modifier.width(4.dp)) }; Heading(if (role == "Doctor") t("Care queue", "देखभाल की सूची") else t("Care team", "देखभाल टीम"), 26); Spacer(Modifier.weight(1f)); if (vm.cloud != null) IconButton(onClick = vm::refresh, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Refresh, t("Refresh care team", "देखभाल टीम ताज़ा करें")) } } }
         // One primary action (ask to talk); adding a task is secondary.
         if (canEdit) item { Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(onClick = { adding = "conversation" }, modifier = Modifier.weight(1f).heightIn(min = 48.dp), shape = RoundedCornerShape(14.dp)) { Icon(Icons.Default.Forum, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Ask to talk", "बात करने को कहें"), fontWeight = FontWeight.SemiBold) }
@@ -198,7 +200,7 @@ object CareLabRules {
             Text(if (showFinished) t("No matching requests or tasks", "कोई अनुरोध या काम नहीं मिला") else t("Nothing waiting here", "यहाँ कुछ बाक़ी नहीं"), fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
             if (canEdit) OutlinedButton(onClick = { adding = if (filter == "Tasks") "task" else "conversation" }, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Text(if (filter == "Tasks") t("Add a task", "काम जोड़ें") else t("Ask to talk", "बात करने को कहें"), color = RustText) }
         } } }
-        items(visible, key = { it.first.id }) { (item, data) -> WorkflowCard(vm, item, data, onTalk) }
+        cappedItems(sortedVisible, workflowsShown, key = { it.first.id }, tag = "workflow") { (item, data) -> WorkflowCard(vm, item, data, onTalk) }
     }
     if (adding.isNotEmpty()) CareWorkflowEditor(vm, adding) { adding = "" }
 }

@@ -15,7 +15,7 @@ data class SampleMedicineDose(
         source == null -> if(scheduledAt > asOf) "Upcoming" else "Not logged"
         outcome == SampleDoseOutcome.SKIPPED -> "Skipped reported"
         outcome == SampleDoseOutcome.TAKEN && reportedTakenAt != null ->
-            if(reportedTakenAt > scheduledAt) "Late reported" else "Taken reported"
+            if(MedicineLateRule.isLate(scheduledAt, reportedTakenAt)) "Late reported" else "Taken reported"
         scheduledAt > asOf -> "Upcoming"
         else -> "Not logged"
     }

@@ -17,12 +17,17 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.*
@@ -42,6 +47,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
@@ -81,6 +88,7 @@ internal const val NEARBY_PAGE = 10
     val clear = { search = ""; service = NearbyHelp.ALL_SERVICES; state = NearbyHelp.ALL_INDIA; district = ""; layerKey = allLayers }
     val filtersOn = search.isNotBlank() || service != NearbyHelp.ALL_SERVICES || state != NearbyHelp.ALL_INDIA || district.isNotBlank() || layerKey != allLayers
     var filtersOpen by rememberSaveable { mutableStateOf(false) }
+    var mapExpanded by rememberSaveable { mutableStateOf(false) }
     val filterCount = listOf(service != NearbyHelp.ALL_SERVICES, state != NearbyHelp.ALL_INDIA, district.isNotBlank(), layerKey != allLayers).count { it }
     // First screen at 360 x 800: title, Call 112, search with one Filters button, a short map, and the first centre. Filters live in one sheet.
     LazyColumn(Modifier.fillMaxSize().saharaScreenEnter().testTag("nearby-list"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -120,7 +128,12 @@ internal const val NEARBY_PAGE = 10
         } }
         // The map, short enough that the first centre shows below it. When nothing has a map spot, the list still has Directions.
         if (listed.any { it.latitude != null && it.longitude != null }) item(key = "nearby-map") {
-            Column(Modifier.clip(RoundedCornerShape(12.dp))) { CentreMap(listed, userLocation = here, height = 220.dp, onLocate = location.ask) { chosen = it } }
+            // Drag and pinch inside the box; "Expand map" opens it full screen. While the full map is open the small one steps aside
+            // (one map at a time), so its place stays the same size and the list does not jump.
+            Column(Modifier.clip(RoundedCornerShape(12.dp))) {
+                if (mapExpanded) Box(Modifier.fillMaxWidth().height(220.dp).background(SaharaColors.Well))
+                else CentreMap(listed, userLocation = here, height = 220.dp, onLocate = location.ask, onExpand = { focus.clearFocus(); mapExpanded = true }) { chosen = it }
+            }
         }
         // Empty results: one icon, one line, one way out.
         if (visible.isEmpty()) item(key = "nearby-empty") { SurfaceCard {
@@ -153,6 +166,66 @@ internal const val NEARBY_PAGE = 10
         onState = { if (state != it) district = ""; state = it }, onDistrict = { district = it }, onService = { service = it },
         onLayer = { layer -> layerKey = NearbyHelp.layerOptions.filter { it in NearbyHelp.toggleLayer(layers, layer) }.joinToString(",") }, onClear = clear, onDismiss = { filtersOpen = false })
     if (suggesting && vm != null) CentreSuggestionSheet(vm, if (state == NearbyHelp.ALL_INDIA) "" else state) { suggesting = false }
+    if (mapExpanded) NearbyFullMap(listed, here, onLocate = location.ask, onClose = { mapExpanded = false })
+}
+
+/**
+ * The full-screen map (24 Nov clinical meeting: "like Google Maps"): the same pins as the list, drag, pinch and + / − to zoom,
+ * the locate button, and a round Back button at the top left. Tapping a pin shows a small card at the foot with the centre's
+ * name, place, phone, Call and Directions; Back closes the card first, then the map.
+ */
+@Composable fun NearbyFullMap(centres: List<Centre>, here: Pair<Double, Double>?, onLocate: (() -> Unit)?, onClose: () -> Unit) {
+    val t = careText()
+    var picked by remember { mutableStateOf<List<Centre>>(emptyList()) }
+    val back: () -> Unit = { if (picked.isNotEmpty()) picked = emptyList() else onClose() }
+    Dialog(onDismissRequest = back, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
+        Box(Modifier.fillMaxSize().background(SaharaColors.Ground).testTag("centre-map-full-screen")) {
+            CentreMap(centres, userLocation = here, onLocate = onLocate, fill = true, tag = "centre-map-full") { picked = it }
+            Surface(onClick = onClose, shape = CircleShape, color = Paper, contentColor = Ink, shadowElevation = 4.dp,
+                modifier = Modifier.align(Alignment.TopStart).systemBarsPadding().padding(12.dp).size(52.dp).testTag("centre-map-full-close")) {
+                Box(contentAlignment = Alignment.Center) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Close map", "नक्शा बंद करें"), Modifier.size(26.dp)) }
+            }
+            AnimatedVisibility(picked.isNotEmpty(), Modifier.align(Alignment.BottomCenter), enter = fadeIn(tween(SaharaMotion.ms(SaharaMotion.SELECT_MS))), exit = fadeOut(tween(SaharaMotion.ms(SaharaMotion.SELECT_MS)))) {
+                CentreMapPeek(picked, here, onClose = { picked = emptyList() })
+            }
+        }
+    }
+}
+
+/**
+ * The small card over the full map for the tapped pin: name, place and distance, the phone as listed, then Call (the dialler,
+ * filled in) and Directions (Google Maps navigation). Several centres on one area pin list one after another; it scrolls.
+ */
+@Composable private fun CentreMapPeek(chosen: List<Centre>, here: Pair<Double, Double>?, onClose: () -> Unit) {
+    val t = careText()
+    Surface(shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp), color = SaharaColors.Surface, contentColor = DoctorCardInk, shadowElevation = 12.dp,
+        modifier = Modifier.fillMaxWidth().navigationBarsPadding().heightIn(max = 420.dp).testTag("centre-map-peek")) {
+        Column(Modifier.verticalScroll(rememberScrollState()).padding(start = 20.dp, end = 8.dp, top = 8.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(if (chosen.size > 1) t("${chosen.size} centres here", "यहाँ ${chosen.size} केंद्र") else t("About this centre", "इस केंद्र के बारे में"),
+                    Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 18.sp, color = DoctorCardSub)
+                IconButton(onClick = onClose, modifier = Modifier.size(48.dp).testTag("centre-map-peek-close")) { Icon(Icons.Default.Close, t("Close", "बंद करें"), tint = DoctorCardSub) }
+            }
+            chosen.forEach { c ->
+                val hasPhone = c.phone.any(Char::isDigit)
+                Column(Modifier.padding(end = 12.dp).testTag("centre-map-peek-${c.id}"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(c.name, fontSize = 18.sp, lineHeight = 24.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    val km = here?.let { NearbyHelp.distanceKm(c, it.first, it.second) }
+                    val place = listOf(c.city, c.state).filter(String::isNotBlank).distinct().joinToString(" · ")
+                    val placeLine = listOfNotNull(place.ifBlank { null }, km?.let { k -> val n = Math.round(k).coerceAtLeast(1); if (CentreLocation.approximate(c)) t("about $n km", "लगभग $n किमी") else t("$n km", "$n किमी") }).joinToString(" · ")
+                    if (placeLine.isNotBlank()) Text(placeLine, color = RustText, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    if (hasPhone) Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Phone, null, Modifier.size(18.dp), tint = DoctorCardSub); Spacer(Modifier.width(8.dp))
+                        Text(c.phone, fontSize = 16.sp, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    }
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                        if (hasPhone) NearbyCallButton(c, "centre-map-peek-call-${c.id}", Modifier.weight(1f))
+                        NearbyDirectionsButton(c, "centre-map-peek-directions-${c.id}", Modifier.weight(1f))
+                    }
+                }
+            }
+        }
+    }
 }
 
 /** All Nearby filters in one sheet: state, district, service, and the two layers (which are also the map legend). One button shows the results. */
@@ -218,13 +291,76 @@ internal const val NEARBY_PAGE = 10
     }
 }
 
-/** A small info icon that opens [content] in a dialog: for fine print that matters but should not sit on the screen. */
-@Composable fun NearbyInfoButton(title: String, modifier: Modifier = Modifier, tint: Color = DoctorAccent, content: @Composable ColumnScope.() -> Unit) {
-    val t = careText(); var open by rememberSaveable(title) { mutableStateOf(false) }
+/**
+ * A small info icon that opens [content] on a solid card over a dimmed screen: for fine print that matters but should not sit
+ * on the screen. [actions] (Call, Directions) sit above Close. 24 Nov: the old dialog let the list and map show through its text.
+ */
+@Composable fun NearbyInfoButton(title: String, modifier: Modifier = Modifier, tint: Color = DoctorAccent, actions: (@Composable RowScope.() -> Unit)? = null, content: @Composable ColumnScope.() -> Unit) {
+    var open by rememberSaveable(title) { mutableStateOf(false) }
     IconButton(onClick = { open = true }, modifier = modifier.size(48.dp)) { Icon(Icons.Outlined.Info, title, tint = tint, modifier = Modifier.size(22.dp)) }
-    if (open) AlertDialog(onDismissRequest = { open = false }, containerColor = Paper, title = { Text(title, fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium) },
-        text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp), content = content) },
-        confirmButton = { TextButton(onClick = { open = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Close", "बंद करें"), color = RustText) } })
+    if (open) NearbyInfoCard(title, onDismiss = { open = false }, actions = actions, content = content)
+}
+
+/**
+ * The info card itself: its own full-screen window with a solid scrim (a tap on it closes the card) and an opaque card on top,
+ * so nothing behind it can show through. The text scrolls inside the card when it is long or the text is large.
+ */
+@Composable internal fun NearbyInfoCard(title: String, onDismiss: () -> Unit, actions: (@Composable RowScope.() -> Unit)? = null, content: @Composable ColumnScope.() -> Unit) {
+    val t = careText()
+    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
+        Box(Modifier.fillMaxSize()) {
+            Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = .55f))
+                .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClickLabel = t("Close", "बंद करें"), onClick = onDismiss).testTag("nearby-info-scrim"))
+            Surface(shape = RoundedCornerShape(24.dp), color = SaharaColors.Surface, contentColor = DoctorCardInk, tonalElevation = 0.dp, shadowElevation = 12.dp,
+                modifier = Modifier.align(Alignment.Center).systemBarsPadding().padding(horizontal = 20.dp, vertical = 24.dp).widthIn(max = 520.dp).fillMaxWidth().testTag("nearby-info-card")) {
+                Column(Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 12.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Outlined.Info, null, Modifier.size(24.dp), tint = DoctorAccent)
+                        Spacer(Modifier.width(10.dp))
+                        Text(title, Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 22.sp, lineHeight = 28.sp, color = DoctorCardInk)
+                    }
+                    Spacer(Modifier.height(14.dp))
+                    ProvideTextStyle(MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp, lineHeight = 23.sp, color = DoctorCardInk)) {
+                        Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp), content = content)
+                    }
+                    Spacer(Modifier.height(16.dp))
+                    if (actions != null) { Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically, content = actions); Spacer(Modifier.height(4.dp)) }
+                    TextButton(onClick = onDismiss, modifier = Modifier.align(Alignment.End).heightIn(min = 48.dp).testTag("nearby-info-close")) {
+                        Text(t("Close", "बंद करें"), color = RustText, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                    }
+                }
+            }
+        }
+    }
+}
+
+/** One line in the info card: a small icon and its text. */
+@Composable private fun NearbyInfoLine(icon: androidx.compose.ui.graphics.vector.ImageVector, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
+        Icon(icon, null, Modifier.padding(top = 2.dp).size(20.dp), tint = DoctorCardSub)
+        Spacer(Modifier.width(10.dp))
+        Box(Modifier.weight(1f)) { content() }
+    }
+}
+
+/** Call: opens the dialler with the centre's number filled in (ACTION_DIAL). */
+@Composable private fun NearbyCallButton(c: Centre, tag: String, modifier: Modifier = Modifier) {
+    val context = LocalContext.current; val t = careText()
+    Button(onClick = { open(context, Intent(Intent.ACTION_DIAL, Uri.parse(NearbyHelp.dialUri(c.phone)))) }, colors = ButtonDefaults.buttonColors(containerColor = DoctorStatusGood, contentColor = Color.White),
+        shape = RoundedCornerShape(12.dp), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp), modifier = modifier.heightIn(min = 48.dp).testTag(tag)) {
+        Icon(Icons.Default.Call, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp))
+        Text(t("Call", "फ़ोन करें"), fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
+}
+
+/** Directions: Google Maps (or any maps app) to the listed centre. */
+@Composable private fun NearbyDirectionsButton(c: Centre, tag: String, modifier: Modifier = Modifier) {
+    val context = LocalContext.current; val t = careText()
+    OutlinedButton(onClick = { nearbyOpenDirections(context, c) }, colors = ButtonDefaults.outlinedButtonColors(containerColor = Paper, contentColor = Ink), border = androidx.compose.foundation.BorderStroke(1.5.dp, Ink),
+        shape = RoundedCornerShape(12.dp), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp), modifier = modifier.heightIn(min = 48.dp).testTag(tag)) {
+        Icon(Icons.Default.Directions, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp))
+        Text(t("Directions", "रास्ता"), fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
 }
 
 /** A field that opens a searchable list in a bottom sheet: a long list of states fits without sideways scrolling. */
@@ -276,56 +412,80 @@ internal const val NEARBY_PAGE = 10
 @Composable fun NearbyTag(tag: String, label: String) {
     val (bg, ink) = NearbyHelp.tagColors(tag)
     Surface(shape = RoundedCornerShape(50), color = Color(bg), modifier = Modifier.testTag("centre-tag-$tag")) {
-        Text(label, color = Color(ink), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp))
+        Text(label, color = Color(ink), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false, modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.dp))
     }
 }
 
-/** A centre: name, place, coloured tags and the three actions. Address, source and location notes sit behind the info icon. */
-@OptIn(ExperimentalLayoutApi::class)
+/**
+ * A centre, kept compact (24 Nov): name, one line of place, the coloured tags on one row (it scrolls sideways when they do not
+ * fit), then Call, Directions and Share in one row. Address, source and location notes sit behind the info icon.
+ */
 @Composable fun NearbyCentreCard(c: Centre, here: Pair<Double, Double>? = null) {
     val context = LocalContext.current; val t = careText(); val optionLabel = nearbyOptionLabel()
     val layer = NearbyHelp.layerOf(c)
+    val hasPhone = c.phone.any(Char::isDigit)
     SurfaceCard {
         Row(verticalAlignment = Alignment.Top) {
-            Surface(shape = CircleShape, color = Color(NearbyHelp.tagColors(layer).first), modifier = Modifier.saharaDropIn().size(40.dp).testTag("centre-layer-$layer")) {
-                Box(contentAlignment = Alignment.Center) { Icon(Icons.Default.LocalHospital, null, tint = Color(NearbyHelp.layerColor(layer)), modifier = Modifier.size(22.dp)) }
+            Surface(shape = CircleShape, color = Color(NearbyHelp.tagColors(layer).first), modifier = Modifier.saharaDropIn().padding(top = 4.dp).size(32.dp).testTag("centre-layer-$layer")) {
+                Box(contentAlignment = Alignment.Center) { Icon(Icons.Default.LocalHospital, null, tint = Color(NearbyHelp.layerColor(layer)), modifier = Modifier.size(18.dp)) }
             }
-            Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f)) {
-                Text(c.name, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, lineHeight = 23.sp, color = DoctorCardInk)
+            Spacer(Modifier.width(10.dp))
+            Column(Modifier.weight(1f).padding(top = 2.dp)) {
+                Text(c.name, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, lineHeight = 22.sp, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 val km = here?.let { NearbyHelp.distanceKm(c, it.first, it.second) }
                 val place = listOf(c.city, c.state).filter(String::isNotBlank).distinct().joinToString(" · ")
                 Text(listOfNotNull(place.ifBlank { null }, km?.let { k -> val n = Math.round(k).coerceAtLeast(1); if (CentreLocation.approximate(c)) t("about $n km", "लगभग $n किमी") else t("$n km", "$n किमी") }).joinToString(" · "),
-                    color = RustText, style = MaterialTheme.typography.bodyMedium)
+                    color = RustText, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
-            NearbyInfoButton(t("About this centre", "इस केंद्र के बारे में"), Modifier.testTag("centre-info-${c.id}")) {
-                if (c.address.isNotBlank()) Text(c.address)
-                if (c.sourceListedMorphine == "available") Text(t("Directory lists morphine · call to confirm", "सूची में मॉर्फ़ीन लिखा है · फ़ोन करके पक्का करें"), color = Color(NearbyHelp.layerColor(NearbyHelp.LAYER_MORPHINE)))
-                Text(listOf(c.sourceName, c.checkedOn.takeIf { it.isNotBlank() }?.let { t("Source retrieved $it", "जानकारी ली गई $it") }).filterNotNull().filter(String::isNotBlank).joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub)
-                CentreLocation.note(c)?.let { (en, hi) -> Text(t(en, hi), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub, modifier = Modifier.testTag("centre-approximate-location")) }
-                TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(c.url))) }, contentPadding = PaddingValues(0.dp), modifier = Modifier.testTag("centre-source-${c.id}")) { Text(t("Open the source listing", "मूल सूची खोलें")) }
+            NearbyInfoButton(t("About this centre", "इस केंद्र के बारे में"), Modifier.testTag("centre-info-${c.id}"), actions = {
+                if (hasPhone) NearbyCallButton(c, "centre-info-call-${c.id}", Modifier.weight(1f))
+                NearbyDirectionsButton(c, "centre-info-directions-${c.id}", Modifier.weight(1f))
+            }) {
+                Text(c.name, fontSize = 18.sp, lineHeight = 24.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+                if (c.address.isNotBlank()) NearbyInfoLine(Icons.Default.Place) { Text(c.address) }
+                if (c.sourceListedMorphine == "available") NearbyInfoLine(Icons.Default.Medication) {
+                    Text(t("Directory lists morphine · call to confirm", "सूची में मॉर्फ़ीन लिखा है · फ़ोन करके पक्का करें"), color = Color(NearbyHelp.layerColor(NearbyHelp.LAYER_MORPHINE)), fontWeight = FontWeight.SemiBold)
+                }
+                val source = listOf(c.sourceName, c.checkedOn.takeIf { it.isNotBlank() }?.let { t("Source retrieved $it", "जानकारी ली गई $it") }).filterNotNull().filter(String::isNotBlank).joinToString(" · ")
+                if (source.isNotBlank()) NearbyInfoLine(Icons.Default.Description) { Text(source, fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardSub) }
+                CentreLocation.note(c)?.let { (en, hi) -> NearbyInfoLine(Icons.Default.LocationOn, Modifier.testTag("centre-approximate-location")) { Text(t(en, hi), fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardSub) } }
+                if (c.url.isNotBlank()) TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(c.url))) }, contentPadding = PaddingValues(horizontal = 4.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("centre-source-${c.id}")) {
+                    Icon(Icons.Default.OpenInNew, null, Modifier.size(18.dp), tint = RustText); Spacer(Modifier.width(8.dp))
+                    Text(t("Open the source listing", "मूल सूची खोलें"), color = RustText, fontWeight = FontWeight.SemiBold)
+                }
             }
         }
         val tags = NearbyHelp.cardTags(c)
-        Spacer(Modifier.height(12.dp))
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { tags.forEach { NearbyTag(it, optionLabel(it)) } }
-        Spacer(Modifier.height(12.dp))
-        FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            if (c.phone.any(Char::isDigit)) Button(onClick = { open(context, Intent(Intent.ACTION_DIAL, Uri.parse(NearbyHelp.dialUri(c.phone)))) }, colors = ButtonDefaults.buttonColors(containerColor = DoctorStatusGood, contentColor = Color.White),
-                shape = RoundedCornerShape(12.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("centre-call-${c.id}")) { Icon(Icons.Default.Call, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Call", "फ़ोन करें"), fontWeight = FontWeight.SemiBold) }
-            OutlinedButton(onClick = { nearbyOpenDirections(context, c) }, colors = ButtonDefaults.outlinedButtonColors(containerColor = Paper, contentColor = Ink), border = androidx.compose.foundation.BorderStroke(1.5.dp, Ink),
-                shape = RoundedCornerShape(12.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("centre-directions-${c.id}")) { Icon(Icons.Default.Directions, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Directions", "रास्ता"), fontWeight = FontWeight.SemiBold) }
+        if (tags.isNotEmpty()) {
+            Spacer(Modifier.height(8.dp))
+            Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) { tags.forEach { NearbyTag(it, optionLabel(it)) } }
+        }
+        Spacer(Modifier.height(10.dp))
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            if (hasPhone) NearbyCallButton(c, "centre-call-${c.id}", Modifier.weight(1f))
+            NearbyDirectionsButton(c, "centre-directions-${c.id}", Modifier.weight(1f))
             IconButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, NearbyHelp.shareText(c)), t("Share centre", "केंद्र भेजें"))) },
                 modifier = Modifier.size(48.dp).testTag("centre-share-${c.id}")) { Icon(Icons.Default.Share, t("Share", "भेजें"), tint = DoctorCardSub) }
         }
     }
 }
 
-/** Opens Google Maps at the listed centre; any other maps app or the browser if Google Maps is not installed. */
+/**
+ * Directions to the listed centre (24 Nov): Google Maps navigation straight away for an exact map spot (google.navigation:);
+ * otherwise, or when that fails, Google Maps at the directions or search link; then any maps app (geo:); last, the https link
+ * in the browser.
+ */
 internal fun nearbyOpenDirections(context: Context, c: Centre) {
-    val uri = Uri.parse(NearbyHelp.directionsUrl(c))
-    try { context.startActivity(Intent(Intent.ACTION_VIEW, uri).setPackage("com.google.android.apps.maps")) }
-    catch (_: android.content.ActivityNotFoundException) { open(context, Intent(Intent.ACTION_VIEW, uri)) }
+    val web = Uri.parse(NearbyHelp.directionsUrl(c))
+    val tries = listOfNotNull(
+        NearbyHelp.navigationUri(c)?.let { Intent(Intent.ACTION_VIEW, Uri.parse(it)).setPackage(NearbyHelp.GOOGLE_MAPS_PACKAGE) },
+        Intent(Intent.ACTION_VIEW, web).setPackage(NearbyHelp.GOOGLE_MAPS_PACKAGE),
+        Intent(Intent.ACTION_VIEW, Uri.parse(NearbyHelp.geoUri(c))),
+    )
+    for (intent in tries) {
+        try { context.startActivity(intent); return } catch (_: android.content.ActivityNotFoundException) { } catch (_: SecurityException) { }
+    }
+    open(context, Intent(Intent.ACTION_VIEW, web))
 }
 
 /** The phone's location for Nearby, plus a way to ask for it again. Coarse location only; null until the person allows it. */

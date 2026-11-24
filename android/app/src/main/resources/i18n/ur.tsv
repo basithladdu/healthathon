@@ -5725,3 +5725,127 @@ I have read this version. This is not a formal signature, consent for treatment 
 The patient is under 18. A parent or guardian makes these decisions with the doctor. Ask the child what matters to them too, in words they understand, and write it in their own words.	مریض کی عمر 18 سال سے کم ہے۔ یہ فیصلے والدین یا سرپرست ڈاکٹر کے ساتھ کرتے ہیں۔ بچے سے بھی، اس کی سمجھ کے الفاظ میں، پوچھیں کہ اس کے لیے کیا اہم ہے، اور اسی کے الفاظ میں لکھیں۔
 Add the parent or guardian as the main decision-maker.	والدین یا سرپرست کو مرکزی فیصلہ کرنے والے کے طور پر شامل کریں۔
 Draft annexure. The clinical team must approve this wording before the pilot.	مسودہ ضمیمہ۔ پائلٹ سے پہلے کلینیکل ٹیم کو یہ الفاظ منظور کرنے ہوں گے۔
+Time	وقت
+Reminder time	یاد دہانی کا وقت
+Other time	دوسرا وقت
+Remove time	وقت ہٹائیں
+Up to six times.	زیادہ سے زیادہ چھ وقت۔
+Cancer	کینسر
+Heart failure	دل کی کمزوری
+Kidney disease	گردے کی بیماری
+Lung disease	پھیپھڑوں کی بیماری
+Stroke	فالج (اسٹروک)
+Dementia	ڈیمنشیا (یادداشت کی بیماری)
+Liver disease	جگر کی بیماری
+Parkinson's disease	پارکنسن کی بیماری
+Show older ($remaining more)	پرانے دیکھیں (مزید $remaining)
+Show all ($total)	سب دکھائیں ($total)
+Country code	ملک کا کوڈ
+UAE	متحدہ عرب امارات
+Saudi Arabia	سعودی عرب
+US / Canada	امریکہ / کینیڈا
+UK	برطانیہ
+Singapore	سنگاپور
+Australia	آسٹریلیا
+Qatar	قطر
+Oman	عمان
+Kuwait	کویت
+1 year	1 سال
+$n years	$n سال
+$n months	$n مہینے
+How long	کتنے عرصے سے
+Hospital / landline number (optional)	ہسپتال / لینڈ لائن نمبر (اختیاری)
+Months	مہینے
+Years	سال
+Expand map	بڑا نقشہ
+Zoom in	قریب سے دیکھیں
+Zoom out	دور سے دیکھیں
+Close map	نقشہ بند کریں
+India	بھارت
+No QR yet: it needs the web link.	ابھی QR نہیں ہے: اس کے لیے ویب لنک چاہیے۔
+Valid until $until	$until تک کارآمد
+No web link	ویب لنک نہیں
+Anyone who scans a printed card will see that the family turned this link off. You can make a new link later.	چھپا ہوا کارڈ اسکین کرنے والے دیکھیں گے کہ گھر والوں نے یہ لنک بند کر دیا ہے۔ آپ بعد میں نیا لنک بنا سکتے ہیں۔
+Every card printed with the old link will stop opening. Print the new card.	پرانے لنک والا ہر چھپا ہوا کارڈ کھلنا بند ہو جائے گا۔ نیا کارڈ چھاپیں۔
+No doctor saved	ڈاکٹر محفوظ نہیں کیا گیا
+A calm talk with your doctor about what matters most to you, so your care follows your wishes. You can bring family.	اپنے ڈاکٹر سے ایک پُرسکون بات چیت کہ آپ کے لیے سب سے اہم کیا ہے، تاکہ آپ کی دیکھ بھال آپ کی خواہش کے مطابق ہو۔ آپ گھر والوں کو ساتھ لا سکتے ہیں۔
+Last 7 days	پچھلے 7 دن
+No check-ins in the last 7 days.	پچھلے 7 دنوں میں کوئی حال نہیں لکھا گیا۔
+Nothing noted this day.	اس دن کچھ نہیں لکھا گیا۔
+Notes only	صرف نوٹ
+Not daily	روزانہ نہیں
+${doses.size} times a day	دن میں ${doses.size} بار
+Once a day	دن میں ایک بار
+$taken of $total	$total میں سے $taken
+Not taken reported	نہ لینے کی اطلاع
+Prescription date	نسخے کی تاریخ
+Nebuliser	نیبولائزر
+Saved as: $current	اس طرح محفوظ ہے: $current
+Saved as: $value	اس طرح محفوظ ہے: $value
+Written before: $writtenBefore	پہلے لکھا تھا: $writtenBefore
+No fixed times. On Today, tap ‘Took a dose now’ each time it is taken.	کوئی مقررہ وقت نہیں۔ ہر بار لینے پر آج والے صفحے پر ‘ابھی ایک خوراک لی’ دبائیں۔
+units	یونٹ
+drops	قطرے
+puffs	پف
+Number	عدد
+Directions as written	جیسے لکھی ہیں ویسی ہدایات
+Twice a day	دن میں دو بار
+Three times a day	دن میں تین بار
+Four times a day	دن میں چار بار
+As needed (SOS)	ضرورت پڑنے پر (SOS)
+Taken, not taken or skipped	لی، نہیں لی یا چھوڑ دی
+Nothing reported on this day.	اس دن کچھ درج نہیں ہوا۔
+All taken	سب لی گئیں
+Side effect noted	مضر اثر درج ہوا
+Taken · late	لی · دیر سے
+For pain	درد کے لیے
+For breakthrough pain	اچانک شدید درد کے لیے
+For background pain	مسلسل رہنے والے درد کے لیے
+For breakthrough abdominal pain	پیٹ کے اچانک شدید درد کے لیے
+For abdominal discomfort	پیٹ کی تکلیف کے لیے
+For nausea	متلی کے لیے
+Ease nausea	متلی میں آرام
+To ease nausea	متلی میں آرام کے لیے
+Appetite loss	بھوک نہ لگنا
+For appetite loss	بھوک نہ لگنے کے لیے
+For nausea and appetite	متلی اور بھوک کے لیے
+To ease nausea and appetite loss	متلی اور بھوک نہ لگنے میں آرام کے لیے
+Short course to ease nausea and appetite loss, now finished	متلی اور بھوک نہ لگنے کے لیے مختصر کورس، اب مکمل ہو گیا
+For vomiting	الٹی کے لیے
+For constipation	قبض کے لیے
+To keep bowels regular	پیٹ صاف رکھنے کے لیے
+To keep bowels regular while taking morphine	مارفین لیتے وقت پیٹ صاف رکھنے کے لیے
+For breathlessness	سانس پھولنے کے لیے
+For cough	کھانسی کے لیے
+For fever	بخار کے لیے
+For sleep	نیند کے لیے
+For anxiety	گھبراہٹ کے لیے
+For low mood	اداسی کے لیے
+For acidity	تیزابیت کے لیے
+For itching	خارش کے لیے
+For swelling	سوجن کے لیے
+For mouth ulcers	منہ کے چھالوں کے لیے
+Take before food	کھانے سے پہلے لیں
+Take after food	کھانے کے بعد لیں
+Take with food	کھانے کے ساتھ لیں
+Taken with food	کھانے کے ساتھ لی جاتی ہے
+Take 30 minutes before meals	کھانے سے 30 منٹ پہلے لیں
+Take 30 minutes before meals if nausea is worse then	اگر اس وقت متلی زیادہ ہو تو کھانے سے 30 منٹ پہلے لیں
+On an empty stomach	خالی پیٹ
+Oral	منہ سے
+Once daily	دن میں ایک بار
+Twice daily	دن میں دو بار
+Three times daily	دن میں تین بار
+Four times daily	دن میں چار بار
+Each morning	ہر صبح
+At night	رات کو
+At bedtime	سوتے وقت
+Every 4 hours as needed	ضرورت پڑنے پر ہر 4 گھنٹے بعد
+Three times daily before meals if nausea persists	متلی برقرار رہے تو دن میں تین بار کھانے سے پہلے
+Review if more than 3 doses in 24 hours	24 گھنٹوں میں 3 سے زیادہ خوراکیں لگیں تو ڈاکٹر کو بتائیں
+Do not take extra paracetamol from other sources	کسی اور دوا سے الگ سے پیراسیٹامول نہ لیں
+Do not crush or chew	نہ پیسیں نہ چبائیں
+Dissolve in water	پانی میں گھول کر لیں
+Shake well before use	استعمال سے پہلے اچھی طرح ہلائیں
+Tap a dose when taken. Hold it for Not taken or Skipped.	دوا لینے پر اسے چھوئیں۔ نہیں لی یا چھوڑی ہو تو دبا کر رکھیں۔
+Not yet · late	ابھی نہیں · دیر ہو گئی

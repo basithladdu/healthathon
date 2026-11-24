@@ -203,7 +203,11 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                         }
                     }
                 } else DoctorPatientWorkspace(vm, realPatientId, section, { next -> navigate { section = next } },
-                    hub = { pane, open -> DoctorPatientOpenPrompts(vm, realPatientId, onOpenSymptoms = { navigate { section = "Progress" } }) { navigate { section = "GoalsOfCare" } }; DoctorSharedPatientHub(realPatient!!, onSection = { next -> navigate { section = next } }, items = vm.items, pane = pane, selected = open) },
+                    hub = { pane, open -> DoctorPatientOpenPrompts(vm, realPatientId, onOpenSymptoms = { navigate { section = "Progress" } }) { navigate { section = "GoalsOfCare" } }
+                        Column(Modifier.fillMaxSize()) {
+                            DoctorGocRequestNotice(vm, realPatientId, onOpen = { navigate { section = "GoalsOfCare" } }, modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp))
+                            Box(Modifier.weight(1f)) { DoctorSharedPatientHub(realPatient!!, onSection = { next -> navigate { section = next } }, items = vm.items, pane = pane, selected = open) }
+                        } },
                     care = { shown -> key(selection!!.stateKey) {
                         editorStates.SaveableStateProvider("${selection!!.stateKey}:care") {
                             EmbeddedPatientCare(vm, realPatientId, shown, { next -> section = next }, onAccount, { selection = null }, onNavigationBlockedChange = { navigationBlocked = it }, onHeaderBackChange = { nestedBack = it })
@@ -217,7 +221,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                     "Reports" -> editorStates.SaveableStateProvider("$userId:test:${patient.id}:files") { ConnectedFiles(cloud, patient, dataset!!.files.filter { it.patientId == patient.id }, onSaved = ::refresh, onNavigationBlockedChange = { navigationBlocked = it }) }
                     "Medicines" -> editorStates.SaveableStateProvider("$userId:test:${patient.id}:medicines") { ConnectedMedicines(cloud, patient, dataset!!.doses.filter { it.patientId == patient.id }, onSaved = ::refresh, onNavigationBlockedChange = { navigationBlocked = it }) }
                     "Visits" -> ConnectedVisits(patient, localVisits, onSchedule = { schedulePatient = patient.id }, onUpdate = { changed -> localVisits = localVisits.map { if (it.id == changed.id) changed else it } })
-                    else -> LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    else -> { val progressShown = rememberShownCount(patient.id); LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                         item { Text(patient.careContext, style = MaterialTheme.typography.titleMedium) }
                         if (section == "Hub") {
                             item { DoctorPatientHub(patient.card(), onSection = { section = it }) }
@@ -230,10 +234,11 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                             item { Text(t("Progress", "प्रगति"), style = MaterialTheme.typography.headlineSmall) }
                             val checks = patient.payload.optJSONArray("checkIns")
                             if (checks == null || checks.length() == 0) item { Text(t("No updates yet.", "अभी कोई अपडेट नहीं।")) }
-                            else items(checks.length()) { index -> val row = checks.getJSONObject(index); ConnectedCard(row.optString("source", t("Reported update", "बताया गया अपडेट"))) { Text(row.optString("text"), lineHeight = 25.sp); row.optLong("at").takeIf { it > 0 }?.let { Text(connectedTime(it), style = MaterialTheme.typography.bodySmall) } } }
+                            else items(minOf(checks.length(), progressShown.intValue.coerceAtLeast(SaharaShowMore.INITIAL))) { index -> val row = checks.getJSONObject(index); ConnectedCard(row.optString("source", t("Reported update", "बताया गया अपडेट"))) { Text(row.optString("text"), lineHeight = 25.sp); row.optLong("at").takeIf { it > 0 }?.let { Text(connectedTime(it), style = MaterialTheme.typography.bodySmall) } } }
+                            if (checks != null && checks.length() > SaharaShowMore.INITIAL) item { SaharaShowOlder(checks.length(), progressShown, tag = "connected-progress") }
                             item { TextButton(onClick = { section = "Medicines" }) { Text(t("Medicines", "दवाइयाँ")) } }
                         }
-                    }
+                    } }
                 }
             } else SaharaScreenHost(tab, Modifier.fillMaxSize(), label = "doctorTabs", direction = { from, to -> if (to > from) SaharaMotion.Direction.Forward else SaharaMotion.Direction.Back }) { shownTab -> when(shownTab) {
                 0 -> CompositionLocalProvider(LocalSaharaStagger provides remember { SaharaStagger() }) { SaharaPullRefresh(vm.refreshing, { vm.refresh(); checkClinician() }, enabled = !earlierWorkspace) { LazyColumn(Modifier.fillMaxSize().background(SaharaBackdrop).testTag("doctor-home"), state = homeList, contentPadding = PaddingValues(start = 16.dp, top = 12.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -415,9 +420,10 @@ private fun connectedTopicLabel(status: WorkflowTopicStatus, t: (String, String)
 }
 
 @Composable private fun ConnectedVisits(patient: ConnectedDoctorPatient, visits: List<DoctorDemoAppointment>, onSchedule: () -> Unit, onUpdate: (DoctorDemoAppointment) -> Unit) { val t = careText();
+    val visitsShown = rememberShownCount(patient.id)
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         item { Text(t("Visits", "विज़िट"), style = MaterialTheme.typography.headlineSmall); Button(onClick = onSchedule) { Text(t("Schedule visit", "विज़िट तय करें")) } }
-        items(visits.filter { it.patientId == patient.id }, key = { it.id }) { visit -> ConnectedCard(connectedTime(visit.startMillis)) { Text("${visit.type} · ${visit.durationMinutes} minutes"); Text(visit.status); Text(visit.note); TextButton(onClick = { onUpdate(visit.copy(status = "Completed")) }) { Text(t("Mark complete", "पूरी हुई")) }; TextButton(onClick = { onUpdate(visit.copy(status = "Cancelled")) }) { Text(t("Cancel visit", "विज़िट रद्द करें")) } } }
+        cappedItems(visits.filter { it.patientId == patient.id }.sortedByDescending { it.startMillis }, visitsShown, key = { it.id }, tag = "connected-visits") { visit -> ConnectedCard(connectedTime(visit.startMillis)) { Text("${visit.type} · ${visit.durationMinutes} minutes"); Text(visit.status); Text(visit.note); TextButton(onClick = { onUpdate(visit.copy(status = "Completed")) }) { Text(t("Mark complete", "पूरी हुई")) }; TextButton(onClick = { onUpdate(visit.copy(status = "Cancelled")) }) { Text(t("Cancel visit", "विज़िट रद्द करें")) } } }
     }
 }
 
@@ -498,6 +504,7 @@ private fun connectedTopicLabel(status: WorkflowTopicStatus, t: (String, String)
             saved = false
         }
     }
+    val notesShown = rememberShownCount(patient.id)
     LazyColumn(Modifier.fillMaxSize().imePadding(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         item { Text(t("Care conversation", "देखभाल पर बातचीत"), fontFamily = SaharaTitleFont, fontSize = 28.sp) }
         item { if (!busy) DoctorLocalPreviewCapture(audio, draft.sourceText, if(draft.sourceText.isBlank()) DoctorTranscriptKind.NONE else if(draft.mockGenerated)DoctorTranscriptKind.FICTIONAL_SAMPLE else DoctorTranscriptKind.MANUAL, ::editSource) else LinearProgressIndicator(Modifier.fillMaxWidth(), color = Rust) }
@@ -586,7 +593,7 @@ private fun connectedTopicLabel(status: WorkflowTopicStatus, t: (String, String)
         item { Button(onClick = { run(false) }, enabled = !busy && !audioState.recording, modifier = Modifier.fillMaxWidth().testTag("connected-save-note")) { Text(t("Save draft", "ड्राफ़्ट सहेजें")) } }
         item { CheckLine(checked, { if(!busy) checked = it }, t("I checked this text", "मैंने यह लिखाई जाँची")) }
         item { OutlinedButton(onClick = { run(true) }, enabled = !busy && !audioState.recording && checked && draft.sourceText.isNotBlank(), modifier = Modifier.fillMaxWidth().testTag("connected-publish-note")) { Text(t("Publish", "प्रकाशित करें")) } }
-        items(notes.filter { it.status != "draft" }.sortedByDescending { it.updatedAt }, key = { it.id }) { note -> ConnectedPublishedNote(note) }
+        cappedItems(notes.filter { it.status != "draft" }.sortedByDescending { it.updatedAt }, notesShown, key = { it.id }, tag = "connected-notes") { note -> ConnectedPublishedNote(note) }
     }
 }
 
@@ -602,9 +609,10 @@ private fun connectedTopicLabel(status: WorkflowTopicStatus, t: (String, String)
     val latestNavigationCallback by rememberUpdatedState(onNavigationBlockedChange)
     LaunchedEffect(busy) { latestNavigationCallback(busy) }
     DisposableEffect(Unit) { onDispose { latestNavigationCallback(false) } }
+    val dosesShown = rememberShownCount(patient.id)
     LazyColumn(Modifier.fillMaxSize().imePadding(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         item { Text(t("Medicines", "दवाइयाँ"), style = MaterialTheme.typography.headlineSmall) }
-        items(doses.sortedByDescending { it.plannedAt }, key = { it.id }) { dose -> ConnectedCard(dose.medicineLabel) { Text(if(dose.outcome == "skipped") t("Skipped reported", "छोड़ने की सूचना") else t("Taken reported", "लेने की सूचना"), color = Rust); Text(t("Planned: ${connectedTime(dose.plannedAt)}", "तय: ${connectedTime(dose.plannedAt)}")); Text(t("Reported taken: ", "लेने का बताया समय: ") + "${dose.reportedTakenAt?.let(::connectedTime) ?: t("Not reported", "सूचना नहीं")}"); Text(t("Logged: ", "दर्ज: ") + connectedTime(dose.loggedAt)); Text(if(dose.reporterId == cloud.session.value?.userId) t("Reported by you", "आपने बताया") else t("Reported by others", "दूसरों ने बताया"), style = MaterialTheme.typography.bodySmall) } }
+        cappedItems(doses.sortedByDescending { it.plannedAt }, dosesShown, key = { it.id }, tag = "connected-doses") { dose -> ConnectedCard(dose.medicineLabel) { Text(if(dose.outcome == "skipped") t("Skipped reported", "छोड़ने की सूचना") else t("Taken reported", "लेने की सूचना"), color = Rust); Text(t("Planned: ${connectedTime(dose.plannedAt)}", "तय: ${connectedTime(dose.plannedAt)}")); Text(t("Reported taken: ", "लेने का बताया समय: ") + "${dose.reportedTakenAt?.let(::connectedTime) ?: t("Not reported", "सूचना नहीं")}"); Text(t("Logged: ", "दर्ज: ") + connectedTime(dose.loggedAt)); Text(if(dose.reporterId == cloud.session.value?.userId) t("Reported by you", "आपने बताया") else t("Reported by others", "दूसरों ने बताया"), style = MaterialTheme.typography.bodySmall) } }
         item { ConnectedCard(t("Add dose", "ख़ुराक जोड़ें")) {
             OutlinedTextField(medicine,{medicine=it},label={Text(t("Medicine label", "दवा का नाम"))},enabled=!busy,modifier=Modifier.fillMaxWidth())
             ConnectedDateTime("Planned",planned,!busy){planned=it}
@@ -666,9 +674,10 @@ private fun connectedTopicLabel(status: WorkflowTopicStatus, t: (String, String)
     DisposableEffect(Unit) { onDispose { latestNavigationCallback(false) } }
     val picker=rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) {uriText=it?.toString();consent=false}
     fun run(action:suspend()->Unit) {if(!busy){busy=true;message=null;scope.launch {try{action()}catch(e:Exception){if(e is CancellationException)throw e;message=e.message ?: t("Something went wrong", "कुछ गड़बड़ हुई")}finally{busy=false}}}}
+    val filesShown = rememberShownCount(patient.id)
     LazyColumn(Modifier.fillMaxSize().imePadding(),contentPadding=PaddingValues(20.dp),verticalArrangement=Arrangement.spacedBy(16.dp)) {
         item { Text(t("Reports and recordings", "रिपोर्ट और रिकॉर्डिंग"),fontFamily = SaharaTitleFont,fontSize=27.sp) }
-        items(files,key={it.id}) {file->ConnectedCard(file.title) {Text("${file.kind} · ${file.bytes/1024} KB");Text(connectedTime(file.createdAt),style=MaterialTheme.typography.bodySmall);if(file.ready) {OutlinedButton(onClick={run {val local=cloud.downloadDoctorFile(context,file);val shared=FileProvider.getUriForFile(context,"${context.packageName}.fileprovider",local);val intent=Intent(Intent.ACTION_VIEW).setDataAndType(shared,file.mime).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);context.startActivity(Intent.createChooser(intent,t("Open file", "फ़ाइल खोलें")))}},enabled=!busy) {Text(t("Open", "खोलें"))}} else Text(t("Upload incomplete", "अपलोड अधूरा"),color=Rust) } }
+        cappedItems(files, filesShown, key={it.id}, tag="connected-files") {file->ConnectedCard(file.title) {Text("${file.kind} · ${file.bytes/1024} KB");Text(connectedTime(file.createdAt),style=MaterialTheme.typography.bodySmall);if(file.ready) {OutlinedButton(onClick={run {val local=cloud.downloadDoctorFile(context,file);val shared=FileProvider.getUriForFile(context,"${context.packageName}.fileprovider",local);val intent=Intent(Intent.ACTION_VIEW).setDataAndType(shared,file.mime).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);context.startActivity(Intent.createChooser(intent,t("Open file", "फ़ाइल खोलें")))}},enabled=!busy) {Text(t("Open", "खोलें"))}} else Text(t("Upload incomplete", "अपलोड अधूरा"),color=Rust) } }
         item {
             ConnectedCard(t("Add file", "फ़ाइल जोड़ें")) {
                 FlowRow(horizontalArrangement=Arrangement.spacedBy(8.dp)) {

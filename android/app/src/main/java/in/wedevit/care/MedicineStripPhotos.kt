@@ -232,59 +232,37 @@ class MedicineStripPhotos(context: Context, storage: String) {
     }
 }
 
-/** Dose times typed by hand: quick choices plus any other HH:mm time. Saved with the medicine, so family phones get the same reminder times. */
+/**
+ * Dose times, tapped never typed: Morning / Afternoon / Evening / Night chips plus "+ Other time", which opens the clock dial ([CareTimeChips]).
+ * Saved with the medicine as "HH:mm", so family phones get the same reminder times.
+ */
 @Composable fun DoseTimesField(times: List<String>, onChange: (List<String>) -> Unit, enabled: Boolean = true) {
-    val t = careText(); val hindi = careHindi()
-    var other by remember { mutableStateOf(times.filter { it !in MedicineDoseRules.commonTimes }.joinToString(", ")) }
-    var error by remember { mutableStateOf(false) }
+    val t = careText()
     Text(t("Dose times", "दवा का समय"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
-    FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        MedicineDoseRules.commonTimes.forEach { time ->
-            val slot = MedicineDoseRules.slot(time); val on = time in times
-            // Time chip: the clock time in bold, the part of day beside it; a tick once chosen.
-            FilterChip(selected = on, enabled = enabled, onClick = { onChange(if (on) times - time else (times + time).sorted()) },
-                label = { Text("${careTr(hindi, slot.english, slot.hindi)} $time", fontSize = 15.sp, maxLines = 1, softWrap = false, fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal) },
-                leadingIcon = if (on) { { Icon(Icons.Default.Check, null, Modifier.size(18.dp)) } } else null, shape = RoundedCornerShape(50),
-                colors = FilterChipDefaults.filterChipColors(containerColor = Paper, labelColor = DoctorCardInk, selectedContainerColor = DoctorStatusGoodBg, selectedLabelColor = DoctorCardInk, selectedLeadingIconColor = DoctorStatusGood),
-                modifier = Modifier.heightIn(min = 48.dp).testTag("dose-time-$time"))
-        }
-    }
-    // Most doses fit the quick chips; a typed time waits behind "+ Add another time" until one is needed or already saved.
-    var showOther by rememberSaveable { mutableStateOf(other.isNotBlank()) }
-    if (!showOther && other.isBlank()) { SaharaAddChip(t("Add another time", "दूसरा समय जोड़ें"), { showOther = true }, Modifier.testTag("dose-time-other"), tone = SaharaTone.Plum); return }
-    CareField(other, { value ->
-        other = value.take(60)
-        val typed = other.split(',').map(String::trim).filter(String::isNotEmpty)
-        val valid = runCatching { CareReminderRules.validTimes(typed) }.getOrNull()
-        error = valid == null
-        if (valid != null) onChange((times.filter { it in MedicineDoseRules.commonTimes } + valid).distinct().sorted())
-    }, t("Other times", "दूसरे समय"), singleLine = true, placeholder = t("e.g. 06:00, 14:30", "जैसे 06:00, 14:30"),
-        supporting = if (error) t("Use HH:mm, such as 08:30.", "HH:mm लिखें, जैसे 08:30।") else null)
+    CareTimeChips(times, onChange, Modifier.fillMaxWidth(), enabled = enabled, tagPrefix = "dose-time")
 }
 
 @OptIn(ExperimentalLayoutApi::class)
-/** The hand-entered parts of a medicine, each label with an example. Nothing here is ever filled from a photo except via [MedicinePhotoFields]. */
+/**
+ * The hand-entered parts of a medicine, each label with an example. Nothing here is ever filled from a photo except via [MedicinePhotoFields].
+ * 24 Nov 2026: the form is a chip (no Oral solution; Nebuliser added; one Injection), How often is a choice that fills the dose times,
+ * and strength is a number with a unit chip ([MedicineFormFields]). Saved as the same labelled text as before.
+ */
 @Composable fun MedicineEntryForm(name: String, onName: (String) -> Unit, detail: String, onDetail: (String) -> Unit, storage: String, personId: String, itemId: String, busy: Boolean) {
-    val t = careText(); val hindi = careHindi()
+    val t = careText()
     val entry = MedicineEntryText.parse(detail) ?: MedicineEntry()
     fun change(next: MedicineEntry) = onDetail(MedicineEntryText.detail(next))
-    // A brand-new medicine starts as a tablet at 08:00 (both visible and easy to change). An existing or restored one is never touched.
-    LaunchedEffect(itemId) { if (detail.isBlank() && name.isBlank()) change(MedicineEntry(form = "Tablet", times = listOf(MedicineDoseRules.commonTimes.first()))) }
+    // A brand-new medicine starts as a tablet once a day at 08:00 (all visible and easy to change). An existing or restored one is never touched.
+    LaunchedEffect(itemId) { if (detail.isBlank() && name.isBlank()) change(MedicineEntry(form = "Tablet", howOften = MedicineFrequency.ONCE.english, times = MedicineFrequencyRules.defaultTimes(MedicineFrequency.ONCE))) }
     CareField(name, onName, t("Medicine name *", "दवा का नाम *"), singleLine = true, placeholder = t("e.g. Paracetamol", "जैसे Paracetamol"))
     MedicineNameSuggestions(name, enabled = !busy) { onName(it) }
-    Text(t("Form", "रूप"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
-    FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        MedicinePhotoFields.forms.forEach { (english, hindiName) ->
-            FilterChip(selected = entry.form.equals(english, true), enabled = !busy, onClick = { change(entry.copy(form = if (entry.form.equals(english, true)) "" else english)) },
-                label = { Text(careTr(hindi, english, hindiName), fontSize = 15.sp, maxLines = 1, softWrap = false) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp))
-        }
-    }
-    // What the strip shows can be filled from a photo (under More details); how to take it is always typed by hand.
+    MedicineFormPicker(entry.form, { change(entry.copy(form = it)) }, enabled = !busy)
+    // What the strip shows can be filled from a photo (under More details); how to take it is always chosen by hand.
     Text(t("How to take it", "कैसे लेनी है"), Modifier.padding(top = 8.dp).a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
     CareField(entry.howMuch, { change(entry.copy(howMuch = it.take(80))) }, t("How much each time", "हर बार कितनी"), singleLine = true, placeholder = t("e.g. 1 tablet, 1½ tablets, 5 ml", "जैसे 1 गोली, 1½ गोली, 5 ml"))
-    DoseTimesField(entry.times, { change(entry.copy(times = it)) }, enabled = !busy)
+    MedicineHowOftenFields(entry.howOften, entry.times, { often, times -> change(entry.copy(howOften = often.take(120), times = times)) }, enabled = !busy)
     // Everything else is optional and waits behind one button; it opens by itself when something in it is already filled.
-    var more by rememberSaveable(itemId) { mutableStateOf(entry.strength.isNotBlank() || entry.howOften.isNotBlank() || entry.food != MedicineMealTiming.NOT_STATED || entry.days != null || entry.directions.isNotBlank()) }
+    var more by rememberSaveable(itemId) { mutableStateOf(entry.strength.isNotBlank() || entry.food != MedicineMealTiming.NOT_STATED || entry.days != null || entry.directions.isNotBlank()) }
     Column(Modifier.fillMaxWidth().saharaContentSize(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         TextButton(onClick = { more = !more }, modifier = Modifier.heightIn(min = 48.dp).testTag("medicine-more-details")) {
             Text(if (more) t("Fewer details", "कम जानकारी") else t("More details", "और जानकारी"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = SaharaSection.Medicines.ink)
@@ -296,8 +274,7 @@ class MedicineStripPhotos(context: Context, storage: String) {
                 val filled = entry.copy(strength = entry.strength.ifBlank { reading.strength }, form = entry.form.ifBlank { reading.form })
                 if (filled != entry) change(filled)
             }
-            CareField(entry.strength, { change(entry.copy(strength = it.take(80))) }, t("Strength", "ताक़त"), singleLine = true, placeholder = t("e.g. 500 mg, 5 mg/5 ml", "जैसे 500 mg, 5 mg/5 ml"))
-    CareField(entry.howOften, { change(entry.copy(howOften = it.take(120))) }, t("How often", "कितनी बार"), singleLine = true, placeholder = t("e.g. twice a day, only when needed", "जैसे दिन में दो बार, ज़रूरत होने पर ही"))
+            MedicineStrengthField(entry.strength, { change(entry.copy(strength = it.take(80))) }, enabled = !busy)
     Text(t("Food", "खाना"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
     FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         listOf(MedicineMealTiming.BEFORE_FOOD to ("Before food" to "खाने से पहले"), MedicineMealTiming.WITH_FOOD to ("With food" to "खाने के साथ"), MedicineMealTiming.AFTER_FOOD to ("After food" to "खाने के बाद")).forEach { (timing, label) ->
@@ -357,9 +334,9 @@ internal object TodayDoseCompact {
     val total = doses.values.sumOf { it.size }
     val taken = medicines.sumOf { m -> MedicineDoses.takenCount(MedicineDoses.states(m, doses[m.id].orEmpty(), events, today, zone)) }
     val failed = t("Couldn't save. Please try again.", "सहेजा नहीं जा सका। कृपया फिर कोशिश करें।")
-    val mark: (CareItem, MedicineDose, Boolean, Boolean, String) -> Unit = { item, dose, yes, quick, label ->
+    val mark: (CareItem, MedicineDose, MedicineDoseChoice, Boolean, String) -> Unit = { item, dose, choice, quick, label ->
         val save: (LocalDate) -> Unit = { day -> if (canEditCareContext(vm, item.personId, vm.accountNamespace)) { working = true; problem = ""; scope.launch {
-            try { markMedicineDose(context, vm, item, doses[item.id].orEmpty(), dose, yes, quick, label, day) }
+            try { markMedicineDose(context, vm, item, doses[item.id].orEmpty(), dose, choice == MedicineDoseChoice.TAKEN, quick, label, day, skipped = choice == MedicineDoseChoice.SKIPPED) }
             catch (e: Exception) { if (e is CancellationException) throw e; problem = if (e is IllegalArgumentException) e.message ?: failed else failed }
             finally { working = false }
         } } }
@@ -389,7 +366,7 @@ internal object TodayDoseCompact {
             LinearProgressIndicator(progress = { share }, modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(50)), color = SaharaTone.Success.solid, trackColor = SaharaColors.Surface, drawStopIndicator = {}, gapSize = 0.dp)
             // All of today's doses taken, by the tick just made: a small burst while its Undo shows.
             if (total > 0 && taken == total && held?.personId == person) SaharaLottie(SaharaLottieKind.Confetti, Modifier.align(Alignment.CenterHorizontally))
-            if (canEdit && taken < total && held?.personId != person) Text(t("Tap a dose when taken. Hold it for Missed.", "दवा लेने पर उसे छुएँ। छूटी हो तो दबाकर रखें।"), fontSize = 14.sp, color = DoctorCardSub)
+            if (canEdit && taken < total && held?.personId != person) Text(t("Tap a dose when taken. Hold it for Not taken or Skipped.", "दवा लेने पर उसे छुएँ। नहीं ली या छोड़ी हो तो दबाकर रखें।"), fontSize = 14.sp, color = DoctorCardSub)
             // "Marked taken · Undo" sits right under the count, in the first screenful, while a one-tap tick waits.
             DoseUndoRow(person)
             // Many doses (20+ medicines is common, Sujay 7 and 21 Nov): only the next time still due is open; other times fold to one line each.
@@ -410,12 +387,23 @@ internal object TodayDoseCompact {
                         Text(if (left == 0) t("All marked", "सब दर्ज") else t("$left to take", "$left लेनी हैं"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub)
                         if (index != nextOpen) Icon(if (open) Icons.Default.ExpandLess else Icons.Default.ExpandMore, if (open) t("Hide", "छिपाएँ") else t("Show", "दिखाएँ"), Modifier.padding(start = 4.dp), tint = SaharaSection.Medicines.ink)
                     }
-                    // Wraps onto new lines instead of hiding doses off the side of the screen.
-                    if (open) FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    // A long day (10 to 20 medicines, owner 24 Nov): one dense row per medicine instead of a big pillbox each.
+                    if (open && compact) Surface(shape = RoundedCornerShape(16.dp), color = Paper, modifier = Modifier.fillMaxWidth()) {
+                        Column {
+                            group.medicines.forEachIndexed { row, medicine ->
+                                val item = byId[medicine.itemId]; val dose = doses[medicine.itemId].orEmpty().firstOrNull { it.time == group.time }
+                                if (item != null && dose != null) key(item.id, dose.key) {
+                                    if (row > 0) HorizontalDivider(Modifier.padding(start = 64.dp), color = DoctorHairline.copy(alpha = .6f))
+                                    MedicineDoseRow(item, dose, MedicineDoses.state(item, dose, events, today, zone), photos[item.id], canEdit && !busy && !working, MedicineDoses.loggedByFamily(item, dose, events, today, zone)) { choice, quick -> mark(item, dose, choice, quick, dose.time) }
+                                }
+                            }
+                        }
+                    } else if (open) FlowRow( // Wraps onto new lines instead of hiding doses off the side of the screen.
+                        Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         group.medicines.forEach { medicine ->
                             val item = byId[medicine.itemId]; val dose = doses[medicine.itemId].orEmpty().firstOrNull { it.time == group.time }
                             if (item != null && dose != null) key(item.id, dose.key) {
-                                MedicinePillbox(item, dose, MedicineDoses.state(item, dose, events, today, zone), photos[item.id], "", canEdit && !busy && !working, MedicineDoses.loggedByFamily(item, dose, events, today, zone)) { yes, quick -> mark(item, dose, yes, quick, dose.time) }
+                                MedicinePillbox(item, dose, MedicineDoses.state(item, dose, events, today, zone), photos[item.id], "", canEdit && !busy && !working, MedicineDoses.loggedByFamily(item, dose, events, today, zone)) { choice, quick -> mark(item, dose, choice, quick, dose.time) }
                             }
                         }
                     }
@@ -432,7 +420,7 @@ internal object TodayDoseCompact {
                     } }
                     untimed.filterNot { (item, _) -> MedicineDoses.isAsNeededMedicine(item) }.forEach { (item, dose) -> key(item.id, dose.key) {
                         val doseLabel = medicineDoseLabel(dose)
-                        MedicinePillbox(item, dose, MedicineDoses.state(item, dose, events, today, zone), photos[item.id], if (dose.count > 1) t("Dose ${dose.index}", "खुराक ${dose.index}") else "", canEdit && !busy && !working, MedicineDoses.loggedByFamily(item, dose, events, today, zone)) { yes, quick -> mark(item, dose, yes, quick, doseLabel) }
+                        MedicinePillbox(item, dose, MedicineDoses.state(item, dose, events, today, zone), photos[item.id], if (dose.count > 1) t("Dose ${dose.index}", "खुराक ${dose.index}") else "", canEdit && !busy && !working, MedicineDoses.loggedByFamily(item, dose, events, today, zone)) { choice, quick -> mark(item, dose, choice, quick, doseLabel) }
                     } }
                 }
             }
@@ -471,7 +459,7 @@ internal object TodayDoseCompact {
     }
 }
 
-@Composable private fun MedicinePillbox(item: CareItem, dose: MedicineDose, state: MedicineDoseState, photo: File?, caption: String, enabled: Boolean, family: Boolean = false, onMark: (taken: Boolean, quick: Boolean) -> Unit) {
+@Composable private fun MedicinePillbox(item: CareItem, dose: MedicineDose, state: MedicineDoseState, photo: File?, caption: String, enabled: Boolean, family: Boolean = false, onMark: (choice: MedicineDoseChoice, quick: Boolean) -> Unit) {
     val t = careText(); var menu by remember { mutableStateOf(false) }
     val interaction = remember { MutableInteractionSource() }
     val haptic = rememberSaharaHaptic()
@@ -480,29 +468,29 @@ internal object TodayDoseCompact {
     Column(Modifier.width(112.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Box {
             // Ring colour echoes the state: green taken, red-brown missed, a hairline while not yet marked.
-            val ringColor by animateColorAsState(when (state) { MedicineDoseState.TAKEN -> DoctorStatusGood; MedicineDoseState.MISSED -> DoctorStatusRest; else -> DoctorHairline }, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "pillbox-ring")
+            val ringColor by animateColorAsState(when (state) { MedicineDoseState.TAKEN -> DoctorStatusGood; MedicineDoseState.MISSED -> DoctorStatusRest; MedicineDoseState.SKIPPED -> DoctorCardSub; else -> DoctorHairline }, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "pillbox-ring")
             val label = medicineDoseLabel(dose)
-            val stateWord = when (state) { MedicineDoseState.TAKEN -> t("Taken", "ली"); MedicineDoseState.MISSED -> t("Missed", "छूटी"); else -> t("Not yet", "अभी नहीं") }
+            val stateWord = doseStateWord(state)
             val pending = state == MedicineDoseState.PENDING
             val taken = state == MedicineDoseState.TAKEN
             // Taken: a soft green ring blooms out from the pillbox and a light green wash rises over it (the tap itself is never delayed).
             Surface(shape = RoundedCornerShape(14.dp), color = Paper, border = BorderStroke(if (pending) 1.dp else 2.dp, ringColor),
                 modifier = Modifier.saharaBloom(taken && tickedHere, DoctorStatusGood, 14.dp).saharaPress(interaction).clip(RoundedCornerShape(14.dp))
                     .combinedClickable(interactionSource = interaction, indication = LocalIndication.current, enabled = enabled, role = Role.Button,
-                        onClickLabel = if (pending) t("Mark taken", "ली हुई दर्ज करें") else t("Change", "बदलें"), onLongClickLabel = t("Taken or missed", "ली या छूटी"), onLongClick = { menu = true }) { if (pending) { haptic(); tickedHere = true; onMark(true, true) } else menu = true }
+                        onClickLabel = if (pending) t("Mark taken", "ली हुई दर्ज करें") else t("Change", "बदलें"), onLongClickLabel = t("Taken, not taken or skipped", "ली, नहीं ली या छोड़ी"), onLongClick = { menu = true }) { if (pending) { haptic(); tickedHere = true; onMark(MedicineDoseChoice.TAKEN, true) } else menu = true }
                     .semantics { contentDescription = "${item.title}, $label: $stateWord" }.testTag("today-dose-${item.id}-${dose.key}")) {
                 Box(Modifier.saharaFillRise(taken, DoctorStatusGood.copy(alpha = .16f))) { StripThumb(photo, 80) }
             }
             // The tick draws itself (or the cross pops in) on the corner the moment the dose is marked.
             androidx.compose.animation.AnimatedVisibility(visible = !pending, modifier = Modifier.align(Alignment.TopEnd).padding(4.dp), enter = fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)) + scaleIn(SaharaMotion.tween(SaharaMotion.SAVED_MS, easing = SaharaMotion.Emphasized), initialScale = 0.3f), exit = fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS))) {
-                val badge by animateColorAsState(if (state == MedicineDoseState.MISSED) DoctorStatusRest else DoctorStatusGood, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "pillbox-badge")
+                val badge by animateColorAsState(when (state) { MedicineDoseState.MISSED -> DoctorStatusRest; MedicineDoseState.SKIPPED -> DoctorCardSub; else -> DoctorStatusGood }, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "pillbox-badge")
                 Surface(shape = RoundedCornerShape(50), color = badge, modifier = Modifier.size(26.dp)) {
                     Box(Modifier.padding(3.dp), contentAlignment = Alignment.Center) { if (taken) SaharaDrawnCheck(Modifier.size(20.dp), Paper, 2.5.dp) else DoseStateIcon(state, Paper, 20) }
                 }
             }
-            DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
-                DropdownMenuItem(text = { Text(t("Taken", "ली"), color = DoctorCardInk) }, leadingIcon = { Icon(Icons.Default.Check, null, tint = DoctorStatusGood) }, onClick = { menu = false; haptic(); tickedHere = true; onMark(true, false) }, modifier = Modifier.heightIn(min = 48.dp).testTag("today-dose-taken-${item.id}-${dose.key}"))
-                DropdownMenuItem(text = { Text(t("Missed", "छूटी"), color = DoctorCardInk) }, leadingIcon = { Icon(Icons.Default.Close, null, tint = DoctorStatusRest) }, onClick = { menu = false; onMark(false, false) }, modifier = Modifier.heightIn(min = 48.dp).testTag("today-dose-missed-${item.id}-${dose.key}"))
+            DoseChoiceMenu(menu, { menu = false }, "today-dose", "${item.id}-${dose.key}") { choice ->
+                if (choice == MedicineDoseChoice.TAKEN) { haptic(); tickedHere = true }
+                onMark(choice, false)
             }
         }
         // Whole words only: a medicine name never breaks mid-word under its pillbox.
@@ -513,5 +501,49 @@ internal object TodayDoseCompact {
         if (caption.isNotBlank()) Text(caption, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1)
         // A dose ticked by an invited family member says so, so the patient and the doctor can tell who logged it.
         if (family && state != MedicineDoseState.PENDING) Text(t("Logged by family", "परिवार ने दर्ज किया"), fontSize = 14.sp, color = DoctorCardSub, maxLines = 2, lineHeight = 18.sp, textAlign = TextAlign.Center, modifier = Modifier.testTag("today-dose-family-${item.id}-${dose.key}"))
+    }
+}
+
+/**
+ * One dose on a long day (more than [TodayDoseCompact.COMPACT_ABOVE] doses): a small strip photo, the name and strength, the state in
+ * words and a state mark on the right, on one 56 dp row. The same taps as the pillbox: one tap ticks Taken; a marked dose (or a long
+ * press) opens Taken / Not taken / Skipped. The tag is the pillbox's ("today-dose-<id>-<dose>").
+ */
+@Composable private fun MedicineDoseRow(item: CareItem, dose: MedicineDose, state: MedicineDoseState, photo: File?, enabled: Boolean, family: Boolean, onMark: (choice: MedicineDoseChoice, quick: Boolean) -> Unit) {
+    val t = careText(); var menu by remember { mutableStateOf(false) }
+    val haptic = rememberSaharaHaptic()
+    val pending = state == MedicineDoseState.PENDING
+    val strength = remember(item.detail) { MedicineEntryText.parse(item.detail)?.strength.orEmpty() }
+    val label = medicineDoseLabel(dose)
+    val stateWord = doseStateWord(state)
+    val late = pending && dose.timed && MedicineLateRule.overdue(dose.time, java.time.LocalTime.now())
+    val tone = when (state) { MedicineDoseState.TAKEN -> SaharaTone.Success; MedicineDoseState.MISSED -> SaharaTone.Error; MedicineDoseState.SKIPPED -> SaharaTone.Neutral; else -> if (late) SaharaTone.Warning else null }
+    Box {
+        Row(Modifier.fillMaxWidth().heightIn(min = 56.dp)
+            .combinedClickable(enabled = enabled, role = Role.Button, onClickLabel = if (pending) t("Mark taken", "ली हुई दर्ज करें") else t("Change", "बदलें"),
+                onLongClickLabel = t("Taken, not taken or skipped", "ली, नहीं ली या छोड़ी"), onLongClick = { menu = true }) { if (pending) { haptic(); onMark(MedicineDoseChoice.TAKEN, true) } else menu = true }
+            .semantics { contentDescription = "${item.title}, $label: $stateWord" }.testTag("today-dose-${item.id}-${dose.key}")
+            .padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+            StripThumb(photo, 40)
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(item.title, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
+                    if (strength.isNotBlank()) Text(" · $strength", fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, softWrap = false)
+                }
+                Text(if (late) t("Not yet · late", "अभी नहीं · देर हो गई") else stateWord, fontSize = 14.sp, color = tone?.ink ?: DoctorCardSub, fontWeight = if (pending && !late) FontWeight.Normal else FontWeight.SemiBold, maxLines = 1)
+                if (family && !pending) Text(t("Logged by family", "परिवार ने दर्ज किया"), fontSize = 13.sp, color = DoctorCardSub, maxLines = 1, modifier = Modifier.testTag("today-dose-family-${item.id}-${dose.key}"))
+            }
+            Spacer(Modifier.width(8.dp))
+            // An empty ring while not marked; a filled circle with a tick, cross or dash once it is.
+            Surface(shape = RoundedCornerShape(50), color = if (pending) Paper else tone?.solid ?: DoctorStatusGood,
+                border = if (pending) BorderStroke(1.5.dp, if (late) SaharaTone.Warning.solid else SaharaSection.Medicines.solid) else null, modifier = Modifier.size(32.dp)) {
+                Box(contentAlignment = Alignment.Center) { if (!pending) DoseStateIcon(state, Paper, 20) }
+            }
+        }
+        DoseChoiceMenu(menu, { menu = false }, "today-dose", "${item.id}-${dose.key}") { choice ->
+            if (choice == MedicineDoseChoice.TAKEN) haptic()
+            onMark(choice, false)
+        }
     }
 }

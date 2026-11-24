@@ -135,10 +135,11 @@ private val SeverityTints = listOf(ChartBands.Mild, ChartBands.Moderate, ChartBa
 }
 
 /** Under one medicine's History: every side effect noted for it, newest first. */
-fun androidx.compose.foundation.lazy.LazyListScope.medicineSideEffectItems(entries: List<SideEffectEntry>, vm: CareModel) {
+fun androidx.compose.foundation.lazy.LazyListScope.medicineSideEffectItems(entries: List<SideEffectEntry>, vm: CareModel, shown: androidx.compose.runtime.MutableIntState? = null) {
     if (entries.isEmpty()) return
     item(key = "side-effects-heading") { val t = careText(); Text(t("Side effects noted", "दर्ज दुष्प्रभाव"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 18.sp, color = DoctorCardInk, modifier = Modifier.a11yHeading().padding(top = 12.dp)) }
-    items(entries.size, key = { "side-effect-${entries[it].item.id}" }) { i -> val e = entries[i]; SurfaceCard(Paper) { SideEffectSummary(e, showMedicine = false) { MarkDiscussedButton(e, vm, SideEffectRules.reporterFor(vm.viewRole.value)) } } }
+    if (shown != null) cappedItems(entries, shown, key = { "side-effect-${it.item.id}" }, tag = "side-effects") { e -> SurfaceCard(Paper) { SideEffectSummary(e, showMedicine = false) { MarkDiscussedButton(e, vm, SideEffectRules.reporterFor(vm.viewRole.value)) } } }
+    else items(entries.size, key = { "side-effect-${entries[it].item.id}" }) { i -> val e = entries[i]; SurfaceCard(Paper) { SideEffectSummary(e, showMedicine = false) { MarkDiscussedButton(e, vm, SideEffectRules.reporterFor(vm.viewRole.value)) } } }
 }
 
 /** Patient/family Medicines section: unresolved side effects since the last doctor visit, ready to raise with the doctor. */

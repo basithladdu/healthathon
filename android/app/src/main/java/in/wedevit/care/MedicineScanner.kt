@@ -415,10 +415,15 @@ private fun MedicineReviewCard(draft: MedicineDraft, storage: String, personId: 
         Spacer(Modifier.height(12.dp))
         CareField(medicine.medicineName, { change(medicine.copy(medicineName = it.take(120))) }, t("Medicine name", "दवा का नाम"), singleLine = true)
         MedicineNameSuggestions(medicine.medicineName) { change(medicine.copy(medicineName = it.take(120))) }
-        CareField(medicine.strength, { change(medicine.copy(strength = it.take(80))) }, t("Strength", "ताक़त"), singleLine = true, placeholder = t("e.g. 500 mg, 5 mg/5 ml", "जैसे 500 mg, 5 mg/5 ml"))
-        CareField(medicine.form, { change(medicine.copy(form = it.take(60))) }, t("Form", "रूप"), singleLine = true, placeholder = t("e.g. tablet, capsule, syrup, injection, patch", "जैसे गोली, कैप्सूल, सिरप, इंजेक्शन, पैच"))
+        // Tapped, not typed (24 Nov 2026): strength as a number and unit, the form as a chip, How often as a choice that fills the times.
+        Column(Modifier.fillMaxWidth().padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            MedicineStrengthField(medicine.strength, { change(medicine.copy(strength = it.take(80))) }, tagPrefix = "scan-strength-${draft.id}")
+            MedicineFormPicker(medicine.form, { change(medicine.copy(form = it.take(60))) }, tagPrefix = "scan-form-${draft.id}")
+        }
         CareField(medicine.quantity, { change(medicine.copy(quantity = it.take(80))) }, t("How much each time", "हर बार कितनी"), singleLine = true, placeholder = t("e.g. 1 tablet, 1½ tablets, 5 ml", "जैसे 1 गोली, 1½ गोली, 5 ml"))
-        CareField(medicine.frequency, { change(medicine.copy(frequency = it.take(120))) }, t("How often", "कितनी बार"), singleLine = true, placeholder = t("e.g. twice a day, only when needed", "जैसे दिन में दो बार, ज़रूरत होने पर ही"))
+        Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            MedicineHowOftenFields(medicine.frequency, medicine.suggestedTimes, { often, times -> change(medicine.copy(frequency = often.take(120), suggestedTimes = times)) }, tagPrefix = "scan-frequency-${draft.id}")
+        }
         CareField(medicine.instructions, { change(medicine.copy(instructions = it.take(500))) }, t("Directions", "तरीक़ा"), minLines = 2, placeholder = t("e.g. as written: dissolve in water", "जैसे पर्चे में लिखा: पानी में घोलकर"))
         Text(t("Food timing", "खाने के हिसाब से समय"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.padding(top = 8.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
@@ -426,7 +431,6 @@ private fun MedicineReviewCard(draft: MedicineDraft, storage: String, personId: 
                 FilterChip(selected = medicine.mealTiming == timing, onClick = { change(medicine.copy(mealTiming = timing)) }, label = { Text(mealTimingLabel(timing, hindi), fontSize = 14.sp) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp))
             }
         }
-        DoseTimesField(medicine.suggestedTimes, { change(medicine.copy(suggestedTimes = it)) })
         CareField(
             medicine.durationDays?.toString().orEmpty(),
             { value -> if (value.isBlank()) change(medicine.copy(durationDays = null)) else value.toIntOrNull()?.takeIf { it in 1..365 }?.let { change(medicine.copy(durationDays = it)) } },

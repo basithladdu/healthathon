@@ -11,6 +11,10 @@ import kotlin.math.hypot
  * notes and dose ticks. Nothing here speaks of prognosis, stage or end of life.
  */
 object SimpleModeRules {
+    /** Team decision (24 Nov meeting): Simple Mode starts on by itself for the patient's own phone at 60 or older, until they choose in More. Family and doctors are never switched. */
+    const val AUTO_AGE = 60
+    fun autoOn(age: Int?, patientOwnView: Boolean): Boolean = patientOwnView && age != null && age >= AUTO_AGE
+
     const val AMBULANCE = "108"
     /** At most this many care-team people on the Call screen, so it stays one short list (108 is always added after them). */
     const val MAX_CONTACTS = 5

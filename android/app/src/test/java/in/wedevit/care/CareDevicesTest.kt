@@ -74,6 +74,16 @@ class CareDevicesTest {
         assertEquals(CareDeviceType.OTHER, CareDeviceRules.decode(unknown).single().type)
     }
 
+    @Test fun stentIsNoLongerOfferedButAnOldStentStillShowsAsOther() {
+        // Clinical team, 24 Nov 2026: stents do not belong in tubes and lines.
+        assertTrue(CareDeviceType.entries.none { it.name == "STENT" || it.en == "Stent" })
+        val old = """{"v":1,"devices":[{"id":"s","type":"STENT","inserted":"2026-10-01","centre":"City Hospital","notes":"Bile duct"}]}"""
+        val shown = CareDeviceRules.decode(old).single()
+        assertEquals(CareDeviceType.OTHER, shown.type)
+        assertEquals("City Hospital", shown.centre)
+        assertEquals("Bile duct", shown.notes)
+    }
+
     @Test fun palliativePhoneComesFromTheNewestPlanThatHasOne() {
         val old = EctprRecord(id = "1", patientId = "p", createdAt = "2026-10-01T00:00:00Z", careTeam = CareTeam(palliativePhone24h = "080 1111 1111"))
         val newer = EctprRecord(id = "2", patientId = "p", createdAt = "2026-10-20T00:00:00Z", careTeam = CareTeam(palliativePhone24h = " 080 2222 2222 "))

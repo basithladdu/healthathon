@@ -526,6 +526,8 @@ private fun LazyListScope.communityTiles(groups: List<CommunityGroup>, onOpen: (
         if (extra.isEmpty()) post else post.copy(replies = (post.replies + extra).distinctBy { it.id })
     }).distinctBy { it.id }
     val now = remember(feed) { System.currentTimeMillis() }
+    // Newest five posts, then "Show older" (24 Nov).
+    val postsShown = rememberShownCount(groupId)
     Box(Modifier.fillMaxSize()) {
         LazyColumn(Modifier.fillMaxSize().testTag("community-feed"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 96.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item { CommunityTitleRow(if (savedList) t("Saved posts", "सहेजी पोस्ट") else group?.let { t(it.nameEn, it.nameHi) } ?: t("Community", "समुदाय"), onBack, tone) }
@@ -551,7 +553,7 @@ private fun LazyListScope.communityTiles(groups: List<CommunityGroup>, onOpen: (
                 SaharaEmpty(t("No posts here yet", "यहाँ अभी कोई पोस्ट नहीं है"), t("Say hello, or ask what helped others. Your words could help someone today.", "नमस्ते कहें, या पूछें कि दूसरों को किस बात से मदद मिली। आपकी बात आज किसी के काम आ सकती है।"),
                     actionLabel = t("Write the first post", "पहली पोस्ट लिखें"), onAction = onWrite, modifier = Modifier.saharaAppear())
             }
-            items(posts, key = { it.id }) { post ->
+            cappedItems(posts, postsShown, key = { it.id }, tag = "community-posts") { post ->
                 CommunityPostCard(post, now = now, tone = tone, queued = post.id in queuedIds, queuedIds = queuedIds, justSent = justSent, canModerate = canModerate,
                     replying = replyingTo == post.id, replyText = if (replyingTo == post.id) replyText else "", replyError = if (replyingTo == post.id) replyError else null, sending = sending,
                     onReact = { onReact(post, it) }, onSave = { onSave(post) },
@@ -675,7 +677,10 @@ private fun authorTone(name: String, byTeam: Boolean): SaharaTone = if (byTeam) 
                 CommunityAction(if (post.hugs > 0) t("Hugs ${post.hugs}", "झप्पी ${post.hugs}") else t("Hugs", "झप्पी"), Icons.Default.Favorite, { onReact(CommunityRules.HUGS) }, post.myHugs, SaharaTone.Rose, "community-hugs")
                 CommunityAction(t("Reply", "जवाब दें"), Icons.AutoMirrored.Filled.Reply, onReplyOpen, replying, tone, "community-reply")
             }
-            post.replies.forEach { reply -> CommunityReplyRow(reply, now, reply.id in queuedIds, justSent == reply.id, canModerate, onReport, onRemove, onModerate) }
+            // The latest three replies; "Show all" opens the rest, so one busy post does not fill the feed.
+            var allReplies by rememberSaveable(post.id) { mutableStateOf(false) }
+            SaharaShowAllToggle(post.replies.size, allReplies, { allReplies = !allReplies }, tag = "community-replies")
+            (if (allReplies) post.replies else post.replies.takeLast(3)).forEach { reply -> CommunityReplyRow(reply, now, reply.id in queuedIds, justSent == reply.id, canModerate, onReport, onRemove, onModerate) }
             AnimatedVisibility(replying, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) {
                 Column(Modifier.padding(end = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(value = replyText, onValueChange = onReplyText, modifier = Modifier.fillMaxWidth().testTag("community-reply-field"),

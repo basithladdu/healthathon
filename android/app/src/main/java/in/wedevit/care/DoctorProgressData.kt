@@ -47,7 +47,7 @@ object DoctorProgressData {
         val taken = dose.reportedTakenAt.takeIf { known && takenInTime && dose.outcome == SampleDoseOutcome.TAKEN }
         val status = when {
             known && dose.outcome == SampleDoseOutcome.SKIPPED -> "Skipped reported"
-            known && dose.outcome == SampleDoseOutcome.TAKEN && taken != null -> if (taken > dose.scheduledAt) "Late reported" else "Taken reported"
+            known && dose.outcome == SampleDoseOutcome.TAKEN && taken != null -> if (MedicineLateRule.isLate(dose.scheduledAt, taken)) "Late reported" else "Taken reported"
             known && dose.outcome == SampleDoseOutcome.TAKEN -> "Taken reported · time not recorded"
             dose.scheduledAt > at -> "Upcoming"
             else -> "Not logged"

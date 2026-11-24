@@ -17,7 +17,9 @@ class DoctorPatientTrackingTest {
     @Test fun lateUsesReportedTakenTimeNotTimeTheEntryWasLogged() {
         val planned = now - 3_600_000
         assertEquals("Taken reported", dose(planned, planned, now, SampleDoseOutcome.TAKEN).status(now))
-        assertEquals("Late reported", dose(planned, planned + 1, planned + 1, SampleDoseOutcome.TAKEN).status(now))
+        // Late only from one hour after the planned time (MedicineLateRule, 24 Nov 2026).
+        assertEquals("Taken reported", dose(planned, planned + 1, planned + 1, SampleDoseOutcome.TAKEN).status(now))
+        assertEquals("Late reported", dose(planned, planned + MedicineLateRule.LATE_AFTER_MS, planned + MedicineLateRule.LATE_AFTER_MS, SampleDoseOutcome.TAKEN).status(now))
         assertEquals("Taken reported", dose(planned, planned - 60_000, now, SampleDoseOutcome.TAKEN).status(now))
     }
 

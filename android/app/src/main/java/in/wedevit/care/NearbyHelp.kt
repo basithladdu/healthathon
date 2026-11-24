@@ -119,6 +119,25 @@ object NearbyHelp {
             "https://www.google.com/maps/dir/?api=1&destination=" + "%.6f,%.6f".format(java.util.Locale.ROOT, c.latitude, c.longitude)
         else "https://www.google.com/maps/search/?api=1&query=" + java.net.URLEncoder.encode(c.name + " " + c.address, "UTF-8")
 
+    /** Google Maps' own package, tried first for Directions. */
+    const val GOOGLE_MAPS_PACKAGE = "com.google.android.apps.maps"
+
+    /**
+     * Turn-by-turn navigation in Google Maps (24 Nov: "Directions opens Google Maps navigation"), only for a centre with an exact
+     * map spot; an area pin (PIN, town, district) would lead to the wrong door, so those use [directionsUrl], which searches the listing.
+     */
+    fun navigationUri(c: Centre): String? =
+        if (c.latitude != null && c.longitude != null && !CentreLocation.approximate(c)) "google.navigation:q=" + "%.6f,%.6f".format(java.util.Locale.ROOT, c.latitude, c.longitude) else null
+
+    /** A geo: link any maps app opens: the exact spot with the centre's name as its label, or a search for the listed name and address. */
+    fun geoUri(c: Centre): String {
+        fun enc(s: String) = java.net.URLEncoder.encode(s.trim(), "UTF-8").replace("+", "%20")
+        return if (c.latitude != null && c.longitude != null && !CentreLocation.approximate(c)) {
+            val spot = "%.6f,%.6f".format(java.util.Locale.ROOT, c.latitude, c.longitude)
+            "geo:$spot?q=$spot(" + enc(c.name) + ")"
+        } else "geo:0,0?q=" + enc(c.name + " " + c.address)
+    }
+
     /** The one number on the Nearby call bar. It opens the dialler filled in (ACTION_DIAL); the app never places the call. */
     const val EMERGENCY_CALL = "112"
 

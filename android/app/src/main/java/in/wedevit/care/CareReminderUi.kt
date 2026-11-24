@@ -110,6 +110,11 @@ import java.time.ZoneId
     }
 }
 
+/** The comma-joined reminder times held while editing, as a list ("" is none). */
+private fun reminderTimes(times: String): List<String> = times.split(',').map(String::trim).filter(String::isNotEmpty)
+/** A saved "YYYY-MM-DD" start or end date as the date button's day (0 when blank or unreadable). */
+private fun reminderDay(value: String): Long = runCatching { careEpoch(java.time.LocalDate.parse(value.trim())) }.getOrDefault(0L)
+
 @Composable private fun ReminderItemSettings(item: CareItem, scheduler: CareReminderScheduler, revision: Int, share: ((List<String>) -> Unit)? = null, changed: () -> Unit) { val t = careText();
     val option = remember(item.id, revision) { scheduler.option(item.id) }
     var times by rememberSaveable(item.id) { mutableStateOf((option?.times ?: CareReminderRules.printedTimes(item.detail)).joinToString(", ")) }
@@ -144,10 +149,11 @@ import java.time.ZoneId
                                 modifier = Modifier.heightIn(min = 48.dp).semantics { contentDescription = time + ": " + if (on) t("Reminder on", "रिमाइंडर चालू") else t("Reminder off", "रिमाइंडर बंद") }.testTag("reminder-dose-${item.id}-$time"))
                         }
                     }
-                } else CareField(times, { times = it; error = "" }, t("Time, e.g. 08:30", "समय, जैसे 08:30"), singleLine = true)
+                } else CareTimeChips(reminderTimes(times), { times = it.joinToString(", "); error = "" }, tagPrefix = "reminder-time-${item.id}")
                 if (dates) {
-                    CareField(starts, { starts = it; error = "" }, t("Start date", "शुरू की तारीख़"), singleLine = true)
-                    CareField(ends, { ends = it; error = "" }, t("Last date", "आख़िरी तारीख़"), singleLine = true)
+                    // Dates are tapped on the calendar; the saved value stays "YYYY-MM-DD" (or "" when removed).
+                    CareDateButton(reminderDay(starts), t("Start date", "शुरू की तारीख़"), { starts = if (it > 0) careDay(it).toString() else ""; error = "" }, allowClear = true)
+                    CareDateButton(reminderDay(ends), t("Last date", "आख़िरी तारीख़"), { ends = if (it > 0) careDay(it).toString() else ""; error = "" }, allowClear = true)
                 } else TextButton(onClick = { dates = true }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Start and end dates", "शुरू और आख़िरी तारीख़"), fontSize = 15.sp) }
                 if (error.isNotBlank()) Text(error, color = RustText, fontSize = 15.sp, modifier = Modifier.announce())
                 if (doseTimes.isEmpty() || dates) Button(onClick = { runCatching {
@@ -158,7 +164,9 @@ import java.time.ZoneId
         } else if (dateOnly) {
             // Saved with a date only: no alert until a time on that day is chosen here (never a midnight alert).
             Column(Modifier.padding(top = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                CareField(times, { times = it; error = "" }, t("Time, e.g. 08:30", "समय, जैसे 08:30"), singleLine = true)
+                val chosen = reminderTimes(times)
+                if (chosen.size > 1) CareTimeChips(chosen, { times = it.joinToString(", "); error = "" }, tagPrefix = "reminder-time-${item.id}")
+                else CareTimeButton(chosen.firstOrNull().orEmpty(), { times = it; error = "" }, t("Reminder time", "रिमाइंडर का समय"), Modifier.testTag("reminder-time-${item.id}"), allowClear = true)
                 if (error.isNotBlank()) Text(error, color = RustText, fontSize = 15.sp, modifier = Modifier.announce())
                 Button(onClick = { runCatching {
                     scheduler.configure(item.id, ReminderOption(if (times.isBlank()) emptyList() else times.split(',').map(String::trim), muted = option?.muted == true)); changed()

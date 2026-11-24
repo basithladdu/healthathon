@@ -185,6 +185,7 @@ private fun doctorRecordedTime(at: Long, zone: ZoneId) = if (at <= 0) "Date not 
 @Composable internal fun DoctorCareStory(person: Person, versions: List<CareVersion>, onRead: (CareVersion) -> Unit) { val t = careText();
     val notes = versions.filter { it.personId == person.id }.sortedByDescending { it.published }
     val latest=notes.firstOrNull()
+    val notesShown = rememberShownCount(person.id)
     LazyColumn(Modifier.fillMaxSize().testTag("doctor-care-story"), contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         item {
             Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(14.dp)) {
@@ -210,7 +211,7 @@ private fun doctorRecordedTime(at: Long, zone: ZoneId) = if (at <= 0) "Date not 
         }
         item {Text(t("Care handover", "देखभाल हैंडओवर"),fontSize=22.sp,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont)}
         if(notes.isEmpty()) item {SurfaceCard {Text(t("No care discussion recorded yet", "अभी कोई देखभाल चर्चा दर्ज नहीं"),fontSize=20.sp,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont)}}
-        items(notes,key={it.id}) {note ->
+        cappedItems(notes, notesShown, key={it.id}, tag="doctor-care-story") {note ->
             Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min),horizontalArrangement=Arrangement.spacedBy(12.dp)) {
                 Canvas(Modifier.width(18.dp).fillMaxHeight()) {val x=size.width/2;drawLine(DoctorHairline,Offset(x,0f),Offset(x,size.height),2.dp.toPx());drawCircle(Rust,5.dp.toPx(),Offset(x,14.dp.toPx()))}
                 Surface(color=Paper,shape=RoundedCornerShape(16.dp),border=BorderStroke(1.dp,DoctorHairline),modifier=Modifier.weight(1f).testTag("doctor-handover-note-${note.id}")) {
@@ -261,7 +262,9 @@ private fun doctorToolLabel(label: String, hindi: Boolean) = careTr(hindi, label
     val picked = moodKeys.split(",").filter { it.isNotEmpty() }.mapNotNull { k -> DoctorReportedMood.entries.firstOrNull { it.name == k } }.toSet()
     val needle = query.trim()
     val shown = checks.filter { c -> (picked.isEmpty() || doctorMood(c.title) in picked) && (needle.isEmpty() || c.title.contains(needle, true) || c.detail.contains(needle, true)) }
-    val grouped = shown.groupBy { java.time.YearMonth.from(Instant.ofEpochMilli(it.created).atZone(zone)) }
+    // The newest five updates, then "Show older" (24 Nov: the list kept growing).
+    val checksShown = rememberShownCount("$personId:$needle:$moodKeys")
+    val grouped = shown.shownOf(checksShown).groupBy { java.time.YearMonth.from(Instant.ofEpochMilli(it.created).atZone(zone)) }
     LazyColumn(Modifier.fillMaxSize().imePadding().testTag("doctor-checkin-history"), contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 96.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -302,6 +305,7 @@ private fun doctorToolLabel(label: String, hindi: Boolean) = careTr(hindi, label
                 item(key = "month-$month") { Text(month.format(DateTimeFormatter.ofPattern("MMMM yyyy")), Modifier.padding(top = 8.dp).testTag("doctor-checkin-month-$month"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub) }
                 items(list, key = { it.id }) { check -> DoctorCheckInCard(check, zone, now) { detail = check } }
             }
+            if (shown.size > SaharaShowMore.INITIAL) item(key = "doctor-checkins-show-more") { SaharaShowOlder(shown.size, checksShown, tag = "doctor-checkins") }
         }
     }
     detail?.let { check -> AlertDialog(onDismissRequest = { detail = null }, title = { Text(check.title) }, text = { Column(Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) { Text(doctorRecordedTime(check.created, zone)); Text(CareEntryCodec.readable(check.detail).ifBlank { t("No additional details recorded.", "और कोई जानकारी दर्ज नहीं।") }) } }, confirmButton = { TextButton(onClick = { detail = null }) { Text(t("Close", "बंद करें")) } }) }

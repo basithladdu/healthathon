@@ -563,7 +563,9 @@ private fun slotTone(slot: SimpleModeRules.Slot): SaharaTone = when (slot) {
 /** The "Simple mode" row in More's settings: patient and family switch it for the selected patient, on this phone only. */
 @Composable fun SimpleModeSwitchRow(vm: CareModel, person: Person) {
     val t = careText(); val context = LocalContext.current
-    val on = rememberSimpleModeOn(vm.storageNamespace, person.id)
+    val role by vm.viewRole.collectAsStateWithLifecycle(); val items by vm.items.collectAsStateWithLifecycle()
+    val age = remember(items, person.id) { PatientProfileCodec.latest(items, person.id)?.let { PatientProfileCodec.decode(it.detail)?.age } }
+    val on = rememberSimpleModeOn(vm.storageNamespace, person.id, SimpleModeRules.autoOn(age, patientOwnView = !CareFamilyRules.isFamily(role, false)))
     val change: (Boolean) -> Unit = { value ->
         SimpleModeStore.setOn(context, vm.storageNamespace, person.id, value)
         if (value) vm.message.value = t("Simple mode is on. Open Today to see it.", "सरल मोड चालू है। देखने के लिए आज खोलें।")

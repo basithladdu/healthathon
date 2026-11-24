@@ -72,7 +72,8 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
         }
         if(earlierDiscussions.isNotEmpty()) {
             Text(t("Earlier discussions (${earlierDiscussions.size})", "पुरानी चर्चाएँ (${earlierDiscussions.size})"),fontWeight=FontWeight.Medium,modifier=Modifier.testTag("overview-history-toggle"), fontFamily = SaharaTitleFont)
-            earlierDiscussions.forEach {earlier ->
+            val earlierShown = rememberShownCount(earlierDiscussions.firstOrNull()?.id)
+            earlierDiscussions.shownOf(earlierShown).forEach {earlier ->
                 Surface(color=Paper,shape=RoundedCornerShape(16.dp),border=BorderStroke(1.dp,DoctorHairline)) {
                     Column(Modifier.fillMaxWidth().padding(16.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
                         Text(overviewDate(earlier.publishedAt),style=MaterialTheme.typography.labelLarge,color=Rust)
@@ -82,6 +83,7 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
                     }
                 }
             }
+            SaharaShowOlder(earlierDiscussions.size, earlierShown, tag = "overview-history")
         }
     }
 }
