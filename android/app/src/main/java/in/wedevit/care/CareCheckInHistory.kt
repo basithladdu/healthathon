@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.YearMonth
 import java.time.ZoneId
 
@@ -76,11 +77,63 @@ internal object CheckInDays {
 }
 
 /** One dot colour per kind of day, so the dots, the legend and the list agree. */
-private fun checkInDotColor(kind: String): Color = when (kind) {
-    CheckInMood.GOOD -> SaharaTone.Leaf.solid
-    CheckInMood.OKAY -> SaharaTone.Marigold.solid
-    CheckInMood.HARD -> SaharaTone.Rose.solid
-    else -> SaharaTone.Indigo.solid
+private fun checkInTone(kind: String): SaharaTone = when (kind) {
+    CheckInMood.GOOD -> SaharaTone.Leaf
+    CheckInMood.OKAY -> SaharaTone.Marigold
+    CheckInMood.HARD -> SaharaTone.Rose
+    else -> SaharaTone.Indigo
+}
+private fun checkInDotColor(kind: String): Color = checkInTone(kind).solid
+
+/** A small rounded label (mood, symptom notes, distress score) for the one-line check-in rows. */
+@Composable private fun CheckInChip(text: String, fill: Color, ink: Color, tag: String) =
+    Text(text, color = ink, fontSize = 13.sp, lineHeight = 16.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis,
+        modifier = Modifier.background(fill, RoundedCornerShape(50)).padding(horizontal = 10.dp, vertical = 4.dp).testTag(tag))
+
+/** A day's small chips: its mood, how many symptom notes, its distress score; the number of entries when there is nothing else. */
+@Composable private fun CheckInDayChips(d: CheckInDay) {
+    val t = careText(); val hindi = careHindi()
+    d.mood?.let { val tone = checkInTone(it); CheckInChip(checkInMoodLabel(it, hindi), tone.wash, tone.ink, "checkin-chip-mood") }
+    d.symptomNotes.takeIf { it > 0 }?.let { n -> CheckInChip(if (n == 1) t("1 symptom note", "1 लक्षण नोट") else t("$n symptom notes", "$n लक्षण नोट"), SaharaSection.Symptoms.wash, SaharaSection.Symptoms.ink, "checkin-chip-symptoms") }
+    d.distressScore?.takeIf { d.distressAnswered }?.let { s -> val band = ChartBands.color(s); CheckInChip(t("Distress $s/10", "परेशानी $s/10"), band, readableOn(band), "checkin-chip-distress") }
+    if (d.mood == null && d.symptomNotes == 0 && !d.distressAnswered)
+        CheckInChip(if (d.items.size == 1) t("1 entry", "1 नोट") else t("${d.items.size} entries", "${d.items.size} नोट"), Cream, DoctorCardInk, "checkin-chip-entries")
+}
+
+/**
+ * One entry of a day as a single line (24 Nov: "we don't need big cards"): time, what it was, its number as a small chip. Tapping
+ * the line opens the usual full card under it (edit, remove, graph); tapping again closes it.
+ */
+@Composable private fun CheckInEntryRow(item: CareItem, vm: CareModel) {
+    val t = careText(); val hindi = careHindi()
+    var open by rememberSaveable(item.id) { mutableStateOf(false) }
+    val note = remember(item.detail) { if (SymptomNoteCodec.isStructured(item.detail)) SymptomNoteCodec.decode(item.detail) else null }
+    val distress = remember(item.detail) { if (DistressCodec.isStructured(item.detail)) DistressCodec.decode(item.detail) else null }
+    val label = when {
+        note != null -> SymptomDiaryRules.symptomLabel(note.symptom, hindi)
+        distress != null -> t("Distress thermometer", "परेशानी थर्मामीटर")
+        item.kind == "checkin" -> checkInMoodLabel(item.title, hindi)
+        else -> item.title
+    }
+    val score = when { note != null -> SymptomSort.headline(item); distress != null -> if (distress.distress) distress.score ?: 0 else 0; else -> null }
+    val dot = when { note != null -> symptomColor(note.symptom); distress != null -> ChartBands.color(score ?: 0); else -> checkInDotColor(item.title) }
+    val time = remember(item.created, note?.observedTime, hindi) {
+        val clock = careDateFormat("h:mm a", hindi)
+        note?.observedTime?.let { runCatching { LocalTime.parse(it).format(clock) }.getOrNull() }
+            ?: Instant.ofEpochMilli(item.created).atZone(ZoneId.systemDefault()).format(clock)
+    }
+    val tick = rememberSaharaTick()
+    Column(Modifier.fillMaxWidth().testTag("checkin-entry-${item.id}")) {
+        Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clip(RoundedCornerShape(12.dp)).clickable(role = Role.Button) { tick(); open = !open }.padding(horizontal = 8.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Box(Modifier.size(8.dp).background(dot, CircleShape))
+            Text(time, fontSize = 13.sp, color = DoctorCardSub, maxLines = 1, softWrap = false)
+            Text(label, fontSize = 15.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+            score?.let { s -> val band = ChartBands.color(s); CheckInChip("$s/10", band, readableOn(band), "checkin-entry-score-${item.id}") }
+            SaharaChevron(open, if (open) t("Hide details", "जानकारी छिपाएँ") else t("Show details", "जानकारी देखें"), Modifier.size(20.dp))
+        }
+        AnimatedVisibility(open, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) { Box(Modifier.padding(top = 4.dp, bottom = 6.dp)) { CareRow(item, vm) } }
+    }
 }
 
 /** "A good day · 2 symptom notes · Distress 3/10", or the number of entries when there is nothing else to say. */
@@ -110,8 +163,9 @@ private fun checkInDotColor(kind: String): Color = when (kind) {
     var monthText by rememberSaveable(personId) { mutableStateOf(YearMonth.now().toString()) }
     var picked by rememberSaveable(personId) { mutableStateOf("") }
     val hasDistress = remember(checkins, personId) { DistressRules.history(checkins, personId).isNotEmpty() }
+    val tick = rememberSaharaTick()
     if (hasDistress) {
-        OutlinedButton(onClick = { showDistress = !showDistress }, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, SaharaSection.CheckIns.solid),
+        OutlinedButton(onClick = { tick(); showDistress = !showDistress }, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, SaharaSection.CheckIns.solid),
             colors = ButtonDefaults.outlinedButtonColors(containerColor = Paper), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("checkin-distress-toggle")) {
             Text(if (showDistress) t("Hide distress graph", "परेशानी का ग्राफ़ छिपाएँ") else t("See distress graph", "परेशानी का ग्राफ़ देखें"), color = DoctorCardInk, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
             SaharaChevron(showDistress, null, tint = DoctorCardInk)
@@ -128,39 +182,45 @@ private fun checkInDotColor(kind: String): Color = when (kind) {
             week.forEachIndexed { i, d ->
                 if (i > 0) HorizontalDivider(color = DoctorHairline)
                 val dayKey = d.day.toString(); val open = openDay == dayKey
-                Row(Modifier.fillMaxWidth().saharaStagger(i).heightIn(min = 56.dp).clickable(role = Role.Button) { openDay = if (open) "" else dayKey }.padding(horizontal = 14.dp, vertical = 8.dp).testTag("checkin-day-$dayKey"),
+                // One line per day: the day, then small chips (24 Nov: "reduce the cards, we don't need big cards").
+                Row(Modifier.fillMaxWidth().saharaStagger(i).heightIn(min = 52.dp).clickable(role = Role.Button) { tick(); openDay = if (open) "" else dayKey }.padding(horizontal = 12.dp, vertical = 6.dp).testTag("checkin-day-$dayKey"),
                     verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.size(10.dp).background(checkInDotColor(CheckInDays.dotKind(d)), CircleShape))
-                    Spacer(Modifier.width(12.dp))
-                    Column(Modifier.weight(1f)) {
-                        Text(checkInDayLabel(d.day), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
-                        Text(checkInDayLine(d), fontSize = 14.sp, color = DoctorCardSub, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                    }
+                    Spacer(Modifier.width(10.dp))
+                    Text(checkInDayLabel(d.day), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.widthIn(max = 130.dp))
+                    Spacer(Modifier.width(10.dp))
+                    FlowRow(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { CheckInDayChips(d) }
                     SaharaChevron(open, if (open) t("Hide details", "जानकारी छिपाएँ") else t("Show details", "जानकारी देखें"))
                 }
                 AnimatedVisibility(open, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) {
-                    Column(Modifier.padding(start = 8.dp, end = 8.dp, bottom = 10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { d.items.forEach { key(it.id) { CareRow(it, vm) } } }
+                    Column(Modifier.padding(start = 6.dp, end = 6.dp, bottom = 8.dp)) { d.items.forEach { key(it.id) { CheckInEntryRow(it, vm) } } }
                 }
             }
         }
     }
-    val month = runCatching { YearMonth.parse(monthText) }.getOrElse { YearMonth.now() }
+    val month = remember(monthText) { runCatching { YearMonth.parse(monthText) }.getOrElse { YearMonth.now() } }
     val byDay = remember(days) { days.associateBy { it.day } }
-    CheckInMonthCalendar(month, byDay, picked = runCatching { LocalDate.parse(picked) }.getOrNull(), today = today,
-        onMonth = { monthText = it.toString(); picked = "" }, onPick = { d -> picked = if (picked == d.toString()) "" else d.toString() })
-    // The tapped day, under the calendar: its line, then its entries with their usual actions.
-    runCatching { LocalDate.parse(picked) }.getOrNull()?.let { day ->
+    val pickedDay = remember(picked) { runCatching { LocalDate.parse(picked) }.getOrNull() }
+    CheckInMonthCalendar(month, byDay, picked = pickedDay, today = today,
+        onMonth = { tick(); monthText = it.toString(); picked = "" }, onPick = { d -> tick(); picked = if (picked == d.toString()) "" else d.toString() })
+    // The tapped day, under the calendar: its line, then its entries with their usual actions. It opens and closes in place
+    // (the last day stays drawn while it closes), and switching to another day crossfades instead of jumping.
+    var lastDay by remember { mutableStateOf(pickedDay) }
+    LaunchedEffect(pickedDay) { if (pickedDay != null) lastDay = pickedDay }
+    AnimatedVisibility(pickedDay != null, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) {
+      SaharaStateSwitch(pickedDay ?: lastDay, label = "checkin-picked-day") { shownDay -> shownDay?.let { day ->
         val d = byDay[day]
-        Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().saharaAppear().testTag("checkin-picked-day")) {
-            Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("checkin-picked-day")) {
+            Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(checkInDayLabel(day), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.a11yHeading())
                 if (d == null) Text(t("Nothing noted this day.", "इस दिन कुछ नहीं लिखा गया।"), fontSize = 15.sp, color = DoctorCardSub)
                 else {
-                    Text(checkInDayLine(d), fontSize = 14.sp, color = DoctorCardSub)
-                    d.items.forEach { key(it.id) { CareRow(it, vm) } }
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { CheckInDayChips(d) }
+                    Column { d.items.forEach { key(it.id) { CheckInEntryRow(it, vm) } } }
                 }
             }
         }
+      } }
     }
 }
 
@@ -176,7 +236,9 @@ private fun checkInDotColor(kind: String): Color = when (kind) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = { onMonth(month.minusMonths(1)) }, modifier = Modifier.size(48.dp).testTag("checkin-cal-previous")) { Icon(Icons.Default.ChevronLeft, t("Previous month", "पिछला महीना"), tint = Rust) }
-                Text(month.atDay(1).format(careDateFormat("MMMM yyyy", hindi)), Modifier.weight(1f), textAlign = TextAlign.Center, fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 1)
+                SaharaStateSwitch(month, Modifier.weight(1f), label = "checkin-cal-month") { m ->
+                    Text(m.atDay(1).format(careDateFormat("MMMM yyyy", hindi)), Modifier.fillMaxWidth(), textAlign = TextAlign.Center, fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 1)
+                }
                 IconButton(onClick = { onMonth(month.plusMonths(1)) }, enabled = month < YearMonth.from(today), modifier = Modifier.size(48.dp).testTag("checkin-cal-next")) { Icon(Icons.Default.ChevronRight, t("Next month", "अगला महीना"), tint = if (month < YearMonth.from(today)) Rust else DoctorHairline) }
             }
             Row(Modifier.fillMaxWidth()) {
@@ -189,7 +251,9 @@ private fun checkInDotColor(kind: String): Color = when (kind) {
                         else {
                             val entry = byDay[d]; val selected = d == picked; val isToday = d == today; val future = d.isAfter(today)
                             val desc = d.format(careDateFormat("EEE d MMM", hindi)) + (entry?.let { ", " + checkInDayLine(it) } ?: "")
-                            Box(Modifier.weight(1f).padding(1.dp).heightIn(min = 48.dp).clip(RoundedCornerShape(12.dp)).background(if (selected) Rust else Color.Transparent)
+                            // The picked day's fill fades in and the old one fades out, like the system date picker.
+                            val cellFill by androidx.compose.animation.animateColorAsState(if (selected) Rust else Rust.copy(alpha = 0f), SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "checkin-cal-fill")
+                            Box(Modifier.weight(1f).padding(1.dp).heightIn(min = 48.dp).clip(RoundedCornerShape(12.dp)).background(cellFill)
                                 .border(if (isToday && !selected) 2.dp else 0.dp, if (isToday && !selected) Rust else Color.Transparent, RoundedCornerShape(12.dp))
                                 .clickable(enabled = !future, role = Role.Button) { onPick(d) }.semantics { contentDescription = desc }.testTag("checkin-cal-$d"), contentAlignment = Alignment.Center) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {

@@ -1,6 +1,5 @@
 package `in`.wedevit.care
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -151,8 +150,9 @@ fun EmbeddedPatientCare(
         currentHeaderBackChange(back)
         onDispose { currentHeaderBackChange(null) }
     }
-    BackHandler(tool.isNotEmpty() && tool !in listOf("scanner", "feedback", "reminders") && reading == null && dialog.isEmpty()) { leaveTool() }
-    BackHandler(recording && tool.isEmpty() && reading == null && dialog.isEmpty()) { vm.stopRecording() }
+    // A tool closes in place and a recording stops on this screen (no screen host changes), so plain BackHandlers, without the preview.
+    androidx.activity.compose.BackHandler(tool.isNotEmpty() && tool !in listOf("scanner", "feedback", "reminders") && reading == null && dialog.isEmpty()) { leaveTool() }
+    androidx.activity.compose.BackHandler(recording && tool.isEmpty() && reading == null && dialog.isEmpty()) { vm.stopRecording() }
 
     // Check-ins use the full-screen slider so both entry points record the same way; it replaces the content rather than sitting under it.
     if (ready && dialog == "checkin" && canEdit) {

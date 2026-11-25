@@ -1,0 +1,4 @@
+# Sahara baseline profile: every Sahara screen and helper is compiled ahead of time at install, so the first open of
+# each screen, scroll and animation does not wait for the JIT. Compose, Material 3 and Lottie ship their own profiles.
+HSPLin/wedevit/care/**;->**(**)**
+Lin/wedevit/care/**;

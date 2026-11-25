@@ -38,11 +38,19 @@ class GocPlainLabelsTest {
         assertTrue(goc.contains("t(\"Make the full care plan\""))
     }
 
-    @Test fun signaturePadHasNoThumbSwitchButTheFormKeepsItsHeading() {
+    /**
+     * The clinical team asked for a thumb impression choice (doc point 11): the pad offers Signature / Thumb impression as two
+     * plain choices plus a camera for a thumbprint on paper. Still no on/off switch or the old flag, and the form keeps its heading.
+     */
+    @Test fun signaturePadOffersSignatureOrThumbAndTheFormKeepsItsHeading() {
         val pad = source("CareSignaturePad.kt")
         assertFalse(pad.contains("Switch("))
-        assertFalse(pad.contains("goc-signature-thumb"))
+        assertFalse(pad.contains("\"goc-signature-thumb\""))
         assertFalse(pad.contains("allowThumb"))
+        assertTrue(pad.contains("\"goc-signature-mode-drawn\""))
+        assertTrue(pad.contains("\"goc-signature-mode-thumb\""))
+        assertTrue(pad.contains("\"goc-thumb-camera\""))
+        assertTrue(pad.contains("t(\"Thumb impression\""))
         assertTrue(source("CareGocExtract.kt").contains("Bi(\"Signature / thumb impression\""))
     }
 }

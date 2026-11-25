@@ -94,6 +94,8 @@ data class MedicineEntry(
     val strength: String = "", val form: String = "", val howMuch: String = "", val howOften: String = "",
     val times: List<String> = emptyList(), val food: MedicineMealTiming = MedicineMealTiming.NOT_STATED,
     val days: Int? = null, val directions: String = "",
+    /** "Important: ring like an alarm" when it differs from the default ([MedicineAlarmRules]); null keeps the default (on for opioids). */
+    val alarm: Boolean? = null,
 )
 
 object MedicineEntryText {
@@ -109,6 +111,7 @@ object MedicineEntryText {
         foods[entry.food]?.let { add(FOOD + it) }
         entry.days?.takeIf { it in 1..365 }?.let { add(COURSE + "$it ${if (it == 1) "day" else "days"}") }
         line(DIRECTIONS, entry.directions)
+        entry.alarm?.let { add(MedicineAlarmRules.LINE + if (it) "on" else "off") }
     }.joinToString("\n")
 
     /** Reads back only text this form wrote; any other line (free text, a scanned source quote) returns null so it is edited as text. */
@@ -124,6 +127,7 @@ object MedicineEntryText {
                 line.startsWith(FOOD) -> entry.copy(food = foods.entries.firstOrNull { it.value == line.removePrefix(FOOD) }?.key ?: return null)
                 line.startsWith(COURSE) -> entry.copy(days = Regex("^(\\d{1,3}) days?$").find(line.removePrefix(COURSE))?.groupValues?.get(1)?.toInt() ?: return null)
                 line.startsWith(DIRECTIONS) -> entry.copy(directions = line.removePrefix(DIRECTIONS))
+                line.startsWith(MedicineAlarmRules.LINE) -> entry.copy(alarm = MedicineAlarmRules.saved(line) ?: return null)
                 else -> return null
             }
         }
@@ -193,6 +197,9 @@ object MedicineDoseRules {
         val noun = if (count == 1) careTr(hindi, "medicine", "दवा") else careTr(hindi, "medicines", "दवाएँ")
         return "$slot · ${group.time} · $count $noun"
     }
+
+    /** A picture for the part of the day where only text can go (a notification title): sun, sun behind a cloud, sunset, moon. */
+    fun symbol(slot: DoseSlot): String = when (slot) { DoseSlot.MORNING -> "☀️"; DoseSlot.AFTERNOON -> "🌤️"; DoseSlot.EVENING -> "🌇"; DoseSlot.NIGHT -> "🌙" }
 
     /** Names and strip photos appear only on an unlocked phone; the lock screen gets the generic public text. */
     fun reminder(group: DoseGroup, hindi: Boolean): DoseReminder = DoseReminder(

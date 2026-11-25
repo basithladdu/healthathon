@@ -10,6 +10,40 @@ import java.time.LocalTime
 class CareSimpleModeRulesTest {
     private val word = SimpleModeRules.PainWord.entries
 
+    @Test fun labelFloorIs18spAtNormalSizeAndKeepsThatLookWithALargerFont() {
+        assertEquals(18f, SimpleModeRules.labelFloor(1f), 0.001f)
+        assertEquals(18f, SimpleModeRules.labelFloor(0.85f), 0.001f) // a smaller font never lowers the floor below 18sp
+        assertEquals(12f, SimpleModeRules.labelFloor(1.5f), 0.001f)
+        assertEquals(9f, SimpleModeRules.labelFloor(2f), 0.001f)
+        // What is drawn (floor x font scale) never falls below 18sp-at-normal-size.
+        listOf(1f, 1.15f, 1.3f, 1.5f, 1.8f, 2f).forEach { assertEquals(18f, SimpleModeRules.labelFloor(it) * it, 0.001f) }
+    }
+
+    @Test fun pictureGoesAboveTheWordsOnlyWithALargeFont() {
+        assertTrue(!SimpleModeRules.stackIcon(1f)); assertTrue(!SimpleModeRules.stackIcon(1.15f))
+        assertTrue(SimpleModeRules.stackIcon(1.3f)); assertTrue(SimpleModeRules.stackIcon(2f))
+    }
+
+    @Test fun bodyPictureTakesTheRestButNeverLessThanTheMinimum() {
+        assertEquals(400, SimpleModeRules.fillHeight(viewport = 700, used = 300, min = 240))
+        assertEquals(240, SimpleModeRules.fillHeight(viewport = 500, used = 450, min = 240))
+        assertEquals(240, SimpleModeRules.fillHeight(viewport = 400, used = 900, min = 240))
+        assertEquals(240, SimpleModeRules.MIN_BODY_DP)
+    }
+
+    @Test fun wherePromptAddsTheVoiceHintOnlyOnceAPartIsMarkedAndRecordingIsAllowed() {
+        val ask = "Where does it hurt? Touch the place on the body."
+        assertEquals(ask, SimpleModeRules.wherePrompt(false, true, CareLang.EN))
+        assertEquals(ask, SimpleModeRules.wherePrompt(true, false, CareLang.EN))
+        assertEquals("$ask To say more in your own voice, tap Record your voice.", SimpleModeRules.wherePrompt(true, true, CareLang.EN))
+        assertTrue(SimpleModeRules.wherePrompt(true, true, CareLang.HI).startsWith("दर्द कहाँ है?"))
+    }
+
+    @Test fun saharaStaysQuietWhileThePatientIsRecorded() {
+        assertTrue(SimpleModeRules.speakNow(recording = false))
+        assertTrue(!SimpleModeRules.speakNow(recording = true))
+    }
+
     @Test fun verbalScaleSavesTheAgreedNumbers() {
         assertEquals(listOf(0, 3, 6, 9), word.map { SimpleModeRules.rating(it) })
         assertEquals(listOf("None", "A little", "A lot", "Worst"), word.map { it.english })
@@ -120,5 +154,77 @@ class CareSimpleModeRulesTest {
         assertTrue(!SimpleModeRules.autoOn(59, patientOwnView = true))
         assertTrue(!SimpleModeRules.autoOn(null, patientOwnView = true))
         assertTrue(!SimpleModeRules.autoOn(75, patientOwnView = false))
+    }
+    @Test fun homeHasExactlyFourButtons() {
+        assertEquals(listOf("FEEL", "MEDICINES", "READ", "CALL"), SimpleModeRules.HomeButton.entries.map { it.name })
+    }
+
+    @Test fun facesScaleGoesFromSmilingToSadAndFollowsTheClinicianNumber() {
+        assertEquals(listOf(1f, .67f, .33f, 0f), word.map { SimpleModeRules.faceScore(it) })
+        assertEquals(1f, SimpleModeRules.faceForRating(0))
+        assertEquals(.67f, SimpleModeRules.faceForRating(3))
+        assertEquals(.33f, SimpleModeRules.faceForRating(7))
+        assertEquals(0f, SimpleModeRules.faceForRating(10))
+        // Every word's saved number comes back to the same face.
+        word.forEach { assertEquals(SimpleModeRules.faceScore(it), SimpleModeRules.faceForRating(SimpleModeRules.rating(it))) }
+    }
+
+    private fun messageItem(id: String, from: SimpleModeRules.MessageFrom, name: String, text: String, created: Long, person: String = "p1") =
+        CareItem(id, person, "journal", SimpleModeRules.MESSAGE_TITLE, SimpleModeRules.messageDetail(from, name, text), created = created)
+
+    @Test fun messageToReadAloudRoundTripsAsPlainJournalText() {
+        val item = messageItem("m1", SimpleModeRules.MessageFrom.NURSE, " Sister\nMary ", "  Take the night medicine after food.\nI will visit on Friday. ", 10)
+        assertEquals("From: nurse · Sister Mary\n\nTake the night medicine after food.\nI will visit on Friday.", item.detail)
+        val message = SimpleModeRules.message(item)!!
+        assertEquals(SimpleModeRules.MessageFrom.NURSE, message.from)
+        assertEquals("Sister Mary", message.name)
+        assertEquals("Take the night medicine after food.\nI will visit on Friday.", message.text)
+        val noName = SimpleModeRules.message(messageItem("m2", SimpleModeRules.MessageFrom.DOCTOR, "", "Hello", 1))!!
+        assertEquals("", noName.name); assertEquals(SimpleModeRules.MessageFrom.DOCTOR, noName.from)
+        // Ordinary journal notes, other kinds, unknown senders and empty messages are not messages.
+        assertNull(SimpleModeRules.message(CareItem("j", "p1", "journal", "Slept well", "From: nurse\n\nhi")))
+        assertNull(SimpleModeRules.message(item.copy(kind = "task")))
+        assertNull(SimpleModeRules.message(item.copy(detail = "From: priest\n\nhi")))
+        assertNull(SimpleModeRules.message(item.copy(detail = "From: doctor\n\n   ")))
+    }
+
+    @Test fun readToMeReadsTheNewestMessageForThisPerson() {
+        val items = listOf(
+            messageItem("a", SimpleModeRules.MessageFrom.DOCTOR, "", "Old", 10),
+            messageItem("b", SimpleModeRules.MessageFrom.NURSE, "", "New", 20),
+            messageItem("c", SimpleModeRules.MessageFrom.FAMILY, "", "Other person", 30, person = "p2"),
+            CareItem("d", "p1", "journal", "Diary", "Newest diary line", created = 40),
+        )
+        assertEquals("b", SimpleModeRules.latestMessage(items, "p1")?.itemId)
+        assertNull(SimpleModeRules.latestMessage(items, "p3"))
+        val spoken = SimpleModeRules.readPrompt(SimpleModeRules.latestMessage(items, "p1"), CareLang.EN)
+        assertEquals("Here is the message from your nurse.\nNew", spoken)
+        assertEquals("Here is the message from your doctor", SimpleModeRules.messageLead(SimpleModeRules.MessageFrom.DOCTOR, CareLang.EN))
+        val none = SimpleModeRules.readPrompt(null, CareLang.EN)
+        assertEquals("There is no message from your doctor or nurse yet.", none)
+        listOf("prognosis", "stage", "terminal", "dying", "death", "end of life").forEach { assertTrue(it, !(spoken + none).lowercase().contains(it)) }
+    }
+
+    @Test fun messageMustHaveWordsAndStayShort() {
+        assertTrue(SimpleModeRules.messageError("  ", CareLang.EN) != null)
+        assertTrue(SimpleModeRules.messageError("x".repeat(SimpleModeRules.MESSAGE_MAX + 1), CareLang.EN) != null)
+        assertNull(SimpleModeRules.messageError("Take the night medicine.", CareLang.EN))
+    }
+
+    @Test fun voiceNoteTitleAndClock() {
+        assertEquals("0:00", SimpleModeRules.clock(-3))
+        assertEquals("0:42", SimpleModeRules.clock(42))
+        assertEquals("3:00", SimpleModeRules.clock(SimpleModeRules.VOICE_MAX_SECONDS))
+        val title = SimpleModeRules.voiceNoteTitle(125)
+        assertEquals("Voice note from the patient (2:05)", title)
+        assertTrue(SimpleModeRules.isVoiceNote(CareItem("v", "p1", "journal", title, SimpleModeRules.VOICE_NOTE_DETAIL)))
+        assertTrue(!SimpleModeRules.isVoiceNote(CareItem("v", "p1", "journal", "Slept well", SimpleModeRules.VOICE_NOTE_DETAIL)))
+        assertTrue(!SimpleModeRules.isVoiceNote(CareItem("v", "p1", "checkin", title, SimpleModeRules.VOICE_NOTE_DETAIL)))
+    }
+
+    @Test fun onlyPlainIdsBecomeFileNames() {
+        assertTrue(SimpleModeRules.safeFileId("3f2a9c1e-77b0-4c1d-9e0f-1a2b3c4d5e6f"))
+        assertTrue(SimpleModeRules.safeFileId("contact_12"))
+        listOf("", "../x", "a/b", "a\\b","x".repeat(81), "a.jpg").forEach { assertTrue(it, !SimpleModeRules.safeFileId(it)) }
     }
 }

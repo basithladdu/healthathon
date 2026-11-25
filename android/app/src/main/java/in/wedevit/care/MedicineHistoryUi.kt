@@ -81,7 +81,7 @@ import java.time.format.DateTimeFormatter
     val canEdit by vm.canEdit.collectAsStateWithLifecycle(); val busy by vm.busy.collectAsStateWithLifecycle()
     val saved by vm.medicineEvents.collectAsStateWithLifecycle()
     val held by DoseUndoWindow.app.pending.collectAsStateWithLifecycle()
-    val events = DoseUndoWindow.shown(saved, held, item.personId)
+    val events = remember(saved, held, item.personId) { DoseUndoWindow.shown(saved, held, item.personId) }
     var menu by remember { mutableStateOf(false) }
     var editing by rememberSaveable(item.id) { mutableStateOf(false) }
     var delete by rememberSaveable(item.id) { mutableStateOf(false) }
@@ -92,7 +92,7 @@ import java.time.format.DateTimeFormatter
     val photo = remember(item.personId, item.id, photoRevision) { runCatching { store.first(item.personId, item.id) }.getOrNull() }
     val doses = medicineDosesFor(item, vm)
     val zone = ZoneId.systemDefault(); val today = LocalDate.now(zone)
-    val allTaken = MedicineDoses.allTaken(MedicineDoses.states(item, doses, events, today, zone))
+    val allTaken = remember(item, doses, events, today) { MedicineDoses.allTaken(MedicineDoses.states(item, doses, events, today, zone)) }
     val entry = remember(item.detail) { MedicineEntryText.parse(item.detail) }
     // Known phrases ("For pain.", "Take with food.") show in the reader's language; the saved words never change (MedicinePhrases).
     val lang = careLanguage()
@@ -104,7 +104,9 @@ import java.time.format.DateTimeFormatter
         listOf(e.strength, e.howMuch, often, food).filter(String::isNotBlank).joinToString(" · ")
     }.orEmpty()
     // Medicines plum wash (green once every dose today is taken), so each medicine reads as part of its section.
-    SurfaceCard(if (allTaken) DoctorStatusGoodBg else SaharaSection.Medicines.wash) {
+    // The wash glides to green as the last dose is ticked (colour only; the card's size never animates).
+    val cardWash by animateColorAsState(if (allTaken) DoctorStatusGoodBg else SaharaSection.Medicines.wash, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "medicine-card-wash")
+    SurfaceCard(cardWash) {
         Row(verticalAlignment = Alignment.Top) {
             // The pillbox: the strip photo once one is taken; tap an empty one to add it.
             Box(Modifier.clickable(enabled = canEdit && !busy, onClickLabel = t("Edit", "बदलें")) { editing = true }.testTag("medicine-photo-${item.id}")) { StripThumb(photo, 56) }
@@ -112,6 +114,7 @@ import java.time.format.DateTimeFormatter
             // Everything about the medicine is shown at once: no tap-to-expand (20 Oct rule: no collapsible sections).
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(item.title, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, lineHeight = 22.sp, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                if (MedicineAlarmRules.isImportant(item)) MedicineAlarmTag(Modifier.testTag("medicine-card-alarm-${item.id}"))
                 if (!compact && summary.isNotBlank()) Text(summary, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
                 if (!compact && purpose.isNotBlank()) Text(purpose, fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardInk, modifier = Modifier.testTag("medicine-purpose-${item.id}"))
                 if (!compact && rest.isNotBlank()) Text(rest, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
@@ -251,7 +254,7 @@ internal suspend fun markMedicineDose(context: Context, vm: CareModel, item: Car
     val t = careText(); val context = LocalContext.current; val scope = rememberCoroutineScope()
     val saved by vm.medicineEvents.collectAsStateWithLifecycle()
     val held by DoseUndoWindow.app.pending.collectAsStateWithLifecycle()
-    val events = DoseUndoWindow.shown(saved, held, item.personId)
+    val events = remember(saved, held, item.personId) { DoseUndoWindow.shown(saved, held, item.personId) }
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     val busy by vm.busy.collectAsStateWithLifecycle()
     val current by vm.items.collectAsStateWithLifecycle()
@@ -262,8 +265,8 @@ internal suspend fun markMedicineDose(context: Context, vm: CareModel, item: Car
     val doses = medicineDosesFor(item, vm)
     var whichNight by remember(item.id) { mutableStateOf<Pair<String, (LocalDate) -> Unit>?>(null) }
     val zone = ZoneId.systemDefault(); val today = LocalDate.now(zone)
-    val states = MedicineDoses.states(item, doses, events, today, zone)
-    val editable = canEdit && current.any { it.id == item.id }
+    val states = remember(item, doses, events, today) { MedicineDoses.states(item, doses, events, today, zone) }
+    val editable = remember(canEdit, current, item.id) { canEdit && current.any { it.id == item.id } }
     val failed = t("Couldn't save. Please try again.", "सहेजा नहीं जा सका। कृपया फिर कोशिश करें।")
     // Dose chips wrap, so every dose of the day is visible without sideways scrolling.
     // A weekly, monthly or every-few-days medicine has no daily tick: its directions say when it is due.
@@ -316,19 +319,22 @@ internal suspend fun markMedicineDose(context: Context, vm: CareModel, item: Car
     val pending = state == MedicineDoseState.PENDING
     val tapLabel = if (pending) t("Mark taken", "ली हुई दर्ज करें") else t("Change", "बदलें")
     val holdLabel = t("Taken, not taken or skipped", "ली, नहीं ली या छोड़ी")
+    val haptic = rememberSaharaHaptic(); val tick = rememberSaharaTick()
     Box {
+        // The chip answers a tick with one soft bounce as it turns green (draw-only; the tap is never delayed).
         Surface(shape = RoundedCornerShape(50), color = bg, border = if (pending && !late) BorderStroke(1.5.dp, SaharaSection.Medicines.solid) else null,
-            modifier = Modifier.minimumInteractiveComponentSize().clip(RoundedCornerShape(50))
-                .combinedClickable(enabled = enabled, role = Role.Button, onClickLabel = tapLabel, onLongClickLabel = holdLabel, onLongClick = { menu = true }) { if (pending) onMark(MedicineDoseChoice.TAKEN, true) else menu = true }
+            modifier = Modifier.saharaSelectBounce(state == MedicineDoseState.TAKEN, .08f).minimumInteractiveComponentSize().clip(RoundedCornerShape(50))
+                .combinedClickable(enabled = enabled, role = Role.Button, onClickLabel = tapLabel, onLongClickLabel = holdLabel, onLongClick = { tick(); menu = true }) { if (pending) { haptic(); onMark(MedicineDoseChoice.TAKEN, true) } else { tick(); menu = true } }
                 .semantics { contentDescription = "${item.title}, $label: $stateWord" }.testTag("medicine-dose-${item.id}-${dose.key}")) {
             // A clear time chip: the dose time in bold; the state shows as icon and colour (the word is in the description).
             Row(Modifier.heightIn(min = 40.dp).padding(start = 10.dp, end = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-                DoseStateIcon(state, fg, 18)
+                // Before it is marked, the sun or moon of its time (point 6); then the tick, cross or dash on the chip's colour.
+                if (pending && !late && dose.timed) DoseSlotIcon(MedicineDoseRules.slot(dose.time), 20, describe = false) else DoseStateIcon(state, fg, if (pending) 18 else 22)
                 Spacer(Modifier.width(6.dp))
                 Text(label, color = if (pending && !late) DoctorCardInk else fg, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
             }
         }
-        DoseChoiceMenu(menu, { menu = false }, "medicine-dose", "${item.id}-${dose.key}") { onMark(it, false) }
+        DoseChoiceMenu(menu, { menu = false }, "medicine-dose", "${item.id}-${dose.key}") { if (it == MedicineDoseChoice.TAKEN) haptic(); onMark(it, false) }
     }
 }
 
@@ -384,6 +390,10 @@ internal suspend fun markMedicineDose(context: Context, vm: CareModel, item: Car
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     var sideEffect by rememberSaveable(item.id) { mutableStateOf(false) }
     val doses = medicineDosesFor(item, vm)
+    val context = LocalContext.current
+    val store = remember(vm.storageNamespace) { MedicineStripPhotos(context.applicationContext, vm.storageNamespace) }
+    val photoRevision by MedicineStripPhotos.revision.collectAsStateWithLifecycle()
+    val photo = remember(item.personId, item.id, photoRevision) { runCatching { store.first(item.personId, item.id) }.getOrNull() }
     SaharaScreenSheet(onDismissRequest = onDismiss, containerColor = Cream) {
         val zone = ZoneId.systemDefault(); val today = LocalDate.now(zone)
         var chosen by rememberSaveable(item.id) { mutableStateOf(today.toEpochDay()) }
@@ -396,23 +406,39 @@ internal suspend fun markMedicineDose(context: Context, vm: CareModel, item: Car
         val reportsShown = rememberShownCount(item.id to chosen)
         val now = System.currentTimeMillis()
         LazyColumn(Modifier.fillMaxWidth().testTag("care-medicine-history-sheet"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            item { SaharaSectionBand("${item.title} · ${t("History", "इतिहास")}", SaharaSection.Medicines) }
+            item(key = "history-band") { SaharaSectionBand("${item.title} · ${t("History", "इतिहास")}", SaharaSection.Medicines) }
+            // The strip photo the patient knows, large, above the month (point 6: the photo everywhere the medicine appears).
+            item(key = "history-photo") {
+                Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                    StripThumb(photo, 96, Modifier.testTag("medicine-history-photo"))
+                    Spacer(Modifier.width(14.dp))
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(item.title, fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+                        DoseSlotLine(doses.filter { it.timed }.map { it.time }, iconSize = 22, fontSize = 15)
+                        if (MedicineAlarmRules.isImportant(item)) MedicineAlarmTag()
+                    }
+                }
+            }
             item(key = "calendar") { MedicineHistoryCalendarCard(item, doses, mine, sideTimes, day, today) { chosen = it.toEpochDay() } }
             item(key = "day-title") {
-                Text(day.format(careDateFormat("EEEE, d MMMM", hindi)), Modifier.padding(start = 4.dp, top = 4.dp).a11yHeading().testTag("medicine-history-day-title"),
-                    fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+                // The chosen day's name changes in place (a short fade and rise) when another day is tapped.
+                val dayTitle = remember(chosen, hindi) { day.format(careDateFormat("EEEE, d MMMM", hindi)) }
+                SaharaAnimatedText(dayTitle) { shown ->
+                    Text(shown, Modifier.padding(start = 4.dp, top = 4.dp).a11yHeading().testTag("medicine-history-day-title"),
+                        fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+                }
             }
             // A quiet line for a day without reports; the Side effect? action sits below.
             if (dayReports.isEmpty() && daySideEffects.isEmpty()) item(key = "day-empty") {
-                Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(Modifier.animateItem().fillMaxWidth().padding(horizontal = 4.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.History, null, Modifier.size(22.dp), tint = DoctorCardSub); Spacer(Modifier.width(10.dp))
                     Text(if (mine.isEmpty()) t("No reports yet.", "अभी कोई जानकारी नहीं।") else t("Nothing reported on this day.", "इस दिन कुछ दर्ज नहीं।"), fontSize = 16.sp, color = DoctorCardInk)
                 }
             }
             cappedItems(dayReports, reportsShown, key = { it.id }, tag = "medicine-history") { CompactMedicineReport(it, mine, now) }
             medicineSideEffectItems(daySideEffects, vm)
-            if (canEdit) item { OutlinedButton(onClick = { sideEffect = true }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().padding(top = 12.dp).heightIn(min = 48.dp).testTag("care-medicine-history-side-effect")) { Icon(Icons.Default.ErrorOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Side effect?", "कोई दुष्प्रभाव?"), fontSize = 16.sp) } }
-            if (vm.cloud != null) item { TextButton(onClick = vm::refreshMedicineHistory, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Refresh history", "इतिहास ताज़ा करें"), fontSize = 15.sp) } }
+            if (canEdit) item(key = "history-side-effect-action") { OutlinedButton(onClick = { sideEffect = true }, shape = RoundedCornerShape(14.dp), modifier = Modifier.animateItem().fillMaxWidth().padding(top = 12.dp).heightIn(min = 48.dp).testTag("care-medicine-history-side-effect")) { Icon(Icons.Default.ErrorOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Side effect?", "कोई दुष्प्रभाव?"), fontSize = 16.sp) } }
+            if (vm.cloud != null) item(key = "history-refresh") { TextButton(onClick = vm::refreshMedicineHistory, modifier = Modifier.animateItem().fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Refresh history", "इतिहास ताज़ा करें"), fontSize = 15.sp) } }
         }
     }
     if (sideEffect) SideEffectSheet(item, vm, onDismiss = { sideEffect = false })
@@ -458,7 +484,7 @@ private val CalendarSideEffect: Color get() = SaharaTone.Info.solid
 @Composable private fun MedicineCalendarDay(d: LocalDate, inMonth: Boolean, selected: Boolean, isToday: Boolean, marks: MedicineDayMarks, onClick: () -> Unit) {
     val t = careText(); val hindi = careHindi()
     val fill by animateColorAsState(if (selected) SaharaSection.Medicines.solid else Color.Transparent, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "medicine-day")
-    val words = listOfNotNull(t("All taken", "सब ली").takeIf { marks.allTaken }, t("Not taken", "नहीं ली").takeIf { marks.notTaken }, t("Side effect noted", "दुष्प्रभाव दर्ज").takeIf { marks.sideEffect })
+    val words = listOfNotNull(t("Doses taken: ${marks.asNeededTaken}", "ली गई खुराक: ${marks.asNeededTaken}").takeIf { marks.asNeededTaken > 0 }, t("All taken", "सब ली").takeIf { marks.allTaken && marks.asNeededTaken == 0 }, t("Not taken", "नहीं ली").takeIf { marks.notTaken }, t("Side effect noted", "दुष्प्रभाव दर्ज").takeIf { marks.sideEffect })
     val desc = (listOf(d.format(careDateFormat("EEE d MMM", hindi))) + words).joinToString(", ")
     Box(Modifier.fillMaxWidth().padding(2.dp).heightIn(min = 48.dp).clip(RoundedCornerShape(12.dp)).background(fill)
         .clickable(role = Role.Button, onClick = onClick).semantics { contentDescription = desc }.testTag(if (inMonth) "medicine-history-day-$d" else "medicine-history-outday-$d"),
@@ -468,7 +494,9 @@ private val CalendarSideEffect: Color get() = SaharaTone.Info.solid
                 color = when { selected -> Color.White; isToday -> SaharaSection.Medicines.ink; inMonth -> DoctorCardInk; else -> DoctorCardFaint })
             Row(Modifier.height(8.dp), horizontalArrangement = Arrangement.spacedBy(3.dp), verticalAlignment = Alignment.CenterVertically) {
                 val dot = Modifier.size(7.dp).then(if (selected) Modifier.border(1.dp, Color.White, CircleShape) else Modifier)
-                if (marks.notTaken) Box(dot.background(CalendarNotTaken, CircleShape)) else if (marks.allTaken) Box(dot.background(CalendarTaken, CircleShape))
+                // An as-needed medicine: one green dot per dose taken that day (three at most, then the count is in the day's list).
+                if (marks.asNeededTaken > 0) repeat(marks.asNeededTaken.coerceAtMost(3)) { Box(dot.background(CalendarTaken, CircleShape)) }
+                else if (marks.notTaken) Box(dot.background(CalendarNotTaken, CircleShape)) else if (marks.allTaken) Box(dot.background(CalendarTaken, CircleShape))
                 if (marks.sideEffect) Box(dot.background(CalendarSideEffect, CircleShape))
             }
         }
@@ -496,6 +524,8 @@ private const val FAMILY_ONLY_NOTE = "Family report only. Not confirmed as taken
 @Composable private fun CompactMedicineReport(event: MedicineIntakeEvent, all: List<MedicineIntakeEvent>, now: Long) {
     val t = careText()
     val status = MedicineHistoryRules.status(event, all, now)
+    val lang = careLanguage()
+    val noteShown = remember(event.note, lang) { MedicinePhrases.shown(event.note, lang) }
     // Only three answers (Taken / Not taken / Skipped); "late" is shown on a Taken report, never as its own answer.
     // Solid status pills: green taken, amber taken late, red not taken, grey skipped, bold white word.
     val (word, pillTone) = when (MedicineDoseStatus.choiceOf(event)) {
@@ -515,12 +545,16 @@ private const val FAMILY_ONLY_NOTE = "Family report only. Not confirmed as taken
     }
     SurfaceCard(Paper) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            // The large green tick or red cross first (point 6), then the word on its colour.
+            MedicineDoseStatus.choiceOf(event)?.let { DoseStateMark(MedicineDoseStatus.stateOf(it), 36, modifier = Modifier.testTag("medicine-report-mark-${event.id}")); Spacer(Modifier.width(8.dp)) }
             Surface(color = pillTone.solid, shape = RoundedCornerShape(50)) { Text(word, Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = pillTone.onSolid) }
             Spacer(Modifier.width(12.dp))
+            // The dose's time of day as a picture (sun, bright sun, sunset, moon) beside its time.
+            doseAt?.let { DoseSlotIcon(MedicineDoseRules.slot(doseClock.format(Instant.ofEpochMilli(it))), 22); Spacer(Modifier.width(6.dp)) }
             Text(main, Modifier.weight(1f), fontSize = 15.sp, color = DoctorCardInk)
             if (MedicineHistoryRules.loggedByFamily(event)) SymptomLoggedByFamilyChip(careHindi(), "medicine-report-family-${event.id}")
         }
         Text(t("Reported by ", "बताने वाले: ") + event.reporter.ifBlank { t("Not recorded", "दर्ज नहीं") } + " · " + t("Logged: ", "दर्ज: ") + reportTime.format(Instant.ofEpochMilli(event.loggedAt)), Modifier.padding(top = 8.dp), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
-        if (event.note.isNotBlank() && event.note != FAMILY_ONLY_NOTE && !event.note.startsWith("Planned dose.") && event.plannedAt == null) Text(event.note, Modifier.padding(top = 4.dp), fontSize = 15.sp, color = DoctorCardInk)
+        if (event.note.isNotBlank() && event.note != FAMILY_ONLY_NOTE && !event.note.startsWith("Planned dose.") && event.plannedAt == null) Text(if (event.note == MedicineDoses.AS_NEEDED_NOTE) t("As-needed dose taken.", "ज़रूरत पड़ने पर ली गई खुराक।") else noteShown, Modifier.padding(top = 4.dp), fontSize = 15.sp, color = DoctorCardInk)
     }
 }

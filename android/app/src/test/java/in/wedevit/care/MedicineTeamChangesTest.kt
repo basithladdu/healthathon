@@ -134,7 +134,7 @@ class MedicineTeamChangesTest {
     }
 
     @Test fun strengthIsANumberAndAUnit() {
-        assertEquals(listOf("mg", "mcg", "ml", "g", "units", "drops", "puffs"), MedicineStrength.units)
+        assertEquals(listOf("mg", "mcg", "ml", "g", "units", "%", "drops", "puffs"), MedicineStrength.units)
         assertEquals(MedicineStrength.Parts("500", "mg"), MedicineStrength.parts("500 mg"))
         assertEquals(MedicineStrength.Parts("500", "mg"), MedicineStrength.parts("500mg"))
         assertEquals(MedicineStrength.Parts("2.5", "ml"), MedicineStrength.parts("2.5 ML"))

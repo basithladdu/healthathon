@@ -4,6 +4,7 @@ import { inflateSync } from 'node:zlib';
 import {
   GOC_SIGNOFF_SCHEME, GocSignOffError, gocAddSignature, gocBytesToDataUrl, gocCrc32, gocEncodeMonoPng, gocExportSize, gocLock, gocNextStep,
   gocNoteSha256, gocReconcile, gocRequiredSteps, gocRestart, gocSealInput, gocSealSha256, gocSha256Hex, gocStartSignOff, gocVerify,
+  gocCleanReading, gocDecodeReading, gocReadingProblems, gocReadingSealParts, gocReadingSummary, gocRelationLabel, isGocSignOffRecord,
 } from '../app/goc-signoff.ts';
 import { loadGocSignOffs, memoryGocSignOffStorage, saveGocSignOff, setGocSignOffStorage } from '../app/goc-signoff-store.ts';
 
@@ -182,4 +183,105 @@ test('cross-platform vector: Android CareGocSignOffTest checks the same hashes',
   r = await gocLock(r, text, undefined, NOW);
   assert.equal(r.noteSha256, '7e18e357acfbef1d4d20863c4607fb1854d60171e16541595918ac58bc6f8467');
   assert.equal(r.sealSha256, '230b8a152907bf0d012847342958d40f05e1964e368d0875dd31e999e17f1adc');
+});
+
+// ---------------------------------------------------------------------------
+// Read aloud and thumb impressions, as the phone (CareGocSignOff.kt + ConsentReadAloud.kt) writes them.
+
+const READ_PERSON = { method: 'PERSON', readerName: 'Ravi Sample', readerRelation: 'Son', language: '', witnessName: '', witnessRelation: '', at: '2026-11-04T09:58:00.000Z' };
+const tEn = (en) => en;
+const GOC_READ_ALOUD_VECTOR = 'ebb167bad91649a15036ec31d88aa20c7bab662be9cbd496b91a4fefcca43a25';
+
+test('a reading is cleaned exactly like Android ConsentReadingRules.clean', () => {
+  const c = gocCleanReading({ method: 'PERSON', readerName: '  Ravi \t  Sample ', readerRelation: ' Son ', language: 'hi', witnessName: ' Mohan ', witnessRelation: 'Neighbour', at: ' 2026-11-04T09:58:00.000Z ' });
+  assert.deepEqual(c, { method: 'PERSON', readerName: 'Ravi Sample', readerRelation: 'Son', language: '', witnessName: 'Mohan', witnessRelation: 'Neighbour', at: '2026-11-04T09:58:00.000Z' });
+  assert.deepEqual(gocCleanReading({ method: 'SELF', readerName: 'x', witnessName: 'y', language: 'hi' }), { method: 'SELF', readerName: '', readerRelation: '', language: '', witnessName: '', witnessRelation: '', at: '' });
+  assert.equal(gocCleanReading({ method: 'PHONE', language: ' te ', readerName: 'x' }).language, 'te');
+  assert.equal(gocCleanReading({ method: 'PERSON', readerName: 'a'.repeat(130) }).readerName.length, 120);
+  // Kotlin trim() drops a no-break space but keeps U+FEFF; Java \s collapses only ASCII spaces.
+  assert.equal(gocCleanReading({ method: 'PERSON', readerName: ' Ravi ' }).readerName, 'Ravi');
+  assert.equal(gocCleanReading({ method: 'PERSON', readerName: '﻿Ravi' }).readerName, '﻿Ravi');
+  assert.equal(gocCleanReading({ method: 'PERSON', readerName: 'Ravi  Sample' }).readerName, 'Ravi  Sample');
+  assert.equal(gocDecodeReading({ method: 'LATER' }), null);
+  assert.equal(gocDecodeReading(null), null);
+  assert.equal(gocDecodeReading('PERSON'), null);
+});
+
+test('the seal adds the reading parts after the signature noteSha256, in the phone order', async () => {
+  const plain = await signed();
+  const read = structuredClone(plain); read.signatures[1].readAloud = READ_PERSON; read.signatures[1].canRead = false;
+  const before = gocSealInput({ ...read, signatures: [read.signatures[0], { ...read.signatures[1], readAloud: null }] });
+  assert.equal(gocSealInput(read), before + '9:readAloud;6:PERSON;11:Ravi Sample;3:Son;0:;0:;0:;24:2026-11-04T09:58:00.000Z;');
+  assert.deepEqual(gocReadingSealParts(READ_PERSON), ['readAloud', 'PERSON', 'Ravi Sample', 'Son', '', '', '', '2026-11-04T09:58:00.000Z']);
+  // No reading (null, missing, or an unknown method the phone would drop) leaves the seal as before.
+  const noField = structuredClone(plain); for (const s of noField.signatures) delete s.readAloud;
+  const unknown = structuredClone(plain); unknown.signatures[1].readAloud = { method: 'LATER', readerName: 'x' };
+  assert.equal(gocSealInput(noField), gocSealInput(plain));
+  assert.equal(gocSealInput(unknown), gocSealInput(plain));
+});
+
+test('a phone-made seal with a thumb impression and a reading verifies on the website', async () => {
+  const text = 'Sample note. आशा wants to be cared for at home.';
+  const img = 'data:image/png;base64,YWJj'; // the bytes "abc"
+  const sha = await gocNoteSha256(text);
+  const sig = (patch) => ({ registrationNo: null, relation: null, canRead: null, imageDataUrl: img, imageSha256: 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad', signedAt: NOW.toISOString(), noteSha256: sha, readAloud: null, ...patch });
+  // JSON as GocSignOffJson.encode writes it (readAloud: null when not recorded).
+  const phone = {
+    scheme: GOC_SIGNOFF_SCHEME, id: 'id-1', noteId: 'note-1', noteSha256: sha, status: 'LOCKED', createdAt: NOW.toISOString(),
+    signatures: [
+      sig({ role: 'DOCTOR', name: 'Dr Sample', registrationNo: 'KMC-123', consent: true, method: 'DRAWN', strokeCount: 2 }),
+      sig({ role: 'FAMILY', name: 'Asha Sample', relation: 'Daughter', consent: true, canRead: false, method: 'THUMB', strokeCount: 1, readAloud: READ_PERSON }),
+      sig({ role: 'WITNESS', name: 'Nurse Sample', relation: 'Nurse', consent: true, method: 'DRAWN', strokeCount: 3 }),
+    ],
+    lockedAt: NOW.toISOString(), sealSha256: null, invalidatedAt: null, invalidatedReason: null,
+  };
+  phone.sealSha256 = await gocSealSha256(phone);
+  const stored = JSON.parse(JSON.stringify(phone));
+  assert.ok(isGocSignOffRecord(stored));
+  assert.deepEqual(await gocVerify(stored, text), { ok: true, problems: [] });
+  // Cross-platform vector: Android CareGocSignOffTest should get the same seal for this record.
+  assert.equal(stored.sealSha256, GOC_READ_ALOUD_VECTOR);
+  for (const change of [(r) => { r.signatures[1].readAloud.readerName = 'Someone else'; }, (r) => { r.signatures[1].readAloud = null; },
+    (r) => { r.signatures[1].readAloud.at = '2026-11-05T09:58:00.000Z'; }, (r) => { r.signatures[1].method = 'DRAWN'; }]) {
+    const tampered = structuredClone(stored); change(tampered);
+    assert.deepEqual((await gocVerify(tampered, text)).problems, ['SEAL_CHANGED']);
+  }
+});
+
+test('signing with a reading decides canRead and refuses an incomplete one', async () => {
+  const r1 = await gocAddSignature(await gocStartSignOff('note-1', NOTE, NOW, 'id-1'), NOTE, await doctor(), undefined, NOW);
+  const heard = await gocAddSignature(r1, NOTE, await patient({ canRead: true, method: 'THUMB', readAloud: { ...READ_PERSON, readerName: ' Ravi  Sample ', language: 'hi' } }), undefined, NOW);
+  const s = heard.signatures[1];
+  assert.equal(s.canRead, false);
+  assert.equal(s.method, 'THUMB');
+  assert.deepEqual(s.readAloud, READ_PERSON);
+  assert.equal(gocNextStep(heard), 'WITNESS');
+  const self = await gocAddSignature(r1, NOTE, await patient({ canRead: null, readAloud: { method: 'SELF', at: NOW.toISOString() } }), undefined, NOW);
+  assert.equal(self.signatures[1].canRead, true);
+  assert.equal(gocNextStep(self), 'LOCK');
+  assert.equal((await gocAddSignature(r1, NOTE, await patient())).signatures[1].readAloud, null);
+  await assert.rejects(gocAddSignature(r1, NOTE, await patient({ readAloud: { method: 'PERSON', readerName: '', readerRelation: 'Son' } })), code('READ_ALOUD_MISSING'));
+  await assert.rejects(gocAddSignature(r1, NOTE, await patient({ readAloud: { method: 'PERSON', readerName: 'Ravi', readerRelation: ' ' } })), code('READ_ALOUD_MISSING'));
+  await assert.rejects(gocAddSignature(r1, NOTE, await patient({ readAloud: { method: 'PERSON', readerName: ' asha  SAMPLE', readerRelation: 'Son' } })), code('READ_ALOUD_MISSING'));
+  await assert.rejects(gocAddSignature(r1, NOTE, await patient({ readAloud: { method: 'LATER' } })), code('READ_ALOUD_MISSING'));
+  assert.deepEqual(gocReadingProblems({ method: 'PHONE' }, 'Asha', true, false), ['NOT_HEARD', 'WITNESS_NAME', 'WITNESS_RELATION']);
+  assert.deepEqual(gocReadingProblems({ method: 'PERSON', readerName: 'Ravi', readerRelation: 'Son', witnessName: 'ravi', witnessRelation: 'Son' }, 'Asha', true), ['WITNESS_IS_READER']);
+});
+
+test('the witness cannot be the person who read the note aloud (Android GocSignOffRules.add)', async () => {
+  const r = await signed({ canRead: null, readAloud: READ_PERSON });
+  assert.equal(gocNextStep(r), 'WITNESS');
+  await assert.rejects(gocAddSignature(r, NOTE, { ...(await witness()), name: '  ravi   SAMPLE ' }, undefined, NOW), code('WITNESS_IS_READER'));
+  assert.equal(gocNextStep(await gocAddSignature(r, NOTE, await witness(), undefined, NOW)), 'LOCK');
+  const phone = await signed({ canRead: null, readAloud: { method: 'PHONE', language: 'hi', at: NOW.toISOString() } });
+  assert.equal(gocNextStep(await gocAddSignature(phone, NOTE, { ...(await witness()), name: 'Ravi Sample' }, undefined, NOW)), 'LOCK');
+});
+
+test('the reading line reads like the phone one', () => {
+  assert.equal(gocReadingSummary({ ...READ_PERSON, witnessName: 'Mohan', witnessRelation: 'Neighbour' }, tEn), 'Read aloud by Ravi Sample (Son) · witnessed by Mohan (Neighbour)');
+  assert.equal(gocReadingSummary(READ_PERSON, tEn), 'Read aloud by Ravi Sample (Son)');
+  assert.equal(gocReadingSummary({ method: 'PHONE', language: 'te', witnessName: 'Mohan', witnessRelation: '' }, tEn), 'Read aloud by the phone · తెలుగు · witnessed by Mohan');
+  assert.equal(gocReadingSummary({ method: 'SELF' }, tEn), 'Read it themselves');
+  assert.equal(gocReadingSummary(READ_PERSON, (_en, hi) => hi), 'पढ़कर सुनाया: Ravi Sample (बेटा)');
+  assert.equal(gocRelationLabel(tEn, 'Cousin'), 'Cousin');
 });

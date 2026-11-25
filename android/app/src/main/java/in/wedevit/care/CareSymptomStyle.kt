@@ -145,12 +145,18 @@ internal val SymptomWords = TextStyle(lineBreak = LineBreak.Paragraph, hyphens =
 @Composable internal fun SymptomPill(selected: Boolean, label: String, tag: String?, modifier: Modifier = Modifier, multi: Boolean = false, onClick: () -> Unit) {
     val shape = RoundedCornerShape(50)
     val bg by animateColorAsState(if (selected) DoctorAccent else Paper, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "pill fill")
-    val base = modifier.heightIn(min = 48.dp).let { if (tag != null) it.testTag(tag) else it }.clip(shape).background(bg, shape)
-        .border(1.5.dp, if (selected) DoctorAccent else DoctorCardSub.copy(alpha = .45f), shape)
-    val clickable = if (multi) base.toggleable(selected, role = Role.Checkbox, onValueChange = { onClick() }) else base.selectable(selected, role = Role.RadioButton, onClick = onClick)
+    val edge by animateColorAsState(if (selected) DoctorAccent else DoctorCardSub.copy(alpha = .45f), SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "pill edge")
+    val ink by animateColorAsState(if (selected) Color.White else DoctorCardInk, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "pill ink")
+    val tick = rememberSaharaTick()
+    val base = modifier.heightIn(min = 48.dp).saharaSelectBounce(selected, .06f).let { if (tag != null) it.testTag(tag) else it }.clip(shape).background(bg, shape)
+        .border(1.5.dp, edge, shape)
+    val clickable = if (multi) base.toggleable(selected, role = Role.Checkbox, onValueChange = { tick(); onClick() }) else base.selectable(selected, role = Role.RadioButton, onClick = { tick(); onClick() })
     Row(clickable.padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally)) {
-        if (selected) Icon(Icons.Default.Check, null, Modifier.size(18.dp), tint = Color.White)
-        Text(label, color = if (selected) Color.White else DoctorCardInk, fontSize = 15.sp, lineHeight = 19.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, style = SymptomWords, modifier = Modifier.weight(1f, fill = false))
+        // The tick grows in beside the words instead of popping.
+        AnimatedVisibility(selected, enter = scaleIn(SaharaMotion.tween(SaharaMotion.SELECT_MS)) + fadeIn(SaharaMotion.tween(SaharaMotion.SELECT_MS)), exit = fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS))) {
+            Icon(Icons.Default.Check, null, Modifier.size(18.dp), tint = Color.White)
+        }
+        Text(label, color = ink, fontSize = 15.sp, lineHeight = 19.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, style = SymptomWords, modifier = Modifier.weight(1f, fill = false))
     }
 }
 
@@ -159,9 +165,11 @@ internal val SymptomWords = TextStyle(lineBreak = LineBreak.Paragraph, hyphens =
     val c = ratingColor(number)
     val bg by animateColorAsState(if (selected) c else lerp(c, Paper, .82f), SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "rating fill")
     val scale by animateFloatAsState(if (selected) 1.08f else 1f, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "rating scale")
+    val edge by animateColorAsState(if (selected) DoctorCardInk else c.copy(alpha = .7f), SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "rating edge")
+    val tick = rememberSaharaTick()
     Box(modifier.heightIn(min = 48.dp).graphicsLayer { scaleX = scale; scaleY = scale }.testTag(tag).clip(CircleShape).background(bg, CircleShape)
-        .border(if (selected) 3.dp else 1.5.dp, if (selected) DoctorCardInk else c.copy(alpha = .7f), CircleShape)
-        .selectable(selected, role = Role.RadioButton, onClick = onClick), contentAlignment = Alignment.Center) {
+        .border(if (selected) 3.dp else 1.5.dp, edge, CircleShape)
+        .selectable(selected, role = Role.RadioButton, onClick = { if (!selected) tick(); onClick() }), contentAlignment = Alignment.Center) {
         Text(number.toString(), color = if (selected) readableOn(c) else DoctorCardInk, fontSize = 19.sp, fontWeight = FontWeight.Bold)
     }
 }

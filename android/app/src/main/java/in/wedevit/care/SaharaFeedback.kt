@@ -18,6 +18,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -66,6 +71,9 @@ object SaharaNotice {
 /** A message routed to a dialog: icon by tone, the message as the title, one OK. */
 @Composable fun SaharaNoticeDialog(message: String, onDismiss: () -> Unit) {
     val t = careText(); val tone = SaharaNotice.tone(message)
+    // A problem is felt as well as seen: one Reject when the dialog opens (saves already give their own Confirm).
+    val reject = rememberSaharaReject()
+    LaunchedEffect(message) { if (tone == SaharaTone.Error) reject() }
     SaharaDialog(SaharaNotice.text(message), onDismiss = onDismiss, tone = tone, confirmLabel = t("OK", "ठीक है"), modifier = Modifier.testTag("sahara-notice-dialog"))
 }
 
@@ -109,13 +117,17 @@ class SaharaSaid internal constructor() {
 
 /** Put directly under the button: "Saved", "Sent to Dr. Rao", or a one-line problem. Read out politely by TalkBack. */
 @Composable fun SaharaInlineResult(said: SaharaSaid, modifier: Modifier = Modifier, clearAfterMs: Long = 4000) {
-    LaunchedEffect(said.serial) { if (said.text != null && said.tone != SaharaTone.Error) { delay(clearAfterMs); said.clear() } }
+    val reject = rememberSaharaReject()
+    LaunchedEffect(said.serial) {
+        if (said.text != null && said.tone == SaharaTone.Error) reject() // a one-line problem gets the Reject haptic as it appears
+        if (said.text != null && said.tone != SaharaTone.Error) { delay(clearAfterMs); said.clear() }
+    }
     AnimatedVisibility(said.text != null, modifier, enter = SaharaMotion.enter, exit = SaharaMotion.exit) {
         val tone = said.tone
-        Row(Modifier.fillMaxWidth().padding(top = 6.dp).announce().testTag("sahara-inline-result"), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.fillMaxWidth().padding(top = SaharaSpacing.Sm).announce().testTag("sahara-inline-result"), verticalAlignment = Alignment.CenterVertically) {
             Icon(when (tone) { SaharaTone.Error -> Icons.Default.ErrorOutline; SaharaTone.Warning -> Icons.Default.WarningAmber; SaharaTone.Success -> Icons.Default.CheckCircle; else -> Icons.Default.Info },
                 null, Modifier.size(18.dp), tint = tone.ink)
-            Spacer(Modifier.width(6.dp))
+            Spacer(Modifier.width(SaharaSpacing.Sm))
             Text(said.text.orEmpty(), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, color = tone.ink)
         }
     }
@@ -155,12 +167,16 @@ class SaharaSaid internal constructor() {
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (text != null) Text(text, style = MaterialTheme.typography.bodyLarge, color = SaharaColors.InkSub, textAlign = TextAlign.Center)
-                Box(Modifier.fillMaxWidth().height(4.dp).clip(CircleShape).background(SaharaTone.Success.wash)) {
-                    Box(Modifier.fillMaxWidth(left.value).fillMaxHeight().clip(CircleShape).background(SaharaTone.Success.solid))
-                }
+                // The time-left bar is drawn, not laid out: reading left.value only in the draw phase redraws it each frame
+                // without recomposing or re-measuring the dialog for 2.5 s. It shrinks towards the start edge, as before.
+                Box(Modifier.fillMaxWidth().height(4.dp).clip(CircleShape).background(SaharaTone.Success.wash).drawBehind {
+                    val w = size.width * left.value
+                    val x = if (layoutDirection == LayoutDirection.Rtl) size.width - w else 0f
+                    drawRoundRect(SaharaTone.Success.solid, Offset(x, 0f), Size(w, size.height), CornerRadius(size.height / 2f))
+                })
             }
         },
-        confirmButton = { TextButton(onClick = onClose, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Close", "बंद करें"), color = SaharaTone.Success.ink, fontWeight = FontWeight.Bold) } })
+        confirmButton = { TextButton(onClick = onClose, modifier = Modifier.heightIn(min = 56.dp)) { Text(t("Close", "बंद करें"), color = SaharaTone.Success.ink, fontWeight = FontWeight.Bold) } })
 }
 
 // ---------------------------------------------------------------- offline chip

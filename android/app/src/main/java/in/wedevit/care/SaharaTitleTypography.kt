@@ -9,7 +9,9 @@ import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.sp
 
 /**
@@ -35,24 +37,67 @@ private fun TextStyle.words(heading: Boolean) = copy(lineBreak = if (heading) Li
 
 /** Titles in the display face; body and labels in Noto Sans. Sizes keep the 5 Nov floor: body >= 16 sp, secondary >= 14 sp. */
 internal fun saharaTitleTypography(base: Typography = Typography()): Typography {
-    fun title(s: TextStyle) = s.copy(fontFamily = SaharaTitleFont, fontWeight = FontWeight.SemiBold).words(true)
+    fun title(s: TextStyle) = s.copy(fontFamily = SaharaTitleFont, fontWeight = FontWeight.SemiBold, lineHeightStyle = SaharaTrimmedLeading).words(true)
     fun body(s: TextStyle) = s.copy(fontFamily = SaharaBodyFont).words(false)
+    fun label(s: TextStyle) = body(s).copy(lineHeightStyle = SaharaTrimmedLeading)
     return Typography(
         displayLarge = title(base.displayLarge), displayMedium = title(base.displayMedium), displaySmall = title(base.displaySmall),
         headlineLarge = title(base.headlineLarge), headlineMedium = title(base.headlineMedium), headlineSmall = title(base.headlineSmall),
         titleLarge = title(base.titleLarge), titleMedium = title(base.titleMedium), titleSmall = title(base.titleSmall),
         bodyLarge = body(base.bodyLarge), bodyMedium = body(base.bodyMedium), bodySmall = body(base.bodySmall),
-        labelLarge = body(base.labelLarge), labelMedium = body(base.labelMedium), labelSmall = body(base.labelSmall),
+        labelLarge = label(base.labelLarge), labelMedium = label(base.labelMedium), labelSmall = label(base.labelSmall),
     )
 }
 
-/** The app's theme typography: [saharaTitleTypography] with the small roles raised for tired eyes and cheap screens. */
-internal fun saharaTypography(base: Typography = Typography()): Typography {
+/**
+ * Titles and labels drop the extra leading above the first line and below the last, so a one-line title or button label sits
+ * where its padding says. Body text keeps its full 1.5x leading (Trim.None) for easy reading over several lines.
+ */
+private val SaharaTrimmedLeading = LineHeightStyle(LineHeightStyle.Alignment.Center, LineHeightStyle.Trim.Both)
+
+/**
+ * Indic scripts other than Devanagari (Telugu, Kannada, Tamil, Malayalam, Bengali, Gujarati, Punjabi) set visibly smaller
+ * than Latin at the same size, with tall marks above and below the line (meeting 24 Nov). Their text is 1.08x larger with
+ * 1.15x line height; English, Hindi and Marathi (Devanagari) and Urdu stay at 1.0.
+ */
+internal object SaharaScriptScale {
+    private val larger = setOf(CareLang.TE, CareLang.KN, CareLang.TA, CareLang.ML, CareLang.BN, CareLang.GU, CareLang.PA)
+    fun fontScale(lang: CareLang): Float = if (lang in larger) 1.08f else 1f
+    fun lineHeightScale(lang: CareLang): Float = if (lang in larger) 1.15f else 1f
+}
+
+/** Scales one style for [lang]'s script ([SaharaScriptScale]); unspecified sizes stay unspecified. */
+internal fun TextStyle.forScript(lang: CareLang): TextStyle {
+    val size = SaharaScriptScale.fontScale(lang); val line = SaharaScriptScale.lineHeightScale(lang)
+    if (size == 1f && line == 1f) return this
+    return copy(fontSize = if (fontSize.isSpecified) fontSize * size else fontSize, lineHeight = if (lineHeight.isSpecified) lineHeight * line else lineHeight)
+}
+
+/** Every role of [typography] scaled for [lang]'s script. */
+internal fun saharaScriptTypography(typography: Typography, lang: CareLang): Typography {
+    if (SaharaScriptScale.fontScale(lang) == 1f && SaharaScriptScale.lineHeightScale(lang) == 1f) return typography
+    return with(typography) { copy(
+        displayLarge = displayLarge.forScript(lang), displayMedium = displayMedium.forScript(lang), displaySmall = displaySmall.forScript(lang),
+        headlineLarge = headlineLarge.forScript(lang), headlineMedium = headlineMedium.forScript(lang), headlineSmall = headlineSmall.forScript(lang),
+        titleLarge = titleLarge.forScript(lang), titleMedium = titleMedium.forScript(lang), titleSmall = titleSmall.forScript(lang),
+        bodyLarge = bodyLarge.forScript(lang), bodyMedium = bodyMedium.forScript(lang), bodySmall = bodySmall.forScript(lang),
+        labelLarge = labelLarge.forScript(lang), labelMedium = labelMedium.forScript(lang), labelSmall = labelSmall.forScript(lang),
+    ) }
+}
+
+/**
+ * The app's theme typography: [saharaTitleTypography] with the small roles raised for tired eyes and cheap screens, then
+ * scaled for the language on screen ([SaharaScriptScale]). Reading [CareLanguageState.current] from the theme's composable
+ * recomposes the theme when the language changes.
+ */
+internal fun saharaTypography(base: Typography = Typography(), lang: CareLang = CareLanguageState.current): Typography = saharaScriptTypography(saharaBaseTypography(base), lang)
+
+private fun saharaBaseTypography(base: Typography): Typography {
     val t = saharaTitleTypography(base)
     // Premium pass (22 Nov): large titles tracked in a touch (-0.2 sp) for a calmer, set look; body lines get 1.5x leading for easy reading.
     fun tight(s: TextStyle) = s.copy(letterSpacing = (-0.2).sp)
     return t.copy(
-        displaySmall = tight(t.displaySmall), headlineLarge = tight(t.headlineLarge), headlineMedium = tight(t.headlineMedium), headlineSmall = tight(t.headlineSmall),
+        displayLarge = tight(t.displayLarge), displayMedium = tight(t.displayMedium), displaySmall = tight(t.displaySmall), headlineLarge = tight(t.headlineLarge), headlineMedium = tight(t.headlineMedium), headlineSmall = tight(t.headlineSmall),
         titleLarge = t.titleLarge.copy(lineHeight = 30.sp),
         bodyLarge = t.bodyLarge.copy(lineHeight = 26.sp, letterSpacing = 0.15.sp),
         bodyMedium = t.bodyMedium.copy(fontSize = 16.sp, lineHeight = 24.sp, letterSpacing = 0.1.sp),

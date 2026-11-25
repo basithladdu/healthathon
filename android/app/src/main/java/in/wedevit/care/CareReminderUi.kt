@@ -5,7 +5,6 @@ import android.Manifest
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -13,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.ui.semantics.contentDescription
@@ -67,12 +67,14 @@ import java.time.ZoneId
         val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_RESUME) { scheduler.reschedule(); revision++ } }
         lifecycle.lifecycle.addObserver(observer); onDispose { lifecycle.lifecycle.removeObserver(observer) }
     }
-    BackHandler(onBack = onClose)
+    SaharaBackHandler(onBack = onClose)
     val enabled = remember(revision) { scheduler.enabled() }
     val allowed = remember(revision) { scheduler.allowed() }
     val count = remember(revision) { scheduler.scheduledCount() }
     val exact = remember(revision) { scheduler.exactAllowed() }
+    val fullScreen = remember(revision) { scheduler.fullScreenAllowed() }
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
+    MedicineAlarmTakenSync(vm)
     LazyColumn(Modifier.fillMaxSize().imePadding().testTag("care-reminder-settings"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { IconButton(onClick = onClose, modifier = Modifier.size(48.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) }; Box(Modifier.weight(1f)) { Heading(t("Reminders", "रिमाइंडर"), 28) }; CareLanguageMenu(compact = true) } }
         item { SurfaceCard(Sage) {
@@ -81,7 +83,7 @@ import java.time.ZoneId
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) { Text(t("Care reminders", "देखभाल रिमाइंडर"), fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = DoctorCardInk)
                     // Status as a chip, not a sentence.
                     SaharaStateSwitch(enabled && allowed, label = "reminders-status") { on -> Surface(shape = RoundedCornerShape(50), color = if (on) Paper else Cream) { Text(if (on) t("On", "चालू") else t("Off", "बंद"), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = if (on) DoctorStatusGood else DoctorCardSub) } } }
-                Switch(checked = enabled && allowed, onCheckedChange = { turnOn ->
+                SaharaSwitch(checked = enabled && allowed, onCheckedChange = { turnOn ->
                 error = ""
                 if (!turnOn) scheduler.enable(false)
                 else if (Build.VERSION.SDK_INT >= 33 && !allowed && !prefs.getBoolean("blocked", false)) permissionDialog = "why"
@@ -93,6 +95,10 @@ import java.time.ZoneId
             if (enabled && allowed && !exact && Build.VERSION.SDK_INT >= 31) {
                 OutlinedButton(onClick = { runCatching { context.startActivity(Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, android.net.Uri.parse("package:${context.packageName}"))) }.onFailure { error = t("Allow alarms in Settings.", "Settings में अलार्म चालू करें।") } }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().padding(top = 12.dp).heightIn(min = 48.dp).testTag("reminder-exact-off")) { Text(t("Allow on-time alerts", "समय पर सूचना की अनुमति दें"), fontSize = 15.sp) }
             }
+            // Android 14+: the spoken alarm opens full screen only when allowed; otherwise it rings as a notification to tap.
+            if (enabled && allowed && !fullScreen && Build.VERSION.SDK_INT >= 34) {
+                OutlinedButton(onClick = { runCatching { context.startActivity(Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT, android.net.Uri.parse("package:${context.packageName}"))) }.onFailure { error = t("Allow full-screen alarms in Settings.", "Settings में पूरी स्क्रीन वाले अलार्म चालू करें।") } }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().padding(top = 12.dp).heightIn(min = 48.dp).testTag("reminder-full-screen-off")) { Text(t("Allow full-screen medicine alarms", "पूरी स्क्रीन पर दवा के अलार्म की अनुमति दें"), fontSize = 15.sp) }
+            }
         } }
         if (error.isNotBlank()) item { Text(error, color = RustText, fontSize = 15.sp, modifier = Modifier.announce()) }
         val today = java.time.LocalDate.now()
@@ -103,8 +109,12 @@ import java.time.ZoneId
             // Says where reminders come from, instead of a second Back button under the one in the header.
             Text(t("Medicines, visits and tasks with a time show here.", "समय वाली दवाएँ, मुलाक़ातें और काम यहाँ दिखेंगे।"), fontSize = 15.sp, color = DoctorCardSub, textAlign = TextAlign.Center)
         } } }
-        items(eligible, key = { it.id }) { item -> Box(Modifier.animateItem()) { ReminderItemSettings(item, scheduler, revision, share = if (canEdit && item.kind == "medicine") { times ->
+        items(eligible, key = { it.id }) { item -> Box(Modifier.animateItem()) { ReminderItemSettings(item, scheduler, revision, vm.storageNamespace, share = if (canEdit && item.kind == "medicine") { times ->
             val detail = runCatching { MedicineEntryText.withTimes(item.detail, times) }.getOrDefault(item.detail)
+            if (detail != item.detail && detail.length <= 4000) vm.updateItem(item.copy(detail = detail)) {}
+        } else null, alarm = if (canEdit && item.kind == "medicine") { on ->
+            // Saved with the medicine ("Alarm: on" / "Alarm: off" only when it differs from the default), so every phone rings the same.
+            val detail = MedicineAlarmRules.withAlarm(item.detail, item.title, on)
             if (detail != item.detail && detail.length <= 4000) vm.updateItem(item.copy(detail = detail)) {}
         } else null) { revision++ } } }
     }
@@ -115,7 +125,11 @@ private fun reminderTimes(times: String): List<String> = times.split(',').map(St
 /** A saved "YYYY-MM-DD" start or end date as the date button's day (0 when blank or unreadable). */
 private fun reminderDay(value: String): Long = runCatching { careEpoch(java.time.LocalDate.parse(value.trim())) }.getOrDefault(0L)
 
-@Composable private fun ReminderItemSettings(item: CareItem, scheduler: CareReminderScheduler, revision: Int, share: ((List<String>) -> Unit)? = null, changed: () -> Unit) { val t = careText();
+@Composable private fun ReminderItemSettings(item: CareItem, scheduler: CareReminderScheduler, revision: Int, storage: String, share: ((List<String>) -> Unit)? = null, alarm: ((Boolean) -> Unit)? = null, changed: () -> Unit) { val t = careText();
+    val context = LocalContext.current
+    // A medicine shows its strip photo here too (point 6), not only in the reminder.
+    val photoRevision by MedicineStripPhotos.revision.collectAsStateWithLifecycle()
+    val photo = remember(item.id, photoRevision, storage) { if (item.kind != "medicine") null else runCatching { MedicineStripPhotos(context.applicationContext, storage).first(item.personId, item.id) }.getOrNull() }
     val option = remember(item.id, revision) { scheduler.option(item.id) }
     var times by rememberSaveable(item.id) { mutableStateOf((option?.times ?: CareReminderRules.printedTimes(item.detail)).joinToString(", ")) }
     var starts by rememberSaveable(item.id) { mutableStateOf(option?.starts.orEmpty()) }
@@ -123,11 +137,11 @@ private fun reminderDay(value: String): Long = runCatching { careEpoch(java.time
     var error by rememberSaveable(item.id) { mutableStateOf("") }
     val dateOnly = CareReminderRules.dateOnly(item)
     SurfaceCard {
-        Row(verticalAlignment = Alignment.CenterVertically) { Icon(careIcon(item.kind), null, Modifier.size(22.dp), tint = RustText); Spacer(Modifier.width(12.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) { if (item.kind == "medicine") StripThumb(photo, 56, Modifier.testTag("reminder-photo-${item.id}")) else Icon(careIcon(item.kind), null, Modifier.size(22.dp), tint = RustText); Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) { Text(item.title, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk); Text(when { option?.muted == true -> t("Paused", "रुका हुआ"); item.kind == "medicine" -> (option?.times ?: CareReminderRules.printedTimes(item.detail)).joinToString(", ").ifBlank { t("No time chosen", "समय नहीं चुना") }
             dateOnly -> careDateFormat("dd MMM yyyy", careHindi()).withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(item.due)) + " · " + option?.times.orEmpty().joinToString(", ").ifBlank { t("No alert time chosen", "सूचना का समय नहीं चुना") }
             item.due > 0 -> careDateFormat("dd MMM yyyy · HH:mm z", careHindi()).withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(item.due)); else -> t("No time chosen", "समय नहीं चुना") }, fontSize = 14.sp, color = if (option?.muted == true) DoctorStatusWarn else DoctorCardSub, modifier = Modifier.testTag("reminder-when-${item.id}")) }
-            Switch(checked = option?.muted != true, onCheckedChange = { enabled -> scheduler.configure(item.id, (option ?: ReminderOption(CareReminderRules.printedTimes(item.detail))).copy(muted = !enabled)); changed() }) }
+            SaharaSwitch(checked = option?.muted != true, onCheckedChange = { enabled -> scheduler.configure(item.id, (option ?: ReminderOption(CareReminderRules.printedTimes(item.detail))).copy(muted = !enabled)); changed() }) }
         // Reminders here repeat every day, so a weekly, monthly or every-few-days medicine gets none (CareReminderScheduler.reconcile).
         if (MedicineDoses.notDaily(item)) Text(t("No daily reminder: this is not a daily medicine. Follow its directions.", "रोज़ का रिमाइंडर नहीं: यह रोज़ की दवा नहीं है। इसके निर्देश देखें।"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.padding(top = 12.dp).testTag("reminder-not-daily-${item.id}"))
         else if (item.kind == "medicine") {
@@ -144,7 +158,8 @@ private fun reminderDay(value: String): Long = runCatching { careEpoch(java.time
                                 val next = if (on) ringing - time else (ringing + time).distinct().sorted()
                                 scheduler.configure(item.id, ReminderOption(next, option?.starts.orEmpty(), option?.ends.orEmpty(), option?.muted == true)); changed()
                             }.onFailure { error = it.message?.let { m -> t(m, ReminderTextHindi[m] ?: m) } ?: t("Check the times and dates.", "समय और तारीख़ें जाँचें।") } },
-                                label = { Text(time, fontSize = 15.sp, fontWeight = FontWeight.SemiBold) }, leadingIcon = { Icon(if (on) Icons.Default.NotificationsActive else Icons.Default.NotificationsOff, null, Modifier.size(18.dp)) }, shape = RoundedCornerShape(50),
+                                label = { Text(careClockLabel(time, careHindi()), fontSize = 15.sp, fontWeight = FontWeight.SemiBold) }, leadingIcon = { DoseSlotIcon(MedicineDoseRules.slot(time), 22, describe = false) },
+                                trailingIcon = { Icon(if (on) Icons.Default.NotificationsActive else Icons.Default.NotificationsOff, null, Modifier.size(18.dp)) }, shape = RoundedCornerShape(50),
                                 colors = FilterChipDefaults.filterChipColors(containerColor = Paper, labelColor = DoctorCardSub,selectedContainerColor = DoctorStatusGoodBg, selectedLabelColor = DoctorCardInk, selectedLeadingIconColor = DoctorStatusGood),
                                 modifier = Modifier.heightIn(min = 48.dp).semantics { contentDescription = time + ": " + if (on) t("Reminder on", "रिमाइंडर चालू") else t("Reminder off", "रिमाइंडर बंद") }.testTag("reminder-dose-${item.id}-$time"))
                         }
@@ -155,6 +170,15 @@ private fun reminderDay(value: String): Long = runCatching { careEpoch(java.time
                     CareDateButton(reminderDay(starts), t("Start date", "शुरू की तारीख़"), { starts = if (it > 0) careDay(it).toString() else ""; error = "" }, allowClear = true)
                     CareDateButton(reminderDay(ends), t("Last date", "आख़िरी तारीख़"), { ends = if (it > 0) careDay(it).toString() else ""; error = "" }, allowClear = true)
                 } else TextButton(onClick = { dates = true }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Start and end dates", "शुरू और आख़िरी तारीख़"), fontSize = 15.sp) }
+                // Point 10: important medicines ring like an alarm and speak; "Try the alarm" plays it once here (nothing is saved).
+                val important = MedicineAlarmRules.isImportant(item)
+                if (alarm != null) MedicineAlarmSwitch(important, alarm, Modifier.testTag("reminder-alarm-${item.id}"))
+                else if (important) MedicineAlarmTag()
+                if (important) TextButton(onClick = {
+                    val time = (option?.times ?: doseTimes).firstOrNull() ?: MedicineDoseRules.commonTimes.last()
+                    val preview = MedicineAlarmRules.Alarm(scheduler.accountId, item.personId, System.currentTimeMillis(), time, listOf(item.id to item.title), preview = true)
+                    runCatching { context.startActivity(MedicineAlarmActivity.intent(context, preview)) }.onFailure { error = t("The alarm screen could not open on this phone.", "इस फ़ोन पर अलार्म स्क्रीन नहीं खुल सकी।") }
+                }, modifier = Modifier.heightIn(min = 48.dp).testTag("reminder-alarm-try-${item.id}")) { Icon(Icons.Default.Alarm, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(t("Try the alarm", "अलार्म आज़माएँ"), fontSize = 15.sp) }
                 if (error.isNotBlank()) Text(error, color = RustText, fontSize = 15.sp, modifier = Modifier.announce())
                 if (doseTimes.isEmpty() || dates) Button(onClick = { runCatching {
                     val chosen = if (doseTimes.isNotEmpty()) option?.times ?: doseTimes else if (times.isBlank()) emptyList() else times.split(',').map(String::trim)

@@ -1,7 +1,8 @@
 package `in`.wedevit.care
 
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.fadeIn
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -98,21 +99,26 @@ import java.time.ZoneId
     var who by rememberSaveable { mutableStateOf("") }; var place by rememberSaveable { mutableStateOf("") }
     val chosen = LocalDate.parse(day)
     LaunchedEffect(person) { if (person != capturedPerson) onDismiss() }
+    // Day and time by the calendar and the scroll wheels, never typed (owner, 25 Nov).
+    var pickingDay by remember { mutableStateOf(false) }; var pickingTime by remember { mutableStateOf(false) }
+    if (pickingDay) CareDatePickerDialog(chosen, t("Day", "दिन"), { day = it.toString(); pickingDay = false }, { pickingDay = false })
+    if (pickingTime) CareClockDialog(LocalTime.of(hour, minute), t("Time", "समय"), { hour = it.hour; minute = it.minute; pickingTime = false }, { pickingTime = false })
     AlertDialog(onDismissRequest = { if (!busy) onDismiss() }, title = { Text(t("Next visit", "अगली मुलाक़ात")) }, text = {
         // No size animation here: an AlertDialog window can't resize smoothly, so animating made the fields clip and the dialog feel slow.
         Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = { DatePickerDialog(context, { _, y, m, d -> day = LocalDate.of(y, m + 1, d).toString() }, chosen.year, chosen.monthValue - 1, chosen.dayOfMonth).show() }, modifier = Modifier.heightIn(min = 48.dp).testTag("quick-visit-date")) {
+                OutlinedButton(onClick = { pickingDay = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("quick-visit-date")) {
                     Icon(Icons.Default.Event, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Day *", "दिन *") + ": " + chosen.format(careDateFormat("d MMM", careHindi())), maxLines = 1, softWrap = false)
                 }
-                OutlinedButton(onClick = { TimePickerDialog(context, { _, h, mi -> hour = h; minute = mi }, hour, minute, false).show() }, modifier = Modifier.heightIn(min = 48.dp).testTag("quick-visit-time")) {
+                OutlinedButton(onClick = { pickingTime = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("quick-visit-time")) {
                     Icon(Icons.Default.Schedule, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Time *", "समय *") + ": " + LocalTime.of(hour, minute).format(java.time.format.DateTimeFormatter.ofPattern("h:mm a")), maxLines = 1, softWrap = false)
                 }
             }
             TextButton(onClick = { more = !more }, modifier = Modifier.heightIn(min = 48.dp).testTag("quick-visit-more")) {
-                Text(t("More details", "और जानकारी"), fontWeight = FontWeight.SemiBold); Icon(if (more) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, null)
+                Text(t("More details", "और जानकारी"), fontWeight = FontWeight.SemiBold); SaharaChevron(more, null, tint = LocalContentColor.current)
             }
-            if (more) {
+            // The extra fields fade in (no size animation: the dialog window cannot resize smoothly) and leave at once.
+            AnimatedVisibility(more, enter = fadeIn(SaharaMotion.tween(SaharaMotion.ENTER_MS)), exit = ExitTransition.None) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(who, { who = it.take(200) }, label = { Text(t("Doctor or hospital (optional)", "डॉक्टर या अस्पताल (चाहें तो)")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
                     OutlinedTextField(place, { place = it.take(500) }, label = { Text(t("Place or note (optional)", "जगह या नोट (चाहें तो)")) }, modifier = Modifier.fillMaxWidth())

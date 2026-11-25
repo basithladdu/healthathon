@@ -258,12 +258,13 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
 
 /** Today: a large QR of the web link (the only code on the card since 24 Nov), or the way to make one. */
 @Composable fun EmergencyCardOnToday(vm: CareModel, onRead: (CareVersion) -> Unit = {}) {
-    val context = LocalContext.current; val scope = rememberCoroutineScope(); val t = careText()
+    val context = LocalContext.current; val scope = rememberCoroutineScope(); val t = careText(); val savedTap = rememberSaharaHaptic()
     val people by vm.people.collectAsStateWithLifecycle(); val selected by vm.selected.collectAsStateWithLifecycle()
     val items by vm.items.collectAsStateWithLifecycle(); val versions by vm.versions.collectAsStateWithLifecycle()
     val acknowledgements by vm.acknowledgements.collectAsStateWithLifecycle(); val trustedAcks by vm.authenticatedConfirmationIds.collectAsStateWithLifecycle()
     val contacts by vm.careContacts.collectAsStateWithLifecycle(); val contactsLoading by vm.careContactsLoading.collectAsStateWithLifecycle()
     val loadedFor by vm.itemsLoadedFor.collectAsStateWithLifecycle(); val owner by vm.isOwner.collectAsStateWithLifecycle()
+    val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     val store = remember(vm.storageNamespace) { EmergencyCardStore(context.applicationContext, vm.storageNamespace) }
     val client = remember(vm.cloud) { vm.cloud?.takeUnless { vm.demoMode }?.let(::EmergencyLinkClient) }
     var record by remember(selected) { mutableStateOf(store.load(selected)) }
@@ -350,7 +351,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
     val savePdf = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { uri ->
         val c = record
         if (uri != null && c != null) scope.launch {
-            try { withContext(Dispatchers.IO) { val file = ensurePdf(c); (context.contentResolver.openOutputStream(uri) ?: error("File unavailable")).use { out -> file.inputStream().use { it.copyTo(out) } } }; done = t("Card PDF saved", "कार्ड PDF सहेजा गया") }
+            try { withContext(Dispatchers.IO) { val file = ensurePdf(c); (context.contentResolver.openOutputStream(uri) ?: error("File unavailable")).use { out -> file.inputStream().use { it.copyTo(out) } } }; savedTap(); done = t("Card PDF saved", "कार्ड PDF सहेजा गया") }
             catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; alert = t("Couldn't save the PDF. Try again.", "PDF सहेजा नहीं जा सका।") }
         }
     }
@@ -360,7 +361,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
         if (uri != null && c != null && password != null) scope.launch {
             try {
                 withContext(Dispatchers.IO) { val locked = PdfPasswordLock.lock(ensurePdf(c).readBytes(), password); (context.contentResolver.openOutputStream(uri) ?: error("File unavailable")).use { it.write(locked) } }
-                done = t("Locked PDF saved", "पासवर्ड वाला PDF सहेजा गया")
+                savedTap(); done = t("Locked PDF saved", "पासवर्ड वाला PDF सहेजा गया")
             } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; alert = t("Couldn't save the locked PDF. Try again.", "PDF सहेजा नहीं जा सका।") }
         }
     }
@@ -386,8 +387,25 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
             record = made; setup = false
             if (blocked == null) try { record = syncLink(made, fresh = false) } catch (e: EmergencyLinkException) { linkProblem = e.problem } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; linkProblem = EmergencyLinkProblem.OFFLINE }
             // A first card appears by itself (the QR is the result); an update is confirmed.
+            savedTap()
             if (previous != null) done = t("Card updated", "कार्ड अपडेट हुआ")
         } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; alert = e.message ?: t("Couldn't make the card. Try again.", "कार्ड नहीं बना।") }
+        finally { busy = false }
+    }
+
+    // "Yes, still the same" (clinical team, 24 Nov): the same card, valid 3 more months. Saved on this phone first, then the
+    // same content is published as a new version so the website shows the new date too.
+    fun renew(c: EmergencyCardRecord) = scope.launch {
+        if (busy) return@launch
+        busy = true
+        try {
+            val renewed = withContext(Dispatchers.IO) { c.renew(System.currentTimeMillis()).also(::keep) }
+            record = renewed
+            if (blocked == null) try { record = syncLink(renewed, fresh = false) } catch (e: EmergencyLinkException) { linkProblem = e.problem } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; linkProblem = EmergencyLinkProblem.OFFLINE }
+            val until = cardDay(renewed.validUntil)
+            savedTap()
+            done = t("Thank you. The card is now valid until $until. Print the new card.", "धन्यवाद। कार्ड अब $until तक मान्य है। नया कार्ड छापें।")
+        } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; alert = t("Couldn't renew the card. Try again.", "कार्ड आगे नहीं बढ़ाया जा सका। फिर कोशिश करें।") }
         finally { busy = false }
     }
 
@@ -409,7 +427,8 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
             }
         }
     } else {
-        val stale = ready && runCatching { card.outOfDate(source) }.getOrDefault(false)
+        // Compared once per change to the card or its sources, not on every recomposition.
+        val stale = remember(card, source, ready) { ready && runCatching { card.outOfDate(source) }.getOrDefault(false) }
         val link = card.link
         // The QR stays on white for scanners; the card's solid red edge says Emergency.
         Surface(shape = RoundedCornerShape(12.dp), color = Paper, border = androidx.compose.foundation.BorderStroke(2.dp, SaharaSection.Emergency.solid), modifier = Modifier.fillMaxWidth().testTag("emergency-card")) {
@@ -424,14 +443,24 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
                 Text(t("Scan in an emergency", "आपातकाल में स्कैन करें"), fontSize = 16.sp, color = DoctorCardSub, textAlign = TextAlign.Center)
                 val until = cardDay(card.validUntil)
                 Text(t("Valid until $until", "$until तक मान्य"), fontSize = 14.sp, color = if (System.currentTimeMillis() > card.validUntil) DoctorStatusWarn else DoctorCardSub, textAlign = TextAlign.Center, modifier = Modifier.testTag("emergency-card-valid-until"))
+                // Within 14 days of the valid-until date, or past it: one plain question with two answers (clinical team, 24 Nov).
+                // It folds away once answered, instead of vanishing.
+                AnimatedVisibility(canEdit && !stale && blocked != EmergencyLinkProblem.NOT_OWNER && card.renewalDue(System.currentTimeMillis()), enter = SaharaMotion.expand, exit = SaharaMotion.collapse) { Column(Modifier.fillMaxWidth().saharaAppear().background(DoctorStatusWarnBg, RoundedCornerShape(12.dp)).padding(12.dp).testTag("emergency-card-renew"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(t("Is everything on the card still the same?", "क्या कार्ड पर सब कुछ अब भी वैसा ही है?"), fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Ink, modifier = Modifier.a11yHeading())
+                    Text(t("Please look at the phone numbers and the medicines. The card is checked every 3 months.", "कृपया फ़ोन नंबर और दवाएँ देख लें। कार्ड हर 3 महीने में जाँचा जाता है।"), fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardInk)
+                    SaharaPrimaryButton(t("Yes, still the same", "हाँ, सब वैसा ही है"), onClick = { renew(card) }, enabled = !busy, busy = busy, tone = SaharaTone.Teal, modifier = Modifier.fillMaxWidth().testTag("emergency-card-renew-same"))
+                    SaharaSecondaryButton(t("Update card", "कार्ड अपडेट करें"), onClick = { setup = true }, enabled = !busy, icon = Icons.Default.Refresh, tone = SaharaTone.Marigold, modifier = Modifier.fillMaxWidth().testTag("emergency-card-renew-update"))
+                } }
                 // Where the web link was last opened, when the person opening it said.
                 if (link != null) linkStatus?.takeIf { it.live }?.recentViews?.firstOrNull()?.let { v -> val at = cardDay(v.at); val place = v.place
                     Text(if (place.isNotBlank()) t("Last opened at $place on $at", "आख़िरी बार $place में $at को खोला गया") else t("Last opened on $at", "आख़िरी बार $at को खोला गया"), fontSize = 14.sp, color = DoctorCardSub, textAlign = TextAlign.Center, modifier = Modifier.testTag("emergency-card-last-opened")) }
                 val problem = linkProblem
                 // Whether the QR is live: the web link is on, the card is out of date, or there is no link yet.
-                if (!linkBusy) FamilyPill(when { link != null && problem == null -> t("Web link on", "वेब लिंक चालू"); stale -> t("Out of date", "पुराना है"); else -> t("No web link", "वेब लिंक नहीं") },
+                // Checking the link and its answer crossfade in place, instead of the spinner and the pill swapping with a jump.
+                SaharaStateSwitch(linkBusy, Modifier.fillMaxWidth(), label = "emergency-link-state") { checking -> Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                if (!checking) FamilyPill(when { link != null && problem == null -> t("Web link on", "वेब लिंक चालू"); stale -> t("Out of date", "पुराना है"); else -> t("No web link", "वेब लिंक नहीं") },
                     when { stale -> FamilyTone.WAIT; link != null && problem == null -> FamilyTone.GOOD; else -> FamilyTone.NEUTRAL }, Modifier.testTag("emergency-card-status"))
-                if (linkBusy) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = Rust)
+                if (checking) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = Rust)
                 else if (problem != null) Column(Modifier.fillMaxWidth().background(DoctorStatusWarnBg, RoundedCornerShape(12.dp)).padding(12.dp).testTag("emergency-link-problem")) {
                     Text(t(problem.en, problem.hi), fontSize = 14.sp, color = DoctorStatusWarn)
                     if (problem == EmergencyLinkProblem.OFFLINE || problem == EmergencyLinkProblem.NOT_SET_UP || problem == EmergencyLinkProblem.LINK_OFF) TextButton(onClick = {
@@ -444,6 +473,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
                         }
                     }, enabled = !linkBusy, modifier = Modifier.heightIn(min = 48.dp)) { Text(if (problem == EmergencyLinkProblem.LINK_OFF) t("Make a new link", "नया लिंक बनाएँ") else t("Try again", "फिर कोशिश करें")) }
                 }
+                } }
                 // One main action: Update when the card is out of date, otherwise Share. Print sits beside it; the rest is in "Edit card and PDF".
                 if (stale) SaharaPrimaryButton(t("Update card", "कार्ड अपडेट करें"), onClick = { remake(card.sections, card) }, enabled = !busy, busy = busy, tone = SaharaTone.Marigold, icon = Icons.Default.Refresh, modifier = Modifier.fillMaxWidth().testTag("emergency-card-update"))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -542,8 +572,9 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
         val window = (LocalView.current.parent as? DialogWindowProvider)?.window
         LaunchedEffect(window) { window?.let { w -> w.setWindowAnimations(0); w.attributes = w.attributes.apply { screenBrightness = 1f } } }
         AnimatedVisibility(shown,
-            enter = fadeIn(tween(SaharaMotion.ENTER_MS - SaharaMotion.FADE_DELAY_MS, delayMillis = SaharaMotion.FADE_DELAY_MS)) + scaleIn(tween(SaharaMotion.ENTER_MS, easing = FastOutSlowInEasing), initialScale = .88f),
-            exit = fadeOut(tween(SaharaMotion.EXIT_MS, easing = FastOutSlowInEasing)) + scaleOut(tween(SaharaMotion.EXIT_MS, easing = FastOutSlowInEasing), targetScale = .94f)) {
+            // SaharaMotion.tween: no scale-in when the phone's animations are off.
+            enter = fadeIn(SaharaMotion.tween(SaharaMotion.ENTER_MS - SaharaMotion.FADE_DELAY_MS, delayMillis = SaharaMotion.FADE_DELAY_MS)) + scaleIn(SaharaMotion.tween(SaharaMotion.ENTER_MS, easing = FastOutSlowInEasing), initialScale = .88f),
+            exit = fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS, easing = FastOutSlowInEasing)) + scaleOut(SaharaMotion.tween(SaharaMotion.EXIT_MS, easing = FastOutSlowInEasing), targetScale = .94f)) {
             Box(Modifier.fillMaxSize().background(Color.White)) {
             Column(Modifier.fillMaxSize().background(Color.White).clickable(onClickLabel = t("Close", "बंद करें")) { shown.targetState = false }.padding(20.dp).testTag("emergency-card-fullscreen"), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                 Text(t("Emergency card", "आपातकालीन कार्ड"), fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.Black, modifier = Modifier.a11yHeading())
@@ -563,13 +594,15 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable private fun EmergencyCardSetup(source: EmergencySource, name: String, ready: Boolean, previous: EmergencyCardRecord?, blocked: EmergencyLinkProblem?, onDismiss: () -> Unit, onMake: (Set<EmergencySection>) -> Unit, extras: @Composable () -> Unit = {}) {
-    var chosen by rememberSaveable { mutableStateOf(previous?.sections?.map { it.name }.orEmpty()) }; val t = careText()
-    val sections = chosen.mapNotNull { s -> EmergencySection.entries.firstOrNull { it.name == s } }.toSet()
+    var chosen by rememberSaveable { mutableStateOf(previous?.sections?.map { it.name }.orEmpty()) }; val t = careText(); val tick = rememberSaharaTick()
+    val sections = remember(chosen) { chosen.mapNotNull { s -> EmergencySection.entries.firstOrNull { it.name == s } }.toSet() }
     val preview = remember(source, sections, previous) { if (sections.isEmpty()) null else runCatching { EmergencyCardRules.build(source, sections, (previous?.number ?: 0) + 1, "NEW", System.currentTimeMillis()) }.getOrNull() }
+    // The same web copy the printed PDF draws its tables from, so the preview shows what the paper will show.
+    val previewCard = remember(source, sections, previous) { if (sections.isEmpty()) null else runCatching { org.json.JSONObject(EmergencyCardRecord.make(previous?.personId ?: "preview", source, sections, previous, System.currentTimeMillis(), id = "NEW").snapshot) }.getOrNull() }
     SaharaScreenSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         LazyColumn(Modifier.fillMaxWidth().testTag("emergency-card-setup"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            item { SaharaSectionBand(if (previous == null) t("Emergency card", "आपातकालीन कार्ड") else t("Edit card", "कार्ड बदलें"), SaharaSection.Emergency) }
-            item {
+            item(key = "band", contentType = "band") { SaharaSectionBand(if (previous == null) t("Emergency card", "आपातकालीन कार्ड") else t("Edit card", "कार्ड बदलें"), SaharaSection.Emergency) }
+            item(key = "sections", contentType = "sections") {
                 val goals = source.goals
                 EmergencySection.entries.forEach { section ->
                     val detail = when (section) {
@@ -579,17 +612,58 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
                             (EmergencyCardRules.doctorOf(source)?.name?.takeIf(String::isNotBlank)?.let { doctor -> t("Doctor: $doctor", "डॉक्टर: $doctor") } ?: t("No doctor saved", "डॉक्टर सहेजा नहीं गया"))
                         EmergencySection.MEDICINES -> if (source.medicines.isEmpty()) t("No current medicines listed", "कोई दवा नहीं है") else t("${source.medicines.size} current", "${source.medicines.size} दवाएँ")
                     }
-                    CheckLine(section.name in chosen, { on -> chosen = if (on) chosen + section.name else chosen - section.name }, "${t(section.en, section.hi)}\n$detail")
+                    CheckLine(section.name in chosen, { on -> tick(); chosen = if (on) chosen + section.name else chosen - section.name }, "${t(section.en, section.hi)}\n$detail")
                 }
             }
             // The main action right under the choices; the card file options next; the long preview last.
-            item { SaharaPrimaryButton(if (!ready) t("Loading…", "लोड हो रहा है…") else if (previous == null) t("Make card", "कार्ड बनाएँ") else t("Save card", "कार्ड सहेजें"), onClick = { onMake(sections) }, enabled = ready && preview != null, tone = SaharaTone.Marigold, modifier = Modifier.fillMaxWidth().testTag("emergency-card-make")) }
-            item { extras() }
-            if (preview != null) item { SurfaceCard {
+            item(key = "make", contentType = "make") { SaharaPrimaryButton(if (!ready) t("Loading…", "लोड हो रहा है…") else if (previous == null) t("Make card", "कार्ड बनाएँ") else t("Save card", "कार्ड सहेजें"), onClick = { onMake(sections) }, enabled = ready && preview != null, tone = SaharaTone.Marigold, modifier = Modifier.fillMaxWidth().testTag("emergency-card-make")) }
+            item(key = "extras", contentType = "extras") { extras() }
+            if (preview != null) item(key = "preview", contentType = "preview") { Box(Modifier.animateItem()) { SurfaceCard {
                 Text(t("Preview", "झलक"), fontWeight = FontWeight.Bold)
-                Spacer(Modifier.height(6.dp)); Text(preview.text, fontFamily = FontFamily.Monospace, fontSize = 12.sp, lineHeight = 16.sp, modifier = Modifier.testTag("emergency-card-preview"))
+                Spacer(Modifier.height(6.dp))
+                if (previewCard != null) EmergencyCardTablesView(previewCard, Modifier.testTag("emergency-card-preview"))
+                else Text(preview.text, fontFamily = FontFamily.Monospace, fontSize = 12.sp, lineHeight = 16.sp, modifier = Modifier.testTag("emergency-card-preview"))
                 if (preview.leftOut.isNotEmpty()) Text(t("Left out: ", "छोड़ा गया: ") + preview.leftOut.joinToString("; "), style = MaterialTheme.typography.bodySmall, color = RustText)
-            } }
+            } } }
         }
+    }
+}
+
+/**
+ * The printed card's two tables on the phone (24 Nov): who to call (next of kin, treating doctor, hospital) and the
+ * current medicines (name, dose, when), read from the same web copy as the PDF ([EmergencyCardTables]), so they match.
+ */
+@Composable internal fun EmergencyCardTablesView(card: org.json.JSONObject, modifier: Modifier = Modifier) { val t = careText()
+    val sections = remember(card) { EmergencyCardTables.sections(card) }
+    val contacts = remember(card) { EmergencyCardTables.contacts(card) }
+    val medicines = remember(card) { EmergencyCardTables.medicines(card) }
+    fun who(label: String) = when (label) {
+        "Next of kin" -> t("Next of kin", "निकटतम परिजन"); "Treating doctor" -> t("Treating doctor", "इलाज करने वाले डॉक्टर")
+        "Hospital / clinic" -> t("Hospital / clinic", "अस्पताल / क्लिनिक"); else -> label
+    }
+    fun value(v: String) = if (v == EmergencyCardTables.NOT_SAVED) t("Not saved", "सहेजा नहीं गया") else v
+    Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        card.optString("name").takeIf { it.isNotBlank() && EmergencySection.NAME in sections }?.let { Text(it, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Ink) }
+        val until = cardDay(card.optLong("validUntil"))
+        if (card.has("validUntil")) Text(t("Valid until $until", "$until तक मान्य"), fontSize = 14.sp, color = DoctorCardSub)
+        card.optString("allergies").takeIf { it.isNotBlank() && !card.isNull("allergies") }?.let { Text(t("Allergies", "एलर्जी") + ": " + it, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = RustText) }
+        if (EmergencySection.CONTACTS in sections) EmergencyTable(t("Who to call", "किसे फ़ोन करें"), listOf(t("Who", "कौन"), t("Name", "नाम"), t("Phone", "फ़ोन")), listOf(1f, 1.4f, 1.1f),
+            contacts.map { listOf(who(it.who), value(it.name), value(it.phone)) }.ifEmpty { listOf(listOf(who("Next of kin"), t("Not saved", "सहेजा नहीं गया"), "")) }, "emergency-card-preview-contacts")
+        if (EmergencySection.MEDICINES in sections) EmergencyTable(t("Current medicines", "अभी की दवाएँ"), listOf(t("Medicine", "दवा"), t("Dose", "मात्रा"), t("When", "कब")), listOf(1.4f, 0.9f, 1.2f),
+            medicines.map { listOf(it.name, it.strength, it.whenTaken) }.ifEmpty { listOf(listOf(t("No current medicines listed", "कोई दवा नहीं है"), "", "")) }, "emergency-card-preview-medicines")
+    }
+}
+
+@Composable private fun EmergencyTableRow(cells: List<String>, weights: List<Float>, header: Boolean) {
+    Row(Modifier.fillMaxWidth().background(if (header) DoctorHairline.copy(alpha = .5f) else Color.Transparent).padding(horizontal = 8.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        cells.forEachIndexed { i, v -> Text(v, Modifier.weight(weights[i]), fontSize = if (header) 13.sp else 15.sp, lineHeight = 20.sp, fontWeight = if (header) FontWeight.Bold else FontWeight.Normal, color = Ink) }
+    }
+}
+
+@Composable private fun EmergencyTable(title: String, headers: List<String>, weights: List<Float>, rows: List<List<String>>, tag: String) {
+    Text(title, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Ink, modifier = Modifier.a11yHeading())
+    Column(Modifier.fillMaxWidth().border(1.dp, DoctorHairline, RoundedCornerShape(8.dp)).testTag(tag)) {
+        EmergencyTableRow(headers, weights, header = true)
+        rows.forEach { r -> HorizontalDivider(color = DoctorHairline); EmergencyTableRow(r, weights, header = false) }
     }
 }

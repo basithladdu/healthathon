@@ -1,6 +1,22 @@
 package `in`.wedevit.care
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.filled.Fingerprint
+import androidx.compose.material.icons.filled.Gesture
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material3.FilterChip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.FileProvider
+import java.io.File
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -148,21 +164,87 @@ internal fun gocRenderSignaturePng(strokes: List<List<Pair<Float, Float>>>, thum
     } finally { bitmap.recycle() }
 }
 
+/** A camera photo of a thumbprint on paper, turned into the same kind of 1-bit PNG as the pad, at most [MAX_SIDE] px on its long side. */
+internal object GocThumbPhoto {
+    const val MAX_SIDE = 480
+    /** A pixel is ink when it is darker than this share of the picture's average brightness. */
+    const val INK_SHARE = 0.85
+
+    fun fit(width: Int, height: Int, max: Int = MAX_SIDE): Pair<Int, Int> {
+        if (width <= 0 || height <= 0) return 0 to 0
+        val scale = minOf(1.0, max.toDouble() / maxOf(width, height))
+        return maxOf(1, Math.round(width * scale).toInt()) to maxOf(1, Math.round(height * scale).toInt())
+    }
+
+    fun luma(argb: Int): Int = ((argb shr 16 and 0xFF) * 299 + (argb shr 8 and 0xFF) * 587 + (argb and 0xFF) * 114) / 1000
+
+    /** Dark ridges black, paper white, whatever the light in the room: the cut-off follows the picture's own average. */
+    fun ink(luma: IntArray): BooleanArray {
+        if (luma.isEmpty()) return BooleanArray(0)
+        val cut = luma.average() * INK_SHARE
+        return BooleanArray(luma.size) { luma[it] < cut }
+    }
+}
+
+/** Decodes the camera file, shrinks it and keeps only black and white. Null when the photo cannot be read. */
+internal fun gocThumbPhotoPng(file: File): Triple<ByteArray, Int, Int>? {
+    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }; BitmapFactory.decodeFile(file.path, bounds)
+    if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
+    var sample = 1; while (maxOf(bounds.outWidth, bounds.outHeight) / (sample * 2) >= GocThumbPhoto.MAX_SIDE) sample *= 2
+    val decoded = BitmapFactory.decodeFile(file.path, BitmapFactory.Options().apply { inSampleSize = sample }) ?: return null
+    val (w, h) = GocThumbPhoto.fit(decoded.width, decoded.height)
+    val scaled = if (w == decoded.width && h == decoded.height) decoded else Bitmap.createScaledBitmap(decoded, w, h, true)
+    try {
+        val pixels = IntArray(w * h); scaled.getPixels(pixels, 0, w, 0, 0, w, h)
+        val black = GocThumbPhoto.ink(IntArray(pixels.size) { GocThumbPhoto.luma(pixels[it]) })
+        return Triple(GocMonoPng.encode(w, h, black), w, h)
+    } finally { if (scaled !== decoded) scaled.recycle(); decoded.recycle() }
+}
+
 /**
- * Clear and Done buttons. No switch: a finger draws a signature, and a thumb held on the pad leaves a thumb impression.
+ * Clear and Done buttons. A finger draws a signature, and a thumb held on the pad leaves a thumb impression. With
+ * [thumbChoice] (patients, family, witnesses) a "Thumb impression" choice makes any press a thumb impression, and a camera
+ * button takes a photo of a thumbprint made on paper instead; either is stored as THUMB in place of the signature.
  * [onDone] gets the PNG; return true to clear the pad, false to keep the drawing (say a name is still missing).
  */
-@Composable internal fun GocSignaturePad(onDone: (GocPadResult) -> Boolean, modifier: Modifier = Modifier, enabled: Boolean = true, doneLabel: String? = null) { val t = careText()
+@Composable internal fun GocSignaturePad(onDone: (GocPadResult) -> Boolean, modifier: Modifier = Modifier, enabled: Boolean = true, doneLabel: String? = null, thumbChoice: Boolean = true) { val t = careText()
+    val context = LocalContext.current
     var strokes by remember { mutableStateOf(listOf<List<Pair<Float, Float>>>()) }
     var held by remember { mutableStateOf(false) }
-    val ready = GocSignatureInk.ready(strokes, held)
-    val thumb = GocSignatureInk.thumbPress(strokes, held)
+    var thumbMode by remember { mutableStateOf(false) }
+    var photo by remember { mutableStateOf<Triple<ByteArray, Int, Int>?>(null) }
+    var photoPath by rememberSaveable { mutableStateOf("") }
+    var photoFailed by remember { mutableStateOf(false) }
+    val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { saved ->
+        val file = File(photoPath); photoPath = ""
+        if (saved && file.isFile && file.length() > 0) {
+            val made = runCatching { gocThumbPhotoPng(file) }.getOrNull()
+            photoFailed = made == null
+            if (made != null) { photo = made; strokes = emptyList(); held = false }
+        }
+        file.delete()
+    }
+    val thumb = (thumbChoice && thumbMode) || GocSignatureInk.thumbPress(strokes, held)
+    val ready = photo != null || if (thumbChoice && thumbMode) strokes.isNotEmpty() else GocSignatureInk.ready(strokes, held)
     Column(modifier.fillMaxWidth().testTag("goc-signature-pad"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(t("Sign here", "यहाँ हस्ताक्षर करें"), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = DoctorCardInk)
+        if (thumbChoice) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FilterChip(selected = !thumbMode, onClick = { if (thumbMode) { thumbMode = false; strokes = emptyList(); held = false; photo = null } }, enabled = enabled,
+                label = { Text(t("Signature", "हस्ताक्षर"), fontSize = 16.sp, modifier = Modifier.padding(vertical = 8.dp)) }, leadingIcon = { Icon(Icons.Default.Gesture, null, Modifier.size(20.dp)) },
+                modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("goc-signature-mode-drawn"))
+            FilterChip(selected = thumbMode, onClick = { if (!thumbMode) { thumbMode = true; strokes = emptyList(); held = false } }, enabled = enabled,
+                label = { Text(t("Thumb impression", "अंगूठे का निशान"), fontSize = 16.sp, modifier = Modifier.padding(vertical = 8.dp)) }, leadingIcon = { Icon(Icons.Default.Fingerprint, null, Modifier.size(20.dp)) },
+                modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("goc-signature-mode-thumb"))
+        }
+        Text(if (thumbChoice && thumbMode) t("Press the thumb on the box", "डिब्बे पर अंगूठा दबाएँ") else t("Sign here", "यहाँ हस्ताक्षर करें"), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = DoctorCardInk)
         val ink = DoctorCardInk
         val guide = DoctorCardSub.copy(alpha = .35f)
-        val padLabel = t("Signature pad", "हस्ताक्षर की जगह")
-        Canvas(Modifier.fillMaxWidth().aspectRatio(GocSignatureInk.ASPECT).clip(RoundedCornerShape(14.dp)).background(Color.White)
+        val padLabel = if (thumbChoice && thumbMode) t("Thumb impression", "अंगूठे का निशान") else t("Signature pad", "हस्ताक्षर की जगह")
+        val shot = photo
+        if (shot != null) {
+            val bitmap = remember(shot) { BitmapFactory.decodeByteArray(shot.first, 0, shot.first.size)?.asImageBitmap() }
+            if (bitmap != null) Image(bitmap, t("Photo of the thumbprint", "अंगूठे के निशान की फ़ोटो"), Modifier.fillMaxWidth().heightIn(max = 240.dp).clip(RoundedCornerShape(14.dp)).background(Color.White)
+                .border(1.5.dp, DoctorCardSub.copy(alpha = .45f), RoundedCornerShape(14.dp)).testTag("goc-thumb-photo"), contentScale = ContentScale.Fit)
+        } else Canvas(Modifier.fillMaxWidth().aspectRatio(GocSignatureInk.ASPECT).clip(RoundedCornerShape(14.dp)).background(Color.White)
             .border(1.5.dp, DoctorCardSub.copy(alpha = .45f), RoundedCornerShape(14.dp))
             .semantics { contentDescription = padLabel }.testTag("goc-signature-canvas")
             .pointerInput(enabled) {
@@ -194,12 +276,25 @@ internal fun gocRenderSignaturePng(strokes: List<List<Pair<Float, Float>>>, thum
                 drawPath(path, ink, style = Stroke(width = width, cap = StrokeCap.Round, join = StrokeJoin.Round))
             }
         }
+        if (thumbChoice && thumbMode) TextButton(onClick = {
+            photoFailed = false
+            val directory = File(context.cacheDir, "signature-photo").apply { mkdirs() }
+            val file = File(directory, "thumb-${newId()}.jpg")
+            runCatching { check(file.createNewFile()); photoPath = file.absolutePath; camera.launch(FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)) }
+                .onFailure { file.delete(); photoPath = ""; photoFailed = true }
+        }, enabled = enabled, modifier = Modifier.heightIn(min = 48.dp).testTag("goc-thumb-camera")) {
+            Icon(Icons.Default.PhotoCamera, null, Modifier.size(20.dp), tint = RustText); Spacer(Modifier.width(6.dp))
+            Text(if (photo == null) t("Photo of a thumbprint on paper", "काग़ज़ पर अंगूठे के निशान की फ़ोटो") else t("Take the photo again", "फ़ोटो फिर से लें"), color = RustText, fontSize = 16.sp)
+        }
+        if (photoFailed) Text(t("Couldn't read photo. Try again.", "फ़ोटो नहीं पढ़ी गई। फिर कोशिश करें।"), color = RustText, fontSize = 15.sp, modifier = Modifier.announce())
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            TextButton(onClick = { strokes = emptyList(); held = false }, enabled = enabled && strokes.isNotEmpty(), modifier = Modifier.heightIn(min = 48.dp).testTag("goc-signature-clear")) { Text(t("Clear", "मिटाएँ"), color = if (enabled && strokes.isNotEmpty()) RustText else DoctorCardFaint, fontSize = 16.sp) }
+            val dirty = strokes.isNotEmpty() || photo != null
+            TextButton(onClick = { strokes = emptyList(); held = false; photo = null }, enabled = enabled && dirty, modifier = Modifier.heightIn(min = 48.dp).testTag("goc-signature-clear")) { Text(t("Clear", "मिटाएँ"), color = if (enabled && dirty) RustText else DoctorCardFaint, fontSize = 16.sp) }
             Button(onClick = {
-                val png = gocRenderSignaturePng(strokes, thumb)
-                val result = GocPadResult(png, strokes.size, GocSignOffRules.isoNow(), if (thumb) GocSignOffRules.THUMB else GocSignOffRules.DRAWN, GocSignatureInk.MAX_WIDTH, (GocSignatureInk.MAX_WIDTH / GocSignatureInk.ASPECT).toInt())
-                if (onDone(result)) { strokes = emptyList(); held = false }
+                val taken = photo
+                val result = if (taken != null) GocPadResult(taken.first, 1, GocSignOffRules.isoNow(), GocSignOffRules.THUMB, taken.second, taken.third)
+                else GocPadResult(gocRenderSignaturePng(strokes, thumb), strokes.size, GocSignOffRules.isoNow(), if (thumb) GocSignOffRules.THUMB else GocSignOffRules.DRAWN, GocSignatureInk.MAX_WIDTH, (GocSignatureInk.MAX_WIDTH / GocSignatureInk.ASPECT).toInt())
+                if (onDone(result)) { strokes = emptyList(); held = false; photo = null }
             }, enabled = enabled && ready, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.weight(1f).heightIn(min = 52.dp).testTag("goc-signature-done")) { Icon(Icons.Default.Check, null); Spacer(Modifier.width(8.dp)); Text(doneLabel ?: t("Done", "हो गया"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold) }
         }
     }

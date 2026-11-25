@@ -95,10 +95,14 @@ import java.util.UUID
  *     imageDataUrl      "data:image/png;base64,..." 1-bit PNG, at most 600 px wide
  *     imageSha256       SHA-256 of the PNG bytes
  *     strokeCount, signedAt (ISO-8601), noteSha256 (the note hash this signature was made on)
+ *     readAloud         PATIENT/FAMILY: how the note was read to them (ConsentReadAloud.kt: method SELF/PHONE/PERSON,
+ *                       readerName, readerRelation, language, witnessName, witnessRelation, at); null when not recorded
  *   }
  * Seal: sealSha256 = SHA-256 of the UTF-8 bytes of [GocSignOffRules.sealInput]: each part as "<length>:<value>;"
  * (length in UTF-16 units, the same as JavaScript), parts = scheme, noteId, noteSha256, then per signature role, name,
- * registrationNo, relation, consent (1/0), canRead (1/0/-), method, imageSha256, strokeCount, signedAt, noteSha256.
+ * registrationNo, relation, consent (1/0), canRead (1/0/-), method, imageSha256, strokeCount, signedAt, noteSha256, and only when
+ * readAloud is present its parts ("readAloud", method, readerName, readerRelation, language, witnessName, witnessRelation, at),
+ * so a seal made without a reading is unchanged.
  *
  * Kept on this phone only, like the care plan ([CarePlanStore]): app-private SharedPreferences "goc-signoff-v1-<account>",
  * one JSON value per note id holding every sign-off for that note (invalidated ones stay as history). Nothing is sent anywhere.
@@ -107,6 +111,8 @@ import java.util.UUID
 internal data class GocSignature(
     val role: String, val name: String, val registrationNo: String?, val relation: String?, val consent: Boolean, val canRead: Boolean?,
     val method: String, val imageDataUrl: String, val imageSha256: String, val strokeCount: Int, val signedAt: String, val noteSha256: String,
+    /** How the note was read to the patient or family member before they signed. */
+    val readAloud: ConsentReading? = null,
 )
 
 internal data class GocSignOffRecord(
@@ -119,9 +125,11 @@ internal data class GocSignOffRecord(
 internal data class GocSignatureInput(
     val role: String, val name: String, val registrationNo: String? = null, val relation: String? = null, val consent: Boolean,
     val canRead: Boolean? = null, val method: String, val png: ByteArray, val strokeCount: Int,
+    /** PATIENT/FAMILY: the required read-aloud step. When given, it decides [canRead]. */
+    val readAloud: ConsentReading? = null,
 )
 
-internal enum class GocSignOffError { NOTE_CHANGED, LOCKED, INVALIDATED, WRONG_ORDER, NAME_BLANK, REGISTRATION_BLANK, RELATION_BLANK, CONSENT_MISSING, CAN_READ_MISSING, NO_SIGNATURE, NOT_READY }
+internal enum class GocSignOffError { NOTE_CHANGED, LOCKED, INVALIDATED, WRONG_ORDER, NAME_BLANK, REGISTRATION_BLANK, RELATION_BLANK, CONSENT_MISSING, CAN_READ_MISSING, READ_ALOUD_MISSING, WITNESS_IS_READER, NO_SIGNATURE, NOT_READY }
 internal class GocSignOffException(val code: GocSignOffError) : IllegalStateException(code.name)
 
 /** A changed note always gives a fresh [record]; [invalidated] is the earlier one with its signatures, when there were any. */
@@ -159,6 +167,7 @@ internal object GocSignOffRules {
             append(part(s.role)); append(part(s.name)); append(part(s.registrationNo ?: "")); append(part(s.relation ?: ""))
             append(part(if (s.consent) "1" else "0")); append(part(when (s.canRead) { null -> "-"; true -> "1"; false -> "0" }))
             append(part(s.method)); append(part(s.imageSha256)); append(part(s.strokeCount.toString())); append(part(s.signedAt)); append(part(s.noteSha256))
+            s.readAloud?.let { r -> ConsentReadingRules.sealParts(r).forEach { append(part(it)) } }
         }
     }
     fun sealSha256(r: GocSignOffRecord): String = sha256(sealInput(r.noteId, r.noteSha256, r.signatures).toByteArray(Charsets.UTF_8))
@@ -189,6 +198,10 @@ internal object GocSignOffRules {
         if (noteSha256(noteText) != r.noteSha256) fail(GocSignOffError.NOTE_CHANGED)
     }
 
+    /** Names of the people who read the note aloud to an earlier signer (method PERSON). */
+    fun readerOf(signatures: List<GocSignature>): List<String> =
+        signatures.mapNotNull { s -> s.readAloud?.takeIf { it.method == ConsentReadingRules.PERSON }?.readerName?.takeIf(String::isNotBlank) }
+
     /** Adds one signature. Refused when the note text is not the one this sign-off started on, or anything is missing. */
     fun add(r: GocSignOffRecord, noteText: String, input: GocSignatureInput, steps: List<String> = DEFAULT_STEPS, at: Long = System.currentTimeMillis()): GocSignOffRecord {
         checkOpen(r, noteText)
@@ -200,11 +213,17 @@ internal object GocSignOffRules {
         val relation = when (input.role) { PATIENT -> "Self"; DOCTOR -> null; else -> input.relation.orEmpty().trim().take(NAME_MAX).ifEmpty { null } }
         if (input.role == FAMILY && relation == null) fail(GocSignOffError.RELATION_BLANK)
         val signer = input.role == PATIENT || input.role == FAMILY
-        if (signer && input.canRead == null) fail(GocSignOffError.CAN_READ_MISSING)
+        // The read-aloud step, when recorded, must be complete; a witness signs separately, so none is asked for here.
+        val reading = if (signer) input.readAloud?.let(ConsentReadingRules::clean) else null
+        if (reading != null && !ConsentReadingRules.valid(reading, name, askWitness = false)) fail(GocSignOffError.READ_ALOUD_MISSING)
+        val canRead = reading?.let(ConsentReadingRules::canRead) ?: input.canRead
+        if (signer && canRead == null) fail(GocSignOffError.CAN_READ_MISSING)
+        // The witness saw it being read, so it is someone other than the person who read it aloud.
+        if (input.role == WITNESS && readerOf(r.signatures).any { ConsentReadingRules.normalise(it) == ConsentReadingRules.normalise(name) }) fail(GocSignOffError.WITNESS_IS_READER)
         if (input.role != DOCTOR && !input.consent) fail(GocSignOffError.CONSENT_MISSING)
         if (input.png.isEmpty() || input.strokeCount < 1) fail(GocSignOffError.NO_SIGNATURE)
-        val signature = GocSignature(input.role, name, registrationNo, relation, if (input.role == DOCTOR) true else input.consent, if (signer) input.canRead else null,
-            if (input.method == THUMB) THUMB else DRAWN, dataUrl(input.png), sha256(input.png), input.strokeCount, iso(at), r.noteSha256)
+        val signature = GocSignature(input.role, name, registrationNo, relation, if (input.role == DOCTOR) true else input.consent, if (signer) canRead else null,
+            if (input.method == THUMB) THUMB else DRAWN, dataUrl(input.png), sha256(input.png), input.strokeCount, iso(at), r.noteSha256, reading)
         return r.copy(signatures = r.signatures + signature)
     }
 
@@ -260,6 +279,7 @@ internal object GocSignOffJson {
     fun encode(s: GocSignature): JSONObject = JSONObject().put("role", s.role).put("name", s.name).put("registrationNo", s.registrationNo.orNull())
         .put("relation", s.relation.orNull()).put("consent", s.consent).put("canRead", s.canRead.orNull()).put("method", s.method)
         .put("imageDataUrl", s.imageDataUrl).put("imageSha256", s.imageSha256).put("strokeCount", s.strokeCount).put("signedAt", s.signedAt).put("noteSha256", s.noteSha256)
+        .put("readAloud", s.readAloud?.let(ConsentReadingRules::encode).orNull())
 
     fun encode(r: GocSignOffRecord): JSONObject = JSONObject().put("scheme", r.scheme).put("id", r.id).put("noteId", r.noteId).put("noteSha256", r.noteSha256)
         .put("status", r.status).put("createdAt", r.createdAt).put("signatures", JSONArray(r.signatures.map(::encode)))
@@ -267,7 +287,7 @@ internal object GocSignOffJson {
 
     fun signature(o: JSONObject) = GocSignature(o.getString("role"), o.getString("name"), o.str("registrationNo"), o.str("relation"), o.getBoolean("consent"),
         if (o.isNull("canRead")) null else o.getBoolean("canRead"), o.getString("method"), o.getString("imageDataUrl"), o.getString("imageSha256"),
-        o.getInt("strokeCount"), o.getString("signedAt"), o.getString("noteSha256"))
+        o.getInt("strokeCount"), o.getString("signedAt"), o.getString("noteSha256"), ConsentReadingRules.decode(o.optJSONObject("readAloud")))
 
     fun decode(o: JSONObject): GocSignOffRecord {
         require(o.getString("scheme") == GocSignOffRules.SCHEME)
@@ -318,7 +338,9 @@ private fun gocErrorText(t: (String, String) -> String, code: GocSignOffError): 
     GocSignOffError.RELATION_BLANK -> t("Write how the family member is related to the patient.", "लिखें कि परिवार के सदस्य का मरीज़ से क्या रिश्ता है।")
     GocSignOffError.CONSENT_MISSING -> t("Tick the box to confirm before signing.", "साइन करने से पहले पुष्टि के लिए बॉक्स पर टिक करें।")
     GocSignOffError.CAN_READ_MISSING -> t("Say whether they can read the note themselves.", "बताएँ कि क्या वे नोट ख़ुद पढ़ सकते हैं।")
-    GocSignOffError.NO_SIGNATURE -> t("Sign or give a thumb impression on the pad.", "जगह पर साइन करें या अंगूठा लगाएँ।")
+    GocSignOffError.READ_ALOUD_MISSING -> t("First say how the note was read to them.", "पहले बताएँ कि नोट उन्हें कैसे पढ़कर सुनाया गया।")
+    GocSignOffError.WITNESS_IS_READER -> t("The witness must be someone other than the person who read it.", "गवाह पढ़कर सुनाने वाले से अलग व्यक्ति होना चाहिए।")
+    GocSignOffError.NO_SIGNATURE ->t("Sign or give a thumb impression on the pad.", "जगह पर साइन करें या अंगूठा लगाएँ।")
     GocSignOffError.NOT_READY -> t("Someone still needs to sign.", "अभी किसी के हस्ताक्षर बाक़ी हैं।")
 }
 
@@ -330,8 +352,12 @@ private fun gocRoleText(t: (String, String) -> String, role: String): String = w
 }
 
 @Composable private fun GocChoice(label: String, selected: Boolean, onSelect: () -> Unit, modifier: Modifier = Modifier) {
-    Row(modifier.heightIn(min = 48.dp).clip(RoundedCornerShape(14.dp)).background(if (selected) DoctorStatusGoodBg else Paper).border(if (selected) 1.5.dp else 1.dp, if (selected) DoctorStatusGood else DoctorHairline, RoundedCornerShape(14.dp))
-        .selectable(selected, onClick = onSelect, role = Role.RadioButton).padding(end = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+    // The choice eases into its colours and answers with a light tap.
+    val tick = rememberSaharaTick()
+    val fill by androidx.compose.animation.animateColorAsState(if (selected) DoctorStatusGoodBg else Paper, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "goc-choice-fill")
+    val edge by androidx.compose.animation.animateColorAsState(if (selected) DoctorStatusGood else DoctorHairline, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "goc-choice-edge")
+    Row(modifier.heightIn(min = 48.dp).saharaSelectBounce(selected, .05f).clip(RoundedCornerShape(14.dp)).background(fill).border(if (selected) 1.5.dp else 1.dp, edge, RoundedCornerShape(14.dp))
+        .selectable(selected, onClick = { if (!selected) tick(); onSelect() }, role = Role.RadioButton).padding(end = 12.dp), verticalAlignment = Alignment.CenterVertically) {
         RadioButton(selected = selected, onClick = null, modifier = Modifier.padding(start = 4.dp)); Text(label, Modifier.padding(start = 4.dp), fontSize = 16.sp, fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal, color = DoctorCardInk)
     }
 }
@@ -372,6 +398,7 @@ private fun gocRoleText(t: (String, String) -> String, role: String): String = w
             s.registrationNo?.let { Text(t("Reg. no.", "रजि. नं.") + " " + it, fontSize = 14.sp, color = DoctorCardSub) }
             Text((if (s.method == GocSignOffRules.THUMB) t("Thumb impression", "अंगूठे का निशान") else t("Signed", "हस्ताक्षर")) + " · " +
                 runCatching { signedAtLabel(Instant.parse(s.signedAt).toEpochMilli()) }.getOrDefault(s.signedAt), fontSize = 14.sp, color = DoctorCardSub)
+            s.readAloud?.let { ConsentReadingLine(it) }
         }
     }
 }
@@ -391,6 +418,8 @@ private fun gocRoleText(t: (String, String) -> String, role: String): String = w
     autoLock: Boolean = true,
     /** Shows the note text again at the patient step. Off when the form is already on screen above. */
     showNote: Boolean = true,
+    /** People on the record (family, care team) offered as taps for who read the note to the patient. */
+    people: List<ConsentPerson> = emptyList(),
 ) { val t = careText()
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("goc-signoff-doctor", Context.MODE_PRIVATE) }
@@ -416,7 +445,8 @@ private fun gocRoleText(t: (String, String) -> String, role: String): String = w
         if (role == GocSignOffRules.FAMILY && relation.isBlank()) relation = familyPrefill?.second.orEmpty()
         signerRole = role
     }
-    var canRead by remember { mutableStateOf<Boolean?>(true) }
+    // The read-aloud step before the patient or family member signs: required, and it decides "can read".
+    var reading by remember(noteId) { mutableStateOf<ConsentReading?>(null) }
     var witnessName by remember { mutableStateOf("") }
     var witnessRole by remember { mutableStateOf("") }
     var witnessConsent by remember { mutableStateOf(false) }
@@ -471,7 +501,7 @@ private fun gocRoleText(t: (String, String) -> String, role: String): String = w
                 GocStepHeading(t("1. Doctor", "1. डॉक्टर"))
                 PrefilledField(doctorName, doctorPrefill, t("Name", "नाम"), "goc-doctor-name") { GocSignField(doctorName, { doctorName = it.take(GocSignOffRules.NAME_MAX) }, t("Name", "नाम"), "goc-doctor-name") }
                 PrefilledField(registrationNo, knownRegistration, t("Registration no.", "रजिस्ट्रेशन नंबर"), "goc-doctor-reg") { GocSignField(registrationNo, { registrationNo = it.take(60) }, t("Registration no.", "रजिस्ट्रेशन नंबर"), "goc-doctor-reg") }
-                GocSignaturePad(onDone = { p -> sign(GocSignatureInput(GocSignOffRules.DOCTOR, doctorName, registrationNo = registrationNo, consent = true, method = GocSignOffRules.DRAWN, png = p.png, strokeCount = p.strokeCount)) })
+                GocSignaturePad(thumbChoice = false, onDone = { p -> sign(GocSignatureInput(GocSignOffRules.DOCTOR, doctorName, registrationNo = registrationNo, consent = true, method = GocSignOffRules.DRAWN, png = p.png, strokeCount = p.strokeCount)) })
             }
             GocSignOffRules.PATIENT_OR_FAMILY -> {
                 GocStepHeading(t("2. Patient or family member", "2. मरीज़ या परिवार के सदस्य"))
@@ -484,21 +514,30 @@ private fun gocRoleText(t: (String, String) -> String, role: String): String = w
                 }
                 PrefilledField(signerName, knownSigner(signerRole), t("Name", "नाम"), "goc-signer-name-$signerRole") { GocSignField(signerName, { signerName = it.take(GocSignOffRules.NAME_MAX) }, t("Name", "नाम"), "goc-signer-name") }
                 if (signerRole == GocSignOffRules.FAMILY) PrefilledField(relation, familyPrefill?.second.orEmpty(), t("Relation to the patient", "मरीज़ से रिश्ता"), "goc-signer-relation") { GocSignField(relation, { relation = it.take(GocSignOffRules.NAME_MAX) }, t("Relation to the patient", "मरीज़ से रिश्ता"), "goc-signer-relation") }
-                GocTick(t("Note read to them", "नोट पढ़कर सुनाया गया"), canRead == false, { canRead = !it }, "goc-signer-read-aloud")
+                val offered = remember(people, familyPrefill) { people + listOfNotNull(familyPrefill?.takeIf { it.first.isNotBlank() }?.let { ConsentPerson(it.first, it.second) }) }
+                ConsentReadAloudStep(noteText, "goc-${r.id}", signerName, offered, onChange = { reading = it }, askWitness = false, modifier = Modifier.testTag("goc-signer-read-aloud"))
                 Surface(color = Cream, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
                     Text(t("I have read or heard this note and it records what we discussed", "मैंने यह नोट पढ़ा या सुना है और इसमें वही लिखा है जिस पर हमने बात की"), fontFamily = SaharaTitleFont, fontSize = 17.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.padding(16.dp).testTag("goc-signer-consent"))
                 }
                 // The declaration boxes in Section 4 of the form are drawn, not tapped: signing here ticks them (SVK, 23 Nov 2026).
                 Text(t("Signing below also ticks the declaration in Section IV of the form.", "नीचे साइन करने से फ़ॉर्म के भाग IV की घोषणा पर भी निशान लग जाता है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.testTag("goc-signer-declaration-hint"))
                 // Signing under that line is the agreement: one tap, "Agree and sign".
-                GocSignaturePad(doneLabel = t("Agree and sign", "सहमत हूँ, साइन करें"), onDone = { p -> sign(GocSignatureInput(signerRole, signerName, relation = relation, consent = true, canRead = canRead, method = p.method, png = p.png, strokeCount = p.strokeCount)) })
+                GocSignaturePad(doneLabel = t("Agree and sign", "सहमत हूँ, साइन करें"), onDone = { p ->
+                    val heard = reading
+                    if (heard == null) { error = gocErrorText(t, GocSignOffError.READ_ALOUD_MISSING); false }
+                    else sign(GocSignatureInput(signerRole, signerName, relation = relation, consent = true, canRead = ConsentReadingRules.canRead(heard), method = p.method, png = p.png, strokeCount = p.strokeCount, readAloud = heard))
+                })
             }
             GocSignOffRules.WITNESS -> {
                 GocStepHeading(t("3. Witness", "3. गवाह"))
                 GocSignField(witnessName, { witnessName = it.take(GocSignOffRules.NAME_MAX) }, t("Name", "नाम"), "goc-witness-name")
                 GocSignField(witnessRole, { witnessRole = it.take(GocSignOffRules.NAME_MAX) }, t("Role (optional)", "भूमिका (वैकल्पिक)"))
                 GocTick(t("I saw the note read out and the person sign or give their thumb impression", "मैंने नोट पढ़कर सुनाते और व्यक्ति को साइन करते या अंगूठा लगाते देखा"), witnessConsent, { witnessConsent = it }, "goc-witness-consent")
-                GocSignaturePad(onDone = { p -> sign(GocSignatureInput(GocSignOffRules.WITNESS, witnessName, relation = witnessRole, consent = witnessConsent, method = GocSignOffRules.DRAWN, png = p.png, strokeCount = p.strokeCount)) })
+                GocSignaturePad(onDone = { p ->
+                    // Pre-check only: GocSignOffRules.add refuses the same (WITNESS_IS_READER).
+                    if (GocSignOffRules.readerOf(r.signatures).any { ConsentReadingRules.normalise(it) == ConsentReadingRules.normalise(witnessName) }) { error = gocErrorText(t, GocSignOffError.WITNESS_IS_READER); false }
+                    else sign(GocSignatureInput(GocSignOffRules.WITNESS, witnessName, relation = witnessRole, consent = witnessConsent, method = p.method, png = p.png, strokeCount = p.strokeCount))
+                })
             }
             GocSignOffRules.LOCK -> Button(onClick = {
                 try {

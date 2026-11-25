@@ -29,11 +29,23 @@
 //     strokeCount: number
 //     signedAt: ISO-8601
 //     noteSha256: hex                  the note hash this signature was made on
+//     readAloud: GocReadAloud | null   PATIENT/FAMILY: how the note was read to them (Android ConsentReadAloud.kt);
+//                                      null or missing when not recorded
+//   }
+//   GocReadAloud {
+//     method: "SELF" | "PHONE" | "PERSON"   read it themselves, read out by the phone, or by a person
+//     readerName, readerRelation: string    PERSON only, otherwise ""
+//     language: string                      PHONE only: the language the phone read in ("hi", "te", ...), otherwise ""
+//     witnessName, witnessRelation: string  PHONE/PERSON only, otherwise "" (in the GOC sign-off the witness signs separately)
+//     at: ISO-8601                          when the reading was chosen or finished
 //   }
 //
 // Seal: sealSha256 = SHA-256 of the UTF-8 bytes of gocSealInput(record): every part written as `<length>:<value>;`
 // (length in UTF-16 code units, the same in JS and Kotlin), parts = scheme, noteId, noteSha256, then per signature
-// role, name, registrationNo, relation, consent (1/0), canRead (1/0/-), method, imageSha256, strokeCount, signedAt, noteSha256.
+// role, name, registrationNo, relation, consent (1/0), canRead (1/0/-), method, imageSha256, strokeCount, signedAt, noteSha256,
+// and only when readAloud is present (with a known method) its parts: "readAloud", method, readerName, readerRelation,
+// language, witnessName, witnessRelation, at (cleaned as gocCleanReading does, like Kotlin ConsentReadingRules.sealParts).
+// A seal made without a reading is unchanged.
 // So the seal covers the note text and every signature's PNG; any later edit to either is detectable with gocVerify().
 
 export const GOC_SIGNOFF_SCHEME = 'sahara-goc-signoff-v1';
@@ -50,6 +62,14 @@ export type GocSignature = {
   role: GocSignatureRole; name: string; registrationNo: string | null; relation: string | null;
   consent: boolean; canRead: boolean | null; method: GocSignatureMethod;
   imageDataUrl: string; imageSha256: string; strokeCount: number; signedAt: string; noteSha256: string;
+  /** How the note was read to the patient or family member before they signed (phone-made sign-offs record it). */
+  readAloud?: GocReadAloud | null;
+};
+
+export type GocReadingMethod = 'SELF' | 'PHONE' | 'PERSON';
+export type GocReadAloud = {
+  method: GocReadingMethod; readerName: string; readerRelation: string; language: string;
+  witnessName: string; witnessRelation: string; at: string;
 };
 
 export type GocSignOffRecord = {
@@ -62,11 +82,13 @@ export type GocSignOffRecord = {
 export type GocSignatureInput = {
   role: GocSignatureRole; name: string; registrationNo?: string | null; relation?: string | null;
   consent: boolean; canRead?: boolean | null; method: GocSignatureMethod; imageDataUrl: string; strokeCount: number;
+  /** PATIENT/FAMILY: the read-aloud step. When given it must be complete, and it decides canRead (SELF = can read). */
+  readAloud?: Partial<GocReadAloud> & { method: string } | null;
 };
 
 export type GocSignOffErrorCode =
   | 'NOTE_CHANGED' | 'LOCKED' | 'INVALIDATED' | 'WRONG_ORDER' | 'NAME_BLANK' | 'REGISTRATION_BLANK'
-  | 'RELATION_BLANK' | 'CONSENT_MISSING' | 'CAN_READ_MISSING' | 'NO_SIGNATURE' | 'NOT_READY';
+  | 'RELATION_BLANK' | 'CONSENT_MISSING' | 'CAN_READ_MISSING' | 'READ_ALOUD_MISSING' | 'WITNESS_IS_READER' | 'NO_SIGNATURE' | 'NOT_READY';
 
 export class GocSignOffError extends Error {
   readonly code: GocSignOffErrorCode;
@@ -102,6 +124,116 @@ export function gocBytesToDataUrl(bytes: Uint8Array): string {
   return 'data:image/png;base64,' + btoa(binary);
 }
 
+// ---------------------------------------------------------------------------
+// Read aloud (twin of Android ConsentReadingRules in ConsentReadAloud.kt; the cleaning must match it character for
+// character, because the cleaned values are sealed).
+
+export const GOC_READ_METHODS: readonly GocReadingMethod[] = ['SELF', 'PHONE', 'PERSON'];
+export const GOC_READ_NAME_MAX = 120;
+
+// Kotlin String.trim() drops every char where Char.isWhitespace() (JVM: Character.isWhitespace || isSpaceChar), i.e.
+// Unicode Zs/Zl/Zp plus \t \n \v \f \r and \u001C-\u001F. JavaScript's trim() differs (e.g. U+FEFF), so it is not used.
+const KT_SPACE = /[\p{Zs}\p{Zl}\p{Zp}\t\n\v\f\r\u001C-\u001F]/u;
+function ktTrim(value: string): string {
+  let start = 0, end = value.length;
+  while (start < end && KT_SPACE.test(value[start])) start++;
+  while (end > start && KT_SPACE.test(value[end - 1])) end--;
+  return value.slice(start, end);
+}
+// Java regex \s is ASCII only: [ \t\n\x0B\f\r].
+const javaSpaces = (value: string) => value.replace(/[ \t\n\v\f\r]+/g, ' ');
+const cleanName = (value: string) => javaSpaces(ktTrim(value)).slice(0, GOC_READ_NAME_MAX);
+const normaliseName = (value: string) => javaSpaces(ktTrim(value).toLowerCase());
+
+export const gocReadingNeedsWitness = (method: string | null | undefined) => method === 'PHONE' || method === 'PERSON';
+/** The canRead answer the sign-off stores, from how the note was read. */
+export const gocReadingCanRead = (r: { method: string }) => r.method === 'SELF';
+
+type ReadingLike = Partial<Record<keyof GocReadAloud, unknown>>;
+const text = (value: unknown) => value === undefined ? '' : value === null ? 'null' : typeof value === 'string' ? value : String(value);
+
+/** Trimmed, capped, and only the fields that belong to the method (Kotlin ConsentReadingRules.clean). */
+export function gocCleanReading(r: ReadingLike): GocReadAloud {
+  const method = text(r.method);
+  const person = method === 'PERSON', witness = gocReadingNeedsWitness(method);
+  return {
+    method: method as GocReadingMethod,
+    readerName: person ? cleanName(text(r.readerName)) : '', readerRelation: person ? cleanName(text(r.readerRelation)) : '',
+    language: method === 'PHONE' ? ktTrim(text(r.language)) : '',
+    witnessName: witness ? cleanName(text(r.witnessName)) : '', witnessRelation: witness ? cleanName(text(r.witnessRelation)) : '',
+    at: ktTrim(text(r.at)),
+  };
+}
+
+/** A stored readAloud value as Android reads it back: null unless it is an object with a known method, then cleaned. */
+export function gocDecodeReading(value: unknown): GocReadAloud | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const r = value as ReadingLike;
+  if (typeof r.method !== 'string' || !(GOC_READ_METHODS as readonly string[]).includes(r.method)) return null;
+  return gocCleanReading(r);
+}
+
+/** The parts a seal covers for one reading, in order. */
+export function gocReadingSealParts(r: ReadingLike): string[] {
+  const c = gocCleanReading(r);
+  return ['readAloud', c.method, c.readerName, c.readerRelation, c.language, c.witnessName, c.witnessRelation, c.at];
+}
+
+export type GocReadingProblem = 'METHOD' | 'NOT_HEARD' | 'READER_NAME' | 'READER_RELATION' | 'READER_IS_SIGNER'
+  | 'WITNESS_NAME' | 'WITNESS_RELATION' | 'WITNESS_IS_SIGNER' | 'WITNESS_IS_READER';
+
+/** Everything still missing before the reading counts (Kotlin ConsentReadingRules.problems). */
+export function gocReadingProblems(reading: ReadingLike | null | undefined, signerName: string, askWitness: boolean, heard = true): GocReadingProblem[] {
+  const out: GocReadingProblem[] = [];
+  if (!reading) return ['METHOD'];
+  const r = gocCleanReading(reading);
+  if (!(GOC_READ_METHODS as readonly string[]).includes(r.method)) return ['METHOD'];
+  const signer = normaliseName(signerName);
+  if (r.method === 'PHONE' && !heard) out.push('NOT_HEARD');
+  if (r.method === 'PERSON') {
+    if (!r.readerName) out.push('READER_NAME');
+    if (!r.readerRelation) out.push('READER_RELATION');
+    if (signer && normaliseName(r.readerName) === signer) out.push('READER_IS_SIGNER');
+  }
+  if (askWitness && gocReadingNeedsWitness(r.method)) {
+    if (!r.witnessName) out.push('WITNESS_NAME');
+    if (!r.witnessRelation) out.push('WITNESS_RELATION');
+    const witness = normaliseName(r.witnessName);
+    if (witness && witness === signer) out.push('WITNESS_IS_SIGNER');
+    if (witness && r.method === 'PERSON' && witness === normaliseName(r.readerName)) out.push('WITNESS_IS_READER');
+  }
+  return out;
+}
+
+const GOC_LANGUAGE_LABELS: Record<string, string> = {
+  en: 'English', hi: 'हिन्दी', te: 'తెలుగు', ur: 'اردو', kn: 'ಕನ್ನಡ', ta: 'தமிழ்', ml: 'മലയാളം', mr: 'मराठी', bn: 'বাংলা', gu: 'ગુજરાતી', pa: 'ਪੰਜਾਬੀ',
+};
+
+/** A stored English relationship in the screen language; a typed one as written (Kotlin ConsentReadingRules.relationLabel). */
+export function gocRelationLabel(t: (en: string, hi: string) => string, relation: string): string {
+  switch (relation) {
+    case 'Son': return t('Son', 'बेटा'); case 'Daughter': return t('Daughter', 'बेटी'); case 'Husband': return t('Husband', 'पति'); case 'Wife': return t('Wife', 'पत्नी');
+    case 'Brother': return t('Brother', 'भाई'); case 'Sister': return t('Sister', 'बहन'); case 'Grandchild': return t('Grandchild', 'पोता / पोती'); case 'Friend': return t('Friend', 'दोस्त');
+    case 'Neighbour': return t('Neighbour', 'पड़ोसी'); case 'Nurse': return t('Nurse', 'नर्स'); case 'Doctor': return t('Doctor', 'डॉक्टर'); case 'Social worker': return t('Social worker', 'सामाजिक कार्यकर्ता');
+    case 'Volunteer': return t('Volunteer', 'स्वयंसेवक'); case 'Self': return t('Self', 'ख़ुद');
+    default: return relation;
+  }
+}
+
+/** "Read aloud by Ravi (Son) · witnessed by Mohan (Neighbour)", the same line as Android ConsentReadingRules.summary. */
+export function gocReadingSummary(reading: ReadingLike, t: (en: string, hi: string) => string): string {
+  const c = gocCleanReading(reading);
+  const who = (name: string, relation: string) => name + (relation.trim() ? ` (${relation})` : '');
+  const head = c.method === 'SELF' ? t('Read it themselves', 'ख़ुद पढ़ा')
+    : c.method === 'PHONE' ? t('Read aloud by the phone', 'फ़ोन ने पढ़कर सुनाया') + (GOC_LANGUAGE_LABELS[c.language] ? ' · ' + GOC_LANGUAGE_LABELS[c.language] : '')
+      : t('Read aloud by', 'पढ़कर सुनाया:') + ' ' + who(c.readerName, gocRelationLabel(t, c.readerRelation));
+  const witness = c.witnessName.trim() ? ' · ' + t('witnessed by', 'गवाह:') + ' ' + who(c.witnessName, gocRelationLabel(t, c.witnessRelation)) : '';
+  return head + witness;
+}
+
+// ---------------------------------------------------------------------------
+// Seal
+
 const part = (value: string) => `${value.length}:${value};`;
 const flag = (value: boolean | null) => value === null ? '-' : value ? '1' : '0';
 
@@ -110,6 +242,9 @@ export function gocSealInput(record: Pick<GocSignOffRecord, 'noteId' | 'noteSha2
   for (const s of record.signatures) {
     out += part(s.role) + part(s.name) + part(s.registrationNo ?? '') + part(s.relation ?? '') + part(s.consent ? '1' : '0')
       + part(flag(s.canRead)) + part(s.method) + part(s.imageSha256) + part(String(s.strokeCount)) + part(s.signedAt) + part(s.noteSha256);
+    // Only when a reading is present, so seals made without one (older web and phone seals) stay the same.
+    const reading = gocDecodeReading(s.readAloud);
+    if (reading) for (const p of gocReadingSealParts(reading)) out += part(p);
   }
   return out;
 }
@@ -158,6 +293,11 @@ function checkOpen(record: GocSignOffRecord, currentNoteSha: string) {
   if (currentNoteSha !== record.noteSha256) throw new GocSignOffError('NOTE_CHANGED');
 }
 
+/** Names of the people who read the note aloud to an earlier signer (method PERSON). */
+export function gocReadersOf(signatures: readonly GocSignature[]): string[] {
+  return signatures.flatMap((s) => s.readAloud?.method === 'PERSON' && (s.readAloud.readerName ?? '').trim() ? [s.readAloud.readerName] : []);
+}
+
 /** Adds one signature. Refused when the note text is not the one this sign-off started on, or anything is missing. */
 export async function gocAddSignature(record: GocSignOffRecord, noteText: string, input: GocSignatureInput, steps: readonly GocSignerStep[] = GOC_DEFAULT_STEPS, now: Date = new Date()): Promise<GocSignOffRecord> {
   checkOpen(record, await gocNoteSha256(noteText));
@@ -171,15 +311,21 @@ export async function gocAddSignature(record: GocSignOffRecord, noteText: string
   if (input.role === 'DOCTOR') relation = null;
   if (input.role === 'FAMILY' && !relation) throw new GocSignOffError('RELATION_BLANK');
   const signer = input.role === 'PATIENT' || input.role === 'FAMILY';
-  if (signer && typeof input.canRead !== 'boolean') throw new GocSignOffError('CAN_READ_MISSING');
+  // The read-aloud step, when recorded, must be complete; a witness signs separately, so none is asked for here.
+  const reading = signer && input.readAloud ? gocCleanReading(input.readAloud) : null;
+  if (reading && gocReadingProblems(reading, name, false).length) throw new GocSignOffError('READ_ALOUD_MISSING');
+  const canRead = reading ? gocReadingCanRead(reading) : input.canRead;
+  if (signer && typeof canRead !== 'boolean') throw new GocSignOffError('CAN_READ_MISSING');
+  // The witness saw it being read, so it is someone other than the person who read it aloud.
+  if (input.role === 'WITNESS' && gocReadersOf(record.signatures).some((reader) => normaliseName(reader) === normaliseName(name))) throw new GocSignOffError('WITNESS_IS_READER');
   if (input.role !== 'DOCTOR' && input.consent !== true) throw new GocSignOffError('CONSENT_MISSING');
   const bytes = gocDataUrlBytes(input.imageDataUrl);
   if (!bytes || !(input.strokeCount >= 1)) throw new GocSignOffError('NO_SIGNATURE');
   const signature: GocSignature = {
     role: input.role, name, registrationNo, relation, consent: input.role === 'DOCTOR' ? true : input.consent,
-    canRead: signer ? input.canRead as boolean : null, method: input.method === 'THUMB' ? 'THUMB' : 'DRAWN',
+    canRead: signer ? canRead as boolean : null, method: input.method === 'THUMB' ? 'THUMB' : 'DRAWN',
     imageDataUrl: input.imageDataUrl, imageSha256: await gocSha256Hex(bytes), strokeCount: Math.floor(input.strokeCount),
-    signedAt: now.toISOString(), noteSha256: record.noteSha256,
+    signedAt: now.toISOString(), noteSha256: record.noteSha256, readAloud: reading,
   };
   return { ...record, signatures: [...record.signatures, signature] };
 }

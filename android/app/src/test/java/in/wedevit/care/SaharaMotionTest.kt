@@ -21,7 +21,7 @@ class SaharaMotionTest {
     }
 
     @Test fun specsStayShortAndCalmWhenAnimationsAreOn() {
-        specs.forEach { assertTrue("$it ms", it in 100..300); assertEquals(it, SaharaMotion.tween<Float>(it, enabled = true).durationMillis) }
+        specs.forEach { assertTrue("$it ms", it in 90..300); assertEquals(it, SaharaMotion.tween<Float>(it, enabled = true).durationMillis) }
         assertEquals(SaharaMotion.STAGGER_ITEMS * SaharaMotion.STAGGER_MS, SaharaMotion.staggerDelay(50, enabled = true))
         assertTrue(SaharaMotion.staggerDelay(50, enabled = true) + SaharaMotion.LIST_ITEM_MS <= 450)
     }

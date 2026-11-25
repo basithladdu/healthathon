@@ -45,9 +45,10 @@ import java.util.concurrent.ConcurrentHashMap
 
 /**
  * The languages Sahara shows. SVK's AMD platform spec (section 7) asks for Telugu, Hindi, Urdu (right to left)
- * and English first; Kannada is added for Karnataka families.
+ * and English first; Kannada is added for Karnataka families, and Tamil, Malayalam, Marathi, Bengali, Gujarati and
+ * Punjabi after the 24 Nov meeting ("all languages").
  *
- * English and Hindi stay inline in the screens as `t("English", "हिन्दी")`. Telugu, Urdu and Kannada are looked up
+ * English and Hindi stay inline in the screens as `t("English", "हिन्दी")`. Every other language is looked up
  * by the English text in `src/main/resources/i18n/<code>.tsv` (see [CareDictionary]). Adding a new screen string
  * needs nothing new in the code: write `t("English", "हिन्दी")` as before and add the English line to each
  * dictionary (CareLanguageDictionaryTest lists anything missing).
@@ -59,11 +60,19 @@ enum class CareLang(val code: String, val label: String, val englishName: String
     HI("hi", "हिन्दी", "Hindi", false),
     TE("te", "తెలుగు", "Telugu", false),
     UR("ur", "اردو", "Urdu", true),
-    KN("kn", "ಕನ್ನಡ", "Kannada", false);
+    KN("kn", "ಕನ್ನಡ", "Kannada", false),
+    TA("ta", "தமிழ்", "Tamil", false),
+    ML("ml", "മലയാളം", "Malayalam", false),
+    MR("mr", "मराठी", "Marathi", false),
+    BN("bn", "বাংলা", "Bengali", false),
+    GU("gu", "ગુજરાતી", "Gujarati", false),
+    PA("pa", "ਪੰਜਾਬੀ", "Punjabi", false);
 
-    /** True for languages read from a dictionary rather than written inline. */
-    val dictionary: Boolean get() = this == TE || this == UR || this == KN
+    /** True for languages read from a dictionary rather than written inline (all but English and Hindi). */
+    val dictionary: Boolean get() = this != EN && this != HI
     val locale: Locale get() = if (this == EN) Locale.ENGLISH else Locale(code, "IN")
+    /** The BCP-47 tag for speech recognition and text-to-speech: en-IN, hi-IN, te-IN, ... pa-IN. */
+    val speechTag: String get() = "$code-IN"
 
     companion object {
         fun of(code: String?): CareLang? = entries.firstOrNull { it.code == code }
@@ -90,7 +99,7 @@ fun <T> careWithDeviceLanguage(context: Context, block: () -> T): T = CareLangua
 
 /**
  * The shared picker for code that passes `hindi: Boolean` down: Hindi when [hindi]; otherwise English, or the
- * dictionary text when Telugu, Urdu or Kannada is shown. Saving code passes `false` inside [careInEnglish].
+ * dictionary text when any other language is shown. Saving code passes `false` inside [careInEnglish].
  */
 fun careTr(hindi: Boolean, en: String, hi: String): String {
     if (hindi) return hi
@@ -107,7 +116,7 @@ fun careTr(lang: CareLang, en: String, hi: String): String = when {
 
 /**
  * A message written in English and Hindi together ("Saved · सहेजा गया"), kept that way for English and Hindi readers.
- * Telugu, Urdu and Kannada readers get just their own language.
+ * Readers of the dictionary languages get just their own language.
  */
 fun careBilingual(en: String, hi: String): String {
     val lang = CareLanguageState.shown
@@ -156,7 +165,7 @@ val LocalCareLanguage = staticCompositionLocalOf<CareLanguageChoice?> { null }
 /** True when Hindi is chosen. */
 @Composable fun careHindi(): Boolean = careLanguage() == CareLang.HI
 
-/** The inline pair picker used across the app: `t("English", "हिन्दी")`; Telugu, Urdu and Kannada come from the dictionaries. */
+/** The inline pair picker used across the app: `t("English", "हिन्दी")`; the other languages come from the dictionaries. */
 @Composable fun careText(): (String, String) -> String { val lang = careLanguage(); return { en, hi -> careTr(lang, en, hi) } }
 
 /** Shows [content] in the chosen language's reading direction: right to left for Urdu. */
@@ -200,7 +209,7 @@ val LocalCareLanguage = staticCompositionLocalOf<CareLanguageChoice?> { null }
 @Composable fun CareLanguageSwitch(modifier: Modifier = Modifier) = CareLanguageMenu(modifier)
 
 /**
- * Telugu, Urdu and Kannada text, keyed by the English source text exactly as written in the Kotlin code
+ * Text for the dictionary languages (all but English and Hindi), keyed by the English source text exactly as written in the Kotlin code
  * (escapes such as `\n` kept, and `$name` / `${expr}` placeholders kept). Lines are `english<TAB>translation`;
  * lines starting with `#` are comments. A key with placeholders matches any English text of that shape, and the
  * captured values are put into the translation's placeholders of the same name.

@@ -483,9 +483,11 @@ enum class GocNoteKind { GENERAL_DISCUSSION, DECISION_TAKEN }
 /** The verbatim words ([lines]) and the doctor's note ([note]) are kept apart: the note says what was said and decided, and the words stay as spoken. [planVersion] tells a carried-over copy from this version's own. */
 data class GocSignOffSummary(val id: String, val sealSha256: String, val lockedAt: String, val signers: List<String>,
     /** DOCTOR, PATIENT, FAMILY or WITNESS, one per signer; with [registrations] and [methods] so Section 19 of the form shows who signed as what. */
-    val roles: List<String> = emptyList(), val registrations: List<String> = emptyList(), val methods: List<String> = emptyList(), val signedAt: List<String> = emptyList()) {
+    val roles: List<String> = emptyList(), val registrations: List<String> = emptyList(), val methods: List<String> = emptyList(), val signedAt: List<String> = emptyList(),
+    /** One per signer: how the note was read to the patient or family member before signing (ConsentReadAloud.kt), or null. */
+    val readAloud: List<ConsentReading?> = emptyList()) {
     fun formSigners(): List<GocFormSigner> = signers.mapIndexedNotNull { i, name -> roles.getOrNull(i)?.let { role ->
-        GocFormSigner(role, name, signedAt.getOrNull(i) ?: lockedAt, registrations.getOrNull(i).orEmpty(), thumb = methods.getOrNull(i) == "THUMB") } }
+        GocFormSigner(role, name, signedAt.getOrNull(i) ?: lockedAt, registrations.getOrNull(i).orEmpty(), thumb = methods.getOrNull(i) == "THUMB", readAloud = readAloud.getOrNull(i)) } }
 }
 
 data class GocTranscript(
@@ -541,7 +543,7 @@ object GocTranscriptJson {
             .put("topics", marks).put("note", g.note)
             .put("planVersion", g.planVersion).put("participants", g.participants).put("noteKind", g.noteKind.name)
             .put("transcribedBy", g.transcribedBy).put("consentBy", g.consentBy)
-            .also { o -> g.signOff?.let { so -> o.put("signOff", JSONObject().put("id", so.id).put("status", "LOCKED").put("sealSha256", so.sealSha256).put("lockedAt", so.lockedAt).put("signers", JSONArray(so.signers.mapIndexed { i, name -> JSONObject().put("name", name).put("role", so.roles.getOrNull(i).orEmpty()).put("registrationNo", so.registrations.getOrNull(i).orEmpty()).put("method", so.methods.getOrNull(i).orEmpty()).put("signedAt", so.signedAt.getOrNull(i).orEmpty()) }))) } }
+            .also { o -> g.signOff?.let { so -> o.put("signOff", JSONObject().put("id", so.id).put("status", "LOCKED").put("sealSha256", so.sealSha256).put("lockedAt", so.lockedAt).put("signers", JSONArray(so.signers.mapIndexed { i, name -> JSONObject().put("name", name).put("role", so.roles.getOrNull(i).orEmpty()).put("registrationNo", so.registrations.getOrNull(i).orEmpty()).put("method", so.methods.getOrNull(i).orEmpty()).put("signedAt", so.signedAt.getOrNull(i).orEmpty()).also { p -> so.readAloud.getOrNull(i)?.let { p.put("readAloud", ConsentReadingRules.encode(it)) } } }))) } }
     }
 
     /** [recordVersion] is the record's own version: a transcript written on the web carries no planVersion of its own. */
@@ -563,7 +565,8 @@ object GocTranscriptJson {
             j.optJSONObject("signOff")?.takeIf { it.optString("status") == "LOCKED" && it.optString("id").isNotBlank() }?.let { o ->
                 val people = o.optJSONArray("signers")?.let { a -> (0 until a.length()).mapNotNull { a.optJSONObject(it)?.takeIf { p -> p.optString("name").isNotBlank() } } }.orEmpty()
                 GocSignOffSummary(o.optString("id"), o.optString("sealSha256"), o.optString("lockedAt"), people.map { it.optString("name") },
-                    people.map { it.optString("role") }.takeIf { r -> r.all(String::isNotBlank) }.orEmpty(), people.map { it.optString("registrationNo") }, people.map { it.optString("method") }, people.map { it.optString("signedAt") })
+                    people.map { it.optString("role") }.takeIf { r -> r.all(String::isNotBlank) }.orEmpty(), people.map { it.optString("registrationNo") }, people.map { it.optString("method") }, people.map { it.optString("signedAt") },
+                    people.map { ConsentReadingRules.decode(it.optJSONObject("readAloud")) }.takeIf { r -> r.any { it != null } }.orEmpty())
             }, j.optString("transcribedBy"), j.optString("consentBy"))
     }
 }
@@ -727,7 +730,9 @@ data class GocFormSection(val id: String, val title: Bi, val groups: List<GocFor
     val rows: List<Bi> get() = GocForm.lines(this)
 }
 /** A signature drawn on the doctor's device for this note (CareGocSignOff.kt), so Section 19 shows it. [role]: DOCTOR, PATIENT, FAMILY or WITNESS. */
-data class GocFormSigner(val role: String, val name: String, val signedAt: String, val registrationNo: String = "", val relation: String = "", val thumb: Boolean = false)
+data class GocFormSigner(val role: String, val name: String, val signedAt: String, val registrationNo: String = "", val relation: String = "", val thumb: Boolean = false,
+    /** How the note was read to this signer before they signed (patient or family member), when recorded. */
+    val readAloud: ConsentReading? = null)
 
 /**
  * The goals-of-care note IS the legal form: Healthathon_form_Rituparna.docx (legal review, 31 Oct 2026), with Rituparna's tracked additions.
@@ -868,6 +873,10 @@ object GocForm {
                 if (s != null) how(s.thumbImpression) else if (device != null) how(device.thumb) else Bi.plain(""), Bi.plain((s?.signedAt ?: device?.signedAt.orEmpty()).take(10)))
         }
         val blank = Bi.plain("")
+        // Who read the note to the patient or family before they signed, and who saw it (shown only when recorded).
+        val readings = r.signatures.mapNotNull { s -> s.readAloud?.let { s.name to it } } + signers.mapNotNull { s -> s.readAloud?.let { s.name to it } }
+        val readAloudGroup = if (readings.isEmpty()) emptyList() else listOf(GocFormGroup(Bi("Read aloud before signing", "हस्ताक्षर से पहले पढ़कर सुनाया"),
+            readings.map { (name, reading) -> GocFormRow(Bi.plain(name), Bi(ConsentReadingRules.summaryEnglish(reading), ConsentReadingRules.summaryHindi(reading))) }))
 
         return numbered(listOf(
             GocFormSection("I", Bi("Section I – General information", "भाग I – सामान्य जानकारी"), listOf(
@@ -952,7 +961,7 @@ object GocForm {
                         listOf(Bi("Treating consultant", "इलाज करने वाले कंसल्टेंट")) + clinician(SignatureRole.TREATING_CONSULTANT, dev("DOCTOR")),
                         listOf(Bi("Palliative care clinician", "पैलिएटिव केयर डॉक्टर")) + clinician(SignatureRole.PALLIATIVE_CLINICIAN, null),
                         listOf(Bi("Nurse involved in the discussion", "बातचीत में शामिल नर्स")) + clinician(SignatureRole.NURSE, null)))),
-            )),
+            ) + readAloudGroup),
         ))
     }
 

@@ -57,14 +57,14 @@ object MedicineFrequencyRules {
  * phones and the doctor read it unchanged. A strength saved earlier that does not fit ("5 mg/5 ml") is kept as written.
  */
 object MedicineStrength {
-    val units = listOf("mg", "mcg", "ml", "g", "units", "drops", "puffs")
+    val units = listOf("mg", "mcg", "ml", "g", "units", "%", "drops", "puffs")
     data class Parts(val number: String, val unit: String)
-    private val pattern = Regex("^(\\d{1,6}(?:[.,]\\d{1,3})?)\\s*([A-Za-zµ]+)?$")
+    private val pattern = Regex("^(\\d{1,6}(?:[.,]\\d{1,3})?)\\s*([A-Za-zµ]+|%)?$")
 
     /** A unit word as one of [units] ("µg" is mcg, "IU" is units, "puff" is puffs), or null when it is not one of them. */
     fun unitOf(word: String): String? = when (word.trim().lowercase(Locale.ROOT)) {
         "mg" -> "mg"; "mcg", "µg", "ug" -> "mcg"; "ml" -> "ml"; "g", "gm", "gram", "grams" -> "g"
-        "unit", "units", "iu" -> "units"; "drop", "drops" -> "drops"; "puff", "puffs" -> "puffs"
+        "unit", "units", "iu" -> "units"; "%", "percent" -> "%"; "drop", "drops" -> "drops"; "puff", "puffs" -> "puffs"
         else -> null
     }
 
@@ -90,7 +90,7 @@ object MedicineStrength {
     /** The saved text: "500 mg". Blank when there is no number yet (a unit alone says nothing). */
     fun text(number: String, unit: String): String {
         val n = cleanNumber(number).trimEnd('.')
-        return if (n.isEmpty()) "" else listOf(n, unit.trim()).filter(String::isNotEmpty).joinToString(" ")
+        return if (n.isEmpty()) "" else if (unit.trim() == "%") "$n%" else listOf(n, unit.trim()).filter(String::isNotEmpty).joinToString(" ")
     }
 }
 
@@ -114,10 +114,10 @@ object MedicineLegacyText {
 }
 
 /** The person's own words in an older free-text medicine, apart from the lines the choices write ("Frequency: ", "Times: "). */
-fun MedicineLegacyText.words(detail: String): String = detail.lineSequence().filterNot { it.startsWith("Frequency: ") || it.startsWith("Times: ") }.joinToString("\n").trimEnd()
+fun MedicineLegacyText.words(detail: String): String = detail.lineSequence().filterNot { it.startsWith("Frequency: ") || it.startsWith("Times: ") || it.startsWith(MedicineAlarmRules.LINE) }.joinToString("\n").trimEnd()
 
 /** [words] in place of the old words, keeping the saved "Frequency: " and "Times: " lines after them. */
 fun MedicineLegacyText.withWords(detail: String, words: String): String {
-    val kept = detail.lineSequence().filter { it.startsWith("Frequency: ") || it.startsWith("Times: ") }.toList()
+    val kept = detail.lineSequence().filter { it.startsWith("Frequency: ") || it.startsWith("Times: ") || it.startsWith(MedicineAlarmRules.LINE) }.toList()
     return (listOf(words.trimEnd()).filter(String::isNotBlank) + kept).joinToString("\n")
 }

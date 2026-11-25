@@ -139,6 +139,9 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
     onActiveChanged: (Boolean) -> Unit,
 ) { val t = careText();
     val context = LocalContext.current
+    // Older phones (below Android 12, or no on-device recognition) never see a dictation panel that cannot work (point 4).
+    val supported = remember(context) { CareVoiceSupport.onDevice(context) }
+    if (!supported) return
     val owner = LocalLifecycleOwner.current
     var revision by remember { mutableIntStateOf(0) }
     var languageTag by rememberSaveable(personId) { mutableStateOf("hi-IN") }
@@ -191,7 +194,7 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
                 if (active) TextButton(onClick = { dictation.cancel(keepWords = false); heldWords = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel turn", "यह बारी रद्द करें"), color = RustText) }
             }
             if (dictation.status.isNotBlank()) Text(dictation.status, fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.padding(top = 8.dp).announce())
-        } else Text(t("Not available on this phone. Type instead.", "इस फ़ोन पर उपलब्ध नहीं। टाइप करें।"), style = MaterialTheme.typography.bodySmall)
+        }
         if (heldWords.isNotBlank() && !active) {
             Text(t("Unfinished words · $pendingSpeaker · ${pendingLanguage.label}", "अधूरे शब्द · $pendingSpeaker · ${pendingLanguage.label}"), style = MaterialTheme.typography.labelMedium)
             CareField(heldWords, { heldWords = it }, t("Words to keep", "रखने वाले शब्द"), minLines = 2)
@@ -263,27 +266,51 @@ internal class CareReadAloud(context: Context, val changed: () -> Unit) {
         else -> speechTr("Downloading a language pack (about 30 MB)…", "भाषा पैक डाउनलोड हो रहा है (लगभग 30 MB)…")
     }
 
-    fun read(text: String, languageTag: String) {
+    // Hindi + English reads the original words with the Hindi voice; nothing is translated.
+    private fun localeFor(languageTag: String): Locale = Locale.forLanguageTag(if (languageTag == "hi-en") "hi-IN" else languageTag)
+
+    /** An installed, offline voice for [languageTag], or null when the phone has none. */
+    private fun voiceFor(tts: TextToSpeech, languageTag: String): android.speech.tts.Voice? {
+        val language = localeFor(languageTag)
+        val voices = runCatching { tts.voices.orEmpty() }.getOrDefault(emptySet())
+        return voices.filter { !it.isNetworkConnectionRequired && it.locale.language == language.language && TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED !in it.features.orEmpty() }
+            .sortedWith(compareByDescending<android.speech.tts.Voice> { it.locale.country == language.country }.thenByDescending { it.quality }).firstOrNull()
+    }
+
+    /** Whether the phone has an offline voice for [languageTag]; null while the speech engine is still starting. */
+    fun hasVoice(languageTag: String): Boolean? {
+        val tts = engine ?: return false
+        if (closed) return false
+        if (!ready) return null
+        return voiceFor(tts, languageTag) != null
+    }
+
+    /**
+     * Reads [text] in [languageTag]. With [translate] (the default) lines in another script are machine-translated first.
+     * [translate] false (consent): the exact words only; text in another script is not read at all.
+     */
+    fun read(text: String, languageTag: String, translate: Boolean = true) {
         val tts = engine ?: return
         if (closed) return
         if (!ready) { status = speechTr("The voice is still preparing. Try Read aloud again in a moment.", "आवाज़ अभी तैयार हो रही है। थोड़ी देर बाद फिर पढ़कर सुनाएँ दबाएँ।"); changed(); return }
         stop()
-        // Hindi + English reads the original words with the Hindi voice; nothing is translated.
-        val voiceTag = if (languageTag == "hi-en") "hi-IN" else languageTag
-        val language = Locale.forLanguageTag(voiceTag)
-        val voices = runCatching { tts.voices.orEmpty() }.getOrDefault(emptySet())
-        val voice = voices.filter { !it.isNetworkConnectionRequired && it.locale.language == language.language && TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED !in it.features.orEmpty() }
-            .sortedWith(compareByDescending<android.speech.tts.Voice> { it.locale.country == language.country }.thenByDescending { it.quality }).firstOrNull()
+        val language = localeFor(languageTag)
+        val voice = voiceFor(tts, languageTag)
         if (voice == null) { status = speechTr("No downloaded voice for this language. Choose another language or install its voice in phone settings.", "इस भाषा की डाउनलोड की हुई आवाज़ नहीं है। दूसरी भाषा चुनें या फ़ोन की सेटिंग में उसकी आवाज़ इंस्टॉल करें।"); changed(); return }
         val label = careSpeechLanguages.firstOrNull { it.tag == languageTag }?.label ?: language.displayLanguage
         val lines = text.lines().filter(String::isNotBlank)
         if (lines.isEmpty()) return
         val base = language.language
         val needsTranslation = languageTag != "hi-en" && lines.any { line -> CareOfflineTranslation.scriptLanguage(line).let { it != null && it != base } }
+        // Consent: the exact words, judged by the language's own script (Marathi is Devanagari too), or nothing.
+        if (!translate) {
+            if (ConsentReadingRules.phoneCanReadExactly(text, base)) { speak(tts, voice, text, label, ""); return }
+            status = speechTr("This text is in another language, so the phone cannot read it out exactly. Ask someone to read it to you.", "यह लेख किसी दूसरी भाषा में है, इसलिए फ़ोन इसे हूबहू नहीं पढ़ सकता। किसी से पढ़कर सुनाने को कहें।"); changed(); return
+        }
         if (!needsTranslation) { speak(tts, voice, text, label, ""); return }
         val target = CareOfflineTranslation.mlKitCode(base)
         if (target == null) {
-            speak(tts, voice, text, label, speechTr("Malayalam translation isn't available on this phone; reading the original words.", "इस फ़ोन पर मलयालम अनुवाद उपलब्ध नहीं है; मूल शब्द पढ़ रहे हैं।"))
+            speak(tts, voice, text, label, "$label · " + speechTr("Translation into this language isn't available on this phone; reading the original words.", "इस फ़ोन पर इस भाषा में अनुवाद उपलब्ध नहीं है; मूल शब्द पढ़ रहे हैं।"))
             return
         }
         val turn = generation

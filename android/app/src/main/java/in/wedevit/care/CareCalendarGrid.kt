@@ -3,7 +3,6 @@ package `in`.wedevit.care
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -135,12 +134,18 @@ private const val PAGER_YEARS = 10L
 @Composable fun CareCalendarGrid(entries: List<CareItem>, day: LocalDate, week: Boolean, onWeek: (Boolean) -> Unit, onDay: (LocalDate) -> Unit) {
     val t = careText(); val hindi = careHindi(); val today = LocalDate.now()
     val first = weekStart(day)
+    // Formatters and the day-by-day grouping are built once, not again for every cell on every frame of a swipe.
+    val lang = CareLanguageState.current
+    val weekdayFormat = remember(hindi, lang) { careDateFormat("EEE", hindi) }
+    val cellFormat = remember(hindi, lang) { careDateFormat("EEE d MMM", hindi) }
+    val byDay = remember(entries) { entries.filter { it.due > 0 }.groupBy { careDay(it.due) } }
+    val tick = rememberSaharaTick()
     // One surface for the whole grid: switch, month name, weekdays, days and legend.
     Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
-    Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 12.dp).animateContentSize().testTag("calendar-grid"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 12.dp).testTag("calendar-grid"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-            SegmentedButton(selected = !week, onClick = { onWeek(false) }, shape = SegmentedButtonDefaults.itemShape(0, 2), modifier = Modifier.heightIn(min = 48.dp).testTag("calendar-month-toggle")) { Text(t("Month", "महीना")) }
-            SegmentedButton(selected = week, onClick = { onWeek(true) }, shape = SegmentedButtonDefaults.itemShape(1, 2), modifier = Modifier.heightIn(min = 48.dp).testTag("calendar-week-toggle")) { Text(t("Week", "सप्ताह")) }
+            SegmentedButton(selected = !week, onClick = { if (week) tick(); onWeek(false) }, shape = SegmentedButtonDefaults.itemShape(0, 2), modifier = Modifier.heightIn(min = 48.dp).testTag("calendar-month-toggle")) { Text(t("Month", "महीना")) }
+            SegmentedButton(selected = week, onClick = { if (!week) tick(); onWeek(true) }, shape = SegmentedButtonDefaults.itemShape(1, 2), modifier = Modifier.heightIn(min = 48.dp).testTag("calendar-week-toggle")) { Text(t("Week", "सप्ताह")) }
         }
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = { onDay(if (week) day.minusWeeks(1) else day.minusMonths(1)) }, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.ChevronLeft, if (week) t("Previous week", "पिछला सप्ताह") else t("Previous month", "पिछला महीना"), tint = Rust) }
@@ -157,17 +162,17 @@ private const val PAGER_YEARS = 10L
             IconButton(onClick = { onDay(if (week) day.plusWeeks(1) else day.plusMonths(1)) }, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.ChevronRight, if (week) t("Next week", "अगला सप्ताह") else t("Next month", "अगला महीना"), tint = Rust) }
         }
         Row(Modifier.fillMaxWidth()) {
-            (0 until 7).forEach { i -> Text(first.plusDays(i.toLong()).format(careDateFormat("EEE", hindi)), Modifier.weight(1f), textAlign = TextAlign.Center, fontSize = 13.sp, fontWeight = FontWeight.Medium, color = RustText, maxLines = 1) }
+            (0 until 7).forEach { i -> Text(first.plusDays(i.toLong()).format(weekdayFormat), Modifier.weight(1f), textAlign = TextAlign.Center, fontSize = 13.sp, fontWeight = FontWeight.Medium, color = RustText, maxLines = 1) }
         }
         val cell: @Composable (LocalDate, Boolean) -> Unit = { d, inMonth ->
-            val dayItems = remember(entries, d) { calendarItems(entries, d) }
+            val dayItems = remember(byDay, d) { calendarItems(byDay[d].orEmpty(), d) }
             val kinds = remember(dayItems) { CalendarKinds.order.filter { k -> dayItems.any { CalendarKinds.key(it) == k } } }
             val n = dayItems.size
             val selected = d == day; val isToday = d == today
-            val desc = d.format(careDateFormat("EEE d MMM", hindi)) + if (n > 0) ", " + (if (n == 1) t("1 entry", "1 प्रविष्टि") else t("$n entries", "$n प्रविष्टियाँ")) else ""
+            val desc = d.format(cellFormat) + if (n > 0) ", " + (if (n == 1) t("1 entry", "1 प्रविष्टि") else t("$n entries", "$n प्रविष्टियाँ")) else ""
             val fill by androidx.compose.animation.animateColorAsState(if (selected) Rust else Color.Transparent, SaharaMotion.tween(SaharaMotion.SELECT_MS))
             Box(Modifier.fillMaxWidth().padding(1.dp).heightIn(min = 48.dp).background(fill, RoundedCornerShape(12.dp))
-                .clickable(role = Role.Button) { onDay(d) }.semantics { contentDescription = desc }.testTag(if (inMonth) "calendar-day-$d" else "calendar-outday-$d")) {
+                .clickable(role = Role.Button) { if (d != day) tick(); onDay(d) }.semantics { contentDescription = desc }.testTag(if (inMonth) "calendar-day-$d" else "calendar-outday-$d")) {
                 Surface(Modifier.matchParentSize(), color = Color.Transparent, shape = RoundedCornerShape(12.dp), border = if (isToday) BorderStroke(2.dp, Rust) else null) {}
                 Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(d.dayOfMonth.toString(), fontWeight = if (selected || isToday) FontWeight.Bold else FontWeight.Normal, color = if (selected) Color.White else if (inMonth) DoctorCardInk else DoctorCardSub, fontSize = 15.sp)
@@ -178,8 +183,11 @@ private const val PAGER_YEARS = 10L
                 }
             }
         }
-        if (week) SaharaWeekPager(day, onDay, Modifier.fillMaxWidth()) { d -> cell(d, true) }
-        else SaharaMonthPager(day, onDay, Modifier.fillMaxWidth()) { d, inMonth -> cell(d, inMonth) }
+        // Month and week views crossfade (the height following once) instead of the whole card resizing on every change.
+        SaharaStateSwitch(week, Modifier.fillMaxWidth(), label = "calendar-view") { showWeek ->
+            if (showWeek) SaharaWeekPager(day, onDay, Modifier.fillMaxWidth()) { d -> cell(d, true) }
+            else SaharaMonthPager(day, onDay, Modifier.fillMaxWidth()) { d, inMonth -> cell(d, inMonth) }
+        }
         // Fixed legend
         HorizontalDivider(color = DoctorHairline)
         androidx.compose.foundation.layout.FlowRow(Modifier.fillMaxWidth().testTag("calendar-legend"), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {

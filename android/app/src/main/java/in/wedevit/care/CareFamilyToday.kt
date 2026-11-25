@@ -1,6 +1,7 @@
 package `in`.wedevit.care
 
 import android.content.Context
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -104,18 +105,23 @@ internal class CaregiverCheckStore(context: Context) {
     val today = LocalDate.now()
     var saved by remember(key) { mutableStateOf(store.load(key, today)) }
     var picking by rememberSaveable(key) { mutableStateOf(false) }
+    val haptic = rememberSaharaHaptic()
     Surface(shape = RoundedCornerShape(20.dp), color = SaharaLavender, modifier = Modifier.fillMaxWidth().saharaAppear().testTag("family-caregiver-check")) {
         Column(Modifier.saharaContentSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(shape = CircleShape, color = Paper) { SaharaLottie(SaharaLottieKind.Heart, Modifier.padding(4.dp).size(34.dp)) }
+                // A gently beating heart (24 Nov meeting): a few beats and a soft swell, then it rests; still when motion is off.
+                Surface(shape = CircleShape, color = Paper, modifier = Modifier.saharaBreathe(cycles = 4, amount = .06f)) { SaharaLottie(SaharaLottieKind.Heart, Modifier.padding(4.dp).size(34.dp), loop = false, iterations = 4) }
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
                     Text(t("How are you holding up?", "आप ख़ुद कैसे हैं?"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
                     val current = saved
                     val band = current?.let { CareFamilyRules.band(it, hindi) }.orEmpty()
-                    if (current != null) Surface(shape = RoundedCornerShape(50), color = Paper, modifier = Modifier.padding(top = 4.dp)) {
-                        Text(t("Today: $current/10 · $band", "आज: $current/10 · $band"), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
-                    }
+                    // The saved score fades in once chosen; a changed score rolls to its new value instead of jumping.
+                    AnimatedVisibility(current != null, enter = SaharaMotion.enter, exit = SaharaMotion.exit) { Surface(shape = RoundedCornerShape(50), color = Paper, modifier = Modifier.padding(top = 4.dp)) {
+                        current?.let { current -> SaharaAnimatedText(t("Today: $current/10 · $band", "आज: $current/10 · $band")) { line ->
+                            Text(line, Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+                        } }
+                    } }
                 }
             }
             // Picking and the saved score crossfade in place; the chosen circle fills as it is tapped.
@@ -128,7 +134,7 @@ internal class CaregiverCheckStore(context: Context) {
                         val fill = CareFamilyRules.colour(score)
                         val shown by animateColorAsState(if (chosen) fill else Paper, SaharaMotion.tween(SaharaMotion.SELECT_MS))
                         Box(Modifier.weight(1f).heightIn(min = 48.dp)
-                            .clickable(role = Role.RadioButton) { store.save(key, today, score); saved = score; picking = false }
+                            .clickable(role = Role.RadioButton) { haptic(); store.save(key, today, score); saved = score; picking = false }
                             .semantics { contentDescription = "$score/10"; selected = chosen }.testTag("family-check-$score"), contentAlignment = Alignment.Center) {
                             Box(Modifier.fillMaxWidth().aspectRatio(1f).saharaSelectBounce(chosen, .12f).clip(CircleShape).background(shown).border(2.dp, fill, CircleShape), contentAlignment = Alignment.Center) {
                                 Text("$score", fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1, softWrap = false, color = if (chosen) Color.White else DoctorCardInk)

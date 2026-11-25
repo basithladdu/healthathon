@@ -56,9 +56,12 @@ object MedicineHistoryRules {
 
 internal fun medicineInstant(at: Long) = Instant.ofEpochMilli(at).toString()
 
-/** The dots on one day of a medicine's history calendar: green all taken, red something not taken, blue a side effect noted (two can show). */
-data class MedicineDayMarks(val allTaken: Boolean = false, val notTaken: Boolean = false, val sideEffect: Boolean = false) {
-    val empty: Boolean get() = !allTaken && !notTaken && !sideEffect
+/**
+ * The dots on one day of a medicine's history calendar: green all taken, red something not taken, blue a side effect noted (two can show).
+ * For an as-needed medicine (morphine "SOS"), [asNeededTaken] is how many doses were taken that day: one green dot each (25 Nov).
+ */
+data class MedicineDayMarks(val allTaken: Boolean = false, val notTaken: Boolean = false, val sideEffect: Boolean = false, val asNeededTaken: Int = 0) {
+    val empty: Boolean get() = !allTaken && !notTaken && !sideEffect && asNeededTaken == 0
 }
 
 /**
@@ -89,6 +92,11 @@ object MedicineHistoryCalendar {
     fun marks(item: CareItem, doses: List<MedicineDose>, events: List<MedicineIntakeEvent>, sideEffectTimes: List<Long>, day: LocalDate, zone: java.time.ZoneId, today: LocalDate): MedicineDayMarks {
         val side = sideEffectTimes.any { Instant.ofEpochMilli(it).atZone(zone).toLocalDate() == day }
         if (day > today) return MedicineDayMarks(sideEffect = side)
+        // As needed: no dose is ever "missed"; each dose taken that day is a dot (24 Nov: "morphine as needed" on the calendar too).
+        if (MedicineDoses.isAsNeededMedicine(item)) {
+            val taken = MedicineDoses.asNeededTimes(item.id, events, day, zone).size
+            return MedicineDayMarks(allTaken = taken > 0, sideEffect = side, asNeededTaken = taken)
+        }
         val mine = events.filter { it.medicineId == item.id && it.outcome in answers }
         // The whole-day tick on the medicine only ever means today.
         val ticked = if (day == today) item else item.copy(doneOn = "")

@@ -149,4 +149,134 @@ object SimpleModeRules {
             else careTr(lang, "Your next visit:", "आपकी अगली मुलाक़ात:") + " $visit."
         return "$medicines\n$next"
     }
+
+    // ------------------------------------------------------------ Home
+
+    /** The patient home: exactly these four big buttons, in reading order (two rows of two), and nothing else. */
+    enum class HomeButton { FEEL, MEDICINES, READ, CALL }
+
+    // ------------------------------------------------------------ Faces scale
+
+    /**
+     * The faces scale next to the verbal words (point 7 of the clinical team's note): a smiling face for none down to a
+     * sad face for the worst, drawn by [CareMoodFace] (1 smiling, 0 sad). Clinicians keep the 0-10 number.
+     */
+    fun faceScore(word: PainWord): Float = when (word) { PainWord.NONE -> 1f; PainWord.A_LITTLE -> .67f; PainWord.A_LOT -> .33f; PainWord.WORST -> 0f }
+
+    /** The face for a 0-10 number written by a clinician or carer: the number goes to its word first. */
+    fun faceForRating(rating: Int): Float = faceScore(fromRating(rating))
+
+    // ------------------------------------------------------------ Messages to read aloud
+
+    /** Who a message to read aloud is from. Stored by [key] (English); the patient hears "your doctor", "your nurse"… */
+    enum class MessageFrom(val key: String, val english: String, val hindi: String) {
+        DOCTOR("doctor", "Doctor", "डॉक्टर"),
+        NURSE("nurse", "Nurse", "नर्स"),
+        CARE_TEAM("care-team", "Care team", "देखभाल टीम"),
+        FAMILY("family", "Family", "परिवार");
+        companion object { fun of(key: String): MessageFrom? = entries.firstOrNull { it.key == key.trim().lowercase() } }
+    }
+
+    data class ReadAloudMessage(val itemId: String, val from: MessageFrom, val name: String, val text: String, val created: Long)
+
+    /**
+     * A message for "Read to me" is an ordinary journal entry (the kinds the server takes are fixed) with this title and a
+     * first line "From: nurse · Priya", then the words. It reads as plain text in the full app's journal, so the family and
+     * the care team see the same message.
+     */
+    const val MESSAGE_TITLE = "Message to read aloud"
+    const val MESSAGE_MAX = 1500
+    private const val FROM = "From: "
+
+    fun messageDetail(from: MessageFrom, name: String, text: String): String {
+        val who = name.replace('\n', ' ').trim().take(60)
+        return FROM + from.key + (if (who.isEmpty()) "" else " · $who") + "\n\n" + text.trim()
+    }
+
+    /** The message in [item], or null when the item is not a readable message to read aloud. */
+    fun message(item: CareItem): ReadAloudMessage? {
+        if (item.kind != "journal" || item.title != MESSAGE_TITLE || !item.detail.startsWith(FROM)) return null
+        val head = item.detail.lineSequence().first().removePrefix(FROM)
+        val from = MessageFrom.of(head.substringBefore(" · ")) ?: return null
+        val name = if (" · " in head) head.substringAfter(" · ").trim() else ""
+        val text = item.detail.substringAfter('\n', "").trim()
+        if (text.isEmpty()) return null
+        return ReadAloudMessage(item.id, from, name, text, item.created)
+    }
+
+    /** The newest message to read aloud for this person (newest saved first; the id breaks a tie). */
+    fun latestMessage(items: List<CareItem>, personId: String): ReadAloudMessage? = items.asSequence()
+        .filter { it.personId == personId }.mapNotNull(::message)
+        .maxWithOrNull(compareBy<ReadAloudMessage> { it.created }.thenBy { it.itemId })
+
+    /** Why a message cannot be saved yet, or null when it can. */
+    fun messageError(text: String, lang: CareLang): String? = when {
+        text.isBlank() -> careTr(lang, "Write or speak the message first.", "पहले संदेश लिखें या बोलें।")
+        text.trim().length > MESSAGE_MAX -> careTr(lang, "Please make the message shorter.", "कृपया संदेश छोटा करें।")
+        else -> null
+    }
+
+    /** The first words "Read to me" says before the message: who it is from. */
+    fun messageLead(from: MessageFrom, lang: CareLang): String = when (from) {
+        MessageFrom.DOCTOR -> careTr(lang, "Here is the message from your doctor", "यह आपके डॉक्टर का संदेश है")
+        MessageFrom.NURSE -> careTr(lang, "Here is the message from your nurse", "यह आपकी नर्स का संदेश है")
+        MessageFrom.CARE_TEAM -> careTr(lang, "Here is the message from your care team", "यह आपकी देखभाल टीम का संदेश है")
+        MessageFrom.FAMILY -> careTr(lang, "Here is the message from your family", "यह आपके परिवार का संदेश है")
+    }
+
+    /** What "Read to me" says: who the message is from, then the message; or that there is none yet. */
+    fun readPrompt(message: ReadAloudMessage?, lang: CareLang): String =
+        if (message == null) careTr(lang, "There is no message from your doctor or nurse yet.", "अभी आपके डॉक्टर या नर्स का कोई संदेश नहीं है।")
+        else messageLead(message.from, lang) + ".\n" + message.text
+
+    // ------------------------------------------------------------ Voice notes
+
+    /** A voice note is at most this long, so it stays small on the phone and quick for the nurse to hear. */
+    const val VOICE_MAX_SECONDS = 180
+
+    /** "0:42", "2:05": minutes and seconds for the recording timer and the saved note's title. */
+    fun clock(seconds: Int): String = seconds.coerceAtLeast(0).let { s -> String.format(java.util.Locale.ROOT, "%d:%02d", s / 60, s % 60) }
+
+    /** The journal title of a patient's voice note (English on the record, like every saved title). */
+    fun voiceNoteTitle(seconds: Int): String = "Voice note from the patient (${clock(seconds)})"
+
+    const val VOICE_NOTE_DETAIL = "Recorded in Simple Mode. The patient's own voice is kept as audio on this phone: open this note in Sahara to listen."
+
+    /** True when [item] is a Simple Mode voice note (its audio file is named by the item's id). */
+    fun isVoiceNote(item: CareItem): Boolean = item.kind == "journal" && item.title.startsWith("Voice note from the patient (") && item.detail == VOICE_NOTE_DETAIL
+
+    // ------------------------------------------------------------ Large text and layout
+
+    /**
+     * The smallest size (sp) a Simple Mode label steps down to so it fits whole: 18sp at the normal font size. With a
+     * larger system font the floor stays at what 18sp looks like normally (18 / fontScale sp), so a long word (Tamil
+     * "முன்பக்கம்", Malayalam "വിളിക്കുക") shrinks to fit instead of being cut off. Never above 18.
+     */
+    fun labelFloor(fontScale: Float): Float = 18f / fontScale.coerceAtLeast(1f)
+
+    /** At this system font scale and above, a Simple button's picture goes above its words, so the words get the full width. */
+    fun stackIcon(fontScale: Float): Boolean = fontScale >= 1.3f
+
+    /** The smallest body picture on "Where does it hurt?" (dp): big enough to tap a part; below it the screen scrolls instead. */
+    const val MIN_BODY_DP = 240
+
+    /** Height for the body picture: what the other blocks leave of [viewport], never less than [min] (all in the same unit). */
+    fun fillHeight(viewport: Int, used: Int, min: Int): Int = maxOf(min, viewport - used)
+
+    /**
+     * What "Where does it hurt?" says (and says again). Once a part is marked and the patient may record, it adds how to
+     * say more in their own voice, since the recorder appears under the body.
+     */
+    fun wherePrompt(marked: Boolean, canRecord: Boolean, lang: CareLang): String {
+        val ask = careTr(lang, "Where does it hurt? Touch the place on the body.", "दर्द कहाँ है? शरीर पर उस जगह को छुएँ।")
+        return if (marked && canRecord) ask + " " + careTr(lang, "To say more in your own voice, tap Record your voice.", "अपनी आवाज़ में और बताने के लिए 'अपनी आवाज़ रिकॉर्ड करें' छुएँ।") else ask
+    }
+
+    /** A spoken body-part name or replay is held back while the patient's voice is being recorded, so Sahara's voice is not recorded. */
+    fun speakNow(recording: Boolean): Boolean = !recording
+
+    // ------------------------------------------------------------ Call photos
+
+    /** A contact or person id that is safe as a file name (contact photos are files named by it). */
+    fun safeFileId(id: String): Boolean = id.length in 1..80 && id.all { it.isLetterOrDigit() || it == '-' || it == '_' }
 }

@@ -4,7 +4,6 @@ package `in`.wedevit.care
 
 import android.content.Intent
 import android.net.Uri
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
@@ -256,7 +255,7 @@ private const val TELE_MANAS = "14416"
         direction = { from, to -> if (depth(to) > depth(from)) SaharaMotion.Direction.Forward else SaharaMotion.Direction.Back }) { shown ->
         when {
             shown == HOME -> {
-                BackHandler(onBack = onBack)
+                SaharaBackHandler(onBack = onBack)
                 CommunityHomePage(signedIn = signedIn, home = shownHome, myName = myName, error = if (local) null else homeError, loading = loading && !local, waiting = if (local) 0 else pending.size,
                     onBack = onBack, onAccount = onAccount, onRetry = ::loadHome, onName = { editingName = true },
                     onSaved = { route = SAVED_ROUTE; if (!local) loadFeed(CommunityRules.SAVED) },
@@ -265,7 +264,7 @@ private const val TELE_MANAS = "14416"
             shown == SAVED_ROUTE || shown.startsWith("group:") -> {
                 val feedId = if (shown == SAVED_ROUTE) CommunityRules.SAVED else shown.removePrefix("group:")
                 fun leaveGroup() { route = HOME; if (!local) loadHome() }
-                BackHandler { leaveGroup() }
+                SaharaBackHandler { leaveGroup() }
                 val group = shownHome?.groups?.firstOrNull { it.id == feedId }
                 val lang = careLanguage()
                 val localFeed = if (local) remember(localState, feedId, lang) { CommunityLocal.feed(feedId, localState, anchor, builtIn = practice) { careTr(lang, it.en, it.hi) } } else null
@@ -304,7 +303,7 @@ private const val TELE_MANAS = "14416"
             }
             else -> {
                 val groupId = shown.removePrefix("write:")
-                BackHandler { route = "group:$groupId" }
+                SaharaBackHandler { route = "group:$groupId" }
                 CommunityWritePage(groups = shownHome?.groups.orEmpty(), groupId = groupId, needsName = myName == null, name = nameDraft, onName = { nameDraft = it.take(CommunityRules.NAME_MAX + 10) },
                     text = draft, onText = { draft = it.take(CommunityRules.POST_MAX + 50) }, sending = sending,
                     onGroup = { route = "write:$it" }, onBack = { route = "group:$groupId" },

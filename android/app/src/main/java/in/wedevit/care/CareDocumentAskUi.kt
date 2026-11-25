@@ -2,7 +2,6 @@
 
 package `in`.wedevit.care
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
@@ -56,8 +55,9 @@ import kotlinx.coroutines.withContext
     var question by rememberSaveable(selected) { mutableStateOf("") }
     var lookIn by rememberSaveable(selected) { mutableStateOf(DocumentQuestionRules.SCOPE_ALL) }
     val searchAll = lookIn != DocumentQuestionRules.SCOPE_PICK
-    val scoped = DocumentQuestionRules.inScope(reports, lookIn, folders) { it.id }
-    val counts = DocumentFolderRules.counts(reports.map { folders[it.id]?.folder ?: DocumentFolderRules.OTHER })
+    val scoped = remember(reports, lookIn, folders) { DocumentQuestionRules.inScope(reports, lookIn, folders) { it.id } }
+    val counts = remember(reports, folders) { DocumentFolderRules.counts(reports.map { folders[it.id]?.folder ?: DocumentFolderRules.OTHER }) }
+    val tick = rememberSaharaTick()
     var consent by remember(chosen, question, lookIn) { mutableStateOf(false) }
     var answer by remember(selected) { mutableStateOf<DocumentAnswer?>(null) }
     var local by remember(selected) { mutableStateOf<LocalDocumentAnswer?>(null) }
@@ -74,7 +74,7 @@ import kotlinx.coroutines.withContext
     val person = remember { selected }
     LaunchedEffect(selected) { if (selected != person) { job?.cancel(); onClose() } }
     DisposableEffect(Unit) { onDispose { job?.cancel() } }
-    BackHandler { job?.cancel(); onClose() }
+    SaharaBackHandler { job?.cancel(); onClose() }
     val service = capabilities?.takeIf { it.askReady }
 
     /** Always finds the matching lines on this phone first. Only when [online] and the person agreed, the question goes out too; if that fails, the phone's lines are the answer. */
@@ -122,23 +122,23 @@ import kotlinx.coroutines.withContext
     fun clear() { answer = null; local = null; askedText = "" }
 
     LazyColumn(Modifier.fillMaxSize().imePadding().testTag("document-ask"), contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { job?.cancel(); onClose() }, modifier = Modifier.size(48.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back to documents", "कागज़ात पर वापस")) }
+        item(key = "ask-title", contentType = "title") { Row(verticalAlignment = Alignment.CenterVertically) {
+            SaharaBackButton({ job?.cancel(); onClose() }, tag = "document-ask-back")
             Heading(t("Ask your documents", "अपने कागज़ों से पूछें"), 26)
         } }
-        if (checked && service == null) item { DocumentAskPill(t("Offline", "ऑफ़लाइन"), Mint, Modifier.testTag("document-ask-off")) }
-        if (!checked) item { SaharaProgressBar(null) }
+        if (checked && service == null) item(key = "ask-offline", contentType = "pill") { DocumentAskPill(t("Offline", "ऑफ़लाइन"), Mint, Modifier.animateItem().testTag("document-ask-off")) }
+        if (!checked) item(key = "ask-checking", contentType = "progress") { Box(Modifier.animateItem()) { SaharaProgressBar(null) } }
         else {
-            item { OutlinedTextField(question, { question = it.take(DocumentQuestionRules.MAX_QUESTION); clear() }, label = { Text(t("Your question", "आपका सवाल")) }, minLines = 2, enabled = job == null, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag("document-ask-question")) }
-            if (reports.isNotEmpty()) item { FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.testTag("document-ask-suggestions")) {
+            item(key = "ask-question", contentType = "question") { OutlinedTextField(question, { question = it.take(DocumentQuestionRules.MAX_QUESTION); clear() }, label = { Text(t("Your question", "आपका सवाल")) }, minLines = 2, enabled = job == null, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().animateItem().testTag("document-ask-question")) }
+            if (reports.isNotEmpty()) item(key = "ask-suggestions", contentType = "suggestions") { FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.animateItem().testTag("document-ask-suggestions")) {
                 suggestions.forEach { (where, text) ->
-                    SuggestionChip(onClick = { question = text; lookIn = where; clear() }, enabled = job == null, label = { Text(text, fontSize = 14.sp) }, shape = RoundedCornerShape(50),
+                    SuggestionChip(onClick = { tick(); question = text; lookIn = where; clear() }, enabled = job == null, label = { Text(text, fontSize = 14.sp) }, shape = RoundedCornerShape(50),
                         colors = SuggestionChipDefaults.suggestionChipColors(containerColor = Paper, labelColor = DoctorCardInk),
                         modifier = Modifier.heightIn(min = 44.dp).testTag("document-ask-suggest-$where"))
                 }
             } }
-            item { Text(t("Look in", "कहाँ देखें"), Modifier.padding(top = 4.dp), style = MaterialTheme.typography.labelLarge, color = DoctorCardSub) }
-            item { FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            item(key = "ask-look-in", contentType = "label") { Text(t("Look in", "कहाँ देखें"), Modifier.animateItem().padding(top = 4.dp), style = MaterialTheme.typography.labelLarge, color = DoctorCardSub) }
+            item(key = "ask-scopes", contentType = "scopes") { FlowRow(Modifier.animateItem(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 val scopes = listOf(DocumentQuestionRules.SCOPE_ALL) + DocumentFolderRules.folders.filter { (counts[it] ?: 0) > 0 } + DocumentQuestionRules.SCOPE_PICK
                 scopes.forEach { option ->
                     val label = when (option) {
@@ -146,38 +146,38 @@ import kotlinx.coroutines.withContext
                         DocumentQuestionRules.SCOPE_PICK -> t("Choose", "चुनें")
                         else -> DocumentFolderRules.label(option, t) + " · ${counts[option] ?: 0}"
                     }
-                    FilterChip(selected = lookIn == option, onClick = { lookIn = option; clear() }, enabled = job == null, label = { Text(label, fontSize = 14.sp) }, shape = RoundedCornerShape(50),
-                        colors = FilterChipDefaults.filterChipColors(containerColor = Paper, selectedContainerColor = Mint, selectedLabelColor = DoctorCardInk),
+                    RecordsChip(selected = lookIn == option, onClick = { lookIn = option; clear() }, enabled = job == null, label = { Text(label, fontSize = 14.sp) }, shape = RoundedCornerShape(50),
+                        containerColor = Paper, selectedContainerColor = Mint, selectedLabelColor = DoctorCardInk,
                         modifier = Modifier.heightIn(min = 44.dp).testTag("document-ask-scope-$option"))
                 }
             } }
-            if (reports.isEmpty()) item { Text(t("Add a report first.", "पहले कोई रिपोर्ट जोड़ें।"), fontSize = 16.sp, color = DoctorCardSub) }
-            if (!searchAll) item { Text(t("Choose documents (up to ${DocumentQuestionRules.MAX_DOCUMENTS})", "कागज़ चुनें (${DocumentQuestionRules.MAX_DOCUMENTS} तक)"), style = MaterialTheme.typography.labelLarge, color = DoctorCardSub) }
-            if (!searchAll) items(reports, key = { it.id }) { report ->
+            if (reports.isEmpty()) item(key = "ask-no-reports", contentType = "label") { Text(t("Add a report first.", "पहले कोई रिपोर्ट जोड़ें।"), Modifier.animateItem(), fontSize = 16.sp, color = DoctorCardSub) }
+            if (!searchAll) item(key = "ask-choose-title", contentType = "label") { Text(t("Choose documents (up to ${DocumentQuestionRules.MAX_DOCUMENTS})", "कागज़ चुनें (${DocumentQuestionRules.MAX_DOCUMENTS} तक)"), Modifier.animateItem(), style = MaterialTheme.typography.labelLarge, color = DoctorCardSub) }
+            if (!searchAll) items(reports, key = { it.id }, contentType = { "pick" }) { report ->
                 val on = report.id in chosen
-                Row(Modifier.fillMaxWidth().toggleable(on, enabled = job == null && (on || chosen.size < DocumentQuestionRules.MAX_DOCUMENTS), role = Role.Checkbox) { chosen = if (it) chosen + report.id else chosen - report.id; clear() }
+                Row(Modifier.fillMaxWidth().animateItem().toggleable(on, enabled = job == null && (on || chosen.size < DocumentQuestionRules.MAX_DOCUMENTS), role = Role.Checkbox) { tick(); chosen = if (it) chosen + report.id else chosen - report.id; clear() }
                     .heightIn(min = 48.dp).padding(vertical = 4.dp).testTag("document-ask-pick-${report.id}"), verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(checked = on, onCheckedChange = null, modifier = Modifier.minimumInteractiveComponentSize())
                     Text(report.name, Modifier.weight(1f), color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     Spacer(Modifier.width(8.dp)); DocumentAskTypeBadge(folders[report.id]?.folder)
                 }
             }
-            if (service != null) item { val count = chosen.size; val sendWhat = if (searchAll) t("the matching lines from my documents", "मेरे कागज़ों की मिलती पंक्तियाँ") else t("the text of these $count documents", "इन $count कागज़ों की लिखाई"); val sendTo = service.provider; CheckLine(consent, { consent = it }, t("Send my question and $sendWhat to $sendTo", "मेरा सवाल और $sendWhat $sendTo को भेजें")) }
-            item { val ready = (if (searchAll) scoped.isNotEmpty() else chosen.isNotEmpty()) && question.isNotBlank() && job == null
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (service != null) item(key = "ask-consent", contentType = "consent") { val count = chosen.size; val sendWhat = if (searchAll) t("the matching lines from my documents", "मेरे कागज़ों की मिलती पंक्तियाँ") else t("the text of these $count documents", "इन $count कागज़ों की लिखाई"); val sendTo = service.provider; CheckLine(consent, { consent = it }, t("Send my question and $sendWhat to $sendTo", "मेरा सवाल और $sendWhat $sendTo को भेजें")) }
+            item(key = "ask-actions", contentType = "actions") { val ready = (if (searchAll) scoped.isNotEmpty() else chosen.isNotEmpty()) && question.isNotBlank() && job == null
+                FlowRow(Modifier.animateItem(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (service != null) Button(onClick = { ask(true) }, enabled = consent && ready, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.heightIn(min = 48.dp).testTag("document-ask-send")) { Icon(Icons.AutoMirrored.Filled.Send, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Ask", "पूछें"), fontWeight = FontWeight.SemiBold) }
                 if (service == null) Button(onClick = { ask(false) }, enabled = ready, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.heightIn(min = 48.dp).testTag("document-ask-local")) { Icon(Icons.Default.Search, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Search", "खोजें")) }
                 else OutlinedButton(onClick = { ask(false) }, enabled = ready, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("document-ask-local")) { Text(t("Search", "खोजें")) }
-                if (job != null) TextButton(onClick = { job?.cancel() }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Stop", "रोकें")) }
+                AnimatedVisibility(job != null, enter = SaharaMotion.enter, exit = SaharaMotion.exit) { TextButton(onClick = { job?.cancel() }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Stop", "रोकें")) } }
             } }
-            if (progress.isNotBlank()) item { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { SaharaProgressBar(null); Text(progress, fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.announce()) } }
+            if (progress.isNotBlank()) item(key = "ask-progress", contentType = "progress") { Column(Modifier.animateItem(), verticalArrangement = Arrangement.spacedBy(8.dp)) { SaharaProgressBar(null); Text(progress, fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.announce()) } }
         }
-        if (message.isNotBlank()) item { Row(verticalAlignment = Alignment.CenterVertically) {
+        if (message.isNotBlank()) item(key = "ask-message", contentType = "message") { Row(Modifier.animateItem(), verticalAlignment = Alignment.CenterVertically) {
             Text(message, Modifier.weight(1f).announce(), color = MaterialTheme.colorScheme.error, fontSize = 14.sp)
             if (job == null && question.isNotBlank() && (if (searchAll) scoped.isNotEmpty() else chosen.isNotEmpty())) TextButton(onClick = { ask(false) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Try again", "फिर कोशिश करें"), color = RustText, fontWeight = FontWeight.SemiBold) }
         } }
         // The question just asked, as the person's own message, so the answer reads like a reply.
-        if (askedText.isNotBlank() && (answer != null || local != null)) item { DocumentAskBubble(mine = true) { Text(askedText, color = DoctorCardInk, fontSize = 16.sp) } }
+        if (askedText.isNotBlank() && (answer != null || local != null)) item(key = "ask-mine", contentType = "bubble") { DocumentAskBubble(mine = true) { Text(askedText, color = DoctorCardInk, fontSize = 16.sp) } }
         answer?.let { result ->
             if (!result.found) item { DocumentAskBubble(mine = false) { Text(t("Not found in the chosen documents", "चुने गए कागज़ों में नहीं मिला"), fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.testTag("document-ask-not-found")) } }
             else {
@@ -197,7 +197,7 @@ import kotlinx.coroutines.withContext
                 }
             }
         }
-        if (notice.isNotBlank()) item { Text(notice, fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.announce()) }
+        if (notice.isNotBlank()) item(key = "ask-notice", contentType = "notice") { Text(notice, fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.animateItem().announce()) }
         local?.let { found ->
             val online = answer?.found == true
             if (!found.found) { if (answer == null) item { DocumentAskBubble(mine = false) {

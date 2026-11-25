@@ -1,6 +1,5 @@
 package `in`.wedevit.care
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.animation.AnimatedContent
@@ -272,7 +271,7 @@ internal fun doctorLabRange(data: CareEntry): Pair<Double?, Double?> {
     var full by rememberSaveable(personId) { mutableStateOf(false) }
     var rangeKey by rememberSaveable(personId) { mutableStateOf(DoctorTrendRange.ALL.name) }
     var open by rememberSaveable(personId) { mutableStateOf("") }
-    BackHandler(full) { full = false }
+    androidx.activity.compose.BackHandler(full) { full = false }
     if (full) {
         Column(Modifier.fillMaxSize()) {
             TextButton(onClick = { full = false }, modifier = Modifier.padding(horizontal = 12.dp).heightIn(min = 48.dp).testTag("doctor-labs-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null); Spacer(Modifier.width(6.dp)); Text(t("Lab trends", "जाँच के रुझान")) }

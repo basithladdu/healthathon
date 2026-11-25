@@ -1,9 +1,6 @@
 package `in`.wedevit.care
 
 import android.content.Context
-import android.view.View
-import android.widget.TimePicker
-import android.widget.DatePicker
 import android.graphics.Bitmap
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.compose.runtime.key
@@ -14,15 +11,8 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.closeSoftKeyboard
 import androidx.compose.ui.semantics.SemanticsActions
-import androidx.test.espresso.UiController
-import androidx.test.espresso.ViewAction
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom
-import androidx.test.espresso.matcher.ViewMatchers.withId
-import org.hamcrest.Matcher
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
@@ -132,12 +122,7 @@ class DoctorDemoFlowTest {
             assertEquals("Scheduled", booked.status)
             visitAction(booked.id, "Reschedule")
             ui.onNodeWithTag("demo-visit-time").performScrollTo().performClick()
-            onView(isAssignableFrom(TimePicker::class.java)).perform(object : ViewAction {
-                override fun getConstraints(): Matcher<View> = isAssignableFrom(TimePicker::class.java)
-                override fun getDescription() = "Set fictional demo visit time to 11 AM"
-                override fun perform(controller: UiController, view: View) { (view as TimePicker).apply { hour = 11; minute = 0 }; controller.loopMainThreadUntilIdle() }
-            })
-            onView(withId(android.R.id.button1)).perform(click())
+            pickClock(hourIndex = 10, minuteIndex = 0, ampmIndex = 0) // 11:00 AM
             ui.onNodeWithTag("demo-appointment-note").performScrollTo().performTextReplacement("Fictional rescheduled visit")
             saveVisit()
             ui.waitForIdle()
@@ -151,19 +136,9 @@ class DoctorDemoFlowTest {
             ui.onNodeWithTag("demo-patient-detail").performScrollToNode(hasTestTag("demo-schedule-visit"))
             ui.onNodeWithTag("demo-schedule-visit").performClick()
             ui.onNodeWithTag("demo-visit-date").performScrollTo().performClick()
-            onView(isAssignableFrom(DatePicker::class.java)).perform(object : ViewAction {
-                override fun getConstraints(): Matcher<View> = isAssignableFrom(DatePicker::class.java)
-                override fun getDescription() = "Set overlapping fictional demo date"
-                override fun perform(controller: UiController, view: View) { (view as DatePicker).updateDate(tomorrow.year, tomorrow.monthValue - 1, tomorrow.dayOfMonth); controller.loopMainThreadUntilIdle() }
-            })
-            onView(withId(android.R.id.button1)).perform(click())
+            pickDate(tomorrow)
             ui.onNodeWithTag("demo-visit-time").performScrollTo().performClick()
-            onView(isAssignableFrom(TimePicker::class.java)).perform(object : ViewAction {
-                override fun getConstraints(): Matcher<View> = isAssignableFrom(TimePicker::class.java)
-                override fun getDescription() = "Set overlapping fictional demo time"
-                override fun perform(controller: UiController, view: View) { (view as TimePicker).apply { hour = 11; minute = 0 }; controller.loopMainThreadUntilIdle() }
-            })
-            onView(withId(android.R.id.button1)).perform(click())
+            pickClock(hourIndex = 10, minuteIndex = 0, ampmIndex = 0) // 11:00 AM, overlapping the rescheduled visit
             saveVisit()
             ui.onNodeWithTag("demo-appointment-error").assertTextEquals("This overlaps another appointment.")
             ui.onNodeWithText("Close", useUnmergedTree = true).performScrollTo().performClick()
@@ -195,6 +170,42 @@ class DoctorDemoFlowTest {
         }
         ui.onNodeWithTag("demo-patient-hub").performScrollToNode(hasTestTag("demo-record-$section"))
         ui.onNodeWithTag("demo-record-$section").performClick()
+    }
+    /**
+     * [CareClockDialog]: three scroll wheels (tags care-clock-hour / -minute / -ampm, rows tagged "<wheel>-<index>"). Scrolling a wheel to
+     * an index puts that row in the middle, which is the chosen value (hour index 0 = 1 o'clock, minute index = minutes / 5, AM = 0, PM = 1).
+     */
+    private fun pickClock(hourIndex: Int, minuteIndex: Int, ampmIndex: Int) {
+        ui.onNodeWithTag("care-clock-dialog").assertExists()
+        listOf("care-clock-hour" to hourIndex, "care-clock-minute" to minuteIndex, "care-clock-ampm" to ampmIndex).forEach { (wheel, index) ->
+            ui.onNode(hasScrollToIndexAction() and hasAnyAncestor(hasTestTag(wheel))).performScrollToIndex(index)
+            ui.waitForIdle()
+            ui.onNodeWithTag("$wheel-$index").assertExists()
+        }
+        ui.onNodeWithTag("care-clock-ok").performClick()
+        ui.waitForIdle()
+        ui.onNodeWithTag("care-clock-dialog").assertDoesNotExist()
+    }
+
+    /**
+     * [CareDatePickerDialog]: the Material 3 date picker (calendar only, no keyboard toggle), then OK (care-date-ok). A day cell's text is
+     * the full date written the way Material writes it (skeleton "yMMMMEEEEd", the device locale); today's cell starts with
+     * "Today, ", so the match is a substring. Moves one month on if [day] is not in the month shown.
+     */
+    private fun pickDate(day: LocalDate) {
+        val locale = InstrumentationRegistry.getInstrumentation().targetContext.resources.configuration.locales[0]
+        // As Material's CalendarModelImpl formats it: the locale's best pattern for the skeleton, through java.time.
+        val pattern = android.text.format.DateFormat.getBestDateTimePattern(locale, "yMMMMEEEEd")
+        val label = java.time.format.DateTimeFormatter.ofPattern(pattern, locale).withDecimalStyle(java.time.format.DecimalStyle.of(locale)).format(day)
+        val cell = hasText(label, substring = true) and hasClickAction()
+        if (ui.onAllNodes(cell).fetchSemanticsNodes().isEmpty()) {
+            ui.onNode(hasContentDescription(if (day.isBefore(LocalDate.now())) "Change to previous month" else "Change to next month")).performClick()
+            ui.waitForIdle()
+        }
+        ui.onNode(cell).performClick()
+        ui.onNodeWithTag("care-date-ok").assertIsEnabled().performClick()
+        ui.waitForIdle()
+        ui.onNodeWithTag("care-date-ok").assertDoesNotExist()
     }
     private fun saveVisit() {
         closeSoftKeyboard()

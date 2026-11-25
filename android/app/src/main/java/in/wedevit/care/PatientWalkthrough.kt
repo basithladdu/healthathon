@@ -2,7 +2,6 @@ package `in`.wedevit.care
 
 import android.app.Application
 import android.content.Context
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -144,8 +143,12 @@ object PatientWalkthrough {
         else -> "open"
     }
     // Back while the walkthrough is still opening, failed or removed leaves it; back while leaving waits.
-    BackHandler(state != "open") { leave() }
-    SaharaScreenHost(state, Modifier.fillMaxSize().background(Cream), label = "Patient walkthrough") { shown -> when (shown) {
+    // Waiting while leaving keeps this screen, so a plain BackHandler (no preview).
+    androidx.activity.compose.BackHandler(state == "closing") { }
+    SaharaScreenHost(state, Modifier.fillMaxSize().background(Cream), label = "Patient walkthrough") { shown ->
+        // Inside the host whose target leave() changes ("closing"), so the swipe previews this screen leaving.
+        SaharaBackHandler(state != "open" && state != "closing") { leave() }
+        when (shown) {
         "closing" -> SaharaLoading(t("Leaving demo…", "डेमो से बाहर जा रहे हैं…"))
         "error" -> Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.Center) { SaharaEmpty(error ?: "", icon = Icons.Default.ErrorOutline, actionLabel = t("Retry", "फिर कोशिश करें"), onAction = { error = null; attempt++ }, secondaryLabel = t("Leave demo", "डेमो से बाहर जाएँ"), onSecondary = ::leave) }
         "removed" -> Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.Center) { SaharaEmpty(t("Demo record removed.", "डेमो रिकॉर्ड हटा दिया गया।"), secondaryLabel = t("Leave demo", "डेमो से बाहर जाएँ"), onSecondary = ::leave) }

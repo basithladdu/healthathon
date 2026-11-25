@@ -120,6 +120,7 @@ internal fun carePhoneCountry(code: String, t: (String, String) -> String): Stri
     LaunchedEffect(value) { if (value.isNotBlank() && parts.code != code) code = parts.code }
     val number = if (value.isBlank()) "" else parts.number
     var open by remember { mutableStateOf(false) }
+    val tick = rememberSaharaTick()
     val height = if (large) 64.dp else 56.dp
     val country = carePhoneCountry(code, t)
     Row(modifier, verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -142,7 +143,7 @@ internal fun carePhoneCountry(code: String, t: (String, String) -> String): Stri
                             Text(carePhoneCountry(option, t), color = SaharaColors.InkSub)
                         }
                     }, trailingIcon = if (on) { { Icon(Icons.Default.Check, t("Selected", "चुना हुआ"), tint = RustText) } } else null,
-                        onClick = { open = false; code = option; if (number.isNotEmpty()) onValueChange(CarePhone.combine(option, number)) },
+                        onClick = { tick(); open = false; code = option; if (number.isNotEmpty()) onValueChange(CarePhone.combine(option, number)) },
                         modifier = Modifier.heightIn(min = 48.dp).testTag("$tag-code-" + option.drop(1)))
                 }
             }

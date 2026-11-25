@@ -96,6 +96,14 @@ internal object SimpleModeStore {
         if (personId.isBlank()) return
         preferences(context, namespace).edit().putBoolean("on:$personId", on).apply(); revision.value++
     }
+    /** True once someone chose on or off in More (or in the age notice); false while only the age default decides. */
+    fun hasChoice(context: Context, namespace: String, personId: String): Boolean = personId.isNotBlank() && preferences(context, namespace).contains("on:$personId")
+    /** The one-time "We made Sahara simpler for you" notice, shown when Simple Mode was switched on by age. */
+    fun ageNoticeShown(context: Context, namespace: String, personId: String): Boolean = personId.isBlank() || preferences(context, namespace).getBoolean("age-notice:$personId", false)
+    fun setAgeNoticeShown(context: Context, namespace: String, personId: String) {
+        if (personId.isBlank()) return
+        preferences(context, namespace).edit().putBoolean("age-notice:$personId", true).apply(); revision.value++
+    }
     fun isMuted(context: Context, namespace: String, personId: String): Boolean = personId.isNotBlank() && preferences(context, namespace).getBoolean("mute:$personId", false)
     fun setMuted(context: Context, namespace: String, personId: String, muted: Boolean) {
         if (personId.isBlank()) return

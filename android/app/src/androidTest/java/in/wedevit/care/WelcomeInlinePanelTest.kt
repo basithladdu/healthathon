@@ -83,9 +83,11 @@ class WelcomeInlinePanelTest {
         ui.onNodeWithTag("onboarding-next").assertIsNotEnabled()
         ui.onNodeWithTag("onboarding-name").performTextInput("   Synthetic patient   ")
         ui.onNodeWithTag("onboarding-next").assertIsEnabled().performClick()
-        ui.onNodeWithTag("onboarding-age").performTextInput("200")
+        // Age by tap: nothing picked keeps Next off; 60 and two taps of + make 62.
         ui.onNodeWithTag("onboarding-next").assertIsNotEnabled()
-        ui.onNodeWithTag("onboarding-age").performTextReplacement("62")
+        ui.onNodeWithTag("onboarding-age-60").performScrollTo().performClick()
+        ui.onNodeWithTag("onboarding-age-plus").performScrollTo().performClick()
+        ui.onNodeWithTag("onboarding-age-plus").performClick()
         ui.onNodeWithTag("onboarding-next").assertIsEnabled().performClick()
         // About the illness: skipped here (the care-now steps have their own test).
         ui.onNodeWithText("About the illness").assertIsDisplayed()

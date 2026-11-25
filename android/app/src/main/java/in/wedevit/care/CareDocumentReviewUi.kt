@@ -1,6 +1,5 @@
 package `in`.wedevit.care
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
@@ -67,6 +66,9 @@ private fun documentDay(value: String): Long = runCatching { careEpoch(LocalDate
         title = found?.name ?: line.take(160); labValue = found?.value.orEmpty(); labUnit = found?.unit.orEmpty(); labLow = found?.low.orEmpty(); labHigh = found?.high.orEmpty()
     }
     val currentPage = value?.pages?.firstOrNull { it.page == page }
+    // The page's lines are split once per text change, not on every recomposition of the list.
+    val pageLines = remember(currentPage?.reviewedText) { currentPage?.reviewedText?.split('\n').orEmpty() }
+    val haptic = rememberSaharaHaptic()
 
     fun read() {
         job?.cancel(); loading = true; error = ""; checked = false; factLine = 0
@@ -86,27 +88,27 @@ private fun documentDay(value: String): Long = runCatching { careEpoch(LocalDate
     }
     LaunchedEffect(selected) { if (selected != report.personId) { job?.cancel(); onClose() } }
     DisposableEffect(Unit) { onDispose { job?.cancel() } }
-    BackHandler { job?.cancel(); onClose() }
+    SaharaBackHandler { job?.cancel(); onClose() }
 
     LazyColumn(Modifier.fillMaxSize().imePadding().testTag("document-review"), contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Row(verticalAlignment = Alignment.CenterVertically) { IconButton(onClick = { job?.cancel(); onClose() }, modifier = Modifier.size(48.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back to documents", "कागज़ात पर वापस")) }; Column(Modifier.weight(1f)) { Heading(t("Review report", "रिपोर्ट जाँचें"), 26); Text(report.name, fontSize = 14.sp, color = DoctorCardSub, maxLines = 2, overflow = TextOverflow.Ellipsis) }
+        item(key = "review-title", contentType = "title") { Row(verticalAlignment = Alignment.CenterVertically) { SaharaBackButton({ job?.cancel(); onClose() }, tag = "document-review-back"); Column(Modifier.weight(1f)) { Heading(t("Review report", "रिपोर्ट जाँचें"), 26); Text(report.name, fontSize = 14.sp, color = DoctorCardSub, maxLines = 2, overflow = TextOverflow.Ellipsis) }
             // Whether this text has been checked against the original, as a status pill that changes in place.
             value?.let { document -> SaharaStateSwitch(document.reviewedAt > 0, label = "review-status") { done ->
                 Surface(shape = RoundedCornerShape(50), color = if (done) DoctorStatusGoodBg else DoctorStatusWarnBg) { Text(if (done) t("Checked", "जाँची गई") else t("Not checked yet", "अभी जाँचा नहीं"), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = if (done) DoctorStatusGood else DoctorStatusWarn, maxLines = 1, softWrap = false) }
             } } } }
-        item { OutlinedButton(onClick = { runCatching { open(context, vm.reportFiles.intent(report, false)) }.onFailure { error = t("Couldn't open this file.", "यह फ़ाइल नहीं खुल सकी।") } }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.OpenInNew, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("View original", "असली फ़ाइल देखें")) } }
-        if (loading) item { SurfaceCard { SaharaProgressBar(if (progress.second > 0) (progress.first.toFloat() / progress.second).coerceIn(0f, 1f) else null); Spacer(Modifier.height(8.dp)); Text(t("Reading page ${progress.first} of ${progress.second.coerceAtLeast(1)}", "पेज ${progress.first} / ${progress.second.coerceAtLeast(1)} पढ़ रहे हैं")); TextButton(onClick = { job?.cancel(); loading = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel reading", "पढ़ना रोकें")) } } }
-        if (error.isNotBlank()) item { SurfaceCard { Text(error, color = MaterialTheme.colorScheme.error, fontSize = 14.sp, modifier = Modifier.announce()); TextButton(onClick = ::read, enabled = !loading, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Read again", "फिर पढ़ें"), color = RustText) } } }
+        item(key = "review-original", contentType = "button") { OutlinedButton(onClick = { runCatching { open(context, vm.reportFiles.intent(report, false)) }.onFailure { error = t("Couldn't open this file.", "यह फ़ाइल नहीं खुल सकी।") } }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.OpenInNew, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("View original", "असली फ़ाइल देखें")) } }
+        if (loading) item(key = "review-loading", contentType = "progress") { Box(Modifier.animateItem()) { SurfaceCard { SaharaProgressBar(if (progress.second > 0) (progress.first.toFloat() / progress.second).coerceIn(0f, 1f) else null); Spacer(Modifier.height(8.dp)); Text(t("Reading page ${progress.first} of ${progress.second.coerceAtLeast(1)}", "पेज ${progress.first} / ${progress.second.coerceAtLeast(1)} पढ़ रहे हैं")); TextButton(onClick = { job?.cancel(); loading = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel reading", "पढ़ना रोकें")) } } } }
+        if (error.isNotBlank()) item(key = "review-error", contentType = "error") { Box(Modifier.animateItem()) { SurfaceCard { Text(error, color = MaterialTheme.colorScheme.error, fontSize = 14.sp, modifier = Modifier.announce()); TextButton(onClick = ::read, enabled = !loading, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Read again", "फिर पढ़ें"), color = RustText) } } } }
         value?.let { document ->
-            item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) { document.pages.forEach { candidate -> FilterChip(selected = page == candidate.page, onClick = { page = candidate.page; factLine = 0; factChecked = false }, label = { Text(t("Page ${candidate.page}", "पेज ${candidate.page}")) }, shape = RoundedCornerShape(50)) } } }
+            item(key = "review-pages", contentType = "chips") { Row(Modifier.animateItem().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) { document.pages.forEach { candidate -> RecordsChip(selected = page == candidate.page, onClick = { page = candidate.page; factLine = 0; factChecked = false }, label = { Text(t("Page ${candidate.page}", "पेज ${candidate.page}")) }, shape = RoundedCornerShape(50)) } } }
             currentPage?.let { shown ->
-                item { CareField(shown.reviewedText, { next ->
+                item(key = "review-text", contentType = "field") { CareField(shown.reviewedText, { next ->
                     value = document.copy(pages = document.pages.map { if (it.page == page) it.copy(reviewedText = next.take(40_000)) else it }, reviewedAt = 0)
                     checked = false; factLine = 0; factChecked = false
                 }, t("Text to check", "जाँचने के लिए लिखाई"), minLines = 8) }
-                item { CheckLine(checked || document.reviewedAt > 0, { checked = it }, t("I checked this against the original.", "मैंने इसे असली फ़ाइल से मिला लिया है।")) }
-                item { val saveReview: () -> Unit = { scope.launch {
-                    try { val confirmed = DocumentEvidenceRules.confirm(requireNotNull(value), checked, System.currentTimeMillis()); withContext(Dispatchers.IO) { store.save(confirmed) }; value = confirmed; checked = false; error = ""; doneNote = t("Reviewed text saved", "जाँची गई लिखाई सहेज ली गई") }
+                item(key = "review-check", contentType = "check") { CheckLine(checked || document.reviewedAt > 0, { checked = it }, t("I checked this against the original.", "मैंने इसे असली फ़ाइल से मिला लिया है।")) }
+                item(key = "review-save", contentType = "button") { val saveReview: () -> Unit = { scope.launch {
+                    try { val confirmed = DocumentEvidenceRules.confirm(requireNotNull(value), checked, System.currentTimeMillis()); withContext(Dispatchers.IO) { store.save(confirmed) }; value = confirmed; checked = false; error = ""; haptic(); doneNote = t("Reviewed text saved", "जाँची गई लिखाई सहेज ली गई") }
                     catch (failure: Exception) { error = failure.message ?: t("Review not saved. Try again.", "जाँच सहेजी नहीं गई। फिर कोशिश करें।") }
                 } }
                     if (document.reviewedAt > 0) OutlinedButton(onClick = saveReview, enabled = checked && !loading && canEdit, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Save review again", "जाँच फिर सहेजें")) }
@@ -118,35 +120,35 @@ private fun documentDay(value: String): Long = runCatching { careEpoch(LocalDate
                 // Copying a fact is the less common step: its line list waits behind one "+ Copy a checked fact" chip.
                 if (document.reviewedAt > 0 && canEdit && !copying && factLine == 0) item(key = "copy-fact-chip") { SaharaAddChip(t("Copy a checked fact", "जाँची हुई बात कॉपी करें"), { copying = true }, Modifier.animateItem().testTag("document-copy-open"), tone = SaharaTone.Teal) }
                 if (document.reviewedAt > 0 && canEdit && (copying || factLine > 0)) {
-                    item { SectionTitle(t("Copy a checked fact", "जाँची हुई बात कॉपी करें")) }
-                    shown.reviewedText.split('\n').forEachIndexed { index, line -> if (line.isNotBlank() && line.length <= 2000) item("line-$page-$index") {
-                        FilterChip(selected = factLine == index + 1, onClick = { factLine = index + 1; if (kind == "Lab result") suggestLab(line) else title = line.take(160); factChecked = false }, label = { Text("${index + 1}. $line", Modifier.padding(vertical = 8.dp)) }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth())
+                    item(key = "copy-title", contentType = "title") { Box(Modifier.animateItem()) { SectionTitle(t("Copy a checked fact", "जाँची हुई बात कॉपी करें")) } }
+                    pageLines.forEachIndexed { index, line -> if (line.isNotBlank() && line.length <= 2000) item("line-$page-$index", contentType = "line") {
+                        RecordsChip(selected = factLine == index + 1, onClick = { factLine = index + 1; if (kind == "Lab result") suggestLab(line) else title = line.take(160); factChecked = false }, label = { Text("${index + 1}. $line", Modifier.padding(vertical = 8.dp)) }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().animateItem())
                     } }
                     if (factLine > 0) {
-                        item { CareField(title, { title = it.take(160); factChecked = false }, if (kind == "Lab result") t("Test name on report", "रिपोर्ट पर जाँच का नाम") else t("Record name", "रिकॉर्ड का नाम"), singleLine = true) }
-                        item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) { listOf("Record", "Medicine", "Follow-up", "Test", "Lab result").forEach { option -> FilterChip(selected = kind == option, onClick = {
+                        item(key = "fact-title", contentType = "field") { Box(Modifier.animateItem()) { CareField(title, { title = it.take(160); factChecked = false }, if (kind == "Lab result") t("Test name on report", "रिपोर्ट पर जाँच का नाम") else t("Record name", "रिकॉर्ड का नाम"), singleLine = true) } }
+                        item(key = "fact-kind", contentType = "chips") { Row(Modifier.animateItem().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) { listOf("Record", "Medicine", "Follow-up", "Test", "Lab result").forEach { option -> RecordsChip(selected = kind == option, onClick = {
                             if (option == "Lab result" && kind != option) currentPage?.reviewedText?.split('\n')?.getOrNull(factLine - 1)?.let(::suggestLab)
                             kind = option; factChecked = false
                         }, label = { Text(when (option) { "Medicine" -> t("Medicine", "दवा"); "Follow-up" -> t("Follow-up", "अगली मुलाक़ात"); "Test" -> t("Test", "जाँच"); "Lab result" -> t("Lab result", "लैब का नतीजा"); else -> t("Record", "रिकॉर्ड") }) }, shape = RoundedCornerShape(50), modifier = Modifier.testTag("document-kind-$option")) } } }
                         if (kind == "Lab result") {
-                            item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            item(key = "fact-lab-value", contentType = "fields") { Row(Modifier.animateItem(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 Box(Modifier.weight(1f)) { CareField(labValue, { labValue = it.take(40); factChecked = false }, t("Value", "नतीजा"), singleLine = true) }
                                 Box(Modifier.weight(1f)) { CareField(labUnit, { labUnit = it.take(40); factChecked = false }, t("Printed unit", "छपी इकाई"), singleLine = true) }
                             } }
                             // The printed range is optional: shown when the line had one or when asked for.
                             if (!showRange && labLow.isBlank() && labHigh.isBlank()) item(key = "lab-range-chip") { SaharaAddChip(t("Add printed range", "छपी सीमा जोड़ें"), { showRange = true }, Modifier.animateItem().testTag("document-lab-range-open"), tone = SaharaTone.Teal) }
-                            else item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            else item(key = "fact-lab-range", contentType = "fields") { Row(Modifier.animateItem(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 Box(Modifier.weight(1f)) { CareField(labLow, { labLow = it.take(40); factChecked = false }, t("Printed lower (optional)", "छपी निचली सीमा (ज़रूरी नहीं)"), singleLine = true) }
                                 Box(Modifier.weight(1f)) { CareField(labHigh, { labHigh = it.take(40); factChecked = false }, t("Printed upper (optional)", "छपी ऊपरी सीमा (ज़रूरी नहीं)"), singleLine = true) }
                             } }
-                            item { CareDateButton(documentDay(dateText), t("Report date", "रिपोर्ट की तारीख़"), { dateText = careDay(it).toString(); factChecked = false }) }
+                            item(key = "fact-lab-date", contentType = "date") { Box(Modifier.animateItem()) { CareDateButton(documentDay(dateText), t("Report date", "रिपोर्ट की तारीख़"), { dateText = careDay(it).toString(); factChecked = false }) } }
                         }
                         if (kind in listOf("Follow-up", "Test")) {
-                            item { CareDateButton(documentDay(dateText), t("Date", "तारीख़"), { dateText = careDay(it).toString(); factChecked = false }) }
-                            item { CareTimeButton(timeText, { timeText = it; factChecked = false }, t("Time", "समय"), Modifier.testTag("document-fact-time")) }
+                            item(key = "fact-date", contentType = "date") { Box(Modifier.animateItem()) { CareDateButton(documentDay(dateText), t("Date", "तारीख़"), { dateText = careDay(it).toString(); factChecked = false }) } }
+                            item(key = "fact-time", contentType = "time") { CareTimeButton(timeText, { timeText = it; factChecked = false }, t("Time", "समय"), Modifier.testTag("document-fact-time")) }
                         }
-                        item { CheckLine(factChecked, { factChecked = it }, if (kind == "Lab result") t("I checked this against the original.", "मैंने इसे असली फ़ाइल से मिला लिया है।") else if (kind == "Medicine") t("I am copying an existing prescription, including its exact dose and directions. I am not changing treatment.", "मैं पहले से लिखा पर्चा, उसकी सही ख़ुराक और तरीक़े के साथ, कॉपी कर रहा/रही हूँ। मैं इलाज नहीं बदल रहा/रही।") else t("I checked this against the original.", "मैंने इसे असली फ़ाइल से मिला लिया है।")) }
-                        item { Button(onClick = {
+                        item(key = "fact-check", contentType = "check") { CheckLine(factChecked, { factChecked = it }, if (kind == "Lab result") t("I checked this against the original.", "मैंने इसे असली फ़ाइल से मिला लिया है।") else if (kind == "Medicine") t("I am copying an existing prescription, including its exact dose and directions. I am not changing treatment.", "मैं पहले से लिखा पर्चा, उसकी सही ख़ुराक और तरीक़े के साथ, कॉपी कर रहा/रही हूँ। मैं इलाज नहीं बदल रहा/रही।") else t("I checked this against the original.", "मैंने इसे असली फ़ाइल से मिला लिया है।")) }
+                        item(key = "fact-save", contentType = "button") { Button(onClick = {
                             try {
                                 require(title.trim().isNotBlank()) { t("Add a record name.", "रिकॉर्ड का नाम लिखें।") }
                                 val current = requireNotNull(value); val quote = current.pages.single { it.page == page }.reviewedText.split('\n')[factLine - 1]
@@ -158,7 +160,7 @@ private fun documentDay(value: String): Long = runCatching { careEpoch(LocalDate
                                     val day = runCatching { LocalDate.parse(dateText.trim()) }.getOrElse { throw IllegalArgumentException(t("Enter the report date as YYYY-MM-DD.", "रिपोर्ट की तारीख़ YYYY-MM-DD में लिखें।")) }
                                     val lab = CareEntry(type = "lab", detail = detail, sender = vm.cloud?.session?.value?.email.orEmpty(), value = labValue.trim(), unit = labUnit.trim(), rangeLow = labLow.trim(), rangeHigh = labHigh.trim(), reportId = report.id, reportName = report.name)
                                     CareLabRules.validate(title, lab, careEpoch(day))
-                                    vm.saveItem("task", title.trim(), CareEntryCodec.encode(lab), careEpoch(day), done = { factLine = 0; factChecked = false; doneNote = t("Added to Lab history", "जाँच रिपोर्टों में जुड़ गया") })
+                                    vm.saveItem("task", title.trim(), CareEntryCodec.encode(lab), careEpoch(day), done = { haptic(); factLine = 0; factChecked = false; doneNote = t("Added to Lab history", "जाँच रिपोर्टों में जुड़ गया") })
                                     error = ""; return@Button
                                 }
                                 val due = if (kind in listOf("Follow-up", "Test")) LocalDateTime.of(LocalDate.parse(dateText), LocalTime.parse(timeText)).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() else 0
@@ -168,7 +170,7 @@ private fun documentDay(value: String): Long = runCatching { careEpoch(LocalDate
                                     require(detail.length <= 1600) { t("Choose a shorter line.", "छोटी पंक्ति चुनें।") }
                                     CareEntryCodec.encode(CareEntry(type = "schedule", detail = detail, category = if (kind == "Test") "Test" else "Follow-up", timed = true, reportId = report.id, reportName = report.name))
                                 } else detail
-                                vm.saveItem(targetKind, title, savedDetail, due, done = { factLine = 0; factChecked = false; doneNote = if (due > 0) t("Added to Calendar", "कैलेंडर में जुड़ गया") else t("Checked fact copied", "जाँची हुई बात कॉपी हो गई") })
+                                vm.saveItem(targetKind, title, savedDetail, due, done = { haptic(); factLine = 0; factChecked = false; doneNote = if (due > 0) t("Added to Calendar", "कैलेंडर में जुड़ गया") else t("Checked fact copied", "जाँची हुई बात कॉपी हो गई") })
                                 error = ""
                             } catch (failure: Exception) { error = failure.message ?: t("Check the date and exact time.", "तारीख़ और सही समय जाँचें।") }
                         }, enabled = factChecked && !busy, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("document-copy-fact")) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else if (kind == "Lab result") t("Add to Lab history", "जाँच रिपोर्टों में जोड़ें") else if (kind in listOf("Follow-up", "Test")) t("Copy to Calendar", "कैलेंडर में कॉपी करें") else t("Copy checked fact", "जाँची हुई बात कॉपी करें")) } }

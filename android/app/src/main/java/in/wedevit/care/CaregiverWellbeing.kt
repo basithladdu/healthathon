@@ -6,7 +6,8 @@ import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.foundation.layout.*
@@ -99,8 +100,12 @@ private val zbiAnswerHi = listOf("कभी नहीं", "शायद ही 
     var writing by rememberSaveable(key) { mutableStateOf(false) }
     val answers = remember(key) { mutableStateListOf<Int?>(null, null, null, null) }
     var draft by rememberSaveable(key) { mutableStateOf("") }
-    val latest = history.maxByOrNull { it.day }
-    val flagged = CaregiverWellbeingRules.shouldFlag(history)
+    val latest = remember(history) { history.maxByOrNull { it.day } }
+    val flagged = remember(history) { CaregiverWellbeingRules.shouldFlag(history) }
+    val haptic = rememberSaharaHaptic(); val tick = rememberSaharaTick()
+    // Counts real saves on this screen; each one shows the saved tick for a moment (nothing on first show).
+    var checkSaves by remember(key) { mutableIntStateOf(0) }
+    var noteSaves by remember(key) { mutableIntStateOf(0) }
 
     Surface(shape = RoundedCornerShape(20.dp), color = SaharaTone.Teal.wash, modifier = Modifier.fillMaxWidth().saharaAppear().testTag("caregiver-wellbeing")) {
         Column(Modifier.saharaContentSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -111,19 +116,23 @@ private val zbiAnswerHi = listOf("कभी नहीं", "शायद ही 
                     Text(t("Your wellbeing", "आपकी सेहत"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
                     Text(t("Kept on this phone only. Not shared.", "सिर्फ़ इस फ़ोन पर। साझा नहीं होता।"), fontSize = 14.sp, color = DoctorCardSub)
                 }
+                SaharaMoment(checkSaves.takeIf { it > 0 }) { SaharaSuccessTick(size = 32, tone = SaharaTone.Teal) }
             }
             if (latest == null) {
                 Text(t("Caring is hard work. A one-minute check helps you notice when you need support.", "देखभाल करना मेहनत का काम है। एक मिनट की जाँच से पता चलता है कि आपको कब सहारे की ज़रूरत है।"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk)
             } else {
                 val band = if (CaregiverWellbeingRules.isHigh(latest.score)) t("A lot to carry", "बहुत बोझ") else t("Manageable", "संभल रहा है")
                 Surface(shape = RoundedCornerShape(50), color = Paper) {
-                    Text(t("Last check: ${latest.score}/${CaregiverWellbeingRules.MAX_SCORE} · $band", "पिछली जाँच: ${latest.score}/${CaregiverWellbeingRules.MAX_SCORE} · $band"),
-                        Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+                    // A new score rolls in place instead of jumping.
+                    SaharaAnimatedText(t("Last check: ${latest.score}/${CaregiverWellbeingRules.MAX_SCORE} · $band", "पिछली जाँच: ${latest.score}/${CaregiverWellbeingRules.MAX_SCORE} · $band")) { line ->
+                        Text(line, Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+                    }
                 }
                 WellbeingTrend(history)
             }
 
-            if (checking) {
+            // The start button and the four questions crossfade in place.
+            SaharaStateSwitch(checking, Modifier.fillMaxWidth(), label = "wellbeing-check") { isChecking -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) { if (isChecking) {
                 Text(t("In the past month, how often have you felt this way?", "पिछले एक महीने में, आपको कितनी बार ऐसा लगा?"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
                 val name = personName
                 val questions = listOf(
@@ -138,11 +147,14 @@ private val zbiAnswerHi = listOf("कभी नहीं", "शायद ही 
                         (0..CaregiverWellbeingRules.ITEM_MAX).forEach { v ->
                             val chosen = answers[i] == v
                             val label = if (hindi) zbiAnswerHi[v] else zbiAnswerEn[v]
-                            Surface(shape = RoundedCornerShape(50), color = if (chosen) SaharaTone.Teal.solid else Paper, border = BorderStroke(1.5.dp, SaharaTone.Teal.solid),
-                                modifier = Modifier.heightIn(min = 48.dp).clip(RoundedCornerShape(50)).clickable(role = Role.RadioButton) { answers[i] = v }
+                            // The chosen answer fills smoothly, gives one small bounce and a light tap.
+                            val fill by animateColorAsState(if (chosen) SaharaTone.Teal.solid else Paper, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "wellbeing-answer")
+                            val ink by animateColorAsState(if (chosen) SaharaTone.Teal.onSolid else DoctorCardInk, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "wellbeing-answer-ink")
+                            Surface(shape = RoundedCornerShape(50), color = fill, border = BorderStroke(1.5.dp, SaharaTone.Teal.solid),
+                                modifier = Modifier.heightIn(min = 48.dp).saharaSelectBounce(chosen, .08f).clip(RoundedCornerShape(50)).clickable(role = Role.RadioButton) { if (answers[i] != v) tick(); answers[i] = v }
                                     .semantics { contentDescription = label; selected = chosen }.testTag("wellbeing-$i-$v")) {
                                 Box(Modifier.padding(horizontal = 14.dp, vertical = 10.dp).heightIn(min = 28.dp), contentAlignment = Alignment.Center) {
-                                    Text(label, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = if (chosen) SaharaTone.Teal.onSolid else DoctorCardInk)
+                                    Text(label, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = ink)
                                 }
                             }
                         }
@@ -150,45 +162,52 @@ private val zbiAnswerHi = listOf("कभी नहीं", "शायद ही 
                 }
                 val total = CaregiverWellbeingRules.score(answers.toList())
                 SaharaPrimaryButton(t("Save", "सहेजें"), {
-                    if (total != null) { history = store.saveCheck(key, LocalDate.now(), total); checking = false; for (i in answers.indices) answers[i] = null }
+                    if (total != null) { haptic(); history = store.saveCheck(key, LocalDate.now(), total); checkSaves += 1; checking = false; for (i in answers.indices) answers[i] = null }
                 }, Modifier.fillMaxWidth().testTag("wellbeing-save"), enabled = total != null, tone = SaharaTone.Teal)
-                if (total == null) Text(t("Answer all four to save.", "सहेजने के लिए चारों के जवाब दें।"), fontSize = 14.sp, color = DoctorCardSub)
+                AnimatedVisibility(total == null, enter = SaharaMotion.enter, exit = SaharaMotion.exit) { Text(t("Answer all four to save.", "सहेजने के लिए चारों के जवाब दें।"), fontSize = 14.sp, color = DoctorCardSub) }
                 TextButton(onClick = { checking = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Not now", "अभी नहीं"), color = RustText) }
             } else {
                 SaharaPrimaryButton(if (latest == null) t("Take the 1-minute check", "1 मिनट की जाँच करें") else t("Check again", "फिर से जाँचें"), { checking = true },
                     Modifier.fillMaxWidth().testTag("wellbeing-start"), tone = SaharaTone.Teal)
-            }
+            } } }
 
             Text(t("Based on the 4-item Zarit Burden Interview screening (Bédard et al., The Gerontologist, 2001). A screening, not a diagnosis.", "ज़ारिट बर्डन इंटरव्यू की 4-प्रश्न स्क्रीनिंग पर आधारित (Bédard et al., The Gerontologist, 2001)। यह जाँच है, निदान नहीं।"), fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardSub, modifier = Modifier.testTag("wellbeing-source"))
-            if (!checking) CaregiverSupportCard(hindi = hindi, flagged = flagged)
+            AnimatedVisibility(!checking, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) { CaregiverSupportCard(hindi = hindi, flagged = flagged) }
 
             // Private journal
-            Text(t("How are you feeling about caring for $personName?", "$personName की देखभाल को लेकर आप कैसा महसूस कर रहे हैं?"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
-            if (writing) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(t("How are you feeling about caring for $personName?", "$personName की देखभाल को लेकर आप कैसा महसूस कर रहे हैं?"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.weight(1f))
+                SaharaMoment(noteSaves.takeIf { it > 0 }) { SaharaSuccessTick(size = 28, tone = SaharaTone.Teal) }
+            }
+            // The write button and the note box crossfade in place.
+            SaharaStateSwitch(writing, Modifier.fillMaxWidth(), label = "wellbeing-journal") { isWriting -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) { if (isWriting) {
                 OutlinedTextField(value = draft, onValueChange = { draft = it.take(CaregiverWellbeingRules.MAX_NOTE_CHARS) }, modifier = Modifier.fillMaxWidth().testTag("journal-text"),
                     placeholder = { Text(t("Write a few words. Only you can see this.", "कुछ शब्द लिखें। इसे सिर्फ़ आप देख सकते हैं।")) }, minLines = 3,
                     colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = Paper, unfocusedContainerColor = Paper))
                 SaharaPrimaryButton(t("Save note", "नोट सहेजें"), {
-                    journal = store.addNote(key, System.currentTimeMillis(), draft); draft = ""; writing = false
+                    haptic(); journal = store.addNote(key, System.currentTimeMillis(), draft); noteSaves += 1; draft = ""; writing = false
                 }, Modifier.fillMaxWidth().testTag("journal-save"), enabled = draft.isNotBlank(), tone = SaharaTone.Teal)
                 TextButton(onClick = { writing = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें"), color = RustText) }
             } else {
                 SaharaSecondaryButton(t("Write in my journal", "अपनी डायरी में लिखें"), { writing = true }, Modifier.fillMaxWidth().testTag("journal-write"), tone = SaharaTone.Teal)
-            }
-            if (journal.isNotEmpty()) {
+            } } }
+            AnimatedVisibility(journal.isNotEmpty(), enter = SaharaMotion.expand, exit = SaharaMotion.collapse) { Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(t("Only you can see these, on this phone.", "इन्हें सिर्फ़ आप देख सकते हैं, इसी फ़ोन पर।"), fontSize = 14.sp, color = DoctorCardSub)
                 val fmt = remember(hindi) { DateTimeFormatter.ofPattern("d MMM, h:mm a", if (hindi) Locale("hi", "IN") else Locale.ENGLISH) }
-                val journalShown = rememberShownCount()
-                journal.shownOf(journalShown).forEach { n ->
-                    Surface(shape = RoundedCornerShape(14.dp), color = Paper, modifier = Modifier.fillMaxWidth()) {
+                // Today stays short (24 Nov meeting): the latest two notes; "Show older" opens the rest.
+                val journalShown = rememberShownCount(initial = 2)
+                journal.shownOf(journalShown, initial = 2).forEach { n -> androidx.compose.runtime.key(n.at, n.text) {
+                    // Keyed by the note, so a new note rises in at the top and the older ones keep their own rows.
+                    val whenText = remember(n.at, fmt) { java.time.Instant.ofEpochMilli(n.at).atZone(java.time.ZoneId.systemDefault()).format(fmt) }
+                    Surface(shape = RoundedCornerShape(14.dp), color = Paper, modifier = Modifier.fillMaxWidth().saharaAppear()) {
                         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text(java.time.Instant.ofEpochMilli(n.at).atZone(java.time.ZoneId.systemDefault()).format(fmt), fontSize = 14.sp, color = DoctorCardSub)
+                            Text(whenText, fontSize = 14.sp, color = DoctorCardSub)
                             Text(n.text, fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk)
                         }
                     }
-                }
-                SaharaShowOlder(journal.size, journalShown, tag = "journal")
-            }
+                } }
+                SaharaShowOlder(journal.size, journalShown, initial = 2, tag = "journal")
+            } }
         }
     }
 }
@@ -221,14 +240,18 @@ private val zbiAnswerHi = listOf("कभी नहीं", "शायद ही 
     val t = careText(); val context = LocalContext.current
     // Always on the family home: calm and folded when the check is fine, open and flagged when it is high or rising.
     var open by remember(flagged) { mutableStateOf(flagged) }
-    Surface(shape = RoundedCornerShape(16.dp), color = if (flagged) SaharaTone.Error.wash else SaharaTone.Teal.wash, border = BorderStroke(1.5.dp, if (flagged) SaharaTone.Error.solid else SaharaTone.Teal.solid), modifier = Modifier.fillMaxWidth().animateContentSize().testTag(if (flagged) "caregiver-flag" else "caregiver-support")) {
+    val tick = rememberSaharaTick()
+    // No size animation on the whole card (owner, 24 Nov); only its hidden part opens and closes, and the flag colour fades.
+    val wash by animateColorAsState(if (flagged) SaharaTone.Error.wash else SaharaTone.Teal.wash, SaharaMotion.tween(SaharaMotion.VALUE_MS), label = "support-wash")
+    val edge by animateColorAsState(if (flagged) SaharaTone.Error.solid else SaharaTone.Teal.solid, SaharaMotion.tween(SaharaMotion.VALUE_MS), label = "support-edge")
+    Surface(shape = RoundedCornerShape(16.dp), color = wash, border = BorderStroke(1.5.dp, edge), modifier = Modifier.fillMaxWidth().testTag(if (flagged) "caregiver-flag" else "caregiver-support")) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable { open = !open }, verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button) { tick(); open = !open }, verticalAlignment = Alignment.CenterVertically) {
                 Text(if (flagged) t("You're carrying a lot", "आप बहुत कुछ उठा रहे हैं") else t("Support for you", "आपके लिए मदद"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
-                Icon(if (open) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, tint = DoctorCardInk)
+                SaharaChevron(open, null, tint = DoctorCardInk)
             }
-            if (!open) Text(t("Psychiatrists and counsellors, respite care and caregiver support groups.", "मनोचिकित्सक और काउंसलर, आराम के लिए देखभाल और देखभालकर्ता सहायता समूह।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
-            if (open) {
+            AnimatedVisibility(!open, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) { Text(t("Psychiatrists and counsellors, respite care and caregiver support groups.", "मनोचिकित्सक और काउंसलर, आराम के लिए देखभाल और देखभालकर्ता सहायता समूह।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub) }
+            AnimatedVisibility(open, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) { Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             if (flagged) Text(t("Many family caregivers feel this way. It is not a failing, and help is there. This check is a screening, not a diagnosis.",
                 "कई परिवारजन ऐसा ही महसूस करते हैं। यह कोई कमी नहीं है, और मदद उपलब्ध है। यह जाँच सिर्फ़ एक शुरुआती संकेत है, निदान नहीं।"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk)
 
@@ -249,7 +272,7 @@ private val zbiAnswerHi = listOf("कभी नहीं", "शायद ही 
             SaharaSecondaryButton(t("SoulUp caregiving support group", "सोलअप देखभाल सहायता समूह"), { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(CaregiverWellbeingRules.SUPPORT_GROUP_SOULUP))) },
                 Modifier.fillMaxWidth().testTag("caregiver-flag-soulup"), icon = Icons.Default.OpenInNew, tone = SaharaTone.Teal)
             Text(t("These open in your browser. In an emergency, call 112.", "ये आपके ब्राउज़र में खुलते हैं। आपात स्थिति में 112 पर कॉल करें।"), fontSize = 14.sp, color = DoctorCardSub)
-            }
+            } }
         }
     }
 }

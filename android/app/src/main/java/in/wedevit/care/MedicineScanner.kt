@@ -5,9 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.OpenableColumns
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -139,12 +138,14 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
     }
     LaunchedEffect(selectedPerson) { if (selectedPerson != personAtOpen) { scanJob?.cancel(); onClose() } }
 
-    BackHandler {
-        if (phase == MedicineScannerPhase.Select) cleanAndClose() else returnToImages()
-    }
+    // Closing the scanner is a plain if/else in CareApp (no screen host), so it uses a plain BackHandler without the preview.
+    androidx.activity.compose.BackHandler(phase == MedicineScannerPhase.Select) { cleanAndClose() }
 
     // Photos → reading → review slide forward and back like the rest of the app.
-    SaharaScreenHost(phase, Modifier.fillMaxSize(), label = "medicine-scanner", direction = { from, to -> if (to.ordinal > from.ordinal) SaharaMotion.Direction.Forward else SaharaMotion.Direction.Back }) { shown -> when (shown) {
+    SaharaScreenHost(phase, Modifier.fillMaxSize(), label = "medicine-scanner", direction = { from, to -> if (to.ordinal > from.ordinal) SaharaMotion.Direction.Forward else SaharaMotion.Direction.Back }) { shown ->
+    // Inside the phase host, so the swipe previews the page going back to the photos.
+    SaharaBackHandler(shown != MedicineScannerPhase.Select) { returnToImages() }
+    when (shown) {
         MedicineScannerPhase.Select -> LazyColumn(
             Modifier.fillMaxSize().imePadding().testTag("medicine-scanner-select"),
             contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 28.dp),
@@ -230,7 +231,12 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                 val value = progress
                 if (value?.stage == MedicineScanStage.PREPARING && value.total > 0) {
                     // Progress as a badge.
-                    Surface(shape = RoundedCornerShape(50), color = Mint) { Text(t("${value.completed.coerceAtMost(value.total)} of ${value.total}", "${value.completed.coerceAtMost(value.total)} / ${value.total}"), Modifier.padding(horizontal = 14.dp, vertical = 6.dp), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk) }
+                    // The page count changes in place (a short rise) as each page is read.
+                    Surface(shape = RoundedCornerShape(50), color = Mint) {
+                        SaharaAnimatedText(t("${value.completed.coerceAtMost(value.total)} of ${value.total}", "${value.completed.coerceAtMost(value.total)} / ${value.total}"), Modifier.padding(horizontal = 14.dp, vertical = 6.dp)) { shown ->
+                            Text(shown, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+                        }
+                    }
                     if (value.fileName.isNotBlank()) Text(value.fileName, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 } else Text(t("Reading the selected pages…", "चुने गए पेज पढ़ रहे हैं…"), fontSize = 16.sp, color = DoctorCardInk)
                 OutlinedButton(onClick = { returnToImages() }, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें"), fontSize = 15.sp) }
@@ -243,14 +249,14 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             item { ScannerHeader(t("Review medicine list", "दवा की सूची जाँचें"), "2 / 2") { returnToImages() } }
-            if (prescriptionUris.isNotEmpty()) item { SurfaceCard {
+            if (prescriptionUris.isNotEmpty()) item(key = "scan-original-pages") { SurfaceCard {
                 Text(t("Original pages", "असली पेज"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
                 prescriptionUris.forEachIndexed { index, uri -> TextButton(onClick = { runCatching {
                     context.startActivity(Intent(Intent.ACTION_VIEW).setDataAndType(Uri.parse(uri), "image/*").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION))
                 }.onFailure { scanError = t("No image viewer available.", "फ़ोटो देखने वाला ऐप नहीं मिला।") } }, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Image, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("View prescription page ${index + 1}", "पर्चे का पेज ${index + 1} देखें"), fontSize = 15.sp) } }
             } }
-            warnings.forEach { warning -> item(warning) { SurfaceCard(Peach) { Row(verticalAlignment = Alignment.Top) { Icon(Icons.Default.WarningAmber, null, Modifier.size(20.dp), tint = RustText); Spacer(Modifier.width(12.dp)); Text(warning, fontSize = 15.sp, color = DoctorCardInk) } } } }
-            items(drafts.size, key = { drafts[it].id }) { index -> Box(Modifier.animateItem()) {
+            warnings.forEach { warning -> item(key = "scan-warning-$warning", contentType = "scan-warning") { Box(Modifier.animateItem()) { SurfaceCard(Peach) { Row(verticalAlignment = Alignment.Top) { Icon(Icons.Default.WarningAmber, null, Modifier.size(20.dp), tint = RustText); Spacer(Modifier.width(12.dp)); Text(warning, fontSize = 15.sp, color = DoctorCardInk) } } } } }
+            items(drafts.size, key = { drafts[it].id }, contentType = { "scan-draft" }) { index -> Box(Modifier.animateItem()) {
                 MedicineReviewCard(
                     draft = drafts[index],
                     storage = vm.storageNamespace,
@@ -259,7 +265,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                     onRemove = { drafts = drafts.toMutableList().also { it.removeAt(index) } },
                 )
             } }
-            if (unmatched.isNotEmpty()) item {
+            if (unmatched.isNotEmpty()) item(key = "scan-unmatched") { Box(Modifier.animateItem()) {
                 SurfaceCard(Peach) {
                     Text(run { val n = unmatched.size; if (n == 1) t("1 medicine photo was not matched", "दवा की 1 फ़ोटो नहीं मिली") else t("$n medicine photos were not matched", "दवा की $n फ़ोटो नहीं मिलीं") }, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
                     unmatched.filter { it in medicineUris.indices }.forEach { index -> TextButton(onClick = { runCatching {
@@ -267,16 +273,19 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                     }.onFailure { scanError = t("No image viewer available.", "फ़ोटो देखने वाला ऐप नहीं मिला।") } }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("View medicine photo ${index + 1}", "दवा की फ़ोटो ${index + 1} देखें")) } }
                     Spacer(Modifier.height(8.dp)); CheckLine(unmatchedReviewed, { unmatchedReviewed = it }, t("I reviewed the unmatched medicine photos.", "मैंने बिना मिली दवा की फ़ोटो जाँच ली हैं।"))
                 }
-            }
-            item {
-                OutlinedButton(onClick = { drafts = drafts + MedicineDraft(newId(), manualMedicine(), false) }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+            } }
+            item(key = "scan-add-manual") {
+                OutlinedButton(onClick = { drafts = drafts + MedicineDraft(newId(), manualMedicine(), false) }, shape = RoundedCornerShape(14.dp), modifier = Modifier.animateItem().fillMaxWidth().heightIn(min = 48.dp)) {
                     Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Add another manually", "एक और दवा ख़ुद लिखें"), fontSize = 15.sp)
                 }
             }
-            item {
-                val names = drafts.map { it.medicine.medicineName.trim().lowercase() }.filter(String::isNotEmpty)
-                val valid = drafts.isNotEmpty() && unmatchedReviewed && names.size == names.distinct().size && drafts.all {
-                    it.confirmed && it.medicine.medicineName.isNotBlank() && (it.medicine.strength.isNotBlank() || it.medicine.quantity.isNotBlank() || it.medicine.form.isNotBlank())
+            item(key = "scan-save") {
+                // Checked once per change of the drafts, not on every recomposition while a card is being typed in.
+                val valid = remember(drafts, unmatchedReviewed) {
+                    val names = drafts.map { it.medicine.medicineName.trim().lowercase() }.filter(String::isNotEmpty)
+                    drafts.isNotEmpty() && unmatchedReviewed && names.size == names.distinct().size && drafts.all {
+                        it.confirmed && it.medicine.medicineName.isNotBlank() && (it.medicine.strength.isNotBlank() || it.medicine.quantity.isNotBlank() || it.medicine.form.isNotBlank())
+                    }
                 }
                 SaharaPrimaryButton(if (busy || savingSources) t("Saving…", "सहेज रहे हैं…") else if(onReviewedMedicines != null) t("Use ${drafts.size} reviewed medicines", "जाँची गई ${drafts.size} दवाएँ लें") else run { val n = drafts.size; if (n == 1) t("Save 1 medicine", "1 दवा सहेजें") else t("Save $n medicines", "$n दवा सहेजें") }, onClick = {
                     scanError = null
@@ -313,7 +322,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
 @Composable
 private fun ScannerHeader(title: String, step: String, info: String? = null, onBack: () -> Unit) {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, careText()("Back", "वापस")) }
+        SaharaBackButton(onBack, tag = "medicine-scanner-back")
         Text(
             text = title,
             modifier = Modifier.weight(1f),
@@ -358,23 +367,29 @@ private fun PhotoSelectionCard(
     onRemove: (Int) -> Unit,
     onMove: ((Int, Int) -> Unit)?,
 ) {
-    val context = LocalContext.current; val t = careText(); val hindi = careHindi()
+    val context = LocalContext.current; val t = careText(); val hindi = careHindi(); val tick = rememberSaharaTick()
     SurfaceCard(tint) {
         Row(verticalAlignment = Alignment.Top) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) { Text(title, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = DoctorCardInk); if (subtitle.isNotBlank()) Text(subtitle, fontSize = 14.sp, color = DoctorCardSub) }
-            // Count as a round badge, green once something is added.
-            Surface(color = if (uris.isEmpty()) Paper else DoctorStatusGoodBg, shape = RoundedCornerShape(50)) { Text(uris.size.toString(), Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = if (uris.isEmpty()) DoctorCardSub else DoctorStatusGood) }
-        }
-        uris.forEachIndexed { index, value ->
-            if (index == 0) Spacer(Modifier.height(4.dp))
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Image, null, Modifier.size(20.dp), tint = DoctorCardSub); Spacer(Modifier.width(8.dp))
-                Text(imageName(context, Uri.parse(value), index, hindi), Modifier.weight(1f), fontSize = 15.sp, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                if (onMove != null && index > 0) IconButton(onClick = { onMove(index, index - 1) }, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.ArrowUpward, t("Move earlier", "ऊपर करें")) }
-                if (onMove != null && index < uris.lastIndex) IconButton(onClick = { onMove(index, index + 1) }, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.ArrowDownward, t("Move later", "नीचे करें")) }
-                IconButton(onClick = { onRemove(index) }, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Close, t("Remove ${index + 1}", "${index + 1} हटाएँ")) }
+            // Count as a round badge. The count rises in place and the badge glides to green once something is added.
+            val badgeFill by animateColorAsState(if (uris.isEmpty()) Paper else DoctorStatusGoodBg, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "scan-count-fill")
+            val badgeInk by animateColorAsState(if (uris.isEmpty()) DoctorCardSub else DoctorStatusGood, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "scan-count-ink")
+            Surface(color = badgeFill, shape = RoundedCornerShape(50)) {
+                SaharaAnimatedText(uris.size.toString(), Modifier.padding(horizontal = 12.dp, vertical = 6.dp)) { shown -> Text(shown, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = badgeInk) }
             }
         }
+        uris.forEachIndexed { index, value -> key(value) {
+            if (index == 0) Spacer(Modifier.height(4.dp))
+            // The file name is looked up once per photo, not on every recomposition (it asks the photo's app each time).
+            val name = remember(value, index, hindi) { imageName(context, Uri.parse(value), index, hindi) }
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Image, null, Modifier.size(20.dp), tint = DoctorCardSub); Spacer(Modifier.width(8.dp))
+                Text(name, Modifier.weight(1f), fontSize = 15.sp, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                if (onMove != null && index > 0) IconButton(onClick = { onMove(index, index - 1) }, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.ArrowUpward, t("Move earlier", "ऊपर करें")) }
+                if (onMove != null && index < uris.lastIndex) IconButton(onClick = { onMove(index, index + 1) }, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.ArrowDownward, t("Move later", "नीचे करें")) }
+                IconButton(onClick = { tick(); onRemove(index) }, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Close, t("Remove ${index + 1}", "${index + 1} हटाएँ")) }
+            }
+        } }
         Spacer(Modifier.height(12.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedButton(onClick = onChoose, shape = RoundedCornerShape(14.dp), contentPadding = PaddingValues(horizontal = 12.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp)) {
@@ -393,7 +408,7 @@ private fun PhotoSelectionCard(
 
 @Composable
 private fun MedicineReviewCard(draft: MedicineDraft, storage: String, personId: String, onChange: (MedicineDraft) -> Unit, onRemove: () -> Unit) {
-    val medicine = draft.medicine; val t = careText(); val hindi = careHindi()
+    val medicine = draft.medicine; val t = careText(); val hindi = careHindi(); val tick = rememberSaharaTick()
     fun change(next: OrganizedMedicine) = onChange(draft.copy(medicine = next, confirmed = false))
     SurfaceCard(Paper) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -428,7 +443,8 @@ private fun MedicineReviewCard(draft: MedicineDraft, storage: String, personId: 
         Text(t("Food timing", "खाने के हिसाब से समय"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.padding(top = 8.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
             MedicineMealTiming.entries.forEach { timing ->
-                FilterChip(selected = medicine.mealTiming == timing, onClick = { change(medicine.copy(mealTiming = timing)) }, label = { Text(mealTimingLabel(timing, hindi), fontSize = 14.sp) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp))
+                val on = medicine.mealTiming == timing
+                FilterChip(selected = on, onClick = { tick(); change(medicine.copy(mealTiming = timing)) }, label = { Text(mealTimingLabel(timing, hindi), fontSize = 14.sp) }, shape = RoundedCornerShape(50), modifier = Modifier.saharaSelectBounce(on, .08f).heightIn(min = 48.dp))
             }
         }
         CareField(

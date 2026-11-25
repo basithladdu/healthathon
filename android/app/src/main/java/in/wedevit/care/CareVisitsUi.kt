@@ -2,7 +2,6 @@
 package `in`.wedevit.care
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -134,11 +133,13 @@ private fun visitStatusTone(status: String): SaharaTone = if (status == "complet
 /** A solid date block in the [tone]'s colour: big white day number over the short month; a dash when the date is not recorded. */
 @Composable private fun VisitDateBlock(at: Long, tone: SaharaTone) {
     val hindi = careHindi()
-    val day = at.takeIf { it > 0 }?.let(::careDay)
-    Surface(shape = RoundedCornerShape(14.dp), color = tone.band, modifier = Modifier.size(width = 48.dp, height = 52.dp)) {
-        Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+    val day = remember(at) { at.takeIf { it > 0 }?.let(::careDay) }
+    val month = remember(day, hindi, CareLanguageState.current) { day?.format(careDateFormat("MMM", hindi))?.uppercase() }
+    // At least 52 dp tall, growing with a large font so the month and year are never cut off.
+    Surface(shape = RoundedCornerShape(14.dp), color = tone.band, modifier = Modifier.width(48.dp).heightIn(min = 52.dp)) {
+        Column(Modifier.fillMaxWidth().padding(vertical = 4.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
             Text(day?.dayOfMonth?.toString() ?: "—", fontFamily = SaharaTitleFont, fontSize = 20.sp, lineHeight = 22.sp, fontWeight = FontWeight.Bold, color = tone.onSolid, maxLines = 1)
-            if (day != null) Text(day.format(careDateFormat("MMM", hindi)).uppercase(), fontSize = 12.sp, lineHeight = 14.sp, fontWeight = FontWeight.Bold, color = tone.onSolid, maxLines = 1)
+            if (month != null) Text(month, fontSize = 12.sp, lineHeight = 14.sp, fontWeight = FontWeight.Bold, color = tone.onSolid, maxLines = 1)
             if (day != null && day.year != LocalDate.now().year) Text("${day.year}", fontSize = 11.sp, lineHeight = 12.sp, fontWeight = FontWeight.Bold, color = tone.onSolid, maxLines = 1)
         }
     }
@@ -209,13 +210,13 @@ private fun visitStatusTone(status: String): SaharaTone = if (status == "complet
     var originals by remember(visit.personId) { mutableStateOf<List<CareReport>>(emptyList()) }
     LaunchedEffect(visit.personId) { originals = withContext(Dispatchers.IO) { runCatching { MedicineSourceStore(context.applicationContext, vm.storageNamespace).list(visit.personId) }.getOrDefault(emptyList()) } }
     val folders = remember(vm.storageNamespace) { runCatching { DocumentFolderStore(context, vm.storageNamespace).all() }.getOrDefault(emptyMap()) }
-    val originalIds = originals.map { it.id }.toSet()
+    val originalIds = remember(originals) { originals.map { it.id }.toSet() }
     val prescription = remember(visit, all, saved, originals) {
         CareVisitRules.dayPrescription(visit, all, saved + originals, folderOf = { r -> if (r.id in originalIds) DocumentFolderRules.PRESCRIPTIONS else folders[r.id]?.folder ?: DocumentFolderRules.OTHER })
     }
     var editing by remember { mutableStateOf(false) }; var removing by remember { mutableStateOf(false) }
-    val whenText = if (visit.due <= 0) t("Date not recorded", "तारीख़ दर्ज नहीं") else Instant.ofEpochMilli(visit.due).atZone(ZoneId.systemDefault())
-        .format(if (info.timed) careDateFormat("EEE, d MMM yyyy · h:mm a", hindi) else careDateFormat("EEE, d MMM yyyy", hindi))
+    val whenText = if (visit.due <= 0) t("Date not recorded", "तारीख़ दर्ज नहीं") else remember(visit.due, info.timed, hindi, CareLanguageState.current) { Instant.ofEpochMilli(visit.due).atZone(ZoneId.systemDefault())
+        .format(if (info.timed) careDateFormat("EEE, d MMM yyyy · h:mm a", hindi) else careDateFormat("EEE, d MMM yyyy", hindi)) }
     SaharaScreenSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 20.dp, end = 20.dp, bottom = 28.dp).testTag("care-visit-day"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Surface(shape = RoundedCornerShape(20.dp), color = tone.wash, border = BorderStroke(1.5.dp, tone.solid), modifier = Modifier.fillMaxWidth()) {
@@ -231,10 +232,13 @@ private fun visitStatusTone(status: String): SaharaTone = if (status == "complet
                     }
                 }
             }
-            if (info.place.isNotBlank()) VisitDetailLine(Icons.Default.Place, info.place)
+            // A pin only beside a real address; a place that just names the visit type shows that type's icon.
+            if (info.place.isNotBlank()) VisitDetailLine(careVisitPlaceIcon(info.place, visit.title, info.doctor), info.place)
             if (info.note.isNotBlank()) VisitDetailLine(Icons.Default.EditNote, info.note)
             Text(t("Prescription", "पर्चा"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Bold, color = SaharaSection.Medicines.ink, modifier = Modifier.a11yHeading())
-            if (prescription.isEmpty) Row(Modifier.fillMaxWidth().testTag("care-visit-no-prescription"), verticalAlignment = Alignment.CenterVertically) {
+            // Scanned prescriptions load a moment after the sheet opens: "No prescription" crossfades into the list instead of jumping.
+            SaharaStateSwitch(prescription.isEmpty, Modifier.fillMaxWidth(), label = "visit-prescription") { none ->
+            if (none) Row(Modifier.fillMaxWidth().testTag("care-visit-no-prescription"), verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.Description, null, Modifier.size(20.dp), tint = DoctorCardSub); Spacer(Modifier.width(12.dp))
                 Text(t("No prescription", "कोई पर्चा नहीं"), fontSize = 14.sp, color = DoctorCardSub)
             }
@@ -253,6 +257,7 @@ private fun visitStatusTone(status: String): SaharaTone = if (status == "complet
                         }
                     } }
                 }
+            }
             }
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (visit.due > 0) OutlinedButton(onClick = { onDismiss(); onCalendarAt(visit.due) }, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) {
@@ -299,16 +304,19 @@ private fun visitStatusTone(status: String): SaharaTone = if (status == "complet
     var menu by remember { mutableStateOf(false) }; var editing by rememberSaveable(item.id) { mutableStateOf(false) }; var removing by rememberSaveable(item.id) { mutableStateOf(false) }
     val done = item.doneOn.isNotBlank()
     val overdue = CareTodoRules.overdue(item, LocalDate.now())
-    val detail = item.detail.takeIf { !CareEntryCodec.isStructured(it) }?.trim().orEmpty()
+    val detail = remember(item.detail) { item.detail.takeIf { !CareEntryCodec.isStructured(it) }?.trim().orEmpty() }
+    val hindi = careHindi()
+    val dueText = remember(item.due, hindi, CareLanguageState.current) { if (item.due > 0) careDay(item.due).format(DateTimeFormatter.ofPattern("d MMM", careLocale(hindi))) else "" }
+    val haptic = rememberSaharaHaptic()
     Surface(onClick = { if (detail.isNotBlank()) expanded = !expanded }, shape = RoundedCornerShape(16.dp), color = if (done) SaharaSection.ToDo.wash else Paper, border = BorderStroke(1.5.dp, SaharaSection.ToDo.solid),
         modifier = Modifier.fillMaxWidth().saharaAppear().heightIn(min = 56.dp).testTag("care-task-${item.id}")) {
-        Column(Modifier.padding(end = 4.dp).animateContentSize()) {
+        Column(Modifier.padding(end = 4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(checked = done, onCheckedChange = { if (!busy && canEditCareContext(vm, item.personId, capturedAccount)) vm.toggle(item) }, enabled = canEdit,
+                Checkbox(checked = done, onCheckedChange = { if (!busy && canEditCareContext(vm, item.personId, capturedAccount)) { haptic(); vm.toggle(item) } }, enabled = canEdit,
                     modifier = Modifier.semantics { contentDescription = "${t("Done", "हो गया")}: ${item.title}" })
                 Text(item.title, Modifier.weight(1f), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = if (done) DoctorCardSub else DoctorCardInk, maxLines = if (expanded) 3 else 1, overflow = TextOverflow.Ellipsis,
                     textDecoration = if (done) TextDecoration.LineThrough else null)
-                if (item.due > 0) VisitChip(careDay(item.due).format(DateTimeFormatter.ofPattern("d MMM", careLocale(careHindi()))), if (overdue) SaharaTone.Error.solid else SaharaSection.ToDo.solid, if (overdue) SaharaTone.Error.onSolid else SaharaSection.ToDo.onSolid)
+                if (item.due > 0) VisitChip(dueText, if (overdue) SaharaTone.Error.solid else SaharaSection.ToDo.solid, if (overdue) SaharaTone.Error.onSolid else SaharaSection.ToDo.onSolid)
                 if (canEdit) Box {
                     IconButton(onClick = { menu = true }, modifier = Modifier.size(48.dp).testTag("care-menu-${item.id}")) { Icon(Icons.Default.MoreVert, t("More actions", "और विकल्प"), tint = DoctorCardInk) }
                     DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
@@ -317,7 +325,7 @@ private fun visitStatusTone(status: String): SaharaTone = if (status == "complet
                     }
                 } else Spacer(Modifier.width(8.dp))
             }
-            AnimatedVisibility(expanded && detail.isNotBlank()) { Text(detail, Modifier.padding(start = 48.dp, end = 12.dp, bottom = 10.dp), fontSize = 14.sp, color = DoctorCardSub) }
+            AnimatedVisibility(expanded && detail.isNotBlank(), enter = SaharaMotion.expand, exit = SaharaMotion.collapse) { Text(detail, Modifier.padding(start = 48.dp, end = 12.dp, bottom = 10.dp), fontSize = 14.sp, color = DoctorCardSub) }
         }
     }
     if (removing) AlertDialog(onDismissRequest = { removing = false }, title = { Text(t("Remove this entry?", "यह जानकारी हटाएँ?")) }, text = { Text(item.title) },

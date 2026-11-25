@@ -168,7 +168,10 @@ internal object CareSyncOps {
 
     fun saveEntry(item: CareItem) = CarePendingWrite(kind = ENTRY_SAVE, personId = item.personId, recordKey = item.id, payload = itemJson(item).toString(), baseRevision = item.revision, isAppend = item.revision == 0L)
     fun removeEntry(item: CareItem) = CarePendingWrite(kind = ENTRY_REMOVE, personId = item.personId, recordKey = item.id, payload = itemJson(item).toString(), baseRevision = item.revision, isAppend = false)
-    fun confirm(personId: String, ack: Acknowledgement) = CarePendingWrite(kind = ACK, personId = personId, recordKey = ack.versionId, payload = ackJson(ack).toString(), isAppend = true)
+    /** [reading]: how the note was read before confirming (ConsentReadAloud.kt); it travels with the confirmation so every phone sees it. */
+    fun confirm(personId: String, ack: Acknowledgement, reading: ConsentReading? = null) = CarePendingWrite(kind = ACK, personId = personId, recordKey = ack.versionId,
+        payload = ackJson(ack).also { json -> reading?.let { json.put("readAloud", ConsentReadingRules.encode(it)) } }.toString(), isAppend = true)
+    fun ackReading(op: CarePendingWrite): ConsentReading? = runCatching { ConsentReadingRules.decode(JSONObject(op.payload).optJSONObject("readAloud")) }.getOrNull()
     /** [row] is the intake report exactly as the server takes it; its id makes a repeated send return the first one. */
     fun medicineEvent(personId: String, medicineId: String, row: JSONObject) = CarePendingWrite(kind = MEDICINE_EVENT, personId = personId, recordKey = medicineId, payload = row.toString(), isAppend = true)
     fun saveContact(contact: CareContact) = CarePendingWrite(kind = CONTACT_SAVE, personId = contact.personId, recordKey = contact.id, payload = contactJson(contact).toString(), baseRevision = contact.revision, isAppend = contact.revision == 0L)
@@ -275,7 +278,7 @@ class CareSyncQueue private constructor(private val db: CareDatabase, @Volatile 
             CareSyncOps.ENTRY_REMOVE -> { service.removeEntryOnce(CareSyncOps.item(op), account); null }
             CareSyncOps.ACK -> {
                 val ack = CareSyncOps.ack(op)
-                val saved = service.confirm(op.personId, ack)
+                val saved = service.confirm(op.personId, ack, CareSyncOps.ackReading(op))
                 require(saved.versionId == ack.versionId && saved.contentHash == ack.contentHash && saved.relationship == ack.relationship) { "The saved confirmation didn't match this version. Refresh the care note before trying again." }
                 val care = db.care()
                 // The server sets the time and may return an earlier identical confirmation: keep exactly its copy.

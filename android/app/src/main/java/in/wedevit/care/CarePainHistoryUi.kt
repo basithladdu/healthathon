@@ -2,6 +2,7 @@
 package `in`.wedevit.care
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -57,6 +58,7 @@ object PainHistoryRules {
     val index = history.indexOfFirst { it.first.id == selected }
     // Tapping a body-part tile zooms the model and shows that part's own dated trend below it.
     var part by rememberSaveable(personId) { mutableStateOf<String?>(null) }
+    val tick = rememberSaharaTick()
     Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 24.dp).testTag("pain-history"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Heading(t("Past pain on the body", "पहले का दर्द शरीर पर"), 27)
         if (index < 0) ChartEmpty(hindi, "pain-history") else {
@@ -66,7 +68,7 @@ object PainHistoryRules {
             LaunchedEffect(index) { if (index + 1 > datesShown.intValue) datesShown.intValue = index + 1 }
             FlowRow(Modifier.fillMaxWidth().animateContentSize(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 history.take(maxOf(datesShown.intValue, index + 1)).forEach { (item, value) ->
-                    FilterChip(selected == item.id, { preferred = item.id }, label = { Text("${friendlyWhen(value.observedDate, value.observedTime, hindi)} · ${SymptomDiaryRules.ratingLabel(value.rating, hindi)}", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false) }, shape = CircleShape,
+                    FilterChip(selected == item.id, { if (selected != item.id) tick(); preferred = item.id }, label = { Text("${friendlyWhen(value.observedDate, value.observedTime, hindi)} · ${SymptomDiaryRules.ratingLabel(value.rating, hindi)}", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false) }, shape = CircleShape,
                         leadingIcon = if (value.rating != null) { { Box(Modifier.size(12.dp).background(ChartBands.color(value.rating), CircleShape)) } } else null,
                         border = FilterChipDefaults.filterChipBorder(enabled = true, selected = selected == item.id, borderColor = DoctorCardSub.copy(alpha = .45f), selectedBorderColor = DoctorAccent, borderWidth = 1.5.dp, selectedBorderWidth = 2.dp),
                         colors = FilterChipDefaults.filterChipColors(containerColor = Paper, labelColor = DoctorCardInk, selectedContainerColor = lerp(Paper, DoctorAccent, .14f), selectedLabelColor = DoctorCardInk), modifier = Modifier.heightIn(min = 48.dp).testTag("pain-history-entry-${item.id}"))
@@ -74,8 +76,8 @@ object PainHistoryRules {
             }
             SaharaShowOlder(history.size, datesShown, tag = "pain-history-dates")
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = { preferred = history[index + 1].first.id }, enabled = index < history.lastIndex, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, DoctorCardSub.copy(alpha = .5f)), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("pain-history-older")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Older", "पुराना")) }
-                OutlinedButton(onClick = { preferred = history[index - 1].first.id }, enabled = index > 0, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, DoctorCardSub.copy(alpha = .5f)), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("pain-history-newer")) { Text(t("Newer", "नया")); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(18.dp)) }
+                OutlinedButton(onClick = { tick(); preferred = history[index + 1].first.id }, enabled = index < history.lastIndex, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, DoctorCardSub.copy(alpha = .5f)), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("pain-history-older")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Older", "पुराना")) }
+                OutlinedButton(onClick = { tick(); preferred = history[index - 1].first.id }, enabled = index > 0, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, DoctorCardSub.copy(alpha = .5f)), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("pain-history-newer")) { Text(t("Newer", "नया")); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(18.dp)) }
             }
             // The chosen observation slides in when another date is picked; its number sits on a band-coloured pill.
             AnimatedContent(history[index], transitionSpec = { SaharaMotion.crossfade() }, contentKey = { it.first.id }, label = "pain observation") { (_, shown) ->
@@ -94,7 +96,10 @@ object PainHistoryRules {
             }
             if (note.painLocation.isNotBlank()) Text(note.painLocation, modifier = Modifier.testTag("pain-history-location"))
             if (PainHistoryRules.locationKind(note) != "unsupported-model") CarePainBodyMap(note.painBodySites, note.painBodyPoints, note.rating, hindi, readOnly = true, ratings = note.painBodyRatings, onFocus = { part = it }) { _, _ -> }
-            part?.let { SymptomPartTrend(entries, personId, it, hindi) }
+            // The part's own trend opens under the body in place (and closes again) instead of popping in.
+            var lastPart by remember { mutableStateOf(part) }
+            LaunchedEffect(part) { if (part != null) lastPart = part }
+            AnimatedVisibility(part != null, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) { (part ?: lastPart)?.let { SymptomPartTrend(entries, personId, it, hindi) } }
             if (note.startedOn.isNotBlank()) Text("${t("Started", "शुरू हुआ")}: ${note.startedOn}", fontSize = 14.sp, color = DoctorCardSub)
             if (note.painTriggers.isNotEmpty()) Text(note.painTriggers.joinToString { SymptomDiaryRules.label(SymptomDiaryRules.triggers, it, hindi) }, fontSize = 14.sp, color = DoctorCardSub)
             if (note.note.isNotBlank()) Text(note.note, fontSize = 16.sp, color = DoctorCardInk)

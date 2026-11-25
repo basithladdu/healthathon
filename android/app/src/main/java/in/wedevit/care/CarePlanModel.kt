@@ -72,7 +72,9 @@ enum class EctprStatus { DRAFT, ACTIVE, SUPERSEDED, REVOKED }
 enum class SignatureRole { TREATING_CONSULTANT, PALLIATIVE_CLINICIAN, NURSE, PATIENT, SURROGATE, WITNESS }
 /** Which decision-maker signed, when the role is SURROGATE (legal review). */
 enum class SurrogateRank { PRIMARY, SECONDARY }
-data class Signature(val role: SignatureRole, val name: String, val registrationNo: String? = null, val signedAt: String, val thumbImpression: Boolean? = null, val surrogateRank: SurrogateRank? = null)
+data class Signature(val role: SignatureRole, val name: String, val registrationNo: String? = null, val signedAt: String, val thumbImpression: Boolean? = null, val surrogateRank: SurrogateRank? = null,
+    /** How the plan was read to the patient or decision-maker before they signed (ConsentReadAloud.kt), when recorded. */
+    val readAloud: ConsentReading? = null)
 
 data class EctprPatient(val name: String = "", val dob: String = "", val sex: String = "", val address: String = "", val phone: String = "", val uhid: String = "", val languagePref: String = "", val gender: String = "")
 data class CareTeam(val oncologist: String = "", val palliativePhysician: String = "", val palliativePhone24h: String = "", val extraTeam: List<String> = emptyList(), val localDoctor: String = "")
@@ -782,7 +784,7 @@ object PlanJson {
                 .put("conflictReasons", JSONObject().also { j -> c.conflictReasons.filterValues(String::isNotBlank).forEach { (k, v) -> j.put(k, v) } })
                 .put("goalAConfirmed", c.goalAConfirmed).n("nivTrial", trial(c.nivTrial)))
             .put("reviewDue", r.reviewDue)
-            .put("signatures", JSONArray(r.signatures.map { s -> JSONObject().put("role", s.role.name).put("name", s.name).put("signedAt", s.signedAt).also { j -> s.registrationNo?.let { j.put("registrationNo", it) }; s.thumbImpression?.let { j.put("thumbImpression", it) }; s.surrogateRank?.let { j.put("surrogateRank", it.name) } } }))
+            .put("signatures", JSONArray(r.signatures.map { s -> JSONObject().put("role", s.role.name).put("name", s.name).put("signedAt", s.signedAt).also { j -> s.registrationNo?.let { j.put("registrationNo", it) }; s.thumbImpression?.let { j.put("thumbImpression", it) }; s.surrogateRank?.let { j.put("surrogateRank", it.name) }; s.readAloud?.let { j.put("readAloud", ConsentReadingRules.encode(it)) } } }))
             .put("limitedLiteracy", r.limitedLiteracy)
             .also { j -> r.gocTranscript?.let { j.put(GOC_TRANSCRIPT_KEY, GocTranscriptJson.encode(it)) }; r.homeCare?.let { j.put("homeCare", homeCare(it)) }; r.withdrawal?.let { j.put("withdrawal", withdrawal(it)) }; r.revokedAt?.let { j.put("revokedAt", it) }; r.revokedReason?.let { j.put("revokedReason", it) }; r.supersedes?.let { j.put("supersedes", it) } }
     }
@@ -821,7 +823,7 @@ object PlanJson {
             ),
             homeCare = j.o("homeCare")?.let { homeCare(it) }, withdrawal = j.o("withdrawal")?.let { withdrawal(it) },
             reviewDue = j.s("reviewDue"),
-            signatures = j.optJSONArray("signatures")?.let { a -> (0 until a.length()).map { a.getJSONObject(it) }.mapNotNull { s -> s.e<SignatureRole>("role")?.let { Signature(it, s.s("name"), s.ns("registrationNo"), s.s("signedAt"), s.nb("thumbImpression"), s.e<SurrogateRank>("surrogateRank")) } } }.orEmpty(),
+            signatures = j.optJSONArray("signatures")?.let { a -> (0 until a.length()).map { a.getJSONObject(it) }.mapNotNull { s -> s.e<SignatureRole>("role")?.let { Signature(it, s.s("name"), s.ns("registrationNo"), s.s("signedAt"), s.nb("thumbImpression"), s.e<SurrogateRank>("surrogateRank"), ConsentReadingRules.decode(s.o("readAloud"))) } } }.orEmpty(),
             limitedLiteracy = j.optBoolean("limitedLiteracy"), revokedAt = j.ns("revokedAt"), revokedReason = j.ns("revokedReason"), supersedes = j.ns("supersedes"), gocTranscript = GocTranscriptJson.decode(j.optJSONObject(GOC_TRANSCRIPT_KEY), j.optInt("version", 1)),
         )
     }

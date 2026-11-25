@@ -2,7 +2,6 @@
 package `in`.wedevit.care
 
 import androidx.compose.foundation.BorderStroke
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -154,7 +153,7 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
     fun moveStep(value:Int) { if(step!=value) {audio.release();onlineJob?.cancel()};step=value }
     LaunchedEffect(selectedVersion) { if(selectedVersion!=null) {audio.release();onlineJob?.cancel()} }
     val version = versions.firstOrNull { it.id == selectedVersion }
-    BackHandler(selectedVersion != null) { selectedVersion = null; revision++ }
+    androidx.activity.compose.BackHandler(selectedVersion != null) { selectedVersion = null; revision++ }
     if (version != null) {
         DoctorVersionReader(patient, version, store, onBack = { selectedVersion = null; revision++ })
         return

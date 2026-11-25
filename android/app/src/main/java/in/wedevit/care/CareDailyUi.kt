@@ -1,6 +1,5 @@
 package `in`.wedevit.care
 
-import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -111,7 +110,10 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
                     }
                 }
             }
-            today?.detail?.takeIf { it.isNotBlank() }?.let { Text(it, fontSize = 15.sp, lineHeight = 20.sp, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis) }
+            // Today's few words open in under the moods once saved, instead of popping in.
+            AnimatedVisibility(!today?.detail.isNullOrBlank(), enter = SaharaMotion.expand, exit = SaharaMotion.collapse) {
+                Text(today?.detail.orEmpty(), fontSize = 15.sp, lineHeight = 20.sp, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            }
         }
         // A soft bloom of petals by the Saved tick once an okay or good day is saved. A hard day gets only the quiet tick: nothing celebrates it.
         SaharaMoment(today?.title?.takeIf { it == tapped && it != CheckInMood.HARD }) {
@@ -163,6 +165,7 @@ internal object TodayHero {
     val dayStart = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
     val today = CheckInMood.today(items, person, dayStart)
     val capturedAccount = remember(person) { vm.accountNamespace }
+    val haptic = rememberSaharaHaptic()
     Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("today-checkin")) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(t("How was today?", "आज का दिन कैसा रहा?"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
@@ -170,13 +173,13 @@ internal object TodayHero {
                 CareDailyFlow.moods.forEach { mood ->
                     FilterChip(selected = today?.title == mood, enabled = !busy, onClick = {
                         val change = CareDailyFlow.checkInChange(today, mood)
-                        if (change != null && canEditCareContext(vm, person, capturedAccount)) { if (today != null) vm.updateItem(change) {} else vm.saveItem("checkin", mood, "") }
+                        if (change != null && canEditCareContext(vm, person, capturedAccount)) { haptic(); if (today != null) vm.updateItem(change) {} else vm.saveItem("checkin", mood, "") }
                     }, label = { Text(checkInMoodLabel(mood, hindi), fontSize = 15.sp, fontWeight = if (today?.title == mood) FontWeight.SemiBold else FontWeight.Medium, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()) },
                         shape = RoundedCornerShape(14.dp), colors = FilterChipDefaults.filterChipColors(containerColor = Cream, labelColor = DoctorCardInk, selectedContainerColor = Mint, selectedLabelColor = DoctorCardInk),
                         modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = 56.dp).testTag("today-checkin-${CareDailyFlow.moods.indexOf(mood)}"))
                 }
             }
-            today?.detail?.takeIf { it.isNotBlank() }?.let { Text(it, fontSize = 14.sp, color = DoctorCardInk, maxLines = 2) }
+            AnimatedVisibility(!today?.detail.isNullOrBlank(), enter = SaharaMotion.expand, exit = SaharaMotion.collapse) { Text(today?.detail.orEmpty(), fontSize = 14.sp, color = DoctorCardInk, maxLines = 2) }
             HorizontalDivider(color = DoctorHairline)
             DistressQuestion(vm, onYes = onDistress)
             HorizontalDivider(color = DoctorHairline)
@@ -210,10 +213,10 @@ internal object CareModules {
 }
 
 @Composable fun CareModuleCard(key: String, title: String, icon: ImageVector, tint: Color, count: Int, defaultOpen: Boolean, forceOpen: Boolean, content: @Composable ColumnScope.() -> Unit) {
-    var open by rememberSaveable(key, forceOpen) { mutableStateOf(defaultOpen || forceOpen) }; val t = careText()
+    var open by rememberSaveable(key, forceOpen) { mutableStateOf(defaultOpen || forceOpen) }; val t = careText(); val tick = rememberSaharaTick()
     Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().saharaAppear().testTag("care-module-$key")) { Column {
         val press = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
-        Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).saharaPress(press).clickable(interactionSource = press, indication = androidx.compose.material3.ripple(), role = Role.Button) { open = !open }.padding(horizontal = 16.dp, vertical = 8.dp).testTag("care-module-$key-toggle"), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).saharaPress(press).clickable(interactionSource = press, indication = androidx.compose.material3.ripple(), role = Role.Button) { tick(); open = !open }.padding(horizontal = 16.dp, vertical = 8.dp).testTag("care-module-$key-toggle"), verticalAlignment = Alignment.CenterVertically) {
             Surface(shape = androidx.compose.foundation.shape.CircleShape, color = tint) { Icon(icon, null, Modifier.padding(8.dp).size(22.dp), tint = DoctorAccent) }
             Spacer(Modifier.width(12.dp)); Text(title, fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
             SaharaAnimatedText("$count") { Text(it, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.background(Cream, CircleShape).padding(horizontal = 10.dp, vertical = 2.dp)) }; Spacer(Modifier.width(6.dp)); SaharaChevron(open, if (open) t("Collapse $title", "$title बंद करें") else t("Expand $title", "$title खोलें"))
@@ -281,8 +284,20 @@ internal class CareModuleTile(val name: String, val title: String, val subtitle:
 
 /** Each Daily care module keeps one section colour everywhere (tile wash, count, icon tile): medicines plum, visits indigo, check-ins teal. */
 internal fun careModuleTone(name: String): SaharaTone = when (name) {
-    "Conversations" -> SaharaTone.Marigold; "Medicines" -> SaharaTone.Plum; "Visits" -> SaharaTone.Indigo
-    "To do" -> SaharaTone.Leaf; "Check-ins" -> SaharaTone.Teal; else -> SaharaTone.Rose
+    "Conversations" -> CareToolGroupTone.Planning; "Medicines" -> CareToolGroupTone.Medicines; "Visits" -> CareToolGroupTone.Records
+    else -> CareToolGroupTone.Daily // To do, Check-ins, Journal
+}
+
+/**
+ * One tone per group of care tools (24 Nov meeting: "why some blue, some purple?"), so a colour always means the same kind of tool:
+ * daily care (how I feel, symptoms, check-ins, journal, to do), medicines, records (visits, calendar, documents, labs, timeline)
+ * and planning (goals of care, emergency plan, tubes and lines, community).
+ */
+internal object CareToolGroupTone {
+    val Daily = SaharaTone.Teal
+    val Medicines = SaharaTone.Plum
+    val Records = SaharaTone.Indigo
+    val Planning = SaharaTone.Marigold
 }
 
 /** The module's icon in the All care tools list. */
@@ -293,7 +308,7 @@ internal fun careModuleIcon(name: String): ImageVector = when (name) {
 
 /** A module on its own screen, with a back arrow to where it was opened from (All care tools, or Today). */
 @Composable internal fun CareModuleScreen(tile: CareModuleTile, onBack: () -> Unit) {
-    BackHandler(onBack = onBack)
+    SaharaBackHandler(onBack = onBack)
     LazyColumn(Modifier.fillMaxSize().saharaScreenEnter().testTag("care-list"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         // The module's header band in its section colour (medicines plum, visits indigo, check-ins teal), white title and back; the art floats gently.
         item { SaharaSectionBand(tile.title, careModuleTone(tile.name), onBack = onBack, backTag = "care-module-back") { SaharaBandArt(tile.art, modifier = Modifier.saharaFloat()) } }

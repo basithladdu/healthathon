@@ -2,10 +2,7 @@
 package `in`.wedevit.care
 
 import android.content.Intent
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
 import android.net.Uri
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -173,7 +170,11 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
     fun openReal(id: String) = navigate { vm.select(id); selection = DoctorPatientSelection(userId, DoctorPatientSource.SHARED, id); section = "Hub"; tab = 1; shared = false }
     fun openShared() = navigate { selection = null; shared = true; tab = 1 }
     fun back() { if (!navigationBlocked && nestedBack != null) nestedBack?.invoke() else navigate { if (isolatedDemo) isolatedDemo = false else if (shared) shared = false else if (selection != null) { if (section == "Hub") selection = null else section = "Hub" } else if (tab != 0) tab = 0 else onExit() } }
-    BackHandler { back() }
+    // Back here mostly closes a panel in place (plain if/else, no screen host), so the plain BackHandler, without the "leaving" preview.
+    // Leaving the workspace previews the screen that encloses it; Patients/Schedule/Account back to Home previews inside the tab host below.
+    androidx.activity.compose.BackHandler { back() }
+    val homeTabsShown = !navigationBlocked && nestedBack == null && !isolatedDemo && !shared && selection == null
+    SaharaBackHandler(homeTabsShown && tab == 0) { back() }
     Scaffold(containerColor = Cream, topBar = { SaharaStatusBarIcons(lightIcons = false); Column { TopAppBar(title = { Column { Text(if (isolatedDemo) DoctorTestProfiles.profiles.firstOrNull {DoctorTestProfiles.personId(it)==testCarePerson}?.name ?: t("Earlier demo care", "पहले की डेमो देखभाल") else realPatient?.name ?: patient?.name ?: if (selection != null) t("Patient record", "मरीज़ का रिकॉर्ड") else if (shared) t("Shared care", "साझा देखभाल") else t("Sahara", "सहारा"), fontFamily = SaharaTitleFont, fontSize = 22.sp, maxLines = 1, overflow = TextOverflow.Ellipsis) } }, navigationIcon = { IconButton(onClick = ::back, enabled = !navigationBlocked) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) } }, actions = { CareLanguageMenu(compact = true, contentColor = SaharaColors.OnHeader) },
         colors = TopAppBarDefaults.topAppBarColors(containerColor = DoctorBand, titleContentColor = SaharaColors.OnHeader, navigationIconContentColor = SaharaColors.OnHeader, actionIconContentColor = SaharaColors.OnHeader))
         HorizontalDivider(color = SaharaColors.HeaderLine) } }, bottomBar = {
@@ -240,7 +241,9 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                         }
                     } }
                 }
-            } else SaharaScreenHost(tab, Modifier.fillMaxSize(), label = "doctorTabs", direction = { from, to -> if (to > from) SaharaMotion.Direction.Forward else SaharaMotion.Direction.Back }) { shownTab -> when(shownTab) {
+            } else SaharaScreenHost(tab, Modifier.fillMaxSize(), label = "doctorTabs", direction = { from, to -> if (to > from) SaharaMotion.Direction.Forward else SaharaMotion.Direction.Back }) { shownTab ->
+                SaharaBackHandler(homeTabsShown && shownTab != 0) { back() }
+                when(shownTab) {
                 0 -> CompositionLocalProvider(LocalSaharaStagger provides remember { SaharaStagger() }) { SaharaPullRefresh(vm.refreshing, { vm.refresh(); checkClinician() }, enabled = !earlierWorkspace) { LazyColumn(Modifier.fillMaxSize().background(SaharaBackdrop).testTag("doctor-home"), state = homeList, contentPadding = PaddingValues(start = 16.dp, top = 12.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Text(LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, d MMMM", careLocale(hindi))), Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
                         if (!earlierWorkspace) IconButton(onClick = { vm.refresh(); checkClinician() }, enabled = !realRefreshing, modifier = Modifier.size(48.dp).testTag("doctor-home-refresh")) { if (realRefreshing) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp, color = DoctorAccent) else Icon(Icons.Default.Refresh, t("Refresh records", "रिकॉर्ड रिफ़्रेश करें"), tint = DoctorAccent) } } }
@@ -640,10 +643,12 @@ private fun connectedTopicLabel(status: WorkflowTopicStatus, t: (String, String)
 }
 
 @Composable private fun ConnectedDateTime(label:String,value:String,enabled:Boolean,onChange:(String)->Unit) {
-    val context=LocalContext.current
     val time=java.time.LocalDateTime.parse(value)
+    // The calendar, then the scroll wheels: never typed (owner, 25 Nov). The stored text stays LocalDateTime.toString().
+    var picking by remember { mutableStateOf(false) }
+    if (picking) CareDateTimeDialog(time, label, { picked -> picking = false; onChange(picked.withSecond(0).withNano(0).toString()) }, { picking = false })
     Text(label,fontWeight=FontWeight.SemiBold)
-    OutlinedButton(onClick={DatePickerDialog(context,{_,year,month,day-> val selected=java.time.LocalDateTime.of(year,month+1,day,time.hour,time.minute);TimePickerDialog(context,{_,hour,minute->onChange(selected.withHour(hour).withMinute(minute).toString())},time.hour,time.minute,false).show()},time.year,time.monthValue-1,time.dayOfMonth).show()},enabled=enabled,modifier=Modifier.fillMaxWidth()) {Icon(Icons.Default.CalendarMonth,null);Spacer(Modifier.width(8.dp));Text(time.format(DateTimeFormatter.ofPattern("d MMM yyyy, h:mm a")))}
+    OutlinedButton(onClick={picking=true},enabled=enabled,modifier=Modifier.fillMaxWidth().heightIn(min=48.dp)) {Icon(Icons.Default.CalendarMonth,null);Spacer(Modifier.width(8.dp));Text(time.format(DateTimeFormatter.ofPattern("d MMM yyyy, h:mm a")))}
 }
 
 @Composable private fun ConnectedPublishedNote(note:ConnectedDoctorNote) { val t = careText();

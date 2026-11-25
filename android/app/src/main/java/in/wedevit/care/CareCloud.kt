@@ -23,7 +23,7 @@ import javax.crypto.spec.GCMParameterSpec
 
 data class CareSession(val userId: String, val email: String, val access: String, val refresh: String, val expires: Long)
 data class CareMember(val userId: String, val canEdit: Boolean, val email: String, val careTeamRead: Boolean = false, val careTeamPermissionKnown: Boolean = false)
-data class CloudRecords(val people: List<Person>, val entries: List<CareItem>, val notes: List<CareVersion>, val confirmations: List<Acknowledgement>, val editable: Set<String>, val owned: Set<String>, val verifiedReviews: Set<String> = emptySet(), val authenticatedConfirmations: Set<String> = emptySet())
+data class CloudRecords(val people: List<Person>, val entries: List<CareItem>, val notes: List<CareVersion>, val confirmations: List<Acknowledgement>, val editable: Set<String>, val owned: Set<String>, val verifiedReviews: Set<String> = emptySet(), val authenticatedConfirmations: Set<String> = emptySet(), val confirmationReadings: Map<String, ConsentReading> = emptyMap())
 internal class CareHttpException(val status: Int, message: String, val code: String = "") : IllegalArgumentException(message)
 /** A server feature the app asks for is not installed yet (PostgREST: no such function), so the screen can say so instead of guessing. */
 internal fun Throwable.isMissingServerFeature() = this is CareHttpException && (status == 404 || code == "PGRST202" || code == "42883")
@@ -36,6 +36,9 @@ internal fun decodeAcknowledgement(row: JSONObject): Acknowledgement {
     val versionId = data.optString("versionId").ifBlank { id }
     return Acknowledgement(versionId, data.getString("contentHash"), data.getString("name"), data.getString("relationship"), data.getLong("at"), id)
 }
+
+/** How the note was read before this confirmation, when the shared row keeps it (data.readAloud). */
+internal fun decodeAcknowledgementReading(row: JSONObject): ConsentReading? = runCatching { ConsentReadingRules.decode(row.getJSONObject("data").optJSONObject("readAloud")) }.getOrNull()
 
 class CareCloud(context: Context) {
     private val preferences = context.getSharedPreferences("care-account", Context.MODE_PRIVATE)
@@ -99,8 +102,10 @@ class CareCloud(context: Context) {
         require(deleted.length() == 1) { "This entry changed. Refresh before removing it." }
     }
     suspend fun saveNote(note: CareVersion) { save("note", note.id, note.personId, noteJson(note), 0) }
-    suspend fun confirm(personId: String, ack: Acknowledgement): Acknowledgement {
+    suspend fun confirm(personId: String, ack: Acknowledgement, reading: ConsentReading? = null): Acknowledgement {
         val data = JSONObject().put("contentHash", ack.contentHash).put("name", ack.name).put("relationship", ack.relationship).put("at", ack.at)
+        // How the note was read (ConsentReadAloud.kt). A server that does not keep data.readAloud yet drops it; the phone keeps its own copy.
+        reading?.let { data.put("readAloud", ConsentReadingRules.encode(it)) }
         // Retain the legacy patient payload/ID; separate family rows require the patient-first migration.
         if (ack.id != ack.versionId) data.put("versionId", ack.versionId)
         data.put("versionId", ack.versionId)
@@ -133,7 +138,7 @@ class CareCloud(context: Context) {
         val membership = rows("healthathon_members?user_id=eq.$user")
         val owned = personRows.filter { it.getString("owner_id") == user }.map { it.getString("id") }.toSet()
         val editable = owned + membership.filter { it.getBoolean("can_edit") }.map { it.getString("person_id") }
-        val entries = mutableListOf<CareItem>(); val notes = mutableListOf<CareVersion>(); val acks = mutableListOf<Acknowledgement>(); val authenticatedAcks = mutableSetOf<String>()
+        val entries = mutableListOf<CareItem>(); val notes = mutableListOf<CareVersion>(); val acks = mutableListOf<Acknowledgement>(); val authenticatedAcks = mutableSetOf<String>(); val ackReadings = mutableMapOf<String, ConsentReading>()
         rows("healthathon_records?order=updated_at.asc").forEach { row ->
             val d = row.getJSONObject("data"); val id = row.getString("id"); val person = row.getString("person_id")
             when (row.getString("kind")) {
@@ -151,12 +156,12 @@ class CareCloud(context: Context) {
                     else require(!d.has("contextVersion") && it.conversationId.isBlank() && it.contextJson.isBlank()) { "This conversation format requires an updated app." }
                     DoctorConversationContext.validateVersion(it)
                 })
-                "ack" -> { acks.add(decodeAcknowledgement(row)); if (runCatching { java.util.UUID.fromString(d.optString("actorId")) }.isSuccess) authenticatedAcks += id }
+                "ack" -> { acks.add(decodeAcknowledgement(row)); decodeAcknowledgementReading(row)?.let { ackReadings[id] = it }; if (runCatching { java.util.UUID.fromString(d.optString("actorId")) }.isSuccess) authenticatedAcks += id }
             }
         }
         // Missing review service leaves ordinary records usable, without granting a badge.
         val receipts = runCatching { verifiedReviewIds() }.getOrDefault(emptySet())
-        return CloudRecords(personRows.map { Person(it.getString("id"), it.getString("name"), it.getLong("created_ms")) }, entries, notes, acks, editable, owned, receipts, authenticatedAcks)
+        return CloudRecords(personRows.map { Person(it.getString("id"), it.getString("name"), it.getLong("created_ms")) }, entries, notes, acks, editable, owned, receipts, authenticatedAcks, ackReadings)
     }
     private suspend fun rows(path: String): List<JSONObject> {
         val result = mutableListOf<JSONObject>(); var offset = 0

@@ -1944,7 +1944,7 @@ Remove this question?	ಈ ಪ್ರಶ್ನೆ ತೆಗೆದುಹಾಕಬ�
 It is only your own preparation note. Removing it does not change any saved conversation or published note.	ಇದು ನಿಮ್ಮ ಸ್ವಂತ ತಯಾರಿಯ ನೋಟ್ ಮಾತ್ರ. ಇದನ್ನು ತೆಗೆದರೆ ಉಳಿಸಿದ ಸಂಭಾಷಣೆ ಅಥವಾ ಪ್ರಕಟಿಸಿದ ನೋಟ್ ಬದಲಾಗುವುದಿಲ್ಲ.
 Remove question	ಪ್ರಶ್ನೆ ತೆಗೆದುಹಾಕಿ
 Keep it	ಇರಲಿ
-Goals of care discussion	ಆರೈಕೆಯ ಗುರಿಗಳ ಬಗ್ಗೆ ಚರ್ಚೆ
+Goals of care discussion	ಆರೈಕೆಯ ಗುರಿಗಳ ಚರ್ಚೆ
 Your own questions to cover, saved on this device. Preparation only: not transcript evidence, not from the patient, and not part of a published note.	ನೀವು ಮಾತನಾಡಬೇಕಾದ ನಿಮ್ಮ ಸ್ವಂತ ಪ್ರಶ್ನೆಗಳು, ಈ ಫೋನ್‌ನಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ. ತಯಾರಿಗೆ ಮಾತ್ರ: ಸಂಭಾಷಣೆಯ ಪುರಾವೆಯಲ್ಲ, ರೋಗಿಯಿಂದ ಬಂದದ್ದಲ್ಲ, ಪ್ರಕಟಿಸಿದ ನೋಟ್‌ನ ಭಾಗವೂ ಅಲ್ಲ.
 No questions yet. Add as many as you need.	ಇನ್ನೂ ಪ್ರಶ್ನೆಗಳಿಲ್ಲ. ಬೇಕಾದಷ್ಟು ಸೇರಿಸಿ.
 ${m.rows.size} of $DOCTOR_PREPARATION_MAX_QUESTIONS questions	$DOCTOR_PREPARATION_MAX_QUESTIONS ರಲ್ಲಿ ${m.rows.size} ಪ್ರಶ್ನೆಗಳು
@@ -5849,3 +5849,277 @@ Dissolve in water	ನೀರಿನಲ್ಲಿ ಕರಗಿಸಿ ತೆಗೆದ
 Shake well before use	ಬಳಸುವ ಮೊದಲು ಚೆನ್ನಾಗಿ ಕುಲುಕಿ
 Tap a dose when taken. Hold it for Not taken or Skipped.	ತೆಗೆದುಕೊಂಡಾಗ ಡೋಸ್ ಒತ್ತಿ. ತೆಗೆದುಕೊಳ್ಳದಿದ್ದರೆ ಅಥವಾ ಬಿಟ್ಟರೆ ಒತ್ತಿ ಹಿಡಿಯಿರಿ.
 Not yet · late	ಇನ್ನೂ ಇಲ್ಲ · ತಡ
+One year less	ಒಂದು ವರ್ಷ ಕಡಿಮೆ
+One year more	ಒಂದು ವರ್ಷ ಹೆಚ್ಚು
+Age not set	ವಯಸ್ಸು ಆಯ್ಕೆ ಮಾಡಿಲ್ಲ
+years	ವರ್ಷ
+Tap the nearest number, then + or − to fine-tune.	ಹತ್ತಿರದ ಸಂಖ್ಯೆಯನ್ನು ಒತ್ತಿ, ನಂತರ ಸರಿಪಡಿಸಲು + ಅಥವಾ − ಒತ್ತಿ.
+Use + or − to change it by one year.	ಒಂದೊಂದು ವರ್ಷ ಬದಲಿಸಲು + ಅಥವಾ − ಒತ್ತಿ.
+What is causing your distress?	ನಿಮ್ಮ ತೊಂದರೆಗೆ ಕಾರಣ ಏನು?
+Tick any that apply (no scores here)	ಅನ್ವಯಿಸುವುದನ್ನು ಆರಿಸಿ (ಇಲ್ಲಿ ಅಂಕಗಳಿಲ್ಲ)
+What we do with your data	ನಿಮ್ಮ ಡೇಟಾದೊಂದಿಗೆ ನಾವು ಏನು ಮಾಡುತ್ತೇವೆ
+Thank you. The card is now valid until $until. Print the new card.	ಧನ್ಯವಾದಗಳು. ಕಾರ್ಡ್ ಈಗ $until ವರೆಗೆ ಮಾನ್ಯವಾಗಿದೆ. ಹೊಸ ಕಾರ್ಡ್ ಅನ್ನು ಮುದ್ರಿಸಿ.
+Couldn't renew the card. Try again.	ಕಾರ್ಡ್ ಅನ್ನು ನವೀಕರಿಸಲು ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Is everything on the card still the same?	ಕಾರ್ಡ್‌ನಲ್ಲಿರುವುದೆಲ್ಲಾ ಇನ್ನೂ ಹಾಗೆಯೇ ಇದೆಯೇ?
+Please look at the phone numbers and the medicines. The card is checked every 3 months.	ದಯವಿಟ್ಟು ಫೋನ್ ಸಂಖ್ಯೆಗಳು ಮತ್ತು ಔಷಧಿಗಳನ್ನು ನೋಡಿ. ಕಾರ್ಡ್ ಅನ್ನು ಪ್ರತಿ 3 ತಿಂಗಳಿಗೊಮ್ಮೆ ಪರಿಶೀಲಿಸಲಾಗುತ್ತದೆ.
+Yes, still the same	ಹೌದು, ಇನ್ನೂ ಹಾಗೆಯೇ ಇದೆ
+Who to call	ಯಾರಿಗೆ ಕರೆ ಮಾಡಬೇಕು
+Who	ಯಾರು
+Dose	ಡೋಸ್
+When	ಯಾವಾಗ
+Next of kin	ಹತ್ತಿರದ ಸಂಬಂಧಿ
+Treating doctor	ಚಿಕಿತ್ಸೆ ನೀಡುವ ವೈದ್ಯರು
+Hospital / clinic	ಆಸ್ಪತ್ರೆ / ಕ್ಲಿನಿಕ್
+We made Sahara simpler for you. You can switch back in Settings.	ನಾವು Sahara ಅನ್ನು ನಿಮಗಾಗಿ ಸರಳಗೊಳಿಸಿದ್ದೇವೆ. ನೀವು ಸೆಟ್ಟಿಂಗ್ಸ್‌ನಲ್ಲಿ ಮತ್ತೆ ಬದಲಾಯಿಸಬಹುದು.
+Switch back	ಮತ್ತೆ ಬದಲಾಯಿಸಿ
+Call for help	ಸಹಾಯಕ್ಕಾಗಿ ಕರೆ ಮಾಡಿ
+Family, care team or ambulance 108	ಕುಟುಂಬ, ಆರೈಕೆ ತಂಡ ಅಥವಾ ಆಂಬ್ಯುಲೆನ್ಸ್ 108
+My note	ನನ್ನ ಟಿಪ್ಪಣಿ
+Tap the big button and say how you are. Your care team will see your note.	ದೊಡ್ಡ ಬಟನ್ ಅನ್ನು ಮುಟ್ಟಿ ನೀವು ಹೇಗಿದ್ದೀರಿ ಎಂದು ಹೇಳಿ. ನಿಮ್ಮ ಆರೈಕೆ ತಂಡ ನಿಮ್ಮ ಟಿಪ್ಪಣಿಯನ್ನು ನೋಡುತ್ತದೆ.
+Say how you are	ನೀವು ಹೇಗಿದ್ದೀರಿ ಎಂದು ಹೇಳಿ
+Tap and speak	ಮುಟ್ಟಿ ಮಾತನಾಡಿ
+Speak again	ಮತ್ತೆ ಮಾತನಾಡಿ
+Write instead	ಬದಲಿಗೆ ಬರೆಯಿರಿ
+Medical research: allowed (name and contact details removed)	ವೈದ್ಯಕೀಯ ಸಂಶೋಧನೆ: ಅನುಮತಿ ಇದೆ (ಹೆಸರು ಮತ್ತು ಸಂಪರ್ಕ ವಿವರಗಳನ್ನು ತೆಗೆದು)
+Medical research: not allowed	ವೈದ್ಯಕೀಯ ಸಂಶೋಧನೆ: ಅನುಮತಿ ಇಲ್ಲ
+Sahara data choices for $personName	$personName ಅವರಿಗಾಗಿ Sahara ಡೇಟಾ ಆಯ್ಕೆಗಳು
+Last changed: $it	ಕೊನೆಯದಾಗಿ ಬದಲಾಯಿಸಿದ್ದು: $it
+Research use is separate from sending feedback to improve the app.	ಸಂಶೋಧನೆಗೆ ಬಳಕೆಯು, ಆ್ಯಪ್ ಸುಧಾರಿಸಲು ಅಭಿಪ್ರಾಯ ಕಳುಹಿಸುವುದರಿಂದ ಬೇರೆ.
+Records stay with the care team either way.	ಯಾವುದೇ ರೀತಿಯಲ್ಲೂ ದಾಖಲೆಗಳು ಆರೈಕೆ ತಂಡದ ಬಳಿಯೇ ಇರುತ್ತವೆ.
+Medical research	ವೈದ್ಯಕೀಯ ಸಂಶೋಧನೆ
+Allow my data, with my name and contact details removed, to be used for medical research by my care team	ನನ್ನ ಹೆಸರು ಮತ್ತು ಸಂಪರ್ಕ ವಿವರಗಳನ್ನು ತೆಗೆದು, ನನ್ನ ಡೇಟಾವನ್ನು ನನ್ನ ಆರೈಕೆ ತಂಡ ವೈದ್ಯಕೀಯ ಸಂಶೋಧನೆಗೆ ಬಳಸಲು ಅನುಮತಿಸಿ
+Research use is off.	ಸಂಶೋಧನೆಗೆ ಬಳಕೆ ಆಫ್ ಆಗಿದೆ.
+Allowed	ಅನುಮತಿ ಇದೆ
+Not allowed	ಅನುಮತಿ ಇಲ್ಲ
+Off unless you switch it on. You can switch it off at any time, and your care does not change either way.	ನೀವು ಆನ್ ಮಾಡುವವರೆಗೆ ಇದು ಆಫ್ ಆಗಿರುತ್ತದೆ. ನೀವು ಇದನ್ನು ಯಾವಾಗ ಬೇಕಾದರೂ ಆಫ್ ಮಾಡಬಹುದು, ಯಾವುದೇ ರೀತಿಯಲ್ಲೂ ನಿಮ್ಮ ಆರೈಕೆ ಬದಲಾಗುವುದಿಲ್ಲ.
+Only the patient or family can change this.	ಇದನ್ನು ರೋಗಿ ಅಥವಾ ಕುಟುಂಬ ಮಾತ್ರ ಬದಲಾಯಿಸಬಹುದು.
+Your data choices	ನಿಮ್ಮ ಡೇಟಾ ಆಯ್ಕೆಗಳು
+Share my data choices	ನನ್ನ ಡೇಟಾ ಆಯ್ಕೆಗಳನ್ನು ಕಳುಹಿಸಿ
+Allow research use?	ಸಂಶೋಧನೆಗೆ ಬಳಸಲು ಅನುಮತಿಸುವಿರಾ?
+Your name and contact details are removed first. You can switch this off at any time in Privacy and data.	ಮೊದಲು ನಿಮ್ಮ ಹೆಸರು ಮತ್ತು ಸಂಪರ್ಕ ವಿವರಗಳನ್ನು ತೆಗೆದುಹಾಕಲಾಗುತ್ತದೆ. ನೀವು ಇದನ್ನು ಯಾವಾಗ ಬೇಕಾದರೂ 'ಗೌಪ್ಯತೆ ಮತ್ತು ಡೇಟಾ'ದಲ್ಲಿ ಆಫ್ ಮಾಡಬಹುದು.
+Research use is on. Thank you.	ಸಂಶೋಧನೆಗೆ ಬಳಕೆ ಆನ್ ಆಗಿದೆ. ಧನ್ಯವಾದಗಳು.
+Research choice and privacy policy	ಸಂಶೋಧನೆಯ ಆಯ್ಕೆ ಮತ್ತು ಗೌಪ್ಯತಾ ನೀತಿ
+Hour	ಗಂಟೆ
+Minute	ನಿಮಿಷ
+AM or PM	AM ಅಥವಾ PM
+As-needed dose taken.	ಅಗತ್ಯವಿದ್ದಾಗ ತೆಗೆದುಕೊಳ್ಳುವ ಡೋಸ್ ತೆಗೆದುಕೊಳ್ಳಲಾಗಿದೆ.
+No photo came back from the camera. Try again.	ಕ್ಯಾಮೆರಾದಿಂದ ಫೋಟೋ ಬರಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+For breathlessness at rest	ವಿಶ್ರಾಂತಿಯಲ್ಲಿರುವಾಗ ಉಸಿರಾಟದ ತೊಂದರೆಗೆ
+For fluid build-up	ದೇಹದಲ್ಲಿ ನೀರು ತುಂಬಿಕೊಳ್ಳುವುದಕ್ಕೆ
+For fluid build-up and breathlessness	ದೇಹದಲ್ಲಿ ನೀರು ತುಂಬಿಕೊಳ್ಳುವುದು ಮತ್ತು ಉಸಿರಾಟದ ತೊಂದರೆಗೆ
+For night-time anxiety with breathlessness	ರಾತ್ರಿ ಉಸಿರಾಟದ ತೊಂದರೆಯೊಂದಿಗೆ ಬರುವ ಆತಂಕಕ್ಕೆ
+For bone pain	ಮೂಳೆ ನೋವಿಗೆ
+For background bone pain	ನಿರಂತರ ಮೂಳೆ ನೋವಿಗೆ
+For wheeze	ಉಸಿರಿನ ಸೀಟಿ ಶಬ್ದಕ್ಕೆ
+For agitation	ಚಡಪಡಿಕೆಗೆ
+For dry mouth	ಬಾಯಿ ಒಣಗುವುದಕ್ಕೆ
+For hiccups	ಬಿಕ್ಕಳಿಕೆಗೆ
+For secretions	ಗಂಟಲು ಮತ್ತು ಎದೆಯ ಕಫಕ್ಕೆ
+To prevent constipation	ಮಲಬದ್ಧತೆ ಆಗದಂತೆ
+To prevent constipation while taking morphine	ಮಾರ್ಫಿನ್ ತೆಗೆದುಕೊಳ್ಳುವಾಗ ಮಲಬದ್ಧತೆ ಆಗದಂತೆ
+While taking morphine	ಮಾರ್ಫಿನ್ ತೆಗೆದುಕೊಳ್ಳುವಾಗ
+Short course for wheeze, finished after review	ಉಸಿರಿನ ಸೀಟಿ ಶಬ್ದಕ್ಕೆ ಸಣ್ಣ ಕೋರ್ಸ್, ಪರಿಶೀಲನೆಯ ನಂತರ ಮುಗಿದಿದೆ
+Earlier anti-sickness medicine, stopped after review	ಹಿಂದಿನ ವಾಕರಿಕೆ ತಡೆಯುವ ಔಷಧ, ಪರಿಶೀಲನೆಯ ನಂತರ ನಿಲ್ಲಿಸಲಾಗಿದೆ
+Sublingual	ನಾಲಿಗೆಯ ಕೆಳಗೆ
+Under the tongue	ನಾಲಿಗೆಯ ಕೆಳಗೆ
+Apply to the skin	ಚರ್ಮಕ್ಕೆ ಹಚ್ಚಿ
+Change patch every 3 days	ಪ್ರತಿ 3 ದಿನಕ್ಕೆ ಪ್ಯಾಚ್ ಬದಲಾಯಿಸಿ
+At night if needed	ಅಗತ್ಯವಿದ್ದರೆ ರಾತ್ರಿ
+Every 4 hours	ಪ್ರತಿ 4 ಗಂಟೆಗೆ
+Every 12 hours	ಪ್ರತಿ 12 ಗಂಟೆಗೆ
+Three times daily before meals	ದಿನಕ್ಕೆ ಮೂರು ಬಾರಿ ಊಟಕ್ಕೆ ಮೊದಲು
+Review if more than 4 doses in 24 hours	24 ಗಂಟೆಗಳಲ್ಲಿ 4 ಕ್ಕಿಂತ ಹೆಚ್ಚು ಡೋಸ್ ಬೇಕಾದರೆ ವೈದ್ಯರಿಗೆ ತಿಳಿಸಿ
+Review if used on more than 4 nights a week	ವಾರದಲ್ಲಿ 4 ಕ್ಕಿಂತ ಹೆಚ್ಚು ರಾತ್ರಿ ಬಳಸಬೇಕಾದರೆ ವೈದ್ಯರಿಗೆ ತಿಳಿಸಿ
+Weigh each morning and tell the team of a gain of 2 kg in 3 days	ಪ್ರತಿ ಬೆಳಿಗ್ಗೆ ತೂಕ ನೋಡಿ, 3 ದಿನಗಳಲ್ಲಿ 2 ಕೆಜಿ ಹೆಚ್ಚಾದರೆ ತಂಡಕ್ಕೆ ತಿಳಿಸಿ
+Time (optional)	ಸಮಯ (ಬೇಕಿದ್ದರೆ)
+Day	ದಿನ
+time	ಸಮಯ
+Which hospital	ಯಾವ ಆಸ್ಪತ್ರೆ
+When admitted	ಯಾವಾಗ ದಾಖಲಾದರು
+Listening… speak now	ಕೇಳುತ್ತಿದ್ದೇವೆ… ಈಗ ಮಾತನಾಡಿ
+No words heard. Tap the microphone and try again.	ಯಾವ ಪದಗಳೂ ಕೇಳಿಸಲಿಲ್ಲ. ಮೈಕ್ ಒತ್ತಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+This language isn't ready for speaking on this phone yet.	ಈ ಫೋನ್‌ನಲ್ಲಿ ಈ ಭಾಷೆಯಲ್ಲಿ ಮಾತನಾಡಿ ಬರೆಯುವುದು ಇನ್ನೂ ಸಿದ್ಧವಾಗಿಲ್ಲ.
+Allow the microphone to speak instead of typing.	ಟೈಪ್ ಮಾಡುವ ಬದಲು ಮಾತನಾಡಲು ಮೈಕ್‌ಗೆ ಅನುಮತಿ ನೀಡಿ.
+Couldn't hear that. Tap the microphone and try again.	ಅದು ಕೇಳಿಸಲಿಲ್ಲ. ಮೈಕ್ ಒತ್ತಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Couldn't start the microphone. Try again.	ಮೈಕ್ ಪ್ರಾರಂಭವಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Stop listening	ಕೇಳುವುದನ್ನು ನಿಲ್ಲಿಸಿ
+Speak instead of typing	ಟೈಪ್ ಮಾಡುವ ಬದಲು ಮಾತನಾಡಿ
+This phone can't record here.	ಈ ಫೋನ್ ಇಲ್ಲಿ ರೆಕಾರ್ಡ್ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ.
+The microphone is busy. Try again in a moment.	ಮೈಕ್ ಬ್ಯುಸಿಯಾಗಿದೆ. ಸ್ವಲ್ಪ ಹೊತ್ತಿನ ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Your voice is saved with this note.	ನಿಮ್ಮ ಧ್ವನಿ ಈ ಟಿಪ್ಪಣಿಯ ಜೊತೆ ಉಳಿಸಲಾಗಿದೆ.
+The voice couldn't be kept on this phone. The words are saved.	ಈ ಫೋನ್‌ನಲ್ಲಿ ಧ್ವನಿಯನ್ನು ಇಡಲು ಆಗಲಿಲ್ಲ. ಪದಗಳನ್ನು ಉಳಿಸಲಾಗಿದೆ.
+No sound reached the microphone. Try again.	ಮೈಕ್‌ಗೆ ಯಾವ ಶಬ್ದವೂ ತಲುಪಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Too short to keep. Tap Record and speak.	ಇಡಲು ತುಂಬಾ ಚಿಕ್ಕದು. ರೆಕಾರ್ಡ್ ಒತ್ತಿ ಮಾತನಾಡಿ.
+Your voice is being kept. The words can't be written on this phone, so tap the microphone in the box to add them.	ನಿಮ್ಮ ಧ್ವನಿಯನ್ನು ಇಡಲಾಗುತ್ತಿದೆ. ಈ ಫೋನ್‌ನಲ್ಲಿ ಪದಗಳನ್ನು ಬರೆಯಲು ಆಗುವುದಿಲ್ಲ, ಆದ್ದರಿಂದ ಅವನ್ನು ಸೇರಿಸಲು ಪೆಟ್ಟಿಗೆಯ ಮೈಕ್ ಒತ್ತಿ.
+Recording… speak now	ರೆಕಾರ್ಡ್ ಆಗುತ್ತಿದೆ… ಈಗ ಮಾತನಾಡಿ
+Record again	ಮತ್ತೆ ರೆಕಾರ್ಡ್ ಮಾಡಿ
+Remove voice	ಧ್ವನಿಯನ್ನು ತೆಗೆದುಹಾಕಿ
+Record your voice	ನಿಮ್ಮ ಧ್ವನಿಯನ್ನು ರೆಕಾರ್ಡ್ ಮಾಡಿ
+Your voice is kept for your nurse, and the words are written above.	ನಿಮ್ಮ ಧ್ವನಿಯನ್ನು ನಿಮ್ಮ ನರ್ಸ್‌ಗಾಗಿ ಇಡಲಾಗುತ್ತದೆ, ಪದಗಳನ್ನು ಮೇಲೆ ಬರೆಯಲಾಗುತ್ತದೆ.
+Your voice is kept for your nurse and family.	ನಿಮ್ಮ ಧ್ವನಿಯನ್ನು ನಿಮ್ಮ ನರ್ಸ್ ಮತ್ತು ಕುಟುಂಬಕ್ಕಾಗಿ ಇಡಲಾಗುತ್ತದೆ.
+Stop the other recording first.	ಮೊದಲು ಇನ್ನೊಂದು ರೆಕಾರ್ಡಿಂಗ್ ನಿಲ್ಲಿಸಿ.
+Speak instead of writing. Your nurse can listen to it.	ಬರೆಯುವ ಬದಲು ಮಾತನಾಡಿ. ನಿಮ್ಮ ನರ್ಸ್ ಅದನ್ನು ಕೇಳಬಹುದು.
+Remove this voice recording?	ಈ ಧ್ವನಿ ರೆಕಾರ್ಡಿಂಗ್ ತೆಗೆದುಹಾಕಬೇಕೇ?
+Pause the voice note	ಧ್ವನಿ ಟಿಪ್ಪಣಿಯನ್ನು ವಿರಾಮಗೊಳಿಸಿ
+Play the voice note	ಧ್ವನಿ ಟಿಪ್ಪಣಿಯನ್ನು ಪ್ಲೇ ಮಾಡಿ
+Voice note	ಧ್ವನಿ ಟಿಪ್ಪಣಿ
+Or sign in with email	ಅಥವಾ ಇಮೇಲ್‌ನೊಂದಿಗೆ ಸೈನ್ ಇನ್ ಮಾಡಿ
+You stay signed in on this phone until you choose Sign out.	ನೀವು ಸೈನ್ ಔಟ್ ಆಯ್ಕೆ ಮಾಡುವವರೆಗೆ ಈ ಫೋನ್‌ನಲ್ಲಿ ಸೈನ್ ಇನ್ ಆಗಿಯೇ ಇರುತ್ತೀರಿ.
+Your clinic's invite is ready	ನಿಮ್ಮ ಕ್ಲಿನಿಕ್‌ನ ಆಹ್ವಾನ ಸಿದ್ಧವಾಗಿದೆ
+Make your account once below. After that you stay signed in on this phone.	ಕೆಳಗೆ ಒಮ್ಮೆ ನಿಮ್ಮ ಖಾತೆ ಮಾಡಿ. ಅದರ ನಂತರ ಈ ಫೋನ್‌ನಲ್ಲಿ ಸೈನ್ ಇನ್ ಆಗಿಯೇ ಇರುತ್ತೀರಿ.
+I have an invite link from my clinic	ನನ್ನ ಬಳಿ ಕ್ಲಿನಿಕ್‌ನಿಂದ ಆಹ್ವಾನ ಲಿಂಕ್ ಇದೆ
+Open the message from your nurse or doctor and tap the link once. Sahara opens by itself. Or copy the link, come back and tap this button again.	ನಿಮ್ಮ ನರ್ಸ್ ಅಥವಾ ಡಾಕ್ಟರ್ ಕಳುಹಿಸಿದ ಸಂದೇಶ ತೆರೆದು ಲಿಂಕ್ ಅನ್ನು ಒಮ್ಮೆ ಒತ್ತಿ. Sahara ತಾನಾಗಿಯೇ ತೆರೆಯುತ್ತದೆ. ಅಥವಾ ಲಿಂಕ್ ಕಾಪಿ ಮಾಡಿ, ಹಿಂತಿರುಗಿ ಈ ಬಟನ್ ಮತ್ತೆ ಒತ್ತಿ.
+Your nurse or doctor sends it on WhatsApp or SMS.	ನಿಮ್ಮ ನರ್ಸ್ ಅಥವಾ ಡಾಕ್ಟರ್ ಇದನ್ನು WhatsApp ಅಥವಾ SMS ಮೂಲಕ ಕಳುಹಿಸುತ್ತಾರೆ.
+Very well	ತುಂಬಾ ಚೆನ್ನಾಗಿದೆ
+Fairly well	ಪರವಾಗಿಲ್ಲ
+Unwell	ಚೆನ್ನಾಗಿಲ್ಲ
+Very unwell	ತುಂಬಾ ಹುಷಾರಿಲ್ಲ
+How are you feeling this morning?	ಇಂದು ಬೆಳಿಗ್ಗೆ ನಿಮಗೆ ಹೇಗಿದೆ?
+How are you feeling this afternoon?	ಇಂದು ಮಧ್ಯಾಹ್ನ ನಿಮಗೆ ಹೇಗಿದೆ?
+How are you feeling this evening?	ಇಂದು ಸಂಜೆ ನಿಮಗೆ ಹೇಗಿದೆ?
+How are you feeling tonight?	ಇಂದು ರಾತ್ರಿ ನಿಮಗೆ ಹೇಗಿದೆ?
+How much $name this morning?	ಇಂದು ಬೆಳಿಗ್ಗೆ $name ಎಷ್ಟಿದೆ?
+How much $name this afternoon?	ಇಂದು ಮಧ್ಯಾಹ್ನ $name ಎಷ್ಟಿದೆ?
+How much $name this evening?	ಇಂದು ಸಂಜೆ $name ಎಷ್ಟಿದೆ?
+How much $name tonight?	ಇಂದು ರಾತ್ರಿ $name ಎಷ್ಟಿದೆ?
+Feelings	ಮನಸ್ಸು ಮತ್ತು ಭಾವನೆಗಳು
+Money and practical	ಹಣ ಮತ್ತು ದಿನನಿತ್ಯದ ಕೆಲಸಗಳು
+Faith	ನಂಬಿಕೆ
+Your care team sees this as $n out of 10.	ನಿಮ್ಮ ಆರೈಕೆ ತಂಡ ಇದನ್ನು 10ರಲ್ಲಿ $n ಎಂದು ನೋಡುತ್ತದೆ.
+Faces	ಮುಖಗಳು
+Numbers 0–10	ಅಂಕಿಗಳು 0–10
+Exact time (optional)	ನಿಖರ ಸಮಯ (ಐಚ್ಛಿಕ)
+When did it start? (optional)	ಇದು ಯಾವಾಗ ಶುರುವಾಯಿತು? (ಐಚ್ಛಿಕ)
+How much distress have you felt this past week? Tap the thermometer.	ಕಳೆದ ಒಂದು ವಾರದಲ್ಲಿ ನಿಮಗೆ ಎಷ್ಟು ಸಂಕಟ ಆಗಿದೆ? ಥರ್ಮಾಮೀಟರ್ ಮುಟ್ಟಿ.
+Tap a number	ಒಂದು ಅಂಕಿ ಮುಟ್ಟಿ
+What is troubling you? Tap the pictures.	ನಿಮಗೆ ಏನು ತೊಂದರೆ ಕೊಡುತ್ತಿದೆ? ಚಿತ್ರಗಳನ್ನು ಮುಟ್ಟಿ.
+Add details (optional)	ಹೆಚ್ಚಿನ ವಿವರ ಸೇರಿಸಿ (ಐಚ್ಛಿಕ)
+Tap a picture first.	ಮೊದಲು ಒಂದು ಚಿತ್ರ ಮುಟ್ಟಿ.
+Choose a face	ಒಂದು ಮುಖ ಆಯ್ಕೆಮಾಡಿ
+You answer with faces: none, a little, a lot or worst. Your care team sees the same answer as a number from 0 to 10.	ನೀವು ಮುಖಗಳಿಂದ ಹೇಳುತ್ತೀರಿ: ಸ್ವಲ್ಪವೂ ಇಲ್ಲ, ಸ್ವಲ್ಪ, ತುಂಬಾ ಅಥವಾ ಅತಿ ಹೆಚ್ಚು. ನಿಮ್ಮ ಆರೈಕೆ ತಂಡ ಅದೇ ಉತ್ತರವನ್ನು 0 ರಿಂದ 10 ರ ಅಂಕಿಯಾಗಿ ನೋಡುತ್ತದೆ.
+Show where it hurts	ಎಲ್ಲಿ ನೋವಿದೆ ಎಂದು ತೋರಿಸಿ
+Tap a face first.	ಮೊದಲು ಒಂದು ಮುಖ ಮುಟ್ಟಿ.
+How much does it hurt here: $part?	ಇಲ್ಲಿ ಎಷ್ಟು ನೋವಿದೆ: $part?
+choose a face	ಮುಖ ಆಯ್ಕೆಮಾಡಿ
+Tap where it hurts *	ನೋವಿರುವಲ್ಲಿ ಮುಟ್ಟಿ *
+Write or speak the message first.	ಮೊದಲು ಸಂದೇಶವನ್ನು ಬರೆಯಿರಿ ಅಥವಾ ಹೇಳಿ.
+Please make the message shorter.	ದಯವಿಟ್ಟು ಸಂದೇಶವನ್ನು ಚಿಕ್ಕದಾಗಿಸಿ.
+Here is the message from your doctor	ಇದು ನಿಮ್ಮ ವೈದ್ಯರಿಂದ ಬಂದ ಸಂದೇಶ
+Here is the message from your nurse	ಇದು ನಿಮ್ಮ ನರ್ಸ್‌ರಿಂದ ಬಂದ ಸಂದೇಶ
+Here is the message from your care team	ಇದು ನಿಮ್ಮ ಆರೈಕೆ ತಂಡದಿಂದ ಬಂದ ಸಂದೇಶ
+Here is the message from your family	ಇದು ನಿಮ್ಮ ಕುಟುಂಬದಿಂದ ಬಂದ ಸಂದೇಶ
+There is no message from your doctor or nurse yet.	ನಿಮ್ಮ ವೈದ್ಯರು ಅಥವಾ ನರ್ಸ್‌ರಿಂದ ಇನ್ನೂ ಯಾವುದೇ ಸಂದೇಶ ಇಲ್ಲ.
+Nurse, family or 108	ನರ್ಸ್, ಕುಟುಂಬ ಅಥವಾ 108
+To tell your nurse more, tap the microphone and speak.	ನಿಮ್ಮ ನರ್ಸ್‌ಗೆ ಇನ್ನಷ್ಟು ಹೇಳಲು, ಮೈಕ್ ಮುಟ್ಟಿ ಮಾತನಾಡಿ.
+Tell your nurse more	ನರ್ಸ್‌ಗೆ ಇನ್ನಷ್ಟು ಹೇಳಿ
+Family: press and hold a person to add their photo.	ಕುಟುಂಬದವರು: ಫೋಟೋ ಸೇರಿಸಲು ವ್ಯಕ್ತಿಯನ್ನು ಒತ್ತಿ ಹಿಡಿಯಿರಿ.
+Add a photo	ಫೋಟೋ ಸೇರಿಸಿ
+Tap Listen to hear it, or Send to give it to your nurse.	ಕೇಳಲು 'ಕೇಳಿ' ಮುಟ್ಟಿ, ಅಥವಾ ನರ್ಸ್‌ಗೆ ಕೊಡಲು 'ಕಳುಹಿಸಿ' ಮುಟ್ಟಿ.
+Tap the big microphone and speak. Your nurse will hear your own voice.	ದೊಡ್ಡ ಮೈಕ್ ಮುಟ್ಟಿ ಮಾತನಾಡಿ. ನಿಮ್ಮ ನರ್ಸ್ ನಿಮ್ಮದೇ ಧ್ವನಿಯನ್ನು ಕೇಳುತ್ತಾರೆ.
+That was too short. Tap and speak again.	ಇದು ತುಂಬಾ ಚಿಕ್ಕದಾಗಿತ್ತು. ಮತ್ತೆ ಮುಟ್ಟಿ ಮಾತನಾಡಿ.
+Couldn't start the microphone. Please try again.	ಮೈಕ್ ಆರಂಭವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Tell your nurse	ನರ್ಸ್‌ಗೆ ಹೇಳಿ
+Stop recording	ರೆಕಾರ್ಡಿಂಗ್ ನಿಲ್ಲಿಸಿ
+Listening. Tap to stop.	ಕೇಳುತ್ತಿದ್ದೇವೆ. ನಿಲ್ಲಿಸಲು ಮುಟ್ಟಿ.
+Listen	ಕೇಳಿ
+Couldn't play it.	ಪ್ಲೇ ಮಾಡಲು ಆಗಲಿಲ್ಲ.
+Send to nurse	ನರ್ಸ್‌ಗೆ ಕಳುಹಿಸಿ
+Photos stay on this phone. Set them on the phone the patient uses.	ಫೋಟೋಗಳು ಈ ಫೋನ್‌ನಲ್ಲೇ ಇರುತ್ತವೆ. ರೋಗಿ ಬಳಸುವ ಫೋನ್‌ನಲ್ಲಿ ಅವನ್ನು ಹಾಕಿ.
+One-tap calling: a tap on a face calls at once	ಒಂದೇ ಸ್ಪರ್ಶದ ಕರೆ: ಮುಖ ಮುಟ್ಟಿದ ಕೂಡಲೇ ಕರೆ ಹೋಗುತ್ತದೆ
+Photo on the call button	ಕರೆ ಬಟನ್‌ನ ಫೋಟೋ
+The patient taps this face to call. Use a clear photo of the face.	ಕರೆ ಮಾಡಲು ರೋಗಿ ಈ ಮುಖವನ್ನು ಮುಟ್ಟುತ್ತಾರೆ. ಮುಖ ಸ್ಪಷ್ಟವಾಗಿರುವ ಫೋಟೋ ಬಳಸಿ.
+Photos for the Call buttons	ಕರೆ ಬಟನ್‌ಗಳಿಗೆ ಫೋಟೋಗಳು
+Add care team phone numbers first; each person then gets a photo button.	ಮೊದಲು ಆರೈಕೆ ತಂಡದ ಫೋನ್ ಸಂಖ್ಯೆಗಳನ್ನು ಸೇರಿಸಿ; ನಂತರ ಪ್ರತಿ ವ್ಯಕ್ತಿಗೆ ಫೋಟೋ ಬಟನ್ ಸಿಗುತ್ತದೆ.
+Add photo	ಫೋಟೋ ಸೇರಿಸಿ
+Change photo	ಫೋಟೋ ಬದಲಿಸಿ
+Listen to the voice note	ಧ್ವನಿ ಟಿಪ್ಪಣಿ ಕೇಳಿ
+Message to read aloud	ಓದಿ ಕೇಳಿಸುವ ಸಂದೇಶ
+Read to me reads the newest message aloud.	'ನನಗೆ ಓದಿ ಹೇಳಿ' ಹೊಸ ಸಂದೇಶವನ್ನು ಓದಿ ಕೇಳಿಸುತ್ತದೆ.
+From	ಯಾರಿಂದ
+Name (optional)	ಹೆಸರು (ಐಚ್ಛಿಕ)
+e.g. Sister Mary	ಉದಾ. ಸಿಸ್ಟರ್ ಮೇರಿ
+Message	ಸಂದೇಶ
+e.g. Take the night medicine after food. I will visit on Friday.	ಉದಾ. ರಾತ್ರಿಯ ಔಷಧಿಯನ್ನು ಊಟದ ನಂತರ ತೆಗೆದುಕೊಳ್ಳಿ. ನಾನು ಶುಕ್ರವಾರ ಬರುತ್ತೇನೆ.
+Speak the message	ಸಂದೇಶವನ್ನು ಹೇಳಿ
+Speech typing is not available on this phone. Type the message.	ಈ ಫೋನ್‌ನಲ್ಲಿ ಮಾತನಾಡಿ ಟೈಪ್ ಮಾಡುವ ಸೌಲಭ್ಯ ಇಲ್ಲ. ಸಂದೇಶವನ್ನು ಟೈಪ್ ಮಾಡಿ.
+Please avoid news about illness stage or outlook here; the doctor talks about that in person.	ದಯವಿಟ್ಟು ಇಲ್ಲಿ ಕಾಯಿಲೆಯ ಹಂತ ಅಥವಾ ಮುಂದಿನ ಸ್ಥಿತಿಯ ಬಗ್ಗೆ ಬರೆಯಬೇಡಿ; ವೈದ್ಯರು ಅದರ ಬಗ್ಗೆ ನೇರವಾಗಿ ಮಾತನಾಡುತ್ತಾರೆ.
+Save message	ಸಂದೇಶ ಉಳಿಸಿ
+None yet. Read to me reads the newest message aloud.	ಇನ್ನೂ ಯಾವುದೂ ಇಲ್ಲ. 'ನನಗೆ ಓದಿ ಹೇಳಿ' ಹೊಸ ಸಂದೇಶವನ್ನು ಓದಿ ಕೇಳಿಸುತ್ತದೆ.
+Write	ಬರೆಯಿರಿ
+New	ಹೊಸದು
+Rings as an alarm	ಅಲಾರಾಂನಂತೆ ಮೊಳಗುತ್ತದೆ
+Important: ring like an alarm	ಮುಖ್ಯ: ಅಲಾರಾಂನಂತೆ ಮೊಳಗಲಿ
+At each dose time it rings, says the medicine's name and shows its photo full screen.	ಪ್ರತಿ ಡೋಸ್ ಸಮಯದಲ್ಲಿ ಇದು ಮೊಳಗುತ್ತದೆ, ಔಷಧಿಯ ಹೆಸರನ್ನು ಹೇಳುತ್ತದೆ ಮತ್ತು ಅದರ ಫೋಟೋವನ್ನು ಪೂರ್ಣ ಪರದೆಯಲ್ಲಿ ತೋರಿಸುತ್ತದೆ.
+Time for your morning medicine	ನಿಮ್ಮ ಬೆಳಗಿನ ಔಷಧಿಯ ಸಮಯವಾಗಿದೆ
+Time for your afternoon medicine	ನಿಮ್ಮ ಮಧ್ಯಾಹ್ನದ ಔಷಧಿಯ ಸಮಯವಾಗಿದೆ
+Time for your evening medicine	ನಿಮ್ಮ ಸಂಜೆಯ ಔಷಧಿಯ ಸಮಯವಾಗಿದೆ
+Time for your night medicine	ನಿಮ್ಮ ರಾತ್ರಿಯ ಔಷಧಿಯ ಸಮಯವಾಗಿದೆ
+and	ಮತ್ತು
+Snooze $minutes minutes	$minutes ನಿಮಿಷಗಳ ನಂತರ ಮತ್ತೆ ಮೊಳಗಿಸಿ
+Snooze	ಸ್ವಲ್ಪ ಸಮಯದ ನಂತರ
+Important medicine alarms	ಮುಖ್ಯ ಔಷಧಿ ಅಲಾರಾಂಗಳು
+Rings and speaks at the dose time of an important medicine.	ಮುಖ್ಯ ಔಷಧಿಯ ಡೋಸ್ ಸಮಯದಲ್ಲಿ ಮೊಳಗಿ, ಮಾತನಾಡಿ ತಿಳಿಸುತ್ತದೆ.
+Allow full-screen alarms in Settings.	ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ಪೂರ್ಣ ಪರದೆಯ ಅಲಾರಾಂಗಳನ್ನು ಅನುಮತಿಸಿ.
+Allow full-screen medicine alarms	ಪೂರ್ಣ ಪರದೆಯ ಔಷಧಿ ಅಲಾರಾಂಗಳನ್ನು ಅನುಮತಿಸಿ
+The alarm screen could not open on this phone.	ಈ ಫೋನ್‌ನಲ್ಲಿ ಅಲಾರಾಂ ಪರದೆ ತೆರೆಯಲು ಆಗಲಿಲ್ಲ.
+Try the alarm	ಅಲಾರಾಂ ಪ್ರಯತ್ನಿಸಿ
+Read it themselves	ಅವರೇ ಸ್ವತಃ ಓದಿದರು
+Read aloud by the phone	ಫೋನ್ ಓದಿ ಹೇಳಿತು
+Read aloud by	ಓದಿ ಹೇಳಿದವರು:
+witnessed by	ಸಾಕ್ಷಿ:
+Husband	ಗಂಡ
+Wife	ಹೆಂಡತಿ
+Grandchild	ಮೊಮ್ಮಗ / ಮೊಮ್ಮಗಳು
+Friend	ಸ್ನೇಹಿತ
+Neighbour	ನೆರೆಹೊರೆಯವರು
+Social worker	ಸಾಮಾಜಿಕ ಕಾರ್ಯಕರ್ತ
+Volunteer	ಸ್ವಯಂಸೇವಕ
+Self	ಸ್ವತಃ
+Choose how it was read before confirming.	ದೃಢಪಡಿಸುವ ಮೊದಲು ಇದನ್ನು ಹೇಗೆ ಓದಲಾಯಿತು ಎಂದು ಆರಿಸಿ.
+Listen to the whole reading first.	ಮೊದಲು ಪೂರ್ತಿ ಓದುವುದನ್ನು ಕೇಳಿ.
+Who read it?	ಯಾರು ಓದಿ ಹೇಳಿದರು?
+How are they related to the patient?	ಅವರು ರೋಗಿಗೆ ಏನಾಗಬೇಕು?
+The person who read it cannot be the person confirming.	ಓದಿ ಹೇಳಿದವರು ಮತ್ತು ದೃಢಪಡಿಸುವವರು ಒಬ್ಬರೇ ಆಗಬಾರದು.
+Who saw it being read?	ಇದನ್ನು ಓದುತ್ತಿರುವಾಗ ಯಾರು ನೋಡಿದರು?
+How is the witness related to the patient?	ಸಾಕ್ಷಿ ರೋಗಿಗೆ ಏನಾಗಬೇಕು?
+The witness must be someone other than the person confirming.	ಸಾಕ್ಷಿ ದೃಢಪಡಿಸುವವರಿಗಿಂತ ಬೇರೆ ವ್ಯಕ್ತಿಯಾಗಿರಬೇಕು.
+The witness must be someone other than the person who read it.	ಸಾಕ್ಷಿ ಓದಿ ಹೇಳಿದವರಿಗಿಂತ ಬೇರೆ ವ್ಯಕ್ತಿಯಾಗಿರಬೇಕು.
+Someone else	ಬೇರೆಯವರು
+Relationship to the patient	ರೋಗಿಯೊಂದಿಗೆ ಸಂಬಂಧ
+Before confirming, how was this read?	ದೃಢಪಡಿಸುವ ಮೊದಲು, ಇದನ್ನು ಹೇಗೆ ಓದಲಾಯಿತು?
+Read it to me	ನನಗೆ ಓದಿ ಹೇಳಿ
+Heard to the end	ಕೊನೆಯವರೆಗೆ ಕೇಳಿದರು
+Someone read it to me	ಯಾರೋ ನನಗೆ ಓದಿ ಹೇಳಿದರು
+I read it myself	ನಾನೇ ಸ್ವತಃ ಓದಿದೆ
+Who saw it being read? (witness)	ಇದನ್ನು ಓದುತ್ತಿರುವಾಗ ಯಾರು ನೋಡಿದರು? (ಸಾಕ್ಷಿ)
+First say how the note was read to them.	ಮೊದಲು ನೋಟ್ ಅನ್ನು ಅವರಿಗೆ ಹೇಗೆ ಓದಿ ಹೇಳಲಾಯಿತು ಎಂದು ತಿಳಿಸಿ.
+Press the thumb on the box	ಡಬ್ಬಿಯ ಮೇಲೆ ಹೆಬ್ಬೆರಳು ಒತ್ತಿ
+Photo of the thumbprint	ಹೆಬ್ಬೆರಳ ಗುರುತಿನ ಫೋಟೋ
+Photo of a thumbprint on paper	ಕಾಗದದ ಮೇಲಿನ ಹೆಬ್ಬೆರಳ ಗುರುತಿನ ಫೋಟೋ
+Take the photo again	ಫೋಟೋ ಮತ್ತೆ ತೆಗೆಯಿರಿ
+Read aloud before signing	ಸಹಿಗೆ ಮೊದಲು ಓದಿ ಹೇಳಲಾಯಿತು
+Say how the paper was read to the person before they signed it.	ಸಹಿ ಮಾಡುವ ಮೊದಲು ಕಾಗದವನ್ನು ಆ ವ್ಯಕ್ತಿಗೆ ಹೇಗೆ ಓದಿ ಹೇಳಲಾಯಿತು ಎಂದು ತಿಳಿಸಿ.
+Add who read the paper to the person and who saw it.	ಕಾಗದವನ್ನು ಆ ವ್ಯಕ್ತಿಗೆ ಯಾರು ಓದಿ ಹೇಳಿದರು ಮತ್ತು ಯಾರು ನೋಡಿದರು ಎಂದು ಸೇರಿಸಿ.
+Doses taken: ${marks.asNeededTaken}	ತೆಗೆದುಕೊಂಡ ಡೋಸ್‌ಗಳು: ${marks.asNeededTaken}
+This is your overall distress, not one problem.	ಇದು ನಿಮ್ಮ ಒಟ್ಟು ತೊಂದರೆ, ಒಂದೇ ಸಮಸ್ಯೆ ಅಲ್ಲ.
+mr	ಮರಾಠಿ
+No invite link?	ಆಹ್ವಾನ ಲಿಂಕ್ ಇಲ್ಲವೇ?
+Contact number (doctor or hospital)	ಸಂಪರ್ಕ ಸಂಖ್ಯೆ (ವೈದ್ಯರು ಅಥವಾ ಆಸ್ಪತ್ರೆ)
+Emergency card QR	ತುರ್ತು ಕಾರ್ಡ್ QR
+Scan the QR on the emergency card	ತುರ್ತು ಕಾರ್ಡ್‌ನಲ್ಲಿರುವ QR ಸ್ಕ್ಯಾನ್ ಮಾಡಿ
+Day of the visit	ಭೇಟಿಯ ದಿನ
+Time of the visit	ಭೇಟಿಯ ಸಮಯ
+family meet	ಕುಟುಂಬ ಸಭೆ
+telemedicine	ಟೆಲಿಮೆಡಿಸಿನ್
+telephone	ಟೆಲಿಫೋನ್
+at home	ಮನೆಯಲ್ಲಿ
+ward	ವಾರ್ಡ್
+palliative	ಪ್ಯಾಲಿಯೇಟಿವ್
+Back of the body	ಹಿಂಭಾಗ
+We made Sahara simpler for you. To go back, tap Full app at the bottom of the screen.	ನಾವು Sahara ಅನ್ನು ನಿಮಗಾಗಿ ಸರಳಗೊಳಿಸಿದ್ದೇವೆ. ಹಿಂದಿನಂತೆ ಮಾಡಲು, ಪರದೆಯ ಕೆಳಗಿರುವ 'ಪೂರ್ಣ ಆ್ಯಪ್' ಒತ್ತಿ.
+To say more in your own voice, tap Record your voice.	ನಿಮ್ಮ ಸ್ವಂತ ಧ್ವನಿಯಲ್ಲಿ ಇನ್ನಷ್ಟು ಹೇಳಲು, 'ನಿಮ್ಮ ಧ್ವನಿಯನ್ನು ರೆಕಾರ್ಡ್ ಮಾಡಿ' ಒತ್ತಿ.
+Translation into this language isn't available on this phone; reading the original words.	ಈ ಫೋನ್‌ನಲ್ಲಿ ಈ ಭಾಷೆಗೆ ಅನುವಾದ ಲಭ್ಯವಿಲ್ಲ; ಮೂಲ ಪದಗಳನ್ನು ಓದುತ್ತಿದ್ದೇವೆ.
+This text is in another language, so the phone cannot read it out exactly. Ask someone to read it to you.	ಈ ಪಠ್ಯ ಬೇರೆ ಭಾಷೆಯಲ್ಲಿದೆ, ಆದ್ದರಿಂದ ಫೋನ್ ಇದನ್ನು ಯಥಾವತ್ತಾಗಿ ಓದಲು ಸಾಧ್ಯವಿಲ್ಲ. ಯಾರನ್ನಾದರೂ ನಿಮಗೆ ಓದಿ ಹೇಳಲು ಕೇಳಿ.
+The phone can only read text written in the app language. Choose “Someone read it to me”.	ಫೋನ್ ಆ್ಯಪ್ ಭಾಷೆಯಲ್ಲಿ ಬರೆದ ಪಠ್ಯವನ್ನು ಮಾತ್ರ ಓದಬಲ್ಲದು. “ಯಾರೋ ನನಗೆ ಓದಿ ಹೇಳಿದರು” ಆಯ್ಕೆಮಾಡಿ.
+This phone has no voice for the app language. Choose “Someone read it to me”.	ಈ ಫೋನ್‌ನಲ್ಲಿ ಆ್ಯಪ್ ಭಾಷೆಯ ಧ್ವನಿ ಇಲ್ಲ. “ಯಾರೋ ನನಗೆ ಓದಿ ಹೇಳಿದರು” ಆಯ್ಕೆಮಾಡಿ.
+Only someone who can edit this care record can change this.	ಈ ಆರೈಕೆ ದಾಖಲೆಯನ್ನು ಬದಲಿಸಬಲ್ಲವರು ಮಾತ್ರ ಇದನ್ನು ಬದಲಿಸಬಹುದು.

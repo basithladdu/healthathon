@@ -1,8 +1,6 @@
 @file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 package `in`.wedevit.care
 
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -61,10 +59,14 @@ fun DoctorVisitEditor(vm: CareModel, personId: String, onDismiss: () -> Unit, in
     LaunchedEffect(selected) { if (selected != personId && !busy) onDismiss() }
     LaunchedEffect(accountMatches, busy) { if (!accountMatches && !busy) onDismiss() }
     val chosen = Instant.ofEpochMilli(startsAt).atZone(ZoneId.systemDefault())
+    // Date and time by the calendar and the scroll wheels, never typed (owner, 25 Nov).
+    var pickingDate by remember { mutableStateOf(false) }; var pickingTime by remember { mutableStateOf(false) }
+    if (pickingDate) CareDatePickerDialog(chosen.toLocalDate(), t("Date", "तारीख़"), { day -> startsAt = day.atTime(chosen.toLocalTime()).atZone(chosen.zone).toInstant().toEpochMilli(); pickingDate = false }, { pickingDate = false })
+    if (pickingTime) CareClockDialog(chosen.toLocalTime(), t("Time", "समय"), { clock -> startsAt = chosen.withHour(clock.hour).withMinute(clock.minute).withSecond(0).withNano(0).toInstant().toEpochMilli(); pickingTime = false }, { pickingTime = false })
     SaharaScreenSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         DoctorVisitForm(doctor, { doctor = it.take(120) }, location, { location = it.take(160) }, note, { note = it.take(1600) }, chosen.format(DateTimeFormatter.ofPattern("EEE, d MMM yyyy")), chosen.format(DateTimeFormatter.ofPattern("h:mm a")), chosen.zone.id, vm.cloud == null, busy, accountMatches && selected == personId && canEdit, error,
-            onDate = { DatePickerDialog(context, { _, year, month, day -> startsAt = java.time.LocalDate.of(year, month + 1, day).atTime(chosen.toLocalTime()).atZone(chosen.zone).toInstant().toEpochMilli() }, chosen.year, chosen.monthValue - 1, chosen.dayOfMonth).show() },
-            onTime = { TimePickerDialog(context, { _, hour, minute -> startsAt = chosen.withHour(hour).withMinute(minute).withSecond(0).withNano(0).toInstant().toEpochMilli() }, chosen.hour, chosen.minute, false).show() },
+            onDate = { pickingDate = true },
+            onTime = { pickingTime = true },
             onSave = { try { vm.saveDoctorVisit(personId, account, doctor, startsAt, location, DoctorVisitDetails.encode(conditionRef, discussionRef, note), onDismiss, entryId, created, initial) } catch (e: IllegalArgumentException) { vm.actionError.value = e.message ?: t("Check the linked records and shorten the note.", "जुड़े रिकॉर्ड जाँचें और नोट छोटा करें।") } }, onCancel = onDismiss,
             knownDoctor = knownDoctor,
             sourceLinks = {

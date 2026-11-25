@@ -51,8 +51,9 @@ android {
         targetSdk = 36
         // -PsaharaAbi=arm64-v8a builds a phones-only APK (about half the size); the default keeps every ABI for emulators and tests.
         (project.findProperty("saharaAbi") as String?)?.let { ndk { abiFilters += it.split(",") } }
-        versionCode = 12
-        versionName = "0.8.0"
+        versionCode = 13
+        versionName = "0.8.2"
+        buildConfigField("boolean", "ALLOW_SCREENSHOTS", "false")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
@@ -87,6 +88,16 @@ android {
             }
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
         }
+        // Phone testing at real speed: the release build (R8, not debuggable, ahead-of-time compiled from the baseline
+        // profile) under the development id and debug key, so it installs over the test app and keeps its data.
+        // A debug build runs Compose several times slower, which is not what patients will feel.
+        create("staging") {
+            initWith(getByName("release"))
+            applicationIdSuffix = ".development"
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("release")
+            buildConfigField("boolean", "ALLOW_SCREENSHOTS", "true")
+        }
     }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     kotlinOptions { jvmTarget = "17" }
@@ -114,6 +125,8 @@ ksp { arg("room.schemaLocation", "$projectDir/schemas") }
 dependencies {
     implementation(platform("androidx.compose:compose-bom:2025.09.01"))
     implementation("androidx.activity:activity-compose:1.11.0")
+    // Installs the app's baseline profile (src/main/baseline-prof.txt) so screens run ahead-of-time compiled from the first open.
+    implementation("androidx.profileinstaller:profileinstaller:1.4.1")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.compose.ui:ui-tooling-preview")

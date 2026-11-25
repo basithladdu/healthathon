@@ -2,10 +2,8 @@
 
 package `in`.wedevit.care
 
-import android.app.DatePickerDialog
 import android.content.Intent
 import android.net.Uri
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.CircleShape
@@ -48,7 +46,7 @@ import java.time.LocalDate
     var saveError by remember { mutableStateOf(false) }
     val today = LocalDate.now()
     fun persist(next: List<CareDevice>): Boolean = runCatching { store.save(personId, next) }.isSuccess.also { ok -> saveError = !ok; if (ok) devices = next }
-    BackHandler(onBack = onBack)
+    SaharaBackHandler(onBack = onBack)
     // The add action is one labelled button pinned at the bottom (reachable however long the list is), not after the last card.
     Box(Modifier.fillMaxSize()) {
     LazyColumn(Modifier.fillMaxSize().saharaScreenEnter().testTag("devices-screen"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 96.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -166,7 +164,12 @@ import java.time.LocalDate
     var notes by remember { mutableStateOf(initial.notes) }
     var error by remember { mutableStateOf<CareDeviceError?>(null) }
     var confirmRemove by remember { mutableStateOf(false) }; var showCentre by remember { mutableStateOf(false) }
-    fun pick(start: LocalDate?, set: (LocalDate) -> Unit) { val d = start ?: LocalDate.now(); DatePickerDialog(context, { _, y, m, day -> set(LocalDate.of(y, m + 1, day)) }, d.year, d.monthValue - 1, d.dayOfMonth).show() }
+    // Dates by the calendar only, never typed (owner, 25 Nov): "inserted" or "due" while a calendar is open.
+    var picking by remember { mutableStateOf("") }
+    when (picking) {
+        "inserted" -> CareDatePickerDialog(inserted, t("Date put in", "लगाने की तारीख़"), { inserted = it; picking = "" }, { picking = "" }, latest = LocalDate.now())
+        "due" -> CareDatePickerDialog(changeDue, t("Next change due", "अगली बार बदलना"), { changeDue = it; picking = "" }, { picking = "" }, opensOn = inserted)
+    }
     SaharaScreenSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = 16.dp).padding(bottom = 32.dp).saharaContentSize().testTag("device-edit-sheet"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(if (existing) t("Edit tube or line", "नली या लाइन बदलें") else t("Add tube or line", "नली या लाइन जोड़ें"), fontFamily = SaharaTitleFont, fontSize = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
@@ -175,8 +178,8 @@ import java.time.LocalDate
                 CareDeviceType.values().forEach { v -> DevicesChip(type == v, t(v.en, v.hi), Modifier.testTag("device-type-${v.name}")) { type = v } }
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                DevicesDateButton(t("Date put in", "लगाने की तारीख़"), inserted?.format(fmt), Modifier.weight(1f).testTag("device-inserted")) { pick(inserted) { inserted = it } }
-                DevicesDateButton(t("Next change due", "अगली बार बदलना"), changeDue?.format(fmt), Modifier.weight(1f).testTag("device-change-due")) { pick(changeDue ?: inserted) { changeDue = it } }
+                DevicesDateButton(t("Date put in", "लगाने की तारीख़"), inserted?.format(fmt), Modifier.weight(1f).testTag("device-inserted")) { picking = "inserted" }
+                DevicesDateButton(t("Next change due", "अगली बार बदलना"), changeDue?.format(fmt), Modifier.weight(1f).testTag("device-change-due")) { picking = "due" }
             }
             // The centre is optional: it waits behind "+ Add centre" until needed or already filled; notes start as one line.
             if (!showCentre && centre.isBlank()) SaharaAddChip(t("Add centre", "अस्पताल जोड़ें"), { showCentre = true }, Modifier.testTag("device-add-centre"), tone = SaharaTone.Teal)

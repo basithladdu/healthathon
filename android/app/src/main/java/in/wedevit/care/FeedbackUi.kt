@@ -1,6 +1,5 @@
 package `in`.wedevit.care
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -78,6 +77,8 @@ internal enum class FeedbackSendState { NONE, LOCAL, SENDING, SENT, QUEUED }
     val selectedPerson by (careModel?.selected ?: remember { kotlinx.coroutines.flow.MutableStateFlow("") }).collectAsStateWithLifecycle()
     val dayStart = remember { java.time.LocalDate.now().atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli() }
     val today = if (checkIn) CheckInMood.today(items, personId!!, dayStart) else null
+    // The id today's check-in is (or will be) saved under, so the patient's voice recording belongs to it.
+    val checkInId = rememberSaveable(accountScope, surface, today?.id) { today?.id ?: newId() }
     if (checkIn) {
         LaunchedEffect(Unit) { careModel!!.actionError.value = null }
         LaunchedEffect(selectedPerson) { if (selectedPerson != personId) onClose() }
@@ -96,7 +97,9 @@ internal enum class FeedbackSendState { NONE, LOCAL, SENDING, SENT, QUEUED }
     var discard by remember { mutableStateOf(false) }
     val dirty = score != savedScore || note != savedNote
     val close = { focus.clearFocus(); if (dirty) discard = true else onClose() }
-    BackHandler { close() }
+    SaharaBackHandler(!dirty) { close() }
+    // With unsaved changes back opens the discard question and the screen stays, so a plain BackHandler (no "leaving" preview).
+    androidx.activity.compose.BackHandler(dirty) { close() }
     val expression by animateFloatAsState(score, tween(120), label = "feedback expression")
     val wash by animateColorAsState(if (score <= .5f) lerp(Peach, Cream, score * 2f) else lerp(Cream, SaharaSoftBlue, (score - .5f) * 2f), tween(160), label = "feedback warmth")
     val label = if (checkIn) CheckInMood.title(score) else FeedbackRules.label(score)
@@ -124,7 +127,7 @@ internal enum class FeedbackSendState { NONE, LOCAL, SENDING, SENT, QUEUED }
     fun save() {
         focus.clearFocus()
         if (saved) return /* already saved and unchanged: a second tap must not add a second check-in before the list refreshes */
-        if (checkIn) { val model = careModel!!; val mood = CheckInMood.title(score); if (!canEditCareContext(model, personId!!, model.accountNamespace)) { model.message.value = t("Care access changed. Reopen this person's records before saving.", "देखभाल की अनुमति बदल गई है। सहेजने से पहले इस व्यक्ति के रिकॉर्ड फिर खोलें।"); onClose() } else if (today != null) model.updateItem(today.copy(title = mood, detail = note), onSaved) else model.saveItem("checkin", mood, note, 0, onSaved) }
+        if (checkIn) { val model = careModel!!; val mood = CheckInMood.title(score); if (!canEditCareContext(model, personId!!, model.accountNamespace)) { model.message.value = t("Care access changed. Reopen this person's records before saving.", "देखभाल की अनुमति बदल गई है। सहेजने से पहले इस व्यक्ति के रिकॉर्ड फिर खोलें।"); onClose() } else if (today != null) model.updateItem(today.copy(title = mood, detail = note), onSaved) else model.saveItem("checkin", mood, note, 0, onSaved, checkInId) }
         else { val to = account; error = store.save(score, note, to); if (error == null) { onSaved(); if (to != null) send(to) else sendState = FeedbackSendState.LOCAL } }
     }
     val moods = if (checkIn) listOf(CheckInMood.HARD to 0f, CheckInMood.OKAY to .5f, CheckInMood.GOOD to 1f) else listOf("Not great" to 0f, "Okay" to .5f, "Good" to 1f)
@@ -177,7 +180,16 @@ internal enum class FeedbackSendState { NONE, LOCAL, SENDING, SENT, QUEUED }
         }
         Spacer(Modifier.height(12.dp))
         // The label says it all; the counter shows only near the limit.
-        OutlinedTextField(value = note, onValueChange = { if (it.length <= limit) { note = it; saved = false; error = null } }, label = { Text(t("Anything to add? (optional)", "कुछ और बताना है? (चाहें तो)")) }, supportingText = if (note.length > limit - 200) { { Text("${note.length}/$limit", fontSize = 14.sp, color = DoctorCardSub) } } else null, minLines = 2, maxLines = 5, modifier = Modifier.fillMaxWidth().testTag("feedback-note"), shape = RoundedCornerShape(12.dp), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Rust, focusedLabelColor = RustText, cursorColor = Rust, unfocusedBorderColor = DoctorCardFaint.copy(alpha = .5f), focusedContainerColor = Paper, unfocusedContainerColor = Paper))
+        // Voice first (owner's point 9): a microphone in the box where this phone writes speech down on the phone itself.
+        val noteMic = rememberCareFieldMic { words -> val next = CareVoiceRules.append(note, words, limit); if (next != note) { note = next; saved = false; error = null } }
+        OutlinedTextField(value = note, onValueChange = { if (it.length <= limit) { note = it; saved = false; error = null } }, label = { Text(t("Anything to add? (optional)", "कुछ और बताना है? (चाहें तो)")) }, supportingText = if (noteMic?.listening == true) { { Text(noteMic.partial.ifBlank { t("Listening… speak now", "सुन रहे हैं… अब बोलिए") }, fontSize = 16.sp, color = RustText) } } else if (noteMic != null && noteMic.status.isNotBlank()) { { Text(noteMic.status, fontSize = 16.sp, color = DoctorCardSub) } } else if (note.length > limit - 200) { { Text("${note.length}/$limit", fontSize = 14.sp, color = DoctorCardSub) } } else null, trailingIcon = noteMic?.let { m -> { CareMicButton(m) } }, minLines = 2, maxLines = 5, modifier = Modifier.fillMaxWidth().testTag("feedback-note"), shape = RoundedCornerShape(12.dp), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Rust, focusedLabelColor = RustText, cursorColor = Rust, unfocusedBorderColor = DoctorCardFaint.copy(alpha = .5f), focusedContainerColor = Paper, unfocusedContainerColor = Paper))
+        if (checkIn && careModel != null) {
+            val recordingNow by careModel.recording.collectAsStateWithLifecycle(); val loadedFor by careModel.itemsLoadedFor.collectAsStateWithLifecycle()
+            val liveIds = remember(items, loadedFor, personId) { items.filter { it.personId == personId }.map { it.id }.toSet().takeIf { loadedFor == personId && it.isNotEmpty() } }
+            Spacer(Modifier.height(12.dp))
+            CareVoiceNoteRecorder(careModel.storageNamespace, personId!!, checkInId, onWords = { words -> val next = CareVoiceRules.append(note, words, limit); if (next != note) { note = next; saved = false; error = null } },
+                enabled = !busy, micBusy = recordingNow, liveIds = liveIds)
+        }
         Spacer(Modifier.height(12.dp))
         (modelError.takeIf { checkIn } ?: error)?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite }); Spacer(Modifier.height(8.dp)) }
         // Saved check-in: the button turns into Done (closes), so the person never wonders whether to tap again.

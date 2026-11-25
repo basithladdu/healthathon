@@ -1,6 +1,5 @@
 package `in`.wedevit.care
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -78,7 +77,7 @@ internal fun doctorCaptureModeLabel(mode: String, hindi: Boolean): String = care
         val frac = remember { Animatable(if (keptOpen) 1f else 0f) }; val scope = rememberCoroutineScope()
         val expanded = frac.targetValue > 0.5f
         SideEffect { keptOpen = expanded }
-        BackHandler(expanded) { scope.launch { frac.animateTo(0f) } }
+        androidx.activity.compose.BackHandler(expanded) { scope.launch { frac.animateTo(0f) } }
         Column(Modifier.fillMaxSize().padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = peek), horizontalAlignment = Alignment.CenterHorizontally) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 if (onBack != null) TextButton(onClick = onBack, enabled = backEnabled, colors = ButtonDefaults.textButtonColors(contentColor = white, disabledContentColor = white.copy(alpha = .5f)), contentPadding = PaddingValues(0.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-capture-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.size(20.dp)); Spacer(Modifier.width(6.dp)); Text(t("Back", "वापस"), fontSize = 16.sp) }

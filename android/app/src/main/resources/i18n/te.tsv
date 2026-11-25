@@ -1944,7 +1944,7 @@ Remove this question?	ఈ ప్రశ్న తీసేయాలా?
 It is only your own preparation note. Removing it does not change any saved conversation or published note.	ఇది మీ సొంత తయారీ నోట్ మాత్రమే. దీన్ని తీసేసినా సేవ్ చేసిన సంభాషణ లేదా ప్రచురించిన నోట్ ఏదీ మారదు.
 Remove question	ప్రశ్న తీసేయండి
 Keep it	ఉంచండి
-Goals of care discussion	కేర్ లక్ష్యాలపై చర్చ
+Goals of care discussion	సంరక్షణ లక్ష్యాల చర్చ
 Your own questions to cover, saved on this device. Preparation only: not transcript evidence, not from the patient, and not part of a published note.	మాట్లాడాల్సిన మీ సొంత ప్రశ్నలు, ఈ ఫోన్‌లో సేవ్ అయ్యాయి. తయారీ కోసం మాత్రమే: సంభాషణ రుజువు కాదు, పేషెంట్ నుండి వచ్చినవి కావు, ప్రచురించిన నోట్‌లో భాగం కావు.
 No questions yet. Add as many as you need.	ఇంకా ప్రశ్నలు లేవు. కావలసినన్ని జోడించండి.
 ${m.rows.size} of $DOCTOR_PREPARATION_MAX_QUESTIONS questions	$DOCTOR_PREPARATION_MAX_QUESTIONS లో ${m.rows.size} ప్రశ్నలు
@@ -5849,3 +5849,277 @@ Dissolve in water	నీటిలో కరిగించి తీసుకో
 Shake well before use	వాడే ముందు బాగా కలపండి
 Tap a dose when taken. Hold it for Not taken or Skipped.	తీసుకున్నప్పుడు మోతాదును నొక్కండి. తీసుకోకపోతే లేదా వదిలేస్తే నొక్కి పట్టుకోండి.
 Not yet · late	ఇంకా లేదు · ఆలస్యం
+One year less	ఒక సంవత్సరం తక్కువ
+One year more	ఒక సంవత్సరం ఎక్కువ
+Age not set	వయసు ఎంచుకోలేదు
+years	సంవత్సరాలు
+Tap the nearest number, then + or − to fine-tune.	దగ్గరగా ఉన్న సంఖ్యను నొక్కండి, తర్వాత సరిచేయడానికి + లేదా − నొక్కండి.
+Use + or − to change it by one year.	ఒక్కో సంవత్సరం మార్చడానికి + లేదా − నొక్కండి.
+What is causing your distress?	మీ బాధకు కారణం ఏమిటి?
+Tick any that apply (no scores here)	వర్తించేవాటిని ఎంచుకోండి (ఇక్కడ స్కోర్లు లేవు)
+What we do with your data	మీ డేటాతో మేము ఏమి చేస్తాము
+Thank you. The card is now valid until $until. Print the new card.	ధన్యవాదాలు. కార్డు ఇప్పుడు $until వరకు చెల్లుతుంది. కొత్త కార్డును ప్రింట్ చేయండి.
+Couldn't renew the card. Try again.	కార్డును పొడిగించలేకపోయాము. మళ్ళీ ప్రయత్నించండి.
+Is everything on the card still the same?	కార్డుపై ఉన్నవన్నీ ఇంకా అలాగే ఉన్నాయా?
+Please look at the phone numbers and the medicines. The card is checked every 3 months.	దయచేసి ఫోన్ నంబర్లు మరియు మందులను చూడండి. కార్డును ప్రతి 3 నెలలకు ఒకసారి తనిఖీ చేస్తారు.
+Yes, still the same	అవును, ఇంకా అలాగే ఉంది
+Who to call	ఎవరికి ఫోన్ చేయాలి
+Who	ఎవరు
+Dose	మోతాదు
+When	ఎప్పుడు
+Next of kin	దగ్గరి బంధువు
+Treating doctor	చికిత్స చేసే డాక్టర్
+Hospital / clinic	ఆసుపత్రి / క్లినిక్
+We made Sahara simpler for you. You can switch back in Settings.	మేము Sahara ను మీ కోసం సులభంగా చేశాము. మీరు సెట్టింగ్‌లలో మళ్లీ మార్చుకోవచ్చు.
+Switch back	మళ్లీ మార్చండి
+Call for help	సహాయం కోసం ఫోన్ చేయండి
+Family, care team or ambulance 108	కుటుంబం, సంరక్షణ బృందం లేదా అంబులెన్స్ 108
+My note	నా నోట్
+Tap the big button and say how you are. Your care team will see your note.	పెద్ద బటన్‌ను తాకి మీరు ఎలా ఉన్నారో చెప్పండి. మీ సంరక్షణ బృందం మీ నోట్‌ను చూస్తుంది.
+Say how you are	మీరు ఎలా ఉన్నారో చెప్పండి
+Tap and speak	తాకి మాట్లాడండి
+Speak again	మళ్లీ మాట్లాడండి
+Write instead	బదులుగా రాయండి
+Medical research: allowed (name and contact details removed)	వైద్య పరిశోధన: అనుమతి ఉంది (పేరు మరియు సంప్రదింపు వివరాలు తీసివేసి)
+Medical research: not allowed	వైద్య పరిశోధన: అనుమతి లేదు
+Sahara data choices for $personName	$personName కోసం Sahara డేటా ఎంపికలు
+Last changed: $it	చివరిగా మార్చినది: $it
+Research use is separate from sending feedback to improve the app.	పరిశోధన కోసం ఉపయోగం, యాప్‌ను మెరుగుపరచడానికి అభిప్రాయం పంపడం నుండి వేరు.
+Records stay with the care team either way.	ఏ విధంగానైనా రికార్డులు సంరక్షణ బృందం వద్దే ఉంటాయి.
+Medical research	వైద్య పరిశోధన
+Allow my data, with my name and contact details removed, to be used for medical research by my care team	నా పేరు మరియు సంప్రదింపు వివరాలు తీసివేసి, నా డేటాను నా సంరక్షణ బృందం వైద్య పరిశోధన కోసం ఉపయోగించడానికి అనుమతించండి
+Research use is off.	పరిశోధన కోసం ఉపయోగం ఆఫ్‌లో ఉంది.
+Allowed	అనుమతి ఉంది
+Not allowed	అనుమతి లేదు
+Off unless you switch it on. You can switch it off at any time, and your care does not change either way.	మీరు ఆన్ చేసే వరకు ఇది ఆఫ్‌లోనే ఉంటుంది. మీరు దీన్ని ఎప్పుడైనా ఆఫ్ చేయవచ్చు, ఏ విధంగానైనా మీ సంరక్షణ మారదు.
+Only the patient or family can change this.	దీన్ని రోగి లేదా కుటుంబం మాత్రమే మార్చగలరు.
+Your data choices	మీ డేటా ఎంపికలు
+Share my data choices	నా డేటా ఎంపికలను పంపండి
+Allow research use?	పరిశోధన కోసం ఉపయోగానికి అనుమతిస్తారా?
+Your name and contact details are removed first. You can switch this off at any time in Privacy and data.	ముందుగా మీ పేరు మరియు సంప్రదింపు వివరాలు తీసివేయబడతాయి. మీరు దీన్ని ఎప్పుడైనా 'గోప్యత, డేటా'లో ఆఫ్ చేయవచ్చు.
+Research use is on. Thank you.	పరిశోధన కోసం ఉపయోగం ఆన్‌లో ఉంది. ధన్యవాదాలు.
+Research choice and privacy policy	పరిశోధన ఎంపిక మరియు గోప్యతా విధానం
+Hour	గంట
+Minute	నిమిషం
+AM or PM	AM లేదా PM
+As-needed dose taken.	అవసరమైనప్పుడు వేసుకునే మోతాదు తీసుకున్నారు.
+No photo came back from the camera. Try again.	కెమెరా నుండి ఫోటో రాలేదు. మళ్ళీ ప్రయత్నించండి.
+For breathlessness at rest	విశ్రాంతిలో ఉన్నప్పుడు ఆయాసం కోసం
+For fluid build-up	శరీరంలో నీరు చేరడం కోసం
+For fluid build-up and breathlessness	శరీరంలో నీరు చేరడం మరియు ఆయాసం కోసం
+For night-time anxiety with breathlessness	రాత్రి వేళ ఆయాసంతో వచ్చే ఆందోళన కోసం
+For bone pain	ఎముకల నొప్పి కోసం
+For background bone pain	నిరంతరం ఉండే ఎముకల నొప్పి కోసం
+For wheeze	ఊపిరిలో గురగుర శబ్దం కోసం
+For agitation	అశాంతి కోసం
+For dry mouth	నోరు ఎండిపోవడం కోసం
+For hiccups	ఎక్కిళ్ళ కోసం
+For secretions	గొంతు, ఛాతీలో కఫం కోసం
+To prevent constipation	మలబద్ధకం రాకుండా
+To prevent constipation while taking morphine	మార్ఫిన్ తీసుకుంటున్నప్పుడు మలబద్ధకం రాకుండా
+While taking morphine	మార్ఫిన్ తీసుకుంటున్నప్పుడు
+Short course for wheeze, finished after review	ఊపిరిలో గురగుర శబ్దం కోసం చిన్న కోర్సు, పరిశీలన తర్వాత పూర్తయింది
+Earlier anti-sickness medicine, stopped after review	ముందటి వికారం తగ్గించే మందు, పరిశీలన తర్వాత ఆపేశారు
+Sublingual	నాలుక కింద
+Under the tongue	నాలుక కింద
+Apply to the skin	చర్మంపై రాయండి
+Change patch every 3 days	ప్రతి 3 రోజులకు ప్యాచ్ మార్చండి
+At night if needed	అవసరమైతే రాత్రి
+Every 4 hours	ప్రతి 4 గంటలకు
+Every 12 hours	ప్రతి 12 గంటలకు
+Three times daily before meals	రోజుకు మూడుసార్లు భోజనానికి ముందు
+Review if more than 4 doses in 24 hours	24 గంటల్లో 4 కంటే ఎక్కువ మోతాదులు అవసరమైతే డాక్టర్‌కు చెప్పండి
+Review if used on more than 4 nights a week	వారంలో 4 కంటే ఎక్కువ రాత్రులు వాడవలసి వస్తే డాక్టర్‌కు చెప్పండి
+Weigh each morning and tell the team of a gain of 2 kg in 3 days	ప్రతి ఉదయం బరువు చూసుకోండి, 3 రోజుల్లో 2 కిలోలు పెరిగితే బృందానికి చెప్పండి
+Time (optional)	సమయం (కావాలంటే)
+Day	రోజు
+time	సమయం
+Which hospital	ఏ ఆసుపత్రి
+When admitted	ఎప్పుడు చేరారు
+Listening… speak now	వింటున్నాం… ఇప్పుడు మాట్లాడండి
+No words heard. Tap the microphone and try again.	ఏ మాటలూ వినిపించలేదు. మైక్ నొక్కి మళ్లీ ప్రయత్నించండి.
+This language isn't ready for speaking on this phone yet.	ఈ ఫోన్‌లో ఈ భాషలో మాట్లాడి రాయడం ఇంకా సిద్ధంగా లేదు.
+Allow the microphone to speak instead of typing.	టైప్ చేయడానికి బదులు మాట్లాడటానికి మైక్‌ను అనుమతించండి.
+Couldn't hear that. Tap the microphone and try again.	అది వినిపించలేదు. మైక్ నొక్కి మళ్లీ ప్రయత్నించండి.
+Couldn't start the microphone. Try again.	మైక్ మొదలుకాలేదు. మళ్లీ ప్రయత్నించండి.
+Stop listening	వినడం ఆపండి
+Speak instead of typing	టైప్ చేయడానికి బదులు మాట్లాడండి
+This phone can't record here.	ఈ ఫోన్ ఇక్కడ రికార్డ్ చేయలేదు.
+The microphone is busy. Try again in a moment.	మైక్ బిజీగా ఉంది. కొద్దిసేపటి తర్వాత మళ్లీ ప్రయత్నించండి.
+Your voice is saved with this note.	మీ గొంతు ఈ నోట్‌తో పాటు సేవ్ అయింది.
+The voice couldn't be kept on this phone. The words are saved.	ఈ ఫోన్‌లో గొంతును ఉంచలేకపోయాం. మాటలు సేవ్ అయ్యాయి.
+No sound reached the microphone. Try again.	మైక్‌కు ఏ శబ్దమూ చేరలేదు. మళ్లీ ప్రయత్నించండి.
+Too short to keep. Tap Record and speak.	ఉంచడానికి చాలా చిన్నది. రికార్డ్ నొక్కి మాట్లాడండి.
+Your voice is being kept. The words can't be written on this phone, so tap the microphone in the box to add them.	మీ గొంతు ఉంచబడుతోంది. ఈ ఫోన్‌లో మాటలు రాయలేము, కాబట్టి వాటిని చేర్చడానికి పెట్టెలోని మైక్ నొక్కండి.
+Recording… speak now	రికార్డ్ అవుతోంది… ఇప్పుడు మాట్లాడండి
+Record again	మళ్లీ రికార్డ్ చేయండి
+Remove voice	గొంతును తీసివేయండి
+Record your voice	మీ గొంతును రికార్డ్ చేయండి
+Your voice is kept for your nurse, and the words are written above.	మీ గొంతు మీ నర్స్ కోసం ఉంచబడుతుంది, మాటలు పైన రాయబడతాయి.
+Your voice is kept for your nurse and family.	మీ గొంతు మీ నర్స్ మరియు కుటుంబం కోసం ఉంచబడుతుంది.
+Stop the other recording first.	ముందుగా మరో రికార్డింగ్‌ను ఆపండి.
+Speak instead of writing. Your nurse can listen to it.	రాయడానికి బదులు మాట్లాడండి. మీ నర్స్ దాన్ని వినగలరు.
+Remove this voice recording?	ఈ గొంతు రికార్డింగ్‌ను తీసివేయాలా?
+Pause the voice note	గొంతు నోట్‌ను ఆపండి
+Play the voice note	గొంతు నోట్‌ను వినిపించండి
+Voice note	గొంతు నోట్
+Or sign in with email	లేదా ఈమెయిల్‌తో సైన్ ఇన్ చేయండి
+You stay signed in on this phone until you choose Sign out.	మీరు సైన్ అవుట్ ఎంచుకునే వరకు ఈ ఫోన్‌లో సైన్ ఇన్‌లోనే ఉంటారు.
+Your clinic's invite is ready	మీ క్లినిక్ ఆహ్వానం సిద్ధంగా ఉంది
+Make your account once below. After that you stay signed in on this phone.	కింద ఒక్కసారి మీ ఖాతా తెరవండి. ఆ తర్వాత ఈ ఫోన్‌లో సైన్ ఇన్‌లోనే ఉంటారు.
+I have an invite link from my clinic	నా దగ్గర క్లినిక్ నుండి ఆహ్వాన లింక్ ఉంది
+Open the message from your nurse or doctor and tap the link once. Sahara opens by itself. Or copy the link, come back and tap this button again.	మీ నర్స్ లేదా డాక్టర్ పంపిన సందేశం తెరిచి లింక్‌ను ఒక్కసారి నొక్కండి. Sahara దానంతట అదే తెరుచుకుంటుంది. లేదా లింక్‌ను కాపీ చేసి, తిరిగి వచ్చి ఈ బటన్‌ను మళ్లీ నొక్కండి.
+Your nurse or doctor sends it on WhatsApp or SMS.	మీ నర్స్ లేదా డాక్టర్ దీన్ని WhatsApp లేదా SMS ద్వారా పంపుతారు.
+Very well	చాలా బాగుంది
+Fairly well	పర్వాలేదు
+Unwell	బాగాలేదు
+Very unwell	అస్సలు బాగాలేదు
+How are you feeling this morning?	ఈ ఉదయం మీకు ఎలా ఉంది?
+How are you feeling this afternoon?	ఈ మధ్యాహ్నం మీకు ఎలా ఉంది?
+How are you feeling this evening?	ఈ సాయంత్రం మీకు ఎలా ఉంది?
+How are you feeling tonight?	ఈ రాత్రి మీకు ఎలా ఉంది?
+How much $name this morning?	ఈ ఉదయం $name ఎంత ఉంది?
+How much $name this afternoon?	ఈ మధ్యాహ్నం $name ఎంత ఉంది?
+How much $name this evening?	ఈ సాయంత్రం $name ఎంత ఉంది?
+How much $name tonight?	ఈ రాత్రి $name ఎంత ఉంది?
+Feelings	మనసు, భావాలు
+Money and practical	డబ్బు, రోజువారీ పనులు
+Faith	విశ్వాసం
+Your care team sees this as $n out of 10.	మీ సంరక్షణ బృందం దీన్ని 10లో ${n}గా చూస్తుంది.
+Faces	ముఖాలు
+Numbers 0–10	అంకెలు 0–10
+Exact time (optional)	సరైన సమయం (ఐచ్ఛికం)
+When did it start? (optional)	ఇది ఎప్పుడు మొదలైంది? (ఐచ్ఛికం)
+How much distress have you felt this past week? Tap the thermometer.	గత వారం రోజుల్లో మీకు ఎంత బాధ కలిగింది? థర్మామీటర్‌ను తాకండి.
+Tap a number	ఒక అంకెను తాకండి
+What is troubling you? Tap the pictures.	మిమ్మల్ని ఏది బాధపెడుతోంది? బొమ్మలను తాకండి.
+Add details (optional)	మరిన్ని వివరాలు జోడించండి (ఐచ్ఛికం)
+Tap a picture first.	ముందు ఒక బొమ్మను తాకండి.
+Choose a face	ఒక ముఖం ఎంచుకోండి
+You answer with faces: none, a little, a lot or worst. Your care team sees the same answer as a number from 0 to 10.	మీరు ముఖాలతో చెబుతారు: అస్సలు లేదు, కొంచెం, చాలా లేదా అత్యంత ఎక్కువ. మీ సంరక్షణ బృందం అదే జవాబును 0 నుంచి 10 వరకు అంకెగా చూస్తుంది.
+Show where it hurts	ఎక్కడ నొప్పిగా ఉందో చూపించండి
+Tap a face first.	ముందు ఒక ముఖాన్ని తాకండి.
+How much does it hurt here: $part?	ఇక్కడ ఎంత నొప్పిగా ఉంది: $part?
+choose a face	ముఖం ఎంచుకోండి
+Tap where it hurts *	నొప్పి ఉన్నచోట తాకండి *
+Write or speak the message first.	ముందు సందేశాన్ని రాయండి లేదా చెప్పండి.
+Please make the message shorter.	దయచేసి సందేశాన్ని చిన్నదిగా చేయండి.
+Here is the message from your doctor	ఇది మీ డాక్టర్ నుండి వచ్చిన సందేశం
+Here is the message from your nurse	ఇది మీ నర్సు నుండి వచ్చిన సందేశం
+Here is the message from your care team	ఇది మీ సంరక్షణ బృందం నుండి వచ్చిన సందేశం
+Here is the message from your family	ఇది మీ కుటుంబం నుండి వచ్చిన సందేశం
+There is no message from your doctor or nurse yet.	మీ డాక్టర్ లేదా నర్సు నుండి ఇంకా ఏ సందేశమూ లేదు.
+Nurse, family or 108	నర్సు, కుటుంబం లేదా 108
+To tell your nurse more, tap the microphone and speak.	మీ నర్సుకు ఇంకా చెప్పాలంటే, మైక్‌ను తాకి మాట్లాడండి.
+Tell your nurse more	నర్సుకు ఇంకా చెప్పండి
+Family: press and hold a person to add their photo.	కుటుంబ సభ్యులు: ఫోటో జోడించడానికి వ్యక్తిని నొక్కి పట్టుకోండి.
+Add a photo	ఫోటో జోడించండి
+Tap Listen to hear it, or Send to give it to your nurse.	వినడానికి 'వినండి' తాకండి, లేదా నర్సుకు ఇవ్వడానికి 'పంపండి' తాకండి.
+Tap the big microphone and speak. Your nurse will hear your own voice.	పెద్ద మైక్‌ను తాకి మాట్లాడండి. మీ నర్సు మీ స్వంత గొంతును వింటారు.
+That was too short. Tap and speak again.	ఇది చాలా చిన్నది. మళ్ళీ తాకి మాట్లాడండి.
+Couldn't start the microphone. Please try again.	మైక్ ప్రారంభం కాలేదు. దయచేసి మళ్ళీ ప్రయత్నించండి.
+Tell your nurse	నర్సుకు చెప్పండి
+Stop recording	రికార్డింగ్ ఆపండి
+Listening. Tap to stop.	వింటున్నాం. ఆపడానికి తాకండి.
+Listen	వినండి
+Couldn't play it.	ప్లే చేయలేకపోయాం.
+Send to nurse	నర్సుకు పంపండి
+Photos stay on this phone. Set them on the phone the patient uses.	ఫోటోలు ఈ ఫోన్‌లోనే ఉంటాయి. రోగి వాడే ఫోన్‌లో వాటిని పెట్టండి.
+One-tap calling: a tap on a face calls at once	ఒక్క తాకుతో ఫోన్: ముఖాన్ని తాకగానే ఫోన్ వెళ్తుంది
+Photo on the call button	ఫోన్ బటన్‌పై ఫోటో
+The patient taps this face to call. Use a clear photo of the face.	ఫోన్ చేయడానికి రోగి ఈ ముఖాన్ని తాకుతారు. ముఖం స్పష్టంగా ఉన్న ఫోటో వాడండి.
+Photos for the Call buttons	ఫోన్ బటన్‌ల కోసం ఫోటోలు
+Add care team phone numbers first; each person then gets a photo button.	ముందు సంరక్షణ బృందం ఫోన్ నంబర్లు జోడించండి; ఆ తర్వాత ప్రతి వ్యక్తికి ఫోటో బటన్ వస్తుంది.
+Add photo	ఫోటో జోడించండి
+Change photo	ఫోటో మార్చండి
+Listen to the voice note	వాయిస్ నోట్ వినండి
+Message to read aloud	చదివి వినిపించే సందేశం
+Read to me reads the newest message aloud.	'నాకు చదివి వినిపించు' కొత్త సందేశాన్ని చదివి వినిపిస్తుంది.
+From	ఎవరి నుండి
+Name (optional)	పేరు (ఐచ్ఛికం)
+e.g. Sister Mary	ఉదా. సిస్టర్ మేరీ
+Message	సందేశం
+e.g. Take the night medicine after food. I will visit on Friday.	ఉదా. రాత్రి మందు భోజనం తర్వాత వేసుకోండి. నేను శుక్రవారం వస్తాను.
+Speak the message	సందేశాన్ని చెప్పండి
+Speech typing is not available on this phone. Type the message.	ఈ ఫోన్‌లో మాట్లాడి టైప్ చేయడం అందుబాటులో లేదు. సందేశాన్ని టైప్ చేయండి.
+Please avoid news about illness stage or outlook here; the doctor talks about that in person.	దయచేసి ఇక్కడ వ్యాధి దశ లేదా ముందు జరగబోయే విషయాల గురించి రాయకండి; డాక్టర్ వాటి గురించి ప్రత్యక్షంగా మాట్లాడతారు.
+Save message	సందేశాన్ని సేవ్ చేయండి
+None yet. Read to me reads the newest message aloud.	ఇంకా ఏదీ లేదు. 'నాకు చదివి వినిపించు' కొత్త సందేశాన్ని చదివి వినిపిస్తుంది.
+Write	రాయండి
+New	కొత్తది
+Rings as an alarm	అలారం లాగా మోగుతుంది
+Important: ring like an alarm	ముఖ్యం: అలారం లాగా మోగాలి
+At each dose time it rings, says the medicine's name and shows its photo full screen.	ప్రతి మోతాదు సమయంలో ఇది మోగుతుంది, మందు పేరు చెబుతుంది, దాని ఫోటోను పూర్తి స్క్రీన్‌పై చూపిస్తుంది.
+Time for your morning medicine	మీ ఉదయం మందు వేసుకునే సమయం అయింది
+Time for your afternoon medicine	మీ మధ్యాహ్నం మందు వేసుకునే సమయం అయింది
+Time for your evening medicine	మీ సాయంత్రం మందు వేసుకునే సమయం అయింది
+Time for your night medicine	మీ రాత్రి మందు వేసుకునే సమయం అయింది
+and	మరియు
+Snooze $minutes minutes	$minutes నిమిషాల తర్వాత మళ్లీ మోగించు
+Snooze	కొద్దిసేపటి తర్వాత
+Important medicine alarms	ముఖ్యమైన మందుల అలారాలు
+Rings and speaks at the dose time of an important medicine.	ముఖ్యమైన మందు మోతాదు సమయంలో మోగి, మాట్లాడి చెబుతుంది.
+Allow full-screen alarms in Settings.	సెట్టింగ్స్‌లో పూర్తి స్క్రీన్ అలారాలను అనుమతించండి.
+Allow full-screen medicine alarms	పూర్తి స్క్రీన్ మందుల అలారాలను అనుమతించండి
+The alarm screen could not open on this phone.	ఈ ఫోన్‌లో అలారం స్క్రీన్ తెరవలేకపోయింది.
+Try the alarm	అలారం ప్రయత్నించండి
+Read it themselves	వారే స్వయంగా చదివారు
+Read aloud by the phone	ఫోన్ చదివి వినిపించింది
+Read aloud by	చదివి వినిపించినవారు:
+witnessed by	సాక్షి:
+Husband	భర్త
+Wife	భార్య
+Grandchild	మనవడు / మనవరాలు
+Friend	స్నేహితుడు
+Neighbour	పొరుగువారు
+Social worker	సామాజిక కార్యకర్త
+Volunteer	స్వచ్ఛంద సేవకుడు
+Self	స్వయంగా
+Choose how it was read before confirming.	నిర్ధారించే ముందు ఇది ఎలా చదివారో ఎంచుకోండి.
+Listen to the whole reading first.	ముందుగా మొత్తం చదవడం వినండి.
+Who read it?	ఎవరు చదివి వినిపించారు?
+How are they related to the patient?	వారు రోగికి ఏమవుతారు?
+The person who read it cannot be the person confirming.	చదివి వినిపించినవారు, నిర్ధారించేవారు ఒకరే కాకూడదు.
+Who saw it being read?	దీన్ని చదువుతుండగా ఎవరు చూశారు?
+How is the witness related to the patient?	సాక్షి రోగికి ఏమవుతారు?
+The witness must be someone other than the person confirming.	సాక్షి నిర్ధారించేవారు కాకుండా వేరే వ్యక్తి అయి ఉండాలి.
+The witness must be someone other than the person who read it.	సాక్షి చదివి వినిపించినవారు కాకుండా వేరే వ్యక్తి అయి ఉండాలి.
+Someone else	వేరొకరు
+Relationship to the patient	రోగితో సంబంధం
+Before confirming, how was this read?	నిర్ధారించే ముందు, ఇది ఎలా చదివారు?
+Read it to me	నాకు చదివి వినిపించండి
+Heard to the end	చివరి వరకు విన్నారు
+Someone read it to me	ఎవరో నాకు చదివి వినిపించారు
+I read it myself	నేనే స్వయంగా చదివాను
+Who saw it being read? (witness)	దీన్ని చదువుతుండగా ఎవరు చూశారు? (సాక్షి)
+First say how the note was read to them.	ముందుగా నోట్ వారికి ఎలా చదివి వినిపించారో చెప్పండి.
+Press the thumb on the box	బాక్స్‌పై బొటనవేలు నొక్కండి
+Photo of the thumbprint	బొటనవేలి ముద్ర ఫోటో
+Photo of a thumbprint on paper	కాగితంపై బొటనవేలి ముద్ర ఫోటో
+Take the photo again	ఫోటో మళ్ళీ తీయండి
+Read aloud before signing	సంతకానికి ముందు చదివి వినిపించారు
+Say how the paper was read to the person before they signed it.	సంతకం చేసే ముందు కాగితం ఆ వ్యక్తికి ఎలా చదివి వినిపించారో చెప్పండి.
+Add who read the paper to the person and who saw it.	కాగితం ఆ వ్యక్తికి ఎవరు చదివి వినిపించారో, ఎవరు చూశారో జోడించండి.
+Doses taken: ${marks.asNeededTaken}	తీసుకున్న మోతాదులు: ${marks.asNeededTaken}
+This is your overall distress, not one problem.	ఇది మీ మొత్తం బాధ, ఒక్క సమస్య కాదు.
+mr	మరాఠీ
+No invite link?	ఆహ్వాన లింక్ లేదా?
+Contact number (doctor or hospital)	సంప్రదింపు నంబర్ (డాక్టర్ లేదా ఆసుపత్రి)
+Emergency card QR	అత్యవసర కార్డ్ QR
+Scan the QR on the emergency card	అత్యవసర కార్డ్‌పై ఉన్న QR స్కాన్ చేయండి
+Day of the visit	సందర్శన రోజు
+Time of the visit	సందర్శన సమయం
+family meet	కుటుంబ సమావేశం
+telemedicine	టెలిమెడిసిన్
+telephone	టెలిఫోన్
+at home	ఇంట్లో
+ward	వార్డు
+palliative	పాలియేటివ్
+Back of the body	వెనుక వైపు
+We made Sahara simpler for you. To go back, tap Full app at the bottom of the screen.	మేము Sahara ను మీ కోసం సులభంగా చేశాము. మళ్లీ మార్చుకోవడానికి, స్క్రీన్ కింద 'పూర్తి యాప్' నొక్కండి.
+To say more in your own voice, tap Record your voice.	మీ సొంత గొంతులో మరింత చెప్పడానికి, 'మీ గొంతును రికార్డ్ చేయండి' నొక్కండి.
+Translation into this language isn't available on this phone; reading the original words.	ఈ ఫోన్‌లో ఈ భాషలోకి అనువాదం అందుబాటులో లేదు; అసలు పదాలను చదువుతున్నాం.
+This text is in another language, so the phone cannot read it out exactly. Ask someone to read it to you.	ఈ పాఠ్యం వేరే భాషలో ఉంది, కాబట్టి ఫోన్ దీన్ని యథాతథంగా చదవలేదు. ఎవరినైనా మీకు చదివి వినిపించమని అడగండి.
+The phone can only read text written in the app language. Choose “Someone read it to me”.	ఫోన్ యాప్ భాషలో రాసిన పాఠ్యాన్ని మాత్రమే చదవగలదు. “ఎవరో నాకు చదివి వినిపించారు” ఎంచుకోండి.
+This phone has no voice for the app language. Choose “Someone read it to me”.	ఈ ఫోన్‌లో యాప్ భాష కోసం గొంతు లేదు. “ఎవరో నాకు చదివి వినిపించారు” ఎంచుకోండి.
+Only someone who can edit this care record can change this.	ఈ సంరక్షణ రికార్డును మార్చగలిగేవారు మాత్రమే దీన్ని మార్చగలరు.

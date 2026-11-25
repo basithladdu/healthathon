@@ -85,6 +85,18 @@ class CareGocSignOffTest {
         assertEquals(GocSignOffRules.LOCK, GocSignOffRules.nextStep(signed()))
     }
 
+    @Test fun theWitnessCannotBeThePersonWhoReadItAloud() {
+        val heard = ConsentReading(ConsentReadingRules.PERSON, readerName = "Ravi Sample", readerRelation = "Son", at = "2026-11-04T10:00:00.000Z")
+        val r = signed(patient(canRead = null).copy(readAloud = heard))
+        assertEquals(GocSignOffRules.WITNESS, GocSignOffRules.nextStep(r))
+        refused(GocSignOffError.WITNESS_IS_READER) { GocSignOffRules.add(r, note, witness().copy(name = "  ravi   SAMPLE "), at = at) }
+        val ok = GocSignOffRules.add(r, note, witness(), at = at)
+        assertEquals(GocSignOffRules.LOCK, GocSignOffRules.nextStep(ok))
+        // Read by the phone: there is no reader, so any witness name is fine.
+        val phone = signed(patient(canRead = null).copy(readAloud = ConsentReading(ConsentReadingRules.PHONE, language = "hi", at = "2026-11-04T10:00:00.000Z")))
+        assertEquals(GocSignOffRules.LOCK, GocSignOffRules.nextStep(GocSignOffRules.add(phone, note, witness().copy(name = "Ravi Sample"), at = at)))
+    }
+
     @Test fun lockSealsAndRefusesMore() {
         val locked = GocSignOffRules.lock(signed(), note, at = at)
         assertEquals(GocSignOffRules.LOCKED, locked.status)

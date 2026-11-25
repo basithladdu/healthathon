@@ -1,10 +1,7 @@
 @file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 package `in`.wedevit.care
 
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
 import android.content.Context
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -77,7 +74,8 @@ private fun medicineTime(at: Long?) = at?.let { DateTimeFormatter.ofPattern("d M
     SideEffect {changedCallback(busy||add||edit!=null||report!=null||retire!=null||prescriptionEditor!=null||scannerOpen)}
     DisposableEffect(account,personId) {onDispose {changedCallback(false)}}
     LaunchedEffect(selected,editable,sessionId) {if(!same(true)){add=false;edit=null;report=null;retire=null;prescriptionEditor=null;pastGroupId=null;scannerOpen=false;prescriptionDraftRows=null}}
-    BackHandler(busy||add||edit!=null||report!=null||retire!=null||prescriptionEditor!=null||pastGroupId!=null) {if(!busy){add=false;edit=null;report=null;retire=null;prescriptionEditor=null;pastGroupId=null}}
+    // Closes a panel or waits while saving: the screen stays, so a plain BackHandler (no "leaving" preview).
+    androidx.activity.compose.BackHandler(busy||add||edit!=null||report!=null||retire!=null||prescriptionEditor!=null||pastGroupId!=null) {if(!busy){add=false;edit=null;report=null;retire=null;prescriptionEditor=null;pastGroupId=null}}
     val intakeShown = rememberShownCount(personId)
     val pastRxShown = rememberShownCount(personId)
     if(!same()) {Text(t("This person's medicine record is unavailable. Return to Patients.", "इस व्यक्ति का दवा रिकॉर्ड उपलब्ध नहीं है। मरीज़ों पर लौटें।"),Modifier.padding(20.dp));return}
@@ -249,21 +247,27 @@ internal val MedicineStatusHindi = mapOf("Late reported" to "देर से �
 
 @Composable private fun MedicineStatusChip(label: String, outcome: String) { when { label.startsWith("Late") || outcome == "planned" && !label.startsWith("Plan followed") -> MedicineChip(label, DoctorStatusWarn, DoctorStatusWarnBg); outcome == "skipped" || outcome == "unmarked" || outcome.startsWith("course") -> MedicineChip(label, DoctorStatusRest, DoctorStatusRestBg); else -> MedicineChip(label, DoctorStatusGood, DoctorStatusGoodBg) } }
 
-private fun chooseMedicineTime(context:Context,current:Long?,onPicked:(Long)->Unit) {
-    val initial=Instant.ofEpochMilli(current?:System.currentTimeMillis()).atZone(ZoneId.systemDefault())
-    DatePickerDialog(context,{_,year,month,day->TimePickerDialog(context,{_,hour,minute->onPicked(java.time.LocalDate.of(year,month+1,day).atTime(hour,minute).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli())},initial.hour,initial.minute,false).show()},initial.year,initial.monthValue-1,initial.dayOfMonth).show()
+/** A medicine time by the calendar, then the scroll wheels, never typed (owner, 25 Nov). [onPicked] gets epoch millis in this phone's zone. */
+@Composable private fun MedicineTimeDialog(current:Long?,title:String,onPicked:(Long)->Unit,onDismiss:()->Unit) {
+    val initial=remember(current){Instant.ofEpochMilli(current?:System.currentTimeMillis()).atZone(ZoneId.systemDefault()).toLocalDateTime()}
+    CareDateTimeDialog(initial,title,{onPicked(it.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli())},onDismiss)
 }
 
 @Composable private fun MedicineReportDialog(item:CareItem,busy:Boolean,plans:List<MedicineIntakeEvent>,onClose:()->Unit,onSave:(MedicineIntakeEvent)->Unit) { val t = careText();
     val context=LocalContext.current;var outcome by rememberSaveable(item.id){mutableStateOf("taken")};var planned by rememberSaveable(item.id){mutableStateOf<Long?>(null)};var taken by rememberSaveable(item.id){mutableStateOf<Long?>(null)}
     var reporter by rememberSaveable(item.id){mutableStateOf("Not recorded")};var note by rememberSaveable(item.id){mutableStateOf("")};val id=rememberSaveable(item.id){UUID.randomUUID().toString()};var error by remember {mutableStateOf<String?>(null)}
+    var choosing by remember {mutableStateOf("")}
+    when(choosing){
+        "planned"->MedicineTimeDialog(planned,t("Planned", "तय"),{planned=it;choosing=""},{choosing=""})
+        "taken"->MedicineTimeDialog(taken,t("Reported taken", "लेने का बताया समय"),{taken=it;choosing=""},{choosing=""})
+    }
     AlertDialog(onDismissRequest={if(!busy)onClose()},title={Text(t("Record medicine report", "दवा की सूचना दर्ज करें"))},text={Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(10.dp)) {
         Text(item.title,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont)
         FlowRow(horizontalArrangement=Arrangement.spacedBy(5.dp)){listOf("taken" to t("Taken", "ली"),"skipped" to t("Skipped", "छोड़ी"),"planned" to t("Planned", "तय")).forEach{(value,label)->FilterChip(outcome==value,onClick={outcome=value;if(value!="taken")taken=null},enabled=!busy,label={Text(label)})}}
         plans.distinctBy {it.plannedAt}.take(6).forEach {plan->FilterChip(selected=planned==plan.plannedAt,onClick={planned=plan.plannedAt},enabled=!busy,label={Text(t("For planned dose: ${medicineTime(plan.plannedAt)}", "तय ख़ुराक के लिए: ${medicineTime(plan.plannedAt)}"))})}
-        OutlinedButton(onClick={chooseMedicineTime(context,planned){planned=it}},enabled=!busy){Text(t("Planned: ", "तय: ") + medicineTime(planned))}
+        OutlinedButton(onClick={choosing="planned"},enabled=!busy){Text(t("Planned: ", "तय: ") + medicineTime(planned))}
         if(planned!=null)TextButton(onClick={planned=null},enabled=!busy){Text(t("Clear planned time", "तय समय हटाएँ"))}
-        if(outcome=="taken"){OutlinedButton(onClick={chooseMedicineTime(context,taken){taken=it}},enabled=!busy){Text(t("Reported taken: ${medicineTime(taken)}", "लेने का बताया समय: ${medicineTime(taken)}"))};if(taken!=null)TextButton(onClick={taken=null},enabled=!busy){Text(t("Clear taken time", "लेने का समय हटाएँ"))}}
+        if(outcome=="taken"){OutlinedButton(onClick={choosing="taken"},enabled=!busy){Text(t("Reported taken: ${medicineTime(taken)}", "लेने का बताया समय: ${medicineTime(taken)}"))};if(taken!=null)TextButton(onClick={taken=null},enabled=!busy){Text(t("Clear taken time", "लेने का समय हटाएँ"))}}
         Text(t("Reported by", "किसने बताया"));listOf("Patient report","Family report","Doctor report","Not recorded").forEach{value->FilterChip(reporter==value,onClick={reporter=value},enabled=!busy,label={Text(when(value){"Patient report"->t("Patient report", "मरीज़ ने बताया");"Family report"->t("Family report", "परिवार ने बताया");"Doctor report"->t("Doctor report", "डॉक्टर ने बताया");else->t("Not recorded", "दर्ज नहीं")})})}
         OutlinedTextField(note,{note=it.take(2000)},label={Text(t("Note (optional)", "नोट (चाहें तो)"))},enabled=!busy)
         error?.let {Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce())}

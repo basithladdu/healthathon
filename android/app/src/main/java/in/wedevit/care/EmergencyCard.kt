@@ -55,7 +55,7 @@ object EmergencyCardRules {
         return clean.substring(0, clean.offsetByCodePoints(0, (max - 1).coerceAtLeast(0))).trimEnd() + "…"
     }
 
-    private fun day(at: Long, zone: ZoneId) = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH).withZone(zone).format(Instant.ofEpochMilli(at))
+    internal fun day(at: Long, zone: ZoneId) = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH).withZone(zone).format(Instant.ofEpochMilli(at))
 
     private val STRENGTH = Regex("(?i)\\b\\d+(?:[.,]\\d+)?\\s?(?:mg|mcg|µg|g|ml|iu|units?|%)(?:\\s?/\\s?\\d*\\s?(?:ml|h|hr|hours?))?(?![a-z])")
     private val LABELS = listOf("Strength: ", "Dose: ", "How often: ", "Frequency: ", "Times: ", "Food: ", "How much each time: ", "Form: ")
@@ -110,6 +110,8 @@ object EmergencyCardRules {
      */
     /** Failsafe for old printed cards (team meeting, 22 Nov): every card states a valid-until date, 90 days (3 months) after it was made; the web page says so too. */
     const val VALID_DAYS = 90L
+    /** The "is everything still the same?" check shows from this many days before the valid-until date (clinical team, 24 Nov). */
+    const val RENEW_NOTICE_DAYS = 14L
     fun build(source: EmergencySource, sections: Set<EmergencySection>, cardNumber: Int, cardId: String, madeAt: Long, zone: ZoneId = ZoneId.systemDefault(), maxBytes: Int = MAX_BYTES): EmergencyCardText {
         require(sections.isNotEmpty()) { "Choose at least one part to put on the card." }
         val header = "SAHARA EMERGENCY CARD\nCard $cardNumber · ID $cardId · made ${day(madeAt, zone)} · VALID UNTIL ${day(madeAt + VALID_DAYS * 86_400_000L, zone)}\nScan the QR for this card on the Sahara website; it says if a newer card exists. After the valid-until date check with the family or doctor."
@@ -194,7 +196,8 @@ data class ReplacedEmergencyCard(val id: String, val number: Int, val madeAt: Lo
  * card was made: the printed tables and the published version are both drawn from it, so paper and website match.
  * Blank for cards saved before 24 Nov 2026 (they are drawn from [text] until the family updates the card).
  */
-data class EmergencyCardRecord(val personId: String, val id: String, val number: Int, val madeAt: Long, val sections: Set<EmergencySection>, val text: String, val body: String, val leftOut: List<String>, val replaced: List<ReplacedEmergencyCard> = emptyList(), val link: EmergencyLink? = null, val snapshot: String = "") {
+/** [renewedAt]: when the family last said "Yes, still the same" (24 Nov); the 3 months then count from it. Null for a card never renewed. */
+data class EmergencyCardRecord(val personId: String, val id: String, val number: Int, val madeAt: Long, val sections: Set<EmergencySection>, val text: String, val body: String, val leftOut: List<String>, val replaced: List<ReplacedEmergencyCard> = emptyList(), val link: EmergencyLink? = null, val snapshot: String = "", val renewedAt: Long? = null) {
     companion object {
         /**
          * A first card, or a replacement: new id, next number, and the old card listed as outdated. The new card has no
@@ -216,18 +219,33 @@ data class EmergencyCardRecord(val personId: String, val id: String, val number:
             val replaced = j.optJSONArray("replaced")?.let { a -> (0 until a.length()).map { a.getJSONObject(it) }.map { ReplacedEmergencyCard(it.getString("id"), it.getInt("number"), it.getLong("madeAt"), it.getLong("replacedAt")) } }.orEmpty()
             val link = j.optJSONObject("link")?.let { l -> runCatching { val created = l.getLong("createdAt")
                 EmergencyLink(l.getString("token").also { EmergencyLinkRules.url(it) }, created, l.getLong("expiresAt"), l.optInt("version", 1).coerceAtLeast(1), l.optLong("publishedAt", created)) }.getOrNull() }
-            return EmergencyCardRecord(j.getString("personId"), j.getString("id"), j.getInt("number"), j.getLong("madeAt"), strings("sections").mapNotNull { s -> EmergencySection.entries.firstOrNull { it.name == s } }.toSet(), j.getString("text"), j.getString("body"), strings("leftOut"), replaced, link, j.optString("snapshot", ""))
+            return EmergencyCardRecord(j.getString("personId"), j.getString("id"), j.getInt("number"), j.getLong("madeAt"), strings("sections").mapNotNull { s -> EmergencySection.entries.firstOrNull { it.name == s } }.toSet(), j.getString("text"), j.getString("body"), strings("leftOut"), replaced, link, j.optString("snapshot", ""), if (j.has("renewedAt")) j.optLong("renewedAt") else null)
         }
     }
     fun encode(): String = org.json.JSONObject().put("personId", personId).put("id", id).put("number", number).put("madeAt", madeAt)
         .put("sections", org.json.JSONArray(sections.map { it.name })).put("text", text).put("body", body).put("leftOut", org.json.JSONArray(leftOut))
         .put("replaced", org.json.JSONArray(replaced.map { org.json.JSONObject().put("id", it.id).put("number", it.number).put("madeAt", it.madeAt).put("replacedAt", it.replacedAt) }))
         .also { j -> link?.let { j.put("link", org.json.JSONObject().put("token", it.token).put("createdAt", it.createdAt).put("expiresAt", it.expiresAt).put("version", it.version).put("publishedAt", it.publishedAt)) } }
-        .also { j -> if (snapshot.isNotBlank()) j.put("snapshot", snapshot) }.toString()
+        .also { j -> if (snapshot.isNotBlank()) j.put("snapshot", snapshot) }.also { j -> renewedAt?.let { j.put("renewedAt", it) } }.toString()
     /** The web copy to publish: the one taken when the card was made, or (older saved cards) built from today's records. */
     fun webCard(source: EmergencySource): org.json.JSONObject = snapshot.takeIf(String::isNotBlank)?.let { runCatching { org.json.JSONObject(it) }.getOrNull() } ?: EmergencyLinkRules.card(source, this)
-    /** Valid-until date of this card (made + [EmergencyCardRules.VALID_DAYS]). */
-    val validUntil: Long get() = madeAt + EmergencyCardRules.VALID_DAYS * 86_400_000L
+    /** Valid-until date of this card: [EmergencyCardRules.VALID_DAYS] after it was made, or after it was last renewed. */
+    val validUntil: Long get() = (renewedAt ?: madeAt) + EmergencyCardRules.VALID_DAYS * 86_400_000L
+    /** True from [EmergencyCardRules.RENEW_NOTICE_DAYS] days before the valid-until date, and after it. */
+    fun renewalDue(now: Long): Boolean = now >= validUntil - EmergencyCardRules.RENEW_NOTICE_DAYS * 86_400_000L
+    /**
+     * "Yes, still the same" (24 Nov): the same card (same ID, number, sections and content), valid for 3 more months from [now].
+     * Only the valid-until date changes, in the saved web copy and the preview text. The link is kept here; the screen then
+     * publishes this same content as a new version, so the website shows the new date.
+     */
+    fun renew(now: Long, zone: ZoneId = ZoneId.systemDefault()): EmergencyCardRecord {
+        val next = copy(renewedAt = now)
+        val oldUntil = "VALID UNTIL " + EmergencyCardRules.day(validUntil, zone)
+        val newUntil = "VALID UNTIL " + EmergencyCardRules.day(next.validUntil, zone)
+        val web = snapshot.takeIf(String::isNotBlank)?.let { runCatching { org.json.JSONObject(it) }.getOrNull() }
+            ?.put("validUntil", next.validUntil)?.put("renewedAt", now)?.toString() ?: snapshot
+        return next.copy(text = text.replaceFirst(oldUntil, newUntil), snapshot = web)
+    }
     /** True when today's records would print a different card than the one saved. */
     fun outOfDate(source: EmergencySource, zone: ZoneId = ZoneId.systemDefault()): Boolean = EmergencyCardRules.build(source, sections, number, id, madeAt, zone).body != body
 }

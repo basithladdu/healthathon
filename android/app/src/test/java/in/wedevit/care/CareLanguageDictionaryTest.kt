@@ -9,13 +9,14 @@ import java.io.File
 
 /**
  * Every English string that has Hindi beside it in the code (`t("English", "हिन्दी")`, `"English" to "हिन्दी"`,
- * `careTr(hindi, "English", "हिन्दी")`, `careBilingual("English", "हिन्दी")`) must also be in the Telugu, Urdu and
- * Kannada dictionaries in `src/main/resources/i18n/<code>.tsv`. A new screen string fails here until it is added.
+ * `careTr(hindi, "English", "हिन्दी")`, `careBilingual("English", "हिन्दी")`) must also be in every dictionary language's file
+ * (Telugu, Urdu, Kannada, Tamil, Malayalam, Marathi, Bengali, Gujarati, Punjabi) in `src/main/resources/i18n/<code>.tsv`.
+ * A new screen string fails here until it is added.
  *
  * Machine-drafted; clinician back-translation required before pilot.
  */
 class CareLanguageDictionaryTest {
-    private val languages = listOf(CareLang.TE, CareLang.UR, CareLang.KN)
+    private val languages = CareLang.entries.filter { it.dictionary }
 
     @After fun reset() { CareLanguageState.current = CareLang.EN }
 
@@ -49,7 +50,10 @@ class CareLanguageDictionaryTest {
     }
 
     @Test fun translationsAreWrittenInTheirOwnScript() {
-        val scripts = mapOf(CareLang.TE to 'ఀ'..'౿', CareLang.UR to '؀'..'ۿ', CareLang.KN to 'ಀ'..'೿')
+        val scripts = mapOf(CareLang.TE to 'ఀ'..'౿', CareLang.UR to '؀'..'ۿ', CareLang.KN to 'ಀ'..'೿',
+            CareLang.TA to '஀'..'௿', CareLang.ML to 'ഀ'..'ൿ', CareLang.MR to 'ऀ'..'ॿ',
+            CareLang.BN to 'ঀ'..'৿', CareLang.GU to '઀'..'૿', CareLang.PA to '਀'..'੿')
+        assertEquals(languages.toSet(), scripts.keys)
         scripts.forEach { (lang, range) ->
             val table = CareDictionary.raw(lang)
             val own = table.values.count { value -> value.any { it in range } }
@@ -84,7 +88,24 @@ class CareLanguageDictionaryTest {
 
     @Test fun onlyUrduReadsRightToLeft() {
         assertEquals(listOf(CareLang.UR), CareLang.entries.filter { it.rtl })
-        assertEquals(listOf("en", "hi", "te", "ur", "kn"), CareLang.entries.map { it.code })
+        assertEquals(listOf("en", "hi", "te", "ur", "kn", "ta", "ml", "mr", "bn", "gu", "pa"), CareLang.entries.map { it.code })
+    }
+
+    @Test fun everyLanguageButEnglishAndHindiReadsADictionary() {
+        assertEquals(listOf("te", "ur", "kn", "ta", "ml", "mr", "bn", "gu", "pa"), languages.map { it.code })
+        assertEquals(listOf("தமிழ்", "മലയാളം", "मराठी", "বাংলা", "ગુજરાતી", "ਪੰਜਾਬੀ"), listOf(CareLang.TA, CareLang.ML, CareLang.MR, CareLang.BN, CareLang.GU, CareLang.PA).map { it.label })
+        assertEquals(listOf("en-IN", "hi-IN", "te-IN", "ur-IN", "kn-IN", "ta-IN", "ml-IN", "mr-IN", "bn-IN", "gu-IN", "pa-IN"), CareLang.entries.map { it.speechTag })
+        CareLanguageState.current = CareLang.TA
+        assertEquals(java.util.Locale("ta", "IN"), careLocale(false))
+    }
+
+    @Test fun indicScriptsOtherThanDevanagariAreSetLarger() {
+        listOf(CareLang.TE, CareLang.KN, CareLang.TA, CareLang.ML, CareLang.BN, CareLang.GU, CareLang.PA).forEach {
+            assertEquals(it.code, 1.08f, SaharaScriptScale.fontScale(it), 0.0001f); assertEquals(it.code, 1.15f, SaharaScriptScale.lineHeightScale(it), 0.0001f)
+        }
+        listOf(CareLang.EN, CareLang.HI, CareLang.MR, CareLang.UR).forEach {
+            assertEquals(it.code, 1f, SaharaScriptScale.fontScale(it), 0f); assertEquals(it.code, 1f, SaharaScriptScale.lineHeightScale(it), 0f)
+        }
     }
 
     @Test fun scannerFindsPairsAndIgnoresPlainText() {

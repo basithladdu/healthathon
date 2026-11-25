@@ -1,6 +1,8 @@
 @file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 package `in`.wedevit.care
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -26,8 +28,12 @@ import androidx.compose.ui.unit.sp
     Text(text, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.a11yHeading())
 }
 
-@Composable private fun medicineChipColors() = FilterChipDefaults.filterChipColors(containerColor = Paper, labelColor = DoctorCardInk,
-    selectedContainerColor = DoctorStatusGoodBg, selectedLabelColor = DoctorCardInk, selectedLeadingIconColor = DoctorStatusGood)
+/** One chip colour set; the fill glides between white and the chosen green ([SaharaMotion.SELECT_MS]) instead of snapping. */
+@Composable internal fun medicineChipColors(on: Boolean): SelectableChipColors {
+    val fill by animateColorAsState(if (on) DoctorStatusGoodBg else Paper, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "medicine-chip")
+    return FilterChipDefaults.filterChipColors(containerColor = fill, labelColor = DoctorCardInk,
+        selectedContainerColor = fill, selectedLabelColor = DoctorCardInk, selectedLeadingIconColor = DoctorStatusGood)
+}
 
 /**
  * Tablet, Capsule, Syrup, Injection, Patch, Drops, Ointment, Inhaler, Nebuliser as chips ([MedicinePhotoFields.forms]); tapping the
@@ -35,17 +41,17 @@ import androidx.compose.ui.unit.sp
  * rewritten until a chip is tapped. Test tags: "[tagPrefix]-tablet", "[tagPrefix]-nebuliser", and so on.
  */
 @Composable fun MedicineFormPicker(selected: String, onSelect: (String) -> Unit, enabled: Boolean = true, tagPrefix: String = "medicine-form") {
-    val t = careText()
+    val t = careText(); val tick = rememberSaharaTick()
     val current = MedicinePhotoFields.canonicalForm(selected)
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         MedicineFieldTitle(t("Form", "रूप"))
         FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             MedicinePhotoFields.forms.forEach { (english, hindiName) ->
                 val on = current.equals(english, ignoreCase = true)
-                FilterChip(selected = on, enabled = enabled, onClick = { onSelect(if (on) "" else english) },
+                FilterChip(selected = on, enabled = enabled, onClick = { tick(); onSelect(if (on) "" else english) },
                     label = { Text(t(english, hindiName), fontSize = 15.sp, maxLines = 1, softWrap = false, fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal) },
                     leadingIcon = if (on) { { Icon(Icons.Default.Check, null, Modifier.size(18.dp)) } } else null,
-                    shape = RoundedCornerShape(50), colors = medicineChipColors(), modifier = Modifier.heightIn(min = 48.dp).testTag("$tagPrefix-${english.lowercase()}"))
+                    shape = RoundedCornerShape(50), colors = medicineChipColors(on), modifier = Modifier.saharaSelectBounce(on, .08f).heightIn(min = 48.dp).testTag("$tagPrefix-${english.lowercase()}"))
             }
         }
         if (current.isNotBlank() && MedicinePhotoFields.forms.none { it.first == current }) Text(t("Saved as: $current", "ऐसे सहेजा: $current"), fontSize = 14.sp, color = DoctorCardSub)
@@ -59,16 +65,16 @@ import androidx.compose.ui.unit.sp
  */
 @Composable fun MedicineFrequencyPicker(selected: MedicineFrequency?, onSelect: (MedicineFrequency) -> Unit, enabled: Boolean = true, writtenBefore: String = "",
     tagPrefix: String = "medicine-frequency") {
-    val t = careText()
+    val t = careText(); val tick = rememberSaharaTick()
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         MedicineFieldTitle(t("How often", "कितनी बार"))
         FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             MedicineFrequency.entries.forEach { frequency ->
                 val on = frequency == selected
-                FilterChip(selected = on, enabled = enabled, onClick = { onSelect(frequency) },
+                FilterChip(selected = on, enabled = enabled, onClick = { tick(); onSelect(frequency) },
                     label = { Text(t(frequency.english, frequency.hindi), fontSize = 16.sp, maxLines = 1, softWrap = false, fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal) },
                     leadingIcon = if (on) { { Icon(Icons.Default.Check, null, Modifier.size(18.dp)) } } else null,
-                    shape = RoundedCornerShape(50), colors = medicineChipColors(), modifier = Modifier.heightIn(min = 56.dp).testTag("$tagPrefix-${frequency.name.lowercase()}"))
+                    shape = RoundedCornerShape(50), colors = medicineChipColors(on), modifier = Modifier.saharaSelectBounce(on, .08f).heightIn(min = 56.dp).testTag("$tagPrefix-${frequency.name.lowercase()}"))
             }
         }
         if (writtenBefore.isNotBlank()) Text(t("Written before: $writtenBefore", "पहले लिखा था: $writtenBefore"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.testTag("$tagPrefix-written"))
@@ -85,9 +91,12 @@ import androidx.compose.ui.unit.sp
     val chosen = MedicineFrequencyRules.fromText(howOften)
     val written = howOften.trim().takeIf { it.isNotEmpty() && (chosen == null || !chosen.english.equals(it, ignoreCase = true)) }.orEmpty()
     MedicineFrequencyPicker(chosen, { picked -> onChange(picked.english, MedicineFrequencyRules.timesFor(picked, times)) }, enabled, written, tagPrefix)
-    if (chosen == MedicineFrequency.AS_NEEDED) Text(t("No fixed times. On Today, tap ‘Took a dose now’ each time it is taken.", "कोई तय समय नहीं। हर बार लेने पर आज वाले पन्ने पर ‘अभी एक खुराक ली’ छुएँ।"),
-        fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
-    else DoseTimesField(times, { onChange(howOften, it) }, enabled = enabled)
+    // Choosing As needed (or leaving it) crossfades the dose times and the "no fixed times" line instead of popping one in for the other.
+    SaharaStateSwitch(chosen == MedicineFrequency.AS_NEEDED, Modifier.fillMaxWidth(), label = "$tagPrefix-times") { asNeeded ->
+        if (asNeeded) Text(t("No fixed times. On Today, tap ‘Took a dose now’ each time it is taken.", "कोई तय समय नहीं। हर बार लेने पर आज वाले पन्ने पर ‘अभी एक खुराक ली’ छुएँ।"),
+            fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
+        else Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) { DoseTimesField(times, { onChange(howOften, it) }, enabled = enabled) }
+    }
 }
 
 /** Shown beside the number: mg, mcg, ml and g as written everywhere; units, drops and puffs in the reader's language. */
@@ -96,12 +105,12 @@ import androidx.compose.ui.unit.sp
 }
 
 /**
- * Strength as a number (number keypad) and one unit chip: mg, mcg, ml, g, units, drops, puffs. [onChange] gets the saved text ("500 mg").
+ * Strength as a number (number keypad) and one unit chip: mg, mcg, ml, g, units, %, drops, puffs. [onChange] gets the saved text ("500 mg").
  * An older strength that is not a single number and unit ("5 mg/5 ml") is shown as saved and kept until a new number is typed.
  * Test tags: "[tagPrefix]-number" and "[tagPrefix]-unit-mg" and so on.
  */
 @Composable fun MedicineStrengthField(value: String, onChange: (String) -> Unit, enabled: Boolean = true, tagPrefix: String = "medicine-strength") {
-    val t = careText()
+    val t = careText(); val tick = rememberSaharaTick()
     val parts = MedicineStrength.parts(value)
     var number by remember { mutableStateOf(parts?.number.orEmpty()) }
     var unit by remember { mutableStateOf(parts?.unit?.takeIf { it.isNotBlank() } ?: MedicineStrength.units.first()) }
@@ -123,9 +132,9 @@ import androidx.compose.ui.unit.sp
         FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             MedicineStrength.units.forEach { u ->
                 val on = u == unit
-                FilterChip(selected = on, enabled = enabled, onClick = { unit = u; if (number.isNotBlank() || !older) onChange(MedicineStrength.text(number, u)) },
+                FilterChip(selected = on, enabled = enabled, onClick = { tick(); unit = u; if (number.isNotBlank() || !older) onChange(MedicineStrength.text(number, u)) },
                     label = { Text(medicineUnitLabel(u), fontSize = 15.sp, maxLines = 1, softWrap = false, fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal) },
-                    shape = RoundedCornerShape(50), colors = medicineChipColors(), modifier = Modifier.heightIn(min = 48.dp).testTag("$tagPrefix-unit-$u"))
+                    shape = RoundedCornerShape(50), colors = medicineChipColors(on), modifier = Modifier.saharaSelectBounce(on, .08f).heightIn(min = 48.dp).testTag("$tagPrefix-unit-$u"))
             }
         }
     }
@@ -141,7 +150,9 @@ import androidx.compose.ui.unit.sp
     val times = CareReminderRules.printedTimes(detail)
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         MedicineFrequencyPicker(chosen, { picked -> onDetail(MedicineEntryText.withTimes(MedicineLegacyText.withFrequency(detail, picked), MedicineFrequencyRules.timesFor(picked, times))) }, enabled)
-        if (chosen != MedicineFrequency.AS_NEEDED) Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { DoseTimesField(times, { onDetail(MedicineEntryText.withTimes(detail, it)) }, enabled = enabled) }
+        AnimatedVisibility(chosen != MedicineFrequency.AS_NEEDED, enter = SaharaMotion.expand, exit = SaharaMotion.collapse, label = "medicine-free-text-times") {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { DoseTimesField(times, { onDetail(MedicineEntryText.withTimes(detail, it)) }, enabled = enabled) }
+        }
         CareField(MedicineLegacyText.words(detail), { onDetail(MedicineLegacyText.withWords(detail, it.take(3800))) }, t("Directions as written", "जैसे लिखा है, वैसे निर्देश"), minLines = 2)
     }
 }

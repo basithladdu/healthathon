@@ -140,7 +140,7 @@ object MedicineDoses {
      * scan's file references (a hash such as "…3bd9…" must not read as "BD", twice a day).
      */
     fun frequencyText(detail: String): String = MedicineEntryText.parse(detail)?.howOften
-        ?: detail.lineSequence().filterNot { it.startsWith("Times: ") || it.startsWith("Original prescription references:") || sourceReference.matches(it.trim()) }.joinToString(" ")
+        ?: detail.lineSequence().filterNot { it.startsWith("Times: ") || it.startsWith(MedicineAlarmRules.LINE) || it.startsWith("Original prescription references:") || sourceReference.matches(it.trim()) }.joinToString(" ")
 
     /** "Weekly", "twice a week", "every 4 weeks", "every 3 days", "alternate days": a schedule that is not every day. */
     private val weeklyOrLonger = Regex("(?<![A-Za-z])(?:weekly|monthly|(?:once|twice|thrice|\\d+ times?) (?:a|per|each|every) (?:week|month)|every \\d+ (?:days|weeks|months)|every other day|alternate days?)(?![A-Za-z])", RegexOption.IGNORE_CASE)
@@ -285,7 +285,7 @@ object MedicineCardText {
     private val purposeStart = Regex("""^(?:for|to|helps?|used for|eases?|relieves?)\b""", RegexOption.IGNORE_CASE)
     private val purposeInside = Regex("""\bto (?:ease|help|treat|prevent|reduce|control|relieve|stop)\b""", RegexOption.IGNORE_CASE)
 
-    private fun sentences(detail: String): List<String> = detail.lineSequence().filterNot { it.startsWith("Times: ") }.joinToString("\n")
+    private fun sentences(detail: String): List<String> = detail.lineSequence().filterNot { it.startsWith("Times: ") || it.startsWith(MedicineAlarmRules.LINE) }.joinToString("\n")
         .split(sentence).map(String::trim).filter(String::isNotEmpty)
 
     /** "What it does" from free text: the first sentence that says what the medicine is for ("For nausea."). Blank when none. */

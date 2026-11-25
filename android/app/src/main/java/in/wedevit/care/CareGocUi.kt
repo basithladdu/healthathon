@@ -187,7 +187,9 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
     fun leave(then: () -> Unit) { if (samePlan(d, record)) then() else if (blockers.isEmpty()) { if (onSave(d)) then() } else leaving = then }
     // The full plan opens with this talk's unsaved choices, so the rules that block them can be fixed there.
     fun fullPlan() { if (samePlan(d, record)) onFullPlan(null) else if (blockers.isEmpty()) { if (onSave(d)) onFullPlan(null) } else if (keepTalk()) onFullPlan(d) }
-    androidx.activity.compose.BackHandler { leave(onClose) }
+    SaharaBackHandler { leave(onClose) }
+    // When the rules block the save, back asks first and the page stays, so a plain BackHandler (no "leaving" preview); composed later, it goes first.
+    androidx.activity.compose.BackHandler(!samePlan(d, record) && blockers.isNotEmpty()) { leave(onClose) }
     // A new version is a different record, so everything on the page starts over for it (the old one stays locked in history).
     androidx.compose.runtime.key(record.id) {
         GocConversationPage(d, { change -> d = change(d) }, LocalGocFolder.current, mic::request, onClose = { leave(onClose) }, onFullPlan = if (canEdit) { { fullPlan() } } else null, onNewVersion = if (canEdit) onNewVersion else null)
@@ -342,7 +344,7 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
 }
 
 @Composable private fun GocConversationPage(d: EctprRecord, update: ((EctprRecord) -> EctprRecord) -> Unit, folder: File?, withMic: (() -> Unit) -> Unit, agreedAt: Long = 0L, agreedBy: String = "", startRecording: Boolean = false, onClose: () -> Unit, onFullPlan: (() -> Unit)? = null, onNewVersion: (() -> Unit)? = null) {
-    val t = careText(); val hindi = careHindi(); val context = LocalContext.current; val scope = rememberCoroutineScope(); val owner = LocalLifecycleOwner.current; val view = LocalView.current
+    val t = careText(); val hindi = careHindi(); val context = LocalContext.current; val scope = rememberCoroutineScope(); val owner = LocalLifecycleOwner.current; val view = LocalView.current; val tick = rememberSaharaTick()
     val recorder = remember(folder, d.patientId) { folder?.let { GocRecorder(context, it, d.patientId, scope) } }
     val engine = remember { GocSpeechEngine(context) }
     val draftFile = remember(folder, d.id) { folder?.let { GocDraftFile(it, d.id) } }
@@ -579,18 +581,18 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
                         Icon(Icons.Default.Keyboard, null, tint = RustText); Spacer(Modifier.width(6.dp)); Text(t("Type or paste", "टाइप या पेस्ट करें"), color = RustText, textAlign = TextAlign.Center)
                     }
                 }
-                if (error.isNotBlank()) Surface(color = DoctorStatusRestBg, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth()) {
+                PlanReveal(error.isNotBlank()) { Surface(color = DoctorStatusRestBg, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth()) {
                     Row(Modifier.padding(start = 12.dp, end = 4.dp, top = 4.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(error, color = DoctorStatusRest, fontSize = 15.sp, lineHeight = 21.sp, modifier = Modifier.weight(1f).padding(vertical = 8.dp).testTag("goc-error").announce())
                         val again = lastClip
                         if (again != null && !busy && !askLanguage) TextButton(onClick = { transcribe(again) }, modifier = Modifier.heightIn(min = 48.dp).testTag("goc-retry")) { Text(t("Try again", "फिर कोशिश करें"), color = RustText, fontWeight = FontWeight.SemiBold) }
                     }
-                }
-                if (askLanguage && lastClip != null) Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                } }
+                PlanReveal(askLanguage && lastClip != null) { Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(t("Language", "भाषा"), fontWeight = FontWeight.Bold)
-                    GocSpeechLanguage.entries.filter { it != GocSpeechLanguage.AUTO }.forEach { choice -> FilterChip(selected = language == choice.name, onClick = { language = choice.name; lastClip?.let { transcribe(it) } }, label = { Text(choice.label) }, shape = CircleShape, modifier = Modifier.heightIn(min = 48.dp).testTag("goc-language-${choice.name}")) }
-                }
-                if (typing) Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    GocSpeechLanguage.entries.filter { it != GocSpeechLanguage.AUTO }.forEach { choice -> FilterChip(selected = language == choice.name, onClick = { tick(); language = choice.name; lastClip?.let { transcribe(it) } }, label = { Text(choice.label) }, shape = CircleShape, modifier = Modifier.saharaSelectBounce(language == choice.name, .08f).heightIn(min = 48.dp).testTag("goc-language-${choice.name}")) }
+                } }
+                PlanReveal(typing) {
                     CareField(typed, { typed = it.take(OfflineSpeechModel.maxOriginalChars) }, t("Type or paste", "टाइप या पेस्ट करें"), minLines = 4)
                     Button(onClick = { lines = lines + GocLines.fromText(typed); typed = ""; typing = false; stage = GocStage.REVIEW }, enabled = typed.isNotBlank(), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust, contentColor = Color.White), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("goc-add-typed")) { Text(t("Use", "इस्तेमाल करें"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold) }
                 }
@@ -722,9 +724,10 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
                 PlanCard {
                     if (note.isNotBlank()) GocSignOff(noteId = "${d.id}:v${d.version}:goc", noteText = note, store = signStore, doctorPrefill = signedInDoctor?.name.orEmpty(), signerPrefill = d.patient.name, showNote = false,
                         doctorRegistrationPrefill = signedInDoctor?.registration.orEmpty(), familyPrefill = d.decisionMakers.primary?.takeIf { it.name.isNotBlank() }?.let { it.name to it.relation },
+                        people = listOfNotNull(d.decisionMakers.primary, d.decisionMakers.alternate).filter { it.name.isNotBlank() }.map { ConsentPerson(it.name, it.relation) },
                         onComplete = { record ->
                             signOff = GocSignOffSummary(record.id, record.sealSha256.orEmpty(), record.lockedAt.orEmpty(), record.signatures.map { it.name },
-                                record.signatures.map { it.role }, record.signatures.map { it.registrationNo.orEmpty() }, record.signatures.map { it.method }, record.signatures.map { it.signedAt })
+                                record.signatures.map { it.role }, record.signatures.map { it.registrationNo.orEmpty() }, record.signatures.map { it.method }, record.signatures.map { it.signedAt }, record.signatures.map { it.readAloud }.takeIf { r -> r.any { it != null } }.orEmpty())
                             // Locked is the end: the note is saved and the audio and draft are cleared now, so Done only closes.
                             finish(close = false)
                         },
@@ -769,7 +772,7 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
             "अगर मरीज़ फ़ैसला न ले सकें, तो जो व्यक्ति टीम के साथ फ़ैसला करेंगे। उनका नाम, रिश्ता और फ़ोन दस्तावेज़ की फ़ैसला लेने वालों की तालिका में जाते हैं।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
         Box(Modifier.testTag("goc-dm-name")) { CareField(dm.name, { v -> setDm { it.copy(name = v) } }, t("Name", "नाम"), singleLine = true) }
         Box(Modifier.testTag("goc-dm-relation")) { CareField(dm.relation, { v -> setDm { it.copy(relation = v) } }, t("Relation", "रिश्ता"), singleLine = true) }
-        Box(Modifier.testTag("goc-dm-phone")) { CareField(dm.phone24h, { v -> setDm { it.copy(phone24h = v) } }, t("24-hour phone", "24 घंटे का फ़ोन"), singleLine = true) }
+        Box(Modifier.testTag("goc-dm-phone")) { CareField(dm.phone24h, { v -> setDm { it.copy(phone24h = v) } }, t("24-hour phone", "24 घंटे का फ़ोन"), singleLine = true, voice = false) }
         Text(t("The patient's own name, phone and address come from their profile. The full care plan holds the rest, such as a second decision-maker and their ID.",
             "मरीज़ का अपना नाम, फ़ोन और पता उनकी प्रोफ़ाइल से आते हैं। बाकी, जैसे दूसरे फ़ैसला लेने वाले और उनकी पहचान, पूरी देखभाल योजना में है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
         val patientLine = listOf(d.patient.name, d.patient.phone).filter(String::isNotBlank).joinToString(" · ")

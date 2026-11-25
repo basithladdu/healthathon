@@ -6,7 +6,6 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -180,7 +179,7 @@ internal object DoctorCareDemoData {
     SideEffect {if(closing || (!ready&&error==null))onNavigationBlockedChange(true)}
     LaunchedEffect(vm,attempt,initialPersonId) {try {if(DoctorTestProfiles.contains(initialPersonId)) DoctorTestProfiles.seed(vm,context) else DoctorCareDemoData.seed(vm,context);vm.select(initialPersonId);vm.refreshCareContacts();vm.refreshMedicineHistory();ready=true;onNavigationBlockedChange(false)}catch(e:Exception){if(e is CancellationException)throw e;android.util.Log.e("SaharaSeed","walkthrough load failed",e);error="Practice could not open. Your own profiles were not changed.";onNavigationBlockedChange(false)}}
     DisposableEffect(section) {onHeaderBackChange(back);onDispose{onHeaderBackChange(null)}}
-    BackHandler(enabled=!childBlocked&&!closing&&(ready||error!=null||closeFailed)) {back()}
+    SaharaBackHandler(enabled=!childBlocked&&!closing&&(ready||error!=null||closeFailed)) {back()}
     if(closing) Column(Modifier.padding(20.dp)){SaharaProgressBar(null);Text(if(DoctorTestProfiles.contains(initialPersonId)) "Saving this discussion…" else "Saving your practice draft…")}
     else if(closeFailed) Column(Modifier.padding(20.dp)){Text("Practice draft was not saved. Leaving may lose its latest practice edits; your own patient records are unchanged.");Button(onClick=::leave){Text("Retry saving practice draft")};TextButton(onClick=onExit){Text("Leave practice without saving")}}
     else if(error!=null) Column(Modifier.padding(20.dp)) {Text(error!!);Button(onClick={error=null;attempt++}){Text("Try again")};TextButton(onClick=::leave){Text("Back to patients")}}

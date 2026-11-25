@@ -1,7 +1,6 @@
 @file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 package `in`.wedevit.care
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -35,6 +34,9 @@ private fun timelineIcon(kind: TimelineKind): ImageVector = when (kind) {
     TimelineKind.LAB -> Icons.Default.Science; TimelineKind.TEST -> Icons.Default.Biotech; TimelineKind.VISIT -> Icons.Default.MedicalServices
     TimelineKind.NOTE -> Icons.Default.Description; TimelineKind.DOCUMENT -> Icons.Default.Folder
 }
+/** A visit shows its own type (Groups for a family meeting, Home for a home visit); other visits keep the medical icon. */
+private fun timelineEventIcon(e: TimelineEvent): ImageVector =
+    if (e.kind == TimelineKind.VISIT) CareVisitKindRules.kind(e.title).takeIf { it != CareVisitKind.OTHER }?.icon() ?: timelineIcon(e.kind) else timelineIcon(e.kind)
 /** One section colour per filter, so a scan reads the same in the summary tiles and on the line. */
 private fun timelineTone(kind: TimelineKind): SaharaTone = when (kind.filter) { TimelineFilter.TREATMENT -> SaharaTone.Rose; TimelineFilter.SCANS -> SaharaTone.Indigo; TimelineFilter.LAB -> SaharaTone.Teal; else -> SaharaTone.Marigold }
 
@@ -84,18 +86,21 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
     var filterName by rememberSaveable { mutableStateOf(TimelineFilter.ALL.name) }
     var toggled by rememberSaveable { mutableStateOf("") }; var showAllMonths by rememberSaveable { mutableStateOf("") }
     fun flip(set: String, key: String) = set.split(',').filter { it.isNotBlank() }.let { if (key in it) it - key else it + key }.joinToString(",")
-    val shortFormat = DateTimeFormatter.ofPattern("d MMM", careLocale(careHindi()))
+    val lang = CareLanguageState.current
+    val shortFormat = remember(hindi, lang) { DateTimeFormatter.ofPattern("d MMM", careLocale(hindi)) }
     fun shortDate(epoch: Long) = java.time.Instant.ofEpochMilli(epoch).atZone(java.time.ZoneId.systemDefault()).format(shortFormat)
     val filter = TimelineFilter.entries.firstOrNull { it.name == filterName } ?: TimelineFilter.ALL
     val now = remember(items, reports, notes) { System.currentTimeMillis() }
     val all = remember(person, items, reports, notes) { CareTimelineRules.events(person, items, reports, notes, cancerType, folderOf, now) }
-    val summary = CareTimelineRules.summary(all)
-    val shown = CareTimelineRules.filter(all, filter)
-    val months = CareTimelineRules.byMonth(shown)
-    val monthFormat = DateTimeFormatter.ofPattern("MMMM yyyy", careLocale(hindi))
+    // Summary, filter and month grouping run when the events or the filter change, not on every recomposition.
+    val summary = remember(all) { CareTimelineRules.summary(all) }
+    val shown = remember(all, filter) { CareTimelineRules.filter(all, filter) }
+    val months = remember(shown) { CareTimelineRules.byMonth(shown) }
+    val monthFormat = remember(hindi, lang) { DateTimeFormatter.ofPattern("MMMM yyyy", careLocale(hindi)) }
     // Newest months first; older months wait behind "Show older" so the page stays short (24 Nov).
     val monthsShown = rememberShownCount("$person:$filterName")
-    BackHandler { onClose() }
+    SaharaBackHandler { onClose() }
+    val tick = rememberSaharaTick()
     fun canOpen(e: TimelineEvent) = when (e.source) {
         TimelineSource.REPORT -> reports.any { it.id == e.sourceId }; TimelineSource.CALENDAR -> onCalendarAt != null; TimelineSource.LAB_HISTORY -> onLabs != null
         TimelineSource.CARE_NOTE -> onCare != null; TimelineSource.GOALS -> notes.any { it.id == e.sourceId }
@@ -110,7 +115,7 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
 
     LazyColumn(Modifier.fillMaxSize().testTag("care-timeline"), contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onClose, modifier = Modifier.size(48.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back to documents", "कागज़ात पर वापस")) }
+            SaharaBackButton(onClose, tag = "timeline-back")
             Column(Modifier.weight(1f)) { Heading(t("Care timeline", "देखभाल की समय-रेखा"), 28) }
         } }
         item { Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -140,22 +145,21 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
                 }
             } }
         } }
-        item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            TimelineFilter.entries.forEach { option -> FilterChip(selected = filter == option, onClick = { filterName = option.name }, label = { Text(timelineFilterLabel(option, t)) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp).testTag("timeline-filter-${option.name}")) }
+        item(key = "timeline-filters", contentType = "filters") { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            TimelineFilter.entries.forEach { option -> RecordsChip(selected = filter == option, onClick = { filterName = option.name }, label = { Text(timelineFilterLabel(option, t)) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp).testTag("timeline-filter-${option.name}")) }
         } }
-        if (shown.isEmpty()) item { SurfaceCard {
+        if (shown.isEmpty()) item(key = "timeline-empty", contentType = "empty") { Box(Modifier.animateItem()) { SurfaceCard {
             Surface(shape = CircleShape, color = SaharaApricot) { Icon(Icons.Default.Timeline, null, Modifier.padding(12.dp).size(28.dp), tint = DoctorAccent) }
             Spacer(Modifier.height(12.dp))
             Text(if (all.isEmpty()) t("Nothing yet", "अभी कुछ नहीं") else t("Nothing here", "यहाँ कुछ नहीं"), fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk)
             if (all.isNotEmpty()) TextButton(onClick = { filterName = TimelineFilter.ALL.name }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Show all", "सब दिखाएँ")) }
-        } }
+        } } }
         cappedItems(months, monthsShown, key = { "month-${it.first}" }, tag = "timeline-months") { (month, events) ->
             val key = month.toString(); val newest = months.first().first == month
             val isOpen = newest != (key in toggled.split(',')) // older months start closed; a tap flips the default
             val expandedAll = key in showAllMonths.split(',')
-            val visible = if (expandedAll) events else events.take(5)
             Column(Modifier.fillMaxWidth().animateItem()) {
-                Surface(onClick = { toggled = flip(toggled, key) }, shape = RoundedCornerShape(50), color = SaharaSoftGold,
+                Surface(onClick = { tick(); toggled = flip(toggled, key) }, shape = RoundedCornerShape(50), color = SaharaSoftGold,
                     modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).a11yHeading().testTag("timeline-month-$key")) {
                     Row(Modifier.padding(start = 16.dp, end = 12.dp, top = 4.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(month.atDay(1).format(monthFormat), Modifier.weight(1f), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
@@ -166,11 +170,11 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
                 }
                 AnimatedVisibility(isOpen, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) {
                     Column(Modifier.padding(top = 8.dp)) {
-                        visible.forEach { e ->
+                        val eventRow: @Composable (TimelineEvent) -> Unit = { e ->
                             val tappable = canOpen(e)
                             Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
                                 Column(Modifier.width(36.dp).fillMaxHeight(), horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Surface(shape = CircleShape, color = timelineTone(e.kind).solid, modifier = Modifier.size(32.dp)) { Box(contentAlignment = Alignment.Center) { Icon(timelineIcon(e.kind), null, Modifier.size(18.dp), tint = timelineTone(e.kind).onSolid) } }
+                                    Surface(shape = CircleShape, color = timelineTone(e.kind).solid, modifier = Modifier.size(32.dp)) { Box(contentAlignment = Alignment.Center) { Icon(timelineEventIcon(e), null, Modifier.size(18.dp), tint = timelineTone(e.kind).onSolid) } }
                                     Box(Modifier.width(2.dp).weight(1f).background(DoctorHairline))
                                 }
                                 // A row that opens something sits on a light card with an arrow, so it reads as tappable.
@@ -191,7 +195,12 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
                                 }
                             }
                         }
-                        if (events.size > 5) TextButton(onClick = { showAllMonths = flip(showAllMonths, key) }, modifier = Modifier.heightIn(min = 48.dp).testTag("timeline-more-$key")) {
+                        events.take(5).forEach { eventRow(it) }
+                        // The rest of the month slides open below the first five instead of popping in.
+                        AnimatedVisibility(expandedAll && events.size > 5, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) {
+                            Column { events.drop(5).forEach { eventRow(it) } }
+                        }
+                        if (events.size > 5) TextButton(onClick = { tick(); showAllMonths = flip(showAllMonths, key) }, modifier = Modifier.heightIn(min = 48.dp).testTag("timeline-more-$key")) {
                             Text(if (expandedAll) t("Show fewer", "कम दिखाएँ") else t("Show all ${events.size}", "सभी ${events.size} दिखाएँ"))
                         }
                     }

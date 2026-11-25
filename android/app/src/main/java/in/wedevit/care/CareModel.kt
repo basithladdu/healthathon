@@ -110,6 +110,8 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
     val refreshError = MutableStateFlow<String?>(null)
     val verifiedReviewIds = MutableStateFlow<Set<String>>(emptySet())
     val authenticatedConfirmationIds = MutableStateFlow<Set<String>>(emptySet())
+    /** Confirmation id -> how the note was read, from the shared record (empty when signed out or the server does not keep it). */
+    val confirmationReadings = MutableStateFlow<Map<String, ConsentReading>>(emptyMap())
     private val editable = MutableStateFlow<Set<String>>(emptySet())
     private val owned = MutableStateFlow<Set<String>>(emptySet())
     /** Server access for a shared person, as loaded at the last refresh. */
@@ -271,7 +273,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
                 requireSameAccount()
             }
             withContext(Dispatchers.IO) { removed.forEach { reportFiles.removePerson(it) } }
-            editable.value = records.editable; owned.value = records.owned; verifiedReviewIds.value = records.verifiedReviews; authenticatedConfirmationIds.value = records.authenticatedConfirmations
+            editable.value = records.editable; owned.value = records.owned; verifiedReviewIds.value = records.verifiedReviews; authenticatedConfirmationIds.value = records.authenticatedConfirmations; confirmationReadings.value = records.confirmationReadings
             if (selected.value in removed) { draft.value = Conversation(""); select(records.people.firstOrNull()?.id.orEmpty()) }
         }
         reconcileReminders()
@@ -522,12 +524,12 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
             done()
         }
     }
-    fun confirm(version: CareVersion, name: String, relationship: String, reviewed: Boolean, onSaved: suspend (Acknowledgement) -> Unit = {}, done: () -> Unit) = action {
+    fun confirm(version: CareVersion, name: String, relationship: String, reviewed: Boolean, onSaved: suspend (Acknowledgement) -> Unit = {}, reading: ConsentReading? = null, done: () -> Unit) = action {
         require(selected.value == version.personId) { mTr("Open this person's care note before confirming.", "पुष्टि करने से पहले इस व्यक्ति का देखभाल नोट खोलें।") }
         val previousConfirmations = dao.confirmations(version.id).filter { cloud == null || it.id in authenticatedConfirmationIds.value }
         val proposed = NoteRules.acknowledge(version, dao.latest(version.personId), name, relationship, reviewed, previousConfirmations)
         val ack = if (cloud != null && dao.confirmation(proposed.id) != null && proposed.id !in authenticatedConfirmationIds.value) proposed.copy(id = newId()) else proposed
-        val write = sync?.let { CareSyncOps.confirm(version.personId, ack) }
+        val write = sync?.let { CareSyncOps.confirm(version.personId, ack, reading) }
         if (sync != null && write != null) {
             val status = sync.submit(write, local = { if (dao.confirmation(ack.id) == null) dao.acknowledge(ack) }, rollback = { dao.deleteAcknowledgement(ack.id) })
             if (status != CareSyncStatus.SENT) { onSaved(ack); message.value = CareSyncText.CONFIRMED_WAITING; done(); return@action }
@@ -538,6 +540,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         if (previous == null) dao.acknowledge(saved)
         else require(previous == saved) { mTr("This confirmation changed. Refresh the care note before trying again.", "यह पुष्टि बदल गई है। फिर कोशिश करने से पहले देखभाल नोट रिफ़्रेश करें।") }
         if (cloud != null) authenticatedConfirmationIds.value += saved.id
+        if (cloud != null && reading != null) confirmationReadings.value += saved.id to ConsentReadingRules.clean(reading)
         onSaved(saved)
         message.value = savedTr("Your confirmation is saved", "आपकी पुष्टि सहेजी गई"); done()
     }

@@ -3,7 +3,6 @@ package `in`.wedevit.care
 
 import android.content.Intent
 import android.net.Uri
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
@@ -84,7 +83,9 @@ internal fun clinicianResubmitNeedsWarning(status: String?) = status == "approve
     // Doctor approval is offered only to accounts the owner made Sahara-team verifiers on the server.
     var verifier by remember { mutableStateOf(false) }
     LaunchedEffect(cloud, cloud?.session?.value?.userId) { verifier = try { cloud?.session?.value != null && cloud.isClinicalVerifier() } catch (cancel: CancellationException) { throw cancel } catch (_: Exception) { false } }
-    BackHandler { if (!busy) onClose() }
+    SaharaBackHandler(!busy) { onClose() }
+    // While a save runs back waits; a plain BackHandler, so the screen does not preview leaving.
+    androidx.activity.compose.BackHandler(busy) { }
     val content: @Composable (PaddingValues) -> Unit = { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding).imePadding(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             if (cloud == null) item { SurfaceCard { Button(onClick = onAccount) { Text(t("Sign in", "साइन इन")) } } }
@@ -98,7 +99,7 @@ internal fun clinicianResubmitNeedsWarning(status: String?) = status == "approve
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         CareField(name, { name = it.take(100) }, t("Registered name", "रजिस्टर्ड नाम"), singleLine = true)
                         CareField(council, { council = it.take(160) }, t("Medical council", "मेडिकल काउंसिल"), singleLine = true)
-                        CareField(registration, { registration = it.take(80) }, t("Registration number", "रजिस्ट्रेशन नंबर"), singleLine = true)
+                        CareField(registration, { registration = it.take(80) }, t("Registration number", "रजिस्ट्रेशन नंबर"), singleLine = true, voice = false)
                         val submit = { run { cloud.requestClinician(name, council, registration); refresh(); notice = t("Request received. Verification is pending.", "अनुरोध मिल गया। पुष्टि बाक़ी है।") } }
                         // The server puts any re-submission back to pending, and patient access needs "approved": say so first.
                         var confirmResubmit by remember { mutableStateOf(false) }

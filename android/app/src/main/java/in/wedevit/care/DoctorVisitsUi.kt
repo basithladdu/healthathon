@@ -1,6 +1,5 @@
 package `in`.wedevit.care
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.lazy.LazyColumn
@@ -79,7 +78,7 @@ internal fun doctorVisitSources(item: CareItem, entries: List<CareItem>, notes: 
     DisposableEffect(detailId, busy, ready) { backCallback(if (detailId != null && !busy && ready) ({ detailId = null }) else null); onDispose { backCallback(null) } }
     DisposableEffect(Unit) { onDispose { blockedCallback(false) } }
     LaunchedEffect(ready, canEdit) { if (!ready) detailId = null; if (!ready || !canEdit) editing = null }
-    BackHandler(detailId != null && editing == null && !busy) { detailId = null }
+    androidx.activity.compose.BackHandler(detailId != null && editing == null && !busy) { detailId = null }
     if (!ready) Text(t("Opening this person's visits…", "इस व्यक्ति की विज़िट खुल रही हैं…"), Modifier.padding(20.dp))
     else if (detail != null) DoctorVisitDetailsContent(detail, canEdit, busy, conditionSources = entries, discussionSources = notes, onBack = { detailId = null }, onEdit = { editing = detail }, onPlanAnother = { detailId = null; onAddVisit() }, onStatus = { status ->
         if (vm.selected.value == personId && vm.draft.value.personId == personId && vm.accountNamespace == account && (vm.cloud == null || vm.cloud.session.value?.userId == account) && vm.canEdit.value && !vm.busy.value) {

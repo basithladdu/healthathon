@@ -3,7 +3,8 @@ package `in`.wedevit.care
 
 import android.content.Context
 import android.content.Intent
-import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -115,8 +116,8 @@ internal fun planStepOf(field: String): Int = when {
         val interp = EdView.forPatient(state.ectprs, selected, today); val r = interp.record ?: return
         scope.launch {
             val amdSummary = AmdLifecycle.statusSummary(state.amds, selected); val card = CardTokens.live(state.tokens, r.id)
-            val offline = EdCardOffline.forQr(r, amdSummary, hindi, today)
-            val file = runCatching { withContext(Dispatchers.IO) { File(store.folder(selected), planPdfName(r.version)).also { CarePlanPdf.plan(it, r, interp, AmdLifecycle.edSummary(r.existingDirective, amdSummary), card?.url, offline, card?.server == CardServerState.ISSUED, hindi, today, CarePlanBook.openReview(state, r.id), AmdLifecycle.governs(state.amds, selected, r.existingDirective)) } } }.getOrNull()
+            // No offline text QR on paper (meeting, 24 Nov): text in a QR opens in a notes app where anyone can edit it. Only the web link QR is printed.
+            val file = runCatching { withContext(Dispatchers.IO) { File(store.folder(selected), planPdfName(r.version)).also { CarePlanPdf.plan(it, r, interp, AmdLifecycle.edSummary(r.existingDirective, amdSummary), card?.url, null, card?.server == CardServerState.ISSUED, hindi, today, CarePlanBook.openReview(state, r.id), AmdLifecycle.governs(state.amds, selected, r.existingDirective)) } } }.getOrNull()
             if (file == null) vm.message.value = t("Couldn't make the PDF. Try again.", "PDF नहीं बना। फिर कोशिश करें।")
             else { commit { CarePlanBook.printed(it, AuditRecordType.ECTPR, r.id, actor, planNow()) }; share(file, t("Share the emergency plan", "आपातकालीन योजना साझा करें"), AuditRecordType.ECTPR, r.id) }
         }
@@ -124,19 +125,18 @@ internal fun planStepOf(field: String): Int = when {
     // Opening the goals-of-care talk with no draft: a signed plan carries over into a new version; with no plan at all, a first plan starts.
     fun gocStart(s: CarePlanState): CarePlanState = if (person != null && EctprLifecycle.active(s.ectprs, selected) != null) GocNewVersion.start(s, selected, actor, planNow(), today)
         else CarePlanBook.startPlan(s, selected, actor, planNow(), EctprPrefill.patient(person?.name.orEmpty(), profile()), clinical = EctprPrefill.clinical(profile())).first
-    BackHandler(page != "home") { page = "home" }
     if (person == null) { Box(Modifier.fillMaxSize()); return }
     // Patients and families never open the doctor's talk or form (Dr Sujay, 22 Nov): their Goals of care tab is the signed note, read-only, and the way to ask for the conversation.
     // Clinical team, 24 Nov 2026: the patient side keeps only Goals of care. The emergency-room view, the pocket card and advance care planning
     // pages were duplicates for patients (the SOS sheet has the one emergency card), so they are hidden here; the doctor side keeps them all,
-    // and nothing saved is removed. "Your data" stays only while this phone holds plan or living-will records, so those rights remain reachable.
+    // and nothing saved is removed. "What we do with your data" always stays on the patient's Care planning page: the doctor
+    // said it is important (24 Nov), so it is not hidden even when this phone holds no plan yet.
     if (!clinician) {
         val fromCareTab = startAt != "goc"
-        val holdsRecords = fromCareTab && (state.ectprs.any { it.patientId == person.id } || state.amds.any { it.patientId == person.id })
         LazyColumn(Modifier.fillMaxSize().testTag(if (fromCareTab) "care-plan-home" else "goc-family-page"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            item { PlanHeader(t("Goals of care", "देखभाल के लक्ष्य"), onBack, if (fromCareTab) "care-plan-header" else "goc-family-header") }
-            item { FamilyTile(t("Goals of care discussion", "देखभाल के लक्ष्यों की चर्चा"), Icons.Default.Forum, FamilyAccent.Indigo, Modifier.testTag("care-plan-goc-tile")) { PatientGocStatus(vm, state.ectprs, person.id) } }
-            if (holdsRecords) item { DpdpNoticeCard(DpdpScope.CARE_PLAN, state, person.id, store, actor != "Family", ::commit, actor) }
+            item(key = "header", contentType = "header") { PlanHeader(t("Goals of care", "देखभाल के लक्ष्य"), onBack, if (fromCareTab) "care-plan-header" else "goc-family-header") }
+            item(key = "goc-tile", contentType = "tile") { FamilyTile(t("Goals of care discussion", "देखभाल के लक्ष्यों की चर्चा"), Icons.Default.Forum, FamilyAccent.Indigo, Modifier.animateItem().testTag("care-plan-goc-tile")) { PatientGocStatus(vm, state.ectprs, person.id) } }
+            if (fromCareTab) item(key = "dpdp", contentType = "dpdp") { Box(Modifier.animateItem()) { DpdpNoticeCard(DpdpScope.CARE_PLAN, state, person.id, store, actor != "Family", ::commit, actor) } }
         }
         return
     }
@@ -152,7 +152,10 @@ internal fun planStepOf(field: String): Int = when {
     // From the Goals of care tab, closing the full plan goes back to the talk, and closing the talk leaves the tab.
     val wizardBack = if (startAt == "goc") "goc" else "home"
     CompositionLocalProvider(LocalSignedInDoctor provides signedInDoctor) {
-    SaharaScreenHost(page, Modifier.fillMaxSize(), label = "care-plan-page", direction = { from, to -> if (to == "home" || (from == "wizard" && to == "goc")) SaharaMotion.Direction.Back else SaharaMotion.Direction.Forward }) { shownPage -> when (shownPage) {
+    SaharaScreenHost(page, Modifier.fillMaxSize(), label = "care-plan-page", direction = { from, to -> if (to == "home" || (from == "wizard" && to == "goc")) SaharaMotion.Direction.Back else SaharaMotion.Direction.Forward }) { shownPage ->
+        // Inside the page host, so a back swipe previews the plan page that is closing, not the whole Care plan tab.
+        SaharaBackHandler(shownPage != "home") { page = "home" }
+        when (shownPage) {
         "goc" -> {
             val draft = EctprLifecycle.draft(state.ectprs, selected)
             if (draft == null) { LaunchedEffect(Unit) { page = "home" }; return@SaharaScreenHost }
@@ -180,7 +183,7 @@ internal fun planStepOf(field: String): Int = when {
         "pilot" -> PilotLogPage(state, selected, actor, ED_VIEW_DETAIL, onBack = { page = "home" }, commit = ::commit)
         "ed" -> EdQuickViewPage(state, selected, onBack = { page = "home" }, onCard = { page = "card" }, onShare = ::sharePlanPdf,
             onViewed = { id -> commit { CarePlanBook.viewed(it, AuditRecordType.ECTPR, id, actor, planNow(), ED_VIEW_DETAIL) } })
-        "card" -> WalletCardPage(state, selected, online, canEdit, onRetry = ::pushCards, onReissue = { commit { CarePlanBook.reissueCard(it, selected, actor, planNow()) } }, onBack = { page = "home" }, onShare = ::sharePlanPdf,
+        "card" -> WalletCardPage(state, selected, online, canEdit, emergencyUrl = remember(vm.storageNamespace, selected) { runCatching { EmergencyCardStore(context.applicationContext, vm.storageNamespace).load(selected)?.link?.url }.getOrNull() }, onRetry = ::pushCards, onReissue = { commit { CarePlanBook.reissueCard(it, selected, actor, planNow()) } }, onBack = { page = "home" }, onShare = ::sharePlanPdf,
             onViewed = { id -> commit { CarePlanBook.viewed(it, AuditRecordType.CARD, id, actor, planNow(), CARD_VIEW_DETAIL) } })
         "amd" -> LivingWillPage(state, person, store, canEdit, clinician, canManageData, actor, onBack = { page = "home" }, commit = ::commit, onShare = { file, id -> share(file, t("Share the advance care planning", "अग्रिम देखभाल योजना साझा करें"), AuditRecordType.AMD, id) })
         else -> CarePlanHome(state, person, clinician, canEdit, loadProblem, store, canManageData, actor, ::commit, transport.takeIf { online }, onBack = onBack, onPage = { page = it },
@@ -241,9 +244,13 @@ internal fun planStepOf(field: String): Int = when {
 
 @Composable internal fun PlanOption(label: String, meaning: String?, selected: Boolean, tag: String, onClick: () -> Unit) {
     // A selectable card: radio mark on the left, label, then one line of meaning. Selected = sage fill and an ink border.
-    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(if (selected) Sage else Paper).border(if (selected) 2.dp else 1.dp, if (selected) Ink else Ink.copy(alpha = .3f), RoundedCornerShape(12.dp))
-        .selectable(selected, role = Role.RadioButton, onClick = onClick).heightIn(min = 56.dp).padding(horizontal = 12.dp, vertical = 12.dp).testTag(tag), verticalAlignment = Alignment.Top) {
-        Icon(if (selected) Icons.Default.RadioButtonChecked else Icons.Default.RadioButtonUnchecked, null, Modifier.padding(top = 1.dp).size(22.dp), tint = if (selected) Ink else DoctorCardSub)
+    // The fill and border ease to the new choice, the mark gives one small bounce, and the phone answers with a light tap.
+    val tick = rememberSaharaTick()
+    val fill by animateColorAsState(if (selected) Sage else Paper, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "plan-option-fill")
+    val edge by animateColorAsState(if (selected) Ink else Ink.copy(alpha = .3f), SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "plan-option-edge")
+    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(fill).border(if (selected) 2.dp else 1.dp, edge, RoundedCornerShape(12.dp))
+        .selectable(selected, role = Role.RadioButton, onClick = { if (!selected) tick(); onClick() }).heightIn(min = 56.dp).padding(horizontal = 12.dp, vertical = 12.dp).testTag(tag), verticalAlignment = Alignment.Top) {
+        Icon(if (selected) Icons.Default.RadioButtonChecked else Icons.Default.RadioButtonUnchecked, null, Modifier.padding(top = 1.dp).saharaSelectBounce(selected).size(22.dp), tint = if (selected) Ink else DoctorCardSub)
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(label, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = Ink)
@@ -261,24 +268,56 @@ internal fun planStepOf(field: String): Int = when {
 }
 
 @Composable internal fun <T> ChipGroup(value: T?, options: List<T>, label: (T) -> Bi, tag: String, onChange: (T?) -> Unit) { val hindi = careHindi()
+    val tick = rememberSaharaTick()
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         options.forEach { o -> val on = value == o
-            FilterChip(on, { onChange(if (on) null else o) }, label = { Text(label(o).pick(hindi), fontSize = 15.sp) },
+            FilterChip(on, { tick(); onChange(if (on) null else o) }, label = { Text(label(o).pick(hindi), fontSize = 15.sp) },
                 leadingIcon = if (on) { { Icon(Icons.Default.Check, null, Modifier.size(18.dp)) } } else null,
                 shape = RoundedCornerShape(50), border = FilterChipDefaults.filterChipBorder(enabled = true, selected = on, borderColor = Ink.copy(alpha = .3f), selectedBorderColor = Ink, selectedBorderWidth = 1.5.dp),
                 colors = FilterChipDefaults.filterChipColors(containerColor = Paper, labelColor = Ink, selectedContainerColor = Sage, selectedLabelColor = Ink, selectedLeadingIconColor = Ink),
-                modifier = Modifier.heightIn(min = 48.dp).testTag("$tag-${o.toString().lowercase()}")) }
+                modifier = Modifier.saharaSelectBounce(on, .08f).heightIn(min = 48.dp).testTag("$tag-${o.toString().lowercase()}")) }
     }
 }
 
-@Composable internal fun PlanNumberField(value: Int?, label: String, tag: String, onChange: (Int?) -> Unit) {
+/**
+ * A whole number in the plan. With [range] it is a scroll wheel opening on [start] (owner, 25 Nov: numbers are tapped, not typed); without
+ * one (money and other open-ended counts for clinicians) it stays a number field.
+ */
+@Composable internal fun PlanNumberField(value: Int?, label: String, tag: String, range: IntRange? = null, unit: String = "", start: Int? = null, onChange: (Int?) -> Unit) {
+    if (range != null) {
+        CareNumberWheelButton(value?.toDouble(), { onChange(it?.toInt()) }, label, unit, CareNumberScale(range.first.toDouble(), range.last.toDouble(), 1.0),
+            (start ?: range.first).toDouble(), tag, Modifier.fillMaxWidth(), allowClear = true)
+        return
+    }
     OutlinedTextField(value?.toString().orEmpty(), { s -> onChange(s.filter(Char::isDigit).take(4).toIntOrNull()) }, label = { Text(label) }, singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().testTag(tag),
         colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper))
 }
 
+/**
+ * The previous admission is saved as one line of text: the hospital, then " · " and the day in English ("Apollo · 3 Mar 2025").
+ * An older line typed freely ("Apollo in March") reads back as the hospital with no day, so nothing written is lost.
+ */
+internal object PlanAdmission {
+    private val format = java.time.format.DateTimeFormatter.ofPattern("d MMM yyyy", java.util.Locale.ENGLISH)
+    private const val SEP = " · "
+    fun split(details: String): Pair<String, LocalDate?> {
+        val at = details.lastIndexOf(SEP)
+        val day = if (at >= 0) runCatching { LocalDate.parse(details.substring(at + SEP.length).trim(), format) }.getOrNull() else
+            runCatching { LocalDate.parse(details.trim(), format) }.getOrNull()
+        return when { day == null -> details to null; at >= 0 -> details.substring(0, at) to day; else -> "" to day }
+    }
+    /** [where] is kept exactly as typed (a space mid-word is not lost while typing). */
+    fun join(where: String, day: LocalDate?): String = listOf(where, day?.format(format).orEmpty()).filter(String::isNotBlank).joinToString(SEP)
+}
+
 @Composable internal fun PlanDateField(value: String, label: String, onChange: (String) -> Unit, latest: LocalDate? = null) {
     CareDateButton(PlanDates.day(value)?.let(::careEpoch) ?: 0L, label, { onChange(if (it == 0L) "" else careDay(it).toString()) }, allowClear = true, latest = latest)
+}
+
+/** An optional part of a form that opens in place (a field asked only after a choice): it unfolds instead of popping in. */
+@Composable internal fun ColumnScope.PlanReveal(visible: Boolean, gap: Int = 12, content: @Composable ColumnScope.() -> Unit) {
+    AnimatedVisibility(visible, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) { Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(gap.dp), content = content) }
 }
 
 @Composable internal fun PlanCard(content: @Composable ColumnScope.() -> Unit) {
@@ -294,21 +333,23 @@ internal fun planStepOf(field: String): Int = when {
     val t = careText(); val hindi = careHindi(); val today = LocalDate.now()
     val active = EctprLifecycle.active(state.ectprs, person.id); val draft = EctprLifecycle.draft(state.ectprs, person.id)
     val interp = EdView.forPatient(state.ectprs, person.id, today)
+    // The version register is sorted once per change to the plans, not on every scroll frame.
+    val versions = remember(state.ectprs, person.id) { state.ectprs.filter { it.patientId == person.id }.sortedByDescending { it.version } }
     var dialog by rememberSaveable { mutableStateOf("") }
     LazyColumn(Modifier.fillMaxSize().testTag("care-plan-home"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { PlanHeader(t("Care planning", "देखभाल योजना"), onBack, "care-plan-header") }
-        if (loadProblem) item { Surface(color = Peach, shape = RoundedCornerShape(12.dp)) { Text(t("Couldn't read the saved plan.", "सहेजी योजना पढ़ी नहीं जा सकी।"), Modifier.padding(12.dp)) } }
+        item(key = "header", contentType = "header") { PlanHeader(t("Care planning", "देखभाल योजना"), onBack, "care-plan-header") }
+        if (loadProblem) item(key = "load-problem", contentType = "banner") { Surface(color = Peach, shape = RoundedCornerShape(12.dp), modifier = Modifier.animateItem()) { Text(t("Couldn't read the saved plan.", "सहेजी योजना पढ़ी नहीं जा सकी।"), Modifier.padding(12.dp)) } }
         // One family of three clinical documents, each with a one-line plain description.
-        item { Text(t("Goals of care discussion, advance care planning and the emergency care plan belong together. All three are clinical documents.", "देखभाल के लक्ष्यों की चर्चा, अग्रिम देखभाल योजना और आपातकालीन देखभाल योजना साथ चलती हैं। तीनों क्लिनिकल दस्तावेज़ हैं।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub, modifier = Modifier.testTag("care-plan-family-intro")) }
+        item(key = "intro", contentType = "intro") { Text(t("Goals of care discussion, advance care planning and the emergency care plan belong together. All three are clinical documents.", "देखभाल के लक्ष्यों की चर्चा, अग्रिम देखभाल योजना और आपातकालीन देखभाल योजना साथ चलती हैं। तीनों क्लिनिकल दस्तावेज़ हैं।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub, modifier = Modifier.testTag("care-plan-family-intro")) }
         // D15 on the doctor's plan home too: the patient's or family's open request, until a signed note answers it.
-        if (clinician) item { DoctorGocRequestNotice(vm, person.id, onOpen = onGoc.takeIf { canEdit || draft != null }, ectprs = state.ectprs) }
-        item { FamilyTile(t("Goals of care discussion", "देखभाल के लक्ष्यों की चर्चा"), Icons.Default.Forum, FamilyAccent.Indigo, Modifier.testTag("care-plan-goc-tile")) {
+        if (clinician) item(key = "goc-request", contentType = "notice") { DoctorGocRequestNotice(vm, person.id, onOpen = onGoc.takeIf { canEdit || draft != null }, modifier = Modifier.animateItem(), ectprs = state.ectprs) }
+        item(key = "goc-tile", contentType = "tile") { FamilyTile(t("Goals of care discussion", "देखभाल के लक्ष्यों की चर्चा"), Icons.Default.Forum, FamilyAccent.Indigo, Modifier.animateItem().testTag("care-plan-goc-tile")) {
             Text(t("The recorded conversation about what matters most and the care to aim for.", "सबसे ज़रूरी क्या है और किस देखभाल का लक्ष्य रखें, इस पर दर्ज की गई बातचीत।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub)
             // One Goals of care place (Dr Sujay, 22 Nov): here the doctor sees the versions and goes there; the family reads the signed note and can ask for the talk.
             if (clinician) DoctorGocHistory(remember(state.ectprs, person.id) { DoctorGocDiscussions.list(state.ectprs, person.id) }, onOpenGoalsOfCare = onGoc.takeIf { canEdit || draft != null })
             else PatientGocStatus(vm, state.ectprs, person.id)
         } }
-        item { ActionCard(if (interp.kind == EdKind.ACTIVE) Mint else Peach, Modifier.fillMaxWidth().testTag("care-plan-ed-entry"), onClick = { onPage("ed") }) {
+        item(key = "ed-entry", contentType = "entry") { ActionCard(if (interp.kind == EdKind.ACTIVE) Mint else Peach, Modifier.animateItem().fillMaxWidth().testTag("care-plan-ed-entry"), onClick = { onPage("ed") }) {
             Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.LocalHospital, null, tint = Rust); Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -321,7 +362,7 @@ internal fun planStepOf(field: String): Int = when {
                 Icon(Icons.AutoMirrored.Filled.ArrowForward, null)
             }
         } }
-        item { FamilyTile(t("Emergency care plan & card", "आपातकालीन देखभाल योजना और कार्ड"), Icons.Default.LocalHospital, FamilyAccent.Marigold) {
+        item(key = "ectpr-tile", contentType = "tile") { FamilyTile(t("Emergency care plan & card", "आपातकालीन देखभाल योजना और कार्ड"), Icons.Default.LocalHospital, FamilyAccent.Marigold, Modifier.animateItem()) {
             Text(t("The summary for the ambulance or emergency department, with a QR code.", "एम्बुलेंस या आपातकालीन विभाग के लिए सारांश, QR कोड के साथ।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub)
             // Patients and families see where the plan stands; only the doctor starts, continues, reviews or withdraws it (Dr Sujay, 21 Nov).
             if (!clinician) Text(when {
@@ -336,15 +377,18 @@ internal fun planStepOf(field: String): Int = when {
                 }
                 active != null -> {
                     Button(onClick = { dialog = "review" }, enabled = canEdit, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-review")) { Text(t("Review", "समीक्षा")) }
-                    if (dialog == "withdraw") WithdrawPlanForm(active, onCancel = { dialog = "" }, onWithdraw = { reason, by -> dialog = ""; onWithdraw(active.id, reason, by) })
-                    else TextButton(onClick = { dialog = "withdraw" }, enabled = canEdit, modifier = Modifier.testTag("care-plan-withdraw")) { Text(t("Withdraw", "वापस लें"), color = RustText) }
+                    // The withdraw form unfolds in place of its button, and folds back on "Keep plan".
+                    SaharaStateSwitch(dialog == "withdraw", Modifier.fillMaxWidth(), label = "care-plan-withdraw") { open ->
+                        if (open) WithdrawPlanForm(active, onCancel = { dialog = "" }, onWithdraw = { reason, by -> dialog = ""; onWithdraw(active.id, reason, by) })
+                        else TextButton(onClick = { dialog = "withdraw" }, enabled = canEdit, modifier = Modifier.testTag("care-plan-withdraw")) { Text(t("Withdraw", "वापस लें"), color = RustText) }
+                    }
                 }
                 else -> Button(onClick = { if (clinician) dialog = "start" else onStart(false) }, enabled = canEdit, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-start")) { Text(t("Start a plan", "योजना शुरू करें")) }
             }
             OutlinedButton(onClick = { onPage("card") }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-card-entry")) { Icon(Icons.Default.QrCode, null); Spacer(Modifier.width(8.dp)); Text(t("Pocket emergency card", "जेब में रखने का आपातकालीन कार्ड")) }
         } }
-        if (active != null && transport != null && ReviewReminder.due(active, today)) item { ReviewReminderCard(active, canEdit, transport) { status -> commit { CarePlanBook.reminded(it, active.id, actor, planNow(), status) } } }
-        item { FamilyTile(t("Advance care planning", "अग्रिम देखभाल योजना"), Icons.Default.Gavel, FamilyAccent.Plum) {
+        if (active != null && transport != null && ReviewReminder.due(active, today)) item(key = "review-reminder", contentType = "reminder") { Box(Modifier.animateItem()) { ReviewReminderCard(active, canEdit, transport) { status -> commit { CarePlanBook.reminded(it, active.id, actor, planNow(), status) } } } }
+        item(key = "amd-tile", contentType = "tile") { FamilyTile(t("Advance care planning", "अग्रिम देखभाल योजना"), Icons.Default.Gavel, FamilyAccent.Plum, Modifier.animateItem()) {
             Text(t("The person’s own wishes about future care, written down.", "भविष्य की देखभाल के बारे में व्यक्ति की अपनी इच्छाएँ, लिखित रूप में।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub)
             // How it differs from the doctor's note, in plain words (Dr Sujay, 22 Nov: the three looked like one form).
             Text(if (clinician) t("The patient fills this in, in their own words, and can change it at any time. Your goals-of-care note is different: you write and sign it after the conversation.",
@@ -355,17 +399,21 @@ internal fun planStepOf(field: String): Int = when {
             Button(onClick = { onPage("amd") }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-amd-entry")) { Icon(Icons.Default.Gavel, null); Spacer(Modifier.width(8.dp)); Text(t("Open", "खोलें")) }
         } }
         // Versions as a plain register, always visible: version, status, date.
-        if (clinician && state.ectprs.any { it.patientId == person.id }) item { FamilyTile(t("Plan versions", "योजना के संस्करण"), Icons.Default.History, FamilyAccent.Indigo, Modifier.testTag("care-plan-versions")) {
-            state.ectprs.filter { it.patientId == person.id }.sortedByDescending { it.version }.forEachIndexed { i, r ->
+        if (clinician && versions.isNotEmpty()) item(key = "versions", contentType = "tile") { FamilyTile(t("Plan versions", "योजना के संस्करण"), Icons.Default.History, FamilyAccent.Indigo, Modifier.animateItem().testTag("care-plan-versions")) {
+            versions.forEachIndexed { i, r ->
                 if (i > 0) HorizontalDivider(color = DoctorHairline)
                 Text("v${r.version} · ${PlanText.status(r.status).pick(hindi)} · ${r.updatedAt.take(10)}" + (r.revokedReason?.let { " · $it" } ?: ""), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(vertical = 6.dp))
             }
         } }
-        if (clinician && state.audit.events.isNotEmpty()) item { InfoDisclosure(t("Audit log", "ऑडिट लॉग")) {
-            if (!state.audit.verify()) Text(t("Warning: the log has been changed.", "चेतावनी: लॉग बदला गया है।"), style = MaterialTheme.typography.bodySmall, color = RustText)
-            state.audit.events.takeLast(40).reversed().forEach { e -> Text("${e.at.take(16).replace('T', ' ')} · ${e.actor} · ${e.action.name} ${e.recordType.name}${e.detail?.let { " · $it" } ?: ""}", style = MaterialTheme.typography.bodySmall) }
-        } }
-        item { DpdpNoticeCard(DpdpScope.CARE_PLAN, state, person.id, store, canManage, commit, actor) }
+        if (clinician && state.audit.events.isNotEmpty()) item(key = "audit", contentType = "disclosure") { Box(Modifier.animateItem()) { InfoDisclosure(t("Audit log", "ऑडिट लॉग")) {
+            // The chain check and the 40 lines are worked out once per change to the log, not on every frame the list moves.
+            val audit = state.audit
+            val intact = remember(audit) { audit.verify() }
+            val lines = remember(audit) { audit.events.takeLast(40).reversed().map { e -> "${e.at.take(16).replace('T', ' ')} · ${e.actor} · ${e.action.name} ${e.recordType.name}${e.detail?.let { " · $it" } ?: ""}" } }
+            if (!intact) Text(t("Warning: the log has been changed.", "चेतावनी: लॉग बदला गया है।"), style = MaterialTheme.typography.bodySmall, color = RustText)
+            lines.forEach { line -> Text(line, style = MaterialTheme.typography.bodySmall) }
+        } } }
+        item(key = "dpdp", contentType = "dpdp") { Box(Modifier.animateItem()) { DpdpNoticeCard(DpdpScope.CARE_PLAN, state, person.id, store, canManage, commit, actor) } }
     }
     when (dialog) {
         "start" -> AlertDialog(onDismissRequest = { dialog = "" }, title = { Text(t("Where is this plan being made?", "यह योजना कहाँ बन रही है?")) },
@@ -404,6 +452,7 @@ internal fun planStepOf(field: String): Int = when {
     // Where "Discard changes" goes when the plan cannot be saved yet: closing, or the Goals of care section.
     var leaveThen by remember { mutableStateOf<(() -> Unit)?>(null) }
     val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+    val saved = rememberSaharaHaptic()
     // Each step opens at its top; a refused "Next" brings its reasons into view, since the step can be long.
     LaunchedEffect(step) { listState.scrollToItem(0) }
     LaunchedEffect(shown) { if (shown.isNotEmpty()) listState.animateScrollToItem((listState.layoutInfo.totalItemsCount - 1).coerceAtLeast(0)) }
@@ -420,7 +469,9 @@ internal fun planStepOf(field: String): Int = when {
         if (blockers.isEmpty() && !samePlan(d, record) && !onSave(d)) return
         step = (step + 1).coerceAtMost(steps.lastIndex); shown = emptyList()
     }
-    BackHandler { if (step > 0) { step--; shown = emptyList() } else tryLeave() }
+    SaharaBackHandler { tryLeave() }
+    // An earlier step stays on this screen, so it uses a plain BackHandler (no "leaving" preview); composed later, it goes first.
+    androidx.activity.compose.BackHandler(step > 0) { step--; shown = emptyList() }
     Column(Modifier.fillMaxSize().testTag("ectpr-wizard")) {
         Row(Modifier.fillMaxWidth().padding(start = 4.dp, end = 16.dp, top = 4.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = ::tryLeave, modifier = Modifier.testTag("ectpr-wizard-close")) { Icon(Icons.Default.Close, t("Close", "बंद करें")) }
@@ -456,12 +507,12 @@ internal fun planStepOf(field: String): Int = when {
                     PlanSummaryExtras(d)
                     GocNoteForSigning(d)
                     Button(onClick = { onSign(d) }, enabled = canEdit && stop.isEmpty(), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("ectpr-sign")) { Icon(Icons.Default.Verified, null); Spacer(Modifier.width(8.dp)); Text(t("Sign plan", "योजना पर हस्ताक्षर करें")) }
-                    OutlinedButton(onClick = { if (blockers.isEmpty() && onSave(d)) onClose() else shown = blockers }, enabled = canEdit, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Save draft", "मसौदा सहेजें")) }
+                    OutlinedButton(onClick = { if (blockers.isEmpty() && onSave(d)) { saved(); onClose() } else shown = blockers }, enabled = canEdit, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Save draft", "मसौदा सहेजें")) }
                 } }
             }
             // The treatment step already lists its own checks; only show what is not on screen there.
             val refused = if (step == 5) shown.filter { planStepOf(it.field) != 5 } else shown
-            if (shown.isNotEmpty()) item { IssueList(refused) }
+            if (shown.isNotEmpty()) item(key = "refused-$step", contentType = "issues") { Box(Modifier.animateItem()) { IssueList(refused) } }
         }
         Surface(color = Paper, shadowElevation = 2.dp) {
             Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 16.dp, vertical = 12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -497,8 +548,8 @@ private fun LazyListScope.patientStep(d: EctprRecord, update: ((EctprRecord) -> 
         // Both are asked on legal advice (22 Nov); one line says why they differ, without judgement.
         Text(t("Sex is as on medical records. Gender is how the patient describes themselves. Often they are the same.", "लिंग वह है जो मेडिकल रिकॉर्ड में लिखा है। जेंडर वह है जैसे मरीज़ खुद को बताते हैं। अक्सर दोनों एक ही होते हैं।"),
             fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub, modifier = Modifier.testTag("plan-sex-gender-hint"))
-        CareField(d.patient.uhid, { v -> p { it.copy(uhid = v) } }, t("Hospital number (UHID)", "अस्पताल नंबर (UHID)"), singleLine = true)
-        CareField(d.patient.phone, { v -> p { it.copy(phone = v) } }, t("Phone", "फ़ोन"), singleLine = true)
+        CareField(d.patient.uhid, { v -> p { it.copy(uhid = v) } }, t("Hospital number (UHID)", "अस्पताल नंबर (UHID)"), singleLine = true, voice = false)
+        CareField(d.patient.phone, { v -> p { it.copy(phone = v) } }, t("Phone", "फ़ोन"), singleLine = true, voice = false)
         CareField(d.patient.address, { v -> p { it.copy(address = v) } }, t("Address", "पता"))
         CareField(d.clinical.diagnosis, { v -> c { it.copy(diagnosis = v) } }, t("Diagnosis", "बीमारी"))
         CareField(d.clinical.stage, { v -> c { it.copy(stage = v) } }, t("Stage", "अवस्था"), singleLine = true)
@@ -512,7 +563,7 @@ private fun LazyListScope.patientStep(d: EctprRecord, update: ((EctprRecord) -> 
         SectionTitle(t("Care team", "देखभाल टीम"))
         CareField(d.careTeam.oncologist, { v -> team { it.copy(oncologist = v) } }, t("Main treating doctor", "मुख्य इलाज करने वाले डॉक्टर"), singleLine = true)
         CareField(d.careTeam.palliativePhysician, { v -> team { it.copy(palliativePhysician = v) } }, t("Palliative doctor", "पैलिएटिव डॉक्टर"), singleLine = true)
-        CareField(d.careTeam.palliativePhone24h, { v -> team { it.copy(palliativePhone24h = v) } }, t("Palliative 24-hour phone", "पैलिएटिव 24 घंटे का फ़ोन"), singleLine = true)
+        CareField(d.careTeam.palliativePhone24h, { v -> team { it.copy(palliativePhone24h = v) } }, t("Palliative 24-hour phone", "पैलिएटिव 24 घंटे का फ़ोन"), singleLine = true, voice = false)
         CareField(d.careTeam.localDoctor, { v -> team { it.copy(localDoctor = v) } }, t("Local doctor", "स्थानीय डॉक्टर"), singleLine = true)
     }
 }
@@ -533,13 +584,13 @@ private fun LazyListScope.decisionMakerStep(d: EctprRecord, update: ((EctprRecor
         SectionTitle(t("Family and friends", "परिवार और दोस्त"))
         CareField(d.decisionMakers.presentAtDiscussion.joinToString("\n"), { v -> update { it.copy(decisionMakers = it.decisionMakers.copy(presentAtDiscussion = v.lines())) } }, t("Present, with relation (one per line)", "मौजूद, रिश्ते के साथ (हर लाइन में एक)"), minLines = 2)
         CareField(d.decisionMakers.familyToInform.joinToString("\n"), { v -> update { it.copy(decisionMakers = it.decisionMakers.copy(familyToInform = v.lines())) } }, t("Family to inform (one per line)", "बताने वाले परिवारजन (हर लाइन में एक)"), minLines = 2)
-        if (showUnreached || d.decisionMakers.attemptedContact.any(String::isNotBlank)) CareField(d.decisionMakers.attemptedContact.joinToString("\n"), { v -> update { it.copy(decisionMakers = it.decisionMakers.copy(attemptedContact = v.lines())) } }, t("Could not reach (one per line)", "संपर्क नहीं हुआ (हर लाइन में एक)"), minLines = 2)
-        if (showNote || d.decisionMakers.familyConsensusNote.isNotBlank()) CareField(d.decisionMakers.familyConsensusNote, { v -> update { it.copy(decisionMakers = it.decisionMakers.copy(familyConsensusNote = v)) } }, t("Family discussion note", "परिवार से बातचीत का नोट"))
+        PlanReveal(showUnreached || d.decisionMakers.attemptedContact.any(String::isNotBlank)) { CareField(d.decisionMakers.attemptedContact.joinToString("\n"), { v -> update { it.copy(decisionMakers = it.decisionMakers.copy(attemptedContact = v.lines())) } }, t("Could not reach (one per line)", "संपर्क नहीं हुआ (हर लाइन में एक)"), minLines = 2) }
+        PlanReveal(showNote || d.decisionMakers.familyConsensusNote.isNotBlank()) { CareField(d.decisionMakers.familyConsensusNote, { v -> update { it.copy(decisionMakers = it.decisionMakers.copy(familyConsensusNote = v)) } }, t("Family discussion note", "परिवार से बातचीत का नोट")) }
         val unreachedHidden = !showUnreached && d.decisionMakers.attemptedContact.none(String::isNotBlank); val noteHidden = !showNote && d.decisionMakers.familyConsensusNote.isBlank()
-        if (unreachedHidden || noteHidden) FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        PlanReveal(unreachedHidden || noteHidden) { FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             if (unreachedHidden) PlanAddButton(t("Could not reach (one per line)", "संपर्क नहीं हुआ (हर लाइन में एक)"), "open-unreached") { showUnreached = true }
             if (noteHidden) PlanAddButton(t("Family discussion note", "परिवार से बातचीत का नोट"), "open-family-note") { showNote = true }
-        }
+        } }
     }
 }
 
@@ -555,10 +606,10 @@ private fun LazyListScope.decisionMakerStep(d: EctprRecord, update: ((EctprRecor
         SectionTitle(if (primary) t("Primary decision-maker", "मुख्य फ़ैसला लेने वाले") else t("Secondary decision-maker", "द्वितीय फ़ैसला लेने वाले"))
         CareField(dm.name, { v -> set { it.copy(name = v) } }, t("Name", "नाम"), singleLine = true)
         CareField(dm.relation, { v -> set { it.copy(relation = v) } }, t("Relation", "रिश्ता"), singleLine = true)
-        CareField(dm.phone24h, { v -> set { it.copy(phone24h = v) } }, t("24-hour phone", "24 घंटे का फ़ोन"), singleLine = true)
+        CareField(dm.phone24h, { v -> set { it.copy(phone24h = v) } }, t("24-hour phone", "24 घंटे का फ़ोन"), singleLine = true, voice = false)
         Text(t("ID type", "पहचान-पत्र का प्रकार"), fontWeight = FontWeight.Medium)
         ChipGroup(dm.idType, IdType.entries, PlanText::idType, "dm-${if (primary) "primary" else "alternate"}-id") { v -> set { it.copy(idType = v) } }
-        CareField(dm.idLast4.orEmpty(), { v -> set { it.copy(idLast4 = PlanIds.last4(v).ifBlank { null }) } }, t("Last 4 digits of the ID", "पहचान-पत्र के आख़िरी 4 अंक"), singleLine = true)
+        CareField(dm.idLast4.orEmpty(), { v -> set { it.copy(idLast4 = PlanIds.last4(v).ifBlank { null }) } }, t("Last 4 digits of the ID", "पहचान-पत्र के आख़िरी 4 अंक"), singleLine = true, voice = false)
         OptionGroup(t("Basis of authority", "अधिकार का आधार"), dm.authorityBasis, AuthorityBasis.entries, PlanText::authority, tag = "dm-basis-${if (primary) "primary" else "alternate"}") { v -> set { it.copy(authorityBasis = v) } }
     }
 }
@@ -622,14 +673,18 @@ private fun LazyListScope.capacityStep(d: EctprRecord, update: ((EctprRecord) ->
         }
         CapacityGuideCard()
         OptionGroup(t("Capacity", "निर्णय-क्षमता"), d.capacity.status, Capacity.entries, PlanText::capacity, tag = "capacity") { v -> cap { it.copy(status = v) } }
-        if (d.capacity.status == Capacity.FLUCTUATES || d.capacity.status == Capacity.LACKS) {
+        val assessed = d.capacity.status == Capacity.FLUCTUATES || d.capacity.status == Capacity.LACKS
+        if (assessed) {
+            // Kept outside the unfolding part, so it runs only while the choice asks for an assessment (not while the fields fold away).
             val doctor = LocalSignedInDoctor.current
             LaunchedEffect(d.capacity.status) { if (d.capacity.assessor.isBlank() && doctor != null || d.capacity.assessedOn.isBlank()) cap { it.copy(assessor = it.assessor.ifBlank { doctor?.name.orEmpty() }, assessedOn = it.assessedOn.ifBlank { LocalDate.now().toString() }) } }
+        }
+        PlanReveal(assessed) {
             CareField(d.capacity.assessor, { v -> cap { it.copy(assessor = v) } }, t("Assessed by", "किसने जाँचा"), singleLine = true)
             PlanDateField(d.capacity.assessedOn, t("Assessed on", "जाँच की तारीख़"), { v -> cap { it.copy(assessedOn = v) } }, latest = LocalDate.now())
             CareField(d.capacity.basis, { v -> cap { it.copy(basis = v) } }, t("Basis of the assessment", "जाँच का आधार"), minLines = 2)
         }
-        if (d.capacity.status == Capacity.FLUCTUATES) PlanDateField(d.capacity.reassessOn, t("Reassess on", "दोबारा जाँच की तारीख़"), { v -> cap { it.copy(reassessOn = v) } })
+        PlanReveal(d.capacity.status == Capacity.FLUCTUATES) { PlanDateField(d.capacity.reassessOn, t("Reassess on", "दोबारा जाँच की तारीख़"), { v -> cap { it.copy(reassessOn = v) } }) }
         val dir = d.existingDirective
         OptionGroup(t("Existing advance care planning or wishes", "पहले की अग्रिम देखभाल योजना या इच्छाएँ"), dir?.kind, DirectiveKind.entries, { when (it) {
             DirectiveKind.VALID_AMD -> Bi("Signed, attested advance care planning", "हस्ताक्षरित, सत्यापित अग्रिम देखभाल योजना"); DirectiveKind.PRIOR_WISHES -> Bi("Wishes said or written before", "पहले कही या लिखी इच्छाएँ"); DirectiveKind.NONE -> Bi("None", "कोई नहीं") } }, tag = "directive") { k ->
@@ -694,7 +749,7 @@ private fun LazyListScope.valuesStep(d: EctprRecord, update: ((EctprRecord) -> E
             CareField(d.values.unacceptableOutcomes.joinToString("\n"), { x -> v { it.copy(unacceptableOutcomes = x.lines()) } }, t("Outcomes the patient would not accept (one per line)", "जो हालात मरीज़ को मंज़ूर नहीं (हर लाइन में एक)"), minLines = 2)
         }
         CheckLine(d.values.familyAskedNotToTell, { x -> v { it.copy(familyAskedNotToTell = x) } }, t("The family asked that the patient not be told", "परिवार ने कहा है कि मरीज़ को न बताया जाए"))
-        if (d.values.familyAskedNotToTell) CareField(d.values.directQuestionPlan, { x -> v { it.copy(directQuestionPlan = x) } }, t("Plan if the patient asks directly", "अगर मरीज़ सीधे पूछें तो क्या करेंगे"), minLines = 2)
+        PlanReveal(d.values.familyAskedNotToTell) { CareField(d.values.directQuestionPlan, { x -> v { it.copy(directQuestionPlan = x) } }, t("Plan if the patient asks directly", "अगर मरीज़ सीधे पूछें तो क्या करेंगे"), minLines = 2) }
         CheckLine(d.values.financialConcernDiscussed == true, { x -> v { it.copy(financialConcernDiscussed = x) } }, t("Money worries were asked about directly", "पैसों की चिंता के बारे में सीधे पूछा गया"))
         CheckLine(d.values.socialWorkReferral == true, { x -> v { it.copy(socialWorkReferral = x) } }, t("Social-work or scheme referral made", "सोशल वर्क या सरकारी योजना के लिए भेजा गया"))
     }
@@ -740,9 +795,14 @@ private fun LazyListScope.treatmentStep(d: EctprRecord, today: LocalDate, update
         CareField(home.assessmentFrequency, { v -> set { it.copy(assessmentFrequency = v) } }, t("How often the patient is assessed", "मरीज़ की जाँच कितनी बार होती है"), singleLine = true)
         CareField(home.coordinator, { v -> set { it.copy(coordinator = v) } }, t("Person coordinating between the family and the hospital or centre (name, phone, centre)", "परिवार और अस्पताल या केंद्र के बीच तालमेल रखने वाले (नाम, फ़ोन, केंद्र)"))
         CareField(home.ngoContact, { v -> set { it.copy(ngoContact = v, ngoConsulted = it.ngoConsulted && v.isNotBlank()) } }, t("Non-governmental organisation caring for the patient: representative and contact", "मरीज़ की देखभाल करने वाली ग़ैर-सरकारी संस्था: प्रतिनिधि और संपर्क"))
-        if (home.ngoContact.isNotBlank()) CheckLine(home.ngoConsulted, { v -> set { it.copy(ngoConsulted = v) } }, t("The organisation was consulted about this plan", "इस योजना पर संस्था से सलाह ली गई"))
+        PlanReveal(home.ngoContact.isNotBlank()) { CheckLine(home.ngoConsulted, { v -> set { it.copy(ngoConsulted = v) } }, t("The organisation was consulted about this plan", "इस योजना पर संस्था से सलाह ली गई")) }
         OptionGroup(t("Admitted to any hospital before for this condition?", "क्या इस बीमारी के लिए पहले किसी अस्पताल में भर्ती हुए थे?"), home.previousAdmission, listOf(true, false), { if (it) Bi("Yes", "हाँ") else Bi("No", "नहीं") }, tag = "home-admitted", noneLabel = NOT_RECORDED) { x -> set { it.copy(previousAdmission = x) } }
-        if (home.previousAdmission == true) CareField(home.previousAdmissionDetails, { v -> set { it.copy(previousAdmissionDetails = v) } }, t("Where and when", "कहाँ और कब"), singleLine = true)
+        // Where is written, when is tapped on the calendar (owner, 25 Nov: no typed dates); both stay in the one saved line, "Place · 3 Mar 2025".
+        PlanReveal(home.previousAdmission == true) { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            val (where, whenDay) = PlanAdmission.split(home.previousAdmissionDetails)
+            CareField(where, { v -> set { it.copy(previousAdmissionDetails = PlanAdmission.join(v, whenDay)) } }, t("Which hospital", "कौन सा अस्पताल"), singleLine = true)
+            CareDateButton(whenDay?.let(::careEpoch) ?: 0L, t("When admitted", "कब भर्ती हुए"), { e -> set { it.copy(previousAdmissionDetails = PlanAdmission.join(where, if (e == 0L) null else careDay(e))) } }, allowClear = true, latest = LocalDate.now())
+        } }
     }
 }
 
@@ -765,8 +825,9 @@ private fun LazyListScope.treatmentStep(d: EctprRecord, today: LocalDate, update
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         OptionGroup(t("Goal of care", "देखभाल का लक्ष्य"), c.goalOfCare, GoalOfCare.entries, PlanText::goal, tag = "goal") { v -> choices { it.copy(goalOfCare = v) } }
         OptionGroup(t("Going to hospital", "अस्पताल जाना"), c.hospitalTransfer?.kind, TransferKind.entries, PlanText::transfer, tag = "transfer") { v -> choices { it.copy(hospitalTransfer = v?.let { k -> HospitalTransfer(k, if (k == TransferKind.ONLY_FOR) it.hospitalTransfer?.reasons.orEmpty() else emptyList()) }) } }
-        if (c.hospitalTransfer?.kind == TransferKind.ONLY_FOR) Column {
-            TransferReason.entries.forEach { r -> CheckLine(r in c.hospitalTransfer.reasons, { on -> choices { it.copy(hospitalTransfer = HospitalTransfer(TransferKind.ONLY_FOR, if (on) it.hospitalTransfer!!.reasons + r else it.hospitalTransfer!!.reasons - r)) } }, PlanText.transferReason(r).pick(hindi)) }
+        PlanReveal(c.hospitalTransfer?.kind == TransferKind.ONLY_FOR, gap = 0) {
+            val reasons = c.hospitalTransfer?.reasons.orEmpty()
+            TransferReason.entries.forEach { r -> CheckLine(r in reasons, { on -> choices { val now = it.hospitalTransfer?.reasons.orEmpty(); it.copy(hospitalTransfer = HospitalTransfer(TransferKind.ONLY_FOR, if (on) now + r else now - r)) } }, PlanText.transferReason(r).pick(hindi)) }
         }
         CareField(c.callBeforeAmbulance.joinToString("\n"), { v -> choices { it.copy(callBeforeAmbulance = v.lines()) } }, t("Numbers to call before an ambulance (one per line)", "एम्बुलेंस से पहले किसे फ़ोन करें (हर लाइन में एक)"), minLines = 2)
         OptionGroup(t("If an ambulance comes", "अगर एम्बुलेंस आए"), c.ambulance, AmbulanceOption.entries, PlanText::ambulance, tag = "ambulance") { v -> choices { it.copy(ambulance = v) } }
@@ -788,7 +849,7 @@ private fun LazyListScope.treatmentStep(d: EctprRecord, today: LocalDate, update
                 dnacprDiscussedWith = it.dnacprDiscussedWith.ifBlank { d.decisionMakers.presentAtDiscussion.filter(String::isNotBlank).joinToString(", ") }) } }
             LaunchedEffect(doctor) { if (doctor != null && by.name.isBlank() && by.registrationNo.isBlank()) choices { it.copy(dnacprDecidedBy = (it.dnacprDecidedBy ?: DnacprDecidedBy()).copy(name = doctor.name, registrationNo = doctor.registration)) } }
             PrefilledField(by.name, doctor?.name.orEmpty(), t("Decided by (doctor's name)", "किसने तय किया (डॉक्टर का नाम)"), "dnacpr-by-name") { CareField(by.name, { v -> choices { it.copy(dnacprDecidedBy = by.copy(name = v)) } }, t("Decided by (doctor's name)", "किसने तय किया (डॉक्टर का नाम)"), singleLine = true) }
-            PrefilledField(by.registrationNo, doctor?.registration.orEmpty(), t("Registration number", "रजिस्ट्रेशन नंबर"), "dnacpr-by-reg") { CareField(by.registrationNo, { v -> choices { it.copy(dnacprDecidedBy = by.copy(registrationNo = v)) } }, t("Registration number", "रजिस्ट्रेशन नंबर"), singleLine = true) }
+            PrefilledField(by.registrationNo, doctor?.registration.orEmpty(), t("Registration number", "रजिस्ट्रेशन नंबर"), "dnacpr-by-reg") { CareField(by.registrationNo, { v -> choices { it.copy(dnacprDecidedBy = by.copy(registrationNo = v)) } }, t("Registration number", "रजिस्ट्रेशन नंबर"), singleLine = true, voice = false) }
             // Tapped, not typed: a date button and the clock dial; still stored as "2026-10-29 10:30".
             PlanDateTimeField(by.decidedAt, t("Date and time decided", "तय करने की तारीख़ और समय")) { v -> choices { it.copy(dnacprDecidedBy = by.copy(decidedAt = v)) } }
         }
@@ -808,7 +869,7 @@ private fun LazyListScope.treatmentStep(d: EctprRecord, today: LocalDate, update
     val date = tr.reviewAt.take(10); val time = tr.reviewAt.drop(11)
     PlanCard {
         Text(title, fontWeight = FontWeight.SemiBold)
-        PlanNumberField(tr.durationValue.takeIf { it > 0 }, t("Length", "अवधि"), "$tag-duration") { onChange(tr.copy(durationValue = it ?: 0)) }
+        PlanNumberField(tr.durationValue.takeIf { it > 0 }, t("Length", "अवधि"), "$tag-duration", range = 1..365) { onChange(tr.copy(durationValue = it ?: 0)) }
         ChipGroup(tr.durationUnit, DurationUnit.entries, PlanText::unit, "$tag-unit") { onChange(tr.copy(durationUnit = it ?: defaultUnit)) }
         PlanDateField(date, t("Review date", "समीक्षा की तारीख़"), { v -> onChange(tr.copy(reviewAt = listOf(v, time).filter(String::isNotBlank).joinToString(" "))) })
         // The clock dial instead of typing "10:00"; reviewAt stays "yyyy-MM-dd HH:mm" (or the date alone).
@@ -822,16 +883,16 @@ private fun LazyListScope.treatmentStep(d: EctprRecord, today: LocalDate, update
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         OptionGroup(t("Highest breathing support", "साँस की सबसे ऊँची मदद"), c.respCeiling, (0..5).toList(), PlanText::ceiling, tag = "ceiling") { v -> choices { it.copy(respCeiling = v, nivTrial = it.nivTrial.takeIf { _ -> (v ?: 0) >= 4 }) } }
         val level = c.respCeiling
-        if (level != null && level >= 1) OutlinedTextField(c.maxOxygenLpm?.let { if (it % 1.0 == 0.0) it.toInt().toString() else it.toString() }.orEmpty(), { s -> choices { it.copy(maxOxygenLpm = s.filter { ch -> ch.isDigit() || ch == '.' }.take(5).toDoubleOrNull()) } },
-            label = { Text(t("Maximum oxygen (L/min)", "अधिकतम ऑक्सीजन (L/min)")) }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper))
-        if (level != null && level < 5) CheckLine(c.ceilingConditions.reversibleCauseException == true, { v -> choices { it.copy(ceilingConditions = it.ceilingConditions.copy(reversibleCauseException = v)) } },
-            t("A new, reversible cause (such as choking or a drug reaction) is treated fully, above this ceiling", "नया और ठीक हो सकने वाला कारण (जैसे गले में अटकना या दवा का रिएक्शन) इस सीमा से ऊपर भी पूरा इलाज पाएगा"))
-        if (level != null && level >= 1) PlanNumberField(c.ceilingConditions.spo2Floor, t("Oxygen level to aim for, at least (SpO₂ %)", "कम से कम ऑक्सीजन स्तर (SpO₂ %)"), "spo2-floor") { v -> choices { it.copy(ceilingConditions = it.ceilingConditions.copy(spo2Floor = v)) } }
-        if (level != null && level >= 4) {
-            PlanNumberField(c.ceilingConditions.nivMaxHours, t("NIV for at most (hours)", "NIV ज़्यादा से ज़्यादा (घंटे)"), "niv-hours") { v -> choices { it.copy(ceilingConditions = it.ceilingConditions.copy(nivMaxHours = v)) } }
+        // Oxygen flow on a wheel, 0.5-15 L/min in half litres, never typed (owner, 25 Nov).
+        PlanReveal(level != null && level >= 1) { CareNumberWheelButton(c.maxOxygenLpm, { v -> choices { it.copy(maxOxygenLpm = v) } }, t("Maximum oxygen (L/min)", "अधिकतम ऑक्सीजन (L/min)"), "L/min",
+            CarePickerScales.OXYGEN_LPM, 2.0, "max-oxygen", Modifier.fillMaxWidth(), allowClear = true) }
+        PlanReveal(level != null && level < 5) { CheckLine(c.ceilingConditions.reversibleCauseException == true, { v -> choices { it.copy(ceilingConditions = it.ceilingConditions.copy(reversibleCauseException = v)) } },
+            t("A new, reversible cause (such as choking or a drug reaction) is treated fully, above this ceiling", "नया और ठीक हो सकने वाला कारण (जैसे गले में अटकना या दवा का रिएक्शन) इस सीमा से ऊपर भी पूरा इलाज पाएगा")) }
+        PlanReveal(level != null && level >= 1) { PlanNumberField(c.ceilingConditions.spo2Floor, t("Oxygen level to aim for, at least (SpO₂ %)", "कम से कम ऑक्सीजन स्तर (SpO₂ %)"), "spo2-floor", range = 70..100, unit = "%", start = 92) { v -> choices { it.copy(ceilingConditions = it.ceilingConditions.copy(spo2Floor = v)) } } }
+        PlanReveal(level != null && level >= 4) {
+            PlanNumberField(c.ceilingConditions.nivMaxHours, t("NIV for at most (hours)", "NIV ज़्यादा से ज़्यादा (घंटे)"), "niv-hours", range = 1..168, start = 24) { v -> choices { it.copy(ceilingConditions = it.ceilingConditions.copy(nivMaxHours = v)) } }
             CheckLine(c.nivTrial != null, { on -> choices { it.copy(nivTrial = if (on) TrialPlan(3, DurationUnit.DAYS) else null) } }, t("NIV as a time-limited trial", "NIV तय समय के ट्रायल के रूप में"))
-            c.nivTrial?.let { tr -> TrialEditor(t("NIV trial", "NIV ट्रायल"), tr, DurationUnit.DAYS, "niv-trial") { v -> choices { it.copy(nivTrial = v) } } }
+            PlanReveal(c.nivTrial != null) { TrialEditor(t("NIV trial", "NIV ट्रायल"), c.nivTrial, DurationUnit.DAYS, "niv-trial") { v -> choices { it.copy(nivTrial = v) } } }
         }
         if (c.hospitalTransfer?.kind == TransferKind.NO && level != null && level >= 3) CareField(c.ceilingConditions.homeNivReason, { v -> choices { it.copy(ceilingConditions = it.ceilingConditions.copy(homeNivReason = v), conflictReasons = it.conflictReasons + ("C1" to v)) } },
             t("Home NIV or other reason this works without hospital", "घर पर NIV या कोई और कारण कि यह अस्पताल के बिना चलेगा"))
@@ -842,12 +903,12 @@ private fun LazyListScope.treatmentStep(d: EctprRecord, today: LocalDate, update
     val c = d.choices
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         OptionGroup(t("Intensive care (ICU)", "इंटेंसिव केयर (ICU)"), c.icu?.kind, IcuKind.entries, PlanText::icu, tag = "icu") { v -> choices { it.copy(icu = v?.let { k -> Icu(k, if (k == IcuKind.TRIAL) it.icu?.trial ?: TrialPlan(3, DurationUnit.DAYS) else null) }) } }
-        if (c.icu?.kind == IcuKind.TRIAL) TrialEditor(t("ICU trial", "ICU ट्रायल"), c.icu.trial, DurationUnit.DAYS, "icu-trial") { v -> choices { it.copy(icu = Icu(IcuKind.TRIAL, v)) } }
+        PlanReveal(c.icu?.kind == IcuKind.TRIAL) { TrialEditor(t("ICU trial", "ICU ट्रायल"), c.icu?.trial, DurationUnit.DAYS, "icu-trial") { v -> choices { it.copy(icu = Icu(IcuKind.TRIAL, v)) } } }
         OptionGroup(t("Drugs to support blood pressure", "BP सँभालने की दवाएँ"), c.vasopressors?.kind, VasopressorKind.entries, PlanText::vaso, tag = "vaso") { v -> choices { it.copy(vasopressors = v?.let { k -> Vasopressors(k, if (k == VasopressorKind.TRIAL) it.vasopressors?.trial ?: TrialPlan(durationUnit = DurationUnit.HOURS) else null, if (k == VasopressorKind.YES_MAX_AGENTS) it.vasopressors?.maxAgents ?: 1 else null) }) } }
-        if (c.vasopressors?.kind == VasopressorKind.TRIAL) TrialEditor(t("Vasopressor trial", "BP दवा ट्रायल"), c.vasopressors.trial, DurationUnit.HOURS, "vaso-trial") { v -> choices { it.copy(vasopressors = Vasopressors(VasopressorKind.TRIAL, v)) } }
-        if (c.vasopressors?.kind == VasopressorKind.YES_MAX_AGENTS) PlanNumberField(c.vasopressors.maxAgents, t("Maximum number of drugs", "दवाओं की अधिकतम संख्या"), "vaso-max") { v -> choices { it.copy(vasopressors = Vasopressors(VasopressorKind.YES_MAX_AGENTS, maxAgents = v)) } }
+        PlanReveal(c.vasopressors?.kind == VasopressorKind.TRIAL) { TrialEditor(t("Vasopressor trial", "BP दवा ट्रायल"), c.vasopressors?.trial, DurationUnit.HOURS, "vaso-trial") { v -> choices { it.copy(vasopressors = Vasopressors(VasopressorKind.TRIAL, v)) } } }
+        PlanReveal(c.vasopressors?.kind == VasopressorKind.YES_MAX_AGENTS) { PlanNumberField(c.vasopressors?.maxAgents, t("Maximum number of drugs", "दवाओं की अधिकतम संख्या"), "vaso-max", range = 1..5) { v -> choices { it.copy(vasopressors = Vasopressors(VasopressorKind.YES_MAX_AGENTS, maxAgents = v)) } } }
         OptionGroup(t("Dialysis", "डायलिसिस"), c.dialysis?.kind, DialysisKind.entries, PlanText::dialysis, tag = "dialysis") { v -> choices { it.copy(dialysis = v?.let { k -> Dialysis(k, if (k == DialysisKind.TRIAL) it.dialysis?.trial ?: TrialPlan(durationUnit = DurationUnit.SESSIONS) else null) }) } }
-        if (c.dialysis?.kind == DialysisKind.TRIAL) TrialEditor(t("Dialysis trial", "डायलिसिस ट्रायल"), c.dialysis.trial, DurationUnit.SESSIONS, "dialysis-trial") { v -> choices { it.copy(dialysis = Dialysis(DialysisKind.TRIAL, v)) } }
+        PlanReveal(c.dialysis?.kind == DialysisKind.TRIAL) { TrialEditor(t("Dialysis trial", "डायलिसिस ट्रायल"), c.dialysis?.trial, DurationUnit.SESSIONS, "dialysis-trial") { v -> choices { it.copy(dialysis = Dialysis(DialysisKind.TRIAL, v)) } } }
     }
 }
 
@@ -855,7 +916,7 @@ private fun LazyListScope.treatmentStep(d: EctprRecord, today: LocalDate, update
     val c = d.choices
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         OptionGroup(t("Nose tube feeding (NG)", "नाक की नली से खाना (NG)"), c.feeding.ng?.kind, NgKind.entries, PlanText::ng, tag = "ng") { v -> choices { it.copy(feeding = it.feeding.copy(ng = v?.let { k -> NgFeeding(k, if (k == NgKind.UP_TO_DAYS) it.feeding.ng?.days ?: 7 else null) })) } }
-        if (c.feeding.ng?.kind == NgKind.UP_TO_DAYS) PlanNumberField(c.feeding.ng.days, t("Days before review", "समीक्षा से पहले दिन"), "ng-days") { v -> choices { it.copy(feeding = it.feeding.copy(ng = NgFeeding(NgKind.UP_TO_DAYS, v))) } }
+        PlanReveal(c.feeding.ng?.kind == NgKind.UP_TO_DAYS) { PlanNumberField(c.feeding.ng?.days, t("Days before review", "समीक्षा से पहले दिन"), "ng-days", range = 1..90, start = 7) { v -> choices { it.copy(feeding = it.feeding.copy(ng = NgFeeding(NgKind.UP_TO_DAYS, v))) } } }
         OptionGroup(t("Stomach tube (PEG)", "पेट की नली (PEG)"), c.feeding.peg, PegFeeding.entries, PlanText::peg, tag = "peg") { v -> choices { it.copy(feeding = it.feeding.copy(peg = v)) } }
         CheckLine(c.feeding.removeExistingTube, { v -> choices { it.copy(feeding = it.feeding.copy(removeExistingTube = v)) } }, t("The patient or family wish an existing feeding tube to be removed", "मरीज़ या परिवार चाहते हैं कि लगी हुई खाने की नली हटाई जाए"))
         OptionGroup(t("Fluids", "तरल (पानी)"), c.hydration, Hydration.entries, PlanText::hydration, tag = "hydration") { v -> choices { it.copy(hydration = v) } }
@@ -900,6 +961,8 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
     var signerRole by rememberSaveable { mutableStateOf(if (d.surrogateDeclaration.answeringAsSurrogate) SurrogateRank.PRIMARY.name else SignatureRole.PATIENT.name) }
     var signer by rememberSaveable { mutableStateOf(knownSigner(signerRole)) }; var thumb by rememberSaveable { mutableStateOf(false) }
     var witness by rememberSaveable { mutableStateOf("") }
+    // Required before the patient or decision-maker signs: how the plan was read to them (ConsentReadAloud.kt).
+    var reading by remember { mutableStateOf<ConsentReading?>(null) }; var readingRound by rememberSaveable { mutableIntStateOf(0) }
     fun add(s: Signature) = update { r -> r.copy(signatures = (if (s.role == SignatureRole.TREATING_CONSULTANT) r.signatures.filter { it.role != SignatureRole.TREATING_CONSULTANT } else r.signatures) + s) }
     fun roleLabel(r: SignatureRole) = when (r) {
         SignatureRole.TREATING_CONSULTANT -> Bi("Treating consultant", "इलाज करने वाले कंसल्टेंट"); SignatureRole.PALLIATIVE_CLINICIAN -> Bi("Palliative clinician", "पैलिएटिव डॉक्टर"); SignatureRole.NURSE -> Bi("Nurse", "नर्स")
@@ -911,32 +974,42 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
         if (d.signatures.isNotEmpty()) PlanCard {
             SectionTitle(t("Signed so far", "अब तक हस्ताक्षर"))
             d.signatures.forEachIndexed { i, s -> Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("${(s.surrogateRank?.let(::rankLabel) ?: roleLabel(s.role)).pick(hindi)}: ${s.name}${s.registrationNo?.let { " · $it" } ?: ""}${if (s.thumbImpression == true) t(" · thumb impression", " · अँगूठे का निशान") else ""} · ${s.signedAt.take(16).replace('T', ' ')}", Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+                Text("${(s.surrogateRank?.let(::rankLabel) ?: roleLabel(s.role)).pick(hindi)}: ${s.name}${s.registrationNo?.let { " · $it" } ?: ""}${if (s.thumbImpression == true) t(" · thumb impression", " · अँगूठे का निशान") else ""} · ${s.signedAt.take(16).replace('T', ' ')}${s.readAloud?.let { " · " + ConsentReadingRules.summary(it, t) }.orEmpty()}", Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
                 IconButton(onClick = { update { r -> r.copy(signatures = r.signatures.filterIndexed { j, _ -> j != i }) } }) { Icon(Icons.Default.Close, t("Remove signature", "हस्ताक्षर हटाएँ")) }
             } }
         }
         PlanCard {
             SectionTitle(t("Treating consultant", "इलाज करने वाले कंसल्टेंट"))
             PrefilledField(consultant, doctor?.name.orEmpty(), t("Consultant's name", "कंसल्टेंट का नाम"), "sign-consultant-name") { CareField(consultant, { consultant = it }, t("Consultant's name", "कंसल्टेंट का नाम"), singleLine = true) }
-            PrefilledField(reg, doctor?.registration.orEmpty(), t("Medical registration number", "मेडिकल रजिस्ट्रेशन नंबर"), "sign-consultant-reg") { CareField(reg, { reg = it }, t("Medical registration number", "मेडिकल रजिस्ट्रेशन नंबर"), singleLine = true) }
+            PrefilledField(reg, doctor?.registration.orEmpty(), t("Medical registration number", "मेडिकल रजिस्ट्रेशन नंबर"), "sign-consultant-reg") { CareField(reg, { reg = it }, t("Medical registration number", "मेडिकल रजिस्ट्रेशन नंबर"), singleLine = true, voice = false) }
             Button(onClick = { add(Signature(SignatureRole.TREATING_CONSULTANT, consultant.trim(), reg.trim(), planNow())); consultant = ""; reg = "" }, enabled = consultant.isNotBlank() && reg.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("sign-consultant")) { Text(t("Sign", "हस्ताक्षर करें")) }
         }
         PlanCard {
             SectionTitle(t("Co-signature (optional)", "सह-हस्ताक्षर (वैकल्पिक)"))
             // Optional: no empty boxes until asked for.
-            if (!coOpen) OutlinedButton(onClick = { coOpen = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("open-cosign")) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Add co-signature", "सह-हस्ताक्षर जोड़ें")) }
-            else {
+            SaharaStateSwitch(coOpen, Modifier.fillMaxWidth(), label = "cosign-open") { open ->
+            if (!open) OutlinedButton(onClick = { coOpen = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("open-cosign")) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Add co-signature", "सह-हस्ताक्षर जोड़ें")) }
+            else Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             ChipGroup(SignatureRole.valueOf(coRole), listOf(SignatureRole.PALLIATIVE_CLINICIAN, SignatureRole.NURSE), ::roleLabel, "cosign-role") { coRole = (it ?: SignatureRole.PALLIATIVE_CLINICIAN).name }
-            CareField(coName, { coName = it }, t("Name", "नाम"), singleLine = true); CareField(coReg, { coReg = it }, t("Registration number", "रजिस्ट्रेशन नंबर"), singleLine = true)
+            CareField(coName, { coName = it }, t("Name", "नाम"), singleLine = true); CareField(coReg, { coReg = it }, t("Registration number", "रजिस्ट्रेशन नंबर"), singleLine = true, voice = false)
             OutlinedButton(onClick = { add(Signature(SignatureRole.valueOf(coRole), coName.trim(), coReg.trim().ifBlank { null }, planNow())); coName = ""; coReg = ""; coOpen = false }, enabled = coName.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Add co-signature", "सह-हस्ताक्षर जोड़ें")) }
-            }
+            } }
         }
         PlanCard {
             SectionTitle(t("Patient or decision-maker", "मरीज़ या फ़ैसला लेने वाले"))
             ChipGroup(signerRole, listOf(SignatureRole.PATIENT.name, SurrogateRank.PRIMARY.name, SurrogateRank.SECONDARY.name), ::signerLabel, "signer-role") { val next = it ?: SignatureRole.PATIENT.name; if (signer.isBlank() || signer.trim() == knownSigner(signerRole)) signer = knownSigner(next); signerRole = next }
             PrefilledField(signer, knownSigner(signerRole), t("Name", "नाम"), "signer-name-$signerRole") { CareField(signer, { signer = it }, t("Name", "नाम"), singleLine = true) }
+            val readTo = remember(d.decisionMakers, d.witnesses) { (listOfNotNull(d.decisionMakers.primary, d.decisionMakers.alternate).map { ConsentPerson(it.name, it.relation) } + d.witnesses.map { ConsentPerson(it.name, "") }) }
+            val planText = remember(d, hindi) { PlanSpeech.summary(d, null, hindi) }
+            ConsentReadAloudStep(planText, "plan-sign-${d.id}-${d.version}-$readingRound", signer, readTo, onChange = { reading = it })
             CheckLine(thumb, { thumb = it }, t("Signed with a thumb impression", "अँगूठे के निशान से हस्ताक्षर"))
-            OutlinedButton(onClick = { val rank = SurrogateRank.entries.firstOrNull { it.name == signerRole }; add(Signature(if (rank == null) SignatureRole.PATIENT else SignatureRole.SURROGATE, signer.trim(), null, planNow(), thumb.takeIf { it }, rank)); signer = ""; thumb = false }, enabled = signer.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Add signature", "हस्ताक्षर जोड़ें")) }
+            OutlinedButton(onClick = {
+                val heard = reading ?: return@OutlinedButton
+                val rank = SurrogateRank.entries.firstOrNull { it.name == signerRole }
+                // Read to them: the plan's rule for limited literacy applies, so two witnesses are asked for.
+                val signed = Signature(if (rank == null) SignatureRole.PATIENT else SignatureRole.SURROGATE, signer.trim(), null, planNow(), thumb.takeIf { it }, rank, heard)
+                update { r -> r.copy(limitedLiteracy = r.limitedLiteracy || !ConsentReadingRules.canRead(heard), signatures = r.signatures + signed) }; signer = ""; thumb = false; reading = null; readingRound++
+            }, enabled = signer.isNotBlank() && reading != null, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("add-signer-signature")) { Text(t("Add signature", "हस्ताक्षर जोड़ें")) }
             CheckLine(d.limitedLiteracy, { v -> update { it.copy(limitedLiteracy = v) } }, t("Limited reading or writing", "पढ़ना-लिखना कम आता है"))
         }
         if (d.limitedLiteracy || d.signatures.any { it.thumbImpression == true } || d.witnesses.isNotEmpty()) PlanCard {
@@ -980,7 +1053,7 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
                 Text(interp.banner.pick(hindi), Modifier.weight(1f).announce(), fontWeight = FontWeight.Bold, fontSize = 18.sp, lineHeight = 23.sp, color = if (interp.kind == EdKind.ACTIVE) DoctorStatusGood else DoctorStatusRest)
             }
         } }
-        if (interp.flags.isNotEmpty()) item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().testTag("ed-flags")) {
+        if (interp.flags.isNotEmpty()) item(key = "ed-flags", contentType = "banner") { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.animateItem().fillMaxWidth().testTag("ed-flags")) {
             Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) { interp.flags.forEach { Text(it.pick(hindi), fontWeight = FontWeight.SemiBold, color = RustText) } }
         } }
         // An active plan leads with its decisions (tech spec §6), so the always-on box is the short form there; every condition stays on screen.
@@ -1036,22 +1109,22 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
     } }
 }
 
-@Composable private fun WalletCardPage(state: CarePlanState, patientId: String, online: Boolean, canEdit: Boolean, onRetry: () -> Unit, onReissue: () -> Unit, onBack: () -> Unit, onShare: () -> Unit, onViewed: (String) -> Unit) {
+@Composable private fun WalletCardPage(state: CarePlanState, patientId: String, online: Boolean, canEdit: Boolean, emergencyUrl: String? = null, onRetry: () -> Unit, onReissue: () -> Unit, onBack: () -> Unit, onShare: () -> Unit, onViewed: (String) -> Unit) {
     val t = careText(); val hindi = careHindi(); val today = LocalDate.now()
     val active = EctprLifecycle.active(state.ectprs, patientId)
     val token = active?.let { CardTokens.live(state.tokens, it.id) }
     val amdNow = AmdLifecycle.statusSummary(state.amds, patientId)
-    val withdrawnPending = state.tokens.count { it.patientId == patientId && !it.live && it.pending }
+    val withdrawnPending = remember(state.tokens, patientId) { state.tokens.count { it.patientId == patientId && !it.live && it.pending } }
     LaunchedEffect(active?.id) { active?.let { onViewed(it.id) } }
     LazyColumn(Modifier.fillMaxSize().testTag("wallet-card"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { PlanHeader(t("Pocket emergency card", "जेब में रखने का आपातकालीन कार्ड"), onBack, "wallet-header") }
-        if (withdrawnPending > 0) item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().testTag("card-revoke-pending")) { Text(t("Old QR may still open until the phone is online.", "फ़ोन ऑनलाइन होने तक पुराना QR खुल सकता है।"), Modifier.padding(12.dp)) } }
+        if (withdrawnPending > 0) item(key = "revoke-pending", contentType = "banner") { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.animateItem().fillMaxWidth().testTag("card-revoke-pending")) { Text(t("Old QR may still open until the phone is online.", "फ़ोन ऑनलाइन होने तक पुराना QR खुल सकता है।"), Modifier.padding(12.dp)) } }
         if (active == null || token == null) item { Column(Modifier.fillMaxWidth().padding(vertical = 32.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Icon(Icons.Default.QrCode, null, Modifier.size(40.dp), tint = DoctorCardSub)
             Text(t("No signed plan yet", "अभी कोई हस्ताक्षरित योजना नहीं"), fontWeight = FontWeight.SemiBold, color = Ink)
         } }
         else {
-            item { CardStatus(token, online, onRetry) }
+            item(key = "card-status", contentType = "status") { Box(Modifier.animateItem()) { CardStatus(token, online, onRetry) } }
             // Past the review date the ED view says standard care applies; the card says the same instead of showing the plan as current.
             EdView.interpret(active, today).takeIf { it.kind == EdKind.OUT_OF_DATE }?.let { stale -> item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().testTag("card-out-of-date")) { Text(stale.banner.pick(hindi), Modifier.padding(12.dp), fontWeight = FontWeight.Bold, color = Ink) } } }
             item { Surface(color = Paper, shape = RoundedCornerShape(12.dp), border = BorderStroke(2.dp, Ink), modifier = Modifier.fillMaxWidth()) {
@@ -1067,13 +1140,17 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
                     HorizontalDivider(color = DoctorHairline)
                     Text(t("Online QR", "ऑनलाइन QR"), fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = Ink, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
                     PlanQr(token.url, t("QR code with a link to this plan", "इस योजना के लिंक वाला QR कोड"), Modifier.fillMaxWidth(.8f).widthIn(max = 320.dp).align(Alignment.CenterHorizontally).border(2.dp, Ink).testTag("wallet-qr"))
-                    Text(t("Offline QR", "ऑफ़लाइन QR"), fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = Ink, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
-                    PlanQr(EdCardOffline.forQr(active, amdNow, hindi, today), t("QR code: offline text summary of this card", "QR कोड: इस कार्ड का ऑफ़लाइन सारांश"), Modifier.fillMaxWidth(.9f).widthIn(max = 360.dp).align(Alignment.CenterHorizontally).border(2.dp, Ink).testTag("wallet-offline-qr"), ErrorCorrectionLevel.L)
+                    // No offline text QR (meeting, 24 Nov): text in a QR opens in a notes app where it can be edited. The emergency card's QR is
+                    // its read-only web link (sahara.wedevit.in/emergency#t=…), the same code as on the patient's card; with no link, say where to scan.
+                    if (emergencyUrl != null) {
+                        Text(t("Emergency card QR", "आपातकालीन कार्ड QR"), fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = Ink, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                        PlanQr(emergencyUrl, t("Emergency web link QR code", "आपातकालीन वेब लिंक QR कोड"), Modifier.fillMaxWidth(.8f).widthIn(max = 320.dp).align(Alignment.CenterHorizontally).border(2.dp, Ink).testTag("wallet-emergency-qr"))
+                    } else Text(t("Scan the QR on the emergency card", "आपातकालीन कार्ड पर दिया QR स्कैन करें"), fontSize = 15.sp, color = Ink, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().testTag("wallet-no-emergency-qr"))
                     run { val v = active.version; val due = active.reviewDue; Text(t("Plan v$v · review due $due", "योजना v$v · समीक्षा $due"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Ink, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()) }
                 }
             } }
             val issuedAmd = runCatching { org.json.JSONObject(token.snapshot).optJSONObject("amdAtIssue") }.getOrNull()
-            if (issuedAmd?.optString("status").orEmpty() != amdNow?.status?.name.orEmpty() || (amdNow != null && issuedAmd?.optInt("version") != amdNow.version)) item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().testTag("card-amd-changed")) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            if (issuedAmd?.optString("status").orEmpty() != amdNow?.status?.name.orEmpty() || (amdNow != null && issuedAmd?.optInt("version") != amdNow.version)) item(key = "amd-changed", contentType = "banner") { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(12.dp), modifier = Modifier.animateItem().fillMaxWidth().testTag("card-amd-changed")) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(t("Advance care planning changed. Issue a new card.", "अग्रिम देखभाल योजना बदली है। नया कार्ड जारी करें।"), style = MaterialTheme.typography.bodyMedium)
                 OutlinedButton(onClick = onReissue, enabled = canEdit, modifier = Modifier.heightIn(min = 48.dp).testTag("card-reissue")) { Text(t("New card", "नया कार्ड")) }
             } } }

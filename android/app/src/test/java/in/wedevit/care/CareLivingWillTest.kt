@@ -19,7 +19,7 @@ class CareLivingWillTest {
         familyPhysician = AmdFamilyPhysician("Dr Menon", "KMC-1"), custodianBody = "BBMP")
     private fun ready() = AmdLifecycle.newDraft("p1", now, content(), "Patient", id = "a1")
     private fun generated() = AmdLifecycle.markGenerated(ready(), "b".repeat(64), "en", now, today)
-    private val execution = AmdExecution("2026-10-29", "Bengaluru", false, listOf(AmdWitness("Mohan K", "Bengaluru"), AmdWitness("Fatima S", "Bengaluru")), AmdAttestor(AttestorKind.NOTARY, "R. Shah", "", "Notary 44"), "amd-scan-a1.jpg", "amd-scan-a1.jpg", "image/jpeg", hash, now)
+    private val execution = AmdExecution("2026-10-29", "Bengaluru", false, listOf(AmdWitness("Mohan K", "Bengaluru"), AmdWitness("Fatima S", "Bengaluru")), AmdAttestor(AttestorKind.NOTARY, "R. Shah", "", "Notary 44"), "amd-scan-a1.jpg", "amd-scan-a1.jpg", "image/jpeg", hash, now, readAloud = ConsentReading(ConsentReadingRules.SELF))
     private val pending = AmdCustodian(AmdCustodianStatus.PENDING, "BBMP")
     private fun ids(c: AmdContent) = AmdRules.validateContent(c, today).map { it.id }
     private fun blocks(e: AmdExecution, c: AmdCustodian? = pending) = AmdRules.blocking(AmdRules.validateExecution(generated(), e, c, today)).map { it.id }
@@ -87,6 +87,10 @@ class CareLivingWillTest {
         assertTrue("SIGNED_BEFORE_PRINT" in blocks(execution.copy(signedOn = "2026-10-01")))
         assertTrue("L5_CUSTODIAN" in blocks(execution, null))
         assertTrue("L5_CUSTODIAN_DETAIL" in blocks(execution, AmdCustodian(AmdCustodianStatus.ACKNOWLEDGED, "BBMP")))
+        // Point 11: how the paper was read to the person is required, and complete when it was read to them.
+        assertTrue("READ_ALOUD" in blocks(execution.copy(readAloud = null)))
+        assertTrue("READ_ALOUD_INCOMPLETE" in blocks(execution.copy(readAloud = ConsentReading(ConsentReadingRules.PERSON, "Ravi Rao", "Son"))))
+        assertTrue("READ_ALOUD" !in blocks(execution) && "READ_ALOUD_INCOMPLETE" !in blocks(execution.copy(readAloud = ConsentReading(ConsentReadingRules.PERSON, "Ravi Rao", "Son", witnessName = "Mohan K", witnessRelation = "Neighbour"))))
         try { AmdLifecycle.execute(listOf(g), "a1", execution.copy(scanKey = ""), pending, now, today); fail() } catch (_: IllegalStateException) {}
         val e = executed().single()
         assertEquals(AmdStatus.EXECUTED, e.status); assertEquals(hash, e.execution?.scanSha256)

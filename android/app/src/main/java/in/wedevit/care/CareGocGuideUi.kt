@@ -156,10 +156,14 @@ private fun sectionTitle(section: String): Pair<String, String> = when (section)
 }
 
 @Composable private fun ModeCard(selected: Boolean, title: String, sub: String, tag: String, modifier: Modifier, onClick: () -> Unit) {
+    // The chosen mode eases into its colours with one small bounce and a light tap, like a system radio choice.
+    val tick = rememberSaharaTick()
+    val fill by androidx.compose.animation.animateColorAsState(if (selected) SaharaColors.PrimaryWash else Paper, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "goc-mode-fill")
+    val edge by androidx.compose.animation.animateColorAsState(if (selected) Rust else DoctorCardSub.copy(alpha = .5f), SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "goc-mode-edge")
     Surface(
-        color = if (selected) SaharaColors.PrimaryWash else Paper, shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(if (selected) 2.dp else 1.dp, if (selected) Rust else DoctorCardSub.copy(alpha = .5f)),
-        modifier = modifier.fillMaxHeight().heightIn(min = 72.dp).clip(RoundedCornerShape(16.dp)).selectable(selected, role = Role.RadioButton, onClick = onClick).testTag(tag),
+        color = fill, shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(if (selected) 2.dp else 1.dp, edge),
+        modifier = modifier.fillMaxHeight().heightIn(min = 72.dp).saharaSelectBounce(selected, .05f).clip(RoundedCornerShape(16.dp)).selectable(selected, role = Role.RadioButton, onClick = { if (!selected) tick(); onClick() }).testTag(tag),
     ) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(title, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = if (selected) RustText else DoctorCardInk)

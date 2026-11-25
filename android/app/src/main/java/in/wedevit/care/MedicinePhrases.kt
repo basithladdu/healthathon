@@ -41,6 +41,22 @@ object MedicinePhrases {
         "For itching" to "खुजली के लिए",
         "For swelling" to "सूजन के लिए",
         "For mouth ulcers" to "मुँह के छालों के लिए",
+        "For breathlessness at rest" to "आराम करते समय साँस फूलने के लिए",
+        "For fluid build-up" to "शरीर में पानी जमा होने के लिए",
+        "For fluid build-up and breathlessness" to "शरीर में पानी जमा होने और साँस फूलने के लिए",
+        "For night-time anxiety with breathlessness" to "रात में साँस फूलने के साथ घबराहट के लिए",
+        "For bone pain" to "हड्डी के दर्द के लिए",
+        "For background bone pain" to "लगातार रहने वाले हड्डी के दर्द के लिए",
+        "For wheeze" to "घरघराहट के लिए",
+        "For agitation" to "बेचैनी के लिए",
+        "For dry mouth" to "मुँह सूखने के लिए",
+        "For hiccups" to "हिचकी के लिए",
+        "For secretions" to "गले और छाती में बलगम के लिए",
+        "To prevent constipation" to "कब्ज़ से बचने के लिए",
+        "To prevent constipation while taking morphine" to "मॉर्फ़ीन लेते समय कब्ज़ से बचने के लिए",
+        "While taking morphine" to "मॉर्फ़ीन लेते समय",
+        "Short course for wheeze, finished after review" to "घरघराहट के लिए छोटा कोर्स, जाँच के बाद पूरा हुआ",
+        "Earlier anti-sickness medicine, stopped after review" to "पहले की मतली की दवा, जाँच के बाद बंद की गई",
         // How and when to take it.
         "Before food" to "खाने से पहले",
         "After food" to "खाने के बाद",
@@ -67,6 +83,17 @@ object MedicinePhrases {
         "Do not crush or chew" to "पीसें या चबाएँ नहीं",
         "Dissolve in water" to "पानी में घोलकर लें",
         "Shake well before use" to "इस्तेमाल से पहले अच्छी तरह हिलाएँ",
+        "Sublingual" to "जीभ के नीचे",
+        "Under the tongue" to "जीभ के नीचे",
+        "Apply to the skin" to "त्वचा पर लगाएँ",
+        "Change patch every 3 days" to "हर 3 दिन में पैच बदलें",
+        "At night if needed" to "ज़रूरत हो तो रात में",
+        "Every 4 hours" to "हर 4 घंटे में",
+        "Every 12 hours" to "हर 12 घंटे में",
+        "Three times daily before meals" to "दिन में तीन बार खाने से पहले",
+        "Review if more than 4 doses in 24 hours" to "24 घंटे में 4 से ज़्यादा खुराक लगें तो डॉक्टर को बताएँ",
+        "Review if used on more than 4 nights a week" to "हफ़्ते में 4 से ज़्यादा रात लेनी पड़े तो डॉक्टर को बताएँ",
+        "Weigh each morning and tell the team of a gain of 2 kg in 3 days" to "हर सुबह वज़न लें और 3 दिन में 2 किलो बढ़ने पर टीम को बताएँ",
     )
 
     private fun key(text: String): String = text.trim().trimEnd('.', '!', ';', ',', '।', '۔').replace(Regex("\\s+"), " ").lowercase(Locale.ROOT)
@@ -82,14 +109,18 @@ object MedicinePhrases {
     fun shown(text: String, lang: CareLang): String {
         if (lang == CareLang.EN || text.isBlank()) return text
         return text.lines().joinToString("\n") { line ->
-            line.split(Regex("(?<=[.!?])\\s+")).joinToString(" ") { part -> translated(part, lang) }
+            line.split(sentenceBreak).joinToString(" ") { part -> translated(part, lang) }
         }
     }
+
+    // Compiled once: [shown] runs for every medicine line on the daily lists.
+    private val sentenceBreak = Regex("(?<=[.!?])\\s+")
+    private val commaBreak = Regex(",\\s*")
 
     private fun translated(text: String, lang: CareLang): String {
         val stop = if (text.trimEnd().endsWith('.')) when (lang) { CareLang.HI -> "।"; CareLang.UR -> "۔"; else -> "." } else ""
         known(text)?.let { return careTr(lang, it.first, it.second) + stop }
-        val parts = text.trim().trimEnd('.').split(Regex(",\\s*")).filter(String::isNotBlank)
+        val parts = text.trim().trimEnd('.').split(commaBreak).filter(String::isNotBlank)
         if (parts.size > 1) {
             val found = parts.map { known(it) ?: return text }
             return found.joinToString(if (lang == CareLang.UR) "، " else ", ") { careTr(lang, it.first, it.second) } + stop

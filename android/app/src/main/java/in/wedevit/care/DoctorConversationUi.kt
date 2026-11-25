@@ -1,8 +1,6 @@
 @file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 package `in`.wedevit.care
 
-import androidx.activity.compose.BackHandler
-import android.app.DatePickerDialog
 import android.media.MediaPlayer
 import android.net.Uri
 import androidx.compose.foundation.BorderStroke
@@ -72,6 +70,9 @@ private fun conversationDate(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy
     val editorState = rememberSaveableStateHolder()
     var doctorFilter by rememberSaveable(person) { mutableStateOf("") }
     var dateFilter by rememberSaveable(person) { mutableStateOf("") }
+    // The day filter by the calendar only, never typed (owner, 25 Nov).
+    var pickingDay by remember { mutableStateOf(false) }
+    if (pickingDay) CareDatePickerDialog(dateFilter.takeIf(String::isNotBlank)?.let(LocalDate::parse), careText()("Choose a day", "दिन चुनें"), { dateFilter = it.toString(); pickingDay = false }, { pickingDay = false })
     var doctorMenu by remember { mutableStateOf(false) }
     var archiveDetail by remember(person) {mutableStateOf<DoctorConversationArchive?>(null)}
     // Goals-of-care discussions from the plan's talk (3 Nov meeting: each one in the legal form's layout, Sections I to IV).
@@ -85,7 +86,7 @@ private fun conversationDate(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy
         onDispose { headerCallback(null) }
     }
     if (editing) {
-        BackHandler(!recording && !interaction) { editing = false }
+        androidx.activity.compose.BackHandler(!recording && !interaction) { editing = false }
         Column(Modifier.fillMaxSize()) {
             Box(Modifier.weight(1f)) { editorState.SaveableStateProvider("$person:conversation-editor") { Talk(vm, canEdit, onRead, onRequestConversation, { active -> interaction = active; onInteractionActiveChange(active) }, doctorPresentation = true,
                 onDoctorBack = { editing = false }, onDoctorCaptureChange = onCaptureHeroChange,
@@ -94,7 +95,7 @@ private fun conversationDate(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy
         return
     }
     gocs.firstOrNull { it.id == openGoc }?.let { open ->
-        BackHandler { openGoc = "" }
+        androidx.activity.compose.BackHandler { openGoc = "" }
         DoctorGocFormPage(open) { openGoc = "" }
         return
     }
@@ -113,7 +114,8 @@ private fun conversationDate(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy
         }
         return
     }
-    BackHandler { destination = "landing" }
+    // These pages switch with plain if/else (no screen host), so plain BackHandlers, without the "leaving" preview.
+    androidx.activity.compose.BackHandler { destination = "landing" }
     archiveDetail?.takeIf {it.personId==person}?.let { saved -> AlertDialog(onDismissRequest={archiveDetail=null},title={Text(t("Draft", "ड्राफ़्ट"))},text={DoctorArchiveContent(saved)},confirmButton={TextButton(onClick={archiveDetail=null}){Text(t("Close", "बंद करें"))}}) }
     LazyColumn(Modifier.fillMaxSize().testTag("doctor-conversations"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { TextButton(onClick = { destination = "landing" }, colors = ButtonDefaults.textButtonColors(contentColor = RustText), modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null); Spacer(Modifier.width(8.dp)); Text(t("Back", "वापस"), fontSize = 16.sp) } }
@@ -133,7 +135,7 @@ private fun conversationDate(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = { val initial = dateFilter.takeIf(String::isNotBlank)?.let(LocalDate::parse) ?: LocalDate.now(); DatePickerDialog(context, { _, y, m, d -> dateFilter = LocalDate.of(y, m + 1, d).toString() }, initial.year, initial.monthValue - 1, initial.dayOfMonth).show() }, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Text(if (dateFilter.isBlank()) t("Choose a day", "दिन चुनें") else LocalDate.parse(dateFilter).format(DateTimeFormatter.ofPattern("d MMM yyyy"))) }
+                OutlinedButton(onClick = { pickingDay = true }, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Text(if (dateFilter.isBlank()) t("Choose a day", "दिन चुनें") else LocalDate.parse(dateFilter).format(DateTimeFormatter.ofPattern("d MMM yyyy"))) }
                 if (dateFilter.isNotBlank()) TextButton(onClick = { dateFilter = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Clear", "हटाएँ")) }
             }
             }

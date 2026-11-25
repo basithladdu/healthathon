@@ -72,12 +72,12 @@ internal data class DoctorNewPatient(
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             CarePatientProfile.SEX.forEach { v -> FilterChip(selected = sex == v, onClick = { sex = if (sex == v) "" else v }, label = { Text(when (v) { "Female" -> t("Female", "महिला"); "Male" -> t("Male", "पुरुष"); else -> t("Other", "अन्य") }) }, modifier = Modifier.heightIn(min = 48.dp)) }
         }
-        CareField(phone, { phone = it.take(40) }, t("Patient's phone", "मरीज़ का फ़ोन"), singleLine = true, supporting = if (!DoctorNewPatient.phoneOk(phone)) t("Check the phone number.", "फ़ोन नंबर जाँचें।") else null)
+        CareField(phone, { phone = it.take(40) }, t("Patient's phone", "मरीज़ का फ़ोन"), singleLine = true, supporting = if (!DoctorNewPatient.phoneOk(phone)) t("Check the phone number.", "फ़ोन नंबर जाँचें।") else null, voice = false)
         CareField(diagnosis, { diagnosis = it.take(300) }, t("Main diagnosis", "मुख्य बीमारी"), singleLine = true)
         Text(t("Main caregiver (optional)", "मुख्य देखभाल करने वाले (चाहें तो)"), Modifier.a11yHeading().padding(top = 4.dp), fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
         CareField(caregiverName, { caregiverName = it.take(120) }, t("Caregiver's name", "देखभाल करने वाले का नाम"), singleLine = true)
         CareField(caregiverRelationship, { caregiverRelationship = it.take(80) }, t("Relationship, for example daughter", "रिश्ता, जैसे बेटी"), singleLine = true)
-        CareField(caregiverPhone, { caregiverPhone = it.take(40) }, t("Caregiver's phone", "देखभाल करने वाले का फ़ोन"), singleLine = true, supporting = if (!DoctorNewPatient.phoneOk(caregiverPhone)) t("Check the phone number.", "फ़ोन नंबर जाँचें।") else null)
+        CareField(caregiverPhone, { caregiverPhone = it.take(40) }, t("Caregiver's phone", "देखभाल करने वाले का फ़ोन"), singleLine = true, supporting = if (!DoctorNewPatient.phoneOk(caregiverPhone)) t("Check the phone number.", "फ़ोन नंबर जाँचें।") else null, voice = false)
         Text(t("How were they referred?", "उन्हें किसने भेजा?"), Modifier.padding(top = 4.dp), fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             DoctorNewPatient.REFERRALS.forEach { v -> FilterChip(selected = referral == v, onClick = { referral = if (referral == v) "" else v }, label = { Text(referralLabel(v)) }, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-add-patient-referral-${DoctorNewPatient.REFERRALS.indexOf(v)}")) }

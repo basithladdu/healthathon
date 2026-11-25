@@ -2,6 +2,30 @@
 
 > **30 Oct 2026:** SVK spec build (emergency care plan, living will, QR card, languages): see [docs/SAHARA_SVK_BUILD_HANDOFF.md](docs/SAHARA_SVK_BUILD_HANDOFF.md).
 
+## 25 Nov: Awaiz, apply the emergency-card versions migration (Supabase)
+
+Basith's PC is signed in to a different Supabase account, so this is yours. The app and the website are already on `main` (`e4a0a0c`, website deployed) and both still work without it; the new card behaviour (each printed card is a version, "This is not the latest version of this card", 3-month notice) only starts once it is applied.
+
+- [ ] **1. Check the two earlier emergency migrations are in.** Supabase → Android project `kjnhtakqzboayqorrlue` → SQL Editor:
+  ```sql
+  select to_regclass('healthathon_private.emergency_links') as links,
+         to_regclass('healthathon_private.emergency_link_views') as views,
+         to_regprocedure('healthathon_private.emergency_clean_place(text)') as clean_place;
+  ```
+  All three must be non-null. If `views` or `clean_place` is null, first paste and run `android/supabase/migrations/20261123120000_emergency_card_view_places.sql`.
+- [ ] **2. Paste and run** the whole of `android/supabase/migrations/20261124120000_emergency_card_versions.sql` in the SQL Editor (it is one transaction: it either all applies or nothing does). Don't use `supabase db push` on this project (see the 21 Nov note below).
+- [ ] **3. Record it:** `insert into supabase_migrations.schema_migrations(version, name) values ('20261124120000','emergency_card_versions') on conflict do nothing;` (and `20261123120000` too if you ran it in step 1).
+- [ ] **4. Check:**
+  ```sql
+  select count(*) from healthathon_private.emergency_link_versions;          -- one row per existing card link
+  select to_regprocedure('public.healthathon_emergency_link_publish(uuid,jsonb)');   -- not null
+  select public.healthathon_emergency_view(repeat('0',64));                  -- {"status": "unknown"}
+  ```
+  Then in the app: SOS → Emergency card → Update card, scan the old printed QR: the website shows "This is not the latest version of this card". Scan the new QR: no banner.
+- [ ] **5. Tell Basith** it's done, so the Command Center can be updated.
+- [ ] **6. Optional (read-aloud consent on other phones):** when a patient confirms a note after it was read aloud, the app now sends `data.readAloud` (method, reader, witness, language, time) with the confirmation (`CareCloud.confirm`). Check whether the server keeps it: confirm a note on one phone with "Someone read it to me", then open the same record on a second phone. If the reader/witness line is missing there, the save function strips unknown keys from that record kind; allow `readAloud` in it. Until then the confirming phone keeps its own copy.
+- [ ] **7. Research consent (DPDP):** Settings → Privacy and data has a new opt-in, off by default, saved as a record on the patient (kind journal entry with the `sahara:research-consent:v1` prefix), so it syncs through the normal record path. No migration needed; just check that it shows on a second phone.
+
 ## 23 Nov: on-device tests (`connectedDebugAndroidTest`) on Awaiz's emulator
 
 First full run on Awaiz's PC (the emulator works now that the hypervisor driver is installed). Emulator `Sahara_Doctor_Demo`, Android 17 (API 37), 1080×2400.

@@ -15,7 +15,6 @@ import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.interaction.InteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
@@ -77,7 +76,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.layout.widthIn
 import androidx.activity.OnBackPressedDispatcher
@@ -102,7 +100,6 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.Spring
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -121,6 +118,57 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.content.BroadcastReceiver
+import android.content.Intent
+import android.content.IntentFilter
+import android.os.Build
+import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.snap
+import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.ui.draw.dropShadow
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.node.LayoutModifierNode
+import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.preferredFrameRate
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.DpOffset
+import kotlinx.coroutines.Job
+
+/**
+ * Sahara's one spring vocabulary, taken from Material 3's standard motion scheme (not the expressive one, which overshoots
+ * too much for older patients). Spatial springs move things (damping 0.9: no visible overshoot), effects springs change
+ * alpha, colour and fills (damping 1: never past the target). [gentle] is the one soft settle allowed for small
+ * celebrations. Every token is a snap when motion is off (Remove animations or Battery Saver). Springs keep their speed when
+ * a new target arrives mid-move, so a quick second tap retargets smoothly instead of restarting.
+ */
+object SaharaSprings {
+    fun <T> fastSpatial(visibilityThreshold: T? = null, enabled: Boolean = SaharaMotion.enabled): FiniteAnimationSpec<T> =
+        if (enabled) spring(0.9f, 1400f, visibilityThreshold) else snap()
+    fun <T> spatial(visibilityThreshold: T? = null, enabled: Boolean = SaharaMotion.enabled): FiniteAnimationSpec<T> =
+        if (enabled) spring(0.9f, 700f, visibilityThreshold) else snap()
+    fun <T> slowSpatial(visibilityThreshold: T? = null, enabled: Boolean = SaharaMotion.enabled): FiniteAnimationSpec<T> =
+        if (enabled) spring(0.9f, 300f, visibilityThreshold) else snap()
+    fun <T> fastEffects(visibilityThreshold: T? = null, enabled: Boolean = SaharaMotion.enabled): FiniteAnimationSpec<T> =
+        if (enabled) spring(1f, 3800f, visibilityThreshold) else snap()
+    fun <T> effects(visibilityThreshold: T? = null, enabled: Boolean = SaharaMotion.enabled): FiniteAnimationSpec<T> =
+        if (enabled) spring(1f, 1600f, visibilityThreshold) else snap()
+    fun <T> slowEffects(visibilityThreshold: T? = null, enabled: Boolean = SaharaMotion.enabled): FiniteAnimationSpec<T> =
+        if (enabled) spring(1f, 800f, visibilityThreshold) else snap()
+    /** The one soft settle for small celebrations (a hug, a chosen mood): a barely visible give, never a wobble. */
+    fun <T> gentle(visibilityThreshold: T? = null, enabled: Boolean = SaharaMotion.enabled): FiniteAnimationSpec<T> =
+        if (enabled) spring(0.8f, 380f, visibilityThreshold) else snap()
+}
 
 /**
  * The one motion spec for Sahara. Every screen change (tabs, pushes into a detail screen,
@@ -129,19 +177,27 @@ import androidx.compose.ui.unit.sp
  *
  * - [Forward]: the new screen fades in while drifting a short way in from the end edge.
  * - [Back]: the mirror of Forward.
- * - [Switch]: a quiet fade-through, for peer changes such as bottom tabs.
+ * - [Switch]: a true fade-through (the old screen is gone before the new one fades in), for peer changes such as bottom tabs.
  *
- * Calm by design for elderly users: 110-240 ms, no springs or bounce. When the phone's
- * "Remove animations" setting is on (animator duration scale 0) every duration and delay is 0.
+ * Calm by design for elderly users: 90-280 ms tweens on Material's emphasized curves, and only critically damped springs
+ * ([SaharaSprings]) with no visible bounce. When the phone's "Remove animations" setting or Battery Saver is on, every
+ * duration and delay is 0.
  */
 object SaharaMotion {
     const val ENTER_MS = 280
-    const val EXIT_MS = 140
+    /** Exits are shorter than enters (Material): the old content gets out of the way before the new one arrives. */
+    const val EXIT_MS = 90
     /** The welcome panel rising to show a form, and settling back. */
     const val PANEL_MS = 300
     /** Material's emphasized curve: a quick start that glides to rest, so long moves feel calm rather than abrupt. */
     val Emphasized: Easing = CubicBezierEasing(0.2f, 0f, 0f, 1f)
-    const val FADE_DELAY_MS = 50
+    /** Material's emphasized decelerate (things arriving) and accelerate (things leaving) curves. */
+    val EmphasizedDecelerate: Easing = CubicBezierEasing(0.05f, 0.7f, 0.1f, 1f)
+    val EmphasizedAccelerate: Easing = CubicBezierEasing(0.3f, 0f, 0.8f, 0.15f)
+    /** The predictive back swipe (Material's standard decelerate): the screen answers the first millimetres of the thumb. */
+    val BackEasing: Easing = CubicBezierEasing(0f, 0f, 0f, 1f)
+    /** The incoming screen waits until the outgoing one has faded ([EXIT_MS]), so two pages are never seen on top of each other. */
+    const val FADE_DELAY_MS = 90
     /** Card expand/collapse and content-size changes. */
     const val EXPAND_MS = 200
     /** One list item appearing on first load; [STAGGER_MS] between items, at most [STAGGER_ITEMS] deep. */
@@ -175,19 +231,47 @@ object SaharaMotion {
     const val SCREEN_MS = 260
 
     private var power: PowerManager? = null
-    /** Called once by the theme so Battery Saver can switch motion off as well. */
-    fun bind(context: Context) { if (power == null) power = context.applicationContext.getSystemService(Context.POWER_SERVICE) as? PowerManager }
+    private var bound = false
+    // Cached as snapshot state: reading them costs nothing (no system call per read), and a change recomposes what reads them.
+    private val animatorsOn = mutableStateOf(runCatching { ValueAnimator.areAnimatorsEnabled() }.getOrDefault(true))
+    private val saverOn = mutableStateOf(false)
+
+    /**
+     * Called once by the theme so Battery Saver can switch motion off as well. Listens for Battery Saver changes and (Android 13+)
+     * for the "Remove animations" scale changing, so either applies at once; [refresh] covers older phones on resume.
+     */
+    fun bind(context: Context) {
+        if (bound) return
+        bound = true
+        val app = context.applicationContext
+        power = app.getSystemService(Context.POWER_SERVICE) as? PowerManager
+        refresh()
+        runCatching {
+            // A protected system broadcast, so no export flag is needed.
+            app.registerReceiver(object : BroadcastReceiver() { override fun onReceive(c: Context?, i: Intent?) { refresh() } },
+                IntentFilter(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED))
+        }
+        if (Build.VERSION.SDK_INT >= 33) runCatching { ValueAnimator.registerDurationScaleChangeListener { scale -> animatorsOn.value = scale != 0f } }
+    }
+
+    /** Re-reads "Remove animations" and Battery Saver. Call from the activity's onResume (the scale listener needs Android 13). */
+    fun refresh() {
+        val animators = runCatching { ValueAnimator.areAnimatorsEnabled() }.getOrDefault(true)
+        val saver = runCatching { power?.isPowerSaveMode == true }.getOrDefault(false)
+        if (animatorsOn.value != animators) animatorsOn.value = animators
+        if (saverOn.value != saver) saverOn.value = saver
+    }
 
     /** True while Battery Saver is on: Sahara then moves nothing, as with "Remove animations". */
-    val powerSave: Boolean get() = runCatching { power?.isPowerSaveMode == true }.getOrDefault(false)
+    val powerSave: Boolean get() = saverOn.value
 
-    /** False while the system "Remove animations" setting or Battery Saver is on. Read live, so changing either applies at once. */
-    val enabled: Boolean get() = runCatching { ValueAnimator.areAnimatorsEnabled() }.getOrDefault(true) && !powerSave
+    /** False while the system "Remove animations" setting or Battery Saver is on. Observable state, so changing either applies at once. */
+    val enabled: Boolean get() = animatorsOn.value && !saverOn.value
 
     /** A duration or delay, collapsed to 0 when animations are off. */
     fun ms(base: Int, enabled: Boolean = this.enabled): Int = if (enabled) base else 0
 
-    fun <T> tween(durationMillis: Int, delayMillis: Int = 0, easing: Easing = FastOutSlowInEasing, enabled: Boolean = this.enabled): TweenSpec<T> =
+    fun <T> tween(durationMillis: Int, delayMillis: Int = 0, easing: Easing = Emphasized, enabled: Boolean = this.enabled): TweenSpec<T> =
         androidx.compose.animation.core.tween(ms(durationMillis, enabled), ms(delayMillis, enabled), easing)
 
     /** Delay before list item [index] starts appearing; 0 when animations are off. */
@@ -203,8 +287,8 @@ object SaharaMotion {
         return t.startsWith("Saved") || t.contains(" saved") || t.contains("सहेज")
     }
 
-    private fun fadeEnter(enabled: Boolean) = fadeIn(tween(ENTER_MS - FADE_DELAY_MS, FADE_DELAY_MS, LinearOutSlowInEasing, enabled))
-    private fun fadeExit(enabled: Boolean) = fadeOut(tween(EXIT_MS, enabled = enabled))
+    private fun fadeEnter(enabled: Boolean) = fadeIn(tween(ENTER_MS - FADE_DELAY_MS, FADE_DELAY_MS, EmphasizedDecelerate, enabled))
+    private fun fadeExit(enabled: Boolean) = fadeOut(tween(EXIT_MS, easing = EmphasizedAccelerate, enabled = enabled))
 
     /** Screen-sized content that slides; [rtl] flips the drift so it always follows reading direction. */
     fun transform(direction: Direction, rtl: Boolean = false, enabled: Boolean = this.enabled): ContentTransform {
@@ -213,7 +297,8 @@ object SaharaMotion {
         val (enter, exit) = when (direction) {
             Direction.Forward -> (fadeEnter(enabled) + slideInHorizontally(slide) { sign * it / 12 }) to (fadeExit(enabled) + slideOutHorizontally(slide) { -sign * it / 24 })
             Direction.Back -> (fadeEnter(enabled) + slideInHorizontally(slide) { -sign * it / 24 }) to (fadeExit(enabled) + slideOutHorizontally(slide) { sign * it / 12 })
-            Direction.Switch -> fadeEnter(enabled) to fadeExit(enabled)
+            // Fade-through: the old tab fades out first, then the new one fades in while settling from 96% (quieter than Material's 92%).
+            Direction.Switch -> (fadeEnter(enabled) + scaleIn(tween(ENTER_MS - FADE_DELAY_MS, FADE_DELAY_MS, EmphasizedDecelerate, enabled), initialScale = .96f)) to fadeExit(enabled)
         }
         // Screens fill the window, so there is no size to animate; skipping it saves a measure pass every frame.
         return ContentTransform(enter, exit, sizeTransform = null)
@@ -240,7 +325,10 @@ object SaharaMotion {
 
     /** A card's hidden section opening and closing. */
     val expand: EnterTransition get() = expandVertically(tween(EXPAND_MS, easing = Emphasized)) + fadeIn(tween(EXPAND_MS))
-    val collapse: ExitTransition get() = shrinkVertically(tween(EXPAND_MS - 50, easing = Emphasized)) + fadeOut(tween(EXIT_MS))
+    val collapse: ExitTransition get() = shrinkVertically(tween(EXPAND_MS - 50, easing = EmphasizedAccelerate)) + fadeOut(tween(EXIT_MS, easing = EmphasizedAccelerate))
+
+    /** Back-commit: the swiped-away card fades from where the thumb left it (no further slide); the screen below fades in. */
+    fun backCommit(enabled: Boolean = this.enabled): ContentTransform = ContentTransform(fadeEnter(enabled), fadeExit(enabled), sizeTransform = null)
 }
 
 /** Hands out first-load stagger delays to the cards of one screen. */
@@ -258,34 +346,69 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
 
 /**
  * Gentle first-composition appearance: fade in and rise 8 dp, once per item. Staggered by position while the screen is still
- * opening (first [SaharaMotion.STAGGER_WINDOW_MS]); items composed later (scrolled in, loaded after a fetch) still animate,
- * without delay. The flag survives rotation and tab switches, so a card never replays. Draw-only; nothing when motion is off.
+ * opening (first [SaharaMotion.STAGGER_WINDOW_MS]); items composed later inside a host (scrolled in, prefetched) simply
+ * appear, while outside a host they still fade in without delay. The flag survives rotation and tab switches, so a card never replays. Draw-only; nothing when motion is off.
  */
 @Composable fun Modifier.saharaAppear(): Modifier {
     if (!SaharaMotion.enabled) return this
     val stagger = LocalSaharaStagger.current
     var played by rememberSaveable { mutableStateOf(false) }
     if (played) return this
+    // Rows composed after the first-load window (scrolled in, or prefetched just before) simply appear, never half-faded mid-fling.
+    val run = remember { stagger?.fresh ?: true }
+    if (!run) return this
     val delay = remember { stagger?.claim() ?: 0 }
     val progress = remember { Animatable(0f) }
-    LaunchedEffect(Unit) { progress.animateTo(1f, SaharaMotion.tween(SaharaMotion.LIST_ITEM_MS, delay, LinearOutSlowInEasing)); played = true }
-    return graphicsLayer { val p = progress.value; alpha = p; translationY = (1f - p) * 8.dp.toPx() }
+    LaunchedEffect(Unit) { progress.animateTo(1f, SaharaMotion.tween(SaharaMotion.LIST_ITEM_MS, delay, SaharaMotion.EmphasizedDecelerate)); played = true }
+    // ModulateAlpha: no offscreen buffer per card, and the card's shadow is not clipped while it fades.
+    return graphicsLayer { val p = progress.value; alpha = p; translationY = (1f - p) * 8.dp.toPx(); compositingStrategy = CompositingStrategy.ModulateAlpha }
 }
 
 /**
- * Press feedback for tappable cards, tiles and buttons: a slight 3% settle while pressed, then a soft spring back with a
- * touch of overshoot on release (Material 3 Expressive's physics feel, kept small). Draw-only, so the tap itself is never
- * delayed; instant when motion is off.
+ * Press feedback for tappable cards, tiles and buttons: a slight 3% settle while pressed and a calm spring back on release
+ * (no overshoot). A modifier node that watches [interaction] itself, so a press never recomposes the card; the scale is
+ * applied in the layer only, so the tap itself is never delayed. Instant when motion is off.
  */
-@Composable fun Modifier.saharaPress(interaction: InteractionSource): Modifier {
-    val pressed by interaction.collectIsPressedAsState()
-    val spec: androidx.compose.animation.core.AnimationSpec<Float> = when {
-        !SaharaMotion.enabled -> androidx.compose.animation.core.snap()
-        pressed -> SaharaMotion.tween(SaharaMotion.PRESS_MS)
-        else -> spring(dampingRatio = .55f, stiffness = Spring.StiffnessMediumLow)
+fun Modifier.saharaPress(interaction: InteractionSource, pressedScale: Float = SAHARA_PRESS_SCALE): Modifier = this then SaharaPressElement(interaction, pressedScale)
+
+/** The one press depth used app-wide (cards, tiles, big buttons). */
+const val SAHARA_PRESS_SCALE = .97f
+
+private data class SaharaPressElement(val source: InteractionSource, val pressedScale: Float) : ModifierNodeElement<SaharaPressNode>() {
+    override fun create() = SaharaPressNode(source, pressedScale)
+    override fun update(node: SaharaPressNode) { node.pressedScale = pressedScale; node.watch(source) }
+}
+
+private class SaharaPressNode(private var source: InteractionSource, var pressedScale: Float) : Modifier.Node(), LayoutModifierNode {
+    private val scale = Animatable(1f)
+    private var job: Job? = null
+    override fun onAttach() { start() }
+    override fun onDetach() { job = null }
+    fun watch(next: InteractionSource) {
+        if (next == source) return
+        source = next
+        if (isAttached) { job?.cancel(); coroutineScope.launch { scale.snapTo(1f) }; start() }
     }
-    val scale by animateFloatAsState(if (pressed) 0.97f else 1f, spec, label = "card press")
-    return graphicsLayer { scaleX = scale; scaleY = scale }
+    private fun start() {
+        job = coroutineScope.launch {
+            val presses = mutableListOf<PressInteraction.Press>()
+            source.interactions.collect { i ->
+                when (i) {
+                    is PressInteraction.Press -> presses.add(i)
+                    is PressInteraction.Release -> presses.remove(i.press)
+                    is PressInteraction.Cancel -> presses.remove(i.press)
+                    else -> return@collect
+                }
+                val down = presses.isNotEmpty()
+                // A new target cancels the running one and keeps its speed, so a quick tap never hitches.
+                launch { scale.animateTo(if (down) pressedScale else 1f, if (down) SaharaSprings.fastSpatial() else SaharaSprings.spatial()) }
+            }
+        }
+    }
+    override fun MeasureScope.measure(measurable: Measurable, constraints: Constraints): MeasureResult {
+        val placeable = measurable.measure(constraints)
+        return layout(placeable.width, placeable.height) { placeable.placeWithLayer(0, 0) { val s = scale.value; scaleX = s; scaleY = s } }
+    }
 }
 
 /** Animated content size for cards that grow or shrink (expanding sections, edited text). */
@@ -298,7 +421,10 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
 
 /** A count or short chip label that changes in place; numbers rise when they grow. */
 @Composable fun SaharaAnimatedText(text: String, modifier: Modifier = Modifier, content: @Composable (String) -> Unit) =
-    AnimatedContent(text, modifier, transitionSpec = { SaharaMotion.valueChange((targetState.toIntOrNull() ?: 0) >= (initialState.toIntOrNull() ?: 0)) }, label = "Sahara value") { content(it) }
+    AnimatedContent(text, modifier, transitionSpec = { SaharaMotion.valueChange((targetState.toIntOrNull() ?: 0) >= (initialState.toIntOrNull() ?: 0)) }, label = "Sahara value") {
+        // Tabular figures: a changing number keeps its width, so nothing beside it jitters (ignored where the font lacks them).
+        CompositionLocalProvider(LocalTextStyle provides LocalTextStyle.current.copy(fontFeatureSettings = "tnum")) { content(it) }
+    }
 
 /** Snackbar host whose save confirmations carry the saved tick. Other messages look as before. */
 @Composable fun SaharaSnackbarHost(state: SnackbarHostState, modifier: Modifier = Modifier) = SnackbarHost(state, modifier) { data ->
@@ -328,15 +454,116 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
     content: @Composable AnimatedContentScope.(T) -> Unit,
 ) {
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    val hostScope = androidx.compose.runtime.rememberCoroutineScope()
+    val preview = remember(hostScope) { SaharaBackPreview(hostScope) }
     val backOwner = LocalOnBackPressedDispatcherOwner.current
     // A leaving screen stays composed for the exit animation; its back handlers move to a dispatcher nothing presses, so back goes to the new screen.
     val inertBack = remember(backOwner) { backOwner?.let { owner -> object : OnBackPressedDispatcherOwner { override val lifecycle get() = owner.lifecycle; override val onBackPressedDispatcher = OnBackPressedDispatcher() } } }
-    AnimatedContent(target, modifier, transitionSpec = { SaharaMotion.transform(direction(initialState, targetState), rtl) },
-        contentAlignment = Alignment.TopStart, label = label) { shown ->
+    val parentEntering = LocalSaharaHostEntering.current
+    // After composition: note the shown target, and on a committed back swipe zero the shared progress for the arriving screen.
+    SideEffect { preview.targetChanged(target) }
+    AnimatedContent(target, modifier, transitionSpec = {
+        if (preview.committed > 0f && initialState == preview.leaving) SaharaMotion.backCommit()
+        else SaharaMotion.transform(direction(initialState, targetState), rtl)
+    }, contentAlignment = Alignment.TopStart, label = label) { shown ->
         val stagger = remember { SaharaStagger() }
-        CompositionLocalProvider(LocalSaharaStagger provides stagger) {
-            if (backOwner == null || inertBack == null) content(shown)
-            else CompositionLocalProvider(LocalOnBackPressedDispatcherOwner provides if (SaharaMotion.handlesBack(transition.targetState)) backOwner else inertBack) { content(shown) }
+        val live = SaharaMotion.handlesBack(transition.targetState)
+        val childTransition = transition
+        val entering: () -> Boolean = remember(childTransition, parentEntering) { { parentEntering() || childTransition.currentState != childTransition.targetState } }
+        // The screen a back swipe just committed keeps the pose the thumb left it in while it fades out (no snap to full size).
+        val frozen = remember(live) { if (!live && shown == preview.leaving) preview.committed else 0f }
+        val frozenLeft = remember(live) { preview.committedLeft }
+        // Predictive back, in Google's geometry: while the thumb swipes from the edge, the screen shrinks to 90%, shifts
+        // (width/20 - 8 dp) towards the swipe and rounds its corners. Read only in the draw layer, so a swipe never recomposes.
+        Box(Modifier.graphicsLayer {
+            val p = if (live) (if (preview.hold) 0f else preview.progress.value) else frozen
+            if (p > 0f) {
+                val s = 1f - .10f * p
+                scaleX = s; scaleY = s
+                val left = if (live) preview.fromLeft else frozenLeft
+                translationX = (if (left) 1f else -1f) * ((size.width / 20f) - 8.dp.toPx()).coerceAtLeast(0f) * p
+                shape = RoundedCornerShape(SaharaRadius.Hero * p); clip = true
+                shadowElevation = 12.dp.toPx() * p
+            }
+        }, propagateMinConstraints = true) {
+            CompositionLocalProvider(LocalSaharaStagger provides stagger, LocalSaharaBackPreview provides preview, LocalSaharaHostEntering provides entering) {
+                if (backOwner == null || inertBack == null) content(shown)
+                else CompositionLocalProvider(LocalOnBackPressedDispatcherOwner provides if (live) backOwner else inertBack) { content(shown) }
+            }
+        }
+    }
+}
+
+/** The back-swipe progress of the screen host it belongs to (0 = resting, 1 = swiped fully). */
+@androidx.compose.runtime.Stable class SaharaBackPreview(internal val scope: kotlinx.coroutines.CoroutineScope) {
+    val progress = Animatable(0f)
+    var fromLeft by mutableStateOf(true)
+    /** The pose (0..1) a committed swipe left the screen in; only that leaving screen draws it while it fades out. */
+    var committed by mutableFloatStateOf(0f); internal set
+    var committedLeft by mutableStateOf(true); internal set
+    /** The host target that the committed swipe is leaving. */
+    var leaving: Any? = null; internal set
+    /** True for the moment between a commit and [progress] reaching 0, so the arriving screen draws at full size at once. */
+    internal var hold by mutableStateOf(false)
+    private var shownTarget: Any? = null
+    private var awaitingCommit = false
+
+    /** A cancelled swipe: the screen springs back to full size. */
+    internal fun settle() { scope.launch { progress.animateTo(0f, SaharaSprings.spatial()) } }
+
+    /** A committed swipe: freeze the pose for the leaving screen; [targetChanged] then resets the live value. */
+    internal fun commit() {
+        val p = progress.value
+        if (p <= 0f) { scope.launch { progress.snapTo(0f) }; return }
+        committed = p; committedLeft = fromLeft; leaving = shownTarget; awaitingCommit = true
+        // If this back did not change the host's screen (it closed something inside it), spring back instead.
+        scope.launch {
+            androidx.compose.runtime.withFrameNanos { }; androidx.compose.runtime.withFrameNanos { }
+            if (awaitingCommit) { awaitingCommit = false; committed = 0f; leaving = null; progress.animateTo(0f, SaharaSprings.spatial()) }
+        }
+    }
+
+    /** Called after each host composition with the shown target. */
+    internal fun targetChanged(target: Any?) {
+        if (target == shownTarget) return
+        shownTarget = target
+        if (awaitingCommit) {
+            awaitingCommit = false
+            hold = true
+            scope.launch { progress.snapTo(0f); hold = false }
+        } else if (committed > 0f) {
+            // A later navigation: the earlier commit pose must not apply to it.
+            committed = 0f; leaving = null
+        }
+    }
+}
+
+val LocalSaharaBackPreview = staticCompositionLocalOf<SaharaBackPreview?> { null }
+
+/** True while the nearest [SaharaScreenHost] is still animating its screen in, so [saharaScreenEnter] does not fade it a second time. */
+val LocalSaharaHostEntering = staticCompositionLocalOf<() -> Boolean> { { false } }
+
+/**
+ * BackHandler with the Android predictive back preview: the nearest [SaharaScreenHost] follows the swipe, then the screen
+ * goes back (or springs back if the swipe is cancelled). Same arguments as BackHandler; works the same on older phones.
+ */
+@Composable fun SaharaBackHandler(enabled: Boolean = true, onBack: () -> Unit) {
+    val preview = LocalSaharaBackPreview.current
+    val currentOnBack by androidx.compose.runtime.rememberUpdatedState(onBack)
+    androidx.activity.compose.PredictiveBackHandler(enabled) { events ->
+        try {
+            events.collect { e ->
+                if (preview != null && SaharaMotion.enabled) {
+                    preview.fromLeft = e.swipeEdge == androidx.activity.BackEventCompat.EDGE_LEFT
+                    preview.progress.snapTo(SaharaMotion.BackEasing.transform(e.progress.coerceIn(0f, 1f)))
+                }
+            }
+            // Freeze the pose first, so the transition chosen for this back already knows it was a swipe.
+            preview?.commit()
+            currentOnBack()
+        } catch (c: kotlinx.coroutines.CancellationException) {
+            preview?.settle()
+            throw c
         }
     }
 }
@@ -360,7 +587,7 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
 
 /** The Sahara mark (the app icon) in a circle, breathing gently while something loads. Decorative. */
 @Composable fun SaharaBrandMark(modifier: Modifier = Modifier, size: Int = 64) {
-    Image(painterResource(R.drawable.ic_care), null, modifier.saharaBreathe(cycles = 40).size(size.dp).shadow(4.dp, CircleShape).clip(CircleShape).clearAndSetSemantics { })
+    Image(painterResource(R.drawable.ic_care), null, modifier.saharaBreathe(cycles = 40).size(size.dp).saharaFloatShadow(CircleShape).clip(CircleShape).clearAndSetSemantics { })
 }
 
 /**
@@ -399,7 +626,7 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
             p.animateTo(0f, androidx.compose.animation.core.tween(SaharaMotion.BREATHE_MS, easing = FastOutSlowInEasing))
         }
     }
-    return graphicsLayer { val s = 1f + amount * p.value; scaleX = s; scaleY = s }
+    return preferredFrameRate(60f).graphicsLayer { val s = 1f + amount * p.value; scaleX = s; scaleY = s }
 }
 
 /**
@@ -416,7 +643,7 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
         }
         p.snapTo(-1f)
     }
-    return drawWithContent {
+    return preferredFrameRate(60f).drawWithContent {
         drawContent()
         val v = p.value
         if (v in 0f..1f) {
@@ -440,7 +667,7 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
 @Composable fun SaharaEmpty(title: String, detail: String? = null, modifier: Modifier = Modifier, icon: ImageVector? = null,
     actionLabel: String? = null, onAction: (() -> Unit)? = null, secondaryLabel: String? = null, onSecondary: (() -> Unit)? = null, tone: SaharaTone = SaharaTone.Rust) {
     Column(modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 32.dp).saharaScreenEnter().testTag("sahara-empty"), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        if (icon != null) Box(Modifier.saharaBreathe(cycles = 3).size(72.dp).shadow(3.dp, CircleShape).clip(CircleShape).background(tone.solid), contentAlignment = Alignment.Center) { Icon(icon, null, Modifier.size(36.dp), tint = tone.onSolid) }
+        if (icon != null) Box(Modifier.saharaBreathe(cycles = 3).size(72.dp).saharaFloatShadow(CircleShape).clip(CircleShape).background(tone.solid), contentAlignment = Alignment.Center) { Icon(icon, null, Modifier.size(36.dp), tint = tone.onSolid) }
         Text(title, fontFamily = SaharaTitleFont, fontSize = 20.sp, lineHeight = 26.sp, color = Ink, textAlign = TextAlign.Center)
         if (detail != null) Text(detail, fontSize = 16.sp, lineHeight = 22.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
         if (actionLabel != null && onAction != null) SaharaPrimaryButton(actionLabel, onAction, tone = tone)
@@ -455,17 +682,29 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
  */
 @Composable fun Modifier.saharaScreenEnter(): Modifier {
     if (!SaharaMotion.enabled) return this
+    // A screen a [SaharaScreenHost] is already fading in gets no second fade or rise (decided once, when it first composes).
+    val hostEntering = LocalSaharaHostEntering.current
+    val skip = remember { hostEntering() }
+    if (skip) return this
     val progress = remember { Animatable(0f) }
     LaunchedEffect(Unit) { progress.animateTo(1f, SaharaMotion.tween(SaharaMotion.SCREEN_MS, easing = SaharaMotion.Emphasized)) }
-    return graphicsLayer { val p = progress.value; alpha = p; translationY = (1f - p) * 12.dp.toPx() }
+    return graphicsLayer { val p = progress.value; alpha = p; translationY = (1f - p) * 12.dp.toPx(); compositingStrategy = CompositingStrategy.ModulateAlpha }
 }
+
+/**
+ * The warm, layered shadow for the few floating surfaces (the brand mark, empty-state discs, the success tick): a soft wide
+ * shadow plus a tight contact one, in [SaharaColors.Shadow]. Put it before clip/background in the chain. Draw-only.
+ */
+fun Modifier.saharaFloatShadow(shape: Shape): Modifier = this
+    .dropShadow(shape, androidx.compose.ui.graphics.shadow.Shadow(24.dp, SaharaColors.Shadow, 0.dp, DpOffset(0.dp, 8.dp), 0.10f))
+    .dropShadow(shape, androidx.compose.ui.graphics.shadow.Shadow(3.dp, SaharaColors.Shadow, 0.dp, DpOffset(0.dp, 1.dp), 0.08f))
 
 /** Success tick: a filled circle that pops in with its check (180 ms, no bounce). Static when motion is off. */
 @Composable fun SaharaSuccessTick(modifier: Modifier = Modifier, size: Int = 56, tone: SaharaTone = SaharaTone.Success, description: String? = null) {
     val shown = remember { MutableTransitionState(!SaharaMotion.enabled).apply { targetState = true } }
     Box(modifier.size(size.dp).semantics { if (description != null) contentDescription = description }, contentAlignment = Alignment.Center) {
         AnimatedVisibility(shown, enter = fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)) + scaleIn(SaharaMotion.tween(SaharaMotion.SAVED_MS + 60, easing = SaharaMotion.Emphasized), initialScale = .6f)) {
-            Box(Modifier.size(size.dp).shadow(3.dp, CircleShape).clip(CircleShape).background(tone.solid).testTag("sahara-success-tick"), contentAlignment = Alignment.Center) {
+            Box(Modifier.size(size.dp).saharaFloatShadow(CircleShape).clip(CircleShape).background(tone.solid).testTag("sahara-success-tick"), contentAlignment = Alignment.Center) {
                 Icon(Icons.Default.Check, null, Modifier.size((size * .58f).dp), tint = tone.onSolid)
             }
         }
@@ -477,8 +716,9 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
     val m = modifier.fillMaxWidth().height(8.dp).clip(CircleShape).semantics { if (label != null) { contentDescription = label; liveRegion = LiveRegionMode.Polite } }
     if (progress == null) LinearProgressIndicator(m, color = tone.solid, trackColor = tone.wash)
     else {
-        val shown = saharaFill(progress)
-        LinearProgressIndicator(progress = { shown }, modifier = m, color = tone.solid, trackColor = tone.wash, drawStopIndicator = {})
+        // Read in the indicator's draw lambda, so the glide never recomposes the bar.
+        val shown = saharaFillState(progress)
+        LinearProgressIndicator(progress = { shown.value }, modifier = m, color = tone.solid, trackColor = tone.wash, drawStopIndicator = {})
     }
 }
 
@@ -499,9 +739,9 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
     if (!run) return this
     val progress = remember { Animatable(0f) }
     LaunchedEffect(Unit) {
-        progress.animateTo(1f, SaharaMotion.tween(SaharaMotion.LIST_ITEM_MS, index.coerceIn(0, SaharaMotion.STAGGER_CAP) * SaharaMotion.STAGGER_STEP_MS, LinearOutSlowInEasing))
+        progress.animateTo(1f, SaharaMotion.tween(SaharaMotion.LIST_ITEM_MS, index.coerceIn(0, SaharaMotion.STAGGER_CAP) * SaharaMotion.STAGGER_STEP_MS, SaharaMotion.EmphasizedDecelerate))
     }
-    return graphicsLayer { val p = progress.value; alpha = p; translationY = (1f - p) * 10.dp.toPx() }
+    return graphicsLayer { val p = progress.value; alpha = p; translationY = (1f - p) * 10.dp.toPx(); compositingStrategy = CompositingStrategy.ModulateAlpha }
 }
 
 /** Gentle idle bob for an icon or illustration: up [amplitude] and back over [SaharaMotion.FLOAT_MS], [cycles] times, then rest. */
@@ -515,7 +755,7 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
             p.animateTo(0f, androidx.compose.animation.core.tween(SaharaMotion.FLOAT_MS / 2, easing = FastOutSlowInEasing))
         }
     }
-    return graphicsLayer { translationY = -p.value * amplitude.toPx() }
+    return preferredFrameRate(60f).graphicsLayer { translationY = -p.value * amplitude.toPx() }
 }
 
 /**
@@ -543,20 +783,30 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
     }
 }
 
-/** A small attention nudge: a quick side-to-side tilt once, [delayMs] after it appears and again whenever [trigger] changes. */
+/**
+ * A small attention nudge: one soft, eased tilt each way that settles upright (about half a second), [delayMs] after it
+ * appears and again whenever [trigger] changes. Gentle on purpose: a fast shake reads as an error.
+ */
 @Composable fun Modifier.saharaWiggleOnce(trigger: Any? = Unit, delayMs: Long = 800): Modifier {
     if (!SaharaMotion.enabled) return this
     val angle = remember { Animatable(0f) }
     LaunchedEffect(trigger) {
         delay(delayMs)
         if (!SaharaMotion.enabled) return@LaunchedEffect
-        listOf(-5f, 5f, -3.5f, 3.5f, -1.5f, 0f).forEach { angle.animateTo(it, androidx.compose.animation.core.tween(70, easing = LinearEasing)) }
+        angle.animateTo(0f, keyframes {
+            durationMillis = 520
+            -3f at 90 using SaharaMotion.Emphasized
+            3f at 230 using SaharaMotion.Emphasized
+            -1.5f at 360 using SaharaMotion.Emphasized
+            0f at 520 using SaharaMotion.Emphasized
+        })
     }
     return graphicsLayer { rotationZ = angle.value }
 }
 
 /**
- * Press bounce for tiles and big buttons: shrinks to 94% while a finger is down and springs back with a small overshoot.
+ * Press feedback for tiles and big buttons without their own interaction source: settles to the app's one press depth
+ * ([SAHARA_PRESS_SCALE]) while a finger is down and springs back calmly (no overshoot).
  * It only watches the touch (never consumes it), so the element's own click, ripple and scrolling work as before;
  * moving past touch slop (a scroll) releases it at once.
  */
@@ -567,13 +817,13 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
     return pointerInput(Unit) {
         awaitEachGesture {
             val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
-            scope.launch { scale.animateTo(.94f, androidx.compose.animation.core.tween(SaharaMotion.PRESS_MS)) }
+            scope.launch { scale.animateTo(SAHARA_PRESS_SCALE, SaharaSprings.fastSpatial()) }
             val slop = viewConfiguration.touchSlop
             while (true) {
                 val change = awaitPointerEvent(PointerEventPass.Initial).changes.firstOrNull { it.id == down.id } ?: break
                 if (!change.pressed || (change.position - down.position).getDistance() > slop) break
             }
-            scope.launch { scale.animateTo(1f, spring(dampingRatio = .45f, stiffness = Spring.StiffnessMediumLow)) }
+            scope.launch { scale.animateTo(1f, SaharaSprings.spatial()) }
         }
     }.graphicsLayer { scaleX = scale.value; scaleY = scale.value }
 }
@@ -583,20 +833,28 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
     val shown = remember { Animatable(if (SaharaMotion.enabled) 0f else target.toFloat()) }
     LaunchedEffect(target) {
         if (!SaharaMotion.enabled) shown.snapTo(target.toFloat())
-        else shown.animateTo(target.toFloat(), androidx.compose.animation.core.tween(SaharaMotion.COUNT_MS, easing = SaharaMotion.Emphasized))
+        // Critically damped: never counts past the target, and a new value mid-count carries on smoothly.
+        else shown.animateTo(target.toFloat(), spring(1f, 200f, .5f))
     }
     return shown.value.roundToInt()
 }
 
 /** A progress fraction (0..1) that fills up from empty when first shown and glides to each new value. */
-@Composable fun saharaFill(target: Float): Float {
+@Composable fun saharaFill(target: Float): Float = saharaFillState(target).value
+
+/**
+ * The same fill as [saharaFill], as state: read `.value` inside a draw or progress lambda (e.g. LinearProgressIndicator's
+ * `progress = { fill.value }`) so the glide redraws without recomposing.
+ */
+@Composable fun saharaFillState(target: Float): State<Float> {
     val goal = target.coerceIn(0f, 1f)
     val shown = remember { Animatable(if (SaharaMotion.enabled) 0f else goal) }
     LaunchedEffect(goal) {
         if (!SaharaMotion.enabled) shown.snapTo(goal)
-        else shown.animateTo(goal, androidx.compose.animation.core.tween(SaharaMotion.FILL_MS, easing = SaharaMotion.Emphasized))
+        // Critically damped spring: never overfills, and ticking two doses in a row retargets without a hitch.
+        else shown.animateTo(goal, spring(1f, 300f, 1f / 1000f))
     }
-    return shown.value
+    return shown.asState()
 }
 
 /** Charts and graphs: drawn in from the start edge once, when first shown. */
@@ -611,7 +869,7 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
     }
 }
 
-/** A small celebration on a tap (a hug, a like): springs in from 80% each time [trigger] changes to a value other than false/null (not on first show). */
+/** A small celebration on a tap (a hug, a like): settles in from 90% with one soft spring each time [trigger] changes to a value other than false/null (not on first show). */
 @Composable fun Modifier.saharaPop(trigger: Any?): Modifier {
     if (!SaharaMotion.enabled) return this
     val scale = remember { Animatable(1f) }
@@ -619,20 +877,20 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
     LaunchedEffect(trigger) {
         if (first) { first = false; return@LaunchedEffect }
         if (trigger == null || trigger == false) return@LaunchedEffect
-        scale.snapTo(.8f); scale.animateTo(1f, spring(dampingRatio = .35f, stiffness = Spring.StiffnessMedium))
+        scale.snapTo(.9f); scale.animateTo(1f, SaharaSprings.gentle())
     }
     return graphicsLayer { scaleX = scale.value; scaleY = scale.value }
 }
 
-/** Map pins and result markers: drop in from above with one small bounce, staggered by [index]. */
+/** Map pins and result markers: drop in from above and settle softly, staggered by [index]. */
 @Composable fun Modifier.saharaDropIn(index: Int = 0): Modifier {
     if (!SaharaMotion.enabled) return this
     val p = remember { Animatable(0f) }
     LaunchedEffect(Unit) {
         delay(index.coerceIn(0, SaharaMotion.STAGGER_CAP) * 40L)
-        p.animateTo(1f, spring(dampingRatio = .5f, stiffness = Spring.StiffnessMediumLow))
+        p.animateTo(1f, SaharaSprings.gentle())
     }
-    return graphicsLayer { val v = p.value; alpha = v.coerceIn(0f, 1f); translationY = (1f - v) * -14.dp.toPx() }
+    return graphicsLayer { val v = p.value; alpha = v.coerceIn(0f, 1f); translationY = (1f - v) * -14.dp.toPx(); compositingStrategy = CompositingStrategy.ModulateAlpha }
 }
 
 /** Dialog content arriving: a quick scale-up from 92% with a fade. */
@@ -640,7 +898,7 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
     if (!SaharaMotion.enabled) return this
     val p = remember { Animatable(0f) }
     LaunchedEffect(Unit) { p.animateTo(1f, androidx.compose.animation.core.tween(SaharaMotion.ENTER_MS - 60, easing = SaharaMotion.Emphasized)) }
-    return graphicsLayer { val v = p.value; alpha = v; val s = .92f + .08f * v; scaleX = s; scaleY = s }
+    return graphicsLayer { val v = p.value; alpha = v; val s = .92f + .08f * v; scaleX = s; scaleY = s; compositingStrategy = CompositingStrategy.ModulateAlpha }
 }
 
 /** Snackbars, banners and inline results: slide up 16 dp (or down, when [fromTop]) and fade in once. */
@@ -648,7 +906,7 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
     if (!SaharaMotion.enabled) return this
     val p = remember { Animatable(0f) }
     LaunchedEffect(Unit) { p.animateTo(1f, androidx.compose.animation.core.tween(SaharaMotion.ENTER_MS, easing = SaharaMotion.Emphasized)) }
-    return graphicsLayer { val v = p.value; alpha = v; translationY = (1f - v) * (if (fromTop) -16 else 16).dp.toPx() }
+    return graphicsLayer { val v = p.value; alpha = v; translationY = (1f - v) * (if (fromTop) -16 else 16).dp.toPx(); compositingStrategy = CompositingStrategy.ModulateAlpha }
 }
 
 /**
@@ -657,15 +915,18 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
  */
 @Composable fun Modifier.saharaNavIndicator(index: Int, count: Int, color: Color = SaharaColors.Primary, gap: Dp = 0.dp, width: Dp = 32.dp): Modifier {
     if (count <= 0) return this
-    val x by animateFloatAsState(index.coerceAtLeast(0).toFloat(), SaharaMotion.tween(SaharaMotion.ENTER_MS, easing = SaharaMotion.Emphasized), label = "navIndicatorX")
-    val shown by animateFloatAsState(if (index in 0 until count) 1f else 0f, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "navIndicatorAlpha")
+    // Springs (no overshoot) so a quick second tab tap retargets the marker mid-slide without restarting from rest.
+    // Kept as State and read only in the draw block, so the slide redraws without recomposing the row.
+    val x = animateFloatAsState(index.coerceAtLeast(0).toFloat(), SaharaSprings.spatial(), label = "navIndicatorX")
+    val shownState = animateFloatAsState(if (index in 0 until count) 1f else 0f, SaharaSprings.effects(), label = "navIndicatorAlpha")
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     return drawWithContent {
         drawContent()
+        val shown = shownState.value
         if (shown <= 0f) return@drawWithContent
         val g = gap.toPx(); val cell = (size.width + g) / count
         val bar = width.toPx().coerceAtMost(cell - g); val h = 3.dp.toPx()
-        val center = cell * x + (cell - g) / 2f
+        val center = cell * x.value + (cell - g) / 2f
         val left = if (rtl) size.width - center - bar / 2f else center - bar / 2f
         drawRoundRect(color.copy(alpha = color.alpha * shown), topLeft = Offset(left, 0f), size = Size(bar, h), cornerRadius = CornerRadius(h / 2f))
     }
@@ -681,30 +942,36 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
  * A light confirming tap of the phone's vibration for a real save (a dose ticked, a mood chosen). Uses the system haptic
  * constants, so it follows the phone's own "Touch feedback" setting and does nothing where that is off.
  */
+/** The phone's light key-tap feel on a button or tile press (follows the phone's "Touch feedback" setting), like system apps. */
+@Composable fun rememberSaharaTick(): () -> Unit {
+    val haptic = LocalHapticFeedback.current
+    return remember(haptic) { { runCatching { haptic.performHapticFeedback(HapticFeedbackType.KeyboardTap) }; Unit } }
+}
+
+/** Confirm haptic for a real save; Compose's semantic type picks the right effect (and fallback) for each Android version. */
 @Composable fun rememberSaharaHaptic(): () -> Unit {
-    val view = androidx.compose.ui.platform.LocalView.current
-    return remember(view) {
-        val tap: () -> Unit = {
-            val kind = if (android.os.Build.VERSION.SDK_INT >= 30) android.view.HapticFeedbackConstants.CONFIRM else android.view.HapticFeedbackConstants.VIRTUAL_KEY
-            runCatching { view.performHapticFeedback(kind) }
-            Unit
-        }
-        tap
-    }
+    val haptic = LocalHapticFeedback.current
+    return remember(haptic) { { runCatching { haptic.performHapticFeedback(HapticFeedbackType.Confirm) }; Unit } }
+}
+
+/** Reject haptic for something that could not be done (a failed save, a blocked action). Follows the phone's Touch feedback setting. */
+@Composable fun rememberSaharaReject(): () -> Unit {
+    val haptic = LocalHapticFeedback.current
+    return remember(haptic) { { runCatching { haptic.performHapticFeedback(HapticFeedbackType.Reject) }; Unit } }
 }
 
 /**
- * A chosen thing answers back: when [selected] turns true (not on first show) it swells about [amount] and springs back
- * with one soft bounce. For mood faces and similar one-of-many choices.
+ * A chosen thing answers back: when [selected] turns true (not on first show) it swells about [amount] and settles back
+ * with one soft spring. For mood faces and similar one-of-many choices.
  */
-@Composable fun Modifier.saharaSelectBounce(selected: Boolean, amount: Float = .16f): Modifier {
+@Composable fun Modifier.saharaSelectBounce(selected: Boolean, amount: Float = .08f): Modifier {
     if (!SaharaMotion.enabled) return this
     val scale = remember { Animatable(1f) }
     var last by remember { mutableStateOf(selected) }
     LaunchedEffect(selected) {
         if (selected && !last && SaharaMotion.enabled) {
-            scale.animateTo(1f + amount, androidx.compose.animation.core.tween(120, easing = FastOutSlowInEasing))
-            scale.animateTo(1f, spring(dampingRatio = .4f, stiffness = Spring.StiffnessMediumLow))
+            scale.animateTo(1f + amount, SaharaSprings.fastSpatial())
+            scale.animateTo(1f, SaharaSprings.gentle())
         }
         last = selected
     }
@@ -713,7 +980,7 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
 
 /**
  * A soft bloom when something is completed: as [done] turns true (not on first show), a ring in [color] spreads out from
- * the element's edge and fades, and the element itself pops from 94% with a gentle spring. [corner] matches its shape.
+ * the element's edge and fades, and the element itself settles from 97% with a gentle spring. [corner] matches its shape.
  */
 @Composable fun Modifier.saharaBloom(done: Boolean, color: Color = SaharaColors.Primary, corner: Dp = SaharaRadius.Lg): Modifier {
     if (!SaharaMotion.enabled) return this
@@ -722,7 +989,7 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
     var last by remember { mutableStateOf(done) }
     LaunchedEffect(done) {
         if (done && !last && SaharaMotion.enabled) {
-            launch { pop.snapTo(.94f); pop.animateTo(1f, spring(dampingRatio = .45f, stiffness = Spring.StiffnessMediumLow)) }
+            launch { pop.snapTo(.97f); pop.animateTo(1f, SaharaSprings.gentle()) }
             ring.snapTo(0f); ring.animateTo(1f, androidx.compose.animation.core.tween(SaharaMotion.GLOW_MS - 400, easing = LinearOutSlowInEasing)); ring.snapTo(0f)
         }
         last = done
@@ -746,7 +1013,8 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
     val level = remember { Animatable(if (filled) 1f else 0f) }
     LaunchedEffect(filled) {
         val goal = if (filled) 1f else 0f
-        if (!SaharaMotion.enabled) level.snapTo(goal) else level.animateTo(goal, androidx.compose.animation.core.tween(SaharaMotion.FILL_MS, easing = SaharaMotion.Emphasized))
+        // Critically damped spring: an undo mid-rise reverses smoothly instead of restarting from rest.
+        if (!SaharaMotion.enabled) level.snapTo(goal) else level.animateTo(goal, spring(1f, 300f, 1f / 1000f))
     }
     return drawWithContent {
         drawContent()
@@ -771,7 +1039,7 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
             angle.animateTo(0f, androidx.compose.animation.core.tween(SaharaMotion.FLOAT_MS / 2, easing = FastOutSlowInEasing))
         }
     }
-    return graphicsLayer { rotationZ = angle.value }
+    return preferredFrameRate(60f).graphicsLayer { rotationZ = angle.value }
 }
 
 /**
@@ -802,4 +1070,14 @@ val LocalSaharaStagger = staticCompositionLocalOf<SaharaStagger?> { null }
         shown = true; delay(showMs); shown = false
     }
     if (shown) content()
+}
+
+/**
+ * List state for Sahara's long LazyColumns: composes half a screen ahead (and a quarter behind) while scrolling, so tall care
+ * cards are ready before they slide into view instead of being built mid-fling.
+ */
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+@Composable fun rememberSaharaListState(initialIndex: Int = 0): androidx.compose.foundation.lazy.LazyListState {
+    val window = remember { androidx.compose.foundation.lazy.layout.LazyLayoutCacheWindow(0.5f, 0.25f) }
+    return androidx.compose.foundation.lazy.rememberLazyListState(window, initialIndex)
 }

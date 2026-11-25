@@ -3,7 +3,7 @@ package `in`.wedevit.care
 
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -51,28 +51,32 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
     var editing by remember { mutableStateOf<CareItem?>(null) }
     var addingDay by rememberSaveable(selected) { mutableStateOf(false) }
     var editingDay by remember { mutableStateOf<TreatmentDay?>(null) }
-    val treatmentDays = TreatmentDayRules.days(entries, selected)
-    val groups = labGroups(entries.filter { it.personId == selected && it.title.contains(query.trim(), ignoreCase = true) })
+    // Grouping and sorting the history runs when the results or the search change, not on every recomposition.
+    val treatmentDays = remember(entries, selected) { TreatmentDayRules.days(entries, selected) }
+    val groups = remember(entries, selected, query) { labGroups(entries.filter { it.personId == selected && it.title.contains(query.trim(), ignoreCase = true) }) }
     val groupsShown = rememberShownCount("$selected:$query")
     LazyColumn(Modifier.fillMaxSize().testTag("lab-history"), contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         // The info-blue Labs band; Add sits on it as a white round button.
         item { SaharaSectionBand(t("Lab history", "जाँच रिपोर्टें"), SaharaSection.Labs, onBack = onBack, backTag = "labs-back") { if (canEdit) FilledTonalIconButton(onClick = { adding = true }, modifier = Modifier.size(48.dp), colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = Paper, contentColor = SaharaSection.Labs.ink)) { Icon(Icons.Default.Add, t("Add a lab result", "जाँच का नतीजा जोड़ें")) } } }
         item { OutlinedTextField(query, { query = it }, placeholder = { Text(t("Find a test", "जाँच खोजें")) }, leadingIcon = { Icon(Icons.Default.Search, null) }, trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { query = "" }) { Icon(Icons.Default.Close, t("Clear search", "खोज मिटाएँ")) } }, singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) }
-        if (groups.isEmpty()) item { SurfaceCard(SaharaSection.Labs.wash) { SaharaIconChip(Icons.Default.Science, SaharaSection.Labs, size = 52); Spacer(Modifier.height(12.dp)); Text(if (query.isBlank()) t("No results yet", "अभी कोई नतीजा नहीं") else t("No matching results", "कोई नतीजा नहीं मिला"), fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk); if (query.isBlank()) { if (canEdit) TextButton(onClick = { adding = true }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Add a result", "नतीजा जोड़ें")) } } else TextButton(onClick = { query = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Clear search", "खोज मिटाएँ")) } } }
+        if (groups.isEmpty()) item(key = "labs-empty", contentType = "empty") { Box(Modifier.animateItem()) { SurfaceCard(SaharaSection.Labs.wash) { SaharaIconChip(Icons.Default.Science, SaharaSection.Labs, size = 52); Spacer(Modifier.height(12.dp)); Text(if (query.isBlank()) t("No results yet", "अभी कोई नतीजा नहीं") else t("No matching results", "कोई नतीजा नहीं मिला"), fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk); if (query.isBlank()) { if (canEdit) TextButton(onClick = { adding = true }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Add a result", "नतीजा जोड़ें")) } } else TextButton(onClick = { query = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Clear search", "खोज मिटाएँ")) } } } }
         cappedItems(groups, groupsShown, key = { values -> "${values.first().first.title.lowercase()}:${values.first().second.unit}" }, tag = "lab-groups") { values -> Box(Modifier.animateItem()) { LabHistoryCard(vm, values, treatmentDays, onEdit = { editing = it }) } }
         // Results first; treatment days, which only mark the charts, come after them.
-        item(key = "treatment-days") { SurfaceCard {
+        item(key = "treatment-days", contentType = "treatment-days") { Box(Modifier.animateItem()) { SurfaceCard {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 SaharaIconChip(Icons.Default.Event, SaharaSection.Visits, size = 36)
                 Spacer(Modifier.width(12.dp))
                 Text(t("Treatment days", "इलाज के दिन"), Modifier.weight(1f).a11yHeading(), fontWeight = FontWeight.Bold, fontFamily = SaharaTitleFont, fontSize = 18.sp, color = DoctorCardInk)
             }
-            treatmentDays.take(6).forEach { day -> Row(Modifier.fillMaxWidth().then(if (canEdit) Modifier.clickable { editingDay = day } else Modifier).heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
+            // Newest treatment days first, capped like every history (Show older adds more).
+            val daysShown = rememberShownCount(selected, initial = 6)
+            treatmentDays.shownOf(daysShown, initial = 6).forEach { day -> Row(Modifier.fillMaxWidth().then(if (canEdit) Modifier.clickable { editingDay = day } else Modifier).heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text("${date(day.item.due)} · ${TreatmentDayRules.label(day.category)}", Modifier.weight(1f), color = if (day.category == "Chemotherapy") DoctorStatusWarn else DoctorCardInk)
                 if (canEdit) Icon(Icons.Default.Edit, t("Edit ${day.category} day ${date(day.item.due)}", "${date(day.item.due)} का दिन बदलें"), Modifier.size(18.dp), tint = DoctorCardSub)
             } }
+            SaharaShowOlder(treatmentDays.size, daysShown, initial = 6, tag = "treatment-days")
             if (canEdit) TextButton(onClick = { addingDay = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("add-treatment-day")) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Add a treatment day", "इलाज का दिन जोड़ें")) }
-        } }
+        } } }
     }
     if (adding) CareLabEditor(vm) { adding = false }
     editing?.let { item -> CareLabEditor(vm, item) { editing = null } }
@@ -93,7 +97,7 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
     val arrow = when (trend) { 1 -> "↑"; -1 -> "↓"; 0 -> "→"; else -> "" }
     val arrowWords = when (trend) { 1 -> t("Higher than last time", "पिछली बार से ज़्यादा"); -1 -> t("Lower than last time", "पिछली बार से कम"); 0 -> t("Same as last time", "पिछली बार जितना"); else -> "" }
     val shape = RoundedCornerShape(16.dp)
-    Surface(shape = shape, color = SaharaSection.Labs.wash, border = androidx.compose.foundation.BorderStroke(1.dp, if (open) SaharaSection.Labs.solid else DoctorHairline), modifier = Modifier.fillMaxWidth().animateContentSize()) {
+    Surface(shape = shape, color = SaharaSection.Labs.wash, border = androidx.compose.foundation.BorderStroke(1.dp, if (open) SaharaSection.Labs.solid else DoctorHairline), modifier = Modifier.fillMaxWidth()) {
         Column {
             Row(Modifier.fillMaxWidth().heightIn(min = 64.dp).clickable(role = androidx.compose.ui.semantics.Role.Button) { open = !open }.padding(horizontal = 14.dp, vertical = 10.dp).testTag("lab-test-$key"),
                 verticalAlignment = Alignment.CenterVertically) {
@@ -111,13 +115,14 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
                 LabPill(if (values.size == 1) t("1 result", "1 नतीजा") else t("${values.size} results", "${values.size} नतीजे"), Paper, SaharaSection.Labs.ink)
                 SaharaChevron(open, if (open) t("Hide details", "जानकारी छिपाएँ") else t("Show details", "जानकारी देखें"))
             }
-            if (open) Column(Modifier.fillMaxWidth().padding(start = 14.dp, end = 14.dp, bottom = 12.dp).testTag("lab-test-$key-open")) {
+            // Only the details slide open on a tap; the card itself never animates its size (24 Nov: "cards keep expanding").
+            AnimatedVisibility(open, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) { Column(Modifier.fillMaxWidth().padding(start = 14.dp, end = 14.dp, bottom = 12.dp).testTag("lab-test-$key-open")) {
                 if (values.size > 1) LabHistoryPlot(values, treatmentDays)
                 // The newest three results; the rest wait behind "Show older" so one test never fills the screen (24 Nov).
                 val resultsShown = rememberShownCount(latest.first.id, initial = 3)
                 values.shownOf(resultsShown, initial = 3).forEach { (item, data) -> LabResultRow(vm, item, data, showDate = true, onEdit = { onEdit(item) }) }
                 SaharaShowOlder(values.size, resultsShown, initial = 3, tag = "lab-results")
-            }
+            } }
         }
     }
 }
@@ -134,10 +139,10 @@ private fun labRange(data: CareEntry): Pair<Double?, Double?> {
 
 @Composable private fun LabHistoryPlot(values: List<Pair<CareItem, CareEntry>>, treatmentDays: List<TreatmentDay>) { val t = careText();
     // oldest first; sortedBy is stable so results sharing a day stay in recorded order
-    val all = values.reversed().mapNotNull { (item, entry) -> entry.value.toDoubleOrNull()?.takeIf { it.isFinite() }?.let { labEpoch(item).toDouble() to it } }.sortedBy { it.first }
+    val all = remember(values) { values.reversed().mapNotNull { (item, entry) -> entry.value.toDoubleOrNull()?.takeIf { it.isFinite() }?.let { labEpoch(item).toDouble() to it } }.sortedBy { it.first } }
     if (all.size < 2) return
-    val now = System.currentTimeMillis()
-    val chartPoints = all.map { ChartPoint(it.first, it.second) }
+    val now = remember(values) { System.currentTimeMillis() }
+    val chartPoints = remember(all) { all.map { ChartPoint(it.first, it.second) } }
     var rangeName by rememberSaveable(values.first().first.id) { mutableStateOf(ChartRange.ALL.name) }
     val range = ChartRange.valueOf(rangeName).takeIf { it in ChartRangeRules.choices(chartPoints, now) } ?: ChartRange.ALL
     // What the chosen range shows: the y axis, the change line and the treatment-day list follow it.
@@ -196,7 +201,7 @@ private fun labRange(data: CareEntry): Pair<Double?, Double?> {
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     val busy by vm.busy.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val report = reports.firstOrNull { it.id == data.reportId && it.personId == item.personId }
+    val report = remember(reports, data.reportId, item.personId) { reports.firstOrNull { it.id == data.reportId && it.personId == item.personId } }
     var openFailed by remember { mutableStateOf(false) }
     if (openFailed) SaharaDialog(t("Couldn't open this report.", "यह रिपोर्ट नहीं खुल सकी।"), onDismiss = { openFailed = false }, tone = SaharaTone.Error)
     HorizontalDivider(Modifier.padding(top = 12.dp, bottom = 8.dp), color = DoctorHairline)
@@ -223,7 +228,8 @@ private fun labRange(data: CareEntry): Pair<Double?, Double?> {
     val saveError by vm.actionError.collectAsStateWithLifecycle()
     val captured = remember { selected }
     val entryId = rememberSaveable { initial?.id ?: newId() }
-    val existing = initial?.let { CareEntryCodec.decode(it.detail) }
+    val existing = remember(initial) { initial?.let { CareEntryCodec.decode(it.detail) } }
+    val haptic = rememberSaharaHaptic(); val tick = rememberSaharaTick()
     var name by rememberSaveable { mutableStateOf(initial?.title.orEmpty()) }
     var value by rememberSaveable { mutableStateOf(existing?.value.orEmpty()) }
     var unit by rememberSaveable { mutableStateOf(existing?.unit.orEmpty()) }
@@ -242,7 +248,8 @@ private fun labRange(data: CareEntry): Pair<Double?, Double?> {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 16.dp, end = 16.dp, bottom = 32.dp).testTag("lab-editor"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Heading(if (initial == null) t("Add a lab result", "जाँच का नतीजा जोड़ें") else t("Edit lab result", "जाँच का नतीजा बदलें"), 26)
             OutlinedTextField(name, { name = it; error = "" }, label = { Text(t("Test name on report", "रिपोर्ट पर जाँच का नाम")) }, modifier = Modifier.fillMaxWidth(), singleLine = true, shape = RoundedCornerShape(14.dp))
-            if (name.isBlank()) Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) { listOf("Haemoglobin", "Red blood cells", "Platelets", "Creatinine", "Sodium").forEach { suggestion -> SuggestionChip(onClick = { name = suggestion }, label = { Text(suggestion) }, shape = RoundedCornerShape(50)) } }
+            // The suggestions fold away once a name is typed, instead of vanishing.
+            AnimatedVisibility(name.isBlank(), enter = SaharaMotion.expand, exit = SaharaMotion.collapse) { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) { listOf("Haemoglobin", "Red blood cells", "Platelets", "Creatinine", "Sodium").forEach { suggestion -> SuggestionChip(onClick = { tick(); name = suggestion }, label = { Text(suggestion) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp)) } } }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(value, { value = it; error = "" }, label = { Text(t("Value", "मान")) }, modifier = Modifier.weight(1f), singleLine = true, shape = RoundedCornerShape(14.dp), keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal))
                 OutlinedTextField(unit, { unit = it; error = "" }, label = { Text(t("Printed unit", "छपी इकाई")) }, modifier = Modifier.weight(1f), singleLine = true, shape = RoundedCornerShape(14.dp))
@@ -257,21 +264,24 @@ private fun labRange(data: CareEntry): Pair<Double?, Double?> {
                 OutlinedTextField(rangeText, { rangeText = it }, label = { Text(t("Or copy the printed range", "या छपी सीमा लिखें")) }, modifier = Modifier.fillMaxWidth(), maxLines = 2, shape = RoundedCornerShape(14.dp))
                 Text(t("Linked report", "जुड़ी रिपोर्ट"), Modifier.padding(top = 8.dp), style = MaterialTheme.typography.labelLarge, color = DoctorCardSub)
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    FilterChip(selected = reportId.isBlank(), onClick = { reportId = ""; reportName = "" }, label = { Text(t("No report link", "रिपोर्ट नहीं जोड़ी")) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp))
-                    reports.filter { it.personId == captured }.forEach { report ->
-                        FilterChip(selected = reportId == report.id, onClick = { reportId = report.id; reportName = report.name }, label = { Text(report.name, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp))
+                    RecordsChip(selected = reportId.isBlank(), onClick = { reportId = ""; reportName = "" }, label = { Text(t("No report link", "रिपोर्ट नहीं जोड़ी")) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp))
+                    remember(reports, captured) { reports.filter { it.personId == captured } }.forEach { report ->
+                        RecordsChip(selected = reportId == report.id, onClick = { reportId = report.id; reportName = report.name }, label = { Text(report.name, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp))
                     }
                 }
                 OutlinedTextField(detail, { detail = it }, label = { Text(t("Report notes (optional)", "रिपोर्ट पर नोट (चाहें तो)")) }, modifier = Modifier.fillMaxWidth(), maxLines = 3, shape = RoundedCornerShape(14.dp))
             }
-            (error.ifBlank { saveError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
+            val shownError = error.ifBlank { saveError.orEmpty() }
+            // The last message stays while it fades out, so the error never just blinks away.
+            val lastError = remember { arrayOf("") }; if (shownError.isNotBlank()) lastError[0] = shownError
+            AnimatedVisibility(shownError.isNotBlank(), enter = SaharaMotion.enter, exit = SaharaMotion.exit) { Text(lastError[0], color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
             Button(onClick = { runCatching {
                 require(selected == captured && canEdit) { t("Choose the right person before saving.", "सहेजने से पहले सही व्यक्ति चुनें।") }
                 val data = CareEntry(type = "lab", detail = detail.trim(), sender = existing?.sender ?: vm.cloud?.session?.value?.email.orEmpty(), value = value.trim(), unit = unit.trim(), rangeLow = low.trim(), rangeHigh = high.trim(), rangeText = rangeText.trim(), reportId = reportId, reportName = reportName)
                 CareLabRules.validate(name, data, due)
                 val encoded = CareEntryCodec.encode(data)
-                if (initial == null) vm.saveItem("task", name, encoded, due, done = onDismiss, id = entryId)
-                else vm.updateItem(initial.copy(title = name, detail = encoded, due = due), onDismiss)
+                if (initial == null) vm.saveItem("task", name, encoded, due, done = { haptic(); onDismiss() }, id = entryId)
+                else vm.updateItem(initial.copy(title = name, detail = encoded, due = due)) { haptic(); onDismiss() }
             }.onFailure { error = it.message.orEmpty() } }, enabled = !busy && canEdit && name.isNotBlank() && value.isNotBlank() && unit.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent)) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Save result", "नतीजा सहेजें"), fontWeight = FontWeight.SemiBold) }
             if (initial != null && canEdit) TextButton(onClick = { remove = true }, enabled = !busy, colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.DeleteOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Remove result", "नतीजा हटाएँ")) }
         }

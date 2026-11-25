@@ -3,8 +3,9 @@ package `in`.wedevit.care
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
@@ -36,6 +37,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -223,7 +228,8 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
         else { role = key; go(if (signedIn) OnboardingStep.Name else OnboardingStep.Account) }
     }
     val close: () -> Unit = { back() }
-    BackHandler(backTarget != null || (step == OnboardingStep.Intro && pager.currentPage > 0)) { back() }
+    // The steps are a plain AnimatedContent (no screen host) and back waits while locked, so a plain BackHandler, without the preview.
+    androidx.activity.compose.BackHandler(backTarget != null || (step == OnboardingStep.Intro && pager.currentPage > 0)) { back() }
     if (walkthroughChooser) PatientWalkthroughChooser(onPick = { walkthroughChooser = false; onPatientWalkthrough(it) }, onDismiss = { walkthroughChooser = false })
 
     val ageError = CarePatientProfileRules.age(age).second
@@ -247,13 +253,22 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
                     OnboardingHero(SaharaLottieKind.Document, SaharaTone.Indigo, compact = true)
                     StepHeading(t("Do you want an account?", "क्या आप खाता बनाना चाहते हैं?"),
                         t("With an account, your records are kept safe if you change phones, and family and doctors can join you.", "खाते के साथ, फ़ोन बदलने पर भी आपके रिकॉर्ड सुरक्षित रहते हैं, और परिवार व डॉक्टर आपसे जुड़ सकते हैं।"))
+                    // The clinic's invite link is the main way in (older-patients doc, point 1): it comes first and largest and opens
+                    // the account form with its invite card on top (ClinicInviteFirst in CareAccount.kt); email and password come second.
+                    OnboardingChoiceCard(OnboardingChoice("invite", t("I have an invite link from my clinic", "मेरे पास क्लिनिक से निमंत्रण लिंक है"),
+                        t("Your nurse or doctor sends it on WhatsApp or SMS.", "आपकी नर्स या डॉक्टर इसे WhatsApp या SMS पर भेजते हैं।"), Icons.Default.Link, SaharaTone.Teal, "welcome-invite-link"),
+                        0, selected = false, enabled = !locked, large = true) {
+                        haptic.performHapticFeedback(HapticFeedbackType.SegmentTick)
+                        if (accountContent == null) onAccount() else go(OnboardingStep.SignUp)
+                    }
+                    Text(t("No invite link?", "निमंत्रण लिंक नहीं है?"), Modifier.padding(top = 4.dp).a11yHeading(), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = SaharaColors.InkSub)
                     val choices = buildList {
                         if (CareEmailAvailability.ready) add(OnboardingChoice("create", t("Create an account", "खाता बनाएँ"), t("Email and password", "ईमेल और पासवर्ड"), Icons.Default.PersonAdd, SaharaTone.Rust, "welcome-create-account"))
                         add(OnboardingChoice("signin", t("I already have an account", "मेरा पहले से खाता है"), t("Sign in", "साइन इन"), Icons.Default.AccountCircle, SaharaTone.Indigo, "welcome-account"))
                         add(OnboardingChoice("local", t("Continue without an account", "बिना खाते के आगे बढ़ें"), t("Your records stay on this phone", "आपके रिकॉर्ड इसी फ़ोन पर रहेंगे"), Icons.Default.PhoneAndroid, SaharaTone.Leaf, "welcome-add-person"))
                     }
                     choices.forEachIndexed { index, choice ->
-                        OnboardingChoiceCard(choice, index, selected = false, enabled = !locked) {
+                        OnboardingChoiceCard(choice, index + 1, selected = false, enabled = !locked, large = false) {
                             haptic.performHapticFeedback(HapticFeedbackType.SegmentTick)
                             when (choice.key) {
                                 "create" -> if (accountContent == null) onAccount() else go(OnboardingStep.SignUp)
@@ -294,8 +309,10 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
                 OnboardingStep.Age -> OnboardingPage {
                     OnboardingHero(SaharaLottieKind.Calendar, SaharaTone.Marigold)
                     StepHeading(if (family) t("How old are they?", "उनकी उम्र क्या है?") else t("How old are you?", "आपकी उम्र क्या है?"), t("Optional", "ज़रूरी नहीं"))
-                    OnboardingField(age, { value -> age = value.filter(Char::isDigit).take(3) }, t("Age in years", "उम्र (साल)"), "onboarding-age",
-                        KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next), error = ageError?.let { t(it.en, it.hi) }) { if (ageError == null) go(OnboardingStep.Illness) }
+                    // By tap, not typing (24 Nov): Simple Mode turns on by itself at 60 and above from this age.
+                    CareAgePicker(age, { picked -> focus.clearFocus(); age = picked }, "onboarding-age", Modifier.fillMaxWidth(), enabled = !locked, large = true)
+                    // The age hint slides in under the picker instead of popping, and out again once it is fixed.
+                    OnboardingShowWhen(ageError, Modifier.fillMaxWidth()) { Text(t(it.en, it.hi), Modifier.fillMaxWidth().announce(), color = RustText, fontSize = 15.sp, textAlign = TextAlign.Center) }
                 }
                 OnboardingStep.Illness -> OnboardingPage {
                     OnboardingHero(SaharaLottieKind.Breathe, SaharaTone.Plum, compact = true)
@@ -316,8 +333,8 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
                         placeholder = t("For example: breast cancer, heart failure", "जैसे: स्तन कैंसर, हृदय की कमज़ोरी"), autoFocus = false, focusRequester = illnessFocus) { focus.clearFocus() }
                     // Since when, by tap (24 Nov clinical meeting): Months or Years, then a number from 1 to 12. Nothing to type.
                     Text(t("Since when", "कब से"), Modifier.fillMaxWidth().padding(top = 4.dp), fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = SaharaColors.Ink)
+                    // The picker gives its own key-tap feel on each tap.
                     CareDurationPicker(illnessSince, { picked ->
-                        haptic.performHapticFeedback(HapticFeedbackType.SegmentTick)
                         focus.clearFocus()
                         illnessSince = picked
                     }, "onboarding-illness-since", Modifier.fillMaxWidth(), enabled = !locked, unitHeight = 56.dp)
@@ -331,7 +348,7 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
                     OnboardingField(doctorPlace, { doctorPlace = it.take(120) }, t("Hospital or clinic", "अस्पताल या क्लिनिक"), "onboarding-doctor-place",
                         KeyboardOptions(capitalization = KeyboardCapitalization.Words, keyboardType = KeyboardType.Text, imeAction = ImeAction.Next), autoFocus = false) { runCatching { phoneFocus.requestFocus() } }
                     // Country code by tap (India first), the number on the phone keyboard; the hospital's landline is optional beside it.
-                    CarePhoneField(doctorPhone, { doctorPhone = it }, t("Doctor's phone", "डॉक्टर का फ़ोन"), "onboarding-doctor-phone", Modifier.fillMaxWidth(),
+                    CarePhoneField(doctorPhone, { doctorPhone = it }, t("Contact number (doctor or hospital)", "संपर्क नंबर (डॉक्टर या अस्पताल)"), "onboarding-doctor-phone", Modifier.fillMaxWidth(),
                         large = true, container = SaharaColors.Surface, enabled = !locked, imeAction = ImeAction.Next, focusRequester = phoneFocus) { runCatching { landlineFocus.requestFocus() } }
                     CarePhoneField(doctorLandline, { doctorLandline = it }, t("Hospital / landline number (optional)", "अस्पताल / लैंडलाइन नंबर (ज़रूरी नहीं)"), "onboarding-doctor-landline", Modifier.fillMaxWidth(),
                         large = true, container = SaharaColors.Surface, enabled = !locked, imeAction = ImeAction.Done, focusRequester = landlineFocus) { go(OnboardingStep.Treatment) }
@@ -418,14 +435,20 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
     val barAlpha by animateFloatAsState(if (progress == null) 0f else 1f, SaharaMotion.tween(SaharaMotion.VALUE_MS), label = "onboarding progress alpha")
     Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.size(56.dp)) {
-            if (canBack) IconButton(onClick = onBack, enabled = enabled, modifier = Modifier.size(56.dp).testTag("welcome-panel-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस"), tint = SaharaColors.Ink) }
+            // Back fades in and out in its fixed slot, so nothing beside it shifts.
+            // Fully qualified: inside this Box (in a Row) the bare name would pick RowScope.AnimatedVisibility and fail to compile.
+            androidx.compose.animation.AnimatedVisibility(canBack, enter = SaharaMotion.enter, exit = SaharaMotion.exit, label = "onboarding back") {
+                IconButton(onClick = onBack, enabled = enabled, modifier = Modifier.size(56.dp).testTag("welcome-panel-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस"), tint = SaharaColors.Ink) }
+            }
         }
         Box(Modifier.weight(1f).padding(horizontal = 8.dp).graphicsLayer { alpha = barAlpha }) {
             SaharaProgressBar(progress ?: 0f, Modifier.testTag("onboarding-progress"), tone = SaharaTone.Rust, label = if (progress == null) null else t("Progress", "प्रगति") + " " + (progress * 100).toInt() + "%")
         }
         Box(Modifier.widthIn(min = 56.dp), contentAlignment = Alignment.CenterEnd) {
-            if (step == OnboardingStep.Intro) TextButton(onClick = onSkip, modifier = Modifier.heightIn(min = 56.dp).testTag("onboarding-skip"), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) {
-                Text(t("Skip", "छोड़ें"), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            androidx.compose.animation.AnimatedVisibility(step == OnboardingStep.Intro, enter = SaharaMotion.enter, exit = SaharaMotion.exit, label = "onboarding skip") {
+                TextButton(onClick = onSkip, modifier = Modifier.heightIn(min = 56.dp).testTag("onboarding-skip"), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) {
+                    Text(t("Skip", "छोड़ें"), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                }
             }
         }
     }
@@ -456,12 +479,22 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
         screenHeight < 700 -> 140.dp
         else -> 176.dp
     }
-    val imeOpen = WindowInsets.ime.getBottom(LocalDensity.current) > 0
-    val shown by animateDpAsState(if (imeOpen) full * .55f else full, SaharaMotion.tween(SaharaMotion.VALUE_MS), label = "onboarding hero")
+    // Only whether the keyboard is open matters here, so the page does not recompose on every frame of the keyboard sliding.
+    val density = LocalDensity.current; val ime = WindowInsets.ime
+    val imeOpen by remember(ime, density) { derivedStateOf { ime.getBottom(density) > 0 } }
+    val fraction = animateFloatAsState(if (imeOpen) .55f else 1f, SaharaMotion.tween(SaharaMotion.VALUE_MS), label = "onboarding hero")
     val once = kind == SaharaLottieKind.Success || kind == SaharaLottieKind.Confetti
-    Box(Modifier.fillMaxWidth().height(shown).then(if (tag != null) Modifier.testTag(tag) else Modifier), contentAlignment = Alignment.Center) {
-        Box(Modifier.size(shown * .94f).clip(CircleShape).background(tone.wash))
-        SaharaLottie(kind, Modifier.size(shown * .8f), loop = kind.loops && !once, iterations = if (once) 1 else 3)
+    // The shrinking is read in layout and drawing only (no recomposition per frame): the slot's height follows the fraction,
+    // and the wash and Lottie keep their full size and scale down from the centre.
+    Box(Modifier.fillMaxWidth().layout { measurable, constraints ->
+        val h = (full.roundToPx() * fraction.value).toInt().coerceAtLeast(0)
+        val placeable = measurable.measure(constraints.copy(minHeight = h, maxHeight = h))
+        layout(placeable.width, h) { placeable.place(0, 0) }
+    }.then(if (tag != null) Modifier.testTag(tag) else Modifier), contentAlignment = Alignment.Center) {
+        Box(Modifier.requiredSize(full).graphicsLayer { scaleX = fraction.value; scaleY = fraction.value }, contentAlignment = Alignment.Center) {
+            Box(Modifier.size(full * .94f).clip(CircleShape).background(tone.wash))
+            SaharaLottie(kind, Modifier.size(full * .8f), loop = kind.loops && !once, iterations = if (once) 1 else 3)
+        }
     }
 }
 
@@ -473,7 +506,8 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
     val tone = choice.tone
     val scale by animateFloatAsState(if (selected) 1.015f else 1f, if (SaharaMotion.enabled) spring(dampingRatio = .55f, stiffness = Spring.StiffnessMediumLow) else snap(), label = "choice select")
     val edge by animateDpAsState(if (selected) 3.dp else 1.5.dp, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "choice edge")
-    Surface(onClick = onClick, enabled = enabled, shape = RoundedCornerShape(SaharaRadius.Xl), color = if (selected) tone.wash else SaharaColors.Surface, contentColor = SaharaColors.Ink,
+    val fill by animateColorAsState(if (selected) tone.wash else SaharaColors.Surface, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "choice fill")
+    Surface(onClick = onClick, enabled = enabled, shape = RoundedCornerShape(SaharaRadius.Xl), color = fill, contentColor = SaharaColors.Ink,
         border = BorderStroke(edge, tone.solid), shadowElevation = if (selected) 3.dp else 1.dp,
         modifier = Modifier.fillMaxWidth().heightIn(min = if (large) 88.dp else 72.dp).saharaStagger(index).saharaPressBounce().graphicsLayer { scaleX = scale; scaleY = scale }
             .semantics { this.selected = selected }.testTag(choice.tag)) {
@@ -533,8 +567,14 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
     Row(Modifier.clearAndSetSemantics { contentDescription = "${current + 1} / $INTRO_PAGES" }.testTag("onboarding-dots"), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
         repeat(INTRO_PAGES) { index ->
             val on = index == current
-            val width by animateDpAsState(if (on) 26.dp else 8.dp, SaharaMotion.tween(SaharaMotion.SELECT_MS + 80, easing = SaharaMotion.Emphasized), label = "dot")
-            Box(Modifier.height(8.dp).width(width).clip(CircleShape).background(if (on) SaharaColors.OnBand else SaharaColors.OnBandSub.copy(alpha = .45f)))
+            val width = animateDpAsState(if (on) 26.dp else 8.dp, SaharaMotion.tween(SaharaMotion.SELECT_MS + 80, easing = SaharaMotion.Emphasized), label = "dot")
+            val color = animateColorAsState(if (on) SaharaColors.OnBand else SaharaColors.OnBandSub.copy(alpha = .45f), SaharaMotion.tween(SaharaMotion.SELECT_MS + 80), label = "dot colour")
+            // The stretch and colour are read in layout and drawing only, so swiping the pages does not recompose the dots.
+            Box(Modifier.layout { measurable, _ ->
+                val w = width.value.roundToPx(); val h = 8.dp.roundToPx()
+                val placeable = measurable.measure(Constraints.fixed(w, h))
+                layout(w, h) { placeable.place(0, 0) }
+            }.drawBehind { drawRoundRect(color.value, cornerRadius = CornerRadius(size.height / 2f)) })
         }
     }
 }
@@ -584,8 +624,10 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
 /** One big tickable pill chip (56 dp), as on the treatment step; it settles in with a soft spring when ticked, still when motion is off. */
 @Composable private fun OnboardingChip(label: String, on: Boolean, enabled: Boolean, tone: SaharaTone, index: Int, tag: String, onClick: () -> Unit) {
     val scale by animateFloatAsState(if (on) 1.03f else 1f, if (SaharaMotion.enabled) spring(dampingRatio = .5f, stiffness = Spring.StiffnessMedium) else snap(), label = "onboarding chip")
+    val fill by animateColorAsState(if (on) tone.wash else SaharaColors.Surface, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "onboarding chip fill")
+    val edge by animateColorAsState(if (on) tone.solid else SaharaColors.Edge, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "onboarding chip edge")
     Surface(checked = on, onCheckedChange = { onClick() }, enabled = enabled, shape = RoundedCornerShape(SaharaRadius.Pill),
-        color = if (on) tone.wash else SaharaColors.Surface, contentColor = SaharaColors.Ink, border = BorderStroke(if (on) 2.dp else 1.5.dp, if (on) tone.solid else SaharaColors.Edge),
+        color = fill, contentColor = SaharaColors.Ink, border = BorderStroke(if (on) 2.dp else 1.5.dp, edge),
         modifier = Modifier.heightIn(min = 56.dp).saharaStagger(index).graphicsLayer { scaleX = scale; scaleY = scale }.testTag(tag)) {
         Row(Modifier.padding(horizontal = 18.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
             if (on) { Icon(Icons.Default.Check, null, Modifier.size(20.dp), tint = tone.ink); Spacer(Modifier.width(6.dp)) }
@@ -606,8 +648,10 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
             val on = code in selected
             val tone = if (code in CarePatientProfile.TREATMENTS_ALONE) SaharaTone.Leaf else SaharaTone.Plum
             val scale by animateFloatAsState(if (on) 1.03f else 1f, if (SaharaMotion.enabled) spring(dampingRatio = .5f, stiffness = Spring.StiffnessMedium) else snap(), label = "treatment chip")
+            val fill by animateColorAsState(if (on) tone.wash else SaharaColors.Surface, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "treatment chip fill")
+            val edge by animateColorAsState(if (on) tone.solid else SaharaColors.Edge, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "treatment chip edge")
             Surface(checked = on, onCheckedChange = { onToggle(code) }, enabled = enabled, shape = RoundedCornerShape(SaharaRadius.Pill),
-                color = if (on) tone.wash else SaharaColors.Surface, contentColor = SaharaColors.Ink, border = BorderStroke(if (on) 2.dp else 1.5.dp, if (on) tone.solid else SaharaColors.Edge),
+                color = fill, contentColor = SaharaColors.Ink, border = BorderStroke(if (on) 2.dp else 1.5.dp, edge),
                 modifier = Modifier.heightIn(min = 56.dp).saharaStagger(index).graphicsLayer { scaleX = scale; scaleY = scale }.testTag("onboarding-treatment-$code")) {
                 Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                     if (on) { Icon(Icons.Default.Check, null, Modifier.size(20.dp), tint = tone.ink); Spacer(Modifier.width(6.dp)) }
@@ -663,7 +707,7 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
                 }
             }
         }
-        error?.let { Text(it, Modifier.fillMaxWidth().announce(), color = MaterialTheme.colorScheme.error, fontSize = 15.sp) }
+        OnboardingShowWhen(error, Modifier.fillMaxWidth()) { Text(it, Modifier.fillMaxWidth().announce(), color = MaterialTheme.colorScheme.error, fontSize = 15.sp) }
     }
 }
 

@@ -51,14 +51,16 @@ object SymptomSummaryRules {
 }
 
 /** A small card: icon, name, when it was last noted, the latest number and a small arrow. Tapping opens that symptom's history. */
-@Composable fun SymptomSummaryCard(summary: SymptomSummary, hindi: Boolean, onOpen: () -> Unit) {
+/** [pictures]: a patient reads the latest number as a face and word ("A lot"); everyone else sees 0-10. */
+@Composable fun SymptomSummaryCard(summary: SymptomSummary, hindi: Boolean, pictures: Boolean = false, onOpen: () -> Unit) {
     val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     val note = remember(summary.latest.detail) { SymptomNoteCodec.decode(summary.latest.detail) }
     val shape = RoundedCornerShape(14.dp); val accent = symptomColor(summary.symptom)
     val arrow = when (summary.trend) { 1 -> "↑"; -1 -> "↓"; 0 -> "→"; else -> "" }
+    val tick = rememberSaharaTick()
     val arrowWords = when (summary.trend) { 1 -> t("Higher than last time", "पिछली बार से ज़्यादा"); -1 -> t("Lower than last time", "पिछली बार से कम"); 0 -> t("Same as last time", "पिछली बार जितना"); else -> "" }
     Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min).heightIn(min = 64.dp).saharaPressBounce().testTag("symptom-trend-${summary.symptom}").clip(shape).background(SaharaSection.Symptoms.wash, shape)
-        .border(1.dp, SaharaSection.Symptoms.solid, shape).clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onOpen).padding(start = 0.dp, end = 8.dp),
+        .border(1.dp, SaharaSection.Symptoms.solid, shape).clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = { tick(); onOpen() }).padding(start = 0.dp, end = 8.dp),
         verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.width(5.dp).fillMaxHeight().background(accent))
         Spacer(Modifier.width(10.dp))
@@ -70,8 +72,8 @@ object SymptomSummaryRules {
                 color = DoctorCardSub, fontSize = 14.sp, lineHeight = 18.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.testTag("symptom-summary-when"))
         }
         if (note?.symptom == SymptomDiaryRules.MOOD) {
-            summary.latestScore?.let { Text("$it/10", color = DoctorCardInk, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
-        } else StrengthBadge(summary.latestScore, hindi)
+            summary.latestScore?.let { if (pictures) PatientScoreBadge(it, faceSize = 22.dp) else Text("$it/10", color = DoctorCardInk, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
+        } else StrengthBadge(summary.latestScore, hindi, pictures = pictures)
         if (arrow.isNotEmpty()) Text(arrow, color = DoctorCardInk, fontSize = 18.sp, fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(start = 6.dp).semantics { contentDescription = arrowWords }.testTag("symptom-summary-arrow"))
         Icon(Icons.Default.ChevronRight, null, Modifier.size(22.dp), tint = SaharaSection.Symptoms.ink)
@@ -105,7 +107,7 @@ object SymptomSummaryRules {
             val live = remember(entries, summary) { summary.notes.mapNotNull { n -> entries.firstOrNull { it.id == n.id } } }
             // The newest five notes, then "Show older" (24 Nov).
             val notesShown = rememberShownCount("$personId:${summary.symptom}")
-            live.shownOf(notesShown).forEach { SymptomNoteCard(it, vm, hindi) }
+            live.shownOf(notesShown).forEach { key(it.id) { SymptomNoteCard(it, vm, hindi) } }
             SaharaShowOlder(live.size, notesShown, tag = "symptom-notes")
             TextButton(onClick = onClose, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Close", "बंद करें")) }
         }

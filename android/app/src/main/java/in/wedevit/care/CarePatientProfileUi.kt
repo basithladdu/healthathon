@@ -1,6 +1,7 @@
 package `in`.wedevit.care
 
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -32,6 +33,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlin.math.roundToInt
 
 /** The patient's own profile card (Account tab) with its edit sheet. The profile lives in the shared care record, so family and doctors see it. */
 @Composable fun PatientProfileCard(vm: CareModel, person: Person) {
@@ -45,10 +47,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
     val profile = remember(sharedItem, person.id, store) { sharedItem?.let { PatientProfileCodec.decode(it.detail) } ?: store.loadOrNull(person.id) ?: CarePatientProfile() }
     var editing by remember { mutableStateOf(false) }
     var addingWeight by remember { mutableStateOf(false) }
+    val savedHaptic = rememberSaharaHaptic()
     // Saves a profile to the shared record (or creates it), then clears the old phone-only copy.
     fun save(saved: CarePatientProfile, done: () -> Unit) {
         if (!canEditCareContext(vm, person.id, capturedAccount)) return
-        val finished = { runCatching { store.remove(person.id) }; done() }
+        val finished = { runCatching { store.remove(person.id) }; savedHaptic(); done() }
         if (sharedItem != null) vm.updateItem(sharedItem.copy(detail = PatientProfileCodec.encode(saved)), finished)
         else vm.saveItem("journal", PatientProfileCodec.TITLE, PatientProfileCodec.encode(saved), done = finished)
     }
@@ -59,23 +62,25 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
     if (editing && canEdit) PatientProfileSheet(profile, shared = vm.cloud != null, busy = busy, onDismiss = { editing = false }) { saved -> save(saved) { editing = false } }
 }
 
-/** Today's weight in one field: no need to open the whole profile editor (Dr Sujay, 22 Nov review). */
+/**
+ * Today's weight on one scroll wheel, 1-300 kg in half kilos (owner, 25 Nov: no typed numbers for families). It opens on the last
+ * weight, so a small change is a short turn. Not opening the whole profile editor (Dr Sujay, 22 Nov review).
+ */
 @Composable private fun AddWeightDialog(current: Double?, busy: Boolean, onDismiss: () -> Unit, onSave: (Double) -> Unit) {
     val t = careText()
-    var text by remember { mutableStateOf("") }
-    var error by remember { mutableStateOf<ProfileError?>(null) }
+    val scale = CarePickerScales.WEIGHT_KG
+    val opensOn = current ?: CarePickerScales.WEIGHT_START
+    var index by remember { mutableIntStateOf(scale.indexOf(opensOn)) }
+    // An unturned wheel saves the last weight exactly (a typed 62.3 is not snapped to 62.5).
+    val kg = scale.picked(opensOn, index)
     AlertDialog(onDismissRequest = { if (!busy) onDismiss() }, modifier = Modifier.testTag("patient-profile-add-weight-dialog"),
         title = { Text(t("Add today's weight", "आज का वज़न लिखें")) },
-        text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            current?.let { Text(t("Last weight", "पिछला वज़न") + ": ${CarePatientProfileRules.weightText(it)} " + t("kg", "किलो"), fontSize = 14.sp, color = DoctorCardSub) }
-            ProfileField(text, { text = it.filter { c -> c.isDigit() || c == '.' || c == ',' }.take(6); error = null }, t("Weight (kg)", "वज़न (किलो)"), Icons.Default.MonitorWeight, KeyboardType.Decimal,
-                Modifier.fillMaxWidth().testTag("patient-profile-add-weight-field"))
-            error?.let { Text(t(it.en, it.hi), color = RustText, fontSize = 14.sp, fontWeight = FontWeight.Medium, modifier = Modifier.announce()) }
+        text = { Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            current?.let { Text(t("Last weight", "पिछला वज़न") + ": ${CarePatientProfileRules.weightText(it)} " + t("kg", "किलो"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.fillMaxWidth()) }
+            Text(scale.text(kg) + " " + t("kg", "किलो"), fontSize = 30.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.testTag("patient-profile-add-weight-shown"))
+            CareValueWheel(scale.count, index, { scale.text(scale.valueAt(it)) }, { index = it }, t("Weight (kg)", "वज़न (किलो)"), "patient-profile-add-weight-field", Modifier.fillMaxWidth(.6f))
         } },
-        confirmButton = { TextButton(onClick = {
-            val (kg, bad) = CarePatientProfileRules.weight(text)
-            if (kg == null) error = bad ?: ProfileError.WEIGHT else onSave(kg)
-        }, enabled = !busy && text.isNotBlank(), modifier = Modifier.heightIn(min = 48.dp).testTag("patient-profile-add-weight-save")) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Save", "सहेजें"), fontWeight = FontWeight.SemiBold) } },
+        confirmButton = { TextButton(onClick = { onSave(kg) }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp).testTag("patient-profile-add-weight-save")) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Save", "सहेजें"), fontWeight = FontWeight.SemiBold) } },
         dismissButton = { TextButton(onClick = onDismiss, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें")) } })
 }
 
@@ -104,11 +109,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
     val sex = when (profile.sex) { "Female" -> t("Female", "महिला"); "Male" -> t("Male", "पुरुष"); "Other" -> t("Other", "अन्य"); else -> "" }
     val blood = if (profile.bloodGroup == "Not known") t("Not known", "पता नहीं") else profile.bloodGroup
     val illness = profile.illness.ifBlank { if (editable) t("Add main illness", "मुख्य बीमारी जोड़ें") else "" }
-    val contact = listOf(profile.phone, profile.address).filter(String::isNotBlank).joinToString("  ·  ")
-    val weights = CareWeightHistory.forCard(profile)
+    val contact = remember(profile.phone, profile.address) { listOf(profile.phone, profile.address).filter(String::isNotBlank).joinToString("  ·  ") }
+    val weights = remember(profile) { CareWeightHistory.forCard(profile) }
     // Kept short on purpose: the Account tab pins this card above its list, so the screen should fit without scrolling.
     Surface(shape = RoundedCornerShape(12.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = modifier.fillMaxWidth().testTag(tag)) {
-        Column(Modifier.padding(16.dp).animateContentSize(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        // No size animation on the whole card (owner, 24 Nov: cards "keep expanding"); its rows change in place.
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 // A plain initial on a soft colour: no photo is stored.
                 Surface(shape = CircleShape, color = SaharaApricot, modifier = Modifier.size(48.dp)) { Box(contentAlignment = Alignment.Center) { Text(name.take(1).uppercase(), fontFamily = SaharaTitleFont, fontSize = 22.sp, fontWeight = FontWeight.Medium, color = DoctorAccent) } }
@@ -178,7 +184,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 /** Current weight with a trend badge (change since the weight before it) and a small line of the last few weights. A tap opens the history. */
 @Composable private fun ProfileWeightTile(kg: Double?, weights: List<CareWeightEntry>, onOpen: () -> Unit, tag: String) {
     val t = careText()
-    val trend = CareWeightHistory.trend(weights); val change = CareWeightHistory.change(weights)
+    val trend = remember(weights) { CareWeightHistory.trend(weights) }; val change = remember(weights) { CareWeightHistory.change(weights) }
     val value = kg?.let { "${CarePatientProfileRules.weightText(it)} ${t("kg", "किलो")}" } ?: "—"
     val changeText = when (trend) {
         CareWeightTrend.UP -> "▲ ${CareWeightHistory.amountText(change ?: 0.0)} ${t("kg", "किलो")}"
@@ -186,7 +192,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
         CareWeightTrend.STEADY -> t("No change", "कोई बदलाव नहीं")
         null -> ""
     }
-    val since = weights.takeIf { it.size >= 2 }?.let { it[it.size - 2].day }?.format(careDateFormat("d MMM", careHindi()))
+    val hindi = careHindi()
+    val since = remember(weights, hindi) { weights.takeIf { it.size >= 2 }?.let { it[it.size - 2].day }?.format(careDateFormat("d MMM", hindi)) }
     val open = weights.isNotEmpty()
     Surface(onClick = onOpen, enabled = open, shape = RoundedCornerShape(12.dp), color = SaharaSoftGold, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag(tag)) {
         Row(Modifier.padding(start = 12.dp, end = 8.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -194,7 +201,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(t("Weight", "वज़न"), fontSize = 14.sp, color = DoctorCardSub, maxLines = 1); Spacer(Modifier.width(8.dp))
-                    Text(value, fontSize = 17.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk, maxLines = 1)
+                    // A new weight rolls in rather than jumping.
+                    SaharaAnimatedText(value) { Text(it, fontSize = 17.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk, maxLines = 1) }
                 }
                 // The change as a small badge; the date it is measured from follows in quieter text.
                 if (changeText.isNotBlank()) Row(verticalAlignment = Alignment.CenterVertically) {
@@ -202,7 +210,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                     since?.let { Text(" " + t("since $it", "$it से"), fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis) }
                 }
             }
-            val points = CareWeightHistory.recent(weights)
+            val points = remember(weights) { CareWeightHistory.recent(weights) }
             if (points.size >= 2) { Spacer(Modifier.width(8.dp)); ProfileWeightSparkline(points, Modifier.width(72.dp).height(32.dp)) }
             if (open) Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, t("Weight history", "वज़न का इतिहास"), Modifier.size(24.dp), tint = Rust)
         }
@@ -225,14 +233,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 /** Every recorded weight, newest first, with an arrow for the change from the one before. */
 @Composable private fun ProfileWeightHistoryDialog(kg: Double?, weights: List<CareWeightEntry>, onDismiss: () -> Unit) {
-    val t = careText(); val format = careDateFormat("d MMM yyyy", careHindi())
-    val sorted = CareWeightHistory.sorted(weights)
+    val t = careText(); val hindi = careHindi(); val format = remember(hindi) { careDateFormat("d MMM yyyy", hindi) }
+    val sorted = remember(weights) { CareWeightHistory.sorted(weights) }
     AlertDialog(onDismissRequest = onDismiss, title = { Text(t("Weight history", "वज़न का इतिहास")) }, text = {
         Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState()).testTag("patient-profile-weight-history"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             // The trend at a glance before the list of numbers.
             sorted.takeIf { it.size >= 2 }?.let { all ->
                 val lo = kotlin.math.floor(all.minOf { it.kg } - 1.0); val hi = kotlin.math.ceil(all.maxOf { it.kg } + 1.0)
-                val pts = all.map { ChartPoint(careEpoch(it.day).toDouble(), it.kg) }
+                val pts = remember(all) { all.map { ChartPoint(careEpoch(it.day).toDouble(), it.kg) } }
                 val kgUnit = t("kg", "किलो")
                 CareTimeLineChart(points = pts, yMin = lo, yMax = hi, yTicks = listOf(lo, (lo + hi) / 2.0, hi), yText = { it.toInt().toString() },
                     description = all.joinToString("; ") { it.day.format(format) + ": " + CarePatientProfileRules.weightText(it.kg) + " " + kgUnit },
@@ -301,15 +309,18 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
           Spacer(Modifier.height(8.dp))
           Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()).saharaContentSize(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             ProfileStep(1, t("About", "परिचय")) {
-                ProfileField(age, { age = it.filter(Char::isDigit).take(3) }, t("Age (years)", "उम्र (साल)"), Icons.Default.Cake, KeyboardType.Number)
+                // Age by tap, not typing (24 Nov): Simple Mode turns on by itself at 60 and above from this age.
+                Text(t("Age (years)", "उम्र (साल)"), fontSize = 14.sp, color = DoctorCardSub)
+                CareAgePicker(age, { age = it; error = null }, "patient-profile-age", Modifier.fillMaxWidth())
                 Text(t("Sex", "लिंग"), fontSize = 14.sp, color = DoctorCardSub)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) { CarePatientProfile.SEX.forEach { v -> ProfileChip(sex == v, sexLabel(v), Modifier.weight(1f)) { sex = if (sex == v) "" else v } } }
             }
             ProfileStep(2, t("Body", "शरीर")) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    ProfileField(weight, { weight = it.filter { c -> c.isDigit() || c == '.' || c == ',' }.take(6) }, t("Weight (kg)", "वज़न (किलो)"), Icons.Default.MonitorWeight, KeyboardType.Decimal, Modifier.weight(1f))
-                    ProfileField(height, { height = it.filter(Char::isDigit).take(3) }, t("Height (cm)", "क़द (सेमी)"), Icons.Default.Height, KeyboardType.Number, Modifier.weight(1f))
-                }
+                // Weight and height on scroll wheels, never typed (owner, 25 Nov). The text kept here is what the typed fields held, so the rules still check it.
+                CareNumberWheelButton(CarePatientProfileRules.weight(weight).first, { weight = CarePatientProfileRules.weightText(it); error = null }, t("Weight (kg)", "वज़न (किलो)"), t("kg", "किलो"),
+                    CarePickerScales.WEIGHT_KG, CarePickerScales.WEIGHT_START, "patient-profile-weight", Modifier.fillMaxWidth(), icon = Icons.Default.MonitorWeight, allowClear = true)
+                CareNumberWheelButton(CarePatientProfileRules.height(height).first?.toDouble(), { height = it?.roundToInt()?.toString().orEmpty(); error = null }, t("Height (cm)", "क़द (सेमी)"), t("cm", "सेमी"),
+                    CarePickerScales.HEIGHT_CM, CarePickerScales.HEIGHT_START, "patient-profile-height", Modifier.fillMaxWidth(), icon = Icons.Default.Height, allowClear = true)
                 Text(t("Blood group", "ख़ून का समूह"), fontSize = 14.sp, color = DoctorCardSub)
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { CarePatientProfile.BLOOD.forEach { v -> ProfileChip(blood == v, if (v == "Not known") t("Not known", "पता नहीं") else v) { blood = if (blood == v) "" else v } } }
             }
@@ -319,30 +330,43 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                 Text(t("Since when", "कब से"), fontSize = 14.sp, color = DoctorCardSub)
                 CareDurationPicker(illnessSince, { illnessSince = it }, "patient-profile-illness-since", Modifier.fillMaxWidth())
                 // The doctor seen now: the fields wait behind one "+ Add" chip until any of them is filled in.
-                if (showDoctor || doctorName.isNotBlank() || doctorPlace.isNotBlank() || doctorPhone.isNotBlank() || doctorLandline.isNotBlank()) {
+                val doctorOpen = showDoctor || doctorName.isNotBlank() || doctorPlace.isNotBlank() || doctorPhone.isNotBlank() || doctorLandline.isNotBlank()
+                AnimatedVisibility(doctorOpen, enter = SaharaMotion.expand, exit = SaharaMotion.collapse, label = "profile doctor") { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     ProfileField(doctorName, { doctorName = it.take(100) }, t("Doctor's name", "डॉक्टर का नाम"), Icons.Default.LocalHospital, KeyboardType.Text, Modifier.fillMaxWidth().testTag("patient-profile-doctor-name"), singleLine = true)
                     ProfileField(doctorPlace, { doctorPlace = it.take(120) }, t("Hospital or clinic", "अस्पताल या क्लिनिक"), Icons.Default.Place, KeyboardType.Text, Modifier.fillMaxWidth().testTag("patient-profile-doctor-place"), singleLine = true)
-                    CarePhoneField(doctorPhone, { doctorPhone = it }, t("Doctor's phone", "डॉक्टर का फ़ोन"), "patient-profile-doctor-phone", Modifier.fillMaxWidth(), leadingIcon = Icons.Default.Phone)
+                    CarePhoneField(doctorPhone, { doctorPhone = it }, t("Contact number (doctor or hospital)", "संपर्क नंबर (डॉक्टर या अस्पताल)"), "patient-profile-doctor-phone", Modifier.fillMaxWidth(), leadingIcon = Icons.Default.Phone)
                     CarePhoneField(doctorLandline, { doctorLandline = it }, t("Hospital / landline number (optional)", "अस्पताल / लैंडलाइन नंबर (ज़रूरी नहीं)"), "patient-profile-doctor-landline", Modifier.fillMaxWidth(), leadingIcon = Icons.Default.Call)
-                } else SaharaAddChip(t("Add doctor now", "अभी के डॉक्टर जोड़ें"), { showDoctor = true }, Modifier.testTag("patient-profile-add-doctor"), tone = SaharaTone.Indigo)
+                } }
+                AnimatedVisibility(!doctorOpen, enter = SaharaMotion.expand, exit = SaharaMotion.collapse, label = "profile add doctor") {
+                    SaharaAddChip(t("Add doctor now", "अभी के डॉक्टर जोड़ें"), { showDoctor = true }, Modifier.testTag("patient-profile-add-doctor"), tone = SaharaTone.Indigo)
+                }
                 Text(t("Treatment now", "अभी का इलाज"), fontSize = 14.sp, color = DoctorCardSub)
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.testTag("patient-profile-treatments")) {
                     CarePatientProfile.TREATMENTS.forEach { code -> ProfileChip(code in treatments, careTreatmentLabel(code, t)) { treatments = CarePatientProfile.toggleTreatment(treatments, code) } }
                 }
                 ProfileField(treatmentNote, { treatmentNote = it.take(200) }, t("Anything else (optional)", "कुछ और (ज़रूरी नहीं)"), Icons.Default.Healing, modifier = Modifier.fillMaxWidth().testTag("patient-profile-treatment-note"))
                 // Optional fields that are still empty wait behind a "+ Add" chip; anything already filled stays open.
-                if (showAllergies || allergies.isNotBlank()) ProfileField(allergies, { allergies = it.take(200) }, t("Allergies (optional)", "एलर्जी (ज़रूरी नहीं)"), Icons.Default.WarningAmber)
-                else SaharaAddChip(t("Add allergies", "एलर्जी जोड़ें"), { showAllergies = true }, Modifier.testTag("patient-profile-add-allergies"), tone = SaharaTone.Plum)
+                val allergiesOpen = showAllergies || allergies.isNotBlank()
+                AnimatedVisibility(allergiesOpen, enter = SaharaMotion.expand, exit = SaharaMotion.collapse, label = "profile allergies") {
+                    ProfileField(allergies, { allergies = it.take(200) }, t("Allergies (optional)", "एलर्जी (ज़रूरी नहीं)"), Icons.Default.WarningAmber)
+                }
+                AnimatedVisibility(!allergiesOpen, enter = SaharaMotion.expand, exit = SaharaMotion.collapse, label = "profile add allergies") {
+                    SaharaAddChip(t("Add allergies", "एलर्जी जोड़ें"), { showAllergies = true }, Modifier.testTag("patient-profile-add-allergies"), tone = SaharaTone.Plum)
+                }
             }
             ProfileStep(4, t("Contact", "संपर्क")) {
-                if (showPhone || phone.isNotBlank()) CarePhoneField(phone, { phone = it }, t("Phone", "फ़ोन"), "patient-profile-phone", Modifier.fillMaxWidth(), leadingIcon = Icons.Default.Phone)
-                if (showAddress || address.isNotBlank()) ProfileField(address, { address = it.take(160) }, t("City / address", "शहर / पता"), Icons.Default.Place)
+                AnimatedVisibility(showPhone || phone.isNotBlank(), enter = SaharaMotion.expand, exit = SaharaMotion.collapse, label = "profile phone") {
+                    CarePhoneField(phone, { phone = it }, t("Phone", "फ़ोन"), "patient-profile-phone", Modifier.fillMaxWidth(), leadingIcon = Icons.Default.Phone)
+                }
+                AnimatedVisibility(showAddress || address.isNotBlank(), enter = SaharaMotion.expand, exit = SaharaMotion.collapse, label = "profile address") {
+                    ProfileField(address, { address = it.take(160) }, t("City / address", "शहर / पता"), Icons.Default.Place)
+                }
                 SaharaAddChips(listOfNotNull(
                     (t("Add phone", "फ़ोन जोड़ें") to { showPhone = true }).takeIf { !showPhone && phone.isBlank() },
                     (t("Add city / address", "शहर / पता जोड़ें") to { showAddress = true }).takeIf { !showAddress && address.isBlank() },
                 ), Modifier.testTag("patient-profile-add-contact"), tone = SaharaTone.Leaf)
             }
-            error?.let { Text(t(it.en, it.hi), color = RustText, fontSize = 14.sp, fontWeight = FontWeight.Medium, modifier = Modifier.announce()) }
+            OnboardingShowWhen(error) { Text(t(it.en, it.hi), color = RustText, fontSize = 14.sp, fontWeight = FontWeight.Medium, modifier = Modifier.announce()) }
           }
           Spacer(Modifier.height(12.dp))
           // One Save; swiping the sheet down or Back cancels.
@@ -379,10 +403,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 /** A choice chip that shows a tick and a soft fill when picked. */
 @Composable private fun ProfileChip(selected: Boolean, label: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    FilterChip(selected = selected, onClick = onClick, label = { Text(label, fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal, maxLines = 1) },
+    val tick = rememberSaharaTick()
+    FilterChip(selected = selected, onClick = { tick(); onClick() }, label = { Text(label, fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal, maxLines = 1) },
         leadingIcon = if (selected) { { Icon(Icons.Default.Check, null, Modifier.size(16.dp)) } } else null, shape = RoundedCornerShape(50),
         colors = FilterChipDefaults.filterChipColors(containerColor = Cream, labelColor = DoctorCardInk, selectedContainerColor = Mint, selectedLabelColor = DoctorCardInk, selectedLeadingIconColor = DoctorAccent),
-        modifier = modifier.heightIn(min = 48.dp))
+        modifier = modifier.heightIn(min = 48.dp).saharaSelectBounce(selected, amount = .06f))
 }
 
 /**
@@ -396,13 +421,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable internal fun CareDurationPicker(value: String, onChange: (String) -> Unit, tag: String, modifier: Modifier = Modifier, enabled: Boolean = true,
     unitHeight: androidx.compose.ui.unit.Dp = 48.dp, tone: SaharaTone = SaharaTone.Teal) {
     val t = careText()
-    val current = CareIllnessDuration.parse(value)
+    val tick = rememberSaharaTick()
+    val current = remember(value) { CareIllnessDuration.parse(value) }
     var chosenYears by androidx.compose.runtime.saveable.rememberSaveable(tag) { mutableStateOf(current?.years ?: false) }
     val years = current?.years ?: chosenYears
     Column(modifier.testTag(tag), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
             listOf(false to t("Months", "महीने"), true to t("Years", "साल")).forEachIndexed { index, (unitYears, label) ->
                 SegmentedButton(selected = years == unitYears, enabled = enabled, onClick = {
+                    if (years != unitYears) tick()
                     chosenYears = unitYears
                     if (current != null && current.years != unitYears) onChange(CareIllnessDuration(current.amount, unitYears).encode())
                 }, shape = SegmentedButtonDefaults.itemShape(index, 2), modifier = Modifier.heightIn(min = unitHeight).testTag("$tag-" + if (unitYears) "years" else "months")) {
@@ -414,16 +441,21 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
             CareIllnessDuration.AMOUNTS.forEach { n ->
                 val on = current != null && current.amount == n
                 val spoken = careIllnessSinceText(CareIllnessDuration(n, years).encode(), t)
-                Surface(checked = on, onCheckedChange = { chosenYears = years; onChange(if (on) "" else CareIllnessDuration(n, years).encode()) }, enabled = enabled, shape = CircleShape,
-                    color = if (on) tone.solid else SaharaColors.Surface, contentColor = if (on) tone.onSolid else SaharaColors.Ink,
-                    border = BorderStroke(if (on) 2.dp else 1.dp, if (on) tone.solid else SaharaColors.Edge),
-                    modifier = Modifier.size(48.dp).testTag("$tag-$n").semantics { contentDescription = spoken }) {
+                val fill by animateColorAsState(if (on) tone.solid else SaharaColors.Surface, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "duration fill")
+                val ink by animateColorAsState(if (on) tone.onSolid else SaharaColors.Ink, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "duration ink")
+                val edge by animateColorAsState(if (on) tone.solid else SaharaColors.Edge, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "duration edge")
+                Surface(checked = on, onCheckedChange = { tick(); chosenYears = years; onChange(if (on) "" else CareIllnessDuration(n, years).encode()) }, enabled = enabled, shape = CircleShape,
+                    color = fill, contentColor = ink,
+                    border = BorderStroke(if (on) 2.dp else 1.dp, edge),
+                    modifier = Modifier.size(48.dp).saharaSelectBounce(on).testTag("$tag-$n").semantics { contentDescription = spoken }) {
                     Box(contentAlignment = Alignment.Center) { Text("$n", fontSize = 17.sp, fontWeight = if (on) FontWeight.Bold else FontWeight.Medium) }
                 }
             }
         }
         // What is saved, in words: "How long: 8 months", or an older typed answer as it was written.
-        if (value.isNotBlank()) Text(careIllnessSinceLabel(value, t) + ": " + careIllnessSinceText(value, t), fontSize = 15.sp, fontWeight = FontWeight.Medium,
-            color = DoctorCardInk, modifier = Modifier.fillMaxWidth().testTag("$tag-value"))
+        OnboardingShowWhen(value.takeIf { it.isNotBlank() }, Modifier.fillMaxWidth()) { shown ->
+            Text(careIllnessSinceLabel(shown, t) + ": " + careIllnessSinceText(shown, t), fontSize = 15.sp, fontWeight = FontWeight.Medium,
+                color = DoctorCardInk, modifier = Modifier.fillMaxWidth().testTag("$tag-value"))
+        }
     }
 }

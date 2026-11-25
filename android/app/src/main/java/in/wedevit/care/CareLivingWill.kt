@@ -47,7 +47,9 @@ data class AmdWitness(val name: String = "", val address: String = "", val idTyp
 data class AmdAttestor(val kind: AttestorKind? = null, val name: String = "", val designation: String = "", val registrationNo: String = "")
 data class AmdExecution(val signedOn: String = "", val place: String = "", val thumbImpression: Boolean = false, val witnesses: List<AmdWitness> = listOf(AmdWitness(), AmdWitness()), val attestor: AmdAttestor = AmdAttestor(),
     /** File name in this person's private folder; the SHA-256 lets a doctor check the copy is the one recorded (L5). */
-    val scanKey: String = "", val scanName: String = "", val scanType: String = "", val scanSha256: String = "", val scanUploadedAt: String = "")
+    val scanKey: String = "", val scanName: String = "", val scanType: String = "", val scanSha256: String = "", val scanUploadedAt: String = "",
+    /** How the paper was read to the person before they signed it (ConsentReadAloud.kt): required before it is marked signed. */
+    val readAloud: ConsentReading? = null)
 /** L5: custodian acknowledgement, or "custodian pending" (few states have appointed custodians). */
 data class AmdCustodian(val status: AmdCustodianStatus = AmdCustodianStatus.PENDING, val body: String = "", val officer: String = "", val acknowledgedOn: String = "")
 /** L4 + DPDP: one entry per copy recipient, each with its own consent. */
@@ -193,6 +195,9 @@ object AmdRules {
         else if (signed.isAfter(today)) add(issue("SIGNED_FUTURE", IssueSeverity.BLOCK, "execution.signedOn", "The signing date cannot be in the future.", "हस्ताक्षर की तारीख़ भविष्य की नहीं हो सकती।"))
         else if (r.generatedAt != null && PlanDates.day(r.generatedAt)?.isAfter(signed) == true) add(issue("SIGNED_BEFORE_PRINT", IssueSeverity.BLOCK, "execution.signedOn", "The signing date is before this version was printed. Check you uploaded the right version.", "हस्ताक्षर की तारीख़ इस संस्करण के प्रिंट से पहले की है। जाँचें कि सही संस्करण अपलोड किया है।"))
         if (!Regex("^[a-f0-9]{64}$").matches(e.scanSha256) || e.scanKey.isBlank()) add(issue("L3_SCAN", IssueSeverity.BLOCK, "execution.scan", "Upload a photo or scan of the signed and attested paper.", "हस्ताक्षरित और सत्यापित काग़ज़ की फ़ोटो या स्कैन अपलोड करें।"))
+        // Point 11 of the clinical team's note: before it is marked signed, say how the paper was read to the person.
+        if (e.readAloud == null) add(issue("READ_ALOUD", IssueSeverity.BLOCK, "execution.readAloud", "Say how the paper was read to the person before they signed it.", "बताएँ कि हस्ताक्षर से पहले काग़ज़ व्यक्ति को कैसे पढ़कर सुनाया गया।"))
+        else if (!ConsentReadingRules.valid(e.readAloud, r.content.executant.name, askWitness = true)) add(issue("READ_ALOUD_INCOMPLETE", IssueSeverity.BLOCK, "execution.readAloud", "Add who read the paper to the person and who saw it.", "जोड़ें कि किसने काग़ज़ पढ़कर सुनाया और किसने देखा।"))
         val executant = normaliseName(r.content.executant.name)
         val dhrNames = r.content.dhrs.map { normaliseName(it.name) }.filter(String::isNotBlank)
         val witnesses = e.witnesses.take(2).let { it + List(2 - it.size) { AmdWitness() } }
@@ -430,7 +435,8 @@ object AmdJson {
         .n("generatedAt", r.generatedAt).n("pdfLang", r.pdfLang).n("pdfSha256", r.pdfSha256).n("contentSha256", r.contentSha256)
         .n("execution", r.execution?.let { e -> JSONObject().put("signedOn", e.signedOn).put("place", e.place).put("thumbImpression", e.thumbImpression).put("witnesses", JSONArray(e.witnesses.map(::witness)))
             .put("attestor", JSONObject().n("kind", e.attestor.kind?.name).put("name", e.attestor.name).put("designation", e.attestor.designation).put("registrationNo", e.attestor.registrationNo))
-            .put("scanKey", e.scanKey).put("scanName", e.scanName).put("scanType", e.scanType).put("scanSha256", e.scanSha256).put("scanUploadedAt", e.scanUploadedAt) })
+            .put("scanKey", e.scanKey).put("scanName", e.scanName).put("scanType", e.scanType).put("scanSha256", e.scanSha256).put("scanUploadedAt", e.scanUploadedAt)
+            .also { o -> e.readAloud?.let { o.put("readAloud", ConsentReadingRules.encode(it)) } } })
         .n("custodian", r.custodian?.let { JSONObject().put("status", it.status.name).put("body", it.body).put("officer", it.officer).put("acknowledgedOn", it.acknowledgedOn) })
         .put("copies", JSONArray(r.copies.map { c -> JSONObject().put("id", c.id).put("kind", c.kind.name).put("name", c.name).n("dhrId", c.dhrId).put("consent", c.consent).put("consentAt", c.consentAt).put("given", c.given).put("givenOn", c.givenOn).n("method", c.method?.name) }))
         .n("abha", r.abha?.let { JSONObject().put("address", it.address).put("consent", it.consent).put("linkedOn", it.linkedOn) })
@@ -443,7 +449,7 @@ object AmdJson {
             createdAt = j.s("createdAt"), updatedAt = j.s("updatedAt"), createdBy = j.s("createdBy"), content = content(j.optJSONObject("content") ?: JSONObject()),
             generatedAt = j.ns("generatedAt"), pdfLang = j.ns("pdfLang"), pdfSha256 = j.ns("pdfSha256"), contentSha256 = j.ns("contentSha256"),
             execution = j.optJSONObject("execution")?.let { e -> val a = e.optJSONObject("attestor") ?: JSONObject()
-                AmdExecution(e.s("signedOn"), e.s("place"), e.optBoolean("thumbImpression"), list(e.optJSONArray("witnesses")).map(::witness), AmdAttestor(a.e<AttestorKind>("kind"), a.s("name"), a.s("designation"), a.s("registrationNo")), e.s("scanKey"), e.s("scanName"), e.s("scanType"), e.s("scanSha256"), e.s("scanUploadedAt")) },
+                AmdExecution(e.s("signedOn"), e.s("place"), e.optBoolean("thumbImpression"), list(e.optJSONArray("witnesses")).map(::witness), AmdAttestor(a.e<AttestorKind>("kind"), a.s("name"), a.s("designation"), a.s("registrationNo")), e.s("scanKey"), e.s("scanName"), e.s("scanType"), e.s("scanSha256"), e.s("scanUploadedAt"), ConsentReadingRules.decode(e.optJSONObject("readAloud"))) },
             custodian = j.optJSONObject("custodian")?.let { AmdCustodian(it.e<AmdCustodianStatus>("status") ?: AmdCustodianStatus.PENDING, it.s("body"), it.s("officer"), it.s("acknowledgedOn")) },
             copies = list(j.optJSONArray("copies")).map { c -> AmdCopy(c.s("id"), c.e<AmdRecipientKind>("kind") ?: AmdRecipientKind.CUSTODIAN, c.s("name"), c.ns("dhrId"), c.optBoolean("consent"), c.s("consentAt"), c.optBoolean("given"), c.s("givenOn"), c.e<AmdCopyMethod>("method")) },
             abha = j.optJSONObject("abha")?.let { AmdAbha(it.s("address"), it.optBoolean("consent"), it.s("linkedOn")) }, supersededAt = j.ns("supersededAt"),

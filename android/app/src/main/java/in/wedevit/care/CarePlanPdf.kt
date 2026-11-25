@@ -116,7 +116,7 @@ internal object CarePlanPdf {
             d.space(4f); d.text(p(AmdText.LEGAL_PENDING_TITLE) + ": " + p(AmdText.LEGAL_PENDING), paint(9f)); d.text(p(AmdText.RECONSIDERATION), paint(9f)); d.space(4f)
             field(Bi("Understanding confirmed", "समझ की पुष्टि"), if (r.prognosticUnderstanding.confirmed) "${r.prognosticUnderstanding.confirmedBy} ${r.prognosticUnderstanding.confirmedOn}".trim() else "")
             d.space(8f); d.text(p(Bi("Signatures", "हस्ताक्षर")), h2, 18f)
-            r.signatures.forEach { s -> d.text("${s.role.name.replace('_', ' ').lowercase()}${s.surrogateRank?.let { " (${it.name.lowercase()})" } ?: ""}: ${s.name}${s.registrationNo?.let { " (reg. $it)" } ?: ""}${if (s.thumbImpression == true) " — thumb impression" else ""} · ${s.signedAt.take(16).replace('T', ' ')}", body) }
+            r.signatures.forEach { s -> d.text("${s.role.name.replace('_', ' ').lowercase()}${s.surrogateRank?.let { " (${it.name.lowercase()})" } ?: ""}: ${s.name}${s.registrationNo?.let { " (reg. $it)" } ?: ""}${if (s.thumbImpression == true) " — thumb impression" else ""} · ${s.signedAt.take(16).replace('T', ' ')}${s.readAloud?.let { " · " + ConsentReadingRules.summaryEnglish(it) }.orEmpty()}", body) }
             d.space(8f); d.text(p(CapacityGuide.TITLE), paint(10.5f, true), 16f); d.text(p(CapacityGuide.NOTE), paint(9f))
             CapacityGuide.POINTS.forEachIndexed { i, point -> d.text("${i + 1}. " + p(point), paint(9f)) }
             // The goals-of-care note in the legal form's structure (Sections I to IV), as the doctors asked on 3 Nov 2026. Never on the wallet card.

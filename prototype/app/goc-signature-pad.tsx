@@ -8,8 +8,8 @@
 
 import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import {
-  GOC_DEFAULT_STEPS, GocSignOffError, gocAddSignature, gocBytesToDataUrl, gocEncodeMonoPng, gocExportSize, gocLock, gocNextStep,
-  gocReconcile, gocRestart, gocStartSignOff,
+  GOC_DEFAULT_STEPS, GocSignOffError, gocAddSignature, gocBytesToDataUrl, gocDecodeReading, gocEncodeMonoPng, gocExportSize, gocLock, gocNextStep,
+  gocReadingSummary, gocReconcile, gocRelationLabel, gocRestart, gocStartSignOff,
   type GocSignOffErrorCode, type GocSignOffRecord, type GocSignatureMethod, type GocSignatureRole, type GocSignerStep,
 } from './goc-signoff.ts';
 import { loadGocSignOffs, saveGocSignOff } from './goc-signoff-store.ts';
@@ -170,6 +170,8 @@ function errorText(t: T, code: GocSignOffErrorCode): string {
     case 'RELATION_BLANK': return t('Write how the family member is related to the patient.', 'लिखें कि परिवार के सदस्य का मरीज़ से क्या रिश्ता है।');
     case 'CONSENT_MISSING': return t('Tick the box to confirm before signing.', 'साइन करने से पहले पुष्टि के लिए बॉक्स पर टिक करें।');
     case 'CAN_READ_MISSING': return t('Say whether they can read the note themselves.', 'बताएँ कि क्या वे नोट ख़ुद पढ़ सकते हैं।');
+    case 'READ_ALOUD_MISSING': return t('First say how the note was read to them.', 'पहले बताएँ कि नोट उन्हें कैसे पढ़कर सुनाया गया।');
+    case 'WITNESS_IS_READER': return t('The witness must be someone other than the person who read it.', 'गवाह पढ़कर सुनाने वाले से अलग व्यक्ति होना चाहिए।');
     case 'NO_SIGNATURE': return t('Sign or give a thumb impression on the pad.', 'जगह पर साइन करें या अंगूठा लगाएँ।');
     case 'NOT_READY': return t('Someone still needs to sign.', 'अभी किसी के हस्ताक्षर बाक़ी हैं।');
   }
@@ -316,12 +318,13 @@ export function GocSignOff({ t, noteId, noteText, roles = GOC_DEFAULT_STEPS, onC
     {notice ? <p className="ep-notice ep-alert" role="alert">{notice}</p> : null}
     {storageProblem ? <p className="ep-notice ep-warn" role="alert">{t('This could not be saved on this device. Keep this page open and try again.', 'यह इस डिवाइस पर सेव नहीं हो सका। पेज खुला रखें और फिर कोशिश करें।')}</p> : null}
 
-    {signed.length ? <ol className="goc-signed">{signed.map((s, i) => <li key={`${s.role}-${i}`}>
+    {signed.length ? <ol className="goc-signed">{signed.map((s, i) => { const reading = gocDecodeReading(s.readAloud); return <li key={`${s.role}-${i}`} data-method={s.method}>
       {/* eslint-disable-next-line @next/next/no-img-element -- a small local data URL, not a remote image */}
-      <img src={s.imageDataUrl} alt={t('Signature of ', 'हस्ताक्षर: ') + s.name} width={150} />
-      <span><strong>{s.name}</strong> · {roleText(t, s.role)}{s.relation && s.role !== 'PATIENT' ? ` (${s.relation})` : ''}{s.registrationNo ? ` · ${t('Reg. no.', 'रजि. नं.')} ${s.registrationNo}` : ''}
-        <br /><small>{s.method === 'THUMB' ? t('Thumb impression', 'अंगूठे का निशान') : t('Signed', 'हस्ताक्षर')} · {when(s.signedAt)}</small></span>
-    </li>)}</ol> : null}
+      <img src={s.imageDataUrl} alt={(s.method === 'THUMB' ? t('Thumb impression of ', 'अंगूठे का निशान: ') : t('Signature of ', 'हस्ताक्षर: ')) + s.name} width={150} />
+      <span><strong>{s.name}</strong> · {roleText(t, s.role)}{s.relation && s.role !== 'PATIENT' ? ` (${gocRelationLabel(t, s.relation)})` : ''}{s.registrationNo ? ` · ${t('Reg. no.', 'रजि. नं.')} ${s.registrationNo}` : ''}
+        <br /><small>{s.method === 'THUMB' ? t('Thumb impression', 'अंगूठे का निशान') : t('Signed', 'हस्ताक्षर')} · {when(s.signedAt)}</small>
+        {reading ? <><br /><small className="goc-reading" dir="auto">{gocReadingSummary(reading, t)}</small></> : null}</span>
+    </li>; })}</ol> : null}
 
     {step === 'DOCTOR' ? <div className="goc-step">
       <h3>{t('1. Doctor', '1. डॉक्टर')}</h3>

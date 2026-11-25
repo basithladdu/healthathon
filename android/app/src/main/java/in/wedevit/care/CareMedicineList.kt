@@ -1,6 +1,12 @@
 package `in`.wedevit.care
 
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
@@ -78,7 +85,7 @@ object MedicineTimeGroups {
     val inputs = remember(current) {
         current.map { item ->
             val times = MedicineDoses.forItem(item, scheduler.option(item.id)?.times).filter { it.timed }.map { it.time }
-            MedicineSlotInput(item.id, item.title, times, MedicineDoses.isAsNeeded(MedicineDoses.frequencyText(item.detail)))
+            MedicineSlotInput(item.id, item.title, times, MedicineDoses.isAsNeededMedicine(item))
         }
     }
     var query by rememberSaveable { mutableStateOf("") }
@@ -87,29 +94,51 @@ object MedicineTimeGroups {
     val active = if (searching) query else ""
     val groups = remember(inputs, active) { MedicineTimeGroups.group(MedicineTimeGroups.filterByName(inputs, active)) }
     val byId = remember(current) { current.associateBy { it.id } }
-    Column(Modifier.fillMaxWidth().animateContentSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    val tick = rememberSaharaTick()
+    // Taken on a spoken alarm is saved here too, as an ordinary tick.
+    MedicineAlarmTakenSync(vm)
+    // The Past chevron turns in the draw layer only, so the toggle never re-lays out the list while it moves.
+    val pastTurn by animateFloatAsState(if (pastOpen) 180f else 0f, SaharaMotion.tween(SaharaMotion.EXPAND_MS, easing = SaharaMotion.Emphasized), label = "medicines-past-chevron")
+    // No size animation on the whole list or a row (owner: "cards keep expanding"); a row opens in one step.
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         if (searching) OutlinedTextField(value = query, onValueChange = { query = it.take(80) }, singleLine = true,
             label = { Text(t("Search medicines", "दवा खोजें")) }, leadingIcon = { Icon(Icons.Default.Search, null) },
             modifier = Modifier.fillMaxWidth().testTag("medicines-search"))
         if (current.isEmpty()) QuietLine(t("No current medicines.", "अभी कोई दवा नहीं चल रही।"))
-        else if (groups.isEmpty()) QuietLine(t("No medicine matches that name.", "इस नाम की कोई दवा नहीं मिली।"))
-        groups.forEach { (slot, list) ->
-            Text("${medicineSlotTitle(slot)} · ${list.size}", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub, modifier = Modifier.padding(start = 4.dp, top = 4.dp).a11yHeading().testTag("medicines-group-${slot.name.lowercase()}"))
+        // A search with no match fades in under the field instead of popping.
+        AnimatedVisibility(current.isNotEmpty() && groups.isEmpty(), enter = SaharaMotion.enter, exit = SaharaMotion.exit, label = "medicines-no-match") {
+            QuietLine(t("No medicine matches that name.", "इस नाम की कोई दवा नहीं मिली।"))
+        }
+        groups.forEach { (slot, list) -> key(slot) {
+            // Each time of day under its picture: sun, bright sun, sunset, moon (point 6).
+            Row(Modifier.padding(start = 4.dp, top = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                medicineSlotDose(slot)?.let { DoseSlotBadge(it, 30); Spacer(Modifier.width(8.dp)) }
+                Text("${medicineSlotTitle(slot)} · ${list.size}", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.a11yHeading().testTag("medicines-group-${slot.name.lowercase()}"))
+            }
             // One calm surface per time of day with hairlines between rows, instead of a card per medicine.
             Surface(shape = RoundedCornerShape(16.dp), color = SaharaSection.Medicines.wash, modifier = Modifier.fillMaxWidth().testTag("medicines-group-list-${slot.name.lowercase()}")) {
                 Column(Modifier.padding(vertical = 2.dp)) {
                     list.forEachIndexed { index, input -> byId[input.id]?.let { item -> key(item.id) { MedicineCompactRow(item, vm, divider = index > 0) } } }
                 }
             }
-        }
+        } }
         if (past.isNotEmpty()) {
-            Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button) { pastOpen = !pastOpen }.padding(horizontal = 4.dp).testTag("medicines-past-toggle"), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button) { tick(); pastOpen = !pastOpen }.padding(horizontal = 4.dp).testTag("medicines-past-toggle"), verticalAlignment = Alignment.CenterVertically) {
                 Text("${t("Past", "पहले की")} (${past.size})", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub, modifier = Modifier.weight(1f).a11yHeading())
-                Icon(if (pastOpen) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, if (pastOpen) t("Hide past medicines", "पहले की दवाइयाँ छिपाएँ") else t("Show past medicines", "पहले की दवाइयाँ दिखाएँ"), tint = DoctorCardSub)
+                Icon(Icons.Default.KeyboardArrowDown, if (pastOpen) t("Hide past medicines", "पहले की दवाइयाँ छिपाएँ") else t("Show past medicines", "पहले की दवाइयाँ दिखाएँ"), Modifier.graphicsLayer { rotationZ = pastTurn }, tint = DoctorCardSub)
             }
-            if (pastOpen) past.forEach { item -> key(item.id) { CareRow(item, vm) } }
+            // The past list is a section that opens and folds (the rows themselves never animate their size).
+            AnimatedVisibility(pastOpen, enter = SaharaMotion.expand, exit = SaharaMotion.collapse, label = "medicines-past") {
+                Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) { past.forEach { item -> key(item.id) { CareRow(item, vm) } } }
+            }
         }
     }
+}
+
+/** The dose part of the day for a Medicines group, for its picture; none for As needed and Other. */
+internal fun medicineSlotDose(slot: MedicineSlot): DoseSlot? = when (slot) {
+    MedicineSlot.MORNING -> DoseSlot.MORNING; MedicineSlot.AFTERNOON -> DoseSlot.AFTERNOON; MedicineSlot.EVENING -> DoseSlot.EVENING; MedicineSlot.NIGHT -> DoseSlot.NIGHT
+    else -> null
 }
 
 @Composable private fun medicineSlotTitle(slot: MedicineSlot): String { val t = careText()
@@ -125,31 +154,43 @@ object MedicineTimeGroups {
  * taken, red when one was not taken). Tap the row to open the full card (dose ticks, directions, strip photo, the menu); "Show less" folds it.
  */
 @Composable private fun MedicineCompactRow(item: CareItem, vm: CareModel, divider: Boolean) {
-    val t = careText(); val lang = careLanguage()
+    val t = careText(); val lang = careLanguage(); val context = LocalContext.current
+    // The strip photo on every row (point 6), so a medicine is found by sight, not by reading its name.
+    val store = remember(vm.storageNamespace) { MedicineStripPhotos(context.applicationContext, vm.storageNamespace) }
+    val photoRevision by MedicineStripPhotos.revision.collectAsStateWithLifecycle()
+    val photo = remember(item.personId, item.id, photoRevision) { runCatching { store.first(item.personId, item.id) }.getOrNull() }
     var open by rememberSaveable(item.id) { mutableStateOf(false) }
-    Column(Modifier.fillMaxWidth().animateContentSize().testTag("medicine-row-${item.id}")) {
-        if (divider && !open) HorizontalDivider(Modifier.padding(start = 16.dp), color = DoctorHairline.copy(alpha = .6f))
+    val tick = rememberSaharaTick()
+    Column(Modifier.fillMaxWidth().testTag("medicine-row-${item.id}")) {
+        if (divider && !open) HorizontalDivider(Modifier.padding(start = 72.dp), color = DoctorHairline.copy(alpha = .6f))
         if (open) Column(Modifier.padding(vertical = 4.dp)) {
             MedicineCareCard(item, vm)
-            TextButton(onClick = { open = false }, modifier = Modifier.heightIn(min = 48.dp).testTag("medicine-collapse-${item.id}")) { Icon(Icons.Default.KeyboardArrowUp, null); Spacer(Modifier.width(4.dp)); Text(t("Show less", "कम दिखाएँ")) }
+            TextButton(onClick = { tick(); open = false }, modifier = Modifier.heightIn(min = 48.dp).testTag("medicine-collapse-${item.id}")) { Icon(Icons.Default.KeyboardArrowUp, null); Spacer(Modifier.width(4.dp)); Text(t("Show less", "कम दिखाएँ")) }
         } else {
             val entry = remember(item.detail) { MedicineEntryText.parse(item.detail) }
-            val strength = entry?.let { e -> listOf(e.strength, e.howMuch).filter { it.isNotBlank() }.joinToString(" · ") }.orEmpty()
+            val strength = remember(entry) { entry?.let { e -> listOf(e.strength, e.howMuch).filter { it.isNotBlank() }.joinToString(" · ") }.orEmpty() }
             val doses = medicineDosesFor(item, vm)
             val schedule = medicineScheduleLine(item, doses, lang)
             val saved by vm.medicineEvents.collectAsStateWithLifecycle()
             val held by DoseUndoWindow.app.pending.collectAsStateWithLifecycle()
-            val events = DoseUndoWindow.shown(saved, held, item.personId)
-            val zone = ZoneId.systemDefault()
-            val states = MedicineDoses.states(item, doses, events, LocalDate.now(zone), zone)
-            Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).clickable(role = Role.Button, onClickLabel = t("Show details", "ब्यौरा दिखाएँ")) { open = true }
-                .padding(start = 16.dp, end = 8.dp, top = 6.dp, bottom = 6.dp).testTag("medicine-expand-${item.id}"), verticalAlignment = Alignment.CenterVertically) {
+            val events = remember(saved, held, item.personId) { DoseUndoWindow.shown(saved, held, item.personId) }
+            val zone = ZoneId.systemDefault(); val today = LocalDate.now(zone)
+            // Worked out once per change of doses or reports, not on every recomposition of a long list.
+            val states = remember(item, doses, events, today) { MedicineDoses.states(item, doses, events, today, zone) }
+            Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).clickable(role = Role.Button, onClickLabel = t("Show details", "ब्यौरा दिखाएँ")) { tick(); open = true }
+                .padding(start = 12.dp, end = 8.dp, top = 6.dp, bottom = 6.dp).testTag("medicine-expand-${item.id}"), verticalAlignment = Alignment.CenterVertically) {
+                StripThumb(photo, 48, Modifier.testTag("medicine-row-photo-${item.id}"))
+                Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(1.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(item.title, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
                         if (strength.isNotBlank()) Text(" · $strength", fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
                     }
-                    if (schedule.isNotBlank()) Text(schedule, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.testTag("medicine-schedule-${item.id}"))
+                    // Dose times as pictures with their words ("☀ Morning  🌙 Night"); a medicine without times keeps its words.
+                    val timed = doses.filter { it.timed }.map { it.time }
+                    if (timed.isNotEmpty()) DoseSlotLine(timed, Modifier.testTag("medicine-schedule-${item.id}"))
+                    else if (schedule.isNotBlank()) Text(schedule, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.testTag("medicine-schedule-${item.id}"))
+                    if (MedicineAlarmRules.isImportant(item)) MedicineAlarmTag(Modifier.testTag("medicine-alarm-tag-${item.id}"))
                 }
                 MedicineTodayStatus(item.id, states)
                 Icon(Icons.Default.KeyboardArrowDown, t("Show details", "ब्यौरा दिखाएँ"), Modifier.padding(start = 4.dp), tint = DoctorCardSub)
@@ -171,19 +212,29 @@ object MedicineTimeGroups {
     }
 }
 
-/** Today's doses as a small pill: "1 of 2" while some are due, a green tick once all are taken, red once one was not taken. Nothing without doses. */
+/**
+ * Today's doses on the right of a row: a large green tick once all are taken, a large red cross once one was not taken (point 6),
+ * and "1 of 2" as a small pill while some are still due. Nothing without doses.
+ */
 @Composable private fun MedicineTodayStatus(itemId: String, states: Map<String, MedicineDoseState>) {
     val t = careText()
     if (states.isEmpty()) return
     val total = states.size; val taken = MedicineDoses.takenCount(states)
     val notTaken = states.values.any { it == MedicineDoseState.MISSED }
     val all = MedicineDoses.allTaken(states)
+    if (all || notTaken) { DoseStateMark(if (notTaken) MedicineDoseState.MISSED else MedicineDoseState.TAKEN, 36, modifier = Modifier.testTag("medicine-status-$itemId")); return }
     val tone = when { notTaken -> SaharaTone.Error; all -> SaharaTone.Success; else -> SaharaTone.Neutral }
     val text = when { all -> t("Taken", "ली"); notTaken -> t("Not taken", "नहीं ली"); else -> t("$taken of $total", "$total में से $taken") }
-    Surface(shape = RoundedCornerShape(50), color = tone.wash, modifier = Modifier.testTag("medicine-status-$itemId")) {
+    // The pill's colour glides between grey, green and red, and its words change in place, when a dose is marked.
+    val wash by animateColorAsState(tone.wash, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "medicine-status-wash")
+    val ink by animateColorAsState(tone.ink, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "medicine-status-ink")
+    Surface(shape = RoundedCornerShape(50), color = wash, modifier = Modifier.testTag("medicine-status-$itemId")) {
         Row(Modifier.padding(horizontal = 10.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            if (all) { Icon(Icons.Default.Check, null, Modifier.size(16.dp), tint = tone.ink); Spacer(Modifier.width(4.dp)) }
-            Text(text, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = tone.ink, maxLines = 1, softWrap = false)
+            AnimatedVisibility(all, enter = fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)) + expandHorizontally(SaharaMotion.tween(SaharaMotion.SAVED_MS)),
+                exit = fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS)) + shrinkHorizontally(SaharaMotion.tween(SaharaMotion.EXIT_MS)), label = "medicine-status-tick") {
+                Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Check, null, Modifier.size(16.dp), tint = ink); Spacer(Modifier.width(4.dp)) }
+            }
+            SaharaAnimatedText(text) { shown -> Text(shown, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = ink, maxLines = 1, softWrap = false) }
         }
     }
 }

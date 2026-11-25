@@ -259,6 +259,14 @@ private fun clipboardText(context: android.content.Context): String? = (context.
             if (heading != "") Heading(heading ?: if (session == null) if (create) t("Create an account", "खाता बनाएँ") else t("Sign in", "साइन इन करें") else t("Your account", "आपका खाता"), if (session == null) 24 else 28)
             banner?.let { Surface(color = Mint, shape = RoundedCornerShape(14.dp)) { Text(it, Modifier.fillMaxWidth().padding(16.dp), fontWeight = FontWeight.Medium) } }
             if (session == null) {
+                // The clinic's invite link is the main way in (owner's point 1): it comes first and largest; email and password come second.
+                if (onInvite != null) {
+                    ClinicInviteFirst(ready = banner != null, enabled = !busy, onPaste = {
+                        val pasted = clipboardText(context)
+                        if (CareInviteLink.parse(pasted) != null) { onInvite(pasted.orEmpty()); error = null; if (signupIntent == null) create = true; true } else false
+                    })
+                    Text(t("Or sign in with email", "या ईमेल से साइन इन करें"), Modifier.padding(top = 8.dp).a11yHeading(), fontWeight = FontWeight.SemiBold, fontSize = 18.sp, color = DoctorCardInk)
+                }
                 if (create && signupIntent?.role.isNullOrBlank()) SignupRolePicker(signupRole) { signupRole = it }
                 if (create) Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable { signupAgreed = !signupAgreed }.testTag("signup-agree"), verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(checked = signupAgreed, onCheckedChange = { signupAgreed = it })
@@ -279,6 +287,7 @@ private fun clipboardText(context: android.content.Context): String? = (context.
                     else { cloud.signIn(email, password); awaitingConfirmation = "" }
                 } },
                     enabled = email.contains('@') && password.isNotEmpty() && (!create || (signupRole.isNotEmpty() && signupAgreed)), busy = busy, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp))
+                Text(t("You stay signed in on this phone until you choose Sign out.", "जब तक आप साइन आउट न चुनें, आप इस फ़ोन पर साइन इन रहते हैं।"), fontSize = 16.sp, color = DoctorCardSub, modifier = Modifier.testTag("account-stay-signed-in"))
                 if (awaitingConfirmation.isNotBlank()) SaharaSecondaryButton(t("Resend email", "ईमेल फिर भेजें"), onClick = { authRun { cloud.resendConfirmation(awaitingConfirmation); notice = t("Email sent again.", "ईमेल फिर भेजा गया।") } }, enabled = !busy, icon = Icons.Default.MailOutline, modifier = Modifier.fillMaxWidth())
                 // Secondary links side by side, so the form stays short.
                 FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -288,7 +297,6 @@ private fun clipboardText(context: android.content.Context): String? = (context.
                     } }, enabled = !busy && email.contains('@') && CareEmailAvailability.ready, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Forgot password?", "पासवर्ड भूल गए?")) }
                     TextButton(onClick = { create = !create; error = null; notice = null }, enabled = !busy && (create || CareEmailAvailability.ready), modifier = Modifier.heightIn(min = 48.dp)) { Text(if (create) t("Already have an account? Sign in", "पहले से खाता है? साइन इन करें") else t("Create an account", "खाता बनाएँ"), fontWeight = FontWeight.SemiBold) }
                 }
-                if (onInvite != null) SaharaSecondaryButton(t("Paste invite", "निमंत्रण चिपकाएँ"), onClick = { val pasted = clipboardText(context); if (CareInviteLink.parse(pasted) != null) { onInvite(pasted.orEmpty()); error = null; notice = t("Invite saved. Sign in to join.", "निमंत्रण रख लिया। जुड़ने के लिए साइन इन करें।") } else { notice = null; error = t("No invite copied.", "कोई निमंत्रण कॉपी नहीं हुआ।") } }, enabled = !busy, icon = Icons.Default.ContentPaste, modifier = Modifier.fillMaxWidth())
             } else {
                 // Who is signed in, with refresh beside it: one row instead of a line and a separate button.
                 Surface(shape = RoundedCornerShape(12.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().saharaAppear()) {
@@ -359,7 +367,7 @@ private fun clipboardText(context: android.content.Context): String? = (context.
                     CareContactManager(vm, selected)
                 }
                 SaharaSectionHeader(t("Join someone's care", "किसी की देखभाल से जुड़ें"), tone = SaharaTone.Teal, icon = Icons.Default.GroupAdd)
-                CareField(code, { code = CareInviteLink.parse(it)?.code ?: it.trim().take(4000) }, t("Invite code", "निमंत्रण कोड"), singleLine = true)
+                CareField(code, { code = CareInviteLink.parse(it)?.code ?: it.trim().take(4000) }, t("Invite code", "निमंत्रण कोड"), singleLine = true, voice = false)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     SaharaSecondaryButton(t("Paste invite", "निमंत्रण चिपकाएँ"), onClick = { val pasted = clipboardText(context); val invite = CareInviteLink.parse(pasted); if (invite != null) { code = invite.code; error = null; notice = null } else { notice = null; error = t("No invite copied.", "कोई निमंत्रण कॉपी नहीं हुआ।") } }, enabled = !busy, icon = Icons.Default.ContentPaste, tone = SaharaTone.Teal, modifier = Modifier.weight(1f))
                     SaharaPrimaryButton(t("Join", "जुड़ें"), onClick = { run { val before = vm.people.value.map { it.id }.toSet(); try { cloud.join(code) } catch (e: Exception) { if (e is CancellationException) throw e; throw IllegalArgumentException(careJoinFailureMessage(e.message, hindi), e) }; code = ""; val added = vm.joinedRefresh(before); notice = added?.name?.let { t("You can now see $it's care.", "अब आप $it की देखभाल देख सकते हैं।") } ?: t("You can now see their care.", "अब आप उनकी देखभाल देख सकते हैं।") } }, enabled = !busy && code.trim().length == 48, tone = SaharaTone.Teal, modifier = Modifier.weight(1f))
@@ -418,7 +426,7 @@ private fun clipboardText(context: android.content.Context): String? = (context.
         confirmButton = { TextButton(onClick = { deleting = false; run {
             vm.stopRecording()
             val result = try { cloud.deleteMyAccount() } catch (e: CareServerFeatureMissing) { deletionByEmail = true; throw IllegalStateException(t("Couldn't delete. Request deletion by email below.", "नहीं मिटा सके। नीचे ईमेल से अनुरोध भेजें।"), e) }
-            runCatching { vm.forgetLocalAccountData() }; inviteStore.save(session!!.userId, emptyList())
+            runCatching { vm.forgetLocalAccountData() }; CareVoiceNotes.forgetAll(context, vm.storageNamespace); inviteStore.save(session!!.userId, emptyList())
             onDeleted(if (result.loginRemoved) t("Your Sahara account and its data were deleted.", "आपका Sahara खाता और उसकी जानकारी मिटा दी गई।") else t("Your data was deleted and the account closed.", "आपकी जानकारी मिटा दी गई और खाता बंद हो गया।"))
             cloud.forgetSession()
         } }, enabled = deleteUnderstood) { Text(t("Delete", "मिटाएँ")) } },
@@ -467,6 +475,37 @@ internal val LocalSignupIntent = staticCompositionLocalOf<SignupIntent?> { null 
     }
     Text(t("We never ask for Aadhaar, date of birth or gender to sign up. Only an email and a password.", "साइन अप के लिए हम कभी आधार, जन्मतिथि या लिंग नहीं माँगते। सिर्फ़ ईमेल और पासवर्ड।"),
         fontSize = 13.sp, color = DoctorCardSub)
+}
+
+/**
+ * The first thing a signed-out person sees: "I have an invite link from my clinic". The nurse or doctor makes the invite; the
+ * family taps the link in WhatsApp or SMS once (Sahara opens by itself), or copies it and taps this button. [ready] is true once
+ * an invite is waiting. [onPaste] reads a copied link and returns whether it was an invite.
+ */
+@Composable private fun ClinicInviteFirst(ready: Boolean, enabled: Boolean, onPaste: () -> Boolean) {
+    val t = careText(); var help by rememberSaveable { mutableStateOf(false) }
+    Surface(shape = RoundedCornerShape(SaharaRadius.Lg), color = SaharaTone.Teal.wash, border = BorderStroke(1.dp, SaharaTone.Teal.solid.copy(alpha = .5f)), modifier = Modifier.fillMaxWidth().saharaAppear().testTag("account-clinic-invite")) {
+        Column(Modifier.saharaContentSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            androidx.compose.animation.AnimatedContent(ready, transitionSpec = { SaharaMotion.crossfade() }, label = "clinic-invite") { has ->
+                if (has) Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.CheckCircle, null, Modifier.size(36.dp), tint = SaharaTone.Success.solid); Spacer(Modifier.width(12.dp))
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(t("Your clinic's invite is ready", "आपके क्लिनिक का निमंत्रण तैयार है"), fontWeight = FontWeight.SemiBold, fontSize = 18.sp, color = DoctorCardInk)
+                        Text(t("Make your account once below. After that you stay signed in on this phone.", "नीचे एक बार अपना खाता बनाएँ। उसके बाद आप इस फ़ोन पर साइन इन रहते हैं।"), fontSize = 16.sp, color = DoctorCardInk)
+                    }
+                } else Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    SaharaPrimaryButton(t("I have an invite link from my clinic", "मेरे पास क्लिनिक से निमंत्रण लिंक है"), onClick = { help = !onPaste() }, enabled = enabled, tone = SaharaTone.Teal, icon = Icons.Default.Link,
+                        modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp).testTag("account-clinic-invite-button"))
+                    androidx.compose.animation.AnimatedVisibility(help, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) {
+                        Text(t("Open the message from your nurse or doctor and tap the link once. Sahara opens by itself. Or copy the link, come back and tap this button again.",
+                            "अपनी नर्स या डॉक्टर का संदेश खोलें और लिंक पर एक बार टैप करें। Sahara अपने आप खुल जाएगा। या लिंक कॉपी करें, वापस आएँ और यह बटन फिर दबाएँ।"),
+                            fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.announce().testTag("account-clinic-invite-help"))
+                    }
+                    if (!help) Text(t("Your nurse or doctor sends it on WhatsApp or SMS.", "आपकी नर्स या डॉक्टर इसे WhatsApp या SMS पर भेजते हैं।"), fontSize = 16.sp, color = DoctorCardSub)
+                }
+            }
+        }
+    }
 }
 
 /** One access choice as a chip with a tick when on; at least 48dp tall. */

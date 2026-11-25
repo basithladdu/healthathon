@@ -59,8 +59,8 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
     LaunchedEffect(person, busy) {
         if (person.isNotBlank() && !busy) prescriptionOriginals = withContext(Dispatchers.IO) { runCatching { MedicineSourceStore(context.applicationContext, vm.storageNamespace).list(person) }.getOrDefault(emptyList()) }.also { PrescriptionOriginalsCache[originalsKey] = it }
     }
-    val reports = (savedReports.filter { it.personId == person } + prescriptionOriginals).distinctBy { it.id }
-    val notes = savedNotes.filter { it.personId == person }
+    val reports = remember(savedReports, person, prescriptionOriginals) { (savedReports.filter { it.personId == person } + prescriptionOriginals).distinctBy { it.id } }
+    val notes = remember(savedNotes, person) { savedNotes.filter { it.personId == person } }
     var search by rememberSaveable { mutableStateOf("") }
     var filter by rememberSaveable { mutableStateOf("All") }
     var importingFor by rememberSaveable { mutableStateOf("") }
@@ -130,8 +130,10 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         Unit
     }
     val bothLanguages: (String, String) -> String = { en, hi -> "$en $hi" }
-    val visibleReports = reports.filter { report -> filter != "Care notes" && (folderFilter.isEmpty() || folderOf(report) == folderFilter) && (filter != "Cancer" || cancerType(report) != null) && DocumentSearchWords.matchesName(search, "${report.name} ${cancerType(report)?.let { CancerDocumentRules.label(it, bothLanguages) }.orEmpty()}") }
-    val visibleNotes = notes.filter { filter !in setOf("Reports", "Cancer") && folderFilter.isEmpty() && DocumentSearchWords.matchesName(search, "Goals of care देखभाल के लक्ष्य ${it.personName} ${it.doctor} Version ${it.version}") }
+    // Filtering and name matching run when the list, folders, types or search change, not on every recomposition.
+    val visibleReports = remember(reports, filter, folderFilter, search, folders, cancerChoices) { reports.filter { report -> filter != "Care notes" && (folderFilter.isEmpty() || folderOf(report) == folderFilter) && (filter != "Cancer" || cancerType(report) != null) && DocumentSearchWords.matchesName(search, "${report.name} ${cancerType(report)?.let { CancerDocumentRules.label(it, bothLanguages) }.orEmpty()}") } }
+    val visibleNotes = remember(notes, filter, folderFilter, search) { notes.filter { filter !in setOf("Reports", "Cancer") && folderFilter.isEmpty() && DocumentSearchWords.matchesName(search, "Goals of care देखभाल के लक्ष्य ${it.personName} ${it.doctor} Version ${it.version}") } }
+    val folderCounts = remember(reports, folders) { DocumentFolderRules.counts(reports.map(::folderOf)) }
     // Long lists start short: the newest five, then "Show older" (24 Nov).
     val notesShown = rememberShownCount("$person:$filter:$search")
     val reportsShown = rememberShownCount("$person:$filter:$folderFilter:$search")
@@ -168,12 +170,12 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
             modifier = Modifier.fillMaxWidth().testTag("document-search"), shape = RoundedCornerShape(14.dp), singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), keyboardActions = KeyboardActions(onSearch = { focus.clearFocus() })) }
         item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf("All", "Care notes", "Reports", "Cancer").forEach { label -> FilterChip(selected = filter == label, onClick = { filter = label }, label = { Text(when (label) { "Care notes" -> t("Care notes", "देखभाल नोट"); "Reports" -> t("Reports", "रिपोर्टें"); "Cancer" -> t("Cancer documents", "कैंसर के कागज़"); else -> t("All", "सभी") }) }, shape = RoundedCornerShape(50), modifier = Modifier.testTag("document-filter-$label")) }
+            listOf("All", "Care notes", "Reports", "Cancer").forEach { label -> RecordsChip(selected = filter == label, onClick = { filter = label }, label = { Text(when (label) { "Care notes" -> t("Care notes", "देखभाल नोट"); "Reports" -> t("Reports", "रिपोर्टें"); "Cancer" -> t("Cancer documents", "कैंसर के कागज़"); else -> t("All", "सभी") }) }, shape = RoundedCornerShape(50), modifier = Modifier.testTag("document-filter-$label")) }
         } }
         // Auto-sorted folders as coloured tiles with their counts; tap one to open it, tap again to see everything.
         // Only folders that hold something (and the open one) are shown, so empty tiles never push the list down.
-        if (reports.isNotEmpty() && !clinician) item { val counts = DocumentFolderRules.counts(reports.map(::folderOf))
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        if (reports.isNotEmpty() && !clinician) item(key = "folders", contentType = "folders") { val counts = folderCounts
+            Column(Modifier.animateItem(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 DocumentFolderRules.folders.filter { (counts[it] ?: 0) > 0 || it == folderFilter }.chunked(2).forEach { pair -> Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     pair.forEach { folder -> FolderTile(DocumentFolderRules.label(folder, t), folder, counts[folder] ?: 0, folderFilter == folder, Modifier.weight(1f).fillMaxHeight().saharaStagger(DocumentFolderRules.folders.indexOf(folder)).testTag("document-folder-$folder")) { folderFilter = if (folderFilter == folder) "" else folder } }
                     if (pair.size == 1) Spacer(Modifier.weight(1f))
@@ -181,7 +183,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
             }
         }
         // Searching inside checked report text only makes sense once something is typed.
-        if (search.isNotBlank()) item { OutlinedButton(onClick = {
+        if (search.isNotBlank()) item(key = "search-text", contentType = "search-text") { OutlinedButton(onClick = {
             val query = search.trim(); val capturedPerson = person
             searching = true; textError = ""
             scope.launch {
@@ -195,28 +197,28 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
                 } catch (_: Exception) { textError = t("Search didn't work. Your documents are safe. Try again.", "खोज नहीं हो पाई। आपके कागज़ सुरक्षित हैं। फिर कोशिश करें।") }
                 finally { searching = false }
             }
-        }, enabled = !searching, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Search, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(if (searching) t("Searching your reports…", "रिपोर्टों में खोज रहे हैं…") else t("Search checked reports", "जाँची गई रिपोर्टों में खोजें")) } }
-        if (textError.isNotBlank()) item { Text(textError, color = MaterialTheme.colorScheme.error, fontSize = 14.sp, modifier = Modifier.announce()) }
+        }, enabled = !searching, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).animateItem()) { Icon(Icons.Default.Search, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(if (searching) t("Searching your reports…", "रिपोर्टों में खोज रहे हैं…") else t("Search checked reports", "जाँची गई रिपोर्टों में खोजें")) } }
+        if (textError.isNotBlank()) item(key = "search-error", contentType = "error") { Text(textError, color = MaterialTheme.colorScheme.error, fontSize = 14.sp, modifier = Modifier.animateItem().announce()) }
         if (searchedText.isNotBlank()) {
-            item { SectionTitle(t("From your reports", "आपकी रिपोर्टों से")) }
-            if (textMatches.isEmpty()) item { SurfaceCard { Text(t("Not found in your reports", "आपकी रिपोर्टों में नहीं मिला"), fontWeight = FontWeight.SemiBold, color = DoctorCardInk) } }
-            items(textMatches, key = { "${it.reportId}:${it.page}:${it.line}" }) { match ->
-                reports.firstOrNull { it.id == match.reportId }?.let { report -> SurfaceCard(Mint) {
+            item(key = "matches-title", contentType = "title") { Box(Modifier.animateItem()) { SectionTitle(t("From your reports", "आपकी रिपोर्टों से")) } }
+            if (textMatches.isEmpty()) item(key = "matches-empty", contentType = "empty") { Box(Modifier.animateItem()) { SurfaceCard { Text(t("Not found in your reports", "आपकी रिपोर्टों में नहीं मिला"), fontWeight = FontWeight.SemiBold, color = DoctorCardInk) } } }
+            items(textMatches, key = { "${it.reportId}:${it.page}:${it.line}" }, contentType = { "match" }) { match ->
+                reports.firstOrNull { it.id == match.reportId }?.let { report -> Box(Modifier.animateItem()) { SurfaceCard(Mint) {
                     Text(report.name, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     Text(t("Page ${match.page} · line ${match.line}", "पेज ${match.page} · पंक्ति ${match.line}"), fontSize = 14.sp, color = DoctorCardSub)
                     Spacer(Modifier.height(4.dp)); Text(match.quote, color = DoctorCardInk)
                     TextButton(onClick = { reviewId = report.id }, colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Text(t("Open report and copy this", "रिपोर्ट खोलें और यह कॉपी करें")) }
-                } }
+                } } }
             }
         }
-        if (visibleNotes.isEmpty() && visibleReports.isEmpty()) item { SurfaceCard {
+        if (visibleNotes.isEmpty() && visibleReports.isEmpty()) item(key = "documents-empty", contentType = "empty") { Box(Modifier.animateItem()) { SurfaceCard {
             SaharaLottie(SaharaLottieKind.Document, Modifier.fillMaxWidth())
             Spacer(Modifier.height(12.dp)); Text(if (search.isNotBlank()) t("No documents found", "कोई कागज़ नहीं मिला") else when (filter) { "Reports" -> t("No reports yet", "अभी कोई रिपोर्ट नहीं"); "Care notes" -> t("No care notes yet", "अभी कोई देखभाल नोट नहीं"); "Cancer" -> t("No cancer documents yet", "अभी कैंसर का कोई कागज़ नहीं"); else -> t("No documents yet", "अभी कोई कागज़ नहीं") }, fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk)
             Spacer(Modifier.height(4.dp))
             if (search.isNotBlank()) TextButton(onClick = { search = ""; filter = "All" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Clear search", "खोज मिटाएँ")) }
             else if (filter != "Care notes" && canEdit && !clinician) TextButton(onClick = { addSheet = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Add document", "कागज़ जोड़ें")) }
-        } }
-        if (visibleNotes.isNotEmpty()) item { SectionTitle(t("Care notes", "देखभाल नोट")) }
+        } } }
+        if (visibleNotes.isNotEmpty()) item(key = "notes-title", contentType = "title") { Box(Modifier.animateItem()) { SectionTitle(t("Care notes", "देखभाल नोट")) } }
         cappedItems(visibleNotes, notesShown, key = { it.id }, tag = "document-notes") { note ->
             val latest = note.id == notes.firstOrNull()?.id
             // Goals-of-care notes keep their indigo: washed card, solid edge and a solid icon chip.
@@ -291,7 +293,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
             Text(report.name, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
             (CancerDocumentRules.types + CancerDocumentRules.NOT_CANCER).forEach { type ->
                 val chosen = if (type == CancerDocumentRules.NOT_CANCER) current == null else current == type
-                FilterChip(selected = chosen, onClick = { cancerStore.set(report.id, type); cancerChoices = cancerStore.all(); marking = null },
+                RecordsChip(selected = chosen, onClick = { cancerStore.set(report.id, type); cancerChoices = cancerStore.all(); marking = null },
                     label = { Text(if (type == CancerDocumentRules.NOT_CANCER) t("Not a cancer document", "कैंसर का कागज़ नहीं") else CancerDocumentRules.label(type, t)) },
                     modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("cancer-type-$type"))
             }
@@ -301,7 +303,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         AlertDialog(onDismissRequest = { moving = null }, title = { Text(t("Move to folder", "किस फ़ोल्डर में रखें?")) }, text = { Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(report.name, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
             DocumentFolderRules.folders.forEach { folder ->
-                FilterChip(selected = folderOf(report) == folder, onClick = { folderStore.choose(report.id, folder); folders = folderStore.all(); moving = null },
+                RecordsChip(selected = folderOf(report) == folder, onClick = { folderStore.choose(report.id, folder); folders = folderStore.all(); moving = null },
                     label = { Text(DocumentFolderRules.label(folder, t)) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("folder-choice-$folder"))
             }
         } }, confirmButton = { TextButton(onClick = { moving = null }) { Text(t("Close", "बंद करें")) } })
@@ -346,8 +348,9 @@ internal val CancerTone = FolderTone(SaharaTone.Rose.ink, SaharaTone.Rose.wash, 
     val fill by androidx.compose.animation.animateColorAsState(if (open) tone.accent else Paper, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "folder-tile")
     val ink by androidx.compose.animation.animateColorAsState(if (open) Paper else DoctorCardInk, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "folder-ink")
     val interaction = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
-    Surface(onClick = onClick, shape = RoundedCornerShape(12.dp), color = fill, border = BorderStroke(1.5.dp, tone.accent), interactionSource = interaction,
-        modifier = modifier.saharaPress(interaction).heightIn(min = 56.dp).semantics { selected = open; contentDescription = "$title, $count" }) {
+    val tick = rememberSaharaTick()
+    Surface(onClick = { tick(); onClick() }, shape = RoundedCornerShape(12.dp), color = fill, border = BorderStroke(1.5.dp, tone.accent), interactionSource = interaction,
+        modifier = modifier.saharaPress(interaction).saharaSelectBounce(open, amount = .05f).heightIn(min = 56.dp).semantics { selected = open; contentDescription = "$title, $count" }) {
         Row(Modifier.padding(horizontal = 10.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             Surface(shape = RoundedCornerShape(10.dp), color = if (open) Paper else tone.soft) { Icon(if (open) Icons.Default.FolderOpen else tone.icon, null, Modifier.padding(7.dp).size(20.dp), tint = tone.accent) }
             Spacer(Modifier.width(8.dp))

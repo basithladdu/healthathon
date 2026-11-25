@@ -1,12 +1,9 @@
 @file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 package `in`.wedevit.care
 
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
 import android.app.Activity
 import android.content.ContextWrapper
 import androidx.core.view.WindowCompat
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.BorderStroke
@@ -217,7 +214,7 @@ private val DoctorMist = Peach
         FeedbackScreen(accountScope = workflowAccountId ?: "guest-doctor-preview", surface = "doctor-preview", onClose = { feedbackOpen = false }, cloud = careModel?.cloud)
         return
     }
-    BackHandler {
+    SaharaBackHandler {
         if(sampleCareOpen) {if(!careNavigationBlocked)sampleCareBack?.invoke() ?: run {sampleCareOpen=false}}
         else if (carePersonId != null) { if (!careNavigationBlocked && careNestedBack != null) careNestedBack?.invoke() else navigateCare { if (careSection == "Hub") carePersonId = null else careSection = "Hub" } }
         else when { editingId != null || creatingFor != null -> { editingId = null; creatingFor = null; schedulingRequestId=null }
@@ -501,11 +498,14 @@ private val DoctorMist = Peach
 @Composable internal fun DemoSchedule(patients: List<DoctorDemoPatient>, appointments: List<DoctorDemoAppointment>, day: LocalDate, onDay: (LocalDate) -> Unit, onPatient: (String) -> Unit, onAdd: () -> Unit, onReschedule: (DoctorDemoAppointment) -> Unit, onCancel: (DoctorDemoAppointment) -> Unit, onComplete: (DoctorDemoAppointment) -> Unit) { val t = careText();
     val context = LocalContext.current
     val visits = appointments.filter { demoDate(it.startMillis) == day }.sortedBy { it.startMillis }
+    // The schedule's day by the calendar only, never typed (owner, 25 Nov).
+    var pickingDay by remember { mutableStateOf(false) }
+    if (pickingDay) CareDatePickerDialog(day, t("Choose a day", "दिन चुनें"), { onDay(it); pickingDay = false }, { pickingDay = false })
     LazyColumn(Modifier.fillMaxSize().testTag("demo-schedule-list"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { DoctorTitle(t("Your schedule", "आपकी समय-सूची")) }
         item { Column { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = { onDay(day.minusDays(1)) }) { Icon(Icons.Default.ChevronLeft, t("Previous day", "पिछला दिन")) }
-            TextButton(onClick = { DatePickerDialog(context, { _, y, m, d -> onDay(LocalDate.of(y, m + 1, d)) }, day.year, day.monthValue - 1, day.dayOfMonth).show() }, modifier = Modifier.weight(1f).heightIn(min=48.dp).testTag("demo-schedule-date")) { Text(demoDay(day),fontSize=13.sp) }
+            TextButton(onClick = { pickingDay = true }, modifier = Modifier.weight(1f).heightIn(min=48.dp).testTag("demo-schedule-date")) { Text(demoDay(day),fontSize=13.sp) }
             IconButton(onClick = { onDay(day.plusDays(1)) }) { Icon(Icons.Default.ChevronRight, t("Next day", "अगला दिन")) }
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(5.dp)) { (-2L..2L).forEach { offset ->
@@ -574,11 +574,15 @@ private val DoctorMist = Peach
                 }
             }
             val date = LocalDate.parse(day); val clock = LocalTime.parse(time)
+            // Date and time by the calendar and the scroll wheels, never typed (owner, 25 Nov); stored as before ("yyyy-MM-dd", "HH:mm").
+            var pickingDate by remember { mutableStateOf(false) }; var pickingTime by remember { mutableStateOf(false) }
+            if (pickingDate) CareDatePickerDialog(date, t("Choose another date", "दूसरी तारीख़ चुनें"), { day = it.toString(); error = null; pickingDate = false }, { pickingDate = false })
+            if (pickingTime) CareClockDialog(clock, t("Starts at", "शुरू होने का समय"), { time = it.toString(); error = null; pickingTime = false }, { pickingTime = false })
             Surface(color = Paper, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) { Text(t("Date & time", "तारीख़ और समय"), fontWeight = FontWeight.SemiBold, fontSize = 18.sp); Text(date.format(DateTimeFormatter.ofPattern("MMMM yyyy")), color = DoctorMuted, style = MaterialTheme.typography.bodyMedium) }
-                        IconButton(onClick = { DatePickerDialog(context, { _, y, m, d -> day = LocalDate.of(y, m + 1, d).toString(); error = null }, date.year, date.monthValue - 1, date.dayOfMonth).show() }, modifier = Modifier.testTag("demo-visit-date")) { Icon(Icons.Default.CalendarMonth, t("Choose another date", "दूसरी तारीख़ चुनें"), tint = Rust) }
+                        IconButton(onClick = { pickingDate = true }, modifier = Modifier.size(48.dp).testTag("demo-visit-date")) { Icon(Icons.Default.CalendarMonth, t("Choose another date", "दूसरी तारीख़ चुनें"), tint = Rust) }
                     }
                     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         (-2L..2L).forEach { offset ->
@@ -591,7 +595,7 @@ private val DoctorMist = Peach
                     }
                     Text(demoDay(date), color = DoctorMuted, style = MaterialTheme.typography.bodySmall)
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                    Surface(onClick = { TimePickerDialog(context, { _, h, m -> time = LocalTime.of(h, m).toString(); error = null }, clock.hour, clock.minute, false).show() }, color = Cream, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("demo-visit-time")) {
+                    Surface(onClick = { pickingTime = true }, color = Cream, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("demo-visit-time")) {
                         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) { Icon(Icons.Default.Schedule, null, tint = Rust); Column(Modifier.weight(1f)) { Text(t("Starts at", "शुरू होने का समय"), color = DoctorMuted, style = MaterialTheme.typography.labelSmall); Text(clock.format(DateTimeFormatter.ofPattern("h:mm a")), fontSize = 19.sp, fontWeight = FontWeight.SemiBold) }; Text(t("Change", "बदलें"), color = Rust, style = MaterialTheme.typography.labelLarge) }
                     }
                 }

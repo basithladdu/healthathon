@@ -80,9 +80,10 @@ internal fun gocMillis(at: String?): Long? {
     val busy by vm.busy.collectAsStateWithLifecycle()
     val asked = remember(items, personId) { GocRequestOps.open(items, personId).firstOrNull() }
     var result by remember(personId) { mutableStateOf("") }
+    val savedTap = rememberSaharaHaptic()
     fun ask() {
         if (personId.isBlank() || busy || asked != null || vm.selected.value != personId) return
-        runCatching { vm.saveItem("task", GocRequestOps.TITLE, CareEntryCodec.encode(GocRequestOps.entry(vm.cloud?.session?.value?.email.orEmpty().ifBlank { vm.viewRole.value })), done = { result = "sent" }) }
+        runCatching { vm.saveItem("task", GocRequestOps.TITLE, CareEntryCodec.encode(GocRequestOps.entry(vm.cloud?.session?.value?.email.orEmpty().ifBlank { vm.viewRole.value })), done = { result = "sent"; savedTap() }) }
             .onFailure { result = "failed" }
     }
     Column(modifier.fillMaxWidth().testTag("goc-family-status"), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -99,17 +100,20 @@ internal fun gocMillis(at: String?): Long? {
         if (signed != null) OutlinedButton(onClick = { reading = signed }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("goc-family-read")) {
             Text(t("Read the signed note", "साइन किया हुआ नोट पढ़ें"))
         }
-        if (asked != null) FamilyRegisterRow(t("You asked for this conversation", "आपने यह बातचीत माँगी है"), meta = gocDay(asked.first.created),
-            pill = asked.second.statusLabel(hindi) to (if (asked.second.status == "accepted") FamilyTone.GOOD else FamilyTone.WAIT), modifier = Modifier.testTag("goc-ask-sent"))
-        if (result == "failed") Text(t("Couldn't save that. Please try again.", "यह सहेजा नहीं जा सका। फिर से कोशिश करें।"), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce())
+        PlanReveal(result == "failed") { Text(t("Couldn't save that. Please try again.", "यह सहेजा नहीं जा सका। फिर से कोशिश करें।"), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
+        // Asking turns into "You asked" with a crossfade, instead of the button vanishing.
+        SaharaStateSwitch(asked != null, Modifier.fillMaxWidth(), label = "goc-ask") { hasAsked -> Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        if (hasAsked) asked?.let { a -> FamilyRegisterRow(t("You asked for this conversation", "आपने यह बातचीत माँगी है"), meta = gocDay(a.first.created),
+            pill = a.second.statusLabel(hindi) to (if (a.second.status == "accepted") FamilyTone.GOOD else FamilyTone.WAIT), modifier = Modifier.testTag("goc-ask-sent")) }
         // What the conversation is, in plain words, beside the button (clinical team, 24 Nov 2026).
-        if (asked == null) Text(t("A calm talk with your doctor about what matters most to you, so your care follows your wishes. You can bring family.",
+        if (!hasAsked) Text(t("A calm talk with your doctor about what matters most to you, so your care follows your wishes. You can bring family.",
             "अपने डॉक्टर से एक शांत बातचीत, कि आपके लिए सबसे ज़रूरी क्या है, ताकि आपकी देखभाल आपकी इच्छा के अनुसार हो। आप परिवार को साथ ला सकते हैं।"),
             fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardSub, modifier = Modifier.testTag("goc-ask-explained"))
-        if (asked == null) Button(onClick = ::ask, enabled = canEdit && !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("goc-ask-doctor")) {
+        if (!hasAsked) Button(onClick = ::ask, enabled = canEdit && !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("goc-ask-doctor")) {
             Icon(Icons.Default.Forum, null); Spacer(Modifier.width(8.dp)); Text(t("Ask my doctor for a goals of care conversation", "अपने डॉक्टर से देखभाल के लक्ष्यों पर बातचीत माँगें"))
         }
-        if (asked == null && !canEdit) Text(t("Someone in the family who can make changes can send this.", "परिवार में जो बदलाव कर सकते हैं, वे इसे भेज सकते हैं।"), fontSize = 14.sp, color = DoctorCardSub)
+        if (!hasAsked && !canEdit) Text(t("Someone in the family who can make changes can send this.", "परिवार में जो बदलाव कर सकते हैं, वे इसे भेज सकते हैं।"), fontSize = 14.sp, color = DoctorCardSub)
+        } }
     }
     reading?.let { d -> GocSignedNoteReader(d) { reading = null } }
 }

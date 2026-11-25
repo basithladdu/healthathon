@@ -60,16 +60,24 @@ import androidx.compose.ui.unit.sp
     val current = routes.indexOfFirst { lit(it) }
     // Premium pass (22 Nov): a floating, softly elevated bar with rounded ends above the system navigation, and one light sage pill
     // that slides under the selected tab (icon filled, label bold dark sage on it). Light wash, not a solid fill, after "dark and scary".
+    // A light tick when the person moves to another tab (follows the phone's touch-feedback setting); none on the tab already open.
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     Box(Modifier.fillMaxWidth().navigationBarsPadding().padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 10.dp)) {
         Surface(Modifier.fillMaxWidth().shadow(SaharaElevation.Floating, RoundedCornerShape(SaharaRadius.Hero), ambientColor = SaharaColors.Shadow, spotColor = SaharaColors.Shadow),
             shape = RoundedCornerShape(SaharaRadius.Hero), color = SaharaColors.Surface, border = BorderStroke(1.dp, SaharaColors.Line)) {
-            Row(Modifier.fillMaxWidth().padding(6.dp).saharaNavPill(current, labels.size, gap = 4.dp).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            Row(Modifier.fillMaxWidth().padding(NavInset).saharaNavPill(current, labels.size, gap = 4.dp).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 labels.forEachIndexed { index, label ->
                     val active = index == current
-                    val tint by animateColorAsState(if (active) SaharaColors.NavOnPill else SaharaColors.InkSub, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "selected-tab-icon")
-                    Column(Modifier.weight(1f).testTag("nav-${keys[index]}").clip(RoundedCornerShape(SaharaRadius.Xl))
-                        .selectable(selected = active, role = Role.Tab, onClick = { onSelect(routes[index]) }).heightIn(min = 60.dp).padding(vertical = 6.dp, horizontal = 2.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                        Icon(if (active) selectedIcons[index] else restIcons[index], null, Modifier.size(24.dp), tint = tint)
+                    val tint by animateColorAsState(if (active) SaharaColors.NavOnPill else SaharaColors.InkSub, SaharaSprings.fastEffects(), label = "selected-tab-icon")
+                    Column(Modifier.weight(1f).testTag("nav-${keys[index]}").clip(RoundedCornerShape(NavInner))
+                        .selectable(selected = active, role = Role.Tab, onClick = {
+                            if (!active) runCatching { haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.SegmentTick) }
+                            onSelect(routes[index])
+                        }).heightIn(min = 60.dp).padding(vertical = 6.dp, horizontal = 2.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                        // Outlined and filled icons cross-fade softly instead of swapping in one frame (instant when motion is off).
+                        Crossfade(active, animationSpec = SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "nav-icon") { on ->
+                            Icon(if (on) selectedIcons[index] else restIcons[index], null, Modifier.size(24.dp), tint = tint)
+                        }
                         Spacer(Modifier.height(4.dp))
                         SaharaFitText(label, style = MaterialTheme.typography.labelMedium.copy(fontSize = cappedLabelSize(14f)), fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
                             color = tint, maxLines = 2, min = 11f)
@@ -80,18 +88,23 @@ import androidx.compose.ui.unit.sp
     }
 }
 
+/** The bar's inner padding, and the tab/pill radius that keeps the corners concentric with the bar (outer radius minus the inset). */
+private val NavInset = 6.dp
+private val NavInner = SaharaRadius.Hero - NavInset
+
 /** The bottom bar's selected marker: one rounded light-sage pill the size of a tab that slides to [index] (hidden at -1). [gap] is the space between tabs. */
 @Composable private fun Modifier.saharaNavPill(index: Int, count: Int, gap: androidx.compose.ui.unit.Dp): Modifier {
     if (count <= 0) return this
-    val x by animateFloatAsState(index.coerceAtLeast(0).toFloat(), SaharaMotion.tween(SaharaMotion.ENTER_MS, easing = SaharaMotion.Emphasized), label = "navPillX")
-    val shown by animateFloatAsState(if (index in 0 until count) 1f else 0f, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "navPillAlpha")
+    // Springs, so a quick second tap carries on from where the pill is instead of restarting from rest (no visible overshoot).
+    val x by animateFloatAsState(index.coerceAtLeast(0).toFloat(), SaharaSprings.spatial(), label = "navPillX")
+    val shown by animateFloatAsState(if (index in 0 until count) 1f else 0f, SaharaSprings.effects(), label = "navPillAlpha")
     val rtl = androidx.compose.ui.platform.LocalLayoutDirection.current == androidx.compose.ui.unit.LayoutDirection.Rtl
     val pill = SaharaColors.NavPill
     return drawBehind {
         if (shown <= 0f) return@drawBehind
         val g = gap.toPx(); val cell = (size.width + g) / count; val w = cell - g
         val left = if (rtl) size.width - cell * x - w else cell * x
-        val r = SaharaRadius.Xl.toPx()
+        val r = NavInner.toPx()
         drawRoundRect(pill.copy(alpha = shown), topLeft = androidx.compose.ui.geometry.Offset(left, 0f), size = androidx.compose.ui.geometry.Size(w, size.height), cornerRadius = androidx.compose.ui.geometry.CornerRadius(r, r))
     }
 }
@@ -205,10 +218,24 @@ import androidx.compose.ui.unit.sp
     }
 }
 
-@Composable fun CareField(value: String, onValueChange: (String) -> Unit, label: String, minLines: Int = 1, singleLine: Boolean = false, placeholder: String? = null, supporting: String? = null) {
+/**
+ * Sahara's text box. [voice] (on by default) puts a microphone at its end so a person can speak instead of type: spoken words
+ * are added after what is already there. The microphone shows only where this phone writes speech down on the phone itself
+ * (Android 12+ with on-device recognition), so older phones never show a feature that fails. Turn it off for codes and ids.
+ */
+@Composable fun CareField(value: String, onValueChange: (String) -> Unit, label: String, minLines: Int = 1, singleLine: Boolean = false, placeholder: String? = null, supporting: String? = null, voice: Boolean = true) {
+    val t = careText()
+    val latestValue by rememberUpdatedState(value)
+    val latestChange by rememberUpdatedState(onValueChange)
+    val mic = if (voice) rememberCareFieldMic { words -> latestChange(CareVoiceRules.append(latestValue, words)) } else null
+    val heard = mic?.let { m -> when { m.listening && m.partial.isNotBlank() -> m.partial; m.listening -> t("Listening… speak now", "सुन रहे हैं… अब बोलिए"); else -> m.status } }.orEmpty()
+    LaunchedEffect(mic?.status) { if (mic != null && mic.status.isNotBlank() && !mic.listening) { kotlinx.coroutines.delay(6000); mic.clearStatus() } }
+    val shownSupporting = heard.ifBlank { supporting.orEmpty() }
     OutlinedTextField(value = value, onValueChange = onValueChange, label = { Text(label) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp), minLines = minLines, singleLine = singleLine,
-        placeholder = placeholder?.let { { Text(it, color = DoctorCardFaint) } }, supportingText = supporting?.let { { Text(it, color = DoctorCardSub) } },
-        colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper, unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+        placeholder = placeholder?.let { { Text(it, color = DoctorCardFaint) } },
+        supportingText = if (shownSupporting.isBlank()) null else { { Text(shownSupporting, color = if (heard.isNotBlank()) RustText else DoctorCardSub, modifier = if (heard.isNotBlank()) Modifier.announce() else Modifier) } },
+        trailingIcon = mic?.let { m -> { CareMicButton(m) } },
+        colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper, unfocusedBorderColor = if (mic?.listening == true) SaharaTone.Rose.solid else MaterialTheme.colorScheme.outline,
             focusedLabelColor = RustText, unfocusedLabelColor = DoctorCardSub))
 }
 
