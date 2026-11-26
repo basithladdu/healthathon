@@ -1041,9 +1041,8 @@ internal fun careTabBack(personShown: Boolean, medicineScanner: Boolean, tab: In
                     item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("Patient", "Family / carer").forEach { role -> FilterChip(selected = relationship == role, onClick = { relationship = role }, enabled = (vm.cloud == null || (role == "Patient") == owner) && !(familyOnly && role == "Patient") && if (role == "Patient") patientConfirmation == null else patientConfirmation != null, label = { Text(if (role == "Patient") t("Patient", "मरीज़") else t("Family / carer", "परिवार / देखभाल करने वाले")) }) } } }
                     item(key = "confirm-read-aloud") { ConsentReadAloudStep(noteSpoken, "note-confirm-${note.id}-$readingRound", name, readers, onChange = { reading = it }) }
                     item { CheckLine(reviewed, { reviewed = it }, t("I have read this version. This is not a formal signature, consent for treatment or a treatment decision. I can ask my doctor to change it later.", "मैंने यही संस्करण पढ़ा है। यह औपचारिक हस्ताक्षर, इलाज की सहमति या इलाज का फ़ैसला नहीं है। मैं बाद में डॉक्टर से इसे बदलवा सकता/सकती हूँ।")) }
-                    // The signing pad is back on the review step (owner, 26 Nov), reversing the 22 Nov removal. The signature is saved
-                    // with the confirmation by saveReview (saveNoteSignature) and shown under it via NoteSignedBy.
-                    item(key = "confirm-signature") { NoteSignatureCapture(signatureDraft, enabled = !busy && !alreadyConfirmed) { vm.message.value = it } }
+                    // No signing pad for the patient or family (Dr Sujay, 22 Nov; owner confirmed again 26 Nov): a read receipt only.
+                    // The doctor and other signers are shown in the form's signature section.
                 }
             }
         }
