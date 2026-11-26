@@ -242,7 +242,7 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
         else -> Modifier
     }).testTag("welcome-panel-screen")) {
         OnboardingTopRow(step, canBack = backTarget != null, enabled = !locked, onBack = ::back,
-            onDemo = { walkthroughChooser = true })
+            onDemo = { walkthroughChooser = true }, onDoctorDemo = onDoctorDemo)
         AnimatedContent(step, Modifier.weight(1f).fillMaxWidth(), transitionSpec = { SaharaMotion.transform(direction, rtl) }, contentAlignment = Alignment.TopCenter, label = "onboarding-step") { shown ->
             when (shown) {
                 OnboardingStep.Hello -> HelloPage { haptic.performHapticFeedback(HapticFeedbackType.SegmentTick); go(OnboardingFlow.afterHello()) }
@@ -377,7 +377,7 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
                 OnboardingStep.Finish -> OnboardingFinish(name.trim(), answers(), profileError)
             }
         }
-        if (step != OnboardingStep.Hello) OnboardingDock(step) { dockStep ->
+        if (step != OnboardingStep.Hello && step != OnboardingStep.Doctor) OnboardingDock(step) { dockStep ->
             when (dockStep) {
                 OnboardingStep.Hello -> Unit
                 OnboardingStep.Role -> Row(verticalAlignment = Alignment.CenterVertically) {
@@ -390,7 +390,7 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
                     modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp), colors = ButtonDefaults.textButtonColors(contentColor = SaharaColors.PrimaryPressed)) {
                     Icon(Icons.Default.Policy, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(t("Privacy policy", "निजता नीति"), fontWeight = FontWeight.SemiBold)
                 }
-                OnboardingStep.Doctor -> Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { DemoLink(null, SaharaColors.PrimaryPressed, !locked, "doctor-demo-entry", onDoctorDemo) }
+                OnboardingStep.Doctor -> Unit
                 OnboardingStep.Name -> DockButton(t("Next", "आगे"), Modifier.testTag("onboarding-next"), enabled = name.isNotBlank() && !locked) { go(OnboardingStep.Age) }
                 OnboardingStep.Age, OnboardingStep.Illness, OnboardingStep.CareDoctor, OnboardingStep.Treatment -> Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     val filled = when (dockStep) {
@@ -486,7 +486,7 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
 private class OnboardingChoice(val key: String, val title: String, val detail: String, val icon: ImageVector, val tone: SaharaTone, val tag: String)
 
 /** Back, the thin progress bar and the demo link. The bar fills smoothly as steps advance and fades away where it has no meaning. */
-@Composable private fun OnboardingTopRow(step: OnboardingStep, canBack: Boolean, enabled: Boolean, onBack: () -> Unit, onDemo: () -> Unit) {
+@Composable private fun OnboardingTopRow(step: OnboardingStep, canBack: Boolean, enabled: Boolean, onBack: () -> Unit, onDemo: () -> Unit, onDoctorDemo: () -> Unit) {
     val t = careText()
     val progress = OnboardingFlow.progress(step)
     val barAlpha by animateFloatAsState(if (progress == null) 0f else 1f, SaharaMotion.tween(SaharaMotion.VALUE_MS), label = "onboarding progress alpha")
@@ -503,8 +503,9 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
         }
         Box(Modifier.widthIn(min = 56.dp), contentAlignment = Alignment.CenterEnd) {
             // The patient demo sits in the top-right corner of Hello, Role and Account (one instance per screen).
-            androidx.compose.animation.AnimatedVisibility(step == OnboardingStep.Hello || step == OnboardingStep.Role || step == OnboardingStep.Account, enter = SaharaMotion.enter, exit = SaharaMotion.exit, label = "onboarding demo") {
-                TextButton(onClick = onDemo, enabled = enabled, modifier = Modifier.heightIn(min = 48.dp).testTag("patient-walkthrough-entry"), colors = ButtonDefaults.textButtonColors(contentColor = SaharaColors.PrimaryPressed)) {
+            androidx.compose.animation.AnimatedVisibility(step == OnboardingStep.Hello || step == OnboardingStep.Role || step == OnboardingStep.Account || step == OnboardingStep.Doctor, enter = SaharaMotion.enter, exit = SaharaMotion.exit, label = "onboarding demo") {
+                val doctorStep = step == OnboardingStep.Doctor
+                TextButton(onClick = if (doctorStep) onDoctorDemo else onDemo, enabled = enabled, modifier = Modifier.heightIn(min = 48.dp).testTag(if (doctorStep) "doctor-demo-entry" else "patient-walkthrough-entry"), colors = ButtonDefaults.textButtonColors(contentColor = SaharaColors.PrimaryPressed)) {
                     Icon(Icons.Default.PlayArrow, null, Modifier.size(18.dp)); Spacer(Modifier.width(4.dp))
                     Text(t("Demo", "डेमो"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline)
                 }

@@ -257,7 +257,7 @@ private fun clipboardText(context: android.content.Context): String? = (context.
         }
     }
     fun day(ms: Long) = java.time.Instant.ofEpochMilli(ms).atZone(java.time.ZoneId.systemDefault()).format(careDateFormat(CARE_SHORT_DATE, hindi))
-        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = 16.dp).padding(bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().navigationBarsPadding().padding(horizontal = 16.dp).padding(bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             if (session == null) AuthHeader(heading, create)
             else if (heading != "") Heading(heading ?: t("Your account", "आपका खाता"), 28)
             banner?.let { Surface(color = SaharaColors.PrimaryWash, shape = RoundedCornerShape(SaharaRadius.Lg), border = BorderStroke(1.dp, SaharaColors.Primary.copy(alpha = .4f))) { Text(it, Modifier.fillMaxWidth().padding(16.dp), fontWeight = FontWeight.Medium, color = DoctorCardInk) } }
@@ -485,7 +485,7 @@ private val AuthErrorInk = androidx.compose.ui.graphics.Color(0xFF8C1D18)
     val t = careText()
     val title = heading ?: if (create) t("Create your account", "अपना खाता बनाएँ") else t("Welcome back", "वापसी पर स्वागत है")
     val sub = when {
-        heading != null -> t("Sign in to your doctor workspace.", "अपने डॉक्टर वर्कस्पेस में साइन इन करें।")
+        heading != null -> t("For registered doctors and nurses. We check your registration number.", "पंजीकृत डॉक्टरों और नर्सों के लिए। हम आपकी पंजीकरण संख्या जाँचते हैं।")
         create -> t("Only an email and a password. No Aadhaar.", "सिर्फ़ ईमेल और पासवर्ड। आधार नहीं।")
         else -> t("Sign in to see your care.", "अपनी देखभाल देखने के लिए साइन इन करें।")
     }

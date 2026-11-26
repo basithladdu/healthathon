@@ -120,7 +120,7 @@ private val GocTickSoft get() = DoctorStatusGoodBg
 /** The page band and speaker chips (6 Nov AI-FIR grammar): a dark Sahara band, and two distinct speaker colours that carry white text above 4.5:1. */
 /** Goals of care keeps its section colour (indigo) on the band, as on Today and the doctor's hub. */
 // Premium pass (22 Nov): the header is the section's light wash with dark ink, not a solid band ("dark and scary").
-private val GocBandColor get() = SaharaSection.GoalsOfCare.wash
+private val GocBandColor get() = SaharaColors.Surface
 private val GocBandSub get() = SaharaColors.InkSub
 /** Done steps: the success solid as a bar, its ink for the tick and label (>= 4.5:1 on the wash). */
 private val GocBandDone get() = SaharaTone.Success.solid
@@ -152,15 +152,8 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
             }
             own?.let { g -> GocStatusChip(if (g.signOff != null) t("Locked", "लॉक") else t("Saved", "सहेजा गया"), done = g.signOff != null) }
         }
-        if (canRecord) Surface(color = if (agreedAt > 0) GocTickSoft else Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(if (agreedAt > 0) 1.5.dp else 1.dp, if (agreedAt > 0) DoctorStatusGood else DoctorCardSub.copy(alpha = .5f)), modifier = Modifier.fillMaxWidth().testTag("goc-card-consent-box")) {
-            Column(Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
-                // Either the patient's or the family's agreement is enough (SVK and Dr Sujay, 23 Nov 2026); which one(s) is recorded with the talk.
-                Box(Modifier.testTag("goc-card-consent")) { Column { CheckLine(agreedAtPatient, { agreedAtPatient = it; agreedAt = GocRecordingConsent.at(it, agreedAtFamily) }, t("The patient agrees to this conversation being recorded and written down", "मरीज़ इस बातचीत को रिकॉर्ड करने और लिखने के लिए सहमत हैं"))
-                    CheckLine(agreedAtFamily, { agreedAtFamily = it; agreedAt = GocRecordingConsent.at(agreedAtPatient, it) }, t("The family members in the room agree", "कमरे में मौजूद परिवार के सदस्य सहमत हैं")) } }
-                Text(t("Either one is enough.", "दोनों में से एक की सहमति काफ़ी है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.padding(start = 12.dp, end = 8.dp, bottom = 6.dp).testTag("goc-card-consent-either"))
-                if (gemini) Text(t("Audio is sent to a secure AI service to transcribe.", "ऑडियो लिखने के लिए एक सुरक्षित AI सेवा को भेजा जाता है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.padding(start = 12.dp, end = 8.dp, bottom = 10.dp))
-            }
-        }
+        if (canRecord) GocConsentCard(agreedAt > 0, agreedAtPatient, agreedAtFamily, { agreedAtPatient = it; agreedAt = GocRecordingConsent.at(it, agreedAtFamily) }, { agreedAtFamily = it; agreedAt = GocRecordingConsent.at(agreedAtPatient, it) },
+            gemini, "goc-card-consent-box", "goc-card-consent-either", null, "goc-card-consent")
         val press = remember { MutableInteractionSource() }
         Button(onClick = { startNow = canRecord && agreedAt > 0; open = true }, interactionSource = press, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust, contentColor = Color.White), elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp, pressedElevation = 0.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).saharaPress(press).testTag("goc-open")) {
             Icon(if (own != null) Icons.AutoMirrored.Filled.ArrowForward else Icons.Default.Mic, null); Spacer(Modifier.width(8.dp)); Text(if (own != null) t("Open", "खोलें") else t("Record", "रिकॉर्ड करें"), fontSize = 17.sp, fontWeight = FontWeight.Bold)
@@ -539,14 +532,8 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
         if (shown == GocStage.CAPTURE) item(key = "capture") {
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 // Consent: the patient's tick or the family's tick, either is enough (23 Nov); the record button stays off until one is ticked. Hidden while recording (it was given).
-                if (!recorderState.recording && !busy) Surface(color = if (consentAt > 0) GocTickSoft else Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(if (consentAt > 0) 1.5.dp else 1.dp, if (consentAt > 0) DoctorStatusGood else DoctorCardSub.copy(alpha = .5f)), modifier = Modifier.fillMaxWidth().testTag("goc-consent")) {
-                    Column(Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
-                        CheckLine(consentAtPatient, { consentAtPatient = it; consentAt = GocRecordingConsent.at(it, consentAtFamily) }, t("The patient agrees to this conversation being recorded and written down", "मरीज़ इस बातचीत को रिकॉर्ड करने और लिखने के लिए सहमत हैं"))
-                        CheckLine(consentAtFamily, { consentAtFamily = it; consentAt = GocRecordingConsent.at(consentAtPatient, it) }, t("The family members in the room agree", "कमरे में मौजूद परिवार के सदस्य सहमत हैं"))
-                        Text(t("Either one is enough.", "दोनों में से एक की सहमति काफ़ी है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.padding(start = 12.dp, end = 8.dp, bottom = 6.dp).testTag("goc-consent-either"))
-                        if (gemini) Text(t("Audio is sent to a secure AI service to transcribe.", "ऑडियो लिखने के लिए एक सुरक्षित AI सेवा को भेजा जाता है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.padding(start = 12.dp, end = 8.dp, bottom = 10.dp).testTag("goc-gemini-line"))
-                    }
-                }
+                if (!recorderState.recording && !busy) GocConsentCard(consentAt > 0, consentAtPatient, consentAtFamily, { consentAtPatient = it; consentAt = GocRecordingConsent.at(it, consentAtFamily) }, { consentAtFamily = it; consentAt = GocRecordingConsent.at(consentAtPatient, it) },
+                    gemini, "goc-consent", "goc-consent-either", "goc-gemini-line", null)
                 // "Guide me" is pinned above this list (Dr Sujay, 22 Nov: no scrolling between the prompt and the rest); free flow's topic grid stays here.
                 if (!recorderState.recording && !busy) { GocRunModePicker(guideMe) { guideMe = it }; if (!guideMe) guidePanel() }
                 if (busy) GocWorkingCard(operation, progress) { task?.cancel() }
@@ -797,17 +784,18 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
                     }
                 }
             }
-            Row(Modifier.fillMaxWidth().padding(start = 12.dp).testTag("goc-steps"), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            // Segmented step indicator: numbered circles joined by a line; done = green with a tick, current = filled green, next = outlined.
+            Row(Modifier.fillMaxWidth().padding(start = 12.dp, top = 4.dp).testTag("goc-steps"), verticalAlignment = Alignment.Top) {
                 labels.forEachIndexed { i, label ->
                     val done = i < step || locked; val now = i == step && !locked
-                    val fill by androidx.compose.animation.animateColorAsState(if (done) GocBandDone else if (now) SaharaSection.GoalsOfCare.solid else SaharaColors.LineStrong, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "goc-step")
-                    Column(Modifier.weight(1f).semantics(mergeDescendants = true) {}, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Box(Modifier.fillMaxWidth().height(if (now) 6.dp else 4.dp).clip(CircleShape).background(fill))
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            if (done) { Icon(Icons.Default.Check, null, Modifier.size(16.dp), tint = GocBandDoneInk); Spacer(Modifier.width(4.dp)) }
-                            Text(label, fontSize = 15.sp, fontWeight = if (now) FontWeight.Bold else FontWeight.Medium, color = if (now) SaharaColors.Ink else if (done) GocBandDoneInk else GocBandSub, maxLines = 1, softWrap = false,
-                                modifier = if (now) Modifier.testTag("goc-step-now") else Modifier)
+                    if (i > 0) Box(Modifier.weight(1f).padding(top = 15.dp, start = 4.dp, end = 4.dp).height(2.dp).background(if (done || now) SaharaColors.Primary else SaharaColors.Line))
+                    Column(Modifier.widthIn(min = 64.dp).semantics(mergeDescendants = true) {}, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Box(Modifier.size(32.dp).clip(CircleShape).background(if (done || now) SaharaColors.Primary else Color.White).then(if (done || now) Modifier else Modifier.border(1.5.dp, SaharaColors.LineStrong, CircleShape)), contentAlignment = Alignment.Center) {
+                            if (done) Icon(Icons.Default.Check, null, Modifier.size(18.dp), tint = Color.White)
+                            else Text("${i + 1}", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = if (now) Color.White else SaharaColors.InkSub)
                         }
+                        Text(label, fontSize = 14.sp, lineHeight = 18.sp, fontWeight = if (now) FontWeight.Bold else FontWeight.Medium, color = if (now) SaharaColors.Ink else SaharaColors.InkSub, maxLines = 1, softWrap = false,
+                            modifier = if (now) Modifier.testTag("goc-step-now") else Modifier)
                     }
                 }
             }
@@ -975,5 +963,28 @@ private fun clock(seconds: Int) ="${seconds / 60}:${(seconds % 60).toString().pa
         Spacer(Modifier.width(10.dp))
         Text(text, fontSize = 15.sp, lineHeight = 21.sp, fontStyle = FontStyle.Italic, color = if (struck) DoctorCardSub else DoctorCardInk,
             textDecoration = if (struck) TextDecoration.LineThrough else null, modifier = Modifier.weight(1f).padding(vertical = 2.dp))
+    }
+}
+
+/** "Consent to record": a clear bordered card, two real checkboxes (48 dp rows) and the two notes as small grey text with an info icon. Either tick is enough. */
+@Composable private fun GocConsentCard(agreed: Boolean, patient: Boolean, family: Boolean, onPatient: (Boolean) -> Unit, onFamily: (Boolean) -> Unit, gemini: Boolean,
+    boxTag: String, eitherTag: String, geminiTag: String?, checksTag: String?) { val t = careText()
+    Surface(color = Color.White, shape = RoundedCornerShape(16.dp), border = BorderStroke(if (agreed) 2.dp else 1.5.dp, if (agreed) SaharaColors.Primary else SaharaColors.LineStrong), modifier = Modifier.fillMaxWidth().testTag(boxTag)) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(t("Consent to record", "रिकॉर्ड करने की सहमति"), Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.SemiBold, fontSize = 18.sp, lineHeight = 24.sp, color = SaharaColors.Ink)
+            // Either the patient's or the family's agreement is enough (SVK and Dr Sujay, 23 Nov 2026); which one(s) is recorded with the talk.
+            Box(if (checksTag != null) Modifier.testTag(checksTag) else Modifier) { Column {
+                CheckLine(patient, onPatient, t("The patient agrees to this conversation being recorded and written down", "मरीज़ इस बातचीत को रिकॉर्ड करने और लिखने के लिए सहमत हैं"))
+                CheckLine(family, onFamily, t("The family members in the room agree", "कमरे में मौजूद परिवार के सदस्य सहमत हैं"))
+            } }
+            Row(Modifier.padding(top = 4.dp), verticalAlignment = Alignment.Top) {
+                Icon(Icons.Default.Info, null, Modifier.padding(top = 2.dp).size(16.dp), tint = SaharaColors.InkFaint); Spacer(Modifier.width(8.dp))
+                Text(t("Either one is enough.", "दोनों में से एक की सहमति काफ़ी है।"), fontSize = 14.sp, lineHeight = 20.sp, color = SaharaColors.InkFaint, modifier = Modifier.testTag(eitherTag))
+            }
+            if (gemini) Row(verticalAlignment = Alignment.Top) {
+                Icon(Icons.Default.Info, null, Modifier.padding(top = 2.dp).size(16.dp), tint = SaharaColors.InkFaint); Spacer(Modifier.width(8.dp))
+                Text(t("Audio is sent to a secure AI service to transcribe.", "ऑडियो लिखने के लिए एक सुरक्षित AI सेवा को भेजा जाता है।"), fontSize = 14.sp, lineHeight = 20.sp, color = SaharaColors.InkFaint, modifier = if (geminiTag != null) Modifier.testTag(geminiTag) else Modifier)
+            }
+        }
     }
 }

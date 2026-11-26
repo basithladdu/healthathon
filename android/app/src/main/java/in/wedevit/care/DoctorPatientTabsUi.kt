@@ -217,15 +217,15 @@ internal fun doctorLabRange(data: CareEntry): Pair<Double?, Double?> {
     val tab = (doctorPatientTabs + doctorMoreSections).firstOrNull { it.section == selected }
     // The section's header band: its colour as a solid strip, white icon and title on one line.
     val barTone = tab?.let { doctorTabTone(it.section) } ?: DoctorTones.Rust
-    val barFill by androidx.compose.animation.animateColorAsState(barTone.wash, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "sectionbar")
+    val barFill = SaharaColors.Surface
     Row(modifier.fillMaxWidth().background(barFill).padding(start = 16.dp, end = 12.dp, top = 8.dp, bottom = 8.dp).testTag("doctor-section-bar"), verticalAlignment = Alignment.CenterVertically) {
         // The title changes in place when the doctor jumps to another section.
         AnimatedContent(tab, Modifier.weight(1f), transitionSpec = { SaharaMotion.crossfade() }, label = "sectiontitle") { shown ->
             Row(verticalAlignment = Alignment.CenterVertically) {
-                if (shown != null) { Icon(shown.icon, null, Modifier.size(26.dp), tint = barTone.ink); Spacer(Modifier.width(12.dp)) }
+                if (shown != null) { Icon(shown.icon, null, Modifier.size(24.dp), tint = SaharaColors.InkSub); Spacer(Modifier.width(12.dp)) }
                 // One line: the title shrinks a step instead of dropping "& card" to a second line beside the button.
                 SaharaFitText(shown?.let { t(it.en, it.hi) } ?: "", Modifier.a11yHeading().testTag("doctor-section-title"), style = LocalTextStyle.current.copy(fontFamily = SaharaTitleFont, fontSize = 20.sp),
-                    color = barTone.ink, maxLines = 1, min = 15f, fontWeight = FontWeight.Bold, textAlign = null)
+                    color = SaharaColors.Ink, maxLines = 1, min = 15f, fontWeight = FontWeight.SemiBold, textAlign = null)
             }
         }
         // No "Sections" button and sheet here (Dr Sujay, 22 Nov): it only repeated the patient's list. Back returns to that list.
@@ -247,8 +247,8 @@ internal fun doctorLabRange(data: CareEntry): Pair<Double?, Double?> {
             Box(Modifier.weight(1f).fillMaxHeight().testTag("doctor-patient-pane-detail")) { DoctorPatientSectionContent(vm, personId, shown, care) }
         } else if (section == "Hub") hub(false, null)
         else Column(Modifier.fillMaxSize()) {
-            DoctorPatientSectionBar(shown, onSection)
-            HorizontalDivider(color = DoctorHairline)
+            if (shown !in setOf("GoalsOfCare", "CarePlan")) { DoctorPatientSectionBar(shown, onSection)
+            HorizontalDivider(color = DoctorHairline) }
             // Tab change: the new tab fades in and drifts from the side it sits on in the row. One instance only, so its saved state stays single.
             val order = doctorPatientTabs.indexOfFirst { it.section == shown }
             var last by remember { mutableIntStateOf(order) }

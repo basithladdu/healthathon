@@ -1,6 +1,7 @@
 package `in`.wedevit.care
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
@@ -113,14 +114,14 @@ internal object GoalsScreening {
     if (guideOpen) AfterDeathGuideSheet { guideOpen = false }
     var answers by rememberSaveable(scope, tool.id) { mutableStateOf(mapOf<String, String>()) }
     val suggestion = remember(answers) { tool.suggest(GoalsScreening.clean(tool, answers)) }
-    Surface(shape = RoundedCornerShape(20.dp), color = DoctorCardReport, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("goals-screening")) {
+    Surface(shape = RoundedCornerShape(20.dp), color = androidx.compose.ui.graphics.Color.White, shadowElevation = 2.dp, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("goals-screening")) {
         Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button, onClickLabel = if (open) t("Collapse", "बंद करें") else t("Expand", "खोलें")) { open = !open }, verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(t("Would you be surprised if this patient died in the next 12 months?", "अगर यह मरीज़ अगले 12 महीनों में गुज़र जाए, तो क्या आपको हैरानी होगी?"), fontSize = 16.sp, lineHeight = 22.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
                     Text(t("With the ECOG performance status", "ECOG कार्य-क्षमता के साथ"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.testTag("goals-screening-ecog-line"))
                 }
-                Icon(if (open) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, null, tint = RustText, modifier = Modifier.size(48.dp).padding(12.dp))
+                Box(Modifier.size(40.dp).background(SaharaColors.PrimaryWash, androidx.compose.foundation.shape.CircleShape), contentAlignment = Alignment.Center) { Icon(if (open) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, null, tint = RustText, modifier = Modifier.size(28.dp)) }
             }
             if (open) {
                 tool.questions.forEach { q ->
