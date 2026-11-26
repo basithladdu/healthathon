@@ -90,7 +90,8 @@ class CareHeaderUiTest {
         var accounts = 0
         var workspaces = 0
         var walkthroughs = 0
-        ui.setContent { CareTheme { Welcome({ accounts++ }, { started++ }, { workspaces++ }, { walkthroughs++ }, showIntro = false) } }
+        ui.setContent { CareTheme { Welcome({ accounts++ }, { started++ }, { workspaces++ }, { walkthroughs++ }) } }
+        ui.onNodeWithTag("onboarding-get-started").performClick()
         ui.onNodeWithText("Explore what Sahara can help with").assertDoesNotExist()
         ui.onNodeWithText("Care notes, medicines and visits.").assertDoesNotExist()
         ui.onNodeWithText("Who are you?").assertIsDisplayed()

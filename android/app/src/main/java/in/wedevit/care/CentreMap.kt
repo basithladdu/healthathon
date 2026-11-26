@@ -58,7 +58,7 @@ import org.maplibre.geojson.Point
  * [onExpand] adds "Expand map" (top left), which opens the full-screen map; [fill] makes the map fill its parent instead of [height].
  */
 @Composable fun CentreMap(centres: List<Centre>, userLocation: Pair<Double, Double>? = null, height: Dp = 260.dp, onLocate: (() -> Unit)? = null,
-    onExpand: (() -> Unit)? = null, fill: Boolean = false, tag: String = "centre-map", onSelect: (List<Centre>) -> Unit) {
+    onExpand: (() -> Unit)? = null, fill: Boolean = false, tag: String = "centre-map", chrome: Boolean = true, recenterKey: Int = 0, bottomInset: Dp = 0.dp, onSelect: (List<Centre>) -> Unit) {
     val context = LocalContext.current; val t = careText()
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val currentCentres by rememberUpdatedState(centres)
@@ -183,17 +183,25 @@ import org.maplibre.geojson.Point
             if (userLocation != null && !centredOnUser) { centredOnUser = true; map?.moveCamera(centreMapAround(userLocation, centres)) }
         }
     }
+    // Home-screen use: the owner draws its own buttons ([chrome] = false); the attribution lifts clear of a bottom sheet; [recenterKey] returns to the person.
+    LaunchedEffect(map, bottomInset) {
+        val d = context.resources.displayMetrics.density
+        map?.uiSettings?.setAttributionMargins((92 * d).toInt(), 0, 0, ((bottomInset.value + 6) * d).toInt())
+    }
+    LaunchedEffect(recenterKey) {
+        if (recenterKey > 0 && userLocation != null) map?.let { m -> val u = centreMapAround(userLocation, centres); if (ValueAnimator.areAnimatorsEnabled()) m.animateCamera(u, 300) else m.moveCamera(u) }
+    }
     fun move(update: org.maplibre.android.camera.CameraUpdate) { if (ValueAnimator.areAnimatorsEnabled()) map?.animateCamera(update, 300) else map?.moveCamera(update) }
     Box((if (fill) Modifier.fillMaxSize() else Modifier.fillMaxWidth().height(height)).testTag(tag).semantics { stateDescription = if (failed) t("Map unavailable", "नक्शा उपलब्ध नहीं") else if (loaded) t("Map ready", "नक्शा तैयार") else t("Loading map", "नक्शा खुल रहा है") }) {
         key(retry) { AndroidView(factory = { view }, modifier = Modifier.fillMaxSize()) }
         // Full screen, the buttons keep clear of the status and navigation bars; the map itself runs under them.
-        Box(Modifier.fillMaxSize().then(if (fill) Modifier.systemBarsPadding() else Modifier)) { CentreMapControls(loaded, failed, fill, centres, userLocation, onLocate, onExpand, tag,
+        Box(Modifier.fillMaxSize().then(if (fill && chrome) Modifier.systemBarsPadding() else Modifier)) { CentreMapControls(loaded, failed, fill, chrome, centres, userLocation, onLocate, onExpand, tag,
             onRetry = { failed = false; loaded = false; retry++ }, onMove = ::move) }
     }
 }
 
 /** The buttons over the map: retry, Show all, Expand, the legend, + / − (full screen only: the small box has no room) and locate me. */
-@Composable private fun BoxScope.CentreMapControls(loaded: Boolean, failed: Boolean, fill: Boolean, centres: List<Centre>, userLocation: Pair<Double, Double>?,
+@Composable private fun BoxScope.CentreMapControls(loaded: Boolean, failed: Boolean, fill: Boolean, chrome: Boolean, centres: List<Centre>, userLocation: Pair<Double, Double>?,
     onLocate: (() -> Unit)?, onExpand: (() -> Unit)?, tag: String, onRetry: () -> Unit, onMove: (org.maplibre.android.camera.CameraUpdate) -> Unit) {
     val t = careText()
     if (!loaded && !failed) CircularProgressIndicator(Modifier.size(28.dp).align(Alignment.Center), color = Rust)
@@ -205,6 +213,7 @@ import org.maplibre.geojson.Point
                 TextButton(onClick = onRetry, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Try again", "फिर कोशिश करें"), color = RustText) }
             }
         }
+        if (!chrome) return
         val located = centres.filter { it.latitude != null && it.longitude != null }
         if (loaded && located.isNotEmpty()) FilledTonalButton(onClick = { onMove(bounds(located)) }, shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Paper, contentColor = Ink),
             modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).heightIn(min = 48.dp)) { Text(t("Show all", "सभी दिखाएँ"), fontWeight = FontWeight.SemiBold) }

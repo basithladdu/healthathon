@@ -577,9 +577,15 @@ val LocalSaharaHostEntering = staticCompositionLocalOf<() -> Boolean> { { false 
     Box(modifier.fillMaxSize().background(background).safeDrawingPadding().testTag("sahara-loading"), contentAlignment = Alignment.Center) {
         AnimatedVisibility(shown, enter = fadeIn(SaharaMotion.tween(SaharaMotion.ENTER_MS, 150))) {
             Column(Modifier.padding(horizontal = 32.dp).a11yCard().announce(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                SaharaBrandMark(size = 80)
+                // The Sahara logo in the middle with a green loading ring turning round it (owner, 26 Nov).
+                Box(Modifier.size(132.dp), contentAlignment = Alignment.Center) {
+                    androidx.compose.material3.CircularProgressIndicator(Modifier.fillMaxSize().testTag("sahara-loading-ring"), color = SaharaColors.Primary,
+                        trackColor = SaharaColors.PrimaryWash, strokeWidth = 5.dp, strokeCap = androidx.compose.ui.graphics.StrokeCap.Round)
+                    Box(Modifier.size(104.dp).clip(CircleShape).background(SaharaColors.Surface).clearAndSetSemantics { }, contentAlignment = Alignment.Center) {
+                        Image(saharaImage(R.drawable.sahara_professional_logo, 72.dp), null, Modifier.size(72.dp))
+                    }
+                }
                 Text(text, color = Ink, fontSize = 18.sp, lineHeight = 24.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
-                SaharaLottie(SaharaLottieKind.Loading)
             }
         }
     }

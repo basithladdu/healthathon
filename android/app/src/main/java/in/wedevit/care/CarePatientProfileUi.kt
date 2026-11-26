@@ -5,6 +5,8 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -111,6 +113,12 @@ import kotlin.math.roundToInt
     val illness = profile.illness.ifBlank { if (editable) t("Add main illness", "मुख्य बीमारी जोड़ें") else "" }
     val contact = remember(profile.phone, profile.address) { listOf(profile.phone, profile.address).filter(String::isNotBlank).joinToString("  ·  ") }
     val weights = remember(profile) { CareWeightHistory.forCard(profile) }
+    // The person's own card (More tab, owner 26 Nov): a centred profile header, then one "Health details" card.
+    if (editable) {
+        PatientOwnProfileCard(profile, name, listOf(sex, illness).filter(String::isNotBlank).joinToString(" · "), blood, contact, weights, onEdit, onAddWeight, { history = true }, modifier, tag)
+        if (history) ProfileWeightHistoryDialog(profile.weightKg, weights) { history = false }
+        return
+    }
     // Kept short on purpose: the Account tab pins this card above its list, so the screen should fit without scrolling.
     Surface(shape = RoundedCornerShape(12.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = modifier.fillMaxWidth().testTag(tag)) {
         // No size animation on the whole card (owner, 24 Nov: cards "keep expanding"); its rows change in place.
@@ -155,6 +163,59 @@ import kotlin.math.roundToInt
         }
     }
     if (history) ProfileWeightHistoryDialog(profile.weightKg, weights) { history = false }
+}
+
+/**
+ * The person's own profile (owner, 26 Nov, after a banking-app reference): a large initial in the centre with the edit
+ * button at the top right, the name, "sex · illness", the place as a small green line, then a "Health details" card with
+ * age, blood group and height in columns and the weight with its trend. Same tags as the compact card, so tests still find it.
+ */
+@Composable private fun PatientOwnProfileCard(profile: CarePatientProfile, name: String, line: String, blood: String, contact: String, weights: List<CareWeightEntry>,
+    onEdit: () -> Unit, onAddWeight: (() -> Unit)?, onHistory: () -> Unit, modifier: Modifier, tag: String) {
+    val t = careText()
+    Column(modifier.fillMaxWidth().testTag(tag), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Box(Modifier.fillMaxWidth()) {
+            Surface(shape = CircleShape, color = SaharaApricot, border = BorderStroke(3.dp, Paper), shadowElevation = 2.dp, modifier = Modifier.align(Alignment.TopCenter).padding(top = 4.dp).size(88.dp)) {
+                Box(contentAlignment = Alignment.Center) { Text(name.take(1).uppercase(), fontFamily = SaharaTitleFont, fontSize = 36.sp, fontWeight = FontWeight.SemiBold, color = DoctorAccent) }
+            }
+            Surface(onClick = onEdit, shape = CircleShape, color = Mint, modifier = Modifier.align(Alignment.TopEnd).size(48.dp).testTag("patient-profile-edit").semantics { contentDescription = t("Edit profile", "प्रोफ़ाइल बदलें") }) {
+                Box(contentAlignment = Alignment.Center) { Icon(Icons.Default.Edit, null, Modifier.size(22.dp), tint = DoctorAccent) }
+            }
+        }
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(name, fontFamily = SaharaTitleFont, fontSize = 24.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
+            if (line.isNotBlank()) Text(line, fontSize = 15.sp, color = DoctorCardSub, textAlign = TextAlign.Center, modifier = Modifier.testTag("$tag-diagnosis"))
+            if (contact.isNotBlank()) Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(if (profile.phone.isNotBlank()) Icons.Default.Phone else Icons.Default.Place, null, Modifier.size(16.dp), tint = DoctorAccent); Spacer(Modifier.width(4.dp))
+                Text(contact, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorAccent, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+        }
+        Surface(shape = RoundedCornerShape(HealthStyle.CardRadius), color = Paper, shadowElevation = 1.5.dp, modifier = Modifier.fillMaxWidth()) {
+            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    HealthCardLabel(HealthCategory.Weight, t("Health details", "सेहत की जानकारी"), Modifier.weight(1f))
+                    if (weights.isNotEmpty()) Text(t("Weight history", "वज़न का इतिहास"), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorAccent,
+                        modifier = Modifier.clip(RoundedCornerShape(8.dp)).clickable(onClick = onHistory).padding(horizontal = 4.dp, vertical = 12.dp))
+                }
+                                Row(Modifier.fillMaxWidth()) {
+                    ProfileDetail(t("Age", "उम्र"), profile.age?.let { t("$it years", "$it साल") } ?: "—", Modifier.weight(1f))
+                    ProfileDetail(t("Blood group", "ख़ून का समूह"), blood.ifBlank { "—" }, Modifier.weight(1f))
+                    ProfileDetail(t("Height", "क़द"), profile.heightCm?.let { "$it ${t("cm", "सेमी")}" } ?: "—", Modifier.weight(1f))
+                }
+                ProfileWeightTile(profile.weightKg, weights, onOpen = onHistory, tag = "$tag-weight")
+                if (onAddWeight != null) HealthTintButton(t("Add weight", "वज़न जोड़ें"), HealthCategory.Weight, onAddWeight, Modifier.testTag("patient-profile-add-weight"))
+                if (profile.hasCareNow) ProfileCareNow(profile, Modifier.testTag("$tag-care-now"))
+            }
+        }
+    }
+}
+
+/** One label over its value, like the reference's "Account balance / ₦76,000" columns. */
+@Composable private fun ProfileDetail(label: String, value: String, modifier: Modifier) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(label, fontSize = 13.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(value, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
 }
 
 /** Since when, the doctor now and the treatment now, one quiet row each (wraps rather than cuts, so a doctor reads it all). */

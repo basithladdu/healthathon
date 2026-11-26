@@ -17,6 +17,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -256,47 +258,62 @@ private fun clipboardText(context: android.content.Context): String? = (context.
     }
     fun day(ms: Long) = java.time.Instant.ofEpochMilli(ms).atZone(java.time.ZoneId.systemDefault()).format(careDateFormat(CARE_SHORT_DATE, hindi))
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = 16.dp).padding(bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            if (heading != "") Heading(heading ?: if (session == null) if (create) t("Create an account", "खाता बनाएँ") else t("Sign in", "साइन इन करें") else t("Your account", "आपका खाता"), if (session == null) 24 else 28)
-            banner?.let { Surface(color = Mint, shape = RoundedCornerShape(14.dp)) { Text(it, Modifier.fillMaxWidth().padding(16.dp), fontWeight = FontWeight.Medium) } }
+            if (session == null) AuthHeader(heading, create)
+            else if (heading != "") Heading(heading ?: t("Your account", "आपका खाता"), 28)
+            banner?.let { Surface(color = SaharaColors.PrimaryWash, shape = RoundedCornerShape(SaharaRadius.Lg), border = BorderStroke(1.dp, SaharaColors.Primary.copy(alpha = .4f))) { Text(it, Modifier.fillMaxWidth().padding(16.dp), fontWeight = FontWeight.Medium, color = DoctorCardInk) } }
             if (session == null) {
-                // The clinic's invite link is the main way in (owner's point 1): it comes first and largest; email and password come second.
-                if (onInvite != null) {
-                    ClinicInviteFirst(ready = banner != null, enabled = !busy, onPaste = {
-                        val pasted = clipboardText(context)
-                        if (CareInviteLink.parse(pasted) != null) { onInvite(pasted.orEmpty()); error = null; if (signupIntent == null) create = true; true } else false
-                    })
-                    Text(t("Or sign in with email", "या ईमेल से साइन इन करें"), Modifier.padding(top = 8.dp).a11yHeading(), fontWeight = FontWeight.SemiBold, fontSize = 18.sp, color = DoctorCardInk)
+                error?.let { AuthErrorBanner(it) }
+                // The clinic's invite link is the main way in (owner's point 1). Once an invite is waiting its "ready" card leads; otherwise
+                // the invite option sits under the form, behind an "or" divider, as a bordered card.
+                val invitePaste = {
+                    val pasted = clipboardText(context)
+                    if (CareInviteLink.parse(pasted) != null) { onInvite?.invoke(pasted.orEmpty()); error = null; if (signupIntent == null) create = true; true } else false
                 }
+                if (onInvite != null && banner != null) ClinicInviteFirst(ready = true, enabled = !busy, onPaste = invitePaste)
                 if (create && signupIntent?.role.isNullOrBlank()) SignupRolePicker(signupRole) { signupRole = it }
-                if (create) Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable { signupAgreed = !signupAgreed }.testTag("signup-agree"), verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(checked = signupAgreed, onCheckedChange = { signupAgreed = it })
-                    Text(t("I am 18 or over and agree to the privacy policy. If the patient is a child, I am their parent or guardian.",
-                        "मेरी उम्र 18 साल या उससे ज़्यादा है और मैं निजता नीति से सहमत हूँ। अगर मरीज़ बच्चा है, तो मैं उनका माता-पिता या अभिभावक हूँ।"), fontSize = 14.sp, color = DoctorCardInk)
-                }
-                OutlinedTextField(email, { email = it }, label = { Text(t("Email", "ईमेल")) }, singleLine = true, leadingIcon = { Icon(Icons.Default.MailOutline, null) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next), shape = RoundedCornerShape(SaharaRadius.Sm), modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(password, { password = it }, label = { Text(t("Password", "पासवर्ड")) }, singleLine = true, leadingIcon = { Icon(Icons.Default.Lock, null) },
-                    trailingIcon = { IconButton(onClick = { passwordShown = !passwordShown }) { Icon(if (passwordShown) Icons.Default.VisibilityOff else Icons.Default.Visibility, if (passwordShown) t("Hide password", "पासवर्ड छिपाएँ") else t("Show password", "पासवर्ड दिखाएँ")) } },
-                    visualTransformation = if (passwordShown) VisualTransformation.None else PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done), shape = RoundedCornerShape(SaharaRadius.Sm), modifier = Modifier.fillMaxWidth(),
-                    placeholder = if (create) { { Text(t("At least 10 characters", "कम से कम 10 अक्षर")) } } else null)
-                SaharaPrimaryButton(if (busy) t("Please wait…", "कृपया रुकें…") else if (create) t("Create account", "खाता बनाएँ") else t("Sign in", "साइन इन करें"), onClick = { authRun {
-                    if (create) when (cloud.signUp(email, password)) {
-                        CareSignUp.SIGNED_IN -> { password = ""; SignupRole.save(context, signupRole); SignupRole.agreed(context) }
-                        CareSignUp.CONFIRMATION_SENT -> { SignupRole.save(context, signupRole); SignupRole.agreed(context); awaitingConfirmation = email.trim(); create = false; password = ""; notice = t("Check your email to confirm, then sign in.", "पुष्टि के लिए अपना ईमेल देखें, फिर साइन इन करें।") }
-                        CareSignUp.ALREADY_REGISTERED -> { create = false; password = ""; error = careAuthMessage(CARE_ALREADY_REGISTERED, hindi) }
+                AuthCard {
+                    AuthField(email, { email = it }, t("Email", "ईमेल"), Icons.Default.MailOutline, KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next))
+                    AuthField(password, { password = it }, t("Password", "पासवर्ड"), Icons.Default.Lock, KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                        placeholder = if (create) t("At least 10 characters", "कम से कम 10 अक्षर") else null,
+                        visual = if (passwordShown) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailing = { IconButton(onClick = { passwordShown = !passwordShown }) { Icon(if (passwordShown) Icons.Default.VisibilityOff else Icons.Default.Visibility, if (passwordShown) t("Hide password", "पासवर्ड छिपाएँ") else t("Show password", "पासवर्ड दिखाएँ"), tint = SaharaColors.PrimaryPressed) } })
+                    if (create) Surface(shape = RoundedCornerShape(SaharaRadius.Md), color = if (signupAgreed) SaharaColors.PrimaryWash else AuthFieldFill, border = BorderStroke(if (signupAgreed) 1.5.dp else 1.dp, if (signupAgreed) SaharaColors.Primary else AuthFieldBorder), modifier = Modifier.fillMaxWidth()) {
+                        Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable { signupAgreed = !signupAgreed }.padding(end = 12.dp).testTag("signup-agree"), verticalAlignment = Alignment.CenterVertically) {
+                            Checkbox(checked = signupAgreed, onCheckedChange = { signupAgreed = it })
+                            Text(t("I am 18 or over and agree to the privacy policy. If the patient is a child, I am their parent or guardian.",
+                                "मेरी उम्र 18 साल या उससे ज़्यादा है और मैं निजता नीति से सहमत हूँ। अगर मरीज़ बच्चा है, तो मैं उनका माता-पिता या अभिभावक हूँ।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardInk, modifier = Modifier.padding(vertical = 8.dp))
+                        }
                     }
-                    else { cloud.signIn(email, password); awaitingConfirmation = "" }
-                } },
-                    enabled = email.contains('@') && password.isNotEmpty() && (!create || (signupRole.isNotEmpty() && signupAgreed)), busy = busy, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp))
-                Text(t("You stay signed in on this phone until you choose Sign out.", "जब तक आप साइन आउट न चुनें, आप इस फ़ोन पर साइन इन रहते हैं।"), fontSize = 16.sp, color = DoctorCardSub, modifier = Modifier.testTag("account-stay-signed-in"))
-                if (awaitingConfirmation.isNotBlank()) SaharaSecondaryButton(t("Resend email", "ईमेल फिर भेजें"), onClick = { authRun { cloud.resendConfirmation(awaitingConfirmation); notice = t("Email sent again.", "ईमेल फिर भेजा गया।") } }, enabled = !busy, icon = Icons.Default.MailOutline, modifier = Modifier.fillMaxWidth())
-                // Secondary links side by side, so the form stays short.
-                FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    AuthPrimaryButton(if (busy) t("Please wait…", "कृपया रुकें…") else if (create) t("Create account", "खाता बनाएँ") else t("Sign in", "साइन इन करें"), onClick = { authRun {
+                        if (create) when (cloud.signUp(email, password)) {
+                            CareSignUp.SIGNED_IN -> { password = ""; SignupRole.save(context, signupRole); SignupRole.agreed(context) }
+                            CareSignUp.CONFIRMATION_SENT -> { SignupRole.save(context, signupRole); SignupRole.agreed(context); awaitingConfirmation = email.trim(); create = false; password = ""; notice = t("Check your email to confirm, then sign in.", "पुष्टि के लिए अपना ईमेल देखें, फिर साइन इन करें।") }
+                            CareSignUp.ALREADY_REGISTERED -> { create = false; password = ""; error = careAuthMessage(CARE_ALREADY_REGISTERED, hindi) }
+                        }
+                        else { cloud.signIn(email, password); awaitingConfirmation = "" }
+                    } }, enabled = email.contains('@') && password.isNotEmpty() && (!create || (signupRole.isNotEmpty() && signupAgreed)), busy = busy)
                     if (!create) TextButton(onClick = { authRun {
                         cloud.sendPasswordReset(email)
                         notice = t("Check your email for a reset link.", "पासवर्ड बदलने का लिंक अपने ईमेल में देखें।")
-                    } }, enabled = !busy && email.contains('@') && CareEmailAvailability.ready, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Forgot password?", "पासवर्ड भूल गए?")) }
-                    TextButton(onClick = { create = !create; error = null; notice = null }, enabled = !busy && (create || CareEmailAvailability.ready), modifier = Modifier.heightIn(min = 48.dp)) { Text(if (create) t("Already have an account? Sign in", "पहले से खाता है? साइन इन करें") else t("Create an account", "खाता बनाएँ"), fontWeight = FontWeight.SemiBold) }
+                    } }, enabled = !busy && email.contains('@') && CareEmailAvailability.ready, modifier = Modifier.align(Alignment.CenterHorizontally).heightIn(min = 48.dp),
+                        colors = ButtonDefaults.textButtonColors(contentColor = SaharaColors.PrimaryPressed, disabledContentColor = AuthLinkDisabled)) { Text(t("Forgot password?", "पासवर्ड भूल गए?"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold) }
+                    Row(verticalAlignment = Alignment.Top, modifier = Modifier.fillMaxWidth()) {
+                        Icon(Icons.Default.Lock, null, Modifier.padding(top = 2.dp).size(16.dp), tint = DoctorCardSub); Spacer(Modifier.width(8.dp))
+                        Text(t("You stay signed in on this phone until you choose Sign out.", "जब तक आप साइन आउट न चुनें, आप इस फ़ोन पर साइन इन रहते हैं।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.testTag("account-stay-signed-in"))
+                    }
+                    if (awaitingConfirmation.isNotBlank()) SaharaSecondaryButton(t("Resend email", "ईमेल फिर भेजें"), onClick = { authRun { cloud.resendConfirmation(awaitingConfirmation); notice = t("Email sent again.", "ईमेल फिर भेजा गया।") } }, enabled = !busy, icon = Icons.Default.MailOutline, modifier = Modifier.fillMaxWidth())
                 }
+                if (onInvite != null && banner == null) {
+                    AuthOrDivider()
+                    ClinicInviteFirst(ready = false, enabled = !busy, onPaste = invitePaste)
+                }
+                if (create) TextButton(onClick = { create = !create; error = null; notice = null }, enabled = !busy, modifier = Modifier.align(Alignment.CenterHorizontally).heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = SaharaColors.PrimaryPressed, disabledContentColor = AuthLinkDisabled)) {
+                    Text(t("Already have an account? Sign in", "पहले से खाता है? साइन इन करें"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                } else Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                    Text(t("New here?", "नए हैं?"), fontSize = 16.sp, color = DoctorCardSub)
+                    TextButton(onClick = { create = !create; error = null; notice = null }, enabled = !busy && CareEmailAvailability.ready, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = SaharaColors.PrimaryPressed, disabledContentColor = AuthLinkDisabled)) { Text(t("Create an account", "खाता बनाएँ"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold) }
+                }
+                AuthPrivacyStrip { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url)))) }
             } else {
                 // Who is signed in, with refresh beside it: one row instead of a line and a separate button.
                 Surface(shape = RoundedCornerShape(12.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().saharaAppear()) {
@@ -383,10 +400,9 @@ private fun clipboardText(context: android.content.Context): String? = (context.
                     if (deletionByEmail) { HorizontalDivider(color = DoctorHairline); SaharaListRow(t("Request deletion by email", "ईमेल से मिटाने का अनुरोध भेजें"), icon = Icons.Default.MailOutline, tone = SaharaTone.Error, onClick = { if (!busy) open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.delete_account_url)))) }) }
                 }
             }
-            if (session == null) TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url)))) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Privacy policy", "निजता नीति"), color = DoctorCardSub) }
         }
     // Results and errors come as a short dialog, signed in or out, so they are never missed below the fold or the keyboard.
-    error?.let { SaharaDialog(it, onDismiss = { error = null }, tone = SaharaTone.Error) }
+    if (session != null) error?.let { SaharaDialog(it, onDismiss = { error = null }, tone = SaharaTone.Error) }
     if (error == null) notice?.let { SaharaDialog(it, onDismiss = { notice = null }, tone = if (session == null) SaharaTone.Info else SaharaTone.Success) }
     if (inviteDoctor && session != null && owner && selected.isNotBlank()) SaharaScreenSheet(onDismissRequest = { if (!busy) { inviteDoctor = false; invite = "" } }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         // Invite a doctor: what they may see and for how long, then one button; the link to share replaces the button when it is made.
@@ -457,6 +473,92 @@ internal object SignupRole {
 internal data class SignupIntent(val create: Boolean, val role: String)
 internal val LocalSignupIntent = staticCompositionLocalOf<SignupIntent?> { null }
 
+// Sign-in / sign-up look (patient-side, green wash): white card, 1dp visible border, soft shadow; filled green-grey fields; green pill buttons.
+private val AuthFieldFill = androidx.compose.ui.graphics.Color(0xFFF3F7F4)
+private val AuthFieldBorder = androidx.compose.ui.graphics.Color(0xFFCFE0D6)
+/** Disabled link text that still reads (>= 4.5:1 on white). */
+private val AuthLinkDisabled = androidx.compose.ui.graphics.Color(0xFF55796A)
+private val AuthErrorInk = androidx.compose.ui.graphics.Color(0xFF8C1D18)
+
+/** Title and one grey line above the sign-in or sign-up form. [heading] overrides the title (the doctor sign-in passes its own). */
+@Composable private fun AuthHeader(heading: String?, create: Boolean) {
+    val t = careText()
+    val title = heading ?: if (create) t("Create your account", "अपना खाता बनाएँ") else t("Welcome back", "वापसी पर स्वागत है")
+    val sub = when {
+        heading != null -> t("Sign in to your doctor workspace.", "अपने डॉक्टर वर्कस्पेस में साइन इन करें।")
+        create -> t("Only an email and a password. No Aadhaar.", "सिर्फ़ ईमेल और पासवर्ड। आधार नहीं।")
+        else -> t("Sign in to see your care.", "अपनी देखभाल देखने के लिए साइन इन करें।")
+    }
+    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(title, Modifier.fillMaxWidth().a11yHeading(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Bold, fontSize = 28.sp, lineHeight = 34.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = SaharaColors.Ink)
+        Text(sub, Modifier.fillMaxWidth(), fontSize = 16.sp, lineHeight = 22.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = SaharaColors.InkSub)
+    }
+}
+
+/** A soft red bordered banner; the message is the same one the dialog used to show. Announced to screen readers. */
+@Composable private fun AuthErrorBanner(message: String) {
+    Surface(shape = RoundedCornerShape(SaharaRadius.Lg), color = SaharaColors.ErrorWash, border = BorderStroke(1.dp, SaharaColors.Error.copy(alpha = .55f)), modifier = Modifier.fillMaxWidth().announce().testTag("account-error")) {
+        Row(Modifier.padding(14.dp), verticalAlignment = Alignment.Top) {
+            Text("⚠️", fontSize = 18.sp, modifier = Modifier.clearAndSetSemantics {}); Spacer(Modifier.width(10.dp))
+            Text(message, Modifier.weight(1f), fontSize = 15.sp, lineHeight = 21.sp, fontWeight = FontWeight.Medium, color = AuthErrorInk)
+        }
+    }
+}
+
+/** The one white form card. */
+@Composable private fun AuthCard(content: @Composable ColumnScope.() -> Unit) {
+    Surface(shape = RoundedCornerShape(24.dp), color = SaharaColors.Surface, shadowElevation = 2.dp, border = BorderStroke(1.dp, SaharaColors.Line), modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp), content = content)
+    }
+}
+
+/** A rounded, filled, single-line field: light green-grey fill, 1dp border, green border on focus, leading icon. */
+@Composable private fun AuthField(value: String, onValueChange: (String) -> Unit, label: String, icon: androidx.compose.ui.graphics.vector.ImageVector, keyboard: KeyboardOptions,
+    placeholder: String? = null, visual: VisualTransformation = VisualTransformation.None, trailing: (@Composable () -> Unit)? = null) {
+    OutlinedTextField(value, onValueChange, label = { Text(label) }, singleLine = true, leadingIcon = { Icon(icon, null, tint = SaharaColors.PrimaryPressed) }, trailingIcon = trailing,
+        placeholder = placeholder?.let { { Text(it, color = SaharaColors.InkFaint) } }, visualTransformation = visual, keyboardOptions = keyboard, shape = RoundedCornerShape(SaharaRadius.Md),
+        colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = AuthFieldFill, unfocusedContainerColor = AuthFieldFill, focusedBorderColor = SaharaColors.Primary, unfocusedBorderColor = AuthFieldBorder,
+            focusedLabelColor = SaharaColors.PrimaryPressed, unfocusedLabelColor = SaharaColors.InkSub, cursorColor = SaharaColors.Primary),
+        modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp))
+}
+
+/** The green pill: 56 dp; disabled is the pale green wash with dark green text (not a grey slab). */
+@Composable private fun AuthPrimaryButton(text: String, onClick: () -> Unit, enabled: Boolean, busy: Boolean) {
+    Button(onClick = onClick, enabled = enabled && !busy, shape = androidx.compose.foundation.shape.CircleShape,
+        colors = ButtonDefaults.buttonColors(containerColor = SaharaColors.Primary, contentColor = androidx.compose.ui.graphics.Color.White, disabledContainerColor = SaharaColors.PrimaryWash, disabledContentColor = SaharaColors.PrimaryPressed),
+        border = if (enabled && !busy) null else BorderStroke(1.dp, SaharaColors.Primary.copy(alpha = .35f)),
+        contentPadding = PaddingValues(horizontal = 24.dp), modifier = Modifier.fillMaxWidth().height(56.dp).saharaPressBounce()) {
+        if (busy) { CircularProgressIndicator(Modifier.size(20.dp), color = SaharaColors.PrimaryPressed, strokeWidth = 2.5.dp); Spacer(Modifier.width(10.dp)) }
+        Text(text, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable private fun AuthOrDivider() {
+    val t = careText()
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        HorizontalDivider(Modifier.weight(1f), color = AuthFieldBorder)
+        Text(t("or", "या"), Modifier.padding(horizontal = 12.dp), fontSize = 15.sp, color = SaharaColors.InkSub)
+        HorizontalDivider(Modifier.weight(1f), color = AuthFieldBorder)
+    }
+}
+
+/** The calm privacy strip: green shield, the no-Aadhaar promise, and the Privacy policy link. */
+@Composable private fun AuthPrivacyStrip(onPolicy: () -> Unit) {
+    val t = careText()
+    Surface(shape = RoundedCornerShape(SaharaRadius.Xl), color = SaharaColors.PrimaryWash, border = BorderStroke(1.dp, SaharaColors.Primary.copy(alpha = .3f)), modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+            Row(Modifier.padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.VerifiedUser, null, Modifier.size(22.dp), tint = SaharaColors.PrimaryPressed); Spacer(Modifier.width(10.dp))
+                Text(t("We never ask for Aadhaar, date of birth or gender to sign up. Only an email and a password.", "साइन अप के लिए हम कभी आधार, जन्मतिथि या लिंग नहीं माँगते। सिर्फ़ ईमेल और पासवर्ड।"),
+                    Modifier.weight(1f), fontSize = 14.sp, lineHeight = 20.sp, color = SaharaColors.PrimaryPressed)
+            }
+            TextButton(onClick = onPolicy, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = SaharaColors.PrimaryPressed)) {
+                Icon(Icons.Default.Policy, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(t("Privacy policy", "निजता नीति"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+            }
+        }
+    }
+}
+
 @Composable private fun SignupRolePicker(role: String, onRole: (String) -> Unit) { val t = careText()
     Text(t("Who are you?", "आप कौन हैं?"), fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = DoctorCardInk)
     listOf(
@@ -465,11 +567,11 @@ internal val LocalSignupIntent = staticCompositionLocalOf<SignupIntent?> { null 
         Triple(SignupRole.DOCTOR, t("I'm a doctor or nurse", "मैं डॉक्टर या नर्स हूँ"), t("We check your registration number first", "पहले हम आपकी पंजीकरण संख्या जाँचते हैं")),
     ).forEach { (value, title, sub) ->
         val chosen = role == value
-        Surface(shape = RoundedCornerShape(14.dp), color = if (chosen) Mint else Paper, border = BorderStroke(if (chosen) 2.dp else 1.dp, if (chosen) Rust else DoctorHairline),
+        Surface(shape = RoundedCornerShape(SaharaRadius.Lg), color = if (chosen) SaharaColors.PrimaryWash else SaharaColors.Surface, border = BorderStroke(if (chosen) 2.dp else 1.dp, if (chosen) SaharaColors.Primary else SaharaColors.Line),
             modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).clickable { onRole(value) }.testTag("signup-role-$value")) {
             Row(Modifier.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) { Text(title, fontWeight = FontWeight.SemiBold, color = DoctorCardInk); Text(sub, fontSize = 13.sp, color = DoctorCardSub) }
-                if (chosen) Icon(Icons.Default.Check, null, tint = Rust)
+                if (chosen) Icon(Icons.Default.Check, null, tint = SaharaColors.PrimaryPressed)
             }
         }
     }
@@ -478,30 +580,37 @@ internal val LocalSignupIntent = staticCompositionLocalOf<SignupIntent?> { null 
 }
 
 /**
- * The first thing a signed-out person sees: "I have an invite link from my clinic". The nurse or doctor makes the invite; the
- * family taps the link in WhatsApp or SMS once (Sahara opens by itself), or copies it and taps this button. [ready] is true once
- * an invite is waiting. [onPaste] reads a copied link and returns whether it was an invite.
+ * "I have an invite link from my clinic". The nurse or doctor makes the invite; the family taps the link in WhatsApp or SMS once
+ * (Sahara opens by itself), or copies it and taps this card. [ready] is true once an invite is waiting. [onPaste] reads a copied
+ * link and returns whether it was an invite. Shown as a white card with a teal border, not a heavy filled box.
  */
 @Composable private fun ClinicInviteFirst(ready: Boolean, enabled: Boolean, onPaste: () -> Boolean) {
     val t = careText(); var help by rememberSaveable { mutableStateOf(false) }
-    Surface(shape = RoundedCornerShape(SaharaRadius.Lg), color = SaharaTone.Teal.wash, border = BorderStroke(1.dp, SaharaTone.Teal.solid.copy(alpha = .5f)), modifier = Modifier.fillMaxWidth().saharaAppear().testTag("account-clinic-invite")) {
-        Column(Modifier.saharaContentSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    val tone = SaharaTone.Teal
+    Surface(shape = RoundedCornerShape(SaharaRadius.Xl), color = if (ready) SaharaColors.PrimaryWash else SaharaColors.Surface, border = BorderStroke(1.5.dp, tone.solid.copy(alpha = .7f)), shadowElevation = if (ready) 0.dp else 1.dp,
+        modifier = Modifier.fillMaxWidth().saharaAppear().testTag("account-clinic-invite")) {
+        Column(Modifier.saharaContentSize()) {
             androidx.compose.animation.AnimatedContent(ready, transitionSpec = { SaharaMotion.crossfade() }, label = "clinic-invite") { has ->
-                if (has) Row(verticalAlignment = Alignment.CenterVertically) {
+                if (has) Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.CheckCircle, null, Modifier.size(36.dp), tint = SaharaTone.Success.solid); Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(t("Your clinic's invite is ready", "आपके क्लिनिक का निमंत्रण तैयार है"), fontWeight = FontWeight.SemiBold, fontSize = 18.sp, color = DoctorCardInk)
                         Text(t("Make your account once below. After that you stay signed in on this phone.", "नीचे एक बार अपना खाता बनाएँ। उसके बाद आप इस फ़ोन पर साइन इन रहते हैं।"), fontSize = 16.sp, color = DoctorCardInk)
                     }
-                } else Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    SaharaPrimaryButton(t("I have an invite link from my clinic", "मेरे पास क्लिनिक से निमंत्रण लिंक है"), onClick = { help = !onPaste() }, enabled = enabled, tone = SaharaTone.Teal, icon = Icons.Default.Link,
-                        modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp).testTag("account-clinic-invite-button"))
+                } else Column {
+                    Row(Modifier.fillMaxWidth().heightIn(min = 72.dp).clickable(enabled = enabled, role = androidx.compose.ui.semantics.Role.Button) { help = !onPaste() }.padding(16.dp).testTag("account-clinic-invite-button"), verticalAlignment = Alignment.CenterVertically) {
+                        SaharaIconChip(Icons.Default.Link, tone, size = 44); Spacer(Modifier.width(14.dp))
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text(t("I have an invite link from my clinic", "मेरे पास क्लिनिक से निमंत्रण लिंक है"), fontSize = 17.sp, lineHeight = 22.sp, fontWeight = FontWeight.SemiBold, color = tone.ink)
+                            if (!help) Text(t("Your nurse or doctor sends it on WhatsApp or SMS.", "आपकी नर्स या डॉक्टर इसे WhatsApp या SMS पर भेजते हैं।"), fontSize = 14.sp, lineHeight = 19.sp, color = DoctorCardSub)
+                        }
+                        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, Modifier.size(24.dp), tint = tone.ink)
+                    }
                     androidx.compose.animation.AnimatedVisibility(help, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) {
                         Text(t("Open the message from your nurse or doctor and tap the link once. Sahara opens by itself. Or copy the link, come back and tap this button again.",
                             "अपनी नर्स या डॉक्टर का संदेश खोलें और लिंक पर एक बार टैप करें। Sahara अपने आप खुल जाएगा। या लिंक कॉपी करें, वापस आएँ और यह बटन फिर दबाएँ।"),
-                            fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.announce().testTag("account-clinic-invite-help"))
+                            fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardInk, modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp).announce().testTag("account-clinic-invite-help"))
                     }
-                    if (!help) Text(t("Your nurse or doctor sends it on WhatsApp or SMS.", "आपकी नर्स या डॉक्टर इसे WhatsApp या SMS पर भेजते हैं।"), fontSize = 16.sp, color = DoctorCardSub)
                 }
             }
         }

@@ -65,17 +65,16 @@ import java.time.ZoneId
         Icon(Icons.Default.Healing, null, Modifier.size(24.dp)); Spacer(Modifier.width(10.dp)); Text(t("Note a symptom", "तबीयत का नोट लिखें"), fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
     }
     // Calm wash header (22 Nov premium pass): the solid teal strip read dark; now a light teal wash with dark ink and a teal initial.
-    Surface(Modifier.fillMaxWidth().saharaAppear().testTag("patient-summary"), shape = RoundedCornerShape(SaharaRadius.Lg), color = SaharaColors.Surface,
-        border = BorderStroke(1.dp, SaharaColors.Line)) { Column {
-        Row(Modifier.fillMaxWidth().background(SaharaTone.Teal.wash).padding(horizontal = 14.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+    Surface(Modifier.fillMaxWidth().saharaAppear().testTag("patient-summary"), shape = RoundedCornerShape(SaharaRadius.Xl), color = SaharaColors.Surface, shadowElevation = 1.5.dp) { Column {
+        Row(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             Surface(shape = CircleShape, color = SaharaTone.Teal.solid, modifier = Modifier.size(40.dp)) { Box(contentAlignment = Alignment.Center) { Text(name.take(1).uppercase(), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = SaharaTone.Teal.onSolid) } }
             Spacer(Modifier.width(12.dp))
             Text(t("$name at a glance", "$name एक नज़र में"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = SaharaColors.Ink, maxLines = 2, modifier = Modifier.weight(1f).semantics { heading() })
         }
-        Column(Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        GlanceRow(Icons.Default.Healing, SaharaSection.Symptoms, t("Pain and symptoms", "दर्द और लक्षण"), summary.symptoms.firstOrNull()?.let { CarePatientSummaryRules.symptomLine(it, hindi) } ?: CarePatientSummaryRules.noSymptoms(hindi), "summary-symptoms", onSymptoms)
-        GlanceRow(Icons.Default.Event, SaharaSection.Visits, t("Next visit", "अगली मुलाक़ात"), visitLine, "summary-visit") { if (visit == null && onAddVisit != null) visitDialog = true else onVisit(visit) }
-        GlanceRow(Icons.Default.Description, SaharaSection.GoalsOfCare, t("Goals of care", "देखभाल के लक्ष्य"), CarePatientSummaryRules.noteLine(note, note?.let { date(it.published) }.orEmpty(), hindi), "today-goals-of-care") { onGoals(note) }
+        Column(Modifier.padding(horizontal = 4.dp, vertical = 4.dp)) {
+        GlanceRow(Icons.Default.Healing, SaharaSection.Symptoms, HealthCategory.Symptoms, t("Pain and symptoms", "दर्द और लक्षण"), summary.symptoms.firstOrNull()?.let { CarePatientSummaryRules.symptomLine(it, hindi) } ?: CarePatientSummaryRules.noSymptoms(hindi), "summary-symptoms", onSymptoms)
+        HorizontalDivider(color = SaharaColors.Line, modifier = Modifier.padding(start = 56.dp)); GlanceRow(Icons.Default.Event, SaharaSection.Visits, HealthCategory.Visits, t("Next visit", "अगली मुलाक़ात"), visitLine, "summary-visit") { if (visit == null && onAddVisit != null) visitDialog = true else onVisit(visit) }
+        HorizontalDivider(color = SaharaColors.Line, modifier = Modifier.padding(start = 56.dp)); GlanceRow(Icons.Default.Description, SaharaSection.GoalsOfCare, HealthCategory.Plans, t("Goals of care", "देखभाल के लक्ष्य"), CarePatientSummaryRules.noteLine(note, note?.let { date(it.published) }.orEmpty(), hindi), "today-goals-of-care") { onGoals(note) }
         // 24 Nov meeting: no separate "Emergency plan" row on the patient side; Goals of care (above) covers it.
         }
     } }
@@ -135,12 +134,12 @@ import java.time.ZoneId
 @Composable fun TodayAllCareTools(onOpen: () -> Unit) {
     val t = careText()
     SaharaRegister(tone = SaharaTone.Rust) { SaharaListRow(t("All care tools", "देखभाल के सभी साधन"), Modifier.testTag("today-all-care-tools"), detail = t("Medicines, visits, documents, labs and more", "दवाइयाँ, मुलाक़ातें, कागज़ात, जाँच और बाक़ी सब"),
-        icon = Icons.Default.Apps, tone = SaharaTone.Rust, onClick = onOpen) }
+        icon = Icons.Default.Apps, tone = SaharaTone.Rust, onClick = onOpen, emoji = HealthCategory.Tools.emoji, emojiTint = HealthCategory.Tools.color) }
 }
 
 /** One glance row: its section's wash with a solid edge, a solid icon chip, the title, today's line and a chevron; the whole row opens its page. */
-@Composable private fun GlanceRow(icon: ImageVector, tone: SaharaTone, title: String, subtitle: String, tag: String, onClick: () -> Unit) {
+@Composable private fun GlanceRow(icon: ImageVector, tone: SaharaTone, category: HealthCategory, title: String, subtitle: String, tag: String, onClick: () -> Unit) {
     val shape = RoundedCornerShape(SaharaRadius.Md)
     // Premium pass (24 Nov): plain rows inside the one summary card, not a coloured box per row; the icon chip keeps the colour.
-    SaharaListRow(title, Modifier.clip(shape).testTag(tag), detail = subtitle, icon = icon, tone = tone, onClick = onClick)
+    SaharaListRow(title, Modifier.clip(shape).testTag(tag), detail = subtitle, icon = icon, tone = tone, onClick = onClick, emoji = category.emoji, emojiTint = category.color)
 }

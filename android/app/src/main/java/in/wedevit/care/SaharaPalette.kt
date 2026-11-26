@@ -20,7 +20,7 @@ object SaharaColors {
     val InkSub = Color(0xFF4A3E36)
     val InkFaint = Color(0xFF5E5249)
     /** Decorative dividers only. */
-    val Line = Color(0xFFE6D8CC)
+    val Line = Color(0xFFD9C7B8)
     /** Edges of cards, tiles and controls: 3:1 on cream and paper (WCAG 1.4.11), so a tappable card reads as one. */
     val Edge = Color(0xFF9C887B)
     val LineStrong = Color(0xFF8D7B70)

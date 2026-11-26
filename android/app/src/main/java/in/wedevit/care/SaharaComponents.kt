@@ -210,19 +210,20 @@ object SaharaRipple {
  * At least 56 dp tall; the row is one button for TalkBack.
  */
 @Composable fun SaharaListRow(title: String, modifier: Modifier = Modifier, detail: String? = null, icon: ImageVector? = null, tone: SaharaTone = SaharaTone.Rust,
-    status: Pair<String, SaharaTone>? = null, onClick: (() -> Unit)? = null, trailing: (@Composable () -> Unit)? = null) {
+    status: Pair<String, SaharaTone>? = null, onClick: (() -> Unit)? = null, trailing: (@Composable () -> Unit)? = null, emoji: String? = null, emojiTint: Color = tone.solid) {
     val interaction = remember { MutableInteractionSource() }
     Row(modifier.fillMaxWidth().heightIn(min = 56.dp).then(if (onClick != null) Modifier.saharaPress(interaction).clip(RoundedCornerShape(SaharaRadius.Md))
         .clickable(interactionSource = interaction, indication = androidx.compose.material3.ripple(color = tone.ink), role = Role.Button, onClick = onClick) else Modifier)
         .a11yCard().padding(horizontal = SaharaSpacing.Md, vertical = SaharaSpacing.Md), verticalAlignment = Alignment.CenterVertically) {
-        if (icon != null) { SaharaIconChip(icon, tone, size = 36); Spacer(Modifier.width(SaharaSpacing.Md)) }
+        if (emoji != null) { Box(Modifier.size(36.dp).clip(RoundedCornerShape(10.dp)).background(emojiTint.copy(alpha = .16f).compositeOver(Color.White)), contentAlignment = Alignment.Center) { HealthEmoji(emoji, size = 19.sp) }; Spacer(Modifier.width(SaharaSpacing.Md)) }
+        else if (icon != null) { SaharaIconChip(icon, tone, size = 36); Spacer(Modifier.width(SaharaSpacing.Md)) }
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold, color = SaharaColors.Ink, maxLines = 2, overflow = TextOverflow.Ellipsis)
             if (!detail.isNullOrBlank()) Text(detail, style = MaterialTheme.typography.bodySmall, color = SaharaColors.InkSub, maxLines = 2, overflow = TextOverflow.Ellipsis)
         }
         if (status != null) { Spacer(Modifier.width(SaharaSpacing.Sm)); SaharaStatusPill(status.first, status.second) }
         if (trailing != null) { Spacer(Modifier.width(SaharaSpacing.Sm)); trailing() }
-        else if (onClick != null) Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, Modifier.size(24.dp), tint = tone.ink)
+        else if (onClick != null) Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, Modifier.size(24.dp), tint = if (emoji != null) SaharaColors.LineStrong else tone.ink)
     }
 }
 
@@ -232,8 +233,7 @@ object SaharaRipple {
  */
 @Composable fun SaharaRegister(modifier: Modifier = Modifier, tone: SaharaTone? = null, content: @Composable ColumnScope.() -> Unit) {
     // Premium pass (24 Nov): one quiet white group with a hairline; the row's icon chip carries the section colour.
-    Surface(modifier.fillMaxWidth().saharaAppear(), shape = RoundedCornerShape(SaharaRadius.Lg), color = SaharaColors.Surface,
-        border = BorderStroke(1.dp, SaharaColors.Line)) {
+    Surface(modifier.fillMaxWidth().saharaAppear(), shape = RoundedCornerShape(SaharaRadius.Xl), color = SaharaColors.Surface, shadowElevation = 1.5.dp) {
         Column(Modifier.padding(vertical = 2.dp), content = content)
     }
 }
@@ -360,9 +360,9 @@ internal const val SAHARA_SPINNER_DELAY_MS = 300L
 @Composable fun SaharaSectionHeader(title: String, modifier: Modifier = Modifier, tone: SaharaTone = SaharaTone.Rust, actionLabel: String? = null, onAction: (() -> Unit)? = null,
     icon: ImageVector? = null) {
     Row(modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
-        if (icon != null) SaharaIconChip(icon, tone, size = 32) else Box(Modifier.size(width = 5.dp, height = 22.dp).clip(CircleShape).background(tone.solid))
-        Spacer(Modifier.width(SaharaSpacing.Md))
-        Text(title, Modifier.weight(1f).a11yHeading(), style = MaterialTheme.typography.titleMedium, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = tone.ink)
+        if (icon != null) SaharaIconChip(icon, tone, size = 32) 
+        if (icon != null) Spacer(Modifier.width(SaharaSpacing.Md))
+        Text(title, Modifier.weight(1f).a11yHeading(), style = MaterialTheme.typography.titleMedium, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = SaharaColors.Ink)
         if (actionLabel != null && onAction != null) TextButton(onClick = onAction, modifier = Modifier.heightIn(min = 56.dp), colors = ButtonDefaults.textButtonColors(contentColor = tone.ink)) {
             Text(actionLabel, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
             Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, Modifier.size(20.dp))

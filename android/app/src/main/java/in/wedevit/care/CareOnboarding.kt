@@ -18,9 +18,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,6 +26,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -44,6 +42,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -77,7 +76,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 
 /*
  * First run (22 Nov redesign). One thing per screen instead of one big form:
- *   Intro (3 calm pages, Skip) -> Who are you? -> Account (create / sign in / keep on this phone) -> Name -> Age (optional)
+ *   Hello (logo, tagline, one line about Sahara, Get started) -> Who are you? -> Account (create / sign in / keep on this phone) -> Name -> Age (optional)
  *   -> About the illness (optional) -> Doctor now (optional) -> Treatment now (optional) -> You're all set (Dr Shirin, 23 Nov:
  *   the care details come before the home page). The doctor card goes to the doctor sign-in and the doctor practice, as before.
  * The account comes before the profile on purpose: a person added on this phone stays in the guest records, so someone who wants
@@ -88,7 +87,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 
 /** The steps; [panel] is the old welcome panel name each one replaces, still reported to CareRoot (it watches for "doctor"). */
 internal enum class OnboardingStep(val panel: String) {
-    Intro(""), Role(""), Account("family"), SignIn("account"), SignUp("account"), Doctor("doctor"), Name("person"), Age("person"), Illness("person"),
+    Hello(""), Role(""), Account("family"), SignIn("account"), SignUp("account"), Doctor("doctor"), Name("person"), Age("person"), Illness("person"),
     /** The doctor the patient sees now (not the doctor sign-in, which is [Doctor]). */
     CareDoctor("person"), Treatment("person"), Finish("person")
 }
@@ -98,24 +97,26 @@ internal object OnboardingFlow {
     private val path = listOf(OnboardingStep.Role, OnboardingStep.Account, OnboardingStep.Name, OnboardingStep.Age, OnboardingStep.Illness,
         OnboardingStep.CareDoctor, OnboardingStep.Treatment, OnboardingStep.Finish)
 
-    /** 0..1 along [path]; null where no bar is shown (the intro and the doctor sign-in). Sign-in and sign-up sit at the account step. */
+    /** 0..1 along [path]; null where no bar is shown (Hello and the doctor sign-in). Sign-in and sign-up sit at the account step. */
     fun progress(step: OnboardingStep): Float? = when (step) {
-        OnboardingStep.Intro, OnboardingStep.Doctor -> null
+        OnboardingStep.Hello, OnboardingStep.Doctor -> null
         OnboardingStep.SignIn, OnboardingStep.SignUp -> (path.indexOf(OnboardingStep.Account) + 1f) / path.size
         else -> (path.indexOf(step) + 1f) / path.size
     }
 
-    /** Where the flow opens: signed in as patient or family it resumes at the name; after the intro has been seen once it opens on the role cards. */
-    fun start(introSeen: Boolean, signedIn: Boolean, role: String): OnboardingStep = when {
+    /** Where the flow opens: signed in as patient or family it resumes at the name; otherwise on the hello screen. */
+    fun start(signedIn: Boolean, role: String): OnboardingStep = when {
         signedIn && (role == SignupRole.PATIENT || role == SignupRole.FAMILY) -> OnboardingStep.Name
-        introSeen -> OnboardingStep.Role
-        else -> OnboardingStep.Intro
+        else -> OnboardingStep.Hello
     }
 
-    /** The step Back returns to, or null when Back should leave the app. [introShown]: the intro pages were shown in this visit. */
-    fun back(step: OnboardingStep, signedIn: Boolean, introShown: Boolean): OnboardingStep? = when (step) {
-        OnboardingStep.Intro -> null
-        OnboardingStep.Role -> if (introShown) OnboardingStep.Intro else null
+    /** Where "Get started" on the hello screen goes: always the role cards (there are no intro pages). */
+    fun afterHello(): OnboardingStep = OnboardingStep.Role
+
+    /** The step Back returns to, or null when Back should leave the app. [helloShown]: the hello screen was shown in this visit. */
+    fun back(step: OnboardingStep, signedIn: Boolean, helloShown: Boolean = false): OnboardingStep? = when (step) {
+        OnboardingStep.Hello -> null
+        OnboardingStep.Role -> if (helloShown) OnboardingStep.Hello else null
         OnboardingStep.Account, OnboardingStep.Doctor -> OnboardingStep.Role
         OnboardingStep.SignIn, OnboardingStep.SignUp -> if (signedIn) OnboardingStep.Name else OnboardingStep.Account
         OnboardingStep.Name -> if (signedIn) OnboardingStep.Role else OnboardingStep.Account
@@ -169,14 +170,14 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
 /**
  * The welcome flow shown while no person is open. [accountContent] and [doctorContent] are the real account forms (CareRoot);
  * without them the old callbacks ([onAccount], [onSharedWorkspace]) open the account sheet instead. [onSaveProfile] adds the person;
- * without it the final button calls [onStart]. [showIntro] null follows the phone's first-run state.
+ * without it the final button calls [onStart].
  */
 @Composable fun Welcome(onAccount: () -> Unit, onStart: () -> Unit, onSharedWorkspace: () -> Unit = {}, onDoctorDemo: () -> Unit = {}, onPatientWalkthrough: (String) -> Unit = {},
     accountContent: (@Composable (() -> Unit, (Boolean) -> Unit) -> Unit)? = null,
     doctorContent: (@Composable (() -> Unit, (Boolean) -> Unit) -> Unit)? = null,
     onPanelChanged: (String) -> Unit = {}, entryBusy: Boolean = false,
     signedIn: Boolean = false, profileError: String? = null,
-    onSaveProfile: ((String, CarePatientProfile?) -> Unit)? = null, showIntro: Boolean? = null) {
+    onSaveProfile: ((String, CarePatientProfile?) -> Unit)? = null) {
     val context = LocalContext.current
     val prefs = remember { CareOnboardingPrefs(context) }
     val t = careText()
@@ -184,8 +185,8 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
     val haptic = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-    var step by rememberSaveable { mutableStateOf(OnboardingFlow.start(showIntro?.not() ?: prefs.introSeen, signedIn, prefs.role)) }
-    var introShown by rememberSaveable { mutableStateOf(step == OnboardingStep.Intro) }
+    var step by rememberSaveable { mutableStateOf(OnboardingFlow.start(signedIn, prefs.role)) }
+    val helloShown by rememberSaveable { mutableStateOf(step == OnboardingStep.Hello) }
     var role by rememberSaveable { mutableStateOf(prefs.role.takeIf { it == SignupRole.FAMILY } ?: SignupRole.PATIENT) }
     var chosen by rememberSaveable { mutableStateOf(prefs.role) }
     var name by rememberSaveable { mutableStateOf("") }
@@ -203,22 +204,21 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
     var formBusy by remember { mutableStateOf(false) }
     var direction by remember { mutableStateOf(SaharaMotion.Direction.Forward) }
     var walkthroughChooser by rememberSaveable { mutableStateOf(false) }
-    val pager = rememberPagerState { INTRO_PAGES }
     val locked = formBusy || entryBusy
     val family = role == SignupRole.FAMILY
 
     fun go(next: OnboardingStep, dir: SaharaMotion.Direction = SaharaMotion.Direction.Forward) {
         if (next == step) return
         focus.clearFocus()
-        if (step == OnboardingStep.Intro) prefs.introSeen = true
+        if (step == OnboardingStep.Hello) prefs.introSeen = true
         if (next.panel != step.panel) onPanelChanged(next.panel)
         direction = dir; step = next
     }
-    val backTarget = OnboardingFlow.back(step, signedIn, introShown)
+    val backTarget = OnboardingFlow.back(step, signedIn, helloShown)
     fun back() {
         if (locked) return
-        if (step == OnboardingStep.Intro) { if (pager.currentPage > 0) scope.launch { pager.animateScrollToPage(pager.currentPage - 1) } }
-        else backTarget?.let { go(it, SaharaMotion.Direction.Back) }
+        backTarget?.let { go(it, SaharaMotion.Direction.Back) }
+        backTarget?.let { go(it, SaharaMotion.Direction.Back) }
     }
     fun pick(key: String) {
         if (locked) return
@@ -229,18 +229,25 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
     }
     val close: () -> Unit = { back() }
     // The steps are a plain AnimatedContent (no screen host) and back waits while locked, so a plain BackHandler, without the preview.
-    androidx.activity.compose.BackHandler(backTarget != null || (step == OnboardingStep.Intro && pager.currentPage > 0)) { back() }
+    androidx.activity.compose.BackHandler(backTarget != null) { back() }
     if (walkthroughChooser) PatientWalkthroughChooser(onPick = { walkthroughChooser = false; onPatientWalkthrough(it) }, onDismiss = { walkthroughChooser = false })
 
     val ageError = CarePatientProfileRules.age(age).second
-    Column(Modifier.fillMaxSize().testTag("welcome-panel-screen")) {
-        OnboardingTopRow(step, canBack = backTarget != null || (step == OnboardingStep.Intro && pager.currentPage > 0), enabled = !locked, onBack = ::back,
-            onSkip = { haptic.performHapticFeedback(HapticFeedbackType.SegmentTick); go(OnboardingStep.Role) })
+    SideEffect { WelcomeBackdrop.value = when (step) { OnboardingStep.Role, OnboardingStep.Account, OnboardingStep.Doctor -> SaharaColors.PrimaryWash; OnboardingStep.SignIn, OnboardingStep.SignUp -> androidx.compose.ui.graphics.Color(0xFFF4F8F5); OnboardingStep.Hello -> SaharaColors.Ground; else -> WelcomePanelOrange } }
+    DisposableEffect(Unit) { onDispose { WelcomeBackdrop.value = WelcomePanelOrange } }
+    Column(Modifier.fillMaxSize().then(when (step) {
+        OnboardingStep.Hello -> Modifier.background(Brush.verticalGradient(listOf(SaharaColors.PrimaryWash, SaharaColors.Ground)))
+        // The same logo-green wash as the patient-side screens, behind the choice, sign-in and sign-up steps.
+        OnboardingStep.Role, OnboardingStep.Account, OnboardingStep.SignIn, OnboardingStep.SignUp, OnboardingStep.Doctor -> Modifier.saharaHealthBackground()
+        else -> Modifier
+    }).testTag("welcome-panel-screen")) {
+        OnboardingTopRow(step, canBack = backTarget != null, enabled = !locked, onBack = ::back,
+            onDemo = { walkthroughChooser = true })
         AnimatedContent(step, Modifier.weight(1f).fillMaxWidth(), transitionSpec = { SaharaMotion.transform(direction, rtl) }, contentAlignment = Alignment.TopCenter, label = "onboarding-step") { shown ->
             when (shown) {
-                OnboardingStep.Intro -> HorizontalPager(pager, Modifier.fillMaxSize().testTag("onboarding-intro")) { page -> IntroPage(page) }
+                OnboardingStep.Hello -> HelloPage { haptic.performHapticFeedback(HapticFeedbackType.SegmentTick); go(OnboardingFlow.afterHello()) }
                 OnboardingStep.Role -> OnboardingPage {
-                    OnboardingHero(SaharaLottieKind.Sprout, SaharaTone.Leaf, compact = true)
+                    OnboardingLogoHero()
                     StepHeading(t("Who are you?", "आप कौन हैं?"), t("Choose the one that fits you best.", "जो आप पर सबसे सही बैठे, वह चुनें।"))
                     val large = !welcomeRolesStacked(LocalConfiguration.current.screenWidthDp, LocalDensity.current.fontScale)
                     listOf(
@@ -250,7 +257,7 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
                     ).forEachIndexed { index, choice -> OnboardingChoiceCard(choice, index, selected = chosen == choice.key, enabled = !locked, large = large) { pick(choice.key) } }
                 }
                 OnboardingStep.Account -> OnboardingPage {
-                    OnboardingHero(SaharaLottieKind.Document, SaharaTone.Indigo, compact = true)
+                    OnboardingLogoHero()
                     StepHeading(t("Do you want an account?", "क्या आप खाता बनाना चाहते हैं?"),
                         t("With an account, your records are kept safe if you change phones, and family and doctors can join you.", "खाते के साथ, फ़ोन बदलने पर भी आपके रिकॉर्ड सुरक्षित रहते हैं, और परिवार व डॉक्टर आपसे जुड़ सकते हैं।"))
                     // The clinic's invite link is the main way in (older-patients doc, point 1): it comes first and largest and opens
@@ -278,15 +285,18 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
                         }
                     }
                     Spacer(Modifier.height(4.dp))
-                    SaharaPracticeEntry(t("Try a demo account", "डेमो खाता आज़माएँ"), t("Log in to a demo account", "डेमो खाते में लॉग इन करें"),
-                        enabled = !locked, onClick = { walkthroughChooser = true }, modifier = Modifier.testTag("patient-walkthrough-entry"))
                 }
-                OnboardingStep.SignIn, OnboardingStep.SignUp -> Box(Modifier.fillMaxSize().padding(top = 4.dp)) {
-                    CompositionLocalProvider(LocalSignupIntent provides SignupIntent(create = shown == OnboardingStep.SignUp, role = role)) {
-                        accountContent?.invoke(close) { formBusy = it }
+                OnboardingStep.SignIn, OnboardingStep.SignUp -> Column(Modifier.fillMaxSize().padding(top = 4.dp)) {
+                    OnboardingLogoHero(80.dp)
+                    Box(Modifier.weight(1f).fillMaxWidth()) {
+                        CompositionLocalProvider(LocalSignupIntent provides SignupIntent(create = shown == OnboardingStep.SignUp, role = role)) {
+                            accountContent?.invoke(close) { formBusy = it }
+                        }
                     }
                 }
-                OnboardingStep.Doctor -> Box(Modifier.fillMaxSize().padding(top = 4.dp)) {
+                OnboardingStep.Doctor -> Column(Modifier.fillMaxSize().padding(top = 4.dp)) {
+                    OnboardingLogoHero(80.dp)
+                    Box(Modifier.weight(1f).fillMaxWidth()) {
                     CompositionLocalProvider(LocalSignupIntent provides SignupIntent(create = false, role = SignupRole.DOCTOR)) {
                         if (doctorContent != null) doctorContent.invoke(close) { formBusy = it }
                         else OnboardingPage {
@@ -294,6 +304,7 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
                             StepHeading(t("Doctor sign in", "डॉक्टर साइन इन"), null)
                             SaharaPrimaryButton(t("Sign in", "साइन इन"), onClick = onSharedWorkspace, enabled = !locked, modifier = Modifier.fillMaxWidth().testTag("welcome-open-doctor-workspace"))
                         }
+                    }
                     }
                 }
                 OnboardingStep.Name -> OnboardingPage {
@@ -366,28 +377,20 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
                 OnboardingStep.Finish -> OnboardingFinish(name.trim(), answers(), profileError)
             }
         }
-        OnboardingDock(step) { dockStep ->
+        if (step != OnboardingStep.Hello) OnboardingDock(step) { dockStep ->
             when (dockStep) {
-                OnboardingStep.Intro -> Column(verticalArrangement = Arrangement.spacedBy(14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    PageDots(pager)
-                    val last = pager.currentPage == INTRO_PAGES - 1
-                    DockButton(if (last) t("Get started", "शुरू करें") else t("Next", "आगे"), Modifier.testTag("onboarding-next")) {
-                        haptic.performHapticFeedback(HapticFeedbackType.SegmentTick)
-                        if (last) go(OnboardingStep.Role) else scope.launch { pager.animateScrollToPage(pager.currentPage + 1) }
-                    }
-                }
+                OnboardingStep.Hello -> Unit
                 OnboardingStep.Role -> Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.VerifiedUser, null, Modifier.size(22.dp), tint = SaharaColors.OnBand)
+                    Icon(Icons.Default.VerifiedUser, null, Modifier.size(22.dp), tint = SaharaColors.PrimaryPressed)
                     Spacer(Modifier.width(10.dp))
                     Text(t("We never ask for Aadhaar, date of birth or gender to sign up. Only an email and a password.", "साइन अप के लिए हम कभी आधार, जन्मतिथि या लिंग नहीं माँगते। सिर्फ़ ईमेल और पासवर्ड।"),
-                        Modifier.weight(1f), color = SaharaColors.OnBandSub, fontSize = 14.sp, lineHeight = 20.sp)
+                        Modifier.weight(1f), color = SaharaColors.PrimaryPressed, fontSize = 14.sp, lineHeight = 20.sp)
                 }
                 OnboardingStep.Account -> TextButton(onClick = { runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url))).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } },
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp), colors = ButtonDefaults.textButtonColors(contentColor = SaharaColors.OnBand)) {
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp), colors = ButtonDefaults.textButtonColors(contentColor = SaharaColors.PrimaryPressed)) {
                     Icon(Icons.Default.Policy, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(t("Privacy policy", "निजता नीति"), fontWeight = FontWeight.SemiBold)
                 }
-                OnboardingStep.Doctor -> SaharaPracticeEntry(t("Try a demo account", "डेमो खाता आज़माएँ"), t("Log in to a demo account", "डेमो खाते में लॉग इन करें"),
-                    enabled = !locked, onClick = onDoctorDemo, modifier = Modifier.testTag("doctor-demo-entry"))
+                OnboardingStep.Doctor -> Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { DemoLink(null, SaharaColors.PrimaryPressed, !locked, "doctor-demo-entry", onDoctorDemo) }
                 OnboardingStep.Name -> DockButton(t("Next", "आगे"), Modifier.testTag("onboarding-next"), enabled = name.isNotBlank() && !locked) { go(OnboardingStep.Age) }
                 OnboardingStep.Age, OnboardingStep.Illness, OnboardingStep.CareDoctor, OnboardingStep.Treatment -> Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     val filled = when (dockStep) {
@@ -424,12 +427,66 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
     }
 }
 
-private const val INTRO_PAGES = 3
+/** The Sahara logo on the soft two-ring circle, used above the role, account, sign-in and doctor screens (and, larger, on the hello screen). */
+@Composable private fun OnboardingLogoHero(size: Dp = 112.dp, modifier: Modifier = Modifier) {
+    Box(modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        Box(Modifier.size(size).clip(CircleShape).background(SaharaColors.PrimaryWash), contentAlignment = Alignment.Center) {
+            Box(Modifier.size(size * .78f).clip(CircleShape).background(SaharaColors.Surface), contentAlignment = Alignment.Center) {
+                Image(saharaImage(R.drawable.sahara_professional_logo, size * .6f), null, Modifier.size(size * .6f), contentScale = androidx.compose.ui.layout.ContentScale.Fit)
+            }
+        }
+    }
+}
+
+/** A small, centred, underlined "Demo" link (optionally after a short lead-in), 48 dp tall. */
+@Composable private fun DemoLink(lead: String?, color: androidx.compose.ui.graphics.Color, enabled: Boolean, tag: String, onClick: () -> Unit) {
+    val t = careText()
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+        if (lead != null) Text(lead, fontSize = 16.sp, color = SaharaColors.InkSub)
+        TextButton(onClick = onClick, enabled = enabled, modifier = Modifier.heightIn(min = 48.dp).testTag(tag), colors = ButtonDefaults.textButtonColors(contentColor = color)) {
+            Text(t("Demo", "डेमो"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline)
+        }
+    }
+}
+
+/** The very first screen: the logo on two soft rings, the name, the tagline, one line about the app and "Get started". Calm; the logo fades and scales in once. */
+@Composable private fun HelloPage(onStart: () -> Unit) {
+    val t = careText()
+    var shown by remember { mutableStateOf(!SaharaMotion.enabled) }
+    LaunchedEffect(Unit) { shown = true }
+    val appear by animateFloatAsState(if (shown) 1f else 0f, if (SaharaMotion.enabled) tween(700, easing = FastOutSlowInEasing) else snap(), label = "hello logo")
+    Column(Modifier.fillMaxSize().testTag("onboarding-hello").padding(horizontal = 24.dp)) {
+        Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()).padding(vertical = 12.dp), horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterVertically)) {
+            Box(Modifier.size(200.dp).graphicsLayer { alpha = appear; scaleX = .88f + .12f * appear; scaleY = .88f + .12f * appear }.clip(CircleShape).background(SaharaColors.PrimaryWash), contentAlignment = Alignment.Center) {
+                Box(Modifier.size(156.dp).clip(CircleShape).background(SaharaColors.Surface), contentAlignment = Alignment.Center) {
+                    Image(saharaImage(R.drawable.sahara_professional_logo, 120.dp), null, Modifier.size(120.dp), contentScale = androidx.compose.ui.layout.ContentScale.Fit)
+                }
+            }
+            Text(t("Sahara", "सहारा"), Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Bold, fontSize = 36.sp, lineHeight = 42.sp, color = SaharaColors.Ink, textAlign = TextAlign.Center)
+            Text(t("Palliative care, together.", "साथ मिलकर, सुकून भरी देखभाल।"), fontSize = 18.sp, lineHeight = 26.sp, color = SaharaColors.InkSub, textAlign = TextAlign.Center)
+            Spacer(Modifier.height(6.dp))
+            Column(Modifier.fillMaxWidth().widthIn(max = 460.dp).clip(RoundedCornerShape(20.dp)).background(SaharaColors.PrimaryWash).padding(horizontal = 20.dp, vertical = 12.dp)) {
+                Text("“", Modifier.height(40.dp), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Bold, fontSize = 64.sp, lineHeight = 64.sp, color = SaharaColors.Primary)
+                Text(t("Comfort, dignity and your own wishes — kept in one place, for you and the people who care for you.",
+                    "आराम, सम्मान और आपकी अपनी इच्छाएँ — एक ही जगह, आपके और आपकी देखभाल करने वालों के लिए।"),
+                    fontSize = 17.sp, lineHeight = 26.sp, fontStyle = androidx.compose.ui.text.font.FontStyle.Italic, color = SaharaColors.Ink)
+            }
+        }
+        Button(onClick = onStart, shape = CircleShape, colors = ButtonDefaults.buttonColors(containerColor = SaharaColors.Primary, contentColor = androidx.compose.ui.graphics.Color.White),
+            contentPadding = PaddingValues(horizontal = 24.dp), modifier = Modifier.fillMaxWidth().height(56.dp).saharaPressBounce().testTag("onboarding-get-started")) {
+            Text(t("Get started", "शुरू करें"), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.width(8.dp))
+            Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(22.dp))
+        }
+        Spacer(Modifier.height(20.dp).navigationBarsPadding())
+    }
+}
 
 private class OnboardingChoice(val key: String, val title: String, val detail: String, val icon: ImageVector, val tone: SaharaTone, val tag: String)
 
-/** Back, the thin progress bar, and Skip on the intro. The bar fills smoothly as steps advance and fades away where it has no meaning. */
-@Composable private fun OnboardingTopRow(step: OnboardingStep, canBack: Boolean, enabled: Boolean, onBack: () -> Unit, onSkip: () -> Unit) {
+/** Back, the thin progress bar and the demo link. The bar fills smoothly as steps advance and fades away where it has no meaning. */
+@Composable private fun OnboardingTopRow(step: OnboardingStep, canBack: Boolean, enabled: Boolean, onBack: () -> Unit, onDemo: () -> Unit) {
     val t = careText()
     val progress = OnboardingFlow.progress(step)
     val barAlpha by animateFloatAsState(if (progress == null) 0f else 1f, SaharaMotion.tween(SaharaMotion.VALUE_MS), label = "onboarding progress alpha")
@@ -445,9 +502,11 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
             SaharaProgressBar(progress ?: 0f, Modifier.testTag("onboarding-progress"), tone = SaharaTone.Rust, label = if (progress == null) null else t("Progress", "प्रगति") + " " + (progress * 100).toInt() + "%")
         }
         Box(Modifier.widthIn(min = 56.dp), contentAlignment = Alignment.CenterEnd) {
-            androidx.compose.animation.AnimatedVisibility(step == OnboardingStep.Intro, enter = SaharaMotion.enter, exit = SaharaMotion.exit, label = "onboarding skip") {
-                TextButton(onClick = onSkip, modifier = Modifier.heightIn(min = 56.dp).testTag("onboarding-skip"), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) {
-                    Text(t("Skip", "छोड़ें"), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            // The patient demo sits in the top-right corner of Hello, Role and Account (one instance per screen).
+            androidx.compose.animation.AnimatedVisibility(step == OnboardingStep.Hello || step == OnboardingStep.Role || step == OnboardingStep.Account, enter = SaharaMotion.enter, exit = SaharaMotion.exit, label = "onboarding demo") {
+                TextButton(onClick = onDemo, enabled = enabled, modifier = Modifier.heightIn(min = 48.dp).testTag("patient-walkthrough-entry"), colors = ButtonDefaults.textButtonColors(contentColor = SaharaColors.PrimaryPressed)) {
+                    Icon(Icons.Default.PlayArrow, null, Modifier.size(18.dp)); Spacer(Modifier.width(4.dp))
+                    Text(t("Demo", "डेमो"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline)
                 }
             }
         }
@@ -461,7 +520,7 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
 
 /** The page's title and its one short line, centred under the [OnboardingHero] picture. */
 @Composable private fun StepHeading(title: String, detail: String?) {
-    Text(title, Modifier.fillMaxWidth().a11yHeading().testTag("onboarding-heading"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 28.sp, lineHeight = 34.sp, textAlign = TextAlign.Center, color = SaharaColors.Ink)
+    Text(title, Modifier.fillMaxWidth().a11yHeading().testTag("onboarding-heading"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Bold, fontSize = 28.sp, lineHeight = 34.sp, textAlign = TextAlign.Center, color = SaharaColors.Ink)
     if (detail != null) Text(detail, Modifier.fillMaxWidth(), fontSize = 17.sp, lineHeight = 24.sp, textAlign = TextAlign.Center, color = SaharaColors.InkSub)
     Spacer(Modifier.height(4.dp))
 }
@@ -508,7 +567,7 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
     val edge by animateDpAsState(if (selected) 3.dp else 1.5.dp, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "choice edge")
     val fill by animateColorAsState(if (selected) tone.wash else SaharaColors.Surface, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "choice fill")
     Surface(onClick = onClick, enabled = enabled, shape = RoundedCornerShape(SaharaRadius.Xl), color = fill, contentColor = SaharaColors.Ink,
-        border = BorderStroke(edge, tone.solid), shadowElevation = if (selected) 3.dp else 1.dp,
+        border = BorderStroke(edge, tone.solid.copy(alpha = if (selected) 1f else .6f)), shadowElevation = if (selected) 3.dp else 2.dp,
         modifier = Modifier.fillMaxWidth().heightIn(min = if (large) 88.dp else 72.dp).saharaStagger(index).saharaPressBounce().graphicsLayer { scaleX = scale; scaleY = scale }
             .semantics { this.selected = selected }.testTag(choice.tag)) {
         Row(Modifier.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -543,7 +602,12 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
 
 /** The band-coloured dock at the foot (it meets the band behind the navigation bar). Its content cross-fades between steps. */
 @Composable private fun OnboardingDock(step: OnboardingStep, content: @Composable (OnboardingStep) -> Unit) {
-    Surface(color = SaharaColors.Band, contentColor = SaharaColors.OnBand, shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp), modifier = Modifier.fillMaxWidth().testTag("welcome-orange-panel")) {
+    // On the green-wash steps the dock is a calm light-green strip with dark green text; on sign-in and sign-up it is empty and clear. The other steps keep the band.
+    val light = step == OnboardingStep.Role || step == OnboardingStep.Account || step == OnboardingStep.Doctor
+    val clear = step == OnboardingStep.SignIn || step == OnboardingStep.SignUp
+    val fill by animateColorAsState(when { light -> SaharaColors.PrimaryWash; clear -> androidx.compose.ui.graphics.Color.Transparent; else -> SaharaColors.Band }, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "dock fill")
+    Surface(color = fill, contentColor = if (light) SaharaColors.PrimaryPressed else SaharaColors.OnBand, shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+        border = if (light) BorderStroke(1.dp, SaharaColors.Primary.copy(alpha = .3f)) else null, modifier = Modifier.fillMaxWidth().testTag("welcome-orange-panel")) {
         AnimatedContent(step, transitionSpec = { SaharaMotion.crossfade() }, contentAlignment = Alignment.Center, label = "Onboarding dock") { shown ->
             val empty = shown == OnboardingStep.SignIn || shown == OnboardingStep.SignUp
             Box(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(top = if (empty) 12.dp else 18.dp, bottom = if (empty) 4.dp else 14.dp)) { content(shown) }
@@ -558,50 +622,6 @@ private class OnboardingChoice(val key: String, val title: String, val detail: S
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp), modifier = modifier.fillMaxWidth().heightIn(min = 56.dp).saharaPressBounce()) {
         if (busy) { CircularProgressIndicator(Modifier.size(20.dp), color = SaharaColors.OnBandSub, strokeWidth = 2.5.dp); Spacer(Modifier.width(10.dp)) }
         Text(text, fontSize = 17.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-    }
-}
-
-/** Page dots: the current one stretches into a pill. Read out as "2 / 3". */
-@Composable private fun PageDots(pager: PagerState) {
-    val current = pager.currentPage
-    Row(Modifier.clearAndSetSemantics { contentDescription = "${current + 1} / $INTRO_PAGES" }.testTag("onboarding-dots"), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-        repeat(INTRO_PAGES) { index ->
-            val on = index == current
-            val width = animateDpAsState(if (on) 26.dp else 8.dp, SaharaMotion.tween(SaharaMotion.SELECT_MS + 80, easing = SaharaMotion.Emphasized), label = "dot")
-            val color = animateColorAsState(if (on) SaharaColors.OnBand else SaharaColors.OnBandSub.copy(alpha = .45f), SaharaMotion.tween(SaharaMotion.SELECT_MS + 80), label = "dot colour")
-            // The stretch and colour are read in layout and drawing only, so swiping the pages does not recompose the dots.
-            Box(Modifier.layout { measurable, _ ->
-                val w = width.value.roundToPx(); val h = 8.dp.roundToPx()
-                val placeable = measurable.measure(Constraints.fixed(w, h))
-                layout(w, h) { placeable.place(0, 0) }
-            }.drawBehind { drawRoundRect(color.value, cornerRadius = CornerRadius(size.height / 2f)) })
-        }
-    }
-}
-
-/** One intro page: one calm Lottie on a soft wash, a short title and two lines. */
-@Composable private fun IntroPage(page: Int) {
-    val t = careText()
-    val (title, body) = when (page) {
-        0 -> t("Welcome to Sahara", "सहारा में आपका स्वागत है") to t("Sahara helps you, your family and your doctors look after comfort, medicines and visits in one calm place.", "सहारा आपको, आपके परिवार और डॉक्टरों को आराम, दवाइयों और मुलाक़ातों का ध्यान एक शांत जगह पर रखने में मदद करता है।")
-        1 -> t("Medicines and symptoms, made simple", "दवाइयाँ और लक्षण, आसान तरीक़े से") to t("Reminders for every dose, and a quick way to note pain, sleep or worry for your doctor.", "हर खुराक की याद, और दर्द, नींद या चिंता को डॉक्टर के लिए जल्दी लिखने का आसान तरीक़ा।")
-        else -> t("Family and doctors, in step", "परिवार और डॉक्टर, एक साथ") to t("Share care with your family and invite your doctor when you are ready. Your records stay private.", "जब आप तैयार हों, परिवार के साथ देखभाल साझा करें और डॉक्टर को बुलाएँ। आपके रिकॉर्ड निजी रहते हैं।")
-    }
-    BoxWithConstraints(Modifier.fillMaxSize()) {
-        val compact = maxHeight < 520.dp
-        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).heightIn(min = maxHeight).padding(horizontal = 24.dp, vertical = 12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterVertically)) {
-            // One Lottie per page: a wave hello, the pill for medicines, a hug for family and doctors.
-            when (page) {
-                0 -> OnboardingHero(SaharaLottieKind.Wave, SaharaTone.Teal, tag = "welcome-hero-illustration", size = if (compact) 160.dp else 200.dp)
-                1 -> OnboardingHero(SaharaLottieKind.Pill, SaharaTone.Plum, size = if (compact) 160.dp else 200.dp)
-                else -> OnboardingHero(SaharaLottieKind.Hug, SaharaTone.Leaf, size = if (compact) 160.dp else 200.dp)
-            }
-            Spacer(Modifier.height(if (compact) 0.dp else 8.dp))
-            Text(title, Modifier.fillMaxWidth().a11yHeading().testTag(if (page == 0) "welcome-panel-heading" else "onboarding-intro-title-$page"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium,
-                fontSize = 28.sp, lineHeight = 34.sp, textAlign = TextAlign.Center, color = SaharaColors.Ink)
-            Text(body, Modifier.fillMaxWidth().widthIn(max = 420.dp), fontSize = 17.sp, lineHeight = 25.sp, textAlign = TextAlign.Center, color = SaharaColors.InkSub)
-        }
     }
 }
 

@@ -3,6 +3,13 @@ package `in`.wedevit.care
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -154,7 +161,7 @@ private fun visitStatusTone(status: String): SaharaTone = if (status == "complet
 @Composable fun CareVisitRow(item: CareItem, onOpen: () -> Unit) {
     val t = careText()
     val info = remember(item) { CareVisitRules.info(item) }
-    val tone = visitTone(info.speciality)
+    val tone = SaharaSection.Visits // one visit colour family; only the status chip changes colour
     val speciality = info.speciality?.let { visitSpecialityLabel(it) }
     val status = visitStatusLabel(info.status)
     val dateText = if (item.due > 0) date(item.due) else t("Date not recorded", "तारीख़ दर्ज नहीं")
@@ -167,7 +174,7 @@ private fun visitStatusTone(status: String): SaharaTone = if (status == "complet
                 Text(info.doctor.ifBlank { t("Visit", "मुलाक़ात") }, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis,
                     textDecoration = if (info.status == "cancelled") TextDecoration.LineThrough else null)
                 if (speciality != null || status.isNotBlank()) Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-                    if (speciality != null) VisitChip(speciality, tone.solid, tone.onSolid)
+                    if (speciality != null) VisitChip(speciality, Color(0xFFECE8E3), Color(0xFF4A423C))
                     if (status.isNotBlank()) visitStatusTone(info.status).let { VisitChip(status, it.solid, it.onSolid) }
                 }
             }
@@ -180,14 +187,118 @@ private fun visitStatusTone(status: String): SaharaTone = if (status == "complet
  * The Visits module: upcoming and past visits as compact cards. A tap opens that day's details and prescription.
  * [onCalendarAt] opens the Calendar on a day (a doctor's planned visit is changed there).
  */
-@Composable fun CareVisitsModule(vm: CareModel, upcoming: List<CareItem>, past: List<CareItem>, onCalendarAt: (Long) -> Unit) {
-    val t = careText()
+@Composable fun CareVisitsModule(vm: CareModel, upcoming: List<CareItem>, past: List<CareItem>, onCalendarAt: (Long) -> Unit, onAdd: (() -> Unit)? = null) {
+    val t = careText(); val hindi = careHindi()
     var openId by rememberSaveable { mutableStateOf<String?>(null) }
-    if (upcoming.isEmpty() && past.isEmpty()) { SaharaLottie(SaharaLottieKind.Calendar, Modifier.fillMaxWidth()); ModuleEmpty(Icons.Default.EventAvailable, t("No visits yet.", "अभी कोई मुलाक़ात नहीं।")) } else {
-        CareModuleList("visits-upcoming", upcoming, t("No upcoming visits.", "आगे कोई मुलाक़ात नहीं।"), t("Upcoming", "आगे की"), { it.id }, capped = false) { CareVisitRow(it) { openId = it.id } }
-        CareModuleList("visits-past", past, t("No past visits yet.", "पहले की कोई मुलाक़ात नहीं।"), t("Past", "पहले की"), { it.id }) { CareVisitRow(it) { openId = it.id } }
+    val today = remember { LocalDate.now() }
+    var selectedDay by rememberSaveable { mutableStateOf(today.toEpochDay()) }
+    val selected = LocalDate.ofEpochDay(selectedDay)
+    val all = remember(upcoming, past) { (upcoming + past).filter { it.due > 0 } }
+    val infos = remember(all) { all.associate { it.id to CareVisitRules.info(it) } }
+    val byDay = remember(all) { all.groupBy { careDay(it.due).toEpochDay() } }
+    val blue = SaharaSection.Visits
+    // Header: "This week", the selected date, week arrows and the round add button.
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f).heightIn(min = 48.dp).clickable(role = androidx.compose.ui.semantics.Role.Button, onClickLabel = t("Open calendar", "कैलेंडर खोलें")) { onCalendarAt(careEpoch(selected)) }.testTag("care-visits-date"), verticalArrangement = Arrangement.Center) {
+            Text(t("This week", "इस हफ़्ते"), fontSize = 13.sp, color = DoctorCardSub)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(selected.format(careDateFormat("EEE, d MMM", hindi)), fontFamily = SaharaTitleFont, fontSize = 24.sp, lineHeight = 30.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk)
+                Icon(Icons.Default.KeyboardArrowDown, null, Modifier.size(22.dp), tint = DoctorCardSub)
+            }
+        }
+        IconButton({ selectedDay -= 7 }, Modifier.size(48.dp).testTag("care-visits-prev-week")) { Icon(Icons.Default.ChevronLeft, t("Previous week", "पिछला हफ़्ता")) }
+        IconButton({ selectedDay += 7 }, Modifier.size(48.dp).testTag("care-visits-next-week")) { Icon(Icons.Default.ChevronRight, t("Next week", "अगला हफ़्ता")) }
+        if (onAdd != null) Surface(onClick = onAdd, shape = androidx.compose.foundation.shape.CircleShape, color = SaharaColors.Primary, contentColor = Color.White, modifier = Modifier.padding(start = 4.dp).size(48.dp).testTag("care-module-add-visit")) {
+            Box(contentAlignment = Alignment.Center) { Icon(Icons.Default.Add, t("Add a visit", "मुलाक़ात जोड़ें"), Modifier.size(26.dp)) }
+        }
     }
+    // Week strip Sun..Sat: the selected day is a dark filled square; a blue dot marks a day with a visit. Swipe to change week.
+    val weekStart = selected.minusDays((selected.dayOfWeek.value % 7).toLong())
+    var drag by remember { mutableStateOf(0f) }
+    Row(Modifier.fillMaxWidth().pointerInput(selectedDay) {
+        detectHorizontalDragGestures(onDragStart = { drag = 0f }, onDragEnd = { if (drag > 120f) selectedDay -= 7 else if (drag < -120f) selectedDay += 7 }, onHorizontalDrag = { _, d -> drag += d })
+    }.testTag("care-visits-week"), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        (0..6).forEach { i ->
+            val day = weekStart.plusDays(i.toLong()); val isSel = day == selected; val isToday = day == today
+            val has = byDay.containsKey(day.toEpochDay())
+            val dayWord = day.format(careDateFormat("EEEE, d MMMM", hindi)) + if (has) ", " + t("has visits", "मुलाक़ात है") else ""
+            Column(Modifier.weight(1f).heightIn(min = 64.dp).clip(RoundedCornerShape(16.dp)).background(if (isSel) DoctorCardInk else Color.Transparent)
+                .selectable(isSel, role = androidx.compose.ui.semantics.Role.Tab) { selectedDay = day.toEpochDay() }
+                .semantics { contentDescription = dayWord }.testTag("care-visits-day-$i"),
+                horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                Text(day.format(careDateFormat("EEEEE", hindi)).take(2), fontSize = 13.sp, color = if (isSel) Color.White else DoctorCardSub)
+                Text("${day.dayOfMonth}", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = if (isSel) Color.White else if (isToday) SaharaColors.PrimaryPressed else DoctorCardInk)
+                Box(Modifier.padding(top = 3.dp).size(6.dp).background(if (has) (if (isSel) Color.White else blue.solid) else Color.Transparent, androidx.compose.foundation.shape.CircleShape))
+            }
+        }
+    }
+    var allUp by rememberSaveable { mutableStateOf(false) }
+    if (upcoming.isEmpty() && past.isEmpty()) { ModuleEmpty(Icons.Default.EventAvailable, t("No visits yet.", "अभी कोई मुलाक़ात नहीं।")) } else {
+        CareModuleList("visits-upcoming", if (allUp) upcoming else upcoming.take(4), t("No upcoming visits.", "आगे कोई मुलाक़ात नहीं।"), t("Upcoming", "आगे की"), { it.id }, capped = false) { CareVisitRow(it) { openId = it.id } }
+        if (upcoming.size > 4 && !allUp) TextButton({ allUp = true }, Modifier.heightIn(min = 48.dp).testTag("care-visits-show-all")) { Text(t("Show all upcoming (${upcoming.size})", "सभी आगे की मुलाक़ातें (${upcoming.size})")) }
+    }
+    // The selected day's visits on a timeline; visits without a time sit in "Any time" above it.
+    val dayVisits = byDay[selectedDay].orEmpty()
+    val zone = ZoneId.systemDefault()
+    val timed = remember(dayVisits) { dayVisits.filter { infos[it.id]?.timed == true }.sortedBy { it.due } }
+    val anyTime = remember(dayVisits) { dayVisits.filter { infos[it.id]?.timed != true } }
+    if (anyTime.isNotEmpty()) Surface(shape = RoundedCornerShape(18.dp), color = Color(0xFFF3F0EC), modifier = Modifier.fillMaxWidth().testTag("care-visits-any-time")) {
+        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(t("Any time", "कभी भी"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub)
+            anyTime.forEach { v -> VisitTimelineCard(v, infos.getValue(v.id), "", Modifier.fillMaxWidth()) { openId = v.id } }
+        }
+    }
+    val hourOf = { v: CareItem -> Instant.ofEpochMilli(v.due).atZone(zone).hour }
+    val startHour = if (timed.isEmpty()) 8 else minOf(8, hourOf(timed.first()) - 1).coerceAtLeast(0)
+    val endHour = if (timed.isEmpty()) 20 else maxOf(20, hourOf(timed.last()) + 2).coerceAtMost(24)
+    val rowH = 64.dp; val hours = endHour - startHour
+    val hourFmt = DateTimeFormatter.ofPattern("h a"); val timeFmt = DateTimeFormatter.ofPattern("h:mm a")
+    val nowMinutes = remember { java.time.LocalTime.now().let { it.hour * 60 + it.minute } }
+    val showNow = selected == today && nowMinutes in (startHour * 60)..(endHour * 60)
+    val lineColor = DoctorHairline
+    if (timed.isNotEmpty()) Box(Modifier.fillMaxWidth().height(rowH * hours).drawBehind {
+        val labelW = 52.dp.toPx()
+        for (h in 0..hours) { val y = h * rowH.toPx(); drawLine(lineColor, androidx.compose.ui.geometry.Offset(labelW, y), androidx.compose.ui.geometry.Offset(size.width, y), strokeWidth = 1.dp.toPx()) }
+        if (showNow) { val y = (nowMinutes - startHour * 60) / 60f * rowH.toPx(); drawLine(Color(0xFFC0504D), androidx.compose.ui.geometry.Offset(labelW, y), androidx.compose.ui.geometry.Offset(size.width, y), strokeWidth = 1.5.dp.toPx(), pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(10f, 8f))) }
+    }.testTag("care-visits-timeline")) {
+        (0 until hours).forEach { h -> Text(java.time.LocalTime.of((startHour + h) % 24, 0).format(hourFmt), Modifier.offset(y = rowH * h - 8.dp).width(48.dp), fontSize = 12.sp, color = DoctorCardSub, maxLines = 1) }
+        timed.groupBy { hourOf(it) }.forEach { (hour, list) ->
+            val y = rowH * (hour - startHour) + rowH * (Instant.ofEpochMilli(list.first().due).atZone(zone).minute / 60f)
+            Row(Modifier.padding(start = 56.dp).fillMaxWidth().offset(y = y + 3.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                list.forEach { v -> VisitTimelineCard(v, infos.getValue(v.id), Instant.ofEpochMilli(v.due).atZone(zone).toLocalTime().format(timeFmt), Modifier.weight(1f)) { openId = v.id } }
+            }
+        }
+    }
+    if (dayVisits.isEmpty()) Text(t("No visits this day.", "इस दिन कोई मुलाक़ात नहीं।"), fontSize = 15.sp, color = DoctorCardSub, modifier = Modifier.testTag("care-visits-day-empty"))
+        if (past.isNotEmpty()) {
+            var pastOpen by rememberSaveable { mutableStateOf(false) }
+            TextButton({ pastOpen = !pastOpen }, Modifier.heightIn(min = 48.dp).testTag("care-visits-show-past")) { Text(if (pastOpen) t("Hide past visits", "पहले की मुलाक़ातें छिपाएँ") else t("Show past visits (${past.size})", "पहले की मुलाक़ातें दिखाएँ (${past.size})")) }
+            AnimatedVisibility(pastOpen, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) {
+                Column { CareModuleList("visits-past", past, t("No past visits yet.", "पहले की कोई मुलाक़ात नहीं।"), t("Past", "पहले की"), { it.id }) { CareVisitRow(it) { openId = it.id } } }
+            }
+        }
     (upcoming + past).firstOrNull { it.id == openId }?.let { visit -> CareVisitDaySheet(vm, visit, onCalendarAt) { openId = null } }
+}
+
+/** One visit on the timeline: soft blue card, doctor in bold, speciality, clock and time, a status chip when it has one. Cancelled is muted and struck through. */
+@Composable private fun VisitTimelineCard(item: CareItem, info: CareVisitInfo, time: String, modifier: Modifier, onOpen: () -> Unit) {
+    val t = careText(); val blue = SaharaSection.Visits
+    val cancelled = info.status == "cancelled"
+    val speciality = info.speciality?.let { visitSpecialityLabel(it) }
+    val status = visitStatusLabel(info.status)
+    val spoken = listOfNotNull(info.doctor, speciality, time.ifBlank { null }, status.ifBlank { null }).joinToString(", ")
+    Surface(onClick = onOpen, shape = RoundedCornerShape(16.dp), color = if (cancelled) Color(0xFFE9E4DF) else blue.wash, border = BorderStroke(1.dp, if (cancelled) Color(0xFFCDBBAE) else blue.solid.copy(alpha = .45f)), modifier = modifier.heightIn(min = 56.dp)
+        .semantics(mergeDescendants = true) { contentDescription = spoken }.testTag("care-visit-timeline-${item.id}")) {
+        Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(info.doctor.ifBlank { t("Visit", "मुलाक़ात") }, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = if (cancelled) DoctorCardSub else blue.ink, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                textDecoration = if (cancelled) TextDecoration.LineThrough else null)
+            if (speciality != null) Text(speciality, fontSize = 13.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+                if (time.isNotBlank()) { Icon(Icons.Default.Schedule, null, Modifier.size(14.dp), tint = DoctorCardSub); Text(time, fontSize = 13.sp, color = DoctorCardSub, maxLines = 1) }
+                if (status.isNotBlank()) visitStatusTone(info.status).let { VisitChip(status, it.solid, it.onSolid) }
+            }
+        }
+    }
 }
 
 /** A friendly empty module: the section's solid icon chip and one line. */
@@ -205,7 +316,7 @@ private fun visitStatusTone(status: String): SaharaTone = if (status == "complet
     val all by vm.allItems.collectAsStateWithLifecycle(); val saved by vm.reports.collectAsStateWithLifecycle()
     val capturedAccount = remember(visit.id) { vm.accountNamespace }
     val info = remember(visit) { CareVisitRules.info(visit) }
-    val tone = visitTone(info.speciality)
+    val tone = SaharaSection.Visits // one visit colour family; only the status chip changes colour
     // Scanned prescription photos are prescriptions by definition; other documents count when filed under Prescriptions.
     var originals by remember(visit.personId) { mutableStateOf<List<CareReport>>(emptyList()) }
     LaunchedEffect(visit.personId) { originals = withContext(Dispatchers.IO) { runCatching { MedicineSourceStore(context.applicationContext, vm.storageNamespace).list(visit.personId) }.getOrDefault(emptyList()) } }

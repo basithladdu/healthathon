@@ -30,8 +30,10 @@ class WelcomeInlinePanelTest {
             Welcome({ legacyCallbacks++ }, { legacyCallbacks++ }, { legacyCallbacks++ }, { walkthroughs++ },
                 accountContent = { close, _ -> Button(onClick = close, modifier = Modifier.testTag("fixture-account")) { Text("Synthetic account form") } },
                 doctorContent = { close, _ -> Button(onClick = close, modifier = Modifier.testTag("fixture-doctor")) { Text("Synthetic doctor sign-in") } },
-                onPanelChanged = { selections += it }, onSaveProfile = { _, _ -> }, showIntro = false)
+                onPanelChanged = { selections += it }, onSaveProfile = { _, _ -> })
         } }
+        ui.onNodeWithTag("onboarding-hello").assertIsDisplayed()
+        ui.onNodeWithTag("onboarding-get-started").performClick()
         ui.onNodeWithText("Who are you?").assertIsDisplayed()
         listOf("welcome-patient-family", "welcome-family", "doctor-workspace-entry").forEach { ui.onNodeWithTag(it).assertHasClickAction().assertHeightIsAtLeast(48.dp) }
         listOf("welcome-add-person", "welcome-account", "doctor-demo-entry", "onboarding-skip").forEach { ui.onNodeWithTag(it).assertDoesNotExist() }
@@ -59,24 +61,20 @@ class WelcomeInlinePanelTest {
         }
     }
 
-    @Test fun introPagesLeadToTheRoleCardsAndCanBeSkipped() {
-        ui.setContent { CareTheme { Welcome({}, {}, showIntro = true) } }
-        ui.onNodeWithTag("welcome-hero-illustration").assertExists()
-        ui.onNodeWithText("Welcome to Sahara").assertIsDisplayed()
-        ui.onNodeWithTag("welcome-patient-family").assertDoesNotExist()
-        ui.onNodeWithTag("onboarding-next").assertHeightIsAtLeast(48.dp).performClick()
-        ui.onNodeWithTag("onboarding-next").performClick()
-        ui.onNodeWithText("Get started").assertIsDisplayed()
-        ui.onNodeWithTag("onboarding-next").performClick()
+    @Test fun getStartedGoesStraightToTheRoleCardsAndBackReturnsToHello() {
+        ui.setContent { CareTheme { Welcome({}, {}) } }
+        ui.onNodeWithTag("onboarding-hello").assertIsDisplayed()
+        ui.onNodeWithTag("onboarding-get-started").assertHeightIsAtLeast(48.dp).performClick()
+        ui.onNodeWithTag("onboarding-intro").assertDoesNotExist()
         ui.onNodeWithTag("welcome-patient-family").assertIsDisplayed()
         ui.onNodeWithTag("welcome-panel-back").performClick()
-        ui.onNodeWithTag("onboarding-skip").assertHeightIsAtLeast(48.dp).performClick()
-        ui.onNodeWithTag("welcome-family").assertIsDisplayed()
+        ui.onNodeWithTag("onboarding-hello").assertIsDisplayed()
     }
 
     @Test fun profileStepsTrimTheNameValidateAgeAndAllowSkipping() {
         val saved = mutableListOf<Pair<String, CarePatientProfile?>>()
-        ui.setContent { CareTheme { Welcome({}, {}, onSaveProfile = { name, profile -> saved += name to profile }, showIntro = false) } }
+        ui.setContent { CareTheme { Welcome({}, {}, onSaveProfile = { name, profile -> saved += name to profile }) } }
+        ui.onNodeWithTag("onboarding-get-started").performClick()
         ui.onNodeWithTag("welcome-family").performScrollTo().performClick()
         ui.onNodeWithTag("welcome-add-person").performScrollTo().performClick()
         ui.onNodeWithText("What is the name of the person you care for?").assertIsDisplayed()
@@ -101,7 +99,8 @@ class WelcomeInlinePanelTest {
 
     @Test fun careNowStepsSaveIllnessDoctorAndTreatment() {
         val saved = mutableListOf<Pair<String, CarePatientProfile?>>()
-        ui.setContent { CareTheme { Welcome({}, {}, onSaveProfile = { name, profile -> saved += name to profile }, showIntro = false) } }
+        ui.setContent { CareTheme { Welcome({}, {}, onSaveProfile = { name, profile -> saved += name to profile }) } }
+        ui.onNodeWithTag("onboarding-get-started").performClick()
         ui.onNodeWithTag("welcome-patient-family").performScrollTo().performClick()
         ui.onNodeWithTag("welcome-add-person").performScrollTo().performClick()
         ui.onNodeWithTag("onboarding-name").performTextInput("Synthetic patient")
@@ -139,7 +138,8 @@ class WelcomeInlinePanelTest {
 
     @Test fun skippingEveryOptionalStepSavesOnlyTheName() {
         val saved = mutableListOf<Pair<String, CarePatientProfile?>>()
-        ui.setContent { CareTheme { Welcome({}, {}, onSaveProfile = { name, profile -> saved += name to profile }, showIntro = false) } }
+        ui.setContent { CareTheme { Welcome({}, {}, onSaveProfile = { name, profile -> saved += name to profile }) } }
+        ui.onNodeWithTag("onboarding-get-started").performClick()
         ui.onNodeWithTag("welcome-patient-family").performScrollTo().performClick()
         ui.onNodeWithTag("welcome-add-person").performScrollTo().performClick()
         ui.onNodeWithText("What is your name?").assertIsDisplayed()
@@ -160,10 +160,11 @@ class WelcomeInlinePanelTest {
                     Welcome({}, {}, doctorContent = { _, onBusy ->
                         androidx.compose.runtime.LaunchedEffect(busy.value) { onBusy(busy.value) }
                         Column { Text("Synthetic doctor sign-in", Modifier.testTag("fixture-real-sign-in")); Button(onClick = { busy.value = !busy.value }, modifier = Modifier.testTag("fixture-busy")) { Text("Toggle request") } }
-                    }, onPanelChanged = { selections += it }, showIntro = false)
+                    }, onPanelChanged = { selections += it })
                 } }
             }
         }
+        ui.onNodeWithTag("onboarding-get-started").performClick()
         ui.onNodeWithTag("doctor-workspace-entry").performScrollTo().performClick()
         ui.onNodeWithTag("fixture-real-sign-in").assertIsDisplayed()
         ui.onNodeWithTag("doctor-demo-entry").assertIsDisplayed()
@@ -189,7 +190,8 @@ class WelcomeInlinePanelTest {
 
     @Test fun parentSavingStateLocksTheFinalStepUntilCompletion() {
         val saving = mutableStateOf(false)
-        ui.setContent { CareTheme { Welcome({}, {}, onSaveProfile = { _, _ -> saving.value = true }, entryBusy = saving.value, showIntro = false) } }
+        ui.setContent { CareTheme { Welcome({}, {}, onSaveProfile = { _, _ -> saving.value = true }, entryBusy = saving.value) } }
+        ui.onNodeWithTag("onboarding-get-started").performClick()
         ui.onNodeWithTag("welcome-patient-family").performScrollTo().performClick()
         ui.onNodeWithTag("welcome-add-person").performScrollTo().performClick()
         ui.onNodeWithTag("onboarding-name").performTextInput("Synthetic patient")

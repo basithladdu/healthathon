@@ -38,6 +38,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -78,6 +79,8 @@ val Mint = SaharaTone.Teal.wash
 val Peach = SaharaColors.PrimaryWash
 /** The welcome panel is the header band: deep oxblood with white text. */
 internal val WelcomePanelOrange = SaharaColors.Band
+/** The strip behind the navigation bar while the welcome flow is open; Welcome sets it to match the dock of the step on screen. */
+internal val WelcomeBackdrop = androidx.compose.runtime.mutableStateOf(WelcomePanelOrange)
 internal val WelcomePanelInk = SaharaColors.OnBand
 internal fun welcomePanelGapDp(screenHeightDp: Int, fontScale: Float): Int =
     if (screenHeightDp < 640 || fontScale >= 1.3f) 32 else 64
@@ -291,7 +294,7 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
             if (activeRecording && next != 1) vm.stopRecording()
             switchTab(next)
         }
-        else if (person == null) Spacer(Modifier.fillMaxWidth().windowInsetsBottomHeight(WindowInsets.navigationBars).background(WelcomePanelOrange).testTag("welcome-navigation-backdrop"))
+        else if (person == null) Spacer(Modifier.fillMaxWidth().windowInsetsBottomHeight(WindowInsets.navigationBars).background(WelcomeBackdrop.value).testTag("welcome-navigation-backdrop"))
     }) { padding ->
         Box(Modifier.padding(padding).consumeWindowInsets(padding).imePadding().fillMaxSize()) {
             if (medicineScanner && person != null) MedicineScanner(vm, onClose = { medicineScanner = false }, onAccount = onAccount)
@@ -420,10 +423,19 @@ internal fun careTabBack(personShown: Boolean, medicineScanner: Boolean, tab: In
     val todayDistress = remember(items, selectedPerson, dayStart) { DistressRules.today(items, selectedPerson, dayStart) }
     val journalNotes = remember(items) { items.filter { it.kind == "journal" && !PatientProfileCodec.isStructured(it.detail) && !SideEffectCodec.isStructured(it.detail) && !ResearchConsentCodec.isStructured(it.detail) } }
     // Signed in: pull the list down to refresh (Material 3), as well as the Refresh button in the header.
+    val todayList = rememberLazyListState()
+    // The floating red SOS shows once the SOS card (item 1) has scrolled out of sight (owner, 26 Nov).
+    val sosFloat by remember { derivedStateOf { todayList.firstVisibleItemIndex >= 2 } }
     SaharaPullRefresh(vm.refreshing, vm::refresh, enabled = vm.cloud != null) {
+    Box(Modifier.fillMaxSize()) {
     // A soft warm wash behind Today so the white and tinted cards stand off the ground.
-    LazyColumn(Modifier.fillMaxSize().background(SaharaBackdrop).saharaScreenEnter().testTag("today-list"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item(key = "today-header", contentType = "header") { Row(saharaTodayItem(Modifier.fillMaxWidth()).saharaStagger(0), verticalAlignment = Alignment.CenterVertically) {
+    LazyColumn(Modifier.fillMaxSize().saharaHealthBackground().saharaScreenEnter().testTag("today-list"), state = todayList, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 96.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        // Patient and family (owner, 26 Nov redesign): a friendly header, the red SOS card, then four quick actions.
+        if (!clinician) item(key = "today-header", contentType = "header") { Box(saharaTodayItem(Modifier.fillMaxWidth()).saharaStagger(0)) {
+            TodayHero(CareTodayRules.greetingLine(hour, hindi, personName, patient = !family, viewerName = if (family) viewerName else ""), today.format(careDateFormat("EEEE, d MMMM", hindi)),
+                patient = !family, caringFor = if (family) personName else "", onRefresh = if (vm.cloud != null) vm::refresh else null)
+        } }
+        else item(key = "today-header", contentType = "header") { Row(saharaTodayItem(Modifier.fillMaxWidth()).saharaStagger(0), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text(CareTodayRules.greetingLine(hour, hindi, personName, patient = !family && !clinician, viewerName = if (family) viewerName else ""), Modifier.a11yHeading().testTag("today-greeting"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 22.sp, lineHeight = 28.sp, color = DoctorCardInk)
                 Text(today.format(careDateFormat("EEEE, d MMMM", hindi)), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub, modifier = Modifier.padding(top = 2.dp).testTag("today-date"))
@@ -439,7 +451,10 @@ internal fun careTabBack(personShown: Boolean, medicineScanner: Boolean, tab: In
             // A labelled button, not a bare arrow icon nobody can name.
             if (vm.cloud != null) TextButton(onClick = vm::refresh, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Icon(Icons.Default.Refresh, null, Modifier.size(20.dp)); Spacer(Modifier.width(6.dp)); Text(t("Refresh", "रिफ़्रेश करें")) }
         } }
-        if (!clinician) item(key = "today-sos", contentType = "sos") { Box(saharaTodayItem().saharaStagger(1)) { CareSosBar(onSos = { sosOpen = true }) } }
+        if (!clinician) item(key = "today-sos", contentType = "sos") { Box(saharaTodayItem().saharaStagger(1)) { TodaySosCard(onSos = { sosOpen = true }) } }
+        if (!clinician && !archived) item(key = "today-quick", contentType = "quick") { Box(saharaTodayItem().saharaStagger(2)) {
+            TodayQuickActions(onSymptom = onSymptomNote, onMedicines = { onCare("Medicines") }, onVisits = onCalendar, onFindCare = onNearby, onAll = { onCare("All") })
+        } }
         if (caregiving != null && caregivingCheckIn) item(key = "caregiving-checkin", contentType = "caregiving") { Box(saharaTodayItem()) { CaregivingCheckInCard(caregiving, caregivingName, asked = true) { caregivingCheckIn = false } } }
         else if (caregiving != null && caregiving.status.state != CaregivingState.ACTIVE) item(key = "caregiving-status", contentType = "caregiving") { Box(saharaTodayItem()) { CaregivingStatusCard(caregiving, caregivingName) } }
         // Patient: SOS, the check-in (the one main action), today's medicines, the at-a-glance register, then All care tools.
@@ -451,7 +466,7 @@ internal fun careTabBack(personShown: Boolean, medicineScanner: Boolean, tab: In
         }
         // Family: their own distress + wellbeing check sits above the medicines so it is not missed (Sujay, 24 Nov meeting 01:21).
         if (family) { summary(); if (!archived) item(key = "family-check", contentType = "family-check") { Box(saharaTodayItem()) { FamilyCaregiverCheckCard(vm, personName.ifBlank { t("the patient", "मरीज़") }) } } }
-        else if (!clinician && canEdit) item(key = "today-checkin", contentType = "checkin") { Box(saharaTodayItem()) { TodayCheckInBar(vm, onOpen = onCheckInWords, onSymptom = onSymptomNote, onDistress = onDistress) } }
+        else if (!clinician && canEdit) item(key = "today-checkin", contentType = "checkin") { Box(saharaTodayItem().padding(bottom = 12.dp)) { TodayCheckInBar(vm, onOpen = onCheckInWords, onSymptom = onSymptomNote, onDistress = onDistress) } }
         val medicineSection: androidx.compose.foundation.lazy.LazyListScope.() -> Unit = {
             // The doses card under the title carries the one "x of y taken" count.
             // One small header link instead of a second full-width button under the doses (owner, 24 Nov: too many buttons).
@@ -516,6 +531,8 @@ internal fun careTabBack(personShown: Boolean, medicineScanner: Boolean, tab: In
         val notes = journalNotes
         if (notes.isEmpty() && loaded) item(key = "journal-empty", contentType = "empty") { SurfaceCard { Text(CareTodayRules.emptyText("journal", canEdit, hindi), color = DoctorCardSub) } }
         items(notes.take(2), key = { it.id }, contentType = { "care-row" }) { Box(saharaTodayItem()) { CareRow(it, vm) } }
+    }
+    if (!clinician) TodaySosFloating(sosFloat, onSos = { sosOpen = true }, modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp))
     }
     }
 }
@@ -966,46 +983,73 @@ internal fun careTabBack(personShown: Boolean, medicineScanner: Boolean, tab: In
             } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; vm.message.value = t("Couldn't save the copy. Your care note is still here. Try again.", "कॉपी सहेजी नहीं जा सकी। आपका देखभाल नोट यहीं है। फिर कोशिश करें।") }
         }
     }
-    SaharaScreenSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
-        LazyColumn(Modifier.fillMaxWidth().imePadding(), contentPadding = PaddingValues(start = 22.dp, end = 22.dp, bottom = 40.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            item { Heading(if (note.hashScheme == DoctorConversationContext.HASH_SCHEME) t("Conversation notes", "बातचीत के नोट") else t("Goals of care", "देखभाल के लक्ष्य")); Text("${note.personName} · " + t("Version ${note.version}", "संस्करण ${note.version}")); Text(t("Reviewer: ${note.doctor} · ${date(note.published)}", "जाँचने वाले: ${note.doctor} · ${date(note.published)}"), style = MaterialTheme.typography.bodySmall); Text(ReviewWorkflow.label(note, note.id in verifiedReviews), style = MaterialTheme.typography.labelMedium, color = Rust) }
-            if(note.hashScheme==DoctorConversationContext.HASH_SCHEME) item { DoctorNoteReaderBody(vm, note) }
-            if (vm.cloud != null) item { OutlinedButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, sharedCareNoteUrl(note)), t("Share exact care-note link", "इसी देखभाल नोट का लिंक भेजें"))) }, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.QrCode, null); Spacer(Modifier.width(8.dp)); Text(t("Share link", "लिंक भेजें")) } }
-            item { Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                OutlinedButton(onClick = { exporting = NoteRules.text(note, confirmations); saveNote.launch("Goals-of-care-v${note.version}.txt") }, modifier = Modifier.weight(1f)) { Icon(Icons.Default.FileDownload, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Save copy", "कॉपी सहेजें")) }
-                FilledTonalButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, NoteRules.text(note, confirmations)), t("Share care note", "देखभाल नोट भेजें"))) }, modifier = Modifier.weight(1f), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Gold, contentColor = Ink)) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Share", "भेजें")) }
-            } }
-            item { CareReadAloudControl(NoteRules.labels.zip(NoteRules.values(note)).filter { it.second.isNotBlank() }.joinToString("\n\n") { "${it.first}. ${it.second}" }, note.id) }
-            if (note.hashScheme != DoctorConversationContext.HASH_SCHEME) items(NoteRules.labels.zip(NoteRules.values(note)), key = { it.first }) { (label, value) -> SurfaceCard(if (label == "What matters") Gold else Paper) { Text(noteSectionLabel(label, careHindi()), fontWeight = FontWeight.Bold); Spacer(Modifier.height(8.dp)); SelectionContainerText(value.ifBlank { t("Not recorded", "दर्ज नहीं") }); CareSourceLinks(note.source, value) } }
-            if (note.hashScheme != DoctorConversationContext.HASH_SCHEME) item { SurfaceCard { Text(t("Original conversation", "असली बातचीत"), fontWeight = FontWeight.Bold); Spacer(Modifier.height(8.dp)); SelectionContainerText(note.source) } }
-            if (!vm.demoMode) item { CareOfflineTranslationPanel(source = NoteRules.labels.zip(NoteRules.values(note)).filter { it.second.isNotBlank() }.joinToString("\n\n") { "${it.first}\n${it.second}" }, versionId = note.id) }
-            cappedItems(confirmations, confirmationsShown, key = { it.id }, tag = "note-confirmations") { confirmation -> SurfaceCard(if (confirmation.relationship == "Patient") Sage else Mint) {
-                Text(if (confirmation.relationship == "Patient") t("Patient confirmed this version", "मरीज़ ने इस संस्करण की पुष्टि की") else t("Family / carer confirmation", "परिवार / देखभाल करने वाले की पुष्टि"), fontWeight = FontWeight.Bold)
-                Text("${confirmation.name} · ${date(confirmation.at)}")
-                signatures.filter { it.ackId == confirmation.id }.forEach { NoteSignedBy(it, signatureStore) }
-                val onPhone = remember(confirmation.id, readingRound) { readingStore.load(confirmation.id) }
-                (sharedReadings[confirmation.id] ?: onPhone)?.let { ConsentReadingLine(it, Modifier.padding(top = 4.dp)) }
-            } }
-            if (versions.firstOrNull()?.id == note.id) {
-                item { HorizontalDivider(); Spacer(Modifier.height(12.dp)); Heading(if (patientConfirmation == null) t("Patient's review", "मरीज़ की जाँच") else t("Family's review", "परिवार की जाँच"), 26) }
-                item { CareField(value = name, onValueChange = { name = it.take(100) }, label = t("Your name", "आपका नाम"), singleLine = true) }
-                item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("Patient", "Family / carer").forEach { role -> FilterChip(selected = relationship == role, onClick = { relationship = role }, enabled = (vm.cloud == null || (role == "Patient") == owner) && !(familyOnly && role == "Patient") && if (role == "Patient") patientConfirmation == null else patientConfirmation != null, label = { Text(if (role == "Patient") t("Patient", "मरीज़") else t("Family / carer", "परिवार / देखभाल करने वाले")) }) } } }
-                item(key = "confirm-read-aloud") { ConsentReadAloudStep(noteSpoken, "note-confirm-${note.id}-$readingRound", name, readers, onChange = { reading = it }) }
-                item { CheckLine(reviewed, { reviewed = it }, t("I have read this version. This is not a formal signature, consent for treatment or a treatment decision. I can ask my doctor to change it later.", "मैंने यही संस्करण पढ़ा है। यह औपचारिक हस्ताक्षर, इलाज की सहमति या इलाज का फ़ैसला नहीं है। मैं बाद में डॉक्टर से इसे बदलवा सकता/सकती हूँ।")) }
-                // No signing pad for the patient or family (Dr Sujay, 22 Nov: "I can sign here also, I don't think that is right"): a read receipt only. The doctor signs in Goals of care.
-                val alreadyConfirmed = confirmations.any { it.relationship == relationship && it.name.equals(name.trim(), ignoreCase = true) && (vm.cloud == null || it.id in authenticatedAcks) }
-                item { Button(onClick = {
-                    val signed = signatureDraft.image(); var signatureFailed = false
-                    val heard = reading ?: return@Button
-                    val keepReading: suspend (Acknowledgement) -> Unit = { ack -> withContext(Dispatchers.IO) { runCatching { readingStore.save(ack.id, heard) } } }
-                    if (signed != null) vm.confirm(note, name, relationship, reviewed, onSaved = { ack -> keepReading(ack); if (!saveNoteSignature(context, vm.storageNamespace, note, ack, signed.first, signed.second)) signatureFailed = true }, reading = heard) {
-                        reviewed = false; name = ""; signatureDraft.clear(); signaturesRead++; reading = null; readingRound++
-                        if (signatureFailed) vm.message.value = t("Your confirmation is saved, but the signature could not be saved on this phone.", "आपकी पुष्टि सहेजी गई, पर हस्ताक्षर इस फ़ोन पर सहेजा नहीं जा सका।")
-                    }
-                    else vm.confirm(note, name, relationship, reviewed, onSaved = keepReading, reading = heard) { reviewed = false; name = ""; reading = null; readingRound++ }
-                }, enabled = reviewed && reading != null && name.isNotBlank() && !busy && !alreadyConfirmed && (relationship == "Patient" || patientConfirmation != null), modifier = Modifier.fillMaxWidth()) { Text(if (alreadyConfirmed) t("Confirmation already saved", "पुष्टि पहले से सहेजी है") else t("Confirm I have read it", "पुष्टि करें कि मैंने पढ़ लिया")) } }
+    // The reader is a step-by-step flow: one form section (or label card) per step, then "Your review". The bar at the bottom stays put.
+    val hindi = careHindi()
+    val doctorScheme = note.hashScheme == DoctorConversationContext.HASH_SCHEME
+    val reader = if (doctorScheme) rememberDoctorNoteSteps(vm, note) else null
+    val legacy = remember(note.id) { NoteRules.labels.zip(NoteRules.values(note)) }
+    val isLatest = versions.firstOrNull()?.id == note.id
+    val stepTitles = if (reader != null) reader.titles(hindi) else legacy.map { noteSectionLabel(it.first, hindi) } + t("Original conversation", "असली बातचीत")
+    val stepCount = stepTitles.size + 1
+    var stepIndex by rememberSaveable(note.id) { mutableIntStateOf(0) }
+    val current = stepIndex.coerceIn(0, stepCount - 1); val onReview = current == stepCount - 1
+    val title = if (onReview) t("Your review", "आपकी जाँच") else stepTitles[current]
+    val listState = rememberLazyListState()
+    LaunchedEffect(current) { listState.scrollToItem(0); if (!onReview) reading = null }
+    val alreadyConfirmed = confirmations.any { it.relationship == relationship && it.name.equals(name.trim(), ignoreCase = true) && (vm.cloud == null || it.id in authenticatedAcks) }
+    val canSave = reviewed && reading != null && name.isNotBlank() && !busy && !alreadyConfirmed && (relationship == "Patient" || patientConfirmation != null)
+    val saveReview: () -> Unit = save@{
+        val signed = signatureDraft.image(); var signatureFailed = false
+        val heard = reading ?: return@save
+        val keepReading: suspend (Acknowledgement) -> Unit = { ack -> withContext(Dispatchers.IO) { runCatching { readingStore.save(ack.id, heard) } } }
+        if (signed != null) vm.confirm(note, name, relationship, reviewed, onSaved = { ack -> keepReading(ack); if (!saveNoteSignature(context, vm.storageNamespace, note, ack, signed.first, signed.second)) signatureFailed = true }, reading = heard) {
+            reviewed = false; name = ""; signatureDraft.clear(); signaturesRead++; reading = null; readingRound++
+            if (signatureFailed) vm.message.value = t("Your confirmation is saved, but the signature could not be saved on this phone.", "आपकी पुष्टि सहेजी गई, पर हस्ताक्षर इस फ़ोन पर सहेजा नहीं जा सका।")
+        }
+        else vm.confirm(note, name, relationship, reviewed, onSaved = keepReading, reading = heard) { reviewed = false; name = ""; reading = null; readingRound++ }
+    }
+    SaharaScreenSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = SaharaColors.GroundWarm) {
+        NoteStepProgress(current, stepCount, title)
+        LazyColumn(Modifier.fillMaxWidth().weight(1f), state = listState, contentPadding = PaddingValues(start = 22.dp, end = 22.dp, top = 8.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            item { Heading(if (doctorScheme) t("Conversation notes", "बातचीत के नोट") else t("Goals of care", "देखभाल के लक्ष्य")); Text("${note.personName} · " + t("Version ${note.version}", "संस्करण ${note.version}")); Text(t("Reviewer: ${note.doctor} · ${date(note.published)}", "जाँचने वाले: ${note.doctor} · ${date(note.published)}"), style = MaterialTheme.typography.bodySmall); Text(ReviewWorkflow.label(note, note.id in verifiedReviews), style = MaterialTheme.typography.labelMedium, color = Rust) }
+            if (!onReview) {
+                if (reader != null) item(key = "step-$current") { reader.Body(current) }
+                else if (current < legacy.size) item(key = "step-$current") { val (label, value) = legacy[current]; SurfaceCard(if (label == "What matters") Gold else Paper) { Text(noteSectionLabel(label, hindi), fontWeight = FontWeight.Bold); Spacer(Modifier.height(8.dp)); SelectionContainerText(value.ifBlank { t("Not recorded", "दर्ज नहीं") }); CareSourceLinks(note.source, value) } }
+                else {
+                    item { SurfaceCard { Text(t("Original conversation", "असली बातचीत"), fontWeight = FontWeight.Bold); Spacer(Modifier.height(8.dp)); SelectionContainerText(note.source) } }
+                    if (!vm.demoMode) item { CareOfflineTranslationPanel(source = NoteRules.labels.zip(NoteRules.values(note)).filter { it.second.isNotBlank() }.joinToString("\n\n") { "${it.first}\n${it.second}" }, versionId = note.id) }
+                }
+            } else {
+                if (vm.cloud != null) item { OutlinedButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, sharedCareNoteUrl(note)), t("Share exact care-note link", "इसी देखभाल नोट का लिंक भेजें"))) }, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.QrCode, null); Spacer(Modifier.width(8.dp)); Text(t("Share link", "लिंक भेजें")) } }
+                if (reader != null) item { reader.PdfAction() }
+                item { Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    OutlinedButton(onClick = { exporting = NoteRules.text(note, confirmations); saveNote.launch("Goals-of-care-v${note.version}.txt") }, modifier = Modifier.weight(1f)) { Icon(Icons.Default.FileDownload, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Save copy", "कॉपी सहेजें")) }
+                    FilledTonalButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, NoteRules.text(note, confirmations)), t("Share care note", "देखभाल नोट भेजें"))) }, modifier = Modifier.weight(1f), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Gold, contentColor = Ink)) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Share", "भेजें")) }
+                } }
+                item { CareReadAloudControl(NoteRules.labels.zip(NoteRules.values(note)).filter { it.second.isNotBlank() }.joinToString("\n\n") { "${it.first}. ${it.second}" }, note.id) }
+                if (doctorScheme && !vm.demoMode) item { CareOfflineTranslationPanel(source = NoteRules.labels.zip(NoteRules.values(note)).filter { it.second.isNotBlank() }.joinToString("\n\n") { "${it.first}\n${it.second}" }, versionId = note.id) }
+                cappedItems(confirmations, confirmationsShown, key = { it.id }, tag = "note-confirmations") { confirmation -> SurfaceCard(if (confirmation.relationship == "Patient") Sage else Mint) {
+                    Text(if (confirmation.relationship == "Patient") t("Patient confirmed this version", "मरीज़ ने इस संस्करण की पुष्टि की") else t("Family / carer confirmation", "परिवार / देखभाल करने वाले की पुष्टि"), fontWeight = FontWeight.Bold)
+                    Text("${confirmation.name} · ${date(confirmation.at)}")
+                    signatures.filter { it.ackId == confirmation.id }.forEach { NoteSignedBy(it, signatureStore) }
+                    val onPhone = remember(confirmation.id, readingRound) { readingStore.load(confirmation.id) }
+                    (sharedReadings[confirmation.id] ?: onPhone)?.let { ConsentReadingLine(it, Modifier.padding(top = 4.dp)) }
+                } }
+                if (isLatest) {
+                    item { HorizontalDivider(); Spacer(Modifier.height(12.dp)); Heading(if (patientConfirmation == null) t("Patient's review", "मरीज़ की जाँच") else t("Family's review", "परिवार की जाँच"), 26) }
+                    item { CareField(value = name, onValueChange = { name = it.take(100) }, label = t("Your name", "आपका नाम"), singleLine = true) }
+                    item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("Patient", "Family / carer").forEach { role -> FilterChip(selected = relationship == role, onClick = { relationship = role }, enabled = (vm.cloud == null || (role == "Patient") == owner) && !(familyOnly && role == "Patient") && if (role == "Patient") patientConfirmation == null else patientConfirmation != null, label = { Text(if (role == "Patient") t("Patient", "मरीज़") else t("Family / carer", "परिवार / देखभाल करने वाले")) }) } } }
+                    item(key = "confirm-read-aloud") { ConsentReadAloudStep(noteSpoken, "note-confirm-${note.id}-$readingRound", name, readers, onChange = { reading = it }) }
+                    item { CheckLine(reviewed, { reviewed = it }, t("I have read this version. This is not a formal signature, consent for treatment or a treatment decision. I can ask my doctor to change it later.", "मैंने यही संस्करण पढ़ा है। यह औपचारिक हस्ताक्षर, इलाज की सहमति या इलाज का फ़ैसला नहीं है। मैं बाद में डॉक्टर से इसे बदलवा सकता/सकती हूँ।")) }
+                    // The signing pad is back on the review step (owner, 26 Nov), reversing the 22 Nov removal. The signature is saved
+                    // with the confirmation by saveReview (saveNoteSignature) and shown under it via NoteSignedBy.
+                    item(key = "confirm-signature") { NoteSignatureCapture(signatureDraft, enabled = !busy && !alreadyConfirmed) { vm.message.value = it } }
+                }
             }
         }
+        NoteStepBar(first = current == 0, last = onReview, onBack = { stepIndex = (current - 1).coerceAtLeast(0) }, onNext = { stepIndex = (current + 1).coerceAtMost(stepCount - 1) },
+            finalAction = if (isLatest) { size -> Button(onClick = saveReview, enabled = canSave, shape = RoundedCornerShape(999.dp), modifier = size.testTag("note-step-save"), colors = ButtonDefaults.buttonColors(containerColor = SaharaColors.Primary, contentColor = SaharaColors.OnPrimary)) {
+                Text(if (alreadyConfirmed) t("Confirmation already saved", "पुष्टि पहले से सहेजी है") else t("Save my review", "मेरी जाँच सहेजें"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center) } } else null)
     }
 }
 
@@ -1048,8 +1092,7 @@ internal fun careTabBack(personShown: Boolean, medicineScanner: Boolean, tab: In
                 // How visits get here (22 Nov review: "does the doctor add them or do we?").
                 Text(if (canAdd) t("Visits your doctor schedules appear here. You can also add one yourself.", "डॉक्टर जो मुलाक़ात तय करते हैं, वह यहाँ दिखती है। आप ख़ुद भी जोड़ सकते हैं।")
                     else t("Visits your doctor schedules appear here.", "डॉक्टर जो मुलाक़ात तय करते हैं, वह यहाँ दिखती है।"), fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardSub, modifier = Modifier.testTag("care-visits-how"))
-                if (canAdd) CareModuleAddButton(t("Add a visit", "मुलाक़ात जोड़ें"), "care-module-add-visit") { onAdd("visit") }
-                CareVisitsModule(vm, upcoming, pastVisits, onCalendarAt)
+                CareVisitsModule(vm, upcoming, pastVisits, onCalendarAt, onAdd = if (canAdd) ({ onAdd("visit") }) else null)
         },
         CareModuleTile("To do", t("To do", "करने के काम"), "", SaharaSoftGold, R.drawable.care_notes_illustration, tasks.size) {
             if (canAdd) CareModuleAddButton(t("Add a to-do", "नया काम जोड़ें"), "care-module-add-task") { onAdd("task") }
@@ -1069,8 +1112,8 @@ internal fun careTabBack(personShown: Boolean, medicineScanner: Boolean, tab: In
     // 24 Nov meeting ("why some blue, some purple?"): one tone per group, so the colour says which kind of tool it is.
     // Every day = teal, Medicines = plum, Visits and records = indigo, Plans and support = marigold (see [CareToolGroupTone]).
     fun module(name: String, tone: SaharaTone): CareToolRow? = byName[name]?.let { tile -> CareToolRow(tile.title, careModuleIcon(name), tone, "care-module-${tile.key}-toggle",
-        if (tile.count == 0) t("Nothing yet", "अभी कुछ नहीं") else "${tile.count}") { openModule = name } }
-    fun page(label: String, icon: ImageVector, tone: SaharaTone, tag: String, open: (() -> Unit)?): CareToolRow? = open?.let { CareToolRow(label, icon, tone, tag, null, it) }
+        if (tile.count == 0) t("Nothing yet", "अभी कुछ नहीं") else "${tile.count}", when (name) { "Medicines" -> HealthCategory.Medicines; "Visits" -> HealthCategory.Visits; "To do" -> HealthCategory.ToDo; "Check-ins" -> HealthCategory.CheckIn; "Journal" -> HealthCategory.Journal; else -> HealthCategory.CareTeam }) { openModule = name } }
+    fun page(label: String, icon: ImageVector, tone: SaharaTone, tag: String, open: (() -> Unit)?): CareToolRow? = open?.let { CareToolRow(label, icon, tone, tag, null, when (tag) { "symptom-tracker-entry" -> HealthCategory.Symptoms; "shortcut-calendar" -> HealthCategory.Calendar; "care-tool-documents" -> HealthCategory.Documents; "shortcut-labs" -> HealthCategory.Labs; "care-tool-plan" -> HealthCategory.Emergency; "shortcut-devices" -> HealthCategory.Devices; "shortcut-community" -> HealthCategory.Community; else -> HealthCategory.Tools }, it) }
     val daily = CareToolGroupTone.Daily; val meds = CareToolGroupTone.Medicines; val records = CareToolGroupTone.Records; val plans = CareToolGroupTone.Planning
     val groups = listOf(
         Triple(t("Every day", "हर दिन"), daily, listOfNotNull(page(t("Symptoms", "लक्षण"), Icons.Default.MonitorHeart, daily, "symptom-tracker-entry", onSymptoms), module("Check-ins", daily), module("Journal", daily), module("To do", daily))),
@@ -1086,7 +1129,7 @@ internal fun careTabBack(personShown: Boolean, medicineScanner: Boolean, tab: In
         direction = { from, to -> if (from == null && to != null) SaharaMotion.Direction.Forward else if (from != null && to == null) SaharaMotion.Direction.Back else SaharaMotion.Direction.Switch }) { shownName ->
     val shownTile = shownName?.let { name -> byName[name] }
     if (shownTile != null) CareModuleScreen(shownTile) { closeModule() } else
-    LazyColumn(Modifier.fillMaxSize().saharaScreenEnter().testTag("care-list"), state = listState, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    LazyColumn(Modifier.fillMaxSize().saharaHealthBackground().saharaScreenEnter().testTag("care-list"), state = listState, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         // One title and the one main action (Add) on top; then the list.
         item(key = "care-tools-header", contentType = "header") { Row(saharaTodayItem(Modifier.fillMaxWidth()), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.weight(1f)) { Heading(title ?: t("Daily care", "रोज़ की देखभाल"), 26) }
@@ -1098,8 +1141,8 @@ internal fun careTabBack(personShown: Boolean, medicineScanner: Boolean, tab: In
                 // Premium pass (24 Nov): a quiet group label above one white list, like a settings page.
                 Text(group, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = SaharaColors.InkSub, modifier = Modifier.padding(start = 4.dp).a11yHeading())
                 SaharaRegister(tone = groupTone) { rows.forEachIndexed { index, row ->
-                    if (index > 0) HorizontalDivider(color = SaharaColors.Line, modifier = Modifier.padding(start = 60.dp, end = 12.dp))
-                    SaharaListRow(row.label, Modifier.saharaStagger(g * 3 + index).testTag(row.tag), detail = row.detail, icon = row.icon, tone = row.tone, onClick = row.onClick)
+                    if (index > 0) HorizontalDivider(color = SaharaColors.Line, modifier = Modifier.padding(start = 60.dp, end = 0.dp))
+                    SaharaListRow(row.label, Modifier.saharaStagger(g * 3 + index).testTag(row.tag), detail = row.detail, icon = row.icon, tone = row.tone, onClick = row.onClick, emoji = row.category.emoji, emojiTint = row.category.color)
                 } }
             }
         } }
@@ -1113,7 +1156,7 @@ internal fun careTabBack(personShown: Boolean, medicineScanner: Boolean, tab: In
 }
 
 /** One row of All care tools: a module of this tab or another page. [detail] is the module's count. */
-private class CareToolRow(val label: String, val icon: ImageVector, val tone: SaharaTone, val tag: String, val detail: String?, val onClick: () -> Unit)
+private class CareToolRow(val label: String, val icon: ImageVector, val tone: SaharaTone, val tag: String, val detail: String?, val category: HealthCategory, val onClick: () -> Unit)
 
 /** The emergency numbers (tap to open the dialler) and a hospitals map link. Shown in Nearby and in Today's SOS sheet. */
 @Composable fun EmergencyNumbersCard() {
@@ -1187,7 +1230,7 @@ private class CareToolRow(val label: String, val icon: ImageVector, val tone: Sa
     var about by rememberSaveable { mutableStateOf(false) }
     var privacy by rememberSaveable { mutableStateOf(false) }
     // An Android settings page: the person's profile at the top, then one plain grouped list. Every row is a title, one short line and a chevron.
-    LazyColumn(Modifier.fillMaxSize().saharaScreenEnter().testTag("more-list"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    LazyColumn(Modifier.fillMaxSize().saharaHealthBackground().saharaScreenEnter().testTag("more-list"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         if (doctorEmbedded || clinicianView) item(key = "more-heading", contentType = "heading") { Heading(if (doctorEmbedded) t("Daily care & tools", "रोज़ की देखभाल और साधन") else t("More", "और"), 26) }
         else item(key = "more-profile", contentType = "profile") { PatientProfileCard(vm, person) }
         if (!doctorEmbedded && !walkthrough) item(key = "more-account-group", contentType = "group") { MoreGroup(t("Account", "खाता"), Modifier.animateItem()) {
@@ -1247,29 +1290,56 @@ private class CareToolRow(val label: String, val icon: ImageVector, val tone: Sa
         confirmButton = { TextButton(onClick = { about = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Close", "बंद करें"), fontWeight = FontWeight.Bold) } })
 }
 
-/** A titled group of settings rows on one card, rows split by inset dividers. */
+/** A titled group of settings rows on one rounded card (iOS grouped inset list), rows split by inset dividers that start after the icon. */
 @Composable private fun MoreGroup(title: String, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     Column(modifier.saharaAppear(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(title, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = RustText, modifier = Modifier.padding(start = 4.dp).a11yHeading())
-        Surface(shape = RoundedCornerShape(12.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(vertical = 2.dp), content = content) }
+        Text(title, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = SaharaColors.InkSub, modifier = Modifier.padding(start = 4.dp).a11yHeading())
+        Surface(shape = RoundedCornerShape(HealthStyle.CardRadius), color = Paper, shadowElevation = 1.5.dp, modifier = Modifier.fillMaxWidth()) {
+            Box { Column(content = content); Box(Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(1.dp).background(Paper)) }
+        }
     }
 }
 
-@Composable private fun MoreIcon(icon: ImageVector, accent: Color) {
-    Surface(shape = RoundedCornerShape(10.dp), color = accent, contentColor = Color.White, modifier = Modifier.size(36.dp)) { Box(contentAlignment = Alignment.Center) { Icon(icon, null, Modifier.size(20.dp)) } }
+/** Each settings icon's emoji and tint (iOS "Health Categories" style); an icon not listed keeps the solid Material chip. Emoji are decorative. */
+private fun moreEmoji(icon: ImageVector): Pair<String, Color>? = when (icon) {
+    Icons.Default.AccountCircle -> "👤" to Color(0xFF3F4F85)
+    Icons.Default.PersonAdd -> HealthCategory.CareTeam.let { it.emoji to it.color }
+    Icons.Default.FolderOpen -> HealthCategory.Documents.let { it.emoji to it.color }
+    Icons.Default.LocalHospital -> HealthCategory.Emergency.let { it.emoji to it.color }
+    Icons.Default.Healing -> HealthCategory.Devices.let { it.emoji to it.color }
+    Icons.Default.CalendarMonth -> HealthCategory.Visits.let { it.emoji to it.color }
+    Icons.Default.Science -> HealthCategory.Labs.let { it.emoji to it.color }
+    Icons.Default.Share -> "📤" to Color(0xFF8A3F55)
+    Icons.Default.Translate -> HealthCategory.Language.let { it.emoji to it.color }
+    Icons.Default.NotificationsNone -> HealthCategory.Reminders.let { it.emoji to it.color }
+    Icons.Default.Lock -> HealthCategory.Privacy.let { it.emoji to it.color }
+    Icons.Default.SentimentSatisfiedAlt -> HealthCategory.Feedback.let { it.emoji to it.color }
+    Icons.Default.Groups -> HealthCategory.CareTeam.let { it.emoji to it.color }
+    Icons.Default.MedicalServices -> HealthCategory.Devices.let { it.emoji to it.color }
+    Icons.Default.Info -> "ℹ️" to Color(0xFF4F6577)
+    else -> null
 }
 
-/** One settings row: a solid coloured icon, a title, an optional short line and a chevron. */
+@Composable private fun MoreIcon(icon: ImageVector, accent: Color) {
+    val emoji = moreEmoji(icon)
+    if (emoji != null) Box(Modifier.size(36.dp).clip(RoundedCornerShape(10.dp)).background(emoji.second.copy(alpha = if (accent == DoctorCardFaint) .08f else .16f).compositeOver(Color.White)), contentAlignment = Alignment.Center) { HealthEmoji(emoji.first, size = 19.sp) }
+    else Surface(shape = RoundedCornerShape(10.dp), color = accent, contentColor = Color.White, modifier = Modifier.size(36.dp)) { Box(contentAlignment = Alignment.Center) { Icon(icon, null, Modifier.size(20.dp)) } }
+}
+
+/** One settings row: a coloured emoji tile, a title, an optional short line (grey) and a chevron; an inset divider below starts after the icon. */
 @Composable private fun MoreRow(icon: ImageVector, accent: Color, title: String, subtitle: String, modifier: Modifier, onClick: () -> Unit, enabled: Boolean = true) {
     val press = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
-    Row(modifier.fillMaxWidth().heightIn(min = 60.dp).clickable(press, LocalIndication.current, enabled = enabled, role = Role.Button, onClick = onClick).saharaPress(press).padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+    val line = SaharaColors.Line
+    Row(modifier.fillMaxWidth().heightIn(min = 60.dp).clickable(press, LocalIndication.current, enabled = enabled, role = Role.Button, onClick = onClick).saharaPress(press)
+        .drawBehind { drawRect(line, topLeft = androidx.compose.ui.geometry.Offset(68.dp.toPx(), size.height - 1.dp.toPx()), size = androidx.compose.ui.geometry.Size(size.width - 68.dp.toPx(), 1.dp.toPx())) }
+        .padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
         MoreIcon(icon, if (enabled) accent else DoctorCardFaint)
         Spacer(Modifier.width(16.dp))
         Column(Modifier.weight(1f)) {
             Text(title, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = if (enabled) DoctorCardInk else DoctorCardSub)
             if (subtitle.isNotBlank()) Text(subtitle, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
-        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, Modifier.size(22.dp), tint = DoctorCardSub)
+        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, Modifier.size(22.dp), tint = SaharaColors.LineStrong)
     }
 }
 
@@ -1363,7 +1433,7 @@ private class CareToolRow(val label: String, val icon: ImageVector, val tone: Sa
     }
 }
 
-@Composable fun SurfaceCard(color: Color = Paper, content: @Composable ColumnScope.() -> Unit) { Surface(shape = RoundedCornerShape(SaharaRadius.Lg), color = color, border = if (color == Paper) BorderStroke(1.dp, DoctorHairline) else null, modifier = Modifier.fillMaxWidth().saharaAppear().a11yCard()) { Column(Modifier.saharaContentSize().padding(16.dp), content = content) } }
+@Composable fun SurfaceCard(color: Color = Paper, content: @Composable ColumnScope.() -> Unit) { Surface(shape = RoundedCornerShape(SaharaRadius.Xl), color = color, shadowElevation = if (color == Paper) 1.5.dp else 0.dp, modifier = Modifier.fillMaxWidth().saharaAppear().a11yCard()) { Column(Modifier.saharaContentSize().padding(16.dp), content = content) } }
 @Composable fun Tile(title: String, illustration: Int, color: Color, modifier: Modifier, onClick: () -> Unit) {
     ActionCard(color, modifier, onClick) {
         Column(Modifier.fillMaxWidth().padding(16.dp)) {
@@ -1378,7 +1448,7 @@ private class CareToolRow(val label: String, val icon: ImageVector, val tone: Sa
     }
 }
 @Composable fun Heading(text: String, size: Int = 30) { Text(text, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = size.sp, lineHeight = (size + 4).sp, letterSpacing = (-0.7).sp) }
-@Composable fun SectionTitle(title: String, action: String? = null, onAction: () -> Unit = {}) { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Text(title, fontSize = 20.sp, fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading()); if (action != null) TextButton(onClick = onAction, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Text(action) } } }
+@Composable fun SectionTitle(title: String, action: String? = null, onAction: () -> Unit = {}) { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Text(title, fontSize = 22.sp, fontFamily = SaharaTitleFont, fontWeight = FontWeight.Bold, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading()); if (action != null) TextButton(onClick = onAction, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Text(action) } } }
 @Composable fun CheckLine(checked: Boolean, change: (Boolean) -> Unit, text: String) { Row(Modifier.fillMaxWidth().toggleable(checked, role = Role.Checkbox, onValueChange = change).padding(vertical = 4.dp), verticalAlignment = Alignment.Top) { Checkbox(checked = checked, onCheckedChange = null, modifier = Modifier.minimumInteractiveComponentSize()); Text(text, Modifier.weight(1f).padding(top = 12.dp), style = MaterialTheme.typography.bodyMedium) } }
 @Composable fun SelectionContainerText(text: String) { androidx.compose.foundation.text.selection.SelectionContainer { Text(text) } }
 fun date(epoch: Long): String = Instant.ofEpochMilli(epoch).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("d MMM yyyy"))

@@ -146,7 +146,7 @@ internal object DoctorGocPdf {
     }
 }
 
-private val GocDocSignatureHeads = setOf("Signature / thumb impression", "Signature", "SIGNATURE")
+internal val GocDocSignatureHeads = setOf("Signature / thumb impression", "Signature", "SIGNATURE")
 
 @Composable private fun GocDocSection(section: GocFormSection, hindi: Boolean) {
     Column(Modifier.fillMaxWidth().testTag("goc-form-section-${section.id}"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -227,7 +227,7 @@ private val GocDocSignatureHeads = setOf("Signature / thumb impression", "Signat
  * Section 19 as signature boxes: the declaration's tick boxes (when the first head cell holds them), then one ruled box per signer, with the form's
  * column names as field labels and an empty signing box where nobody has signed yet.
  */
-@Composable private fun GocDocSignatures(table: GocFormTable, hindi: Boolean) {
+@Composable internal fun GocDocSignatures(table: GocFormTable, hindi: Boolean) {
     val first = table.head.first()
     val declaration = first.pick(hindi).let { it.startsWith(GocForm.TICK_ON) || it.startsWith(GocForm.TICK_OFF) }
     if (declaration) Column(verticalArrangement = Arrangement.spacedBy(6.dp)) { GocDocCell(first, hindi, head = false, single = false) }

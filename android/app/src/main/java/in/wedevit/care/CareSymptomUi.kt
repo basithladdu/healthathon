@@ -28,8 +28,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.sp
@@ -102,7 +104,7 @@ import java.time.format.DateTimeFormatter
                 // "All symptoms" is its own full-width button with an arrow under the tiles, not one more tile (Sujay, 7 Nov: "not able to realise that's a more button").
                 val tiles = quickKeys.map { it to SymptomDiaryRules.symptomLabel(it, hindi) }
                 tiles.chunked(if (largeText) 1 else 2).forEach { row ->
-                    Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         row.forEach { (key, label) ->
                             SymptomFitTile(false, label, key, if (key == "Other") "symptom-add" else "symptom-quick-$key", Modifier.weight(1f).fillMaxHeight().saharaStagger(tiles.indexOfFirst { it.first == key }), role = androidx.compose.ui.semantics.Role.Button) {
                                 quickStart = if (key == "Other") "" else key; adding = true
@@ -171,35 +173,52 @@ import java.time.format.DateTimeFormatter
  */
 @Composable private fun DistressEntryTile(today: DistressCheck?, hindi: Boolean, onClick: () -> Unit) {
     val t = { en: String, hi: String -> careTr(hindi, en, hi) }
-    val shape = RoundedCornerShape(20.dp); val tone = SaharaTone.Marigold
-    Column(Modifier.fillMaxWidth().saharaPressBounce().testTag("symptom-distress").clip(shape).background(tone.wash, shape).border(2.dp, tone.solid, shape)
+    val shape = RoundedCornerShape(22.dp); val amberInk = Color(0xFF8E2A22); val roseInk = Color(0xFF7A2A24)
+    val scored = today != null
+    val n = if (today?.distress == true) today.score ?: 0 else 0
+    // Light and calm: a white card with a soft amber wash fading in from the left, a slim 0-10 bar with today's mark, a tinted action pill.
+    Column(Modifier.fillMaxWidth().saharaPressBounce().testTag("symptom-distress").shadow(2.dp, shape).clip(shape).border(1.5.dp, Color(0xFFE3A49B), shape)
+        .background(androidx.compose.ui.graphics.Brush.linearGradient(listOf(Color(0xFFFCE4E1), Color(0xFFFFF1E8))), shape)
         .clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onClick).padding(horizontal = 16.dp, vertical = 14.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Row(Modifier.fillMaxWidth().heightIn(min = 64.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-            Box(Modifier.size(60.dp).clip(RoundedCornerShape(18.dp)).background(tone.solid), contentAlignment = Alignment.Center) {
-                Icon(Icons.Default.Thermostat, null, Modifier.size(38.dp), tint = tone.onSolid)
-            }
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Box(Modifier.size(44.dp).clip(RoundedCornerShape(14.dp)).background(Color.White).clearAndSetSemantics { }, contentAlignment = Alignment.Center) { Text("🌡️", fontSize = 24.sp) }
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(t("Distress thermometer", "परेशानी थर्मामीटर"), fontFamily = SaharaTitleFont, fontSize = 21.sp, lineHeight = 26.sp, fontWeight = FontWeight.Bold, color = tone.ink, style = SymptomWords, modifier = Modifier.a11yHeading())
-                val line = when {
-                    today == null -> t("One overall score, 0–10, for this past week", "इस हफ़्ते की कुल परेशानी का एक अंक, 0–10")
-                    today.distress -> t("Today", "आज") + ": ${today.score ?: 0}/10 · " + t("Tap to change", "बदलने के लिए दबाएँ")
-                    else -> t("Today: no distress", "आज: कोई परेशानी नहीं") + " · " + t("Tap to change", "बदलने के लिए दबाएँ")
-                }
-                Text(line, fontSize = 15.sp, lineHeight = 20.sp, color = DoctorCardInk, style = SymptomWords)
+                Text(t("Distress thermometer", "परेशानी थर्मामीटर"), fontFamily = SaharaTitleFont, fontSize = 20.sp, lineHeight = 25.sp, fontWeight = FontWeight.SemiBold, color = roseInk, style = SymptomWords, modifier = Modifier.a11yHeading())
+                Text(t("One overall score, 0–10, for this past week", "इस हफ़्ते की कुल परेशानी का एक अंक, 0–10"), fontSize = 14.sp, lineHeight = 19.sp, color = DoctorCardSub, style = SymptomWords)
             }
-            // Today's score, large and in its band colour, so the overall number stands out from the symptom scores below.
-            if (today != null) {
-                val n = if (today.distress) today.score ?: 0 else 0; val band = ChartBands.color(n)
-                Box(Modifier.size(64.dp).saharaPop(n).clip(RoundedCornerShape(18.dp)).background(band).testTag("symptom-distress-score"), contentAlignment = Alignment.Center) {
-                    Text("$n", fontFamily = SaharaTitleFont, fontSize = 34.sp, lineHeight = 36.sp, fontWeight = FontWeight.Bold, color = readableOn(band))
+            if (scored) {
+                val band = ChartBands.color(n)
+                Box(Modifier.size(48.dp).saharaPop(n).clip(RoundedCornerShape(14.dp)).background(Color(0xFFB5473C)).testTag("symptom-distress-score"), contentAlignment = Alignment.Center) {
+                    Text("$n", fontFamily = SaharaTitleFont, fontSize = 26.sp, lineHeight = 28.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 }
-            } else Icon(Icons.Default.ChevronRight, null, Modifier.size(28.dp), tint = tone.ink)
+            }
+        }
+        // The slim 0-10 bar (soft green to amber to red) with today's mark; "Not scored yet" when there is no answer.
+        BoxWithConstraints(Modifier.fillMaxWidth().height(22.dp).clearAndSetSemantics { }) {
+            Box(Modifier.align(Alignment.Center).fillMaxWidth().height(8.dp).clip(RoundedCornerShape(50)).background(androidx.compose.ui.graphics.Brush.horizontalGradient(listOf(Color(0xFFBFE3C8), Color(0xFFF6E1A0), Color(0xFFF2B8AE)))))
+            if (scored) Box(Modifier.offset(x = (maxWidth - 18.dp) * (n / 10f)).align(Alignment.CenterStart).size(18.dp).background(Color.White, CircleShape).border(3.dp, roseInk, CircleShape))
+        }
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text(when {
+                today == null -> t("Not scored yet", "अभी अंक नहीं दिया")
+                today.distress -> t("Today", "आज") + ": $n/10"
+                else -> t("Today: no distress", "आज: कोई परेशानी नहीं")
+            }, Modifier.weight(1f), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, style = SymptomWords)
+            Surface(shape = RoundedCornerShape(50), color = Color.White, contentColor = amberInk, border = BorderStroke(1.5.dp, Color(0xFFD98A80))) {
+                Row(Modifier.heightIn(min = 48.dp).padding(start = 18.dp, end = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(if (scored) t("Update", "बदलें") else t("Rate now", "अभी बताएँ"), fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                    Icon(Icons.Default.ChevronRight, null, Modifier.size(22.dp))
+                }
+            }
         }
         // Distress vs symptoms (SVK and Sujay, 23-24 Nov): say plainly which number is which.
-        Text(t("This is your overall distress, not one problem.", "यह आपकी कुल परेशानी है, कोई एक समस्या नहीं।"),
-            fontSize = 16.sp, lineHeight = 22.sp, fontWeight = FontWeight.SemiBold, color = tone.ink, style = SymptomWords, modifier = Modifier.testTag("symptom-vs-distress"))
-        Text("NCCN Distress Thermometer", fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint)
+        Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text("ℹ️", Modifier.clearAndSetSemantics { }, fontSize = 14.sp)
+            Text(t("This is your overall distress, not one problem.", "यह आपकी कुल परेशानी है, कोई एक समस्या नहीं।"),
+                fontSize = 14.sp, lineHeight = 19.sp, color = amberInk, style = SymptomWords, modifier = Modifier.testTag("symptom-vs-distress"))
+        }
+        Text("NCCN Distress Thermometer", fontSize = 11.sp, lineHeight = 14.sp, color = Color(0xFF5E5249))
     }
 }
 
@@ -208,27 +227,26 @@ import java.time.format.DateTimeFormatter
  * font shrinks (never breaks mid-word) so "Breathlessness" fits at any text size.
  */
 @Composable private fun SymptomFitTile(selected: Boolean, label: String, key: String, tag: String, modifier: Modifier = Modifier, role: androidx.compose.ui.semantics.Role = androidx.compose.ui.semantics.Role.RadioButton, onClick: () -> Unit) {
-    val shape = RoundedCornerShape(16.dp); val c = symptomColor(key)
+    val shape = RoundedCornerShape(22.dp); val p = symptomPastel(key)
     val interaction = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
-    val ring by androidx.compose.animation.animateColorAsState(if (selected) c else DoctorHairline, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "tile ring")
-    val fill by androidx.compose.animation.animateColorAsState(if (selected) lerp(Paper, c, .12f) else Paper, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "tile fill")
+    val ring by androidx.compose.animation.animateColorAsState(if (selected) p.ink.copy(alpha = .75f) else p.accent.copy(alpha = .7f), SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "tile ring")
     // A light key tap on every tile press, and a small answering bounce when a tile becomes chosen.
     val tick = rememberSaharaTick()
     val press: () -> Unit = { tick(); onClick() }
-    Column(modifier.heightIn(min = 64.dp).saharaPressBounce().saharaSelectBounce(selected, .05f).testTag(tag).clip(shape).background(fill, shape).border(if (selected) 2.dp else 1.dp, ring, shape)
+    // Soft pastel tile: a light tint fading to lighter, the emoji in a white rounded square, the name in a dark ink of the same hue.
+    // Selected: a 2 dp deeper border and a tick badge.
+    Box(modifier.heightIn(min = 128.dp).saharaPressBounce().saharaSelectBounce(selected, .05f).testTag(tag).clip(shape)
+        .background(androidx.compose.ui.graphics.Brush.verticalGradient(listOf(p.tint, lerp(p.tint, Color.White, .45f))), shape).border(if (selected) 2.dp else 1.dp, ring, shape)
         .then(if (role == androidx.compose.ui.semantics.Role.RadioButton) Modifier.selectable(selected, interaction, ripple(), role = role, onClick = press) else Modifier.clickable(interaction, ripple(), role = role, onClick = press))) {
-        Column(Modifier.weight(1f).fillMaxWidth().padding(start = 12.dp, end = 12.dp, top = 10.dp, bottom = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                SymptomIconChip(key, 40.dp)
-                Spacer(Modifier.weight(1f))
-                AnimatedVisibility(selected, enter = SaharaMotion.enter, exit = SaharaMotion.exit) {
-                    Box(Modifier.size(24.dp).background(c, CircleShape), contentAlignment = Alignment.Center) { Icon(Icons.Default.Check, null, Modifier.size(16.dp), tint = readableOn(c)) }
-                }
-            }
-            SaharaFitText(label, Modifier.fillMaxWidth(), style = LocalTextStyle.current.copy(fontSize = 16.sp), color = DoctorCardInk, maxLines = 2, min = 11f,
-                fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold, textAlign = androidx.compose.ui.text.style.TextAlign.Start)
+        Column(Modifier.fillMaxSize().padding(start = 14.dp, end = 14.dp, top = 14.dp, bottom = 12.dp)) {
+            Box(Modifier.size(48.dp).shadow(2.dp, CircleShape).background(Color.White, CircleShape).clearAndSetSemantics { }, contentAlignment = Alignment.Center) { Icon(symptomVector(key), null, Modifier.size(28.dp), tint = p.ink) }
+            Spacer(Modifier.weight(1f).heightIn(min = 8.dp))
+            SaharaFitText(label, Modifier.fillMaxWidth(), style = LocalTextStyle.current.copy(fontSize = 16.sp, lineHeight = 20.sp), color = p.ink, maxLines = 2, min = 11f,
+                fontWeight = FontWeight.SemiBold, textAlign = androidx.compose.ui.text.style.TextAlign.Start)
         }
-        Box(Modifier.fillMaxWidth().height(5.dp).background(c))
+        Box(Modifier.align(Alignment.TopEnd).padding(10.dp).size(26.dp).clearAndSetSemantics { }.then(if (selected) Modifier.background(p.ink, CircleShape) else Modifier.border(1.5.dp, p.accent, CircleShape)), contentAlignment = Alignment.Center) {
+            if (selected) Icon(Icons.Default.Check, null, Modifier.size(18.dp), tint = Color.White) else Icon(Icons.Default.Add, null, Modifier.size(16.dp), tint = p.accent)
+        }
     }
 }
 
@@ -294,14 +312,14 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
     val isPain = note?.symptom?.trim()?.equals("Pain", true) == true
     val isMood = note?.symptom == SymptomDiaryRules.MOOD
     val largeText = LocalDensity.current.fontScale > 1.15f
-    val accent = symptomColor(note?.symptom ?: item.title)
+    val accent = symptomTileColor(note?.symptom ?: item.title)
     // Patients read every saved number as a face and word; family and the care team keep 0-10.
     val role by vm.viewRole.collectAsStateWithLifecycle()
     val pictures = SymptomScaleRules.picturesByDefault(role)
     val shownScore = { r: Int? -> if (pictures) SymptomScaleRules.shown(r, true, hindi, note?.scale ?: SymptomDiaryRules.PERSONAL_SCALE) else SymptomDiaryRules.ratingLabel(r, hindi) }
     Surface(shape = RoundedCornerShape(16.dp), color = SaharaSection.Symptoms.wash, border = BorderStroke(1.5.dp, SaharaSection.Symptoms.solid), modifier = Modifier.fillMaxWidth().saharaContentSize()) { Row(Modifier.height(IntrinsicSize.Min)) {
       // The symptom's own colour down the left edge, so a long list scans by colour as well as by name.
-      Box(Modifier.width(5.dp).fillMaxHeight().background(accent))
+      Box(Modifier.width(10.dp).fillMaxHeight().background(accent))
       Column(Modifier.weight(1f).padding(start = 12.dp, top = 12.dp, end = 8.dp, bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             SymptomIconChip(note?.symptom ?: item.title, 40.dp)
@@ -600,7 +618,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
                 if (!quick && cur == "what") SymptomSection(null, t("What would you like to note?", "किस बारे में नोट लिखना है?")) {
                     if (multi) Text(t("Pick all that apply, then tap Next.", "जो भी लागू हों सब चुनें, फिर आगे दबाएँ।"), color = DoctorCardSub, fontSize = 15.sp, modifier = Modifier.testTag("symptom-multi-hint"))
                     SymptomDiaryRules.symptoms.entries.chunked(if (largeText) 1 else 2).forEach { pair ->
-                        Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                             pair.forEach { (en, _) -> if (multi) SymptomFitTile(en in pickedList, SymptomDiaryRules.symptomLabel(en, hindi), en, "symptom-choice-$en", Modifier.weight(1f).fillMaxHeight(), role = androidx.compose.ui.semantics.Role.Checkbox) {
                                 picked = (if (en in pickedList) pickedList - en else pickedList + en).joinToString("|")
                             } else SymptomFitTile(if (en == "Other") otherSymptom else !otherSymptom && symptom == en, SymptomDiaryRules.symptomLabel(en, hindi), en, "symptom-choice-$en", Modifier.weight(1f).fillMaxHeight()) {

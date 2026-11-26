@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -116,8 +117,8 @@ object MedicineTimeGroups {
                 Text("${medicineSlotTitle(slot)} · ${list.size}", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.a11yHeading().testTag("medicines-group-${slot.name.lowercase()}"))
             }
             // One calm surface per time of day with hairlines between rows, instead of a card per medicine.
-            Surface(shape = RoundedCornerShape(16.dp), color = SaharaSection.Medicines.wash, modifier = Modifier.fillMaxWidth().testTag("medicines-group-list-${slot.name.lowercase()}")) {
-                Column(Modifier.padding(vertical = 2.dp)) {
+            Surface(shape = RoundedCornerShape(20.dp), color = androidx.compose.ui.graphics.Color(0xFFF3E4EC), shadowElevation = 2.dp, border = androidx.compose.foundation.BorderStroke(1.dp, androidx.compose.ui.graphics.Color(0xFFD7C2DA)), modifier = Modifier.fillMaxWidth().testTag("medicines-group-list-${slot.name.lowercase()}")) {
+                Column(Modifier.background(androidx.compose.ui.graphics.Brush.linearGradient(listOf(androidx.compose.ui.graphics.Color(0xFFEBD9EF), androidx.compose.ui.graphics.Color(0xFFF6E0EA)))).padding(vertical = 2.dp)) {
                     list.forEachIndexed { index, input -> byId[input.id]?.let { item -> key(item.id) { MedicineCompactRow(item, vm, divider = index > 0) } } }
                 }
             }

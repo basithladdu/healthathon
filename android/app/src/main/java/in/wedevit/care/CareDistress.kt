@@ -198,7 +198,7 @@ internal object DistressCodec {
 }
 
 /** "Are you in any distress today?" under the mood buttons: one tap saves "No"; "Yes" opens the thermometer screen. */
-@Composable fun DistressQuestion(vm: CareModel, onYes: () -> Unit) {
+@Composable fun DistressQuestion(vm: CareModel, onYes: () -> Unit, compact: Boolean = false) {
     val t = careText(); val hindi = careHindi()
     val items by vm.items.collectAsStateWithLifecycle(); val person by vm.selected.collectAsStateWithLifecycle(); val busy by vm.busy.collectAsStateWithLifecycle()
     val dayStart = remember(LocalDate.now()) { LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() }
@@ -208,6 +208,25 @@ internal object DistressCodec {
     val tick = rememberSaharaTick()
     Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.testTag("distress-question")) {
         val about = distressAboutName(vm, person)
+        if (compact) {
+            val yesSel = answer?.distress == true; val noSel = answer?.distress == false
+            val green = androidx.compose.ui.graphics.Color(0xFFCFE8D8); val red = androidx.compose.ui.graphics.Color(0xFFF3C9C4)
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(if (about != null) t("Any distress for $about today?", "क्या आज $about किसी परेशानी में हैं?") else t("Any distress today?", "आज कोई परेशानी?"), Modifier.weight(1f), fontSize = 15.sp, lineHeight = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+                Row(Modifier.clip(RoundedCornerShape(50)).background(androidx.compose.ui.graphics.Color.White).border(1.5.dp, androidx.compose.ui.graphics.Color(0xFFCDBBAE), RoundedCornerShape(50)).padding(3.dp), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Surface(onClick = { tick(); onYes() }, enabled = !busy, shape = RoundedCornerShape(50), color = if (yesSel) red else androidx.compose.ui.graphics.Color.Transparent, contentColor = if (yesSel) androidx.compose.ui.graphics.Color(0xFF8E2A22) else DoctorCardSub, modifier = Modifier.heightIn(min = 48.dp).widthIn(min = 64.dp).testTag("distress-yes")) {
+                        Box(Modifier.padding(horizontal = 14.dp), contentAlignment = Alignment.Center) { Text(t("Yes", "हाँ") + (answer?.takeIf { it.distress }?.score?.let { " · $it/10" } ?: ""), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, maxLines = 1) }
+                    }
+                    Surface(onClick = {
+                        tick()
+                        val change = DistressRules.change(today, DistressCheck(false))
+                        if (change != null && canEditCareContext(vm, person, capturedAccount)) { if (today != null) vm.updateItem(change) {} else vm.saveItem("checkin", change.title, change.detail) }
+                    }, enabled = !busy, shape = RoundedCornerShape(50), color = if (noSel) green else androidx.compose.ui.graphics.Color.Transparent, contentColor = if (noSel) androidx.compose.ui.graphics.Color(0xFF1F5E3D) else DoctorCardSub, modifier = Modifier.heightIn(min = 48.dp).widthIn(min = 64.dp).testTag("distress-no")) {
+                        Box(Modifier.padding(horizontal = 14.dp), contentAlignment = Alignment.Center) { Text(t("No", "नहीं"), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, maxLines = 1) }
+                    }
+                }
+            }
+        } else {
         Text(if (about != null) t("Is $about in any distress today?", "क्या आज $about किसी परेशानी में हैं?") else t("Are you in any distress today?", "क्या आज आप किसी परेशानी में हैं?"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             // A saved score shows on the Yes chip itself ("Yes · 7/10"); tapping it again opens the thermometer to change it.
@@ -217,6 +236,7 @@ internal object DistressCodec {
                 val change = DistressRules.change(today, DistressCheck(false))
                 if (change != null && canEditCareContext(vm, person, capturedAccount)) { if (today != null) vm.updateItem(change) {} else vm.saveItem("checkin", change.title, change.detail) }
             }, label = { Text(t("No", "नहीं"), textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()) }, modifier = Modifier.weight(1f).heightIn(min = 56.dp).testTag("distress-no"))
+        }
         }
         AnimatedVisibility(DistressRules.tellCareTeam(answer), enter = SaharaMotion.expand, exit = SaharaMotion.collapse) {
             Text(t("Tell your care team how you are.", "देखभाल टीम को अपना हाल बताएँ।"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk, modifier = Modifier.testTag("distress-tell-team"))

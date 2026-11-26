@@ -26,7 +26,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import java.text.DateFormat
 import java.util.Date
 
-private data class ReaderGoal(val id: String, val title: String, val body: String, val answer: String = body)
+internal data class ReaderGoal(val id: String, val title: String, val body: String, val answer: String = body)
 
 /** B7: the transcript lines an answer in the note came from, so a reader can see what was said. Word matching only. */
 internal object NoteSourceLines {
@@ -91,6 +91,55 @@ private fun readerFallbackGoals(note: CareVersion): List<ReaderGoal> = listOf(no
             NoteReaderTranscript(note.source)
         }
     }
+}
+
+/**
+ * The patient's step-by-step reader for a doctor conversation note: one step per section of the form (Section I, II, ...), then one
+ * step for the doctor's note, the transcript and the recording. The PDF button moves to the review step ([PdfAction]).
+ */
+internal class DoctorNoteSteps(val form: DoctorGocDiscussion, private val goals: List<ReaderGoal>, private val vm: CareModel, private val note: CareVersion) {
+    val sections: List<GocFormSection> = form.sections()
+    val count: Int get() = sections.size + 1
+
+    // The form titles already read "Section III – Decisive Actions"; only add the "Section III ·" prefix when a title lacks it (no "Section III · Section III").
+    fun titles(hindi: Boolean): List<String> = sections.map { s -> val title = s.title.pick(hindi)
+        if (title.startsWith(careTr(hindi, "Section", "भाग"))) title else careTr(hindi, "Section ", "भाग ") + s.id + " · " + title } + careTr(hindi, "Doctor's note and recording", "डॉक्टर का नोट और रिकॉर्डिंग")
+
+    @Composable fun Body(index: Int) { val t = careText(); val hindi = careHindi()
+        if (index < sections.size) { PatientNoteSectionCard(sections[index], hindi); return }
+        Column(Modifier.animateContentSize(), verticalArrangement = Arrangement.spacedBy(24.dp)) {
+            val asked = goals.filterNot { it.id.startsWith("fallback-") }
+            if (asked.isNotEmpty() || form.note.isNotBlank()) Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                ReaderHeading(t("Doctor's note", "डॉक्टर का नोट"))
+                asked.forEach { NoteReaderGoalCard(it, note.source) }
+                if (form.note.isNotBlank()) Surface(color = DoctorCardReport, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("note-reader-doctor-note")) {
+                    SelectionContainer { Text(form.note, fontSize = 16.sp, lineHeight = 24.sp, color = DoctorCardInk, modifier = Modifier.padding(16.dp)) }
+                }
+            }
+            NoteReaderAudio(vm, note)
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                ReaderHeading(t("Transcription", "बातचीत की लिखाई"))
+                NoteReaderTranscript(note.source)
+            }
+        }
+    }
+
+    @Composable fun PdfAction() { var problem by remember(note.id) { mutableStateOf<String?>(null) }
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            DoctorGocPdfButton(form) { problem = it }
+            problem?.let { Text(it, color = MaterialTheme.colorScheme.error, fontSize = 14.sp, modifier = Modifier.announce()) }
+        }
+    }
+}
+
+@Composable internal fun rememberDoctorNoteSteps(vm: CareModel, note: CareVersion): DoctorNoteSteps { val t = careText(); val hindi = careHindi()
+    val context = LocalContext.current
+    val form = remember(note.id, note.contentHash, hindi) { DoctorGocDiscussions.fromNote(note, hindi) }
+    val goals = remember(vm, note.id, note.personId, note.conversationId, note.priorities, note.participants, note.topics, note.questions, note.nextSteps) {
+        val stored = runCatching { DoctorPreparationStore(context, vm.storageNamespace).load(DoctorPreparationStore.scope(vm.accountNamespace, note.personId, note.conversationId)) }.getOrDefault(emptyList())
+        if (stored.isNotEmpty()) stored.map { ReaderGoal(it.id, it.text.trim(), it.answer.trim().ifBlank { t("Not answered", "जवाब नहीं मिला") }, it.answer.trim()) } else readerFallbackGoals(note)
+    }
+    return remember(form, goals, vm, note) { DoctorNoteSteps(form, goals, vm, note) }
 }
 
 @Composable private fun ReaderHeading(text: String) { Text(text, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 21.sp, lineHeight = 26.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk) }

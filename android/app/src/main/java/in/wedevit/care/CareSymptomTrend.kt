@@ -94,12 +94,12 @@ object TrendChartRules {
 /** Tiny legend in words: Mild · Moderate · Severe with their colours and number ranges. */
 @Composable internal fun ChartLegend(hindi: Boolean) {
     // Three soft pills, one per band, so the legend reads like the chips elsewhere in the app.
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.testTag("chart-legend")) {
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.testTag("chart-legend")) {
         listOf(2, 5, 8).zip(listOf("0–3", "4–6", "7–10")).forEach { (sample, range) ->
             val band = ChartBands.color(sample)
-            Row(Modifier.background(lerp(Paper, band, .12f), CircleShape).border(1.5.dp, band, CircleShape).padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Box(Modifier.size(12.dp).background(band, CircleShape))
-                Text("${ChartBands.word(sample, hindi)} $range", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, softWrap = false)
+            Row(Modifier.padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Box(Modifier.size(10.dp).background(band, CircleShape))
+                Text("${ChartBands.word(sample, hindi)} $range", fontSize = 13.sp, color = DoctorCardSub, maxLines = 1, softWrap = false)
             }
         }
     }

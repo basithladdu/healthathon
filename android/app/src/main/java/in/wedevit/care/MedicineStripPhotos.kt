@@ -21,12 +21,16 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -40,6 +44,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -373,31 +378,23 @@ internal object TodayDoseCompact {
         if (MedicineDoses.askWhichNight(item, dose, events, ZonedDateTime.now(zone))) whichNight = dose.time to save else save(LocalDate.now(zone))
     }
     // Medicines plum: the card sits on the plum wash with a solid plum edge; the white pillboxes stand out on it.
-    Surface(shape = RoundedCornerShape(20.dp), color = SaharaSection.Medicines.wash, border = BorderStroke(1.5.dp, SaharaSection.Medicines.solid), modifier = Modifier.fillMaxWidth().saharaAppear().testTag("today-doses")) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                // Medicines keep the plum section colour on their icon tile.
-                SaharaIconChip(Icons.Default.Medication, SaharaSection.Medicines, size = 40)
-                Spacer(Modifier.width(12.dp))
-                Text(t("Today's doses", "आज की दवाएँ"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
-                // The count as a status pill, green once every dose is ticked; the number rises in when it changes.
-                val allDone = taken == total
-                val taken = saharaCountUp(taken)
-                // Solid pill: plum while doses are due, green once all are taken; bold white count on it.
-                val pillBg by animateColorAsState(if (allDone) SaharaTone.Success.solid else SaharaSection.Medicines.solid, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "doses-pill")
-                Surface(shape = RoundedCornerShape(50), color = pillBg) {
-                    SaharaAnimatedText(t("$taken of $total taken", "$total में से $taken ली"), Modifier.padding(horizontal = 12.dp, vertical = 6.dp)) { text ->
-                        Text(text, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = SaharaSection.Medicines.onSolid, maxLines = 1, softWrap = false, modifier = Modifier.testTag("today-doses-count"))
-                    }
+    Surface(shape = RoundedCornerShape(24.dp), color = Color(0xFFF3E4EC), shadowElevation = 3.dp, border = BorderStroke(1.dp, Color(0xFFD7C2DA)), modifier = Modifier.fillMaxWidth().saharaAppear().testTag("today-doses")) {
+        Column(Modifier.background(androidx.compose.ui.graphics.Brush.linearGradient(listOf(Color(0xFFEBD9EF), Color(0xFFF6E0EA)))).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            HealthCardLabel(HealthCategory.Medicines, t("Medicines", "दवाएँ"))
+            val allDone = taken == total
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(t("Today's doses", "आज की दवाएँ"), fontFamily = SaharaTitleFont, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Medium, color = Color(0xFF5E2E59), modifier = Modifier.a11yHeading())
+                    // Spoken and read as one phrase; the ring beside it shows the same count.
+                    Text(t("$taken of $total taken", "$total में से $taken ली"), fontSize = 14.sp, color = if (allDone) Color(0xFF1E5B38) else DoctorCardSub, fontWeight = FontWeight.SemiBold, maxLines = 1, modifier = Modifier.testTag("today-doses-count"))
                 }
+                DoseRing(taken, total, allDone, Modifier.clearAndSetSemantics { })
             }
-            val share = saharaFill(if (total == 0) 0f else taken.toFloat() / total)
-            LinearProgressIndicator(progress = { share }, modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(50)), color = SaharaTone.Success.solid, trackColor = SaharaColors.Surface, drawStopIndicator = {}, gapSize = 0.dp)
             // All of today's doses taken, by the tick just made: a small burst while its Undo shows.
             if (total > 0 && taken == total && held?.personId == person) SaharaLottie(SaharaLottieKind.Confetti, Modifier.align(Alignment.CenterHorizontally))
             // The tap hint folds away while "Marked taken · Undo" shows, and comes back after.
             AnimatedVisibility(canEdit && taken < total && held?.personId != person, enter = SaharaMotion.expand, exit = SaharaMotion.collapse, label = "today-doses-hint") {
-                Text(t("Tap a dose when taken. Hold it for Not taken or Skipped.", "दवा लेने पर उसे छुएँ। नहीं ली या छोड़ी हो तो दबाकर रखें।"), fontSize = 14.sp, color = DoctorCardSub)
+                Text(t("Tap when taken. Hold for Not taken or Skipped.", "लेने पर छुएँ। नहीं ली या छोड़ी हो तो दबाकर रखें।"), fontSize = 14.sp, color = DoctorCardSub)
             }
             // "Marked taken · Undo" sits right under the count, in the first screenful, while a one-tap tick waits.
             DoseUndoRow(person)
@@ -409,24 +406,20 @@ internal object TodayDoseCompact {
             groups.forEachIndexed { index, group -> key(group.time) {
                 val open = !compact || index == nextOpen || group.time in openTimes.split('|')
                 Column(Modifier.testTag("today-doses-${group.time}"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    HorizontalDivider(color = SaharaSection.Medicines.solid.copy(alpha = .35f))
                     // The time of day as a picture first (sun, bright sun, sunset, moon), then "Morning · 08:00 · 3 medicines".
-                    if (!compact) Row(Modifier.padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                        DoseSlotBadge(group.slot, 36); Spacer(Modifier.width(10.dp))
-                        Text(MedicineDoseRules.title(group, hindi), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = SaharaSection.Medicines.ink, modifier = Modifier.weight(1f))
-                    }
+                    if (!compact) DoseGroupChip(group.slot, MedicineDoseRules.title(group, hindi), Modifier.fillMaxWidth())
                     else Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button, enabled = index != nextOpen) {
                         tick()
                         val set = openTimes.split('|').filter(String::isNotBlank).toSet(); openTimes = (if (group.time in set) set - group.time else set + group.time).joinToString("|")
                     }.testTag("today-doses-toggle-${group.time}"), verticalAlignment = Alignment.CenterVertically) {
-                        DoseSlotBadge(group.slot, 36); Spacer(Modifier.width(10.dp))
-                        Text(MedicineDoseRules.title(group, hindi), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = SaharaSection.Medicines.ink, modifier = Modifier.weight(1f))
+                        DoseGroupChip(group.slot, MedicineDoseRules.title(group, hindi), Modifier.weight(1f)) {
                         val left = groupPending[index]
                         // "3 to take" counts down in place as doses are ticked.
                         SaharaAnimatedText(if (left == 0) t("All marked", "सब दर्ज") else t("$left to take", "$left लेनी हैं")) { shown -> Text(shown, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub) }
                         // The chevron turns in the draw layer only.
                         val turn by animateFloatAsState(if (open) 180f else 0f, SaharaMotion.tween(SaharaMotion.EXPAND_MS, easing = SaharaMotion.Emphasized), label = "today-doses-chevron")
                         if (index != nextOpen) Icon(Icons.Default.ExpandMore, if (open) t("Hide", "छिपाएँ") else t("Show", "दिखाएँ"), Modifier.padding(start = 4.dp).graphicsLayer { rotationZ = turn }, tint = SaharaSection.Medicines.ink)
+                        }
                     }
                     // A folded time opens and closes as a section (the card itself never animates its size).
                     AnimatedVisibility(open, enter = SaharaMotion.expand, exit = SaharaMotion.collapse, label = "today-doses-group") {
@@ -520,12 +513,21 @@ internal object TodayDoseCompact {
             val pending = state == MedicineDoseState.PENDING
             val taken = state == MedicineDoseState.TAKEN
             // Taken: a soft green ring blooms out from the pillbox and a light green wash rises over it (the tap itself is never delayed).
-            Surface(shape = RoundedCornerShape(14.dp), color = Paper, border = BorderStroke(if (pending) 1.dp else 2.dp, ringColor),
-                modifier = Modifier.saharaBloom(taken && tickedHere, DoctorStatusGood, 14.dp).saharaPress(interaction).clip(RoundedCornerShape(14.dp))
+            val cardTint by animateColorAsState(when (state) { MedicineDoseState.TAKEN -> Color(0xFFE6F3EA); MedicineDoseState.MISSED -> Color(0xFFFBE6E3); else -> Color.White }, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "pillbox-tint")
+            Surface(shape = RoundedCornerShape(18.dp), color = cardTint, shadowElevation = 3.dp, border = if (pending) BorderStroke(1.dp, Color(0xFF7A3E73).copy(alpha = .14f)) else BorderStroke(2.dp, ringColor),
+                modifier = Modifier.width(112.dp).saharaBloom(taken && tickedHere, DoctorStatusGood, 18.dp).saharaPress(interaction).clip(RoundedCornerShape(18.dp))
                     .combinedClickable(interactionSource = interaction, indication = LocalIndication.current, enabled = enabled, role = Role.Button,
                         onClickLabel = if (pending) t("Mark taken", "ली हुई दर्ज करें") else t("Change", "बदलें"), onLongClickLabel = t("Taken, not taken or skipped", "ली, नहीं ली या छोड़ी"), onLongClick = { menu = true }) { if (pending) { haptic(); tickedHere = true; onMark(MedicineDoseChoice.TAKEN, true) } else menu = true }
                     .semantics { contentDescription = "${item.title}, $label: $stateWord" }.testTag("today-dose-${item.id}-${dose.key}")) {
-                Box(Modifier.saharaFillRise(taken, DoctorStatusGood.copy(alpha = .16f))) { StripThumb(photo, 80) }
+                Column(Modifier.padding(horizontal = 8.dp, vertical = 12.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    PlumThumb(photo, 64)
+                    // Whole words only: a medicine name never breaks mid-word. A long single word gets a slightly smaller size.
+                    val longest = item.title.split(' ').maxOfOrNull { it.length } ?: 0
+                    Text(item.title, fontSize = if (longest >= 12) 13.sp else 14.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis, lineHeight = 18.sp, textAlign = TextAlign.Center,
+                        style = LocalTextStyle.current.copy(hyphens = androidx.compose.ui.text.style.Hyphens.None, lineBreak = androidx.compose.ui.text.style.LineBreak.Heading))
+                    val strength = remember(item.detail) { MedicineEntryText.parse(item.detail)?.strength.orEmpty() }
+                    if (strength.isNotBlank()) Text(strength, fontSize = 13.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
             }
             // A large green tick (or red cross) pops onto the corner the moment the dose is marked (point 6); before that, the sun or moon of its time.
             if (!pending || dose.timed) DoseStateMark(state, 40, if (dose.timed) dose.time else "", Modifier.align(Alignment.TopEnd).offset(x = 8.dp, y = (-8).dp).testTag("today-dose-mark-${item.id}-${dose.key}"))
@@ -534,11 +536,6 @@ internal object TodayDoseCompact {
                 onMark(choice, false)
             }
         }
-        // Whole words only: a medicine name never breaks mid-word under its pillbox.
-        // A long single word (Dexamethasone, Ondansetron) gets a slightly smaller size so it fits on one line instead of splitting.
-        val longest = item.title.split(' ').maxOfOrNull { it.length } ?: 0
-        Text(item.title, fontSize = if (longest >= 12) 13.sp else 14.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis, lineHeight = 18.sp, textAlign = TextAlign.Center,
-            style = LocalTextStyle.current.copy(hyphens = androidx.compose.ui.text.style.Hyphens.None, lineBreak = androidx.compose.ui.text.style.LineBreak.Heading))
         if (caption.isNotBlank()) Text(caption, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1)
         // A dose ticked by an invited family member says so, so the patient and the doctor can tell who logged it.
         if (family && state != MedicineDoseState.PENDING) Text(t("Logged by family", "परिवार ने दर्ज किया"), fontSize = 14.sp, color = DoctorCardSub, maxLines = 2, lineHeight = 18.sp, textAlign = TextAlign.Center, modifier = Modifier.testTag("today-dose-family-${item.id}-${dose.key}"))
@@ -583,5 +580,45 @@ internal object TodayDoseCompact {
             if (choice == MedicineDoseChoice.TAKEN) haptic()
             onMark(choice, false)
         }
+    }
+}
+
+/** The medicine picture in a plum-tinted circle: the pill icon while there is no photo, the photo cropped round when there is. */
+@Composable private fun PlumThumb(file: File?, size: Int) {
+    val context = LocalContext.current
+    val pixels = with(LocalDensity.current) { size.dp.roundToPx() }
+    val motion = SaharaMotion.enabled
+    Box(Modifier.size(size.dp).clip(androidx.compose.foundation.shape.CircleShape).background(androidx.compose.ui.graphics.Color(0xFF7A3E73).copy(alpha = .12f)), contentAlignment = Alignment.Center) {
+        Icon(Icons.Default.Medication, null, tint = HealthCategory.Medicines.color, modifier = Modifier.size((size / 2).dp))
+        if (file != null) {
+            val request = remember(file.path, pixels, motion) { ImageRequest.Builder(context).data(file).size(pixels).crossfade(motion).build() }
+            AsyncImage(request, null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+        }
+    }
+}
+
+/** Progress ring (plum, green once everything is taken) with "taken/total" inside. */
+@Composable private fun DoseRing(taken: Int, total: Int, allDone: Boolean, modifier: Modifier = Modifier) {
+    val share = saharaFill(if (total == 0) 0f else taken.toFloat() / total)
+    val color by animateColorAsState(if (allDone) androidx.compose.ui.graphics.Color(0xFF2E7D4F) else HealthCategory.Medicines.color, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "ring")
+    Box(modifier.size(64.dp), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator(progress = { 1f }, modifier = Modifier.fillMaxSize(), color = HealthCategory.Medicines.color.copy(alpha = .15f), strokeWidth = 7.dp, trackColor = androidx.compose.ui.graphics.Color.Transparent, gapSize = 0.dp)
+        CircularProgressIndicator(progress = { share }, modifier = Modifier.fillMaxSize(), color = color, strokeWidth = 7.dp, trackColor = androidx.compose.ui.graphics.Color.Transparent, gapSize = 0.dp)
+        Text("$taken/$total", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = HealthCategory.Medicines.ink, maxLines = 1, softWrap = false)
+    }
+}
+
+/** Soft tinted header chip of one time of day: emoji, "Morning · 08:00 · 2 medicines". Colours keep >= 4.5:1 for the ink on the tint. */
+@Composable private fun DoseGroupChip(slot: DoseSlot, title: String, modifier: Modifier = Modifier, trailing: @Composable RowScope.() -> Unit = {}) {
+    val (emoji, tint, ink) = when (slot) {
+        DoseSlot.MORNING -> Triple("🌅", androidx.compose.ui.graphics.Color(0xFFFCEFD2), androidx.compose.ui.graphics.Color(0xFF7A5200))
+        DoseSlot.AFTERNOON -> Triple("☀️", androidx.compose.ui.graphics.Color(0xFFFBF3C4), androidx.compose.ui.graphics.Color(0xFF6B5A00))
+        DoseSlot.EVENING -> Triple("🌇", androidx.compose.ui.graphics.Color(0xFFFFE0CC), androidx.compose.ui.graphics.Color(0xFF8A3B00))
+        DoseSlot.NIGHT -> Triple("🌙", androidx.compose.ui.graphics.Color(0xFFE0E3F7), androidx.compose.ui.graphics.Color(0xFF2F3A8F))
+    }
+    Row(modifier.shadow(1.dp, RoundedCornerShape(50)).clip(RoundedCornerShape(50)).background(Color.White).border(1.dp, Color(0xFFD7C2DA), RoundedCornerShape(50)).padding(horizontal = 14.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        HealthEmoji(emoji, size = 18.sp); Spacer(Modifier.width(8.dp))
+        Text(title, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = ink, modifier = Modifier.weight(1f))
+        trailing()
     }
 }

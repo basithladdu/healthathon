@@ -75,15 +75,14 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
     val capturedAccount = remember(person) { vm.accountNamespace }
     val done = today != null
     // Light card, dark text (team feedback 21 Nov: the dark teal felt heavy). Teal stays as the accent on buttons and icons.
-    val band by animateColorAsState(if (done) SaharaTone.Success.wash else SaharaTone.Teal.wash, SaharaMotion.tween(SaharaMotion.VALUE_MS))
+    val band = Color(0xFFFDEFEA)
     val haptic = rememberSaharaHaptic()
     // The mood tapped here; the bloom plays once that mood is really saved (it follows the record, so a failed save shows nothing).
     var tapped by remember { mutableStateOf<String?>(null) }
-    Surface(shape = RoundedCornerShape(TodayHero.radius), color = band, contentColor = DoctorCardInk, border = BorderStroke(1.dp, SaharaTone.Teal.solid.copy(alpha = .25f)), modifier = Modifier.fillMaxWidth().saharaAppear().saharaPulseGlow(TodayHero.dueBand, TodayHero.radius, active = !done).saharaBloom(tapped != null && today?.title == tapped && tapped != CheckInMood.HARD, SaharaTone.Success.solid, TodayHero.radius).testTag("today-checkin")) { Box {
+    Surface(shape = RoundedCornerShape(TodayHero.radius), color = band, contentColor = DoctorCardInk, shadowElevation = 3.dp, border = BorderStroke(1.dp, Color(0xFFE0C8BA)), modifier = Modifier.fillMaxWidth().saharaAppear().saharaPulseGlow(TodayHero.dueBand, TodayHero.radius, active = !done).saharaBloom(tapped != null && today?.title == tapped && tapped != CheckInMood.HARD, SaharaTone.Success.solid, TodayHero.radius).testTag("today-checkin")) { Box(Modifier.background(androidx.compose.ui.graphics.Brush.linearGradient(listOf(Color(0xFFFFE8C2), Color(0xFFFBD8DF), Color(0xFFD2EADF))))) {
         Column(Modifier.saharaContentSize().padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 6.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { HealthCardLabel(HealthCategory.CheckIn, t("Check-in", "रोज़ का हाल"), Modifier.weight(1f)); Text(LocalDate.now().format(careDateFormat("EEE, d MMM", hindi)), fontSize = 13.sp, color = Color(0xFF5E5650)) }
             Row(verticalAlignment = Alignment.CenterVertically) {
-                // The one main card on Today: the sun (evening sun, or moon at night) on a breathing halo, floating and swaying a few times, then resting.
-                SaharaDaySky(size = 30); Spacer(Modifier.width(6.dp))
                 Text(t("How was today?", "आज का दिन कैसा रहा?"), fontFamily = SaharaTitleFont, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
                 // The saved tick pops in once the check-in is stored (it follows the saved record, not a timer).
                 AnimatedVisibility(done, enter = scaleIn(spring(dampingRatio = Spring.DampingRatioMediumBouncy), initialScale = .6f) + fadeIn(SaharaMotion.tween(SaharaMotion.SAVED_MS)), exit = fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS))) {
@@ -95,24 +94,25 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
                     }
                 }
             }
-            // The two most-used actions come first and are big: note a symptom, add a few words.
-            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                TodayBigAction(t("Note a symptom", "तबीयत का नोट लिखें"), Icons.Default.Healing, onSymptom, Modifier.weight(1f).fillMaxHeight().saharaStagger(0).testTag("today-checkin-symptom"))
-                TodayBigAction(if (today?.detail.isNullOrBlank()) t("Add a few words", "कुछ शब्द लिखें") else t("Change the words", "शब्द बदलें"), Icons.Default.Edit, onOpen, Modifier.weight(1f).fillMaxHeight().saharaStagger(1).testTag("today-checkin-words"))
-            }
-            // Distress question stays on Today (Dr Sujay: the thermometer must not be buried).
-            if (onDistress != null) DistressQuestion(vm, onYes = onDistress)
-            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            // The three moods first: big tinted tiles with a face and the label under it.
+            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 CareDailyFlow.moods.forEachIndexed { index, mood ->
-                    TodayMoodButton(checkInMoodLabel(mood, hindi), index / 2f, selected = today?.title == mood, enabled = !busy, ink = SaharaTone.Teal.ink, modifier = Modifier.weight(1f).fillMaxHeight().saharaStagger(index).testTag("today-checkin-$index")) {
+                    val look = TodayMoodLook.of(index)
+                    TodayMoodButton(checkInMoodLabel(mood, hindi), look, selected = today?.title == mood, enabled = !busy, modifier = Modifier.weight(1f).fillMaxHeight().saharaStagger(index).testTag("today-checkin-$index")) {
                         val change = CareDailyFlow.checkInChange(today, mood)
                         if (change != null && canEditCareContext(vm, person, capturedAccount)) { haptic(); tapped = mood; if (today != null) vm.updateItem(change) {} else vm.saveItem("checkin", mood, "") }
                     }
                 }
             }
+            // Distress question stays on Today (Dr Sujay: the thermometer must not be buried), as a compact Yes/No row.
+            if (onDistress != null) DistressQuestion(vm, onYes = onDistress, compact = true)
             // Today's few words open in under the moods once saved, instead of popping in.
             AnimatedVisibility(!today?.detail.isNullOrBlank(), enter = SaharaMotion.expand, exit = SaharaMotion.collapse) {
                 Text(today?.detail.orEmpty(), fontSize = 15.sp, lineHeight = 20.sp, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            }
+            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                TodayPillAction("🩹", t("Note a symptom", "तबीयत का नोट लिखें"), HealthCategory.Symptoms.ink, onSymptom, Modifier.weight(1f).fillMaxHeight().saharaStagger(0).testTag("today-checkin-symptom"))
+                TodayPillAction("📝", if (today?.detail.isNullOrBlank()) t("Add a few words", "कुछ शब्द लिखें") else t("Change the words", "शब्द बदलें"), HealthCategory.Journal.ink, onOpen, Modifier.weight(1f).fillMaxHeight().saharaStagger(1).testTag("today-checkin-words"))
             }
         }
         // A soft bloom of petals by the Saved tick once an okay or good day is saved. A hard day gets only the quiet tick: nothing celebrates it.
@@ -122,40 +122,42 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
     } }
 }
 
-/** A large white action on the Today hero: icon over a short label that wraps between words, never inside one. */
-@Composable private fun TodayBigAction(label: String, icon: ImageVector, onClick: () -> Unit, modifier: Modifier) {
+/** Colours of one mood tile: soft tint, strong border and ink (all >= 4.5:1 on the tint). */
+internal class TodayMoodLook(val face: Float, val tint: Color, val accent: Color, val ink: Color) {
+    companion object {
+        private val looks = listOf(
+            TodayMoodLook(0f, Color(0xFFFBD3C9), Color(0xFFC0504D), Color(0xFF8E2F2B)),
+            TodayMoodLook(.5f, Color(0xFFFBE3B5), Color(0xFFD99A1E), Color(0xFF7A5200)),
+            TodayMoodLook(1f, Color(0xFFCBE6D3), Color(0xFF2E7D4F), Color(0xFF1E5B38)))
+        fun of(index: Int) = looks[index.coerceIn(0, 2)]
+    }
+}
+
+/** One mood on the Today card: a big emoji face over its label on a soft tint. Chosen = 2 dp coloured border, check badge and a slight scale. */
+@Composable private fun TodayMoodButton(label: String, look: TodayMoodLook, selected: Boolean, enabled: Boolean, modifier: Modifier, onClick: () -> Unit) {
     val press = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
-    Surface(onClick = onClick, shape = RoundedCornerShape(TodayHero.buttonRadius), color = Color.White, contentColor = TodayHero.dueBand, border = BorderStroke(1.dp, DoctorHairline), interactionSource = press, modifier = modifier.heightIn(min = 84.dp).saharaPress(press)) {
-        Column(Modifier.padding(horizontal = 8.dp, vertical = 12.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-            Icon(icon, null, Modifier.size(30.dp)); Spacer(Modifier.height(6.dp))
-            SaharaFitText(label, style = LocalTextStyle.current.copy(fontSize = 17.sp, lineHeight = 21.sp), color = TodayHero.dueBand, maxLines = 2, min = 12f, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+    val scale by androidx.compose.animation.core.animateFloatAsState(if (selected) 1.04f else 1f, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "mood-scale")
+    Box(modifier.graphicsLayer { scaleX = scale; scaleY = scale }) {
+        Surface(shape = RoundedCornerShape(18.dp), color = if (selected) look.tint else Color.White, border = BorderStroke(if (selected) 2.dp else 1.dp, if (selected) look.accent else look.accent.copy(alpha = .6f)),
+            modifier = Modifier.fillMaxSize().heightIn(min = 96.dp).saharaPress(press).selectable(selected = selected, enabled = enabled, role = Role.RadioButton, interactionSource = press, indication = androidx.compose.material3.ripple(), onClick = onClick)) {
+            Column(Modifier.padding(horizontal = 4.dp, vertical = 10.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                Box(Modifier.size(56.dp).background(if (selected) Color.White.copy(alpha = .7f) else look.tint, CircleShape).saharaSelectBounce(selected, .2f).clearAndSetSemantics { }, contentAlignment = Alignment.Center) { CareMoodFace(look.face, Modifier.size(44.dp)) }
+                Spacer(Modifier.height(4.dp))
+                SaharaFitText(label, style = LocalTextStyle.current.copy(fontSize = 15.sp, lineHeight = 18.sp), color = look.ink, maxLines = 2, min = 10f, fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold, textAlign = TextAlign.Center)
+            }
+        }
+        if (selected) Box(Modifier.align(Alignment.TopEnd).padding(6.dp).size(20.dp).background(look.accent, CircleShape).clearAndSetSemantics { }, contentAlignment = Alignment.Center) {
+            Icon(Icons.Default.Check, null, Modifier.size(14.dp), tint = Color.White)
         }
     }
 }
 
-/** One mood on the Today hero: a small face over its label. Solid white once chosen; a press shrinks it slightly. */
-@Composable private fun TodayMoodButton(label: String, face: Float, selected: Boolean, enabled: Boolean, ink: Color, modifier: Modifier, onClick: () -> Unit) {
-    val press = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
-    val fill by animateColorAsState(if (selected) SaharaTone.Teal.solid.copy(alpha = .12f) else Color.White, SaharaMotion.tween(SaharaMotion.SELECT_MS))
-    val text by animateColorAsState(if (selected) ink else DoctorCardInk, SaharaMotion.tween(SaharaMotion.SELECT_MS))
-    Surface(shape = RoundedCornerShape(TodayHero.buttonRadius), color = fill, border = BorderStroke(if (selected) 2.dp else 1.dp, if (selected) SaharaTone.Teal.solid else DoctorHairline),
-        modifier = modifier.heightIn(min = 76.dp).saharaPress(press).selectable(selected = selected, enabled = enabled, role = Role.RadioButton, interactionSource = press, indication = androidx.compose.material3.ripple(), onClick = onClick)) {
-        Column(Modifier.padding(horizontal = 4.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-            // The chosen face answers with one small bounce.
-            CareMoodFace(face, Modifier.size(32.dp).saharaSelectBounce(selected, .2f).clearAndSetSemantics { })
-            Spacer(Modifier.height(4.dp))
-            // Shrinks the label instead of splitting a word ("ठीक-ठा / क") at large font sizes.
-            SaharaFitText(label, style = LocalTextStyle.current.copy(fontSize = 15.sp, lineHeight = 18.sp), color = text, maxLines = 2, min = 10f,
-                fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold, textAlign = TextAlign.Center)
-        }
-    }
-}
 
 /** The Today hero's colours and shapes; one place so the theme tokens can replace them. */
 internal object TodayHero {
     val dueBand get() = SaharaTone.Teal.solid
     val doneBand get() = SaharaTone.Success.solid
-    val radius = 12.dp
+    val radius = 24.dp
     val buttonRadius = 12.dp
 }
 
@@ -313,5 +315,15 @@ internal fun careModuleIcon(name: String): ImageVector = when (name) {
         // The module's header band in its section colour (medicines plum, visits indigo, check-ins teal), white title and back; the art floats gently.
         item { SaharaSectionBand(tile.title, careModuleTone(tile.name), onBack = onBack, backTag = "care-module-back") { SaharaBandArt(tile.art, modifier = Modifier.saharaFloat()) } }
         item { Column(Modifier.testTag("care-module-${tile.key}"), verticalArrangement = Arrangement.spacedBy(12.dp), content = tile.content) }
+    }
+}
+
+/** A white pill action with a coloured emoji and coloured text, side by side with its twin; 48 dp or taller, soft shadow. */
+@Composable private fun TodayPillAction(emoji: String, label: String, ink: Color, onClick: () -> Unit, modifier: Modifier) {
+    Surface(onClick = onClick, shape = RoundedCornerShape(50), color = Color.White, contentColor = ink, shadowElevation = 2.dp, border = BorderStroke(1.5.dp, Color(0xFFCDBBAE)), modifier = modifier.heightIn(min = 48.dp)) {
+        Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+            Text(emoji, Modifier.clearAndSetSemantics { }, fontSize = 18.sp); Spacer(Modifier.width(6.dp))
+            Text(label, fontSize = 14.sp, lineHeight = 17.sp, fontWeight = FontWeight.SemiBold, color = ink, textAlign = TextAlign.Center, maxLines = 2)
+        }
     }
 }

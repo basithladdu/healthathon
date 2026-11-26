@@ -9,6 +9,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -16,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -55,16 +57,16 @@ object SymptomSummaryRules {
 @Composable fun SymptomSummaryCard(summary: SymptomSummary, hindi: Boolean, pictures: Boolean = false, onOpen: () -> Unit) {
     val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     val note = remember(summary.latest.detail) { SymptomNoteCodec.decode(summary.latest.detail) }
-    val shape = RoundedCornerShape(14.dp); val accent = symptomColor(summary.symptom)
+    val shape = RoundedCornerShape(14.dp); val accent = symptomTileColor(summary.symptom)
     val arrow = when (summary.trend) { 1 -> "↑"; -1 -> "↓"; 0 -> "→"; else -> "" }
     val tick = rememberSaharaTick()
     val arrowWords = when (summary.trend) { 1 -> t("Higher than last time", "पिछली बार से ज़्यादा"); -1 -> t("Lower than last time", "पिछली बार से कम"); 0 -> t("Same as last time", "पिछली बार जितना"); else -> "" }
     Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min).heightIn(min = 64.dp).saharaPressBounce().testTag("symptom-trend-${summary.symptom}").clip(shape).background(SaharaSection.Symptoms.wash, shape)
         .border(1.dp, SaharaSection.Symptoms.solid, shape).clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = { tick(); onOpen() }).padding(start = 0.dp, end = 8.dp),
         verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.width(5.dp).fillMaxHeight().background(accent))
+        Box(Modifier.width(10.dp).fillMaxHeight().background(accent))
         Spacer(Modifier.width(10.dp))
-        SymptomIconChip(summary.symptom, 36.dp)
+        Box(Modifier.size(36.dp).clip(RoundedCornerShape(12.dp)).background(symptomPastel(summary.symptom).tint), contentAlignment = Alignment.Center) { Icon(symptomVector(summary.symptom), null, Modifier.size(22.dp), tint = symptomPastel(summary.symptom).ink) }
         Spacer(Modifier.width(10.dp))
         Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
             Text(SymptomDiaryRules.symptomLabel(summary.symptom, hindi), color = DoctorCardInk, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, lineHeight = 20.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
@@ -90,19 +92,23 @@ object SymptomSummaryRules {
     val name = SymptomDiaryRules.symptomLabel(summary.symptom, hindi)
     val latest = remember(summary.latest.detail) { SymptomNoteCodec.decode(summary.latest.detail) }
     val markers = remember(entries, personId) { symptomTreatmentMarkers(entries, personId) }
-    SaharaScreenSheet(onDismissRequest = onClose, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
+    SaharaScreenSheet(onDismissRequest = onClose, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = SaharaColors.GroundWarm) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 24.dp).testTag("symptom-detail"), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) { SymptomIconChip(summary.symptom, 48.dp); Box(Modifier.weight(1f)) { Heading(name, 27) } }
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Box(Modifier.size(52.dp).clip(RoundedCornerShape(16.dp)).background(symptomPastel(summary.symptom).tint), contentAlignment = Alignment.Center) { Icon(symptomVector(summary.symptom), null, Modifier.size(30.dp), tint = symptomPastel(summary.symptom).ink) }
+                Box(Modifier.weight(1f)) { Heading(name, 27) }
+                Surface(onClick = onClose, shape = androidx.compose.foundation.shape.CircleShape, color = androidx.compose.ui.graphics.Color(0xFFE6E1DB), modifier = Modifier.size(48.dp).testTag("symptom-detail-x")) { Box(contentAlignment = Alignment.Center) { Icon(Icons.Default.Close, t("Close", "बंद करें"), Modifier.size(20.dp), tint = DoctorCardInk) } }
+            }
             ChartLegend(hindi)
             if (summary.symptom == SymptomDiaryRules.MOOD) SymptomDiaryRules.moodShort.forEach { (key, label) ->
                 val points = remember(entries, personId, key) { SymptomDiaryRules.moodSeries(entries, personId, key) }
-                SymptomHistoryChart(careTr(hindi, label.first, label.second), points, hindi, "mood-trend-$key", markers, showEntries = false)
+                SymptomChartCard { SymptomLatestBlock(points, hindi, symptomPastel(summary.symptom).ink); SymptomHistoryChart(careTr(hindi, label.first, label.second), points, hindi, "mood-trend-$key", markers, showEntries = false) }
             } else {
                 val points = remember(entries, personId, latest?.symptom) { SymptomDiaryRules.symptomSeries(entries, personId, latest?.symptom ?: summary.symptom) }
-                SymptomHistoryChart(name, points, hindi, "symptom-trend", markers, showEntries = false)
+                SymptomChartCard { SymptomLatestBlock(points, hindi, symptomPastel(summary.symptom).ink); SymptomHistoryChart(name, points, hindi, "symptom-trend", markers, showEntries = false) }
                 if (summary.symptom == "Pain") SymptomPartTrendPicker(entries, personId, hindi, preferred = latest?.painBodyRatings?.maxByOrNull { it.value }?.key ?: latest?.painBodySites?.firstOrNull(), showEntries = false)
             }
-            Text("${t("Notes", "नोट")} · ${summary.notes.size}", fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = SaharaSection.Symptoms.ink, modifier = Modifier.a11yHeading())
+            Text("${t("Notes", "नोट")} · ${summary.notes.size}", fontFamily = SaharaTitleFont, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = SaharaSection.Symptoms.ink, modifier = Modifier.a11yHeading())
             // Every note of this symptom, newest first; the latest entries come straight from the live list so edits show at once.
             val live = remember(entries, summary) { summary.notes.mapNotNull { n -> entries.firstOrNull { it.id == n.id } } }
             // The newest five notes, then "Show older" (24 Nov).
@@ -111,5 +117,36 @@ object SymptomSummaryRules {
             SaharaShowOlder(live.size, notesShown, tag = "symptom-notes")
             TextButton(onClick = onClose, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Close", "बंद करें")) }
         }
+    }
+}
+
+/** iOS-style "Latest / Average" block above a chart: small coloured label, the big number with "/10", and a soft severity pill. */
+@Composable private fun SymptomLatestBlock(points: List<DatedRating>, hindi: Boolean, hue: androidx.compose.ui.graphics.Color) {
+    if (points.isEmpty()) return
+    val t = { en: String, hi: String -> careTr(hindi, en, hi) }
+    val latest = remember(points) { points.maxWith(compareBy<DatedRating>({ it.date }, { it.time })).value }
+    val average = remember(points) { points.map { it.value }.average() }
+    val band = ChartBands.color(latest)
+    Row(Modifier.fillMaxWidth().testTag("symptom-latest-block"), horizontalArrangement = Arrangement.spacedBy(24.dp), verticalAlignment = Alignment.Bottom) {
+        Column {
+            Text(t("Latest", "ताज़ा"), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = hue)
+            Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(verticalAlignment = Alignment.Bottom) { Text("$latest", fontSize = 30.sp, lineHeight = 34.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk); Text("/10", fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.padding(bottom = 5.dp)) }
+                Surface(shape = androidx.compose.foundation.shape.CircleShape, color = band.copy(alpha = .14f), modifier = Modifier.padding(bottom = 5.dp)) {
+                    Text(ChartBands.word(latest, hindi), Modifier.padding(horizontal = 10.dp, vertical = 2.dp), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = band)
+                }
+            }
+        }
+        if (points.size >= 2) Column {
+            Text(t("Average", "औसत"), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub)
+            Row(verticalAlignment = Alignment.Bottom) { Text(String.format(java.util.Locale.US, "%.1f", average), fontSize = 30.sp, lineHeight = 34.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk); Text("/10", fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.padding(bottom = 5.dp)) }
+        }
+    }
+}
+
+/** A white iOS-style card (20 dp, soft shadow, no border) around one chart and its Latest block. */
+@Composable private fun SymptomChartCard(content: @Composable ColumnScope.() -> Unit) {
+    Surface(shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp), color = androidx.compose.ui.graphics.Color.White, shadowElevation = 2.dp, modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp), content = content)
     }
 }
