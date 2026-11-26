@@ -52,7 +52,7 @@ private val SosRedBottom = Color(0xFFB71C1C)
             Text(buildAnnotatedString {
                 if (patient) { append(t("Take care of", "अपना ख़याल रखें,") + "\n"); withStyle(SpanStyle(color = accent)) { append(t("yourself today.", "आज भी।")) } }
                 else { append(t("Care for them,", "उनका ख़याल रखें,") + "\n"); withStyle(SpanStyle(color = accent)) { append(t("and for you.", "और अपना भी।")) } }
-            }, fontFamily = SaharaTitleFont, fontSize = 28.sp, lineHeight = 34.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk)
+            }, fontFamily = SaharaTitleFont, fontSize = 24.sp, lineHeight = 29.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk)
             Spacer(Modifier.height(8.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.CalendarToday, null, Modifier.size(16.dp), tint = DoctorCardSub); Spacer(Modifier.width(6.dp))
@@ -66,9 +66,9 @@ private val SosRedBottom = Color(0xFFB71C1C)
             }
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Box(Modifier.size(104.dp).clip(CircleShape).background(SaharaColors.PrimaryWash), contentAlignment = Alignment.Center) {
-                Box(Modifier.size(80.dp).clip(CircleShape).background(SaharaColors.Surface), contentAlignment = Alignment.Center) {
-                    Image(saharaImage(R.drawable.sahara_professional_logo, 56.dp), null, Modifier.size(56.dp), contentScale = ContentScale.Fit)
+            Box(Modifier.size(76.dp).clip(CircleShape).background(SaharaColors.PrimaryWash), contentAlignment = Alignment.Center) {
+                Box(Modifier.size(60.dp).clip(CircleShape).background(SaharaColors.Surface), contentAlignment = Alignment.Center) {
+                    Image(saharaImage(R.drawable.sahara_professional_logo, 40.dp), null, Modifier.size(40.dp), contentScale = ContentScale.Fit)
                 }
             }
             if (onRefresh != null) TextButton(onClick = onRefresh, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) {
@@ -83,7 +83,7 @@ private val SosRedBottom = Color(0xFFB71C1C)
     val t = careText()
     Surface(onClick = onSos, shape = RoundedCornerShape(24.dp), color = Color.Transparent, shadowElevation = 4.dp,
         modifier = Modifier.fillMaxWidth().testTag("today-sos").semantics { contentDescription = t("SOS, emergency help", "SOS, आपातकालीन मदद") }) {
-        Box(Modifier.background(Brush.linearGradient(listOf(SosRedTop, SosRedBottom))).padding(20.dp)) {
+        Box(Modifier.background(Brush.linearGradient(listOf(SosRedTop, SosRedBottom))).padding(horizontal = 18.dp, vertical = 14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(t("SOS · Emergency help", "SOS · आपातकालीन मदद"), fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.White)
@@ -91,9 +91,9 @@ private val SosRedBottom = Color(0xFFB71C1C)
                     Text(t("Call an ambulance or show the emergency card", "एम्बुलेंस बुलाएँ या इमरजेंसी कार्ड दिखाएँ"), fontSize = 15.sp, lineHeight = 20.sp, color = Color.White.copy(alpha = .9f))
                 }
                 Spacer(Modifier.width(12.dp))
-                Box(Modifier.size(84.dp).clip(CircleShape).background(Color.White.copy(alpha = .18f)), contentAlignment = Alignment.Center) {
-                    Box(Modifier.size(60.dp).clip(CircleShape).background(Color.White), contentAlignment = Alignment.Center) {
-                        Icon(Icons.Default.Call, null, Modifier.size(30.dp), tint = SosRedTop)
+                Box(Modifier.size(64.dp).clip(CircleShape).background(Color.White.copy(alpha = .18f)), contentAlignment = Alignment.Center) {
+                    Box(Modifier.size(48.dp).clip(CircleShape).background(Color.White), contentAlignment = Alignment.Center) {
+                        Icon(Icons.Default.Call, null, Modifier.size(24.dp), tint = SosRedTop)
                     }
                 }
             }
@@ -134,10 +134,10 @@ private data class TodayQuick(val label: String, val hint: String, val icon: Ima
             tiles.forEach { q ->
                 Surface(onClick = q.onClick, shape = RoundedCornerShape(18.dp), color = SaharaColors.Surface, border = BorderStroke(1.dp, DoctorHairline), shadowElevation = 1.dp,
                     modifier = Modifier.weight(1f).fillMaxHeight().testTag(q.tag)) {
-                    Column(Modifier.padding(horizontal = 4.dp, vertical = 12.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Column(Modifier.padding(horizontal = 4.dp, vertical = 10.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Box(Modifier.size(48.dp).clip(CircleShape).background(q.tone), contentAlignment = Alignment.Center) { Icon(q.icon, null, Modifier.size(26.dp), tint = q.ink) }
                         Text(q.label, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, textAlign = TextAlign.Center, maxLines = 2, lineHeight = 17.sp)
-                        Text(q.hint, fontSize = 12.sp, color = DoctorCardSub, textAlign = TextAlign.Center, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        // Name only (26 Nov refinement): the grey hint line is dropped to keep the row compact.
                     }
                 }
             }

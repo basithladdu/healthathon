@@ -470,7 +470,9 @@ internal fun careTabBack(personShown: Boolean, medicineScanner: Boolean, tab: In
         val medicineSection: androidx.compose.foundation.lazy.LazyListScope.() -> Unit = {
             // The doses card under the title carries the one "x of y taken" count.
             // One small header link instead of a second full-width button under the doses (owner, 24 Nov: too many buttons).
-            item(key = "medicines-open", contentType = "section-header") { SaharaSectionHeader(t("Medicines", "दवाइयाँ"), saharaTodayItem().saharaStagger(3).testTag("today-medicines-title"), tone = SaharaTone.Plum,
+            // Patient and family (owner, 26 Nov: fewer cards on Today): no separate header; the doses card carries its own
+            // "Medicines" label and the Medicines quick action opens the page. The doctor's view keeps the header.
+            if (clinician) item(key = "medicines-open", contentType = "section-header") { SaharaSectionHeader(t("Medicines", "दवाइयाँ"), saharaTodayItem().saharaStagger(3).testTag("today-medicines-title"), tone = SaharaTone.Plum,
                 actionLabel = t("Open", "खोलें"), onAction = { onCare("Medicines") }, icon = careIcon("medicine")) }
             item(key = "today-doses", contentType = "doses") { Box(saharaTodayItem().saharaStagger(4)) { TodayDosesCard(vm) } }
             if (medicines.isEmpty() && loaded && canEdit) item(key = "medicines-add", contentType = "add-button") { SaharaSecondaryButton(t("Add a medicine", "दवा जोड़ें"), { onAdd("medicine") }, saharaTodayItem(Modifier.fillMaxWidth()), icon = Icons.Default.Add, tone = SaharaTone.Plum) }
@@ -490,7 +492,7 @@ internal fun careTabBack(personShown: Boolean, medicineScanner: Boolean, tab: In
                 itemsIndexed(tasks.take(3), key = { _, it -> it.id }, contentType = { _, _ -> "care-row" }) { i, it -> Box(saharaTodayItem().saharaStagger(5 + i)) { CareRow(it, vm) } }
                 if (canEdit) item(key = "todo-add", contentType = "add-button") { SaharaSecondaryButton(t("Add task", "काम जोड़ें"), { onAdd("task") }, saharaTodayItem(Modifier.fillMaxWidth()), icon = Icons.Default.Add, tone = CareToolGroupTone.Daily) }
             }
-            item(key = "all-care-tools", contentType = "all-care-tools") { Box(saharaTodayItem().saharaStagger(6)) { TodayAllCareTools { onCare("All") } } }
+            // "All care tools" is the same as "View all" in Quick actions, so it is no longer a separate card (owner, 26 Nov: fewer cards).
             if (caregiving != null && caregiving.status.state == CaregivingState.ACTIVE && !caregivingCheckIn) item(key = "caregiving-change", contentType = "caregiving") { Box(saharaTodayItem()) { CaregivingChangeRow { caregivingSheet = true } } }
             return@LazyColumn
         }
