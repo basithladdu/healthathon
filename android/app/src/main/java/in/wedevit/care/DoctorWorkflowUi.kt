@@ -48,14 +48,18 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
 @Composable fun DoctorRequestQueue(store: DoctorWorkflowStore, patients: List<DoctorDemoPatient>, onBack: () -> Unit, onOpen: (String) -> Unit, onSchedule: (WorkflowRequest) -> Unit, refreshToken: Int = 0) { val t = careText();
     var revision by remember { mutableIntStateOf(0) }
     var filter by rememberSaveable { mutableStateOf("All") }
+    var query by rememberSaveable { mutableStateOf("") }
     var message by remember { mutableStateOf<String?>(null) }
     val requests = remember(store, revision, refreshToken) { store.requests() }
     val requestsShown = rememberShownCount(filter)
     LazyColumn(Modifier.fillMaxSize().testTag("workflow-request-list"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { DoctorRequestQueueHeader(onBack) }
-        item { DoctorRequestFilters(filter) { filter = it } }
+        item { DoctorRequestFilters(filter, { filter = it }, query, { query = it }) }
         message?.let { item { WorkflowStatus(it) } }
-        val shown = requests.filter { filter == "All" || requestLabel(it.status) == filter }
+        // Status from the dropdown, then the search words against the patient's name and the request reason (owner, 27 Nov).
+        val words = query.trim()
+        val shown = requests.filter { filter == "All" || requestLabel(it.status) == filter }.filter { r ->
+            words.isEmpty() || (patients.firstOrNull { it.id == r.patientId }?.name.orEmpty() + " " + r.reason).contains(words, ignoreCase = true) }
         if (shown.isEmpty()) item { WorkflowCard { Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) { Icon(Icons.Default.Inbox, null, tint = DoctorAccent, modifier = Modifier.size(24.dp)); Text(t("No requests in this group.", "इस समूह में कोई अनुरोध नहीं।"), fontSize = 16.sp, modifier = Modifier.weight(1f)) }; if (filter != "All") TextButton(onClick = { filter = "All" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Show all", "सभी दिखाएँ"), color = DoctorAccent) } } }
         cappedItems(shown, requestsShown, key = { it.id }, tag = "workflow-requests") { request ->
             val patient = patients.firstOrNull { it.id == request.patientId }
@@ -85,11 +89,16 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
     }
 }
 
-@Composable internal fun DoctorRequestFilters(filter: String, onFilter: (String) -> Unit) {
-    FlowRow(Modifier.fillMaxWidth().testTag("workflow-request-filters"),horizontalArrangement=Arrangement.spacedBy(8.dp),verticalArrangement=Arrangement.spacedBy(10.dp)) {
-        listOf("All","New","Accepted","Scheduled","Deferred","Completed").forEach { value ->
-            FilterChip(filter==value,onClick={onFilter(value)},label={Text(value,fontSize=15.sp)},shape=RoundedCornerShape(50),modifier=Modifier.heightIn(min=48.dp).testTag("workflow-filter-$value"))
-        }
+@Composable internal fun DoctorRequestFilters(filter: String, onFilter: (String) -> Unit, query: String = "", onQuery: (String) -> Unit = {}) { val t = careText()
+    // A search bar and one status dropdown instead of six capsules (owner, 27 Nov). Each menu row keeps its old "workflow-filter-<status>" tag.
+    val statuses = listOf("All","New","Accepted","Scheduled","Deferred","Completed")
+    fun label(v: String) = when (v) { "All" -> t("All requests", "सभी अनुरोध"); "New" -> t("New", "नया"); "Accepted" -> t("Accepted", "स्वीकार"); "Scheduled" -> t("Scheduled", "तय"); "Deferred" -> t("Deferred", "टाला गया"); else -> t("Completed", "पूरी हुई") }
+    Column(Modifier.fillMaxWidth().testTag("workflow-request-filters"), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        OutlinedTextField(value = query, onValueChange = onQuery, singleLine = true, placeholder = { Text(t("Search by patient or reason", "मरीज़ या कारण से खोजें"), fontSize = 16.sp) },
+            leadingIcon = { Icon(Icons.Default.Search, null) },
+            trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { onQuery("") }, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Close, t("Clear search", "खोज मिटाएँ")) } },
+            shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("workflow-request-search"))
+        SaharaDropdown(t("Status", "स्थिति"), label(filter), statuses.map { SaharaDropdownOption(label(it), "workflow-filter-$it", it == filter) }, { onFilter(statuses[it]) }, tag = "workflow-request-status")
     }
 }
 
