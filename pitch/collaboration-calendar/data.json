@@ -1,17 +1,17 @@
 {
  "stats": {
-  "commits": 642,
-  "basith": 584,
+  "commits": 647,
+  "basith": 589,
   "awaiz": 58,
   "build_days": 53,
   "first": "2026-08-07",
   "last": "2026-11-27",
-  "ins": 1795272,
-  "dels": 44442,
+  "ins": 1795692,
+  "dels": 44620,
   "clin_commits": 16,
   "team_meetings": 9,
   "mentor": 3,
-  "reviews": 16,
+  "reviews": 15,
   "releases": 5,
   "chat": 1642,
   "chat_days": 62,
@@ -26,7 +26,7 @@
   "chat_eng": 451,
   "ai_sessions": 176,
   "ai_days": 16,
-  "active_days": 77
+  "active_days": 80
  },
  "days": {
   "2026-08-01": {
@@ -37,7 +37,13 @@
    "chat_clin": 0,
    "chat_eng": 0,
    "ai": 0,
-   "events": []
+   "events": [
+    {
+     "kind": "milestone",
+     "label": "Doctor registration",
+     "detail": "Doctors and health professionals register, 1\u20133 Aug"
+    }
+   ]
   },
   "2026-08-02": {
    "commits": 0,
@@ -177,7 +183,13 @@
    "chat_clin": 0,
    "chat_eng": 0,
    "ai": 0,
-   "events": []
+   "events": [
+    {
+     "kind": "milestone",
+     "label": "Tech registration opens",
+     "detail": "Technology teams can join from 15 Aug"
+    }
+   ]
   },
   "2026-08-16": {
    "commits": 0,
@@ -253,7 +265,13 @@
    "chat_clin": 0,
    "chat_eng": 0,
    "ai": 0,
-   "events": []
+   "events": [
+    {
+     "kind": "milestone",
+     "label": "Matchmaking begins",
+     "detail": "Doctors and tech teams pair up, 22 Aug \u2013 18 Sep"
+    }
+   ]
   },
   "2026-08-23": {
    "commits": 0,
@@ -1081,9 +1099,9 @@
    "ai": 0,
    "events": [
     {
-     "kind": "review",
-     "label": "Legal review",
-     "detail": "Legal comments on the form"
+     "kind": "milestone",
+     "label": "Advice on the form",
+     "detail": "Comments received on the goals-of-care form"
     }
    ]
   },
@@ -1434,8 +1452,8 @@
    "events": []
   },
   "2026-11-27": {
-   "commits": 5,
-   "basith": 0,
+   "commits": 10,
+   "basith": 5,
    "awaiz": 5,
    "chat": 0,
    "chat_clin": 0,
