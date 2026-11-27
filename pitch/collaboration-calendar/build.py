@@ -47,21 +47,32 @@ EV = [
     ("2026-09-23", "meet", "Round 1 pitch call", "Team meeting, minutes saved"),
     ("2026-09-24", "review", "Dr Sujay's feedback", "Morning feedback on the deck"),
     ("2026-09-25", "milestone", "Round 1 answers", "Revised portal answers saved"),
+    ("2026-09-27", "review", "Dr Sharada's review", "Round 1 deck and story"),
     ("2026-10-09", "milestone", "Top 120 shortlist", "Shortlisted from 450+ submissions"),
     ("2026-10-14", "release", "Closed testing 0.4.1", "Play Store closed testing"),
+    ("2026-10-19", "release", "Production 0.4.1", "First public release, Google Play India"),
+    ("2026-10-22", "release", "Production 0.5.0", "100% India rollout, live by 24 Oct"),
     ("2026-10-20", "mentor", "Mentor meeting", "Mentor session with test APK"),
     ("2026-10-23", "review", "Hospital survey", "Dr Sujay's survey follow-up"),
+    ("2026-10-24", "review", "Symptom list agreed", "Dr Shirin with Dr Sharada and Dr Sujay"),
     ("2026-10-28", "meet", "Team meeting", "Goals-of-care sign-off decisions"),
     ("2026-10-29", "review", "Dr Sharada's specs", "Clinical and tech specifications"),
     ("2026-10-31", "review", "Legal review", "Legal comments on the form"),
+    ("2026-11-01", "review", "Doctors' app notes", "Dr Sujay and Dr Sharada on the app"),
     ("2026-11-03", "meet", "Team meeting", "Transcript saved, changes built 4 Nov"),
+    ("2026-11-06", "review", "Dr Shirin's notes", "Family and caregiver screens"),
     ("2026-11-07", "milestone", "Final submission pack", "Brief and deck with Dr Sujay's edits"),
+    ("2026-11-07", "review", "Dr Sujay's review", "13-item checklist and wording, built that day"),
     ("2026-11-09", "release", "Production 0.7.1", "Live on the Play Store"),
+    ("2026-11-18", "milestone", "Finale shortlist", "Selected for the Grand Finale"),
+    ("2026-11-20", "meet", "Team meeting", "Finale deck and survey plan"),
     ("2026-11-21", "review", "Dr Sujay's photo review", "Device test, six screens"),
     ("2026-11-22", "review", "Video reviews", "Dr Sujay's two videos; notes from Dr Shirin and Dr Sharada"),
     ("2026-11-22", "meet", "Team meeting", "Pitch plan and field-test plan"),
     ("2026-11-23", "mentor", "Organisers' briefing", "Finale format and jury"),
     ("2026-11-23", "release", "0.8.0 in review", "Sent to Play Store review"),
+    ("2026-11-23", "review", "Doctors' notes", "Alerts, consent, caregiving changes"),
+    ("2026-11-24", "meet", "Team meeting", "Changes built the same night"),
     ("2026-11-28", "dday", "D-DAY: Grand Finale", "IIT Bombay"),
 ]
 events = collections.defaultdict(list)
@@ -101,7 +112,7 @@ stats = {
     "chat_clin": sum(v.get("clin", 0) for v in chat_daily.values()),
     "chat_eng": sum(v.get("eng", 0) for v in chat_daily.values()),
     "ai_sessions": sum(sessions_daily.values()), "ai_days": len(sessions_daily),
-    "active_days": sum(1 for v in days.values() if v["commits"] or v["chat"] or v["events"] or v["ai"]),
+    "active_days": sum(1 for k, v in days.items() if k <= "2026-11-27" and (v["commits"] or v["chat"] or v["events"] or v["ai"])),
 }
 json.dump({"stats": stats, "days": days}, open(os.path.join(HERE, "data.json"), "w"), indent=1)
 
@@ -128,19 +139,47 @@ ICON_AI = '<svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.
 # final submission deck's sprint calendar (output/final-submission/source/build_deck_v3.py),
 # which was itself built from the git history.
 BUILT = {
-    "2026-10-09": ["Native Android + map"], "2026-10-10": ["Safe account deletion"],
+    "2026-08-07": ["Hackathon brief saved"],
+    "2026-09-08": ["First web prototype"], "2026-09-09": ["Webinar notes saved"],
+    "2026-09-13": ["Patient portal + map", "ED Quick View"], "2026-09-14": ["Familiar labels", "Note summaries kept"],
+    "2026-09-15": ["Escalation plan grid", "Offline QR scanner", "Hindi patient side"],
+    "2026-09-16": ["Clinician tool trials", "ESAS-r symptom radar", "Oncology emergencies"],
+    "2026-09-18": ["20 simulated talks", "Bleeding crisis guide"],
+    "2026-09-21": ["Family care pages", "Role-based sign-in", "Signed notes, handover"],
+    "2026-09-22": ["Meeting follow-up"], "2026-09-23": ["Website deployed", "Family care flows"],
+    "2026-09-24": ["Care-talk requests", "Round 1 deck rebuilt"], "2026-09-25": ["Dr Sujay's deck edits"],
+    "2026-09-26": ["App + deck refresh"], "2026-09-27": ["Pitch story revised"],
+    "2026-10-02": ["Karnataka directory", "Shared hospital reports"], "2026-10-05": ["Project checkpoint"],
+    "2026-10-09": ["Native Android + map"], "2026-10-10": ["Safe account deletion", "Renamed Sahara", "Account recovery"],
     "2026-10-11": ["Prescription organiser", "Web features on Android"], "2026-10-13": ["Scanner verified"],
-    "2026-10-14": ["Testers invited"], "2026-10-16": ["Sahara 0.5 alpha", "Privacy and safety"],
-    "2026-10-19": ["On-device processing"], "2026-10-20": ["National care directory"],
+    "2026-10-14": ["Testers invited"], "2026-10-15": ["Play support follow-up"],
+    "2026-10-16": ["Sahara 0.5 alpha", "Privacy and safety", "Care tasks + labs"],
+    "2026-10-19": ["On-device processing", "Hospital survey", "Feedback forms"],
+    "2026-10-20": ["National care directory", "On-phone Hindi tools"],
     "2026-10-21": ["Release verified", "Research archive"], "2026-10-22": ["Daily health workflow"],
-    "2026-10-23": ["Phase 2 deck"], "2026-10-25": ["Symptom tracker", "Navigation, feedback"],
-    "2026-10-26": ["Pain body map", "Motion and loading"], "2026-10-27": ["Hindi + offline speech"],
-    "2026-10-28": ["Ask your documents"], "2026-10-30": ["Goals of care + QR", "Telugu, Urdu, Kannada"],
-    "2026-10-31": ["Patient summary"], "2026-11-01": ["Recording to text", "Today / Care redesign"],
-    "2026-11-02": ["Doctor schedule", "Patient profile"], "2026-11-04": ["Clinical document", "8 practice talks pass"],
-    "2026-11-05": ["AI + backup models", "Offline Whisper"], "2026-11-06": ["Community groups", "910 tests pass"],
-    "2026-11-07": ["Caregiver wellbeing"],
-    "2026-11-23": ["First-run care details"],
+    "2026-10-23": ["Phase 2 deck"], "2026-10-24": ["Symptom diary (0.6)", "3D pain locations", "New walkthroughs"],
+    "2026-10-25": ["Symptom tracker", "Navigation, feedback"],
+    "2026-10-26": ["Pain body map", "Motion and loading", "Family invite link"],
+    "2026-10-27": ["Hindi + offline speech", "1,631 care centres", "Doctor workspace", "Web-link QR card"],
+    "2026-10-28": ["Ask your documents", "Distress thermometer", "Pain bands + trends", "In-app doctor approval"],
+    "2026-10-29": ["Hospital survey admin", "Spec groundwork", "Smaller Play download"],
+    "2026-10-30": ["Goals of care + QR", "Telugu, Urdu, Kannada", "Emergency care plan"],
+    "2026-10-31": ["Patient summary", "Side-effect notes", "Care timeline"],
+    "2026-11-01": ["Recording to text", "Today / Care redesign", "Legal comments in app"],
+    "2026-11-02": ["Doctor schedule", "Patient profile"],
+    "2026-11-04": ["Clinical document", "8 practice talks pass", "3 Nov meeting changes"],
+    "2026-11-05": ["AI + backup models", "Offline Whisper"],
+    "2026-11-06": ["Community groups", "910 tests pass", "Pre-filled forms"],
+    "2026-11-07": ["Caregiver wellbeing", "13-item checklist", "Medicine safety fixes"],
+    "2026-11-08": ["0.7.0 build for Play", "Website catches up"],
+    "2026-11-09": ["Sahara feature film", "Care plan step removed"], "2026-11-10": ["Journey film v2"],
+    "2026-11-21": ["Visit dialog fix"],
+    "2026-11-22": ["Video-review fixes", "One goals-of-care entry", "Surprise-question prompt"],
+    "2026-11-23": ["First-run care details", "Under-18 care plans", "Doctor alert pop-up"],
+    "2026-11-24": ["Simple Mode, 60+", "Calmer UI", "Caregiving changes"],
+    "2026-11-25": ["Sahara 0.8.2", "Six more languages", "Smoother native feel"],
+    "2026-11-26": ["Patient-side redesign", "Tighter Today screen"],
+    "2026-11-27": ["Doctor-side redesign", "24 Nov follow-ups", "Searchable lists"],
 }
 CHIP = {"meet": "c-meet", "mentor": "c-meet", "review": "c-review", "release": "c-mile", "milestone": "c-mile"}
 
@@ -161,7 +200,7 @@ def month_page(m):
     mmeet = sum(1 for v in mdays for e in v["events"] if e["kind"] in ("meet", "mentor"))
     mrev = sum(1 for v in mdays for e in v["events"] if e["kind"] == "review")
     mai = sum(v["ai"] for v in mdays)
-    maxchips = 3 if len(cal) <= 5 else 2
+    maxchips = 4 if len(cal) <= 5 else 3
     cells = ['<div class="wk"></div>'] + [f'<div class="wd">{w}</div>' for w in ["MON","TUE","WED","THU","FRI","SAT","SUN"]]
     for week in cal:
         cells.append(f'<div class="wk">Week {week_no(week[0])}</div>')
@@ -176,7 +215,7 @@ def month_page(m):
                              '<div class="ddsub">Grand Finale · IIT Bombay</div></div>')
                 continue
             cls = ["cell", heat(v["commits"])]
-            if day > dt.date(2026, 11, 23): cls.append("future")
+            if day > dt.date(2026, 11, 27): cls.append("future")
             chips = [(CHIP[e["kind"]], e["label"]) for e in v["events"]]
             chips += [("c-built", b) for b in BUILT.get(k, [])]
             chips = chips[:maxchips]
@@ -194,10 +233,10 @@ def month_page(m):
         for k, e in evs)
     note = {8: "The idea phase: two team meetings and the first clinical notes.",
             9: "Clinicians shape the product; the Round 1 pitch comes out of two review meetings.",
-            10: "Shortlisted. The first test build reaches real phones; mentor review; hospital survey.",
-            11: "Final submission, production release, doctors' device reviews, then the finale."}[m]
-    chat_note = '<div class="small muted">Chat counts cover the exported group chat (25 Aug to 4 Nov).</div>' if m in (8, 11) else ""
-    built_note = '<div class="small muted">Teal chips: what was built that day, from the git history (as on the final-submission sprint calendar).</div>' if m in (10, 11) else ""
+            10: "Shortlisted. Closed testing on 14 Oct, live on Google Play from 19 Oct; mentor review; hospital survey.",
+            11: "Final submission, finale shortlist, doctors' device and video reviews, two redesigns, then the finale."}[m]
+    chat_note = '<div class="small muted">Chat counts cover the exported group chat (25 Aug to 23 Nov).</div>' if m in (8, 11) else ""
+    built_note = '<div class="small muted">Teal chips: what was built that day, from the git history and the team\'s dated change log.</div>'
     return f'''
 <section class="page month">
   <header class="mhead">
@@ -245,14 +284,14 @@ cover = f'''
     <div class="tile"><b>{s["team_meetings"]}</b><span>team meetings</span><i>doctors and engineers together</i></div>
     <div class="tile"><b>{s["mentor"]}</b><span>mentor and organiser sessions</span><i>webinar, mentor review, finale briefing</i></div>
     <div class="tile rose"><b>{s["reviews"]}</b><span>logged doctor and legal reviews</span><i>concept, specs, survey, legal advice, device tests</i></div>
-    <div class="tile"><b>{fmt(s["chat"])}</b><span>group-chat messages</span><i>{s["chat_days"]} days, 25 Aug to 4 Nov</i></div>
-    <div class="tile"><b>{s["ai_sessions"]}</b><span>AI-assisted build sessions</span><i>on {s["ai_days"]} days, incl. agent sub-tasks</i></div>
-    <div class="tile gold"><b>{s["releases"]}</b><span>Play Store releases</span><i>closed test, production, 0.8.0</i></div>
+    <div class="tile"><b>{fmt(s["chat"])}</b><span>group-chat messages</span><i>{s["chat_days"]} days, 25 Aug to 23 Nov</i></div>
+    <div class="tile"><b>{s["ai_sessions"]}</b><span>AI-assisted build sessions</span><i>on {s["ai_days"]} days to 23 Nov, incl. agent sub-tasks</i></div>
+    <div class="tile gold"><b>{s["releases"]}</b><span>Play Store releases</span><i>closed test, production 0.4.1, 0.5.0, 0.7.1, then 0.8.0</i></div>
   </div>
   <div class="story">
     <div class="step"><span class="n">1</span><div><b>Idea from the bedside.</b> Dr Sujay's goals-of-care concept and two August team meetings set the problem: a family's wishes never reach the emergency room.</div></div>
     <div class="step"><span class="n">2</span><div><b>Clinician-led reviews.</b> Dr Sharada, Dr Shirin and Dr Sujay wrote the clinical reference, specs and survey, and reviewed every pitch and screen.</div></div>
-    <div class="step"><span class="n">3</span><div><b>Build sprints to field testing.</b> The engineers turned each review into builds, from closed testing in October to production in November and doctors testing on their own phones.</div></div>
+    <div class="step"><span class="n">3</span><div><b>Build sprints to field testing.</b> The engineers turned each review into builds, from closed testing and the first live release in October to doctors testing new builds on their own phones in November.</div></div>
   </div>
   <div class="team">
     <div><span class="tag rose">Clinicians</span>Dr Sujay H S · Dr Sharada Vinod Kutty · Dr Shirin Ayub</div>
@@ -264,10 +303,10 @@ timeline_items = [
     ("20 Aug", "review", "Goals-of-care concept"), ("24 Aug", "meet", "First team meeting"),
     ("12 Sep", "review", "Clinical reference shared"), ("21–23 Sep", "meet", "Two review meetings"),
     ("25 Sep", "milestone", "Round 1 answers"), ("9 Oct", "milestone", "Top 120 shortlist"),
-    ("14 Oct", "release", "Closed testing 0.4.1"), ("20 Oct", "mentor", "Mentor meeting"),
+    ("14 Oct", "release", "Closed testing 0.4.1"), ("19 Oct", "release", "Live on Google Play"), ("20 Oct", "mentor", "Mentor meeting"),
     ("29 Oct", "review", "Dr Sharada's specs"), ("7 Nov", "milestone", "Final submission pack"),
-    ("9 Nov", "release", "Production 0.7.1"), ("21–22 Nov", "review", "Doctors' device reviews"),
-    ("23 Nov", "release", "0.8.0 in review"), ("28 Nov", "dday", "D-DAY: Grand Finale"),
+    ("9 Nov", "release", "Production 0.7.1"), ("18 Nov", "milestone", "Finale shortlist"), ("21–22 Nov", "review", "Doctors' device reviews"),
+    ("23 Nov", "release", "0.8.0 in review"), ("24 Nov", "meet", "Team meeting"), ("28 Nov", "dday", "D-DAY: Grand Finale"),
 ]
 tl = "".join(
     f'<div class="ti {"dd" if k=="dday" else ""}"><div class="tdot k-{k}"></div><div class="td">{E(d)}</div><div class="tt">{E(t)}</div></div>'
@@ -311,7 +350,7 @@ pulse = f'''<div class="pulsebox"><div class="ph"><b>Week by week</b>
 <span class="lg"><span class="sw" style="background:#7353AC"></span>chat: clinicians</span>
 <span class="lg"><span class="sw" style="background:#8FA89C"></span>chat: engineers</span>
 <span class="lg"><span class="mk dot meet"></span>meeting</span><span class="lg"><span class="mk dot review"></span>doctor review</span>
-<span class="muted" style="margin-left:auto">weeks starting Monday; chat export ends 4 Nov</span></div>
+<span class="muted" style="margin-left:auto">weeks starting Monday; chat export ends 23 Nov</span></div>
 {"".join(svg)}<div class="wl">{wlabels}</div></div>'''
 last = f'''
 <section class="page last">
@@ -321,7 +360,7 @@ last = f'''
     <div class="col clin">
       <h3><span class="tag rose">Clinicians</span> set the direction and checked the work</h3>
       <ul>
-        <li><b>Reviews and inputs:</b> {s["reviews"]-1} logged doctor inputs plus 1 legal review, from the first concept (20 Aug) to device and video reviews (21–22 Nov).</li>
+        <li><b>Reviews and inputs:</b> {s["reviews"]-1} logged doctor inputs plus 1 legal review, from the first concept (20 Aug) to the device, video and written reviews (21–23 Nov).</li>
         <li><b>Questionnaires and survey:</b> the clinical form that guided Round 1 (Sep) and the hospital survey the doctors ran (Oct).</li>
         <li><b>Goals-of-care content:</b> the clinical reference, the specifications and the wording of the doctor's note.</li>
         <li><b>Field tests:</b> testing the Play Store build on their own phones, with photo and video reviews.</li>
@@ -337,8 +376,8 @@ last = f'''
       <h3><span class="tag">Engineers</span> turned each review into a build</h3>
       <ul>
         <li><b>Builds:</b> {fmt(s["commits"])} commits on {s["build_days"]} days, {s["first"][8:].lstrip("0")} Aug to {int(s["last"][8:])} Nov; {fmt(s["ins"])} lines added.</li>
-        <li><b>Releases:</b> closed testing 0.4.1 (14 Oct), production 0.7.1 (9 Nov), 0.8.0 sent for review (23 Nov).</li>
-        <li><b>Acting on feedback:</b> the 21 Sep, 28 Oct and 3 Nov meetings were each followed by recorded changes; {s["clin_commits"]} commit messages name a doctor's feedback.</li>
+        <li><b>Releases:</b> closed testing 0.4.1 (14 Oct); production 0.4.1 (19 Oct), 0.5.0 (22 Oct) and 0.7.1 (9 Nov); 0.8.0 sent for review (23 Nov).</li>
+        <li><b>Acting on feedback:</b> the 21 Sep, 28 Oct, 3 Nov and 24 Nov meetings were each followed by recorded changes; {s["clin_commits"]} commit messages name a doctor's feedback.</li>
         <li><b>AI-assisted build sessions:</b> {s["ai_sessions"]} sessions on {s["ai_days"]} days (main working sessions plus their agent sub-tasks).</li>
       </ul>
       <div class="bars">
@@ -352,8 +391,8 @@ last = f'''
     </div>
   </div>
   {pulse}
-  <div class="together"><b>Together:</b> {s["team_meetings"]} team meetings and {s["mentor"]} mentor and organiser sessions; {fmt(s["chat"])} chat messages ({fmt(s["chat_clin"])} from clinicians, {fmt(s["chat_eng"])} from engineers); activity on {s["active_days"]} of the days from 1 Aug to 23 Nov.</div>
-  <div class="foot">Counts from git history (all branches), the team's group-chat export (counts only, no messages shown), saved meeting minutes and review notes, and Play Console release dates. Prepared 23 Nov 2026.</div>
+  <div class="together"><b>Together:</b> {s["team_meetings"]} team meetings and {s["mentor"]} mentor and organiser sessions; {fmt(s["chat"])} chat messages ({fmt(s["chat_clin"])} from clinicians, {fmt(s["chat_eng"])} from engineers); activity on {s["active_days"]} of the days from 1 Aug to 27 Nov.</div>
+  <div class="foot">Counts from git history (all branches), the team's group-chat export (counts only, no messages shown), saved meeting minutes and review notes, and Play Console release dates. Prepared 27 Nov 2026.</div>
 </section>'''
 
 
@@ -365,7 +404,7 @@ impact1 = f'''
 <section class="page impact">
   <header class="mhead"><div><div class="kicker">Impact in numbers · 1 of 2</div><h2>What the collaboration produced</h2></div></header>
   <div class="igrid">
-    {tile(fmt(s["commits"]), "code commits", f'{fmt(s["basith"])} Basith · {s["awaiz"]} Awaiz · 7 Aug to 23 Nov', "solid")}
+    {tile(fmt(s["commits"]), "code commits", f'{fmt(s["basith"])} Basith · {s["awaiz"]} Awaiz · 7 Aug to 27 Nov', "solid")}
     {tile(s["build_days"], "active build days", f'{fmt(s["ins"])} lines of code and docs added')}
     {tile(s["team_meetings"], "team meetings", "doctors and engineers together")}
     {tile(s["mentor"], "mentor and organiser sessions", "webinar 6 Sep · mentor 20 Oct · briefing 23 Nov")}
@@ -379,8 +418,8 @@ impact2 = f'''
 <section class="page impact">
   <header class="mhead"><div><div class="kicker">Impact in numbers · 2 of 2</div><h2>What patients, families and doctors get</h2></div></header>
   <div class="igrid">
-    {tile("LIVE", "on Google Play in India", "closed test 14 Oct · production 0.7.1 on 9 Nov · 0.8.0 in review 23 Nov", "solid")}
-    {tile(s["releases"], "Play Store releases", "0.4.1 · 0.7.1 · 0.8.0", "gold")}
+    {tile("LIVE", "on Google Play in India", "closed test 14 Oct · live from 19 Oct · 0.7.1 on 9 Nov · 0.8.0 in review 23 Nov", "solid")}
+    {tile(s["releases"], "Play Store releases", "0.4.1 · 0.5.0 · 0.7.1 · 0.8.0", "gold")}
     {tile("22 + English", "languages for speech", "goals-of-care recordings and note translation (Sarvam); app screens in English and Hindi, with Telugu, Urdu and Kannada", "long")}
     {tile("981", "Android unit tests passing", "plus the website's checks")}
     {tile("3", "tools based on validated scales", "ESAS-style symptom diary · ZBI-4 carer check · NCCN distress thermometer", "rose")}

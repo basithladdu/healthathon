@@ -399,13 +399,133 @@
 "p_shirin": 2
 },
 "2026-11-04": {
-"total": 17,
+"total": 26,
+"clin": 19,
+"p_sharada": 13,
+"eng": 7,
+"p_awaiz": 5,
+"p_sujay": 6,
+"p_basith": 2
+},
+"2026-11-05": {
+"total": 24,
 "clin": 15,
-"p_sharada": 11,
-"eng": 2,
+"p_sharada": 3,
+"eng": 9,
+"p_basith": 9,
+"p_shirin": 5,
+"p_sujay": 7
+},
+"2026-11-06": {
+"total": 62,
+"eng": 26,
+"p_basith": 26,
+"clin": 36,
+"p_sujay": 12,
+"p_shirin": 12,
+"p_sharada": 12
+},
+"2026-11-07": {
+"total": 128,
+"clin": 99,
+"p_sujay": 80,
+"eng": 29,
+"p_basith": 29,
+"p_sharada": 15,
+"p_shirin": 4
+},
+"2026-11-08": {
+"total": 22,
+"eng": 13,
+"p_basith": 11,
+"clin": 9,
+"p_sujay": 7,
 "p_awaiz": 2,
+"p_shirin": 2
+},
+"2026-11-10": {
+"total": 11,
+"eng": 5,
+"p_basith": 5,
+"clin": 6,
 "p_sujay": 4,
-"kw_meet": 1,
-"kw_link": 1
+"p_shirin": 2
+},
+"2026-11-12": {
+"total": 7,
+"eng": 2,
+"p_basith": 2,
+"clin": 5,
+"p_sujay": 2,
+"p_sharada": 3
+},
+"2026-11-13": {
+"total": 1,
+"eng": 1,
+"p_basith": 1
+},
+"2026-11-16": {
+"total": 6,
+"clin": 4,
+"p_sharada": 4,
+"eng": 2,
+"p_basith": 2
+},
+"2026-11-18": {
+"total": 88,
+"eng": 24,
+"p_basith": 22,
+"clin": 64,
+"p_sharada": 17,
+"p_shirin": 10,
+"p_awaiz": 2,
+"p_sujay": 37
+},
+"2026-11-19": {
+"total": 98,
+"clin": 77,
+"p_sujay": 33,
+"p_sharada": 29,
+"eng": 21,
+"p_basith": 20,
+"p_shirin": 15,
+"p_awaiz": 1
+},
+"2026-11-20": {
+"total": 77,
+"clin": 51,
+"p_sujay": 32,
+"eng": 26,
+"p_basith": 16,
+"p_awaiz": 10,
+"p_sharada": 10,
+"p_shirin": 9
+},
+"2026-11-21": {
+"total": 45,
+"clin": 36,
+"p_sujay": 23,
+"eng": 9,
+"p_basith": 9,
+"p_sharada": 5,
+"p_shirin": 8
+},
+"2026-11-22": {
+"total": 41,
+"clin": 26,
+"p_sujay": 21,
+"eng": 15,
+"p_basith": 13,
+"p_awaiz": 2,
+"p_sharada": 5
+},
+"2026-11-23": {
+"total": 98,
+"eng": 13,
+"p_basith": 13,
+"clin": 85,
+"p_sharada": 34,
+"p_sujay": 31,
+"p_shirin": 20
 }
 }

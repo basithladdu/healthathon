@@ -1,32 +1,32 @@
 {
  "stats": {
-  "commits": 638,
-  "basith": 588,
-  "awaiz": 50,
-  "build_days": 49,
+  "commits": 642,
+  "basith": 584,
+  "awaiz": 58,
+  "build_days": 53,
   "first": "2026-08-07",
-  "last": "2026-11-23",
-  "ins": 445801,
-  "dels": 41357,
+  "last": "2026-11-27",
+  "ins": 1795272,
+  "dels": 44442,
   "clin_commits": 16,
-  "team_meetings": 7,
+  "team_meetings": 9,
   "mentor": 3,
-  "reviews": 10,
-  "releases": 3,
-  "chat": 925,
-  "chat_days": 48,
+  "reviews": 16,
+  "releases": 5,
+  "chat": 1642,
+  "chat_days": 62,
   "chat_people": {
-   "sujay": 446,
-   "basith": 225,
-   "sharada": 148,
-   "awaiz": 26,
-   "shirin": 80
+   "sujay": 737,
+   "basith": 405,
+   "sharada": 287,
+   "awaiz": 46,
+   "shirin": 167
   },
-  "chat_clin": 674,
-  "chat_eng": 251,
+  "chat_clin": 1191,
+  "chat_eng": 451,
   "ai_sessions": 176,
   "ai_days": 16,
-  "active_days": 69
+  "active_days": 77
  },
  "days": {
   "2026-08-01": {
@@ -679,7 +679,13 @@
    "chat_clin": 0,
    "chat_eng": 0,
    "ai": 0,
-   "events": []
+   "events": [
+    {
+     "kind": "review",
+     "label": "Dr Sharada's review",
+     "detail": "Round 1 deck and story"
+    }
+   ]
   },
   "2026-09-28": {
    "commits": 0,
@@ -911,7 +917,13 @@
    "chat_clin": 4,
    "chat_eng": 5,
    "ai": 0,
-   "events": []
+   "events": [
+    {
+     "kind": "release",
+     "label": "Production 0.4.1",
+     "detail": "First public release, Google Play India"
+    }
+   ]
   },
   "2026-10-20": {
    "commits": 2,
@@ -947,7 +959,13 @@
    "chat_clin": 5,
    "chat_eng": 2,
    "ai": 0,
-   "events": []
+   "events": [
+    {
+     "kind": "release",
+     "label": "Production 0.5.0",
+     "detail": "100% India rollout, live by 24 Oct"
+    }
+   ]
   },
   "2026-10-23": {
    "commits": 4,
@@ -973,7 +991,13 @@
    "chat_clin": 56,
    "chat_eng": 13,
    "ai": 0,
-   "events": []
+   "events": [
+    {
+     "kind": "review",
+     "label": "Symptom list agreed",
+     "detail": "Dr Shirin with Dr Sharada and Dr Sujay"
+    }
+   ]
   },
   "2026-10-25": {
    "commits": 1,
@@ -1006,8 +1030,8 @@
    "events": []
   },
   "2026-10-28": {
-   "commits": 45,
-   "basith": 45,
+   "commits": 43,
+   "basith": 43,
    "awaiz": 0,
    "chat": 13,
    "chat_clin": 9,
@@ -1071,7 +1095,13 @@
    "chat_clin": 32,
    "chat_eng": 9,
    "ai": 4,
-   "events": []
+   "events": [
+    {
+     "kind": "review",
+     "label": "Doctors' app notes",
+     "detail": "Dr Sujay and Dr Sharada on the app"
+    }
+   ]
   },
   "2026-11-02": {
    "commits": 2,
@@ -1103,9 +1133,9 @@
    "commits": 5,
    "basith": 5,
    "awaiz": 0,
-   "chat": 17,
-   "chat_clin": 15,
-   "chat_eng": 2,
+   "chat": 26,
+   "chat_clin": 19,
+   "chat_eng": 7,
    "ai": 17,
    "events": []
   },
@@ -1113,35 +1143,46 @@
    "commits": 19,
    "basith": 18,
    "awaiz": 1,
-   "chat": 0,
-   "chat_clin": 0,
-   "chat_eng": 0,
+   "chat": 24,
+   "chat_clin": 15,
+   "chat_eng": 9,
    "ai": 45,
    "events": []
   },
   "2026-11-06": {
-   "commits": 111,
-   "basith": 111,
+   "commits": 106,
+   "basith": 106,
    "awaiz": 0,
-   "chat": 0,
-   "chat_clin": 0,
-   "chat_eng": 0,
+   "chat": 62,
+   "chat_clin": 36,
+   "chat_eng": 26,
    "ai": 0,
-   "events": []
+   "events": [
+    {
+     "kind": "review",
+     "label": "Dr Shirin's notes",
+     "detail": "Family and caregiver screens"
+    }
+   ]
   },
   "2026-11-07": {
    "commits": 38,
    "basith": 38,
    "awaiz": 0,
-   "chat": 0,
-   "chat_clin": 0,
-   "chat_eng": 0,
+   "chat": 128,
+   "chat_clin": 99,
+   "chat_eng": 29,
    "ai": 21,
    "events": [
     {
      "kind": "milestone",
      "label": "Final submission pack",
      "detail": "Brief and deck with Dr Sujay's edits"
+    },
+    {
+     "kind": "review",
+     "label": "Dr Sujay's review",
+     "detail": "13-item checklist and wording, built that day"
     }
    ]
   },
@@ -1149,9 +1190,9 @@
    "commits": 12,
    "basith": 12,
    "awaiz": 0,
-   "chat": 0,
-   "chat_clin": 0,
-   "chat_eng": 0,
+   "chat": 22,
+   "chat_clin": 9,
+   "chat_eng": 13,
    "ai": 6,
    "events": []
   },
@@ -1175,9 +1216,9 @@
    "commits": 2,
    "basith": 2,
    "awaiz": 0,
-   "chat": 0,
-   "chat_clin": 0,
-   "chat_eng": 0,
+   "chat": 11,
+   "chat_clin": 6,
+   "chat_eng": 5,
    "ai": 6,
    "events": []
   },
@@ -1195,9 +1236,9 @@
    "commits": 0,
    "basith": 0,
    "awaiz": 0,
-   "chat": 0,
-   "chat_clin": 0,
-   "chat_eng": 0,
+   "chat": 7,
+   "chat_clin": 5,
+   "chat_eng": 2,
    "ai": 0,
    "events": []
   },
@@ -1205,9 +1246,9 @@
    "commits": 0,
    "basith": 0,
    "awaiz": 0,
-   "chat": 0,
+   "chat": 1,
    "chat_clin": 0,
-   "chat_eng": 0,
+   "chat_eng": 1,
    "ai": 0,
    "events": []
   },
@@ -1235,9 +1276,9 @@
    "commits": 0,
    "basith": 0,
    "awaiz": 0,
-   "chat": 0,
-   "chat_clin": 0,
-   "chat_eng": 0,
+   "chat": 6,
+   "chat_clin": 4,
+   "chat_eng": 2,
    "ai": 0,
    "events": []
   },
@@ -1255,19 +1296,25 @@
    "commits": 0,
    "basith": 0,
    "awaiz": 0,
-   "chat": 0,
-   "chat_clin": 0,
-   "chat_eng": 0,
+   "chat": 88,
+   "chat_clin": 64,
+   "chat_eng": 24,
    "ai": 0,
-   "events": []
+   "events": [
+    {
+     "kind": "milestone",
+     "label": "Finale shortlist",
+     "detail": "Selected for the Grand Finale"
+    }
+   ]
   },
   "2026-11-19": {
    "commits": 0,
    "basith": 0,
    "awaiz": 0,
-   "chat": 0,
-   "chat_clin": 0,
-   "chat_eng": 0,
+   "chat": 98,
+   "chat_clin": 77,
+   "chat_eng": 21,
    "ai": 0,
    "events": []
   },
@@ -1275,19 +1322,25 @@
    "commits": 0,
    "basith": 0,
    "awaiz": 0,
-   "chat": 0,
-   "chat_clin": 0,
-   "chat_eng": 0,
+   "chat": 77,
+   "chat_clin": 51,
+   "chat_eng": 26,
    "ai": 4,
-   "events": []
+   "events": [
+    {
+     "kind": "meet",
+     "label": "Team meeting",
+     "detail": "Finale deck and survey plan"
+    }
+   ]
   },
   "2026-11-21": {
    "commits": 1,
    "basith": 0,
    "awaiz": 1,
-   "chat": 0,
-   "chat_clin": 0,
-   "chat_eng": 0,
+   "chat": 45,
+   "chat_clin": 36,
+   "chat_eng": 9,
    "ai": 2,
    "events": [
     {
@@ -1301,9 +1354,9 @@
    "commits": 3,
    "basith": 2,
    "awaiz": 1,
-   "chat": 0,
-   "chat_clin": 0,
-   "chat_eng": 0,
+   "chat": 41,
+   "chat_clin": 26,
+   "chat_eng": 15,
    "ai": 13,
    "events": [
     {
@@ -1322,9 +1375,9 @@
    "commits": 11,
    "basith": 5,
    "awaiz": 6,
-   "chat": 0,
-   "chat_clin": 0,
-   "chat_eng": 0,
+   "chat": 98,
+   "chat_clin": 85,
+   "chat_eng": 13,
    "ai": 3,
    "events": [
     {
@@ -1336,22 +1389,33 @@
      "kind": "release",
      "label": "0.8.0 in review",
      "detail": "Sent to Play Store review"
+    },
+    {
+     "kind": "review",
+     "label": "Doctors' notes",
+     "detail": "Alerts, consent, caregiving changes"
     }
    ]
   },
   "2026-11-24": {
-   "commits": 0,
-   "basith": 0,
+   "commits": 2,
+   "basith": 2,
    "awaiz": 0,
    "chat": 0,
    "chat_clin": 0,
    "chat_eng": 0,
    "ai": 0,
-   "events": []
+   "events": [
+    {
+     "kind": "meet",
+     "label": "Team meeting",
+     "detail": "Changes built the same night"
+    }
+   ]
   },
   "2026-11-25": {
-   "commits": 0,
-   "basith": 0,
+   "commits": 1,
+   "basith": 1,
    "awaiz": 0,
    "chat": 0,
    "chat_clin": 0,
@@ -1360,9 +1424,9 @@
    "events": []
   },
   "2026-11-26": {
-   "commits": 0,
+   "commits": 3,
    "basith": 0,
-   "awaiz": 0,
+   "awaiz": 3,
    "chat": 0,
    "chat_clin": 0,
    "chat_eng": 0,
@@ -1370,9 +1434,9 @@
    "events": []
   },
   "2026-11-27": {
-   "commits": 0,
+   "commits": 5,
    "basith": 0,
-   "awaiz": 0,
+   "awaiz": 5,
    "chat": 0,
    "chat_clin": 0,
    "chat_eng": 0,

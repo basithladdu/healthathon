@@ -218,3 +218,8 @@ html, body { background: var(--cream); color: var(--ink);
 .last .timeline { margin-top: 4mm; } .last .split { margin-top: 3mm; } .last .pulsebox { margin-top: 3mm; }
 .last .together { margin-top: 3mm; } .last .foot { margin-top: 2mm; }
 .last .col li { margin-bottom: 1mm; }
+/* round 3: fuller day cells */
+.mstats span { white-space: nowrap; }
+.chip { font-size: 5.8pt; letter-spacing: -.02em; padding: .55mm .8mm; }
+.grid { grid-auto-rows: minmax(0, 1fr); }
+.cell { overflow: hidden; min-height: 0; }
