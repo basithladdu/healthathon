@@ -84,7 +84,7 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
     val notes by vm.versions.collectAsStateWithLifecycle()
     val person by vm.selected.collectAsStateWithLifecycle()
     var filterName by rememberSaveable { mutableStateOf(TimelineFilter.ALL.name) }
-    var toggled by rememberSaveable { mutableStateOf("") }; var showAllMonths by rememberSaveable { mutableStateOf("") }
+    var toggled by rememberSaveable { mutableStateOf("") }
     fun flip(set: String, key: String) = set.split(',').filter { it.isNotBlank() }.let { if (key in it) it - key else it + key }.joinToString(",")
     val lang = CareLanguageState.current
     val shortFormat = remember(hindi, lang) { DateTimeFormatter.ofPattern("d MMM", careLocale(hindi)) }
@@ -157,7 +157,6 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
         cappedItems(months, monthsShown, key = { "month-${it.first}" }, tag = "timeline-months") { (month, events) ->
             val key = month.toString(); val newest = months.first().first == month
             val isOpen = newest != (key in toggled.split(',')) // older months start closed; a tap flips the default
-            val expandedAll = key in showAllMonths.split(',')
             Column(Modifier.fillMaxWidth().animateItem()) {
                 Surface(onClick = { tick(); toggled = flip(toggled, key) }, shape = RoundedCornerShape(50), color = SaharaSoftGold,
                     modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).a11yHeading().testTag("timeline-month-$key")) {
@@ -171,7 +170,7 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
                 AnimatedVisibility(isOpen, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) {
                     Column(Modifier.padding(top = 8.dp)) {
                         val eventRow: @Composable (TimelineEvent) -> Unit = { e ->
-                            val tappable = canOpen(e)
+                            val tappable = canOpen(e); val closePage = LocalShowAllClose.current
                             Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
                                 Column(Modifier.width(36.dp).fillMaxHeight(), horizontalAlignment = Alignment.CenterHorizontally) {
                                     Surface(shape = CircleShape, color = timelineTone(e.kind).solid, modifier = Modifier.size(32.dp)) { Box(contentAlignment = Alignment.Center) { Icon(timelineEventIcon(e), null, Modifier.size(18.dp), tint = timelineTone(e.kind).onSolid) } }
@@ -179,7 +178,7 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
                                 }
                                 // A row that opens something sits on a light card with an arrow, so it reads as tappable.
                                 Surface(modifier = Modifier.weight(1f).padding(start = 6.dp, bottom = 8.dp).heightIn(min = 48.dp).semantics(mergeDescendants = true) { contentDescription = description(e) }.testTag("timeline-event-${e.id}"),
-                                    onClick = { open(e) }, enabled = tappable, shape = RoundedCornerShape(20.dp), color = if (tappable) Paper else Color.Transparent,
+                                    onClick = { closePage(); open(e) }, enabled = tappable, shape = RoundedCornerShape(20.dp), color = if (tappable) Paper else Color.Transparent,
                                     border = if (tappable) BorderStroke(1.dp, DoctorHairline) else null) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                     Column(Modifier.weight(1f).padding(start = 12.dp, top = 8.dp, bottom = 8.dp, end = 4.dp)) {
@@ -196,13 +195,8 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
                             }
                         }
                         events.take(5).forEach { eventRow(it) }
-                        // The rest of the month slides open below the first five instead of popping in.
-                        AnimatedVisibility(expandedAll && events.size > 5, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) {
-                            Column { events.drop(5).forEach { eventRow(it) } }
-                        }
-                        if (events.size > 5) TextButton(onClick = { tick(); showAllMonths = flip(showAllMonths, key) }, modifier = Modifier.heightIn(min = 48.dp).testTag("timeline-more-$key")) {
-                            Text(if (expandedAll) t("Show fewer", "कम दिखाएँ") else t("Show all ${events.size}", "सभी ${events.size} दिखाएँ"))
-                        }
+                        // The rest of the month is on its own full page (header, back, search), not unrolled under the first five.
+                        SaharaSeeAll(events, "timeline-more-$key", month.atDay(1).format(monthFormat), initial = 5, searchText = { "${dateText(it)} ${timelineHeadline(it, t)} ${timelineSource(it, t)}" }, key = { it.id }, row = eventRow)
                     }
                 }
             }

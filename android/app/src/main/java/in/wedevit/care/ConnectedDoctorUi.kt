@@ -235,8 +235,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                             item { Text(t("Progress", "प्रगति"), style = MaterialTheme.typography.headlineSmall) }
                             val checks = patient.payload.optJSONArray("checkIns")
                             if (checks == null || checks.length() == 0) item { Text(t("No updates yet.", "अभी कोई अपडेट नहीं।")) }
-                            else items(minOf(checks.length(), progressShown.intValue.coerceAtLeast(SaharaShowMore.INITIAL))) { index -> val row = checks.getJSONObject(index); ConnectedCard(row.optString("source", t("Reported update", "बताया गया अपडेट"))) { Text(row.optString("text"), lineHeight = 25.sp); row.optLong("at").takeIf { it > 0 }?.let { Text(connectedTime(it), style = MaterialTheme.typography.bodySmall) } } }
-                            if (checks != null && checks.length() > SaharaShowMore.INITIAL) item { SaharaShowOlder(checks.length(), progressShown, tag = "connected-progress") }
+                            else { val checkRows = (0 until checks.length()).map { checks.getJSONObject(it) }; cappedItems(checkRows, progressShown, tag = "connected-progress", title = t("Progress", "प्रगति"), searchText = { "${it.optString("source")} ${it.optString("text")}" }) { row -> ConnectedCard(row.optString("source", t("Reported update", "बताया गया अपडेट"))) { Text(row.optString("text"), lineHeight = 25.sp); row.optLong("at").takeIf { it > 0 }?.let { Text(connectedTime(it), style = MaterialTheme.typography.bodySmall) } } } }
                             item { TextButton(onClick = { section = "Medicines" }) { Text(t("Medicines", "दवाइयाँ")) } }
                         }
                     } }

@@ -6120,19 +6120,66 @@ This text is in another language, so the phone cannot read it out exactly. Ask s
 The phone can only read text written in the app language. Choose “Someone read it to me”.	ਫ਼ੋਨ ਸਿਰਫ਼ ਐਪ ਦੀ ਭਾਸ਼ਾ ਵਿੱਚ ਲਿਖੀ ਲਿਖਤ ਹੀ ਪੜ੍ਹ ਸਕਦਾ ਹੈ। “ਕਿਸੇ ਨੇ ਮੈਨੂੰ ਪੜ੍ਹ ਕੇ ਸੁਣਾਇਆ” ਚੁਣੋ।
 This phone has no voice for the app language. Choose “Someone read it to me”.	ਇਸ ਫ਼ੋਨ ਵਿੱਚ ਐਪ ਦੀ ਭਾਸ਼ਾ ਦੀ ਆਵਾਜ਼ ਨਹੀਂ ਹੈ। “ਕਿਸੇ ਨੇ ਮੈਨੂੰ ਪੜ੍ਹ ਕੇ ਸੁਣਾਇਆ” ਚੁਣੋ।
 Only someone who can edit this care record can change this.	ਇਸ ਨੂੰ ਸਿਰਫ਼ ਉਹੀ ਬਦਲ ਸਕਦੇ ਹਨ ਜੋ ਇਸ ਦੇਖਭਾਲ ਰਿਕਾਰਡ ਵਿੱਚ ਬਦਲਾਅ ਕਰ ਸਕਦੇ ਹਨ।
-About the distress number	About the distress number
-How this differs from symptoms	How this differs from symptoms
-Where this thermometer comes from	Where this thermometer comes from
-Distress answers	Distress answers
-Kind of plan	Kind of plan
-Body part	Body part
-About symptom scores	About symptom scores
-How scores work	How scores work
-Choose a person	Choose a person
-Doctor or hospital number (mobile or landline)	Doctor or hospital number (mobile or landline)
-Earlier conversations	Earlier conversations
-Earlier discussions	Earlier discussions
-Choose the form	Choose the form
-Choose how often	Choose how often
-See all ($total)	See all ($total)
-Nothing matches your search.	Nothing matches your search.
+About the distress number	ਪਰੇਸ਼ਾਨੀ ਨੰਬਰ ਬਾਰੇ
+How this differs from symptoms	ਲੱਛਣਾਂ ਤੋਂ ਇਹ ਕਿਵੇਂ ਵੱਖਰਾ ਹੈ
+Where this thermometer comes from	ਇਹ ਥਰਮਾਮੀਟਰ ਕਿੱਥੋਂ ਆਇਆ ਹੈ
+Distress answers	ਪਰੇਸ਼ਾਨੀ ਦੇ ਜਵਾਬ
+Kind of plan	ਯੋਜਨਾ ਦੀ ਕਿਸਮ
+Body part	ਸਰੀਰ ਦਾ ਹਿੱਸਾ
+About symptom scores	ਲੱਛਣਾਂ ਦੇ ਅੰਕਾਂ ਬਾਰੇ
+How scores work	ਅੰਕ ਕਿਵੇਂ ਕੰਮ ਕਰਦੇ ਹਨ
+Choose a person	ਇੱਕ ਵਿਅਕਤੀ ਚੁਣੋ
+Doctor or hospital number (mobile or landline)	ਡਾਕਟਰ ਜਾਂ ਹਸਪਤਾਲ ਦਾ ਨੰਬਰ (ਮੋਬਾਈਲ ਜਾਂ ਲੈਂਡਲਾਈਨ)
+Earlier conversations	ਪਹਿਲਾਂ ਦੀਆਂ ਗੱਲਬਾਤਾਂ
+Earlier discussions	ਪਹਿਲਾਂ ਦੀਆਂ ਚਰਚਾਵਾਂ
+Choose the form	ਕਿਸਮ ਚੁਣੋ
+Choose how often	ਕਿੰਨੀ ਵਾਰ ਚੁਣੋ
+See all ($total)	ਸਭ ਦੇਖੋ ($total)
+Nothing matches your search.	ਤੁਹਾਡੀ ਖੋਜ ਨਾਲ ਕੁਝ ਨਹੀਂ ਮਿਲਿਆ।
+New here?	ਨਵੇਂ ਹੋ?
+Create your account	ਆਪਣਾ ਖਾਤਾ ਬਣਾਓ
+For registered doctors and nurses. We check your registration number.	ਰਜਿਸਟਰਡ ਡਾਕਟਰਾਂ ਅਤੇ ਨਰਸਾਂ ਲਈ। ਅਸੀਂ ਤੁਹਾਡਾ ਰਜਿਸਟ੍ਰੇਸ਼ਨ ਨੰਬਰ ਜਾਂਚਦੇ ਹਾਂ।
+Only an email and a password. No Aadhaar.	ਸਿਰਫ਼ ਇੱਕ ਈਮੇਲ ਅਤੇ ਪਾਸਵਰਡ। ਆਧਾਰ ਦੀ ਲੋੜ ਨਹੀਂ।
+Sign in to see your care.	ਆਪਣੀ ਦੇਖਭਾਲ ਵੇਖਣ ਲਈ ਸਾਈਨ ਇਨ ਕਰੋ।
+or	ਜਾਂ
+Replies	ਜਵਾਬ
+Check-in	ਹਾਲ-ਚਾਲ
+Any distress for $about today?	ਅੱਜ $about ਨੂੰ ਕੋਈ ਪਰੇਸ਼ਾਨੀ ਹੈ?
+Any distress today?	ਅੱਜ ਕੋਈ ਪਰੇਸ਼ਾਨੀ ਹੈ?
+Consent to record	ਰਿਕਾਰਡ ਕਰਨ ਦੀ ਸਹਿਮਤੀ
+Demo	ਡੈਮੋ
+Palliative care, together.	ਪੈਲੀਏਟਿਵ ਦੇਖਭਾਲ, ਇਕੱਠੇ।
+Comfort, dignity and your own wishes — kept in one place, for you and the people who care for you.	ਆਰਾਮ, ਸਨਮਾਨ ਅਤੇ ਤੁਹਾਡੀਆਂ ਆਪਣੀਆਂ ਇੱਛਾਵਾਂ — ਸਭ ਇੱਕੋ ਥਾਂ, ਤੁਹਾਡੇ ਅਤੇ ਤੁਹਾਡੀ ਦੇਖਭਾਲ ਕਰਨ ਵਾਲਿਆਂ ਲਈ।
+Past pain dates	ਪਿਛਲੇ ਦਰਦ ਦੀਆਂ ਤਾਰੀਖਾਂ
+Health details	ਸਿਹਤ ਦਾ ਵੇਰਵਾ
+Average	ਔਸਤ
+Not scored yet	ਹਾਲੇ ਅੰਕ ਨਹੀਂ ਦਿੱਤੇ
+Update	ਬਦਲੋ
+Rate now	ਹੁਣੇ ਦੱਸੋ
+Take care of	ਆਪਣਾ ਖ਼ਿਆਲ ਰੱਖੋ,
+yourself today.	ਅੱਜ ਵੀ।
+Care for them,	ਉਨ੍ਹਾਂ ਦੀ ਦੇਖਭਾਲ ਕਰੋ,
+and for you.	ਅਤੇ ਆਪਣੀ ਵੀ।
+Caring for $caringFor	$caringFor ਦੀ ਦੇਖਭਾਲ
+SOS, emergency help	SOS, ਐਮਰਜੈਂਸੀ ਮਦਦ
+Call an ambulance or show the emergency card	ਐਂਬੂਲੈਂਸ ਬੁਲਾਓ ਜਾਂ ਐਮਰਜੈਂਸੀ ਕਾਰਡ ਦਿਖਾਓ
+Note one	ਲਿਖੋ
+Doses	ਖ਼ੁਰਾਕਾਂ
+Near you	ਤੁਹਾਡੇ ਨੇੜੇ
+Your review	ਤੁਹਾਡੀ ਜਾਂਚ
+Save my review	ਮੇਰੀ ਜਾਂਚ ਸੰਭਾਲੋ
+This week	ਇਸ ਹਫ਼ਤੇ
+has visits	ਮੁਲਾਕਾਤ ਹੈ
+No visits this day.	ਇਸ ਦਿਨ ਕੋਈ ਮੁਲਾਕਾਤ ਨਹੀਂ।
+Hide past visits	ਪਿਛਲੀਆਂ ਮੁਲਾਕਾਤਾਂ ਲੁਕਾਓ
+Show past visits (${past.size})	ਪਿਛਲੀਆਂ ਮੁਲਾਕਾਤਾਂ ਵੇਖੋ (${past.size})
+Section	ਹਿੱਸਾ
+Section 	ਹਿੱਸਾ 
+Doctor's note and recording	ਡਾਕਟਰ ਦਾ ਨੋਟ ਅਤੇ ਰਿਕਾਰਡਿੰਗ
+Start or continue the discussion	ਚਰਚਾ ਸ਼ੁਰੂ ਕਰੋ ਜਾਂ ਜਾਰੀ ਰੱਖੋ
+Medicine activity	ਦਵਾਈ ਗਤੀਵਿਧੀ
+Tap when taken. Hold for Not taken or Skipped.	ਲੈਣ ਤੋਂ ਬਾਅਦ ਟੈਪ ਕਰੋ। ਨਹੀਂ ਲਈ ਜਾਂ ਛੱਡੀ ਹੋਵੇ ਤਾਂ ਦਬਾ ਕੇ ਰੱਖੋ।
+Care near you	ਤੁਹਾਡੇ ਨੇੜੇ ਦੇਖਭਾਲ
+Step ${step + 1} of $count	$count ਵਿੱਚੋਂ ਕਦਮ ${step + 1}
+See all (${items.size})	ਸਭ ਦੇਖੋ (${items.size})
+Past visits	ਪਿਛਲੀਆਂ ਮੁਲਾਕਾਤਾਂ

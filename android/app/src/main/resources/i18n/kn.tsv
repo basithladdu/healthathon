@@ -6123,19 +6123,66 @@ This text is in another language, so the phone cannot read it out exactly. Ask s
 The phone can only read text written in the app language. Choose “Someone read it to me”.	ಫೋನ್ ಆ್ಯಪ್ ಭಾಷೆಯಲ್ಲಿ ಬರೆದ ಪಠ್ಯವನ್ನು ಮಾತ್ರ ಓದಬಲ್ಲದು. “ಯಾರೋ ನನಗೆ ಓದಿ ಹೇಳಿದರು” ಆಯ್ಕೆಮಾಡಿ.
 This phone has no voice for the app language. Choose “Someone read it to me”.	ಈ ಫೋನ್‌ನಲ್ಲಿ ಆ್ಯಪ್ ಭಾಷೆಯ ಧ್ವನಿ ಇಲ್ಲ. “ಯಾರೋ ನನಗೆ ಓದಿ ಹೇಳಿದರು” ಆಯ್ಕೆಮಾಡಿ.
 Only someone who can edit this care record can change this.	ಈ ಆರೈಕೆ ದಾಖಲೆಯನ್ನು ಬದಲಿಸಬಲ್ಲವರು ಮಾತ್ರ ಇದನ್ನು ಬದಲಿಸಬಹುದು.
-About the distress number	About the distress number
-How this differs from symptoms	How this differs from symptoms
-Where this thermometer comes from	Where this thermometer comes from
-Distress answers	Distress answers
-Kind of plan	Kind of plan
-Body part	Body part
-About symptom scores	About symptom scores
-How scores work	How scores work
-Choose a person	Choose a person
-Doctor or hospital number (mobile or landline)	Doctor or hospital number (mobile or landline)
-Earlier conversations	Earlier conversations
-Earlier discussions	Earlier discussions
-Choose the form	Choose the form
-Choose how often	Choose how often
-See all ($total)	See all ($total)
-Nothing matches your search.	Nothing matches your search.
+About the distress number	ಸಂಕಟದ ಸಂಖ್ಯೆಯ ಬಗ್ಗೆ
+How this differs from symptoms	ಲಕ್ಷಣಗಳಿಗಿಂತ ಇದು ಹೇಗೆ ಬೇರೆ
+Where this thermometer comes from	ಈ ಥರ್ಮಾಮೀಟರ್ ಎಲ್ಲಿಂದ ಬಂದಿದೆ
+Distress answers	ಸಂಕಟದ ಉತ್ತರಗಳು
+Kind of plan	ಯೋಜನೆಯ ವಿಧ
+Body part	ದೇಹದ ಭಾಗ
+About symptom scores	ಲಕ್ಷಣಗಳ ಅಂಕಗಳ ಬಗ್ಗೆ
+How scores work	ಅಂಕಗಳು ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತವೆ
+Choose a person	ಒಬ್ಬ ವ್ಯಕ್ತಿಯನ್ನು ಆಯ್ಕೆಮಾಡಿ
+Doctor or hospital number (mobile or landline)	ಡಾಕ್ಟರ್ ಅಥವಾ ಆಸ್ಪತ್ರೆಯ ಸಂಖ್ಯೆ (ಮೊಬೈಲ್ ಅಥವಾ ಲ್ಯಾಂಡ್‌ಲೈನ್)
+Earlier conversations	ಹಿಂದಿನ ಮಾತುಕತೆಗಳು
+Earlier discussions	ಹಿಂದಿನ ಚರ್ಚೆಗಳು
+Choose the form	ರೂಪವನ್ನು ಆಯ್ಕೆಮಾಡಿ
+Choose how often	ಎಷ್ಟು ಬಾರಿ ಎಂದು ಆಯ್ಕೆಮಾಡಿ
+See all ($total)	ಎಲ್ಲಾ ನೋಡಿ ($total)
+Nothing matches your search.	ನಿಮ್ಮ ಹುಡುಕಾಟಕ್ಕೆ ಯಾವುದೂ ಹೊಂದಿಕೆಯಾಗಿಲ್ಲ.
+New here?	ಹೊಸಬರೇ?
+Create your account	ನಿಮ್ಮ ಖಾತೆ ತೆರೆಯಿರಿ
+For registered doctors and nurses. We check your registration number.	ನೋಂದಾಯಿತ ಡಾಕ್ಟರ್‌ಗಳು ಮತ್ತು ನರ್ಸ್‌ಗಳಿಗಾಗಿ. ನಿಮ್ಮ ನೋಂದಣಿ ಸಂಖ್ಯೆಯನ್ನು ನಾವು ಪರಿಶೀಲಿಸುತ್ತೇವೆ.
+Only an email and a password. No Aadhaar.	ಇಮೇಲ್ ಮತ್ತು ಪಾಸ್‌ವರ್ಡ್ ಮಾತ್ರ. ಆಧಾರ್ ಬೇಡ.
+Sign in to see your care.	ನಿಮ್ಮ ಆರೈಕೆಯನ್ನು ನೋಡಲು ಸೈನ್ ಇನ್ ಮಾಡಿ.
+or	ಅಥವಾ
+Replies	ಉತ್ತರಗಳು
+Check-in	ದಿನದ ಸ್ಥಿತಿ
+Any distress for $about today?	ಇಂದು $about ಅವರಿಗೆ ಯಾವುದಾದರೂ ಸಂಕಟ ಇದೆಯೇ?
+Any distress today?	ಇಂದು ಯಾವುದಾದರೂ ಸಂಕಟ ಇದೆಯೇ?
+Consent to record	ರೆಕಾರ್ಡ್ ಮಾಡಲು ಒಪ್ಪಿಗೆ
+Demo	ಡೆಮೊ
+Palliative care, together.	ಪ್ಯಾಲಿಯೇಟಿವ್ ಕೇರ್, ಜೊತೆಯಾಗಿ.
+Comfort, dignity and your own wishes — kept in one place, for you and the people who care for you.	ಆರಾಮ, ಗೌರವ ಮತ್ತು ನಿಮ್ಮ ಸ್ವಂತ ಇಚ್ಛೆಗಳು — ಎಲ್ಲವೂ ಒಂದೇ ಕಡೆ, ನಿಮಗಾಗಿ ಮತ್ತು ನಿಮ್ಮ ಆರೈಕೆ ಮಾಡುವವರಿಗಾಗಿ.
+Past pain dates	ಹಿಂದಿನ ನೋವಿನ ದಿನಾಂಕಗಳು
+Health details	ಆರೋಗ್ಯದ ವಿವರಗಳು
+Average	ಸರಾಸರಿ
+Not scored yet	ಇನ್ನೂ ಅಂಕ ನೀಡಿಲ್ಲ
+Update	ಬದಲಿಸಿ
+Rate now	ಈಗ ತಿಳಿಸಿ
+Take care of	ನಿಮ್ಮ ಆರೈಕೆ ಮಾಡಿಕೊಳ್ಳಿ,
+yourself today.	ಇಂದೂ ಕೂಡ.
+Care for them,	ಅವರನ್ನು ನೋಡಿಕೊಳ್ಳಿ,
+and for you.	ನಿಮ್ಮನ್ನೂ ಕೂಡ.
+Caring for $caringFor	$caringFor ಅವರ ಆರೈಕೆ
+SOS, emergency help	SOS, ತುರ್ತು ಸಹಾಯ
+Call an ambulance or show the emergency card	ಆಂಬ್ಯುಲೆನ್ಸ್ ಕರೆಯಿರಿ ಅಥವಾ ತುರ್ತು ಕಾರ್ಡ್ ತೋರಿಸಿ
+Note one	ಬರೆಯಿರಿ
+Doses	ಡೋಸ್‌ಗಳು
+Near you	ನಿಮ್ಮ ಹತ್ತಿರ
+Your review	ನಿಮ್ಮ ಪರಿಶೀಲನೆ
+Save my review	ನನ್ನ ಪರಿಶೀಲನೆ ಉಳಿಸಿ
+This week	ಈ ವಾರ
+has visits	ಭೇಟಿ ಇದೆ
+No visits this day.	ಈ ದಿನ ಯಾವುದೇ ಭೇಟಿ ಇಲ್ಲ.
+Hide past visits	ಹಿಂದಿನ ಭೇಟಿಗಳನ್ನು ಮರೆಮಾಡಿ
+Show past visits (${past.size})	ಹಿಂದಿನ ಭೇಟಿಗಳನ್ನು ನೋಡಿ (${past.size})
+Section	ವಿಭಾಗ
+Section 	ವಿಭಾಗ 
+Doctor's note and recording	ಡಾಕ್ಟರ್ ಟಿಪ್ಪಣಿ ಮತ್ತು ರೆಕಾರ್ಡಿಂಗ್
+Start or continue the discussion	ಚರ್ಚೆಯನ್ನು ಪ್ರಾರಂಭಿಸಿ ಅಥವಾ ಮುಂದುವರಿಸಿ
+Medicine activity	ಔಷಧಿ ಚಟುವಟಿಕೆ
+Tap when taken. Hold for Not taken or Skipped.	ತೆಗೆದುಕೊಂಡಾಗ ಟ್ಯಾಪ್ ಮಾಡಿ. ತೆಗೆದುಕೊಂಡಿಲ್ಲ ಅಥವಾ ಬಿಟ್ಟಿದ್ದರೆ ಒತ್ತಿ ಹಿಡಿಯಿರಿ.
+Care near you	ನಿಮ್ಮ ಹತ್ತಿರ ಆರೈಕೆ
+Step ${step + 1} of $count	ಹಂತ ${step + 1} / $count
+See all (${items.size})	ಎಲ್ಲಾ ನೋಡಿ (${items.size})
+Past visits	ಹಿಂದಿನ ಭೇಟಿಗಳು

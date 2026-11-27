@@ -63,18 +63,24 @@ object PainHistoryRules {
         Heading(t("Past pain on the body", "पहले का दर्द शरीर पर"), 27)
         if (index < 0) ChartEmpty(hindi, "pain-history") else {
             val note = history[index].second
-            // The newest five dates; older ones behind "Show older" (the picked one always stays in view).
-            val datesShown = rememberShownCount(personId)
-            LaunchedEffect(index) { if (index + 1 > datesShown.intValue) datesShown.intValue = index + 1 }
+            // The newest five dates as chips (the picked one always stays in view); every date is on the "See all" page, with search.
+            val dateLabel = { value: SymptomNote -> "${friendlyWhen(value.observedDate, value.observedTime, hindi)} · ${SymptomDiaryRules.ratingLabel(value.rating, hindi)}" }
             FlowRow(Modifier.fillMaxWidth().animateContentSize(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                history.take(maxOf(datesShown.intValue, index + 1)).forEach { (item, value) ->
+                history.take(maxOf(SaharaShowMore.INITIAL, index + 1)).forEach { (item, value) ->
                     FilterChip(selected == item.id, { if (selected != item.id) tick(); preferred = item.id }, label = { Text("${friendlyWhen(value.observedDate, value.observedTime, hindi)} · ${SymptomDiaryRules.ratingLabel(value.rating, hindi)}", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false) }, shape = CircleShape,
                         leadingIcon = if (value.rating != null) { { Box(Modifier.size(12.dp).background(ChartBands.color(value.rating), CircleShape)) } } else null,
                         border = FilterChipDefaults.filterChipBorder(enabled = true, selected = selected == item.id, borderColor = DoctorCardSub.copy(alpha = .45f), selectedBorderColor = DoctorAccent, borderWidth = 1.5.dp, selectedBorderWidth = 2.dp),
                         colors = FilterChipDefaults.filterChipColors(containerColor = Paper, labelColor = DoctorCardInk, selectedContainerColor = lerp(Paper, DoctorAccent, .14f), selectedLabelColor = DoctorCardInk), modifier = Modifier.heightIn(min = 48.dp).testTag("pain-history-entry-${item.id}"))
                 }
             }
-            SaharaShowOlder(history.size, datesShown, tag = "pain-history-dates")
+            SaharaSeeAll(history, "pain-history-dates", t("Past pain dates", "पहले के दर्द की तारीख़ें"), initial = SaharaShowMore.INITIAL, key = { it.first.id }, searchText = { (_, v) -> dateLabel(v) }) { (item, value) ->
+                val close = LocalShowAllClose.current
+                OutlinedButton(onClick = { tick(); preferred = item.id; close() }, shape = RoundedCornerShape(14.dp), border = BorderStroke(if (selected == item.id) 2.dp else 1.5.dp, if (selected == item.id) DoctorAccent else DoctorCardSub.copy(alpha = .45f)),
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("pain-history-all-entry-${item.id}")) {
+                    if (value.rating != null) Box(Modifier.size(12.dp).background(ChartBands.color(value.rating), CircleShape))
+                    Spacer(Modifier.width(8.dp)); Text(dateLabel(value), Modifier.weight(1f), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+                }
+            }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(onClick = { tick(); preferred = history[index + 1].first.id }, enabled = index < history.lastIndex, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, DoctorCardSub.copy(alpha = .5f)), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("pain-history-older")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Older", "पुराना")) }
                 OutlinedButton(onClick = { tick(); preferred = history[index - 1].first.id }, enabled = index > 0, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, DoctorCardSub.copy(alpha = .5f)), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("pain-history-newer")) { Text(t("Newer", "नया")); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(18.dp)) }

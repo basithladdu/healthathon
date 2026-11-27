@@ -143,11 +143,12 @@ object TrendChartRules {
                 lineColor = DoctorCardSub.copy(alpha = 0.7f), xMin = 0.0, xMax = (window.days.size - 1).coerceAtLeast(1).toDouble(), xLabelLines = 2,
                 bands = listOf(ChartBand(0.0, 3.5, ChartBands.Mild), ChartBand(3.5, 6.5, ChartBands.Moderate), ChartBand(6.5, 10.0, ChartBands.Severe)),
             )
-            TextButton(onClick = { showAll = !showAll }, modifier = Modifier.heightIn(min = 48.dp).testTag("$tag-toggle")) {
-                Text(if (showAll) t("Hide entries", "नोट छिपाएँ") else t("See all ${points.size} entries", "सभी ${points.size} नोट देखें"))
+            TextButton(onClick = { showAll = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("$tag-toggle")) {
+                Text(t("See all ${points.size} entries", "सभी ${points.size} नोट देखें"))
             }
-            if (showAll) points.asReversed().forEach { p ->
-                Row(Modifier.fillMaxWidth().heightIn(min = 32.dp), verticalAlignment = Alignment.CenterVertically) {
+            // Every entry, newest first, on its own full page with search.
+            if (showAll) SaharaShowAllPage(points.asReversed(), tag, name, { p -> "${friendlyWhen(p.date, p.time, hindi)} ${SymptomDiaryRules.label(SymptomDiaryRules.respondents, p.respondent, hindi)} ${p.value} ${ChartBands.word(p.value, hindi)}" }, null, { showAll = false }) { p ->
+                Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text("${friendlyWhen(p.date, p.time, hindi)} · ${SymptomDiaryRules.label(SymptomDiaryRules.respondents, p.respondent, hindi)}", fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.weight(1f))
                     Text("${p.value} · ${ChartBands.word(p.value, hindi)}", fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
                 }

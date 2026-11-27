@@ -16,6 +16,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -125,9 +127,9 @@ private data class TodayQuick(val label: String, val hint: String, val icon: Ima
     )
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(t("Quick actions", "जल्दी करें"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
+            FitWordsText(t("Quick actions", "जल्दी करें"), 20f, Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.SemiBold, maxLines = 2)
             TextButton(onClick = onAll, modifier = Modifier.heightIn(min = 48.dp).testTag("today-quick-all"), colors = ButtonDefaults.textButtonColors(contentColor = SaharaColors.Primary)) {
-                Text(t("View all", "सब देखें"), fontWeight = FontWeight.SemiBold); Icon(Icons.Default.ChevronRight, null, Modifier.size(20.dp))
+                Text(t("View all", "सब देखें"), fontWeight = FontWeight.SemiBold, maxLines = 1); Icon(Icons.Default.ChevronRight, null, Modifier.size(20.dp))
             }
         }
         Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -136,11 +138,28 @@ private data class TodayQuick(val label: String, val hint: String, val icon: Ima
                     modifier = Modifier.weight(1f).fillMaxHeight().testTag(q.tag)) {
                     Column(Modifier.padding(horizontal = 4.dp, vertical = 10.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Box(Modifier.size(48.dp).clip(CircleShape).background(q.tone), contentAlignment = Alignment.Center) { Icon(q.icon, null, Modifier.size(26.dp), tint = q.ink) }
-                        Text(q.label, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, textAlign = TextAlign.Center, maxLines = 2, lineHeight = 17.sp)
+                        FitWordsText(q.label, 14f, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, maxLines = 2)
                         // Name only (26 Nov refinement): the grey hint line is dropped to keep the row compact.
                     }
                 }
             }
         }
     }
+}
+
+
+/**
+ * Text that never splits a word across lines (seen in Tamil/Telugu on narrow tiles, 27 Nov): if a line ends inside a
+ * word, or the text needs more than [maxLines], it shrinks a little (down to 70%) and lays out again.
+ */
+@Composable private fun FitWordsText(text: String, sizeSp: Float, modifier: Modifier = Modifier, fontFamily: androidx.compose.ui.text.font.FontFamily? = null,
+    fontWeight: FontWeight? = null, textAlign: TextAlign? = null, maxLines: Int = 2) {
+    var scale by androidx.compose.runtime.remember(text) { androidx.compose.runtime.mutableFloatStateOf(1f) }
+    Text(text, modifier, fontSize = (sizeSp * scale).sp, lineHeight = (sizeSp * scale * 1.22f).sp, fontFamily = fontFamily, fontWeight = fontWeight,
+        color = DoctorCardInk, textAlign = textAlign, maxLines = maxLines, overflow = TextOverflow.Ellipsis,
+        onTextLayout = { r ->
+            val splitsWord = (0 until r.lineCount - 1).any { i -> val end = r.getLineEnd(i, visibleEnd = true)
+                end in 1 until text.length && !text[end - 1].isWhitespace() && !text[end].isWhitespace() && text[end - 1].isLetterOrDigit() }
+            if ((splitsWord || r.hasVisualOverflow) && scale > 0.7f) scale -= 0.06f
+        })
 }

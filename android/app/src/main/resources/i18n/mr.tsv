@@ -6118,19 +6118,66 @@ This text is in another language, so the phone cannot read it out exactly. Ask s
 The phone can only read text written in the app language. Choose “Someone read it to me”.	फोन फक्त ॲपच्या भाषेत लिहिलेला मजकूर वाचू शकतो. “कोणीतरी मला वाचून दाखवले” निवडा.
 This phone has no voice for the app language. Choose “Someone read it to me”.	या फोनमध्ये ॲपच्या भाषेचा आवाज नाही. “कोणीतरी मला वाचून दाखवले” निवडा.
 Only someone who can edit this care record can change this.	हा काळजी रेकॉर्ड बदलू शकणारेच हे बदलू शकतात.
-About the distress number	About the distress number
-How this differs from symptoms	How this differs from symptoms
-Where this thermometer comes from	Where this thermometer comes from
-Distress answers	Distress answers
-Kind of plan	Kind of plan
-Body part	Body part
-About symptom scores	About symptom scores
-How scores work	How scores work
-Choose a person	Choose a person
-Doctor or hospital number (mobile or landline)	Doctor or hospital number (mobile or landline)
-Earlier conversations	Earlier conversations
-Earlier discussions	Earlier discussions
-Choose the form	Choose the form
-Choose how often	Choose how often
-See all ($total)	See all ($total)
-Nothing matches your search.	Nothing matches your search.
+About the distress number	त्रासाच्या अंकाबद्दल
+How this differs from symptoms	लक्षणांपेक्षा हे कसे वेगळे आहे
+Where this thermometer comes from	हे थर्मामीटर कुठून आले आहे
+Distress answers	त्रासाची उत्तरे
+Kind of plan	नियोजनाचा प्रकार
+Body part	शरीराचा भाग
+About symptom scores	लक्षणांच्या गुणांबद्दल
+How scores work	गुण कसे काम करतात
+Choose a person	एक व्यक्ती निवडा
+Doctor or hospital number (mobile or landline)	डॉक्टर किंवा रुग्णालयाचा क्रमांक (मोबाईल किंवा लँडलाईन)
+Earlier conversations	आधीची संभाषणे
+Earlier discussions	आधीच्या चर्चा
+Choose the form	प्रकार निवडा
+Choose how often	किती वेळा ते निवडा
+See all ($total)	सर्व पहा ($total)
+Nothing matches your search.	तुमच्या शोधाशी काहीही जुळत नाही.
+New here?	नवीन आहात?
+Create your account	तुमचे खाते तयार करा
+For registered doctors and nurses. We check your registration number.	नोंदणीकृत डॉक्टर आणि नर्ससाठी. आम्ही तुमचा नोंदणी क्रमांक तपासतो.
+Only an email and a password. No Aadhaar.	फक्त ईमेल आणि पासवर्ड. आधार नको.
+Sign in to see your care.	तुमची काळजी पाहण्यासाठी साइन इन करा.
+or	किंवा
+Replies	उत्तरे
+Check-in	तब्येत-तपासणी
+Any distress for $about today?	आज $about यांना काही त्रास आहे का?
+Any distress today?	आज काही त्रास आहे का?
+Consent to record	रेकॉर्ड करण्यासाठी संमती
+Demo	डेमो
+Palliative care, together.	पॅलिएटिव्ह केअर, एकत्र.
+Comfort, dignity and your own wishes — kept in one place, for you and the people who care for you.	आराम, सन्मान आणि तुमच्या स्वतःच्या इच्छा — सगळे एकाच ठिकाणी, तुमच्यासाठी आणि तुमची काळजी घेणाऱ्यांसाठी.
+Past pain dates	आधीच्या वेदनेच्या तारखा
+Health details	आरोग्याची माहिती
+Average	सरासरी
+Not scored yet	अजून गुण दिलेले नाहीत
+Update	बदला
+Rate now	आता सांगा
+Take care of	स्वतःची काळजी घ्या,
+yourself today.	आजही.
+Care for them,	त्यांची काळजी घ्या,
+and for you.	आणि स्वतःचीही.
+Caring for $caringFor	$caringFor यांची काळजी
+SOS, emergency help	SOS, आपत्कालीन मदत
+Call an ambulance or show the emergency card	रुग्णवाहिका बोलवा किंवा आपत्कालीन कार्ड दाखवा
+Note one	लिहा
+Doses	डोस
+Near you	तुमच्या जवळ
+Your review	तुमची तपासणी
+Save my review	माझी तपासणी जतन करा
+This week	या आठवड्यात
+has visits	भेट आहे
+No visits this day.	या दिवशी कोणतीही भेट नाही.
+Hide past visits	मागच्या भेटी लपवा
+Show past visits (${past.size})	मागच्या भेटी पहा (${past.size})
+Section	विभाग
+Section 	विभाग 
+Doctor's note and recording	डॉक्टरांची नोंद आणि रेकॉर्डिंग
+Start or continue the discussion	चर्चा सुरू करा किंवा पुढे चालू ठेवा
+Medicine activity	औषध नोंदी
+Tap when taken. Hold for Not taken or Skipped.	घेतल्यावर टॅप करा. घेतले नाही किंवा चुकवले असल्यास दाबून धरा.
+Care near you	तुमच्या जवळ काळजी
+Step ${step + 1} of $count	पायरी ${step + 1} / $count
+See all (${items.size})	सर्व पहा (${items.size})
+Past visits	मागच्या भेटी

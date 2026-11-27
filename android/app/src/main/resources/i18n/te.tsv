@@ -6123,19 +6123,66 @@ This text is in another language, so the phone cannot read it out exactly. Ask s
 The phone can only read text written in the app language. Choose “Someone read it to me”.	ఫోన్ యాప్ భాషలో రాసిన పాఠ్యాన్ని మాత్రమే చదవగలదు. “ఎవరో నాకు చదివి వినిపించారు” ఎంచుకోండి.
 This phone has no voice for the app language. Choose “Someone read it to me”.	ఈ ఫోన్‌లో యాప్ భాష కోసం గొంతు లేదు. “ఎవరో నాకు చదివి వినిపించారు” ఎంచుకోండి.
 Only someone who can edit this care record can change this.	ఈ సంరక్షణ రికార్డును మార్చగలిగేవారు మాత్రమే దీన్ని మార్చగలరు.
-About the distress number	About the distress number
-How this differs from symptoms	How this differs from symptoms
-Where this thermometer comes from	Where this thermometer comes from
-Distress answers	Distress answers
-Kind of plan	Kind of plan
-Body part	Body part
-About symptom scores	About symptom scores
-How scores work	How scores work
-Choose a person	Choose a person
-Doctor or hospital number (mobile or landline)	Doctor or hospital number (mobile or landline)
-Earlier conversations	Earlier conversations
-Earlier discussions	Earlier discussions
-Choose the form	Choose the form
-Choose how often	Choose how often
-See all ($total)	See all ($total)
-Nothing matches your search.	Nothing matches your search.
+About the distress number	బాధ సంఖ్య గురించి
+How this differs from symptoms	లక్షణాల నుండి ఇది ఎలా భిన్నం
+Where this thermometer comes from	ఈ థర్మామీటర్ ఎక్కడి నుండి వచ్చింది
+Distress answers	బాధ జవాబులు
+Kind of plan	ప్లాన్ రకం
+Body part	శరీర భాగం
+About symptom scores	లక్షణాల అంకెల గురించి
+How scores work	అంకెలు ఎలా పనిచేస్తాయి
+Choose a person	ఒక వ్యక్తిని ఎంచుకోండి
+Doctor or hospital number (mobile or landline)	డాక్టర్ లేదా ఆసుపత్రి నంబర్ (మొబైల్ లేదా ల్యాండ్‌లైన్)
+Earlier conversations	ముందటి సంభాషణలు
+Earlier discussions	ముందటి చర్చలు
+Choose the form	రూపాన్ని ఎంచుకోండి
+Choose how often	ఎన్నిసార్లో ఎంచుకోండి
+See all ($total)	అన్నీ చూడండి ($total)
+Nothing matches your search.	మీ శోధనకు ఏదీ సరిపోలలేదు.
+New here?	కొత్తవారా?
+Create your account	మీ ఖాతా తెరవండి
+For registered doctors and nurses. We check your registration number.	నమోదైన డాక్టర్లు, నర్సుల కోసం. మీ రిజిస్ట్రేషన్ నంబర్‌ను మేము సరిచూస్తాము.
+Only an email and a password. No Aadhaar.	ఒక ఇమెయిల్, పాస్‌వర్డ్ చాలు. ఆధార్ అవసరం లేదు.
+Sign in to see your care.	మీ సంరక్షణను చూడటానికి సైన్ ఇన్ చేయండి.
+or	లేదా
+Replies	జవాబులు
+Check-in	రోజువారీ పరిస్థితి
+Any distress for $about today?	ఈరోజు $about కి ఏదైనా బాధ ఉందా?
+Any distress today?	ఈరోజు ఏదైనా బాధ ఉందా?
+Consent to record	రికార్డ్ చేయడానికి అంగీకారం
+Demo	డెమో
+Palliative care, together.	పాలియేటివ్ కేర్, కలిసి.
+Comfort, dignity and your own wishes — kept in one place, for you and the people who care for you.	సౌకర్యం, గౌరవం, మీ స్వంత కోరికలు — అన్నీ ఒకే చోట, మీ కోసం, మీ సంరక్షణ చూసేవారి కోసం.
+Past pain dates	గత నొప్పి తేదీలు
+Health details	ఆరోగ్య వివరాలు
+Average	సగటు
+Not scored yet	ఇంకా అంకె ఇవ్వలేదు
+Update	మార్చండి
+Rate now	ఇప్పుడు చెప్పండి
+Take care of	మిమ్మల్ని మీరు చూసుకోండి,
+yourself today.	ఈరోజు కూడా.
+Care for them,	వారిని చూసుకోండి,
+and for you.	మిమ్మల్ని కూడా.
+Caring for $caringFor	$caringFor గారి సంరక్షణ
+SOS, emergency help	SOS, అత్యవసర సహాయం
+Call an ambulance or show the emergency card	అంబులెన్స్‌ను పిలవండి లేదా అత్యవసర కార్డ్ చూపించండి
+Note one	నమోదు చేయండి
+Doses	మోతాదులు
+Near you	మీ దగ్గర
+Your review	మీ సమీక్ష
+Save my review	నా సమీక్షను సేవ్ చేయండి
+This week	ఈ వారం
+has visits	సందర్శన ఉంది
+No visits this day.	ఈ రోజు సందర్శనలు లేవు.
+Hide past visits	గత సందర్శనలను దాచండి
+Show past visits (${past.size})	గత సందర్శనలను చూడండి (${past.size})
+Section	విభాగం
+Section 	విభాగం 
+Doctor's note and recording	డాక్టర్ నోట్, రికార్డింగ్
+Start or continue the discussion	చర్చను మొదలుపెట్టండి లేదా కొనసాగించండి
+Medicine activity	మందుల వివరాలు
+Tap when taken. Hold for Not taken or Skipped.	తీసుకున్నాక ట్యాప్ చేయండి. తీసుకోలేదు లేదా వదిలేశారు అయితే నొక్కి పట్టుకోండి.
+Care near you	మీ దగ్గర సంరక్షణ
+Step ${step + 1} of $count	దశ ${step + 1} / $count
+See all (${items.size})	అన్నీ చూడండి (${items.size})
+Past visits	గత సందర్శనలు

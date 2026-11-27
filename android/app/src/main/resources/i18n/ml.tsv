@@ -6120,19 +6120,66 @@ This text is in another language, so the phone cannot read it out exactly. Ask s
 The phone can only read text written in the app language. Choose “Someone read it to me”.	ആപ്പിന്റെ ഭാഷയിൽ എഴുതിയത് മാത്രമേ ഫോണിന് വായിക്കാൻ കഴിയൂ. “ഒരാൾ എനിക്ക് വായിച്ചു തന്നു” തിരഞ്ഞെടുക്കുക.
 This phone has no voice for the app language. Choose “Someone read it to me”.	ഈ ഫോണിൽ ആപ്പിന്റെ ഭാഷയ്ക്കുള്ള ശബ്ദമില്ല. “ഒരാൾ എനിക്ക് വായിച്ചു തന്നു” തിരഞ്ഞെടുക്കുക.
 Only someone who can edit this care record can change this.	ഈ പരിചരണ രേഖ തിരുത്താൻ കഴിയുന്നവർക്ക് മാത്രമേ ഇത് മാറ്റാൻ കഴിയൂ.
-About the distress number	About the distress number
-How this differs from symptoms	How this differs from symptoms
-Where this thermometer comes from	Where this thermometer comes from
-Distress answers	Distress answers
-Kind of plan	Kind of plan
-Body part	Body part
-About symptom scores	About symptom scores
-How scores work	How scores work
-Choose a person	Choose a person
-Doctor or hospital number (mobile or landline)	Doctor or hospital number (mobile or landline)
-Earlier conversations	Earlier conversations
-Earlier discussions	Earlier discussions
-Choose the form	Choose the form
-Choose how often	Choose how often
-See all ($total)	See all ($total)
-Nothing matches your search.	Nothing matches your search.
+About the distress number	വിഷമത്തിന്റെ നമ്പറിനെക്കുറിച്ച്
+How this differs from symptoms	ലക്ഷണങ്ങളിൽ നിന്ന് ഇത് എങ്ങനെ വ്യത്യസ്തമാണ്
+Where this thermometer comes from	ഈ തെർമോമീറ്റർ എവിടെ നിന്നാണ്
+Distress answers	വിഷമത്തിന്റെ മറുപടികൾ
+Kind of plan	പദ്ധതിയുടെ തരം
+Body part	ശരീരഭാഗം
+About symptom scores	ലക്ഷണ സ്കോറുകളെക്കുറിച്ച്
+How scores work	സ്കോറുകൾ എങ്ങനെ പ്രവർത്തിക്കുന്നു
+Choose a person	ഒരാളെ തിരഞ്ഞെടുക്കുക
+Doctor or hospital number (mobile or landline)	ഡോക്ടറുടെയോ ആശുപത്രിയുടെയോ നമ്പർ (മൊബൈൽ അല്ലെങ്കിൽ ലാൻഡ്‌ലൈൻ)
+Earlier conversations	മുമ്പത്തെ സംഭാഷണങ്ങൾ
+Earlier discussions	മുമ്പത്തെ ചർച്ചകൾ
+Choose the form	തരം തിരഞ്ഞെടുക്കുക
+Choose how often	എത്ര തവണയെന്ന് തിരഞ്ഞെടുക്കുക
+See all ($total)	എല്ലാം കാണുക ($total)
+Nothing matches your search.	നിങ്ങളുടെ തിരച്ചിലിന് ഒന്നും ചേരുന്നില്ല.
+New here?	പുതിയതാണോ?
+Create your account	നിങ്ങളുടെ അക്കൗണ്ട് ഉണ്ടാക്കുക
+For registered doctors and nurses. We check your registration number.	രജിസ്റ്റർ ചെയ്ത ഡോക്ടർമാർക്കും നഴ്സുമാർക്കും വേണ്ടി. നിങ്ങളുടെ രജിസ്ട്രേഷൻ നമ്പർ ഞങ്ങൾ പരിശോധിക്കും.
+Only an email and a password. No Aadhaar.	ഒരു ഇമെയിലും പാസ്‌വേഡും മാത്രം. ആധാർ വേണ്ട.
+Sign in to see your care.	നിങ്ങളുടെ പരിചരണം കാണാൻ സൈൻ ഇൻ ചെയ്യുക.
+or	അല്ലെങ്കിൽ
+Replies	മറുപടികൾ
+Check-in	ചെക്ക്-ഇൻ
+Any distress for $about today?	ഇന്ന് $about-ന് എന്തെങ്കിലും വിഷമമുണ്ടോ?
+Any distress today?	ഇന്ന് എന്തെങ്കിലും വിഷമമുണ്ടോ?
+Consent to record	റെക്കോർഡ് ചെയ്യാനുള്ള സമ്മതം
+Demo	ഡെമോ
+Palliative care, together.	സാന്ത്വന പരിചരണം, ഒരുമിച്ച്.
+Comfort, dignity and your own wishes — kept in one place, for you and the people who care for you.	സുഖവും അന്തസ്സും നിങ്ങളുടെ സ്വന്തം ആഗ്രഹങ്ങളും — എല്ലാം ഒരിടത്ത്, നിങ്ങൾക്കും നിങ്ങളെ പരിചരിക്കുന്നവർക്കും വേണ്ടി.
+Past pain dates	മുമ്പത്തെ വേദനയുടെ തീയതികൾ
+Health details	ആരോഗ്യ വിവരങ്ങൾ
+Average	ശരാശരി
+Not scored yet	ഇതുവരെ സ്കോർ നൽകിയിട്ടില്ല
+Update	മാറ്റുക
+Rate now	ഇപ്പോൾ അറിയിക്കുക
+Take care of	സ്വയം ശ്രദ്ധിക്കൂ,
+yourself today.	ഇന്നും.
+Care for them,	അവരെ പരിചരിക്കൂ,
+and for you.	നിങ്ങളെയും.
+Caring for $caringFor	$caringFor-നെ പരിചരിക്കുന്നു
+SOS, emergency help	SOS, അടിയന്തര സഹായം
+Call an ambulance or show the emergency card	ആംബുലൻസ് വിളിക്കുക അല്ലെങ്കിൽ അടിയന്തര കാർഡ് കാണിക്കുക
+Note one	എഴുതുക
+Doses	ഡോസുകൾ
+Near you	നിങ്ങളുടെ അടുത്ത്
+Your review	നിങ്ങളുടെ പരിശോധന
+Save my review	എന്റെ പരിശോധന സേവ് ചെയ്യുക
+This week	ഈ ആഴ്ച
+has visits	സന്ദർശനമുണ്ട്
+No visits this day.	ഈ ദിവസം സന്ദർശനങ്ങളില്ല.
+Hide past visits	കഴിഞ്ഞ സന്ദർശനങ്ങൾ മറയ്ക്കുക
+Show past visits (${past.size})	കഴിഞ്ഞ സന്ദർശനങ്ങൾ കാണുക (${past.size})
+Section	വിഭാഗം
+Section 	വിഭാഗം 
+Doctor's note and recording	ഡോക്ടറുടെ കുറിപ്പും റെക്കോർഡിംഗും
+Start or continue the discussion	ചർച്ച തുടങ്ങുകയോ തുടരുകയോ ചെയ്യുക
+Medicine activity	മരുന്ന് വിവരം
+Tap when taken. Hold for Not taken or Skipped.	കഴിച്ചാൽ ടാപ്പ് ചെയ്യുക. കഴിച്ചില്ല അല്ലെങ്കിൽ ഒഴിവാക്കി എങ്കിൽ അമർത്തിപ്പിടിക്കുക.
+Care near you	നിങ്ങളുടെ അടുത്ത് പരിചരണം
+Step ${step + 1} of $count	ഘട്ടം ${step + 1} / $count
+See all (${items.size})	എല്ലാം കാണുക (${items.size})
+Past visits	കഴിഞ്ഞ സന്ദർശനങ്ങൾ

@@ -6120,19 +6120,66 @@ This text is in another language, so the phone cannot read it out exactly. Ask s
 The phone can only read text written in the app language. Choose “Someone read it to me”.	ফোন শুধু অ্যাপের ভাষায় লেখা লেখাই পড়তে পারে। “কেউ আমাকে পড়ে শুনিয়েছেন” বেছে নিন।
 This phone has no voice for the app language. Choose “Someone read it to me”.	এই ফোনে অ্যাপের ভাষার কণ্ঠ নেই। “কেউ আমাকে পড়ে শুনিয়েছেন” বেছে নিন।
 Only someone who can edit this care record can change this.	এই যত্নের রেকর্ড যিনি বদলাতে পারেন, শুধু তিনিই এটি বদলাতে পারেন।
-About the distress number	About the distress number
-How this differs from symptoms	How this differs from symptoms
-Where this thermometer comes from	Where this thermometer comes from
-Distress answers	Distress answers
-Kind of plan	Kind of plan
-Body part	Body part
-About symptom scores	About symptom scores
-How scores work	How scores work
-Choose a person	Choose a person
-Doctor or hospital number (mobile or landline)	Doctor or hospital number (mobile or landline)
-Earlier conversations	Earlier conversations
-Earlier discussions	Earlier discussions
-Choose the form	Choose the form
-Choose how often	Choose how often
-See all ($total)	See all ($total)
-Nothing matches your search.	Nothing matches your search.
+About the distress number	কষ্টের সংখ্যা সম্পর্কে
+How this differs from symptoms	উপসর্গ থেকে এটি কীভাবে আলাদা
+Where this thermometer comes from	এই থার্মোমিটার কোথা থেকে এসেছে
+Distress answers	কষ্টের উত্তর
+Kind of plan	পরিকল্পনার ধরন
+Body part	শরীরের অংশ
+About symptom scores	উপসর্গের সংখ্যা সম্পর্কে
+How scores work	সংখ্যাগুলি কীভাবে কাজ করে
+Choose a person	একজনকে বেছে নিন
+Doctor or hospital number (mobile or landline)	ডাক্তার বা হাসপাতালের নম্বর (মোবাইল বা ল্যান্ডলাইন)
+Earlier conversations	আগের কথোপকথন
+Earlier discussions	আগের আলোচনা
+Choose the form	ধরন বেছে নিন
+Choose how often	কতবার তা বেছে নিন
+See all ($total)	সব দেখুন ($total)
+Nothing matches your search.	আপনার খোঁজের সঙ্গে কিছু মেলেনি।
+New here?	নতুন এসেছেন?
+Create your account	আপনার অ্যাকাউন্ট খুলুন
+For registered doctors and nurses. We check your registration number.	নিবন্ধিত ডাক্তার ও নার্সদের জন্য। আমরা আপনার রেজিস্ট্রেশন নম্বর যাচাই করি।
+Only an email and a password. No Aadhaar.	শুধু একটি ইমেল আর পাসওয়ার্ড। আধার লাগবে না।
+Sign in to see your care.	আপনার যত্নের তথ্য দেখতে সাইন ইন করুন।
+or	অথবা
+Replies	উত্তর
+Check-in	চেক-ইন
+Any distress for $about today?	আজ $about-এর কি কোনো কষ্ট আছে?
+Any distress today?	আজ কি কোনো কষ্ট আছে?
+Consent to record	রেকর্ড করার সম্মতি
+Demo	ডেমো
+Palliative care, together.	প্যালিয়েটিভ কেয়ার, একসাথে।
+Comfort, dignity and your own wishes — kept in one place, for you and the people who care for you.	আরাম, মর্যাদা আর আপনার নিজের ইচ্ছা — সবই এক জায়গায়, আপনার এবং যাঁরা আপনার যত্ন নেন তাঁদের জন্য।
+Past pain dates	আগের ব্যথার তারিখ
+Health details	স্বাস্থ্যের তথ্য
+Average	গড়
+Not scored yet	এখনও সংখ্যা দেওয়া হয়নি
+Update	বদলান
+Rate now	এখনই জানান
+Take care of	নিজের যত্ন নিন,
+yourself today.	আজও।
+Care for them,	তাঁদের যত্ন নিন,
+and for you.	আর নিজেরও।
+Caring for $caringFor	$caringFor-এর যত্নে
+SOS, emergency help	SOS, জরুরি সাহায্য
+Call an ambulance or show the emergency card	অ্যাম্বুলেন্স ডাকুন বা জরুরি কার্ড দেখান
+Note one	লিখুন
+Doses	ডোজ
+Near you	কাছাকাছি
+Your review	আপনার যাচাই
+Save my review	আমার যাচাই রাখুন
+This week	এই সপ্তাহে
+has visits	সাক্ষাৎ আছে
+No visits this day.	এই দিনে কোনো সাক্ষাৎ নেই।
+Hide past visits	আগের সাক্ষাৎ লুকান
+Show past visits (${past.size})	আগের সাক্ষাৎ দেখুন (${past.size})
+Section	অংশ
+Section 	অংশ 
+Doctor's note and recording	ডাক্তারের নোট ও রেকর্ডিং
+Start or continue the discussion	আলোচনা শুরু করুন বা চালিয়ে যান
+Medicine activity	ওষুধের কাজ
+Tap when taken. Hold for Not taken or Skipped.	খাওয়া হলে ট্যাপ করুন। খাওয়া হয়নি বা বাদ গেলে চেপে ধরে রাখুন।
+Care near you	আপনার কাছে যত্ন
+Step ${step + 1} of $count	$count-এর মধ্যে ধাপ ${step + 1}
+See all (${items.size})	সব দেখুন (${items.size})
+Past visits	আগের সাক্ষাৎ

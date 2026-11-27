@@ -6120,19 +6120,66 @@ This text is in another language, so the phone cannot read it out exactly. Ask s
 The phone can only read text written in the app language. Choose “Someone read it to me”.	ஃபோன் செயலியின் மொழியில் எழுதிய உரையை மட்டுமே படிக்க முடியும். “ஒருவர் எனக்குப் படித்துக் காட்டினார்” என்பதைத் தேர்ந்தெடுங்கள்.
 This phone has no voice for the app language. Choose “Someone read it to me”.	இந்த ஃபோனில் செயலியின் மொழிக்கான குரல் இல்லை. “ஒருவர் எனக்குப் படித்துக் காட்டினார்” என்பதைத் தேர்ந்தெடுங்கள்.
 Only someone who can edit this care record can change this.	இந்தப் பராமரிப்புப் பதிவைத் திருத்தக்கூடியவர் மட்டுமே இதை மாற்ற முடியும்.
-About the distress number	About the distress number
-How this differs from symptoms	How this differs from symptoms
-Where this thermometer comes from	Where this thermometer comes from
-Distress answers	Distress answers
-Kind of plan	Kind of plan
-Body part	Body part
-About symptom scores	About symptom scores
-How scores work	How scores work
-Choose a person	Choose a person
-Doctor or hospital number (mobile or landline)	Doctor or hospital number (mobile or landline)
-Earlier conversations	Earlier conversations
-Earlier discussions	Earlier discussions
-Choose the form	Choose the form
-Choose how often	Choose how often
-See all ($total)	See all ($total)
-Nothing matches your search.	Nothing matches your search.
+About the distress number	மன உளைச்சல் எண் பற்றி
+How this differs from symptoms	அறிகுறிகளிலிருந்து இது எப்படி வேறுபடுகிறது
+Where this thermometer comes from	இந்த அளவுமானி எங்கிருந்து வந்தது
+Distress answers	மன உளைச்சல் பதில்கள்
+Kind of plan	திட்டத்தின் வகை
+Body part	உடல் பகுதி
+About symptom scores	அறிகுறி மதிப்பெண்கள் பற்றி
+How scores work	மதிப்பெண்கள் எப்படிச் செயல்படுகின்றன
+Choose a person	ஒருவரைத் தேர்வு செய்யுங்கள்
+Doctor or hospital number (mobile or landline)	மருத்துவர் அல்லது மருத்துவமனை எண் (மொபைல் அல்லது லேண்ட்லைன்)
+Earlier conversations	முந்தைய உரையாடல்கள்
+Earlier discussions	முந்தைய கலந்துரையாடல்கள்
+Choose the form	வடிவத்தைத் தேர்வு செய்யுங்கள்
+Choose how often	எத்தனை முறை என்பதைத் தேர்வு செய்யுங்கள்
+See all ($total)	அனைத்தும் பார்க்கவும் ($total)
+Nothing matches your search.	உங்கள் தேடலுக்கு எதுவும் பொருந்தவில்லை.
+New here?	புதியவரா?
+Create your account	உங்கள் கணக்கை உருவாக்குங்கள்
+For registered doctors and nurses. We check your registration number.	பதிவுபெற்ற மருத்துவர்கள் மற்றும் செவிலியர்களுக்கு. உங்கள் பதிவு எண்ணை நாங்கள் சரிபார்ப்போம்.
+Only an email and a password. No Aadhaar.	ஒரு மின்னஞ்சலும் கடவுச்சொல்லும் மட்டும். ஆதார் தேவையில்லை.
+Sign in to see your care.	உங்கள் பராமரிப்பைப் பார்க்க உள்நுழையுங்கள்.
+or	அல்லது
+Replies	பதில்கள்
+Check-in	நலம் விசாரிப்பு
+Any distress for $about today?	இன்று $about க்கு ஏதேனும் மன உளைச்சல் உள்ளதா?
+Any distress today?	இன்று ஏதேனும் மன உளைச்சல் உள்ளதா?
+Consent to record	பதிவு செய்ய ஒப்புதல்
+Demo	டெமோ
+Palliative care, together.	நோய்த்தணிப்புப் பராமரிப்பு, ஒன்றாக.
+Comfort, dignity and your own wishes — kept in one place, for you and the people who care for you.	சௌகரியம், மரியாதை, உங்கள் சொந்த விருப்பங்கள் — எல்லாம் ஒரே இடத்தில், உங்களுக்கும் உங்களைப் பராமரிப்பவர்களுக்கும்.
+Past pain dates	முந்தைய வலியின் தேதிகள்
+Health details	உடல்நல விவரங்கள்
+Average	சராசரி
+Not scored yet	இன்னும் மதிப்பெண் இடப்படவில்லை
+Update	மாற்று
+Rate now	இப்போது தெரிவியுங்கள்
+Take care of	உங்களைக் கவனித்துக் கொள்ளுங்கள்,
+yourself today.	இன்றும்.
+Care for them,	அவர்களைக் கவனியுங்கள்,
+and for you.	உங்களையும்தான்.
+Caring for $caringFor	$caringFor அவர்களின் பராமரிப்பு
+SOS, emergency help	SOS, அவசர உதவி
+Call an ambulance or show the emergency card	ஆம்புலன்ஸை அழையுங்கள் அல்லது அவசர அட்டையைக் காட்டுங்கள்
+Note one	பதிவிடுங்கள்
+Doses	டோஸ்கள்
+Near you	உங்கள் அருகில்
+Your review	உங்கள் சரிபார்ப்பு
+Save my review	என் சரிபார்ப்பைச் சேமி
+This week	இந்த வாரம்
+has visits	சந்திப்பு உள்ளது
+No visits this day.	இந்த நாளில் சந்திப்புகள் இல்லை.
+Hide past visits	கடந்த சந்திப்புகளை மறை
+Show past visits (${past.size})	கடந்த சந்திப்புகளைப் பார் (${past.size})
+Section	பகுதி
+Section 	பகுதி 
+Doctor's note and recording	மருத்துவரின் குறிப்பும் பதிவும்
+Start or continue the discussion	கலந்துரையாடலைத் தொடங்குங்கள் அல்லது தொடருங்கள்
+Medicine activity	மருந்துச் செயல்பாடு
+Tap when taken. Hold for Not taken or Skipped.	எடுத்ததும் தட்டுங்கள். எடுக்கவில்லை அல்லது தவிர்த்தால் அழுத்திப் பிடியுங்கள்.
+Care near you	உங்கள் அருகில் பராமரிப்பு
+Step ${step + 1} of $count	படி ${step + 1} / $count
+See all (${items.size})	அனைத்தும் பார்க்கவும் (${items.size})
+Past visits	கடந்த சந்திப்புகள்

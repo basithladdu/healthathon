@@ -6120,19 +6120,66 @@ This text is in another language, so the phone cannot read it out exactly. Ask s
 The phone can only read text written in the app language. Choose “Someone read it to me”.	ફોન ફક્ત ઍપની ભાષામાં લખેલું લખાણ જ વાંચી શકે છે. “કોઈએ મને વાંચી સંભળાવ્યું” પસંદ કરો.
 This phone has no voice for the app language. Choose “Someone read it to me”.	આ ફોનમાં ઍપની ભાષાનો અવાજ નથી. “કોઈએ મને વાંચી સંભળાવ્યું” પસંદ કરો.
 Only someone who can edit this care record can change this.	આ સંભાળ રેકોર્ડમાં ફેરફાર કરી શકનાર જ આ બદલી શકે છે.
-About the distress number	About the distress number
-How this differs from symptoms	How this differs from symptoms
-Where this thermometer comes from	Where this thermometer comes from
-Distress answers	Distress answers
-Kind of plan	Kind of plan
-Body part	Body part
-About symptom scores	About symptom scores
-How scores work	How scores work
-Choose a person	Choose a person
-Doctor or hospital number (mobile or landline)	Doctor or hospital number (mobile or landline)
-Earlier conversations	Earlier conversations
-Earlier discussions	Earlier discussions
-Choose the form	Choose the form
-Choose how often	Choose how often
-See all ($total)	See all ($total)
-Nothing matches your search.	Nothing matches your search.
+About the distress number	તકલીફના આંક વિશે
+How this differs from symptoms	લક્ષણોથી આ કેવી રીતે અલગ છે
+Where this thermometer comes from	આ થર્મોમીટર ક્યાંથી આવ્યું છે
+Distress answers	તકલીફના જવાબો
+Kind of plan	આયોજનનો પ્રકાર
+Body part	શરીરનો ભાગ
+About symptom scores	લક્ષણોના આંક વિશે
+How scores work	આંક કેવી રીતે કામ કરે છે
+Choose a person	એક વ્યક્તિ પસંદ કરો
+Doctor or hospital number (mobile or landline)	ડૉક્ટર અથવા હોસ્પિટલનો નંબર (મોબાઇલ કે લેન્ડલાઇન)
+Earlier conversations	પહેલાંની વાતચીત
+Earlier discussions	પહેલાંની ચર્ચાઓ
+Choose the form	પ્રકાર પસંદ કરો
+Choose how often	કેટલી વાર તે પસંદ કરો
+See all ($total)	બધું જુઓ ($total)
+Nothing matches your search.	તમારી શોધ સાથે કંઈ મળતું નથી.
+New here?	નવા છો?
+Create your account	તમારું એકાઉન્ટ બનાવો
+For registered doctors and nurses. We check your registration number.	નોંધાયેલા ડૉક્ટર અને નર્સ માટે. અમે તમારો રજિસ્ટ્રેશન નંબર તપાસીએ છીએ.
+Only an email and a password. No Aadhaar.	ફક્ત ઇમેઇલ અને પાસવર્ડ. આધાર નહીં જોઈએ.
+Sign in to see your care.	તમારી સંભાળ જોવા માટે સાઇન ઇન કરો.
+or	અથવા
+Replies	જવાબો
+Check-in	ખબરઅંતર
+Any distress for $about today?	આજે $about ને કોઈ તકલીફ છે?
+Any distress today?	આજે કોઈ તકલીફ છે?
+Consent to record	રેકોર્ડ કરવાની સંમતિ
+Demo	ડેમો
+Palliative care, together.	પેલિએટિવ સંભાળ, સાથે મળીને.
+Comfort, dignity and your own wishes — kept in one place, for you and the people who care for you.	આરામ, સન્માન અને તમારી પોતાની ઇચ્છાઓ — બધું એક જગ્યાએ, તમારા માટે અને તમારી સંભાળ રાખનારાઓ માટે.
+Past pain dates	પહેલાંના દુખાવાની તારીખો
+Health details	આરોગ્યની વિગતો
+Average	સરેરાશ
+Not scored yet	હજી આંક આપ્યો નથી
+Update	બદલો
+Rate now	હમણાં જણાવો
+Take care of	પોતાનું ધ્યાન રાખો,
+yourself today.	આજે પણ.
+Care for them,	તેમની સંભાળ રાખો,
+and for you.	અને તમારી પણ.
+Caring for $caringFor	$caringFor ની સંભાળ
+SOS, emergency help	SOS, ઇમરજન્સી મદદ
+Call an ambulance or show the emergency card	એમ્બ્યુલન્સ બોલાવો અથવા ઇમરજન્સી કાર્ડ બતાવો
+Note one	લખો
+Doses	ડોઝ
+Near you	તમારી નજીક
+Your review	તમારી તપાસ
+Save my review	મારી તપાસ સાચવો
+This week	આ અઠવાડિયે
+has visits	મુલાકાત છે
+No visits this day.	આ દિવસે કોઈ મુલાકાત નથી.
+Hide past visits	પાછલી મુલાકાતો છુપાવો
+Show past visits (${past.size})	પાછલી મુલાકાતો જુઓ (${past.size})
+Section	ભાગ
+Section 	ભાગ 
+Doctor's note and recording	ડૉક્ટરની નોંધ અને રેકોર્ડિંગ
+Start or continue the discussion	ચર્ચા શરૂ કરો અથવા આગળ વધારો
+Medicine activity	દવાની વિગત
+Tap when taken. Hold for Not taken or Skipped.	લીધા પછી ટૅપ કરો. લીધી નથી અથવા છોડી તો દબાવી રાખો.
+Care near you	તમારી નજીક સંભાળ
+Step ${step + 1} of $count	$count માંથી પગલું ${step + 1}
+See all (${items.size})	બધું જુઓ (${items.size})
+Past visits	પાછલી મુલાકાતો

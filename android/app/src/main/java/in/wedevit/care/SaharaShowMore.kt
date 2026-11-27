@@ -140,17 +140,24 @@ internal fun <T> List<T>.shownOf(shown: MutableIntState, initial: Int = SaharaSh
     }
 }
 
+/** Closes the full-page list it is read in; a row that picks something (a date, a visit) calls it so the page does not stay open behind the choice. */
+internal val LocalShowAllClose = androidx.compose.runtime.staticCompositionLocalOf<() -> Unit> { {} }
+
 /**
- * For a card that lists many lines inside itself (all past doses, all replies): "Show all (N)" while folded, "Show less"
- * once open. Draws nothing while [total] fits in [initial]. Test tag: `<tag>-show-all`.
+ * For a card or a section that shows only its first [initial] records and keeps the rest on the full-page list (24 Nov): draws a "See all (N)" button
+ * (nothing while [items] fit in [initial]) that opens [SaharaShowAllPage] with a header, back arrow and search bar. [row] draws one record, on the card and on the page.
+ * Test tags: `<tag>-see-all`, `<tag>-all-page`, `<tag>-search`.
  */
-@Composable internal fun SaharaShowAllToggle(total: Int, expanded: Boolean, onToggle: () -> Unit, modifier: Modifier = Modifier, initial: Int = 3, tag: String = "card") {
+@Composable internal fun <T> SaharaSeeAll(items: List<T>, tag: String, title: String?, modifier: Modifier = Modifier, initial: Int = 3, searchText: ((T) -> String)? = null,
+    key: ((T) -> Any)? = null, row: @Composable (T) -> Unit) {
     val t = careText()
-    if (total <= initial) return
-    TextButton(onClick = onToggle, modifier = modifier.heightIn(min = 56.dp).testTag("$tag-show-all")) {
-        Icon(if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, Modifier.size(20.dp), tint = RustText); Spacer(Modifier.width(4.dp))
-        Text(if (expanded) t("Show less", "कम दिखाएँ") else t("Show all ($total)", "सभी दिखाएँ ($total)"), color = RustText, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+    if (items.size <= initial) return
+    var page by rememberSaveable(tag) { androidx.compose.runtime.mutableStateOf(false) }
+    TextButton(onClick = { page = true }, modifier = modifier.heightIn(min = 56.dp).testTag("$tag-see-all")) {
+        Icon(Icons.Default.ExpandMore, null, Modifier.size(20.dp), tint = RustText); Spacer(Modifier.width(4.dp))
+        Text(t("See all (${items.size})", "सभी देखें (${items.size})"), color = RustText, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
     }
+    if (page) SaharaShowAllPage(items, tag, title, searchText, key, { page = false }) { item -> row(item) }
 }
 
 /**
@@ -167,6 +174,7 @@ internal fun <T> List<T>.shownOf(shown: MutableIntState, initial: Int = SaharaSh
     }
     androidx.compose.ui.window.Dialog(onDismissRequest = onClose, properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
         androidx.compose.material3.Surface(Modifier.fillMaxSize().testTag("$tag-all-page"), color = Cream) {
+          androidx.compose.runtime.CompositionLocalProvider(LocalShowAllClose provides onClose) {
             androidx.compose.foundation.layout.Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
                 Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = onClose, modifier = Modifier.sizeIn(minWidth = 48.dp, minHeight = 48.dp).testTag("$tag-all-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) }
@@ -182,6 +190,7 @@ internal fun <T> List<T>.shownOf(shown: MutableIntState, initial: Int = SaharaSh
                     if (shownItems.isEmpty()) item { Text(t("Nothing matches your search.", "खोज से कुछ नहीं मिला।"), color = SaharaColors.InkSub) }
                 }
             }
+          }
         }
     }
 }

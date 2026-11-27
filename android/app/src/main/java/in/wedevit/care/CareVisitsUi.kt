@@ -232,10 +232,10 @@ private fun visitStatusTone(status: String): SaharaTone = if (status == "complet
             }
         }
     }
-    var allUp by rememberSaveable { mutableStateOf(false) }
     if (upcoming.isEmpty() && past.isEmpty()) { ModuleEmpty(Icons.Default.EventAvailable, t("No visits yet.", "अभी कोई मुलाक़ात नहीं।")) } else {
-        CareModuleList("visits-upcoming", if (allUp) upcoming else upcoming.take(4), t("No upcoming visits.", "आगे कोई मुलाक़ात नहीं।"), t("Upcoming", "आगे की"), { it.id }, capped = false) { CareVisitRow(it) { openId = it.id } }
-        if (upcoming.size > 4 && !allUp) TextButton({ allUp = true }, Modifier.heightIn(min = 48.dp).testTag("care-visits-show-all")) { Text(t("Show all upcoming (${upcoming.size})", "सभी आगे की मुलाक़ातें (${upcoming.size})")) }
+        CareModuleList("visits-upcoming", upcoming.take(4), t("No upcoming visits.", "आगे कोई मुलाक़ात नहीं।"), t("Upcoming", "आगे की"), { it.id }, capped = false) { CareVisitRow(it) { openId = it.id } }
+        // The other upcoming visits are on their own page (header, back, search); opening one closes the page.
+        SaharaSeeAll(upcoming, "care-visits", t("Upcoming visits", "आगे की मुलाक़ातें"), initial = 4, key = { it.id }, searchText = { "${it.title} ${it.detail}" }) { v -> val close = LocalShowAllClose.current; CareVisitRow(v) { close(); openId = v.id } }
     }
     // The selected day's visits on a timeline; visits without a time sit in "Any time" above it.
     val dayVisits = byDay[selectedDay].orEmpty()
@@ -272,10 +272,9 @@ private fun visitStatusTone(status: String): SaharaTone = if (status == "complet
     if (dayVisits.isEmpty()) Text(t("No visits this day.", "इस दिन कोई मुलाक़ात नहीं।"), fontSize = 15.sp, color = DoctorCardSub, modifier = Modifier.testTag("care-visits-day-empty"))
         if (past.isNotEmpty()) {
             var pastOpen by rememberSaveable { mutableStateOf(false) }
-            TextButton({ pastOpen = !pastOpen }, Modifier.heightIn(min = 48.dp).testTag("care-visits-show-past")) { Text(if (pastOpen) t("Hide past visits", "पहले की मुलाक़ातें छिपाएँ") else t("Show past visits (${past.size})", "पहले की मुलाक़ातें दिखाएँ (${past.size})")) }
-            AnimatedVisibility(pastOpen, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) {
-                Column { CareModuleList("visits-past", past, t("No past visits yet.", "पहले की कोई मुलाक़ात नहीं।"), t("Past", "पहले की"), { it.id }) { CareVisitRow(it) { openId = it.id } } }
-            }
+            TextButton({ pastOpen = true }, Modifier.heightIn(min = 48.dp).testTag("care-visits-show-past")) { Text(t("Show past visits (${past.size})", "पहले की मुलाक़ातें दिखाएँ (${past.size})")) }
+            // The past visits are on their own page (header, back, search); opening one closes the page.
+            if (pastOpen) SaharaShowAllPage(past, "care-visits-past", t("Past visits", "पहले की मुलाक़ातें"), { "${it.title} ${it.detail}" }, { it.id }, { pastOpen = false }) { v -> val close = LocalShowAllClose.current; CareVisitRow(v) { close(); openId = v.id } }
         }
     (upcoming + past).firstOrNull { it.id == openId }?.let { visit -> CareVisitDaySheet(vm, visit, onCalendarAt) { openId = null } }
 }

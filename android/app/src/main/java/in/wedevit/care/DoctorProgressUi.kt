@@ -68,17 +68,19 @@ import java.util.Locale
         if (report.questions.isNotEmpty()) ProgressDetailCard(t("Questions and concerns", "सवाल और चिंताएँ"), Icons.Outlined.QuestionAnswer, SaharaSoftBlue) { report.questions.forEach { Text(it, lineHeight = 23.sp) } }
         if (report.familySupport.isNotEmpty()) ProgressDetailCard(t("Family coordination", "परिवार का तालमेल"), Icons.Outlined.PeopleOutline, SaharaLavender) { report.familySupport.forEach { Text(it, lineHeight = 23.sp) } }
         if (report.medicineActivity.isNotEmpty()) ProgressDetailCard(t("Medicine activity for this day", "इस दिन की दवा गतिविधि"), Icons.Outlined.Medication, Paper) {
-            // The first three doses; "Show all" opens the rest of that day.
-            var allDoses by androidx.compose.runtime.saveable.rememberSaveable(report.id) { androidx.compose.runtime.mutableStateOf(false) }
-            (if (allDoses) report.medicineActivity else report.medicineActivity.take(3)).forEach { dose ->
-                HorizontalDivider(color = DoctorHairline)
-                Text(dose.medicineLabel, fontWeight = FontWeight.SemiBold)
-                Text(dose.status, color = RustText, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                Text(t("Planned: ${progressTimestamp(dose.scheduledAt, report.zoneId)}", "तय: ${progressTimestamp(dose.scheduledAt, report.zoneId)}"), fontSize = 14.sp)
-                Text(t("Reported taken: ", "लेने का बताया समय: ") + "${dose.reportedTakenAt?.let { progressTimestamp(it, report.zoneId) } ?: t("Not reported", "सूचना नहीं")}", fontSize = 14.sp)
-                Text(t("Logged: ", "दर्ज: ") + "${dose.loggedAt?.let { progressTimestamp(it, report.zoneId) } ?: t("Not logged", "दर्ज नहीं")}", fontSize = 14.sp)
+            // The first three doses; "See all" opens every dose of that day on its own page with search.
+            val doseRow: @Composable (DoctorHistoricalDose) -> Unit = { dose ->
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    HorizontalDivider(color = DoctorHairline)
+                    Text(dose.medicineLabel, fontWeight = FontWeight.SemiBold)
+                    Text(dose.status, color = RustText, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                    Text(t("Planned: ${progressTimestamp(dose.scheduledAt, report.zoneId)}", "तय: ${progressTimestamp(dose.scheduledAt, report.zoneId)}"), fontSize = 14.sp)
+                    Text(t("Reported taken: ", "लेने का बताया समय: ") + "${dose.reportedTakenAt?.let { progressTimestamp(it, report.zoneId) } ?: t("Not reported", "सूचना नहीं")}", fontSize = 14.sp)
+                    Text(t("Logged: ", "दर्ज: ") + "${dose.loggedAt?.let { progressTimestamp(it, report.zoneId) } ?: t("Not logged", "दर्ज नहीं")}", fontSize = 14.sp)
+                }
             }
-            SaharaShowAllToggle(report.medicineActivity.size, allDoses, { allDoses = !allDoses }, tag = "progress-doses")
+            report.medicineActivity.take(3).forEach { doseRow(it) }
+            SaharaSeeAll(report.medicineActivity, "progress-doses", t("Medicine activity", "दवा गतिविधि"), searchText = { "${it.medicineLabel} ${it.status}" }, row = doseRow)
         }
         report.linkedDiscussion?.let { discussion -> ProgressDetailCard(t("Linked discussion", "जुड़ी चर्चा"), Icons.Outlined.Forum, SaharaApricot) { Text(discussion.text, lineHeight = 24.sp) } }
         TextButton(onClick = onOpenVisits, modifier = Modifier.heightIn(min = 48.dp).testTag("progress-open-visits")) { Icon(Icons.Outlined.CalendarMonth, null, tint = Rust, modifier = Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Visits", "विज़िट"), color = Rust) }

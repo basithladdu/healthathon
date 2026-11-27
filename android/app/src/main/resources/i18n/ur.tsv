@@ -6123,19 +6123,66 @@ This text is in another language, so the phone cannot read it out exactly. Ask s
 The phone can only read text written in the app language. Choose “Someone read it to me”.	فون صرف ایپ کی زبان میں لکھا متن پڑھ سکتا ہے۔ “کسی نے مجھے پڑھ کر سنایا” چنیں۔
 This phone has no voice for the app language. Choose “Someone read it to me”.	اس فون میں ایپ کی زبان کی آواز نہیں ہے۔ “کسی نے مجھے پڑھ کر سنایا” چنیں۔
 Only someone who can edit this care record can change this.	اسے صرف وہی بدل سکتے ہیں جو اس دیکھ بھال کے ریکارڈ میں تبدیلی کر سکتے ہیں۔
-About the distress number	About the distress number
-How this differs from symptoms	How this differs from symptoms
-Where this thermometer comes from	Where this thermometer comes from
-Distress answers	Distress answers
-Kind of plan	Kind of plan
-Body part	Body part
-About symptom scores	About symptom scores
-How scores work	How scores work
-Choose a person	Choose a person
-Doctor or hospital number (mobile or landline)	Doctor or hospital number (mobile or landline)
-Earlier conversations	Earlier conversations
-Earlier discussions	Earlier discussions
-Choose the form	Choose the form
-Choose how often	Choose how often
-See all ($total)	See all ($total)
-Nothing matches your search.	Nothing matches your search.
+About the distress number	پریشانی کے نمبر کے بارے میں
+How this differs from symptoms	علامات سے یہ کیسے مختلف ہے
+Where this thermometer comes from	یہ تھرمامیٹر کہاں سے آیا ہے
+Distress answers	پریشانی کے جوابات
+Kind of plan	منصوبے کی قسم
+Body part	جسم کا حصہ
+About symptom scores	علامات کے نمبروں کے بارے میں
+How scores work	نمبر کیسے کام کرتے ہیں
+Choose a person	ایک شخص چنیں
+Doctor or hospital number (mobile or landline)	ڈاکٹر یا ہسپتال کا نمبر (موبائل یا لینڈ لائن)
+Earlier conversations	پہلے کی گفتگو
+Earlier discussions	پہلے کی بات چیت
+Choose the form	شکل چنیں
+Choose how often	کتنی بار، یہ چنیں
+See all ($total)	سب دیکھیں ($total)
+Nothing matches your search.	آپ کی تلاش سے کچھ نہیں ملا۔
+New here?	نئے ہیں؟
+Create your account	اپنا اکاؤنٹ بنائیں
+For registered doctors and nurses. We check your registration number.	رجسٹرڈ ڈاکٹروں اور نرسوں کے لیے۔ ہم آپ کا رجسٹریشن نمبر جانچتے ہیں۔
+Only an email and a password. No Aadhaar.	صرف ایک ای میل اور پاس ورڈ۔ آدھار کی ضرورت نہیں۔
+Sign in to see your care.	اپنی دیکھ بھال دیکھنے کے لیے سائن ان کریں۔
+or	یا
+Replies	جوابات
+Check-in	روز کا حال
+Any distress for $about today?	کیا آج $about کو کوئی پریشانی ہے؟
+Any distress today?	کیا آج کوئی پریشانی ہے؟
+Consent to record	ریکارڈ کرنے کی رضامندی
+Demo	ڈیمو
+Palliative care, together.	پیلی ایٹو کیئر، مل جل کر۔
+Comfort, dignity and your own wishes — kept in one place, for you and the people who care for you.	آرام، عزت اور آپ کی اپنی خواہشات — سب ایک جگہ، آپ کے لیے اور آپ کی دیکھ بھال کرنے والوں کے لیے۔
+Past pain dates	پچھلے درد کی تاریخیں
+Health details	صحت کی تفصیل
+Average	اوسط
+Not scored yet	ابھی نمبر نہیں دیا گیا
+Update	تبدیل کریں
+Rate now	ابھی بتائیں
+Take care of	اپنا خیال رکھیں،
+yourself today.	آج بھی۔
+Care for them,	ان کا خیال رکھیں،
+and for you.	اور اپنا بھی۔
+Caring for $caringFor	$caringFor کی دیکھ بھال
+SOS, emergency help	SOS، ایمرجنسی مدد
+Call an ambulance or show the emergency card	ایمبولینس بلائیں یا ایمرجنسی کارڈ دکھائیں
+Note one	لکھیں
+Doses	خوراکیں
+Near you	آپ کے قریب
+Your review	آپ کی جانچ
+Save my review	میری جانچ محفوظ کریں
+This week	اس ہفتے
+has visits	ملاقات ہے
+No visits this day.	اس دن کوئی ملاقات نہیں۔
+Hide past visits	پچھلی ملاقاتیں چھپائیں
+Show past visits (${past.size})	پچھلی ملاقاتیں دیکھیں (${past.size})
+Section	حصہ
+Section 	حصہ 
+Doctor's note and recording	ڈاکٹر کا نوٹ اور ریکارڈنگ
+Start or continue the discussion	بات چیت شروع کریں یا جاری رکھیں
+Medicine activity	دوا سرگرمی
+Tap when taken. Hold for Not taken or Skipped.	لینے کے بعد ٹیپ کریں۔ نہیں لی یا چھوڑی ہو تو دبائے رکھیں۔
+Care near you	آپ کے قریب دیکھ بھال
+Step ${step + 1} of $count	مرحلہ ${step + 1} از $count
+See all (${items.size})	سب دیکھیں (${items.size})
+Past visits	پچھلی ملاقاتیں

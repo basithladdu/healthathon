@@ -676,10 +676,9 @@ private fun authorTone(name: String, byTeam: Boolean): SaharaTone = if (byTeam) 
                 CommunityAction(if (post.hugs > 0) t("Hugs ${post.hugs}", "झप्पी ${post.hugs}") else t("Hugs", "झप्पी"), Icons.Default.Favorite, { onReact(CommunityRules.HUGS) }, post.myHugs, SaharaTone.Rose, "community-hugs")
                 CommunityAction(t("Reply", "जवाब दें"), Icons.AutoMirrored.Filled.Reply, onReplyOpen, replying, tone, "community-reply")
             }
-            // The latest three replies; "Show all" opens the rest, so one busy post does not fill the feed.
-            var allReplies by rememberSaveable(post.id) { mutableStateOf(false) }
-            SaharaShowAllToggle(post.replies.size, allReplies, { allReplies = !allReplies }, tag = "community-replies")
-            (if (allReplies) post.replies else post.replies.takeLast(3)).forEach { reply -> CommunityReplyRow(reply, now, reply.id in queuedIds, justSent == reply.id, canModerate, onReport, onRemove, onModerate) }
+            // The latest three replies; "See all" opens every reply on its own page with search, so one busy post does not fill the feed.
+            SaharaSeeAll(post.replies, "community-replies", t("Replies", "जवाब"), searchText = { "${it.name} ${it.body}" }, key = { it.id }) { reply -> CommunityReplyRow(reply, now, reply.id in queuedIds, justSent == reply.id, canModerate, onReport, onRemove, onModerate) }
+            post.replies.takeLast(3).forEach { reply -> CommunityReplyRow(reply, now, reply.id in queuedIds, justSent == reply.id, canModerate, onReport, onRemove, onModerate) }
             AnimatedVisibility(replying, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) {
                 Column(Modifier.padding(end = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(value = replyText, onValueChange = onReplyText, modifier = Modifier.fillMaxWidth().testTag("community-reply-field"),
