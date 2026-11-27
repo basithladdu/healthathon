@@ -6181,3 +6181,12 @@ Care near you	तुमच्या जवळ काळजी
 Step ${step + 1} of $count	पायरी ${step + 1} / $count
 See all (${items.size})	सर्व पहा (${items.size})
 Past visits	मागच्या भेटी
+Caregiver consensus	काळजी घेणाऱ्यांची एकमती
+The patient has capacity but has asked caregivers to decide with the team. Record the patient’s own words:	रुग्णाची निर्णयक्षमता आहे पण त्यांनी काळजी घेणाऱ्यांना टीमसोबत निर्णय घ्यायला सांगितले आहे. रुग्णाचे स्वतःचे शब्द लिहा:
+No directive and no recorded prior wishes. Decisions will be made in the patient’s best interests through caregiver consensus with the team.	कोणतीही सूचना किंवा आधी नोंदलेली इच्छा नाही. टीमसोबत काळजी घेणाऱ्यांच्या एकमतीने रुग्णाच्या हिताचे निर्णय घेतले जातील.
+The caregiver has asked that the patient not be told. Discussed with the caregiver that the patient may ask directly and will not be lied to. Caregiver understands: Yes / Not yet resolved	काळजी घेणाऱ्यांनी रुग्णाला न सांगण्याची विनंती केली आहे. रुग्ण थेट विचारू शकतात आणि त्यांच्याशी खोटे बोलले जाणार नाही, असे काळजी घेणाऱ्यांशी बोलले. काळजी घेणाऱ्यांना समजले: हो / अजून ठरले नाही
+DO NOT ATTEMPT RESUSCITATION (DNAR).	पुनरुज्जीवनाचा प्रयत्न करू नका (DNAR).
+Caregivers who must be informed before any major decision (name, relation, phone)	मोठ्या निर्णयापूर्वी कळवायलाच हवे असे काळजी घेणारे (नाव, नाते, फोन)
+Caregivers who were attempted to be contacted, but were unavailable	संपर्काचा प्रयत्न केला पण उपलब्ध नव्हते असे काळजी घेणारे
+If not, what is the frequency of assessments, and the details of the person coordinating between the patient/caregiver and the relevant hospital/centre	नसेल, तर तपासणी किती वेळा होते, आणि रुग्ण/काळजी घेणारे व संबंधित रुग्णालय/केंद्र यांच्यात समन्वय करणाऱ्या व्यक्तीची माहिती
+Do not attempt resuscitation (DNAR)	पुनरुज्जीवनाचा प्रयत्न करू नका (DNAR)

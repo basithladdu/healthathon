@@ -6183,3 +6183,12 @@ Care near you	আপনার কাছে যত্ন
 Step ${step + 1} of $count	$count-এর মধ্যে ধাপ ${step + 1}
 See all (${items.size})	সব দেখুন (${items.size})
 Past visits	আগের সাক্ষাৎ
+Caregiver consensus	দেখাশোনাকারীদের সম্মিলিত মত
+The patient has capacity but has asked caregivers to decide with the team. Record the patient’s own words:	রোগীর সিদ্ধান্তের ক্ষমতা আছে, কিন্তু দেখাশোনাকারীদের দলের সঙ্গে সিদ্ধান্ত নিতে বলেছেন। রোগীর নিজের কথা লিখুন:
+No directive and no recorded prior wishes. Decisions will be made in the patient’s best interests through caregiver consensus with the team.	কোনো নির্দেশনা বা আগের লেখা ইচ্ছা নেই। দলের সঙ্গে দেখাশোনাকারীদের সম্মিলিত মতে রোগীর মঙ্গলের কথা ভেবে সিদ্ধান্ত হবে।
+The caregiver has asked that the patient not be told. Discussed with the caregiver that the patient may ask directly and will not be lied to. Caregiver understands: Yes / Not yet resolved	দেখাশোনাকারীরা চান রোগীকে যেন বলা না হয়। দেখাশোনাকারীদের বলা হয়েছে রোগী সরাসরি জিজ্ঞেস করতে পারেন আর তাঁকে মিথ্যা বলা হবে না। দেখাশোনাকারীরা বুঝেছেন: হ্যাঁ / এখনও মেটেনি
+DO NOT ATTEMPT RESUSCITATION (DNAR).	পুনরুজ্জীবনের চেষ্টা করবেন না (DNAR)।
+Caregivers who must be informed before any major decision (name, relation, phone)	বড় কোনো সিদ্ধান্তের আগে যে দেখাশোনাকারীদের জানাতেই হবে (নাম, সম্পর্ক, ফোন)
+Caregivers who were attempted to be contacted, but were unavailable	যে দেখাশোনাকারীদের সঙ্গে যোগাযোগের চেষ্টা হয়েছিল, কিন্তু পাওয়া যায়নি
+If not, what is the frequency of assessments, and the details of the person coordinating between the patient/caregiver and the relevant hospital/centre	না হলে, কত দিন পর পর দেখা হয়, আর রোগী/দেখাশোনাকারী ও হাসপাতাল/কেন্দ্রের মধ্যে যোগাযোগ রাখেন যিনি তাঁর বিবরণ
+Do not attempt resuscitation (DNAR)	পুনরুজ্জীবনের চেষ্টা করবেন না (DNAR)

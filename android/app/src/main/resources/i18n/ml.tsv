@@ -6183,3 +6183,12 @@ Care near you	നിങ്ങളുടെ അടുത്ത് പരിചര�
 Step ${step + 1} of $count	ഘട്ടം ${step + 1} / $count
 See all (${items.size})	എല്ലാം കാണുക (${items.size})
 Past visits	കഴിഞ്ഞ സന്ദർശനങ്ങൾ
+Caregiver consensus	പരിചാരകരുടെ പൊതു തീരുമാനം
+The patient has capacity but has asked caregivers to decide with the team. Record the patient’s own words:	രോഗിക്ക് തീരുമാനശേഷിയുണ്ട്, പക്ഷേ ടീമുമായി ചേർന്ന് തീരുമാനിക്കാൻ പരിചാരകരോട് ആവശ്യപ്പെട്ടു. രോഗിയുടെ സ്വന്തം വാക്കുകൾ എഴുതുക:
+No directive and no recorded prior wishes. Decisions will be made in the patient’s best interests through caregiver consensus with the team.	നിർദ്ദേശമോ മുമ്പ് രേഖപ്പെടുത്തിയ ആഗ്രഹങ്ങളോ ഇല്ല. ടീമുമായി ചേർന്ന് പരിചാരകരുടെ പൊതു തീരുമാനത്തിലൂടെ രോഗിയുടെ നന്മയ്ക്കായി തീരുമാനങ്ങൾ എടുക്കും.
+The caregiver has asked that the patient not be told. Discussed with the caregiver that the patient may ask directly and will not be lied to. Caregiver understands: Yes / Not yet resolved	രോഗിയോട് പറയരുതെന്ന് പരിചാരകർ ആവശ്യപ്പെട്ടു. രോഗി നേരിട്ട് ചോദിച്ചേക്കാം, കള്ളം പറയില്ല എന്ന് പരിചാരകരുമായി സംസാരിച്ചു. പരിചാരകർക്ക് മനസ്സിലായി: ഉവ്വ് / ഇതുവരെ തീർപ്പായില്ല
+DO NOT ATTEMPT RESUSCITATION (DNAR).	പുനരുജ്ജീവന ശ്രമം നടത്തരുത് (DNAR).
+Caregivers who must be informed before any major decision (name, relation, phone)	വലിയ തീരുമാനത്തിന് മുമ്പ് അറിയിക്കേണ്ട പരിചാരകർ (പേര്, ബന്ധം, ഫോൺ)
+Caregivers who were attempted to be contacted, but were unavailable	ബന്ധപ്പെടാൻ ശ്രമിച്ചെങ്കിലും ലഭ്യമല്ലാതിരുന്ന പരിചാരകർ
+If not, what is the frequency of assessments, and the details of the person coordinating between the patient/caregiver and the relevant hospital/centre	ഇല്ലെങ്കിൽ, എത്ര ഇടവിട്ട് വിലയിരുത്തുന്നു, രോഗി/പരിചാരകർക്കും ആശുപത്രി/കേന്ദ്രത്തിനും ഇടയിൽ ഏകോപിപ്പിക്കുന്നയാളുടെ വിവരങ്ങൾ
+Do not attempt resuscitation (DNAR)	പുനരുജ്ജീവന ശ്രമം നടത്തരുത് (DNAR)

@@ -6183,3 +6183,12 @@ Care near you	તમારી નજીક સંભાળ
 Step ${step + 1} of $count	$count માંથી પગલું ${step + 1}
 See all (${items.size})	બધું જુઓ (${items.size})
 Past visits	પાછલી મુલાકાતો
+Caregiver consensus	સંભાળ રાખનારાઓની સહમતિ
+The patient has capacity but has asked caregivers to decide with the team. Record the patient’s own words:	દર્દી ક્ષમતા ધરાવે છે પણ સંભાળ રાખનારાઓને ટીમ સાથે નિર્ણય લેવા કહ્યું છે. દર્દીના પોતાના શબ્દો નોંધો:
+No directive and no recorded prior wishes. Decisions will be made in the patient’s best interests through caregiver consensus with the team.	કોઈ નિર્દેશ નથી અને અગાઉની ઇચ્છાઓ નોંધાયેલી નથી. ટીમ સાથે સંભાળ રાખનારાઓની સહમતિથી દર્દીના હિતમાં નિર્ણયો લેવાશે.
+The caregiver has asked that the patient not be told. Discussed with the caregiver that the patient may ask directly and will not be lied to. Caregiver understands: Yes / Not yet resolved	સંભાળ રાખનારાઓએ કહ્યું છે કે દર્દીને ન જણાવવું. સંભાળ રાખનારાઓ સાથે ચર્ચા થઈ કે દર્દી સીધું પૂછી શકે છે અને તેમને ખોટું નહીં કહેવાય. સંભાળ રાખનારાઓ સમજે છે: હા / હજુ નક્કી નથી
+DO NOT ATTEMPT RESUSCITATION (DNAR).	પુનર્જીવનનો પ્રયાસ ન કરો (DNAR).
+Caregivers who must be informed before any major decision (name, relation, phone)	કોઈ મોટા નિર્ણય પહેલાં જેમને જાણ કરવી જ પડે એવા સંભાળ રાખનારાઓ (નામ, સંબંધ, ફોન)
+Caregivers who were attempted to be contacted, but were unavailable	જે સંભાળ રાખનારાઓનો સંપર્ક કરવાનો પ્રયાસ થયો, પણ મળ્યા નહીં
+If not, what is the frequency of assessments, and the details of the person coordinating between the patient/caregiver and the relevant hospital/centre	જો નહીં, તો તપાસ કેટલી વાર થાય છે, અને દર્દી/સંભાળ રાખનાર તથા હોસ્પિટલ/કેન્દ્ર વચ્ચે સંકલન કરનાર વ્યક્તિની વિગતો
+Do not attempt resuscitation (DNAR)	પુનર્જીવનનો પ્રયાસ ન કરો (DNAR)

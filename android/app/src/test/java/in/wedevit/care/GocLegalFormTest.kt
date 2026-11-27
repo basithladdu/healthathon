@@ -14,15 +14,15 @@ class GocLegalFormTest {
         val r = r0.copy(choices = r0.choices.copy(respCeiling = 1, maxOxygenLpm = 2.0, hospitalTransfer = HospitalTransfer(TransferKind.ONLY_FOR, listOf(TransferReason.PAIN))))
         val note = text(r, listOf(GocFormSigner("DOCTOR", "Dr Sample", "2026-11-04T10:00:00Z", "REG-1"))).lowercase()
         val form = listOf("Section I – General information", "Patient details", "Age, Sex, Gender", "Physician details", "Primary Oncologist name and hospital – and contact",
-            "Additional space for the team", "Additional option to add a local physician", "Family/Friend details", "Members present for discussion", "Language preferred",
+            "Additional space for the team", "Additional option to add a local physician", "Caregiver details", "Members present for discussion", "Language preferred",
             "|  | PRIMARY | SECONDARY |", "Phone (must be reachable 24 h)", "Basis for authority", "Named by patient", "Court-appointed",
-            "Family members who must be informed before any major decision", "attempted to be contacted",
+            "Caregivers who must be informed before any major decision", "attempted to be contacted",
             "Section II – Preliminary medical information and patient values", "Primary diagnosis and stage", "Functional status – ECOG", "2.1  The patient’s capacity, now",
             "Capacity fluctuates", "2.2  Existing directives", "Attested by Notary", "with two witnesses", "2.3  What the patient knows", "will not be lied to", "2.4  In their own words",
             "The most distressing physical symptom right now is", "What I am most afraid of is: Not discussed", "Unfinished things that matter", "2.5  Outcomes that would be unacceptable",
             "Exhausting the family’s savings", "Section III – Decisive Actions", "Home care (if relevant)", "Should the patient be brought to the hospital?", "☑ ONLY FOR THE FOLLOWING",
             "☑     Pain that cannot be controlled at home", "Caregiver unable to cope — respite admission", "NO — the patient is to be cared for where they are.", "frequency of assessments",
-            "non-governmental organisation", "previously admitted", "Should CPR be performed?", "ATTEMPT CPR.", "DO NOT ATTEMPT CPR (DNACPR).", "Reason recorded (clinical futility",
+            "non-governmental organisation", "previously admitted", "Should CPR be performed?", "ATTEMPT CPR.", "DO NOT ATTEMPT RESUSCITATION (DNAR).", "Reason recorded (clinical futility",
             "Discussed with (patient / surrogate / both)", "| LEVEL | WHAT IT MEANS FOR THE PATIENT | CEILING |", "Low-flow oxygen up to 2 L/min", "Other parameters", "Dialysis or CRRT",
             "Only if the renal failure is judged reversible", "Others", "Requirement of ICU?", "Vasopressors / inotropes", "no escalation beyond ____ agents", "3.6  Feeding",
             "☑ Comfort feeding by mouth only", "Nasogastric (Ryle’s) tube", "Gastrostomy (PEG)", "A. PRIORITISE LIFE", "B. BALANCED / CEILING OF CARE", "C. PRIORITISE COMFORT",

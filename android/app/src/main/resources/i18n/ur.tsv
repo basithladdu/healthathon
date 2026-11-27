@@ -6186,3 +6186,12 @@ Care near you	آپ کے قریب دیکھ بھال
 Step ${step + 1} of $count	مرحلہ ${step + 1} از $count
 See all (${items.size})	سب دیکھیں (${items.size})
 Past visits	پچھلی ملاقاتیں
+Caregiver consensus	دیکھ بھال کرنے والوں کا اتفاقِ رائے
+The patient has capacity but has asked caregivers to decide with the team. Record the patient’s own words:	مریض فیصلہ کرنے کی اہلیت رکھتا ہے لیکن اس نے دیکھ بھال کرنے والوں سے کہا ہے کہ ٹیم کے ساتھ مل کر فیصلہ کریں۔ مریض کے اپنے الفاظ درج کریں:
+No directive and no recorded prior wishes. Decisions will be made in the patient’s best interests through caregiver consensus with the team.	کوئی ہدایت نہیں اور کوئی درج شدہ سابقہ خواہشات نہیں۔ فیصلے ٹیم کے ساتھ دیکھ بھال کرنے والوں کے اتفاقِ رائے سے مریض کے بہترین مفاد میں کیے جائیں گے۔
+The caregiver has asked that the patient not be told. Discussed with the caregiver that the patient may ask directly and will not be lied to. Caregiver understands: Yes / Not yet resolved	دیکھ بھال کرنے والوں نے درخواست کی ہے کہ مریض کو نہ بتایا جائے۔ دیکھ بھال کرنے والوں سے بات کی گئی کہ مریض براہِ راست پوچھ سکتا ہے اور اس سے جھوٹ نہیں بولا جائے گا۔ دیکھ بھال کرنے والے سمجھتے ہیں: ہاں / ابھی حل نہیں ہوا
+DO NOT ATTEMPT RESUSCITATION (DNAR).	دل اور سانس بحال کرنے کی کوشش نہ کریں (DNAR)۔
+Caregivers who must be informed before any major decision (name, relation, phone)	وہ دیکھ بھال کرنے والے جنہیں کسی بھی بڑے فیصلے سے پہلے مطلع کرنا ضروری ہے (نام، رشتہ، فون)
+Caregivers who were attempted to be contacted, but were unavailable	وہ دیکھ بھال کرنے والے جن سے رابطے کی کوشش کی گئی، لیکن دستیاب نہیں تھے
+If not, what is the frequency of assessments, and the details of the person coordinating between the patient/caregiver and the relevant hospital/centre	اگر نہیں، تو جائزوں کی تعداد کتنی بار ہے، اور مریض/دیکھ بھال کرنے والے اور متعلقہ اسپتال/مرکز کے درمیان رابطہ کار شخص کی تفصیلات
+Do not attempt resuscitation (DNAR)	دل اور سانس بحال کرنے کی کوشش نہ کریں (DNAR)

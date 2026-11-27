@@ -777,7 +777,7 @@ object GocForm {
         TransferReason.CAREGIVER_RESPITE -> Bi("Caregiver unable to cope — respite admission", "देखभाल करने वाला संभाल नहीं पा रहा — राहत के लिए भर्ती")
     }
     private fun authority(a: AuthorityBasis): Bi = when (a) {
-        AuthorityBasis.NAMED_BY_PATIENT -> Bi("Named by patient", "मरीज़ द्वारा नामित"); AuthorityBasis.NEXT_OF_KIN -> Bi("Family consensus", "परिवार की सहमति")
+        AuthorityBasis.NAMED_BY_PATIENT -> Bi("Named by patient", "मरीज़ द्वारा नामित"); AuthorityBasis.NEXT_OF_KIN -> Bi("Caregiver consensus", "देखभाल करने वालों की सहमति")
         AuthorityBasis.NAMED_IN_AMD -> Bi("Named in AMD", "AMD में नामित"); AuthorityBasis.COURT_APPOINTED -> Bi("Court-appointed", "अदालत द्वारा नियुक्त")
     }
     private val AUTHORITY_ORDER = listOf(AuthorityBasis.NAMED_BY_PATIENT, AuthorityBasis.NEXT_OF_KIN, AuthorityBasis.NAMED_IN_AMD, AuthorityBasis.COURT_APPOINTED)
@@ -811,7 +811,7 @@ object GocForm {
         ))
         val capacityTicks = listOf(
             tk(cap.status == Capacity.HAS, Bi("The patient has capacity for these decisions and has completed this record themselves.", "मरीज़ में इन फ़ैसलों की क्षमता है और उन्होंने यह रिकॉर्ड ख़ुद भरा।")),
-            tk(cap.status == Capacity.HAS_DELEGATED, Bi("The patient has capacity but has asked family to decide with the team. Record the patient’s own words:", "मरीज़ में क्षमता है, पर उन्होंने परिवार से टीम के साथ फ़ैसला करने को कहा। मरीज़ के अपने शब्द:"), cap.basis.takeIf { cap.status == Capacity.HAS_DELEGATED }),
+            tk(cap.status == Capacity.HAS_DELEGATED, Bi("The patient has capacity but has asked caregivers to decide with the team. Record the patient’s own words:", "मरीज़ में क्षमता है, पर उन्होंने देखभाल करने वालों से टीम के साथ फ़ैसला करने को कहा। मरीज़ के अपने शब्द:"), cap.basis.takeIf { cap.status == Capacity.HAS_DELEGATED }),
             tk(cap.status == Capacity.FLUCTUATES, Bi("Capacity fluctuates. Assessed by: ____ on ____. Re-assess before acting on any section.", "क्षमता बदलती रहती है। किसने जाँचा: ____ कब: ____। किसी भी भाग पर अमल से पहले दोबारा जाँचें।"), listOf(cap.assessor, cap.assessedOn).filter(String::isNotBlank).joinToString(" · ").takeIf { cap.status == Capacity.FLUCTUATES }),
             tk(cap.status == Capacity.LACKS, Bi("The patient lacks capacity for these decisions. Basis of assessment (understand / retain / weigh / communicate):", "मरीज़ में इन फ़ैसलों की क्षमता नहीं है। जाँच का आधार (समझना / याद रखना / तौलना / बताना):"), cap.basis.takeIf { cap.status == Capacity.LACKS }),
         )
@@ -823,25 +823,24 @@ object GocForm {
             tk(amd?.twoWitnesses == true, indent(Bi("With two witnesses? Yes. If yes, this ECTPR must be read as subordinate to it — the directive governs; this record operationalises it.", "दो गवाहों के साथ? हाँ। अगर हाँ, तो यह ECTPR उसके अधीन है — डायरेक्टिव ही मान्य है; यह रिकॉर्ड उसे लागू करता है।"))),
             tk(amd?.twoWitnesses == false, indent(Bi("With two witnesses? No.", "दो गवाहों के साथ? नहीं।"))),
             tk(dir?.kind == DirectiveKind.PRIOR_WISHES, Bi("There is no directive, but the patient previously expressed clear wishes. Recorded here, with who heard them and when:", "कोई डायरेक्टिव नहीं, पर मरीज़ ने पहले साफ़ इच्छाएँ बताई थीं। यहाँ दर्ज, किसने और कब सुनीं:"), dir?.note?.takeIf { dir?.kind == DirectiveKind.PRIOR_WISHES }),
-            tk(dir?.kind == DirectiveKind.NONE, Bi("No directive and no recorded prior wishes. Decisions will be made in the patient’s best interests through family consensus with the team.", "न डायरेक्टिव, न पहले की दर्ज इच्छाएँ। फ़ैसले मरीज़ के हित में, परिवार और टीम की सहमति से होंगे।")),
+            tk(dir?.kind == DirectiveKind.NONE, Bi("No directive and no recorded prior wishes. Decisions will be made in the patient’s best interests through caregiver consensus with the team.", "न डायरेक्टिव, न पहले की दर्ज इच्छाएँ। फ़ैसले मरीज़ के हित में, देखभाल करने वालों और टीम की सहमति से होंगे।")),
         )
         // Each box ticks only from its own recorded field; nothing is guessed.
         val knowsTicks = listOf(
             tk(v.knowsPrognosis, Bi("The patient knows the diagnosis and the prognosis.", "मरीज़ बीमारी और आगे क्या होगा, दोनों जानते हैं।")),
             tk(v.patientKnows == true, Bi("The patient knows the diagnosis but not the prognosis.", "मरीज़ बीमारी जानते हैं, पर आगे क्या होगा यह नहीं।")),
-            tk(v.familyAskedNotToTell, Bi("The family has asked that the patient not be told. Discussed with the family that the patient may ask directly and will not be lied to. Family understands: Yes / Not yet resolved", "परिवार ने कहा कि मरीज़ को न बताया जाए। परिवार से बात हुई कि मरीज़ सीधे पूछ सकते हैं और उनसे झूठ नहीं बोला जाएगा। परिवार समझता है: हाँ / अभी तय नहीं"), v.directQuestionPlan.takeIf { v.familyAskedNotToTell }),
+            tk(v.familyAskedNotToTell, Bi("The caregiver has asked that the patient not be told. Discussed with the caregiver that the patient may ask directly and will not be lied to. Caregiver understands: Yes / Not yet resolved", "देखभाल करने वाले ने कहा कि मरीज़ को न बताया जाए। देखभाल करने वाले से बात हुई कि मरीज़ सीधे पूछ सकते हैं और उनसे झूठ नहीं बोला जाएगा। देखभाल करने वाले समझते हैं: हाँ / अभी तय नहीं"), v.directQuestionPlan.takeIf { v.familyAskedNotToTell }),
             tk(v.doesNotWishToKnow, Bi("The patient has said they do not wish to know details and has delegated:", "मरीज़ ने कहा कि वे विस्तार नहीं जानना चाहते और यह सौंपा:")),
         )
         val outcomes = v.unacceptableOutcomes.map(GocExtract::withoutSoundCaptions).map(String::trim).filter(String::isNotBlank)
         val other = outcomes.filter { o -> UNACCEPTABLE.none { same(o, it.en) || same(o, it.hi) } }
         val outcomeTicks = UNACCEPTABLE.map { u -> tk(outcomes.any { same(it, u.en) || same(it, u.hi) }, u) } + tk(other.isNotEmpty(), Bi("Other:", "अन्य:"), other.joinToString("; "))
-        fun firstOn(ticks: List<GocFormTick>) = ticks.firstOrNull { it.on }?.let { Bi.join("", listOf(it.text, Bi.plain(if (it.detail.isBlank()) "" else " " + it.detail))) }
         val tr = c.hospitalTransfer
         val transferTicks = listOf(tk(tr?.kind == TransferKind.ANY, Bi("YES — for any significant deterioration.", "हाँ — किसी भी गंभीर बिगड़ने पर।")),
             tk(tr?.kind == TransferKind.ONLY_FOR, Bi("ONLY FOR THE FOLLOWING (tick each that applies):", "केवल इनके लिए (जो लागू हों उन पर निशान):"))) +
             TransferReason.entries.map { x -> GocFormTick(indent(reason(x)), tr?.kind == TransferKind.ONLY_FOR && x in tr!!.reasons) } +
             listOf(tk(false, indent(Bi("Other:", "अन्य:"))), tk(tr?.kind == TransferKind.NO, Bi("NO — the patient is to be cared for where they are.", "नहीं — मरीज़ की देखभाल वहीं होगी जहाँ वे हैं।")))
-        val cprTicks = listOf(tk(c.cpr == Cpr.ATTEMPT, Bi("ATTEMPT CPR.", "CPR करें।")), tk(c.cpr == Cpr.DNACPR, Bi("DO NOT ATTEMPT CPR (DNACPR).", "CPR न करें (DNACPR)।")))
+        val cprTicks = listOf(tk(c.cpr == Cpr.ATTEMPT, Bi("ATTEMPT CPR.", "CPR करें।")), tk(c.cpr == Cpr.DNACPR, Bi("DO NOT ATTEMPT RESUSCITATION (DNAR).", "पुनर्जीवन का प्रयास न करें (DNAR)।")))
         val reasonText = when (c.dnacprReason) { DnacprReason.FUTILITY -> "clinical futility"; DnacprReason.PATIENT_REFUSAL -> "patient refusal"; DnacprReason.BURDEN_OUTWEIGHS_BENEFIT -> "burden outweighs benefit"; null -> "" }
         val ceiling = c.respCeiling
         val oxygen = GocFormTable(listOf(Bi("LEVEL", "स्तर"), Bi("WHAT IT MEANS FOR THE PATIENT", "मरीज़ के लिए इसका मतलब"), Bi("CEILING", "सबसे ऊँचा स्तर")), OXYGEN_LEVELS.mapIndexed { level, (name, meaning) ->
@@ -888,21 +887,18 @@ object GocForm {
                     field(Bi("Palliative care physician name and hospital – and contact", "पैलिएटिव केयर डॉक्टर का नाम और अस्पताल – और संपर्क"), listOf(r.careTeam.palliativePhysician, r.careTeam.palliativePhone24h).filter(String::isNotBlank).joinToString(" · ")),
                     field(Bi("Additional space for the team – Surgical oncology, radiation oncology, etc.", "टीम के लिए और जगह – सर्जिकल ऑन्कोलॉजी, रेडिएशन ऑन्कोलॉजी आदि"), r.careTeam.extraTeam.filter(String::isNotBlank).joinToString("; ")),
                     field(Bi("Additional option to add a local physician who can be briefed about the care and part of the team", "स्थानीय डॉक्टर जिन्हें देखभाल के बारे में बताया जा सके और जो टीम में हों"), r.careTeam.localDoctor))),
-                GocFormGroup(Bi("Family/Friend details", "परिवार/दोस्तों की जानकारी"), listOf(
+                GocFormGroup(Bi("Caregiver details", "देखभाल करने वालों की जानकारी"), listOf(
                     field(Bi("Members present for discussion and relationship with the patient", "बातचीत में मौजूद सदस्य और मरीज़ से रिश्ता"), dm.presentAtDiscussion.filter(String::isNotBlank).joinToString("; ")),
                     field(Bi("Language preferred", "पसंद की भाषा"), p.languagePref))),
                 GocFormGroup(Bi("Primary decision maker and contact details · Secondary decision maker and contact details", "मुख्य फ़ैसला लेने वाले और संपर्क · द्वितीय फ़ैसला लेने वाले और संपर्क"), table = dmTable),
-                GocFormGroup(Bi("Family members who must be informed before any major decision (name, relation, phone)", "जिन परिवार वालों को किसी बड़े फ़ैसले से पहले बताना ज़रूरी है (नाम, रिश्ता, फ़ोन)"), listOf(
+                GocFormGroup(Bi("Caregivers who must be informed before any major decision (name, relation, phone)", "जिन देखभाल करने वालों को किसी बड़े फ़ैसले से पहले बताना ज़रूरी है (नाम, रिश्ता, फ़ोन)"), listOf(
                     field(Bi("Name, relation, phone", "नाम, रिश्ता, फ़ोन"), dm.familyToInform.filter(String::isNotBlank).joinToString("; ")),
-                    field(Bi("Family/friends who were attempted to be contacted, but were unavailable", "परिवार/दोस्त जिनसे संपर्क की कोशिश हुई, पर नहीं मिले"), dm.attemptedContact.filter(String::isNotBlank).joinToString("; ")))),
+                    field(Bi("Caregivers who were attempted to be contacted, but were unavailable", "देखभाल करने वाले जिनसे संपर्क की कोशिश हुई, पर नहीं मिले"), dm.attemptedContact.filter(String::isNotBlank).joinToString("; ")))),
             )),
             GocFormSection("II", Bi("Section II – Preliminary medical information and patient values", "भाग II – शुरुआती चिकित्सा जानकारी और मरीज़ के मूल्य"), listOf(
                 GocFormGroup(Bi.plain(""), listOf(
                     field(Bi("Primary diagnosis and stage", "मुख्य बीमारी और स्टेज"), listOf(r.clinical.diagnosis, r.clinical.stage).filter(String::isNotBlank).joinToString(" · ")),
                     field(Bi("Functional status – ECOG", "काम करने की क्षमता – ECOG"), r.clinical.ecog?.toString()),
-                    firstOn(capacityTicks)?.let { GocFormRow(Bi("Patient’s capacity", "मरीज़ की क्षमता"), it) } ?: GocFormRow(Bi("Patient’s capacity", "मरीज़ की क्षमता"), NOT_DISCUSSED, open = true),
-                    firstOn(directiveTicks)?.let { GocFormRow(Bi("Existing medical directives", "पहले के चिकित्सा निर्देश"), it) } ?: GocFormRow(Bi("Existing medical directives", "पहले के चिकित्सा निर्देश"), NOT_DISCUSSED, open = true),
-                    firstOn(knowsTicks)?.let { GocFormRow(Bi("What the patient knows", "मरीज़ क्या जानते हैं"), it) } ?: GocFormRow(Bi("What the patient knows", "मरीज़ क्या जानते हैं"), NOT_DISCUSSED, open = true),
                 )),
                 GocFormGroup(Bi("The patient’s capacity, now", "मरीज़ की अभी की क्षमता"), listOf(boxes(blank, capacityTicks, NOT_DISCUSSED))),
                 GocFormGroup(Bi("Existing directives", "पहले के निर्देश"), listOf(boxes(blank, directiveTicks, NOT_DISCUSSED))),
@@ -917,7 +913,7 @@ object GocForm {
             GocFormSection("III", Bi("Section III – Decisive Actions", "भाग III – निर्णायक फ़ैसले"), listOf(
                 GocFormGroup(Bi("Home care (if relevant)", "घर पर देखभाल (अगर लागू हो)"), listOf(
                     decision(Bi("Should the patient be brought to the hospital? (To inform any doctor that has been called to the home for evaluation)", "क्या मरीज़ को अस्पताल लाया जाए? (घर पर जाँच के लिए बुलाए गए किसी भी डॉक्टर को बताने के लिए)"), GocDecision.TRANSFER, transferTicks),
-                    field(Bi("If not, what is the frequency of assessments, and the details of the person coordinating between the patient/family and the relevant hospital/centre", "अगर नहीं, तो जाँच कितनी बार होगी, और मरीज़/परिवार और अस्पताल/केंद्र के बीच तालमेल रखने वाले व्यक्ति की जानकारी"), listOfNotNull(h?.assessmentFrequency, h?.coordinator).filter(String::isNotBlank).joinToString(" · ")),
+                    field(Bi("If not, what is the frequency of assessments, and the details of the person coordinating between the patient/caregiver and the relevant hospital/centre", "अगर नहीं, तो जाँच कितनी बार होगी, और मरीज़/देखभाल करने वाले और अस्पताल/केंद्र के बीच तालमेल रखने वाले व्यक्ति की जानकारी"), listOfNotNull(h?.assessmentFrequency, h?.coordinator).filter(String::isNotBlank).joinToString(" · ")),
                     field(Bi("If a non-governmental organisation has been taking care of the patients, contact details of their representative + declaration confirming consultation with the NGO", "अगर कोई ग़ैर-सरकारी संस्था मरीज़ की देखभाल कर रही है, तो उसके प्रतिनिधि का संपर्क + संस्था से सलाह की पुष्टि"), h?.ngoContact?.takeIf(String::isNotBlank)?.let { it + if (h?.ngoConsulted == true) " · $TICK_ON NGO consulted" else "" }),
                     field(Bi("Had they been previously admitted to any hospital for the current condition?", "क्या इसी बीमारी के लिए पहले किसी अस्पताल में भर्ती हुए थे?"), when (h?.previousAdmission) { true -> "Yes" + h?.previousAdmissionDetails.orEmpty().takeIf(String::isNotBlank)?.let { ": $it" }.orEmpty(); false -> "No"; null -> null }))),
                 GocFormGroup(Bi("Should CPR be performed?", "क्या CPR किया जाए?"), listOf(
@@ -935,7 +931,7 @@ object GocForm {
                     GocFormRow(blank, blank, ticks = listOf(tk(true, Bi("Comfort feeding by mouth only — careful hand feeding, sips, tastes, favourite foods, no volume target, no forcing. Mouth care given regardless.", "केवल मुँह से आराम के लिए खाना — ध्यान से हाथ से खिलाना, घूँट, स्वाद, पसंद का खाना, कोई मात्रा लक्ष्य नहीं, कोई ज़बरदस्ती नहीं। मुँह की देखभाल हर हाल में।")))),
                     decision(Bi("Nasogastric (Ryle’s) tube", "नाक की नली (राइल्स ट्यूब)"), GocDecision.FEEDING_NG, ngTicks),
                     decision(Bi("Gastrostomy (PEG)", "पेट की नली (PEG)"), GocDecision.FEEDING_PEG, pegTicks))),
-                GocFormGroup(Bi("Goal of care", "देखभाल का लक्ष्य"), listOf(decision(Bi("A, B or C", "A, B या C"), GocDecision.GOAL, goalTicks))),
+                GocFormGroup(Bi("Goal of care", "देखभाल का लक्ष्य"), listOf(decision(blank, GocDecision.GOAL, goalTicks))),
             )),
             GocFormSection("IV", Bi("Section IV – Signatures and declarations", "भाग IV – हस्ताक्षर और घोषणाएँ"), listOf(
                 GocFormGroup(Bi("Patient", "मरीज़"), table = GocFormTable(listOf(

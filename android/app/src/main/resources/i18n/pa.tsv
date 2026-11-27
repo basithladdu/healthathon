@@ -6183,3 +6183,12 @@ Care near you	ਤੁਹਾਡੇ ਨੇੜੇ ਦੇਖਭਾਲ
 Step ${step + 1} of $count	$count ਵਿੱਚੋਂ ਕਦਮ ${step + 1}
 See all (${items.size})	ਸਭ ਦੇਖੋ (${items.size})
 Past visits	ਪਿਛਲੀਆਂ ਮੁਲਾਕਾਤਾਂ
+Caregiver consensus	ਦੇਖਭਾਲ ਕਰਨ ਵਾਲਿਆਂ ਦੀ ਸਾਂਝੀ ਰਾਏ
+The patient has capacity but has asked caregivers to decide with the team. Record the patient’s own words:	ਮਰੀਜ਼ ਵਿੱਚ ਸਮਰੱਥਾ ਹੈ ਪਰ ਉਸ ਨੇ ਦੇਖਭਾਲ ਕਰਨ ਵਾਲਿਆਂ ਨੂੰ ਟੀਮ ਨਾਲ ਫ਼ੈਸਲਾ ਕਰਨ ਲਈ ਕਿਹਾ ਹੈ। ਮਰੀਜ਼ ਦੇ ਆਪਣੇ ਸ਼ਬਦ ਲਿਖੋ:
+No directive and no recorded prior wishes. Decisions will be made in the patient’s best interests through caregiver consensus with the team.	ਕੋਈ ਲਿਖਤੀ ਹਦਾਇਤ ਨਹੀਂ ਅਤੇ ਪਹਿਲਾਂ ਦੀ ਕੋਈ ਦਰਜ ਇੱਛਾ ਨਹੀਂ। ਫ਼ੈਸਲੇ ਮਰੀਜ਼ ਦੇ ਭਲੇ ਲਈ, ਟੀਮ ਨਾਲ ਦੇਖਭਾਲ ਕਰਨ ਵਾਲਿਆਂ ਦੀ ਸਾਂਝੀ ਰਾਏ ਰਾਹੀਂ ਕੀਤੇ ਜਾਣਗੇ।
+The caregiver has asked that the patient not be told. Discussed with the caregiver that the patient may ask directly and will not be lied to. Caregiver understands: Yes / Not yet resolved	ਦੇਖਭਾਲ ਕਰਨ ਵਾਲਿਆਂ ਨੇ ਕਿਹਾ ਹੈ ਕਿ ਮਰੀਜ਼ ਨੂੰ ਨਾ ਦੱਸਿਆ ਜਾਵੇ। ਦੇਖਭਾਲ ਕਰਨ ਵਾਲਿਆਂ ਨਾਲ ਗੱਲ ਕੀਤੀ ਕਿ ਮਰੀਜ਼ ਸਿੱਧਾ ਪੁੱਛ ਸਕਦਾ ਹੈ ਅਤੇ ਉਸ ਨਾਲ ਝੂਠ ਨਹੀਂ ਬੋਲਿਆ ਜਾਵੇਗਾ। ਦੇਖਭਾਲ ਕਰਨ ਵਾਲੇ ਸਮਝਦੇ ਹਨ: ਹਾਂ / ਹਾਲੇ ਹੱਲ ਨਹੀਂ
+DO NOT ATTEMPT RESUSCITATION (DNAR).	ਮੁੜ ਜੀਵਤ ਕਰਨ ਦੀ ਕੋਸ਼ਿਸ਼ ਨਾ ਕੀਤੀ ਜਾਵੇ (DNAR)।
+Caregivers who must be informed before any major decision (name, relation, phone)	ਦੇਖਭਾਲ ਕਰਨ ਵਾਲੇ ਜਿਨ੍ਹਾਂ ਨੂੰ ਕਿਸੇ ਵੱਡੇ ਫ਼ੈਸਲੇ ਤੋਂ ਪਹਿਲਾਂ ਦੱਸਣਾ ਜ਼ਰੂਰੀ ਹੈ (ਨਾਮ, ਰਿਸ਼ਤਾ, ਫ਼ੋਨ)
+Caregivers who were attempted to be contacted, but were unavailable	ਦੇਖਭਾਲ ਕਰਨ ਵਾਲੇ ਜਿਨ੍ਹਾਂ ਨਾਲ ਸੰਪਰਕ ਦੀ ਕੋਸ਼ਿਸ਼ ਕੀਤੀ ਗਈ, ਪਰ ਉਪਲਬਧ ਨਹੀਂ ਸਨ
+If not, what is the frequency of assessments, and the details of the person coordinating between the patient/caregiver and the relevant hospital/centre	ਜੇ ਨਹੀਂ, ਤਾਂ ਜਾਂਚ ਕਿੰਨੀ ਵਾਰ ਹੁੰਦੀ ਹੈ, ਅਤੇ ਮਰੀਜ਼/ਦੇਖਭਾਲ ਕਰਨ ਵਾਲੇ ਅਤੇ ਸਬੰਧਤ ਹਸਪਤਾਲ/ਕੇਂਦਰ ਵਿਚਕਾਰ ਤਾਲਮੇਲ ਕਰਨ ਵਾਲੇ ਵਿਅਕਤੀ ਦੇ ਵੇਰਵੇ
+Do not attempt resuscitation (DNAR)	ਮੁੜ ਜੀਵਤ ਕਰਨ ਦੀ ਕੋਸ਼ਿਸ਼ ਨਾ ਕਰੋ (DNAR)

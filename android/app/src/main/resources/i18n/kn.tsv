@@ -6186,3 +6186,12 @@ Care near you	ನಿಮ್ಮ ಹತ್ತಿರ ಆರೈಕೆ
 Step ${step + 1} of $count	ಹಂತ ${step + 1} / $count
 See all (${items.size})	ಎಲ್ಲಾ ನೋಡಿ (${items.size})
 Past visits	ಹಿಂದಿನ ಭೇಟಿಗಳು
+Caregiver consensus	ಆರೈಕೆದಾರರ ಒಮ್ಮತ
+The patient has capacity but has asked caregivers to decide with the team. Record the patient’s own words:	ರೋಗಿಗೆ ನಿರ್ಧಾರ ಸಾಮರ್ಥ್ಯವಿದೆ ಆದರೆ ತಂಡದೊಂದಿಗೆ ನಿರ್ಧರಿಸಲು ಆರೈಕೆದಾರರನ್ನು ಕೇಳಿಕೊಂಡಿದ್ದಾರೆ. ರೋಗಿಯ ಸ್ವಂತ ಮಾತುಗಳನ್ನು ದಾಖಲಿಸಿ:
+No directive and no recorded prior wishes. Decisions will be made in the patient’s best interests through caregiver consensus with the team.	ಯಾವುದೇ ನಿರ್ದೇಶನವಿಲ್ಲ ಮತ್ತು ದಾಖಲಾದ ಹಿಂದಿನ ಇಚ್ಛೆಗಳಿಲ್ಲ. ತಂಡದೊಂದಿಗೆ ಆರೈಕೆದಾರರ ಒಮ್ಮತದ ಮೂಲಕ ರೋಗಿಯ ಹಿತದೃಷ್ಟಿಯಿಂದ ನಿರ್ಧಾರಗಳನ್ನು ತೆಗೆದುಕೊಳ್ಳಲಾಗುತ್ತದೆ.
+The caregiver has asked that the patient not be told. Discussed with the caregiver that the patient may ask directly and will not be lied to. Caregiver understands: Yes / Not yet resolved	ರೋಗಿಗೆ ತಿಳಿಸಬಾರದೆಂದು ಆರೈಕೆದಾರರು ಕೇಳಿಕೊಂಡಿದ್ದಾರೆ. ರೋಗಿ ನೇರವಾಗಿ ಕೇಳಬಹುದು ಮತ್ತು ಅವರಿಗೆ ಸುಳ್ಳು ಹೇಳಲಾಗುವುದಿಲ್ಲ ಎಂದು ಆರೈಕೆದಾರರೊಂದಿಗೆ ಚರ್ಚಿಸಲಾಗಿದೆ. ಆರೈಕೆದಾರರು ಅರ್ಥಮಾಡಿಕೊಂಡಿದ್ದಾರೆ: ಹೌದು / ಇನ್ನೂ ಬಗೆಹರಿದಿಲ್ಲ
+DO NOT ATTEMPT RESUSCITATION (DNAR).	ಪುನರುಜ್ಜೀವನ ಪ್ರಯತ್ನಿಸಬೇಡಿ (DNAR).
+Caregivers who must be informed before any major decision (name, relation, phone)	ಯಾವುದೇ ಪ್ರಮುಖ ನಿರ್ಧಾರಕ್ಕೆ ಮೊದಲು ತಿಳಿಸಬೇಕಾದ ಆರೈಕೆದಾರರು (ಹೆಸರು, ಸಂಬಂಧ, ಫೋನ್)
+Caregivers who were attempted to be contacted, but were unavailable	ಸಂಪರ್ಕಿಸಲು ಪ್ರಯತ್ನಿಸಿದರೂ ಲಭ್ಯವಿಲ್ಲದ ಆರೈಕೆದಾರರು
+If not, what is the frequency of assessments, and the details of the person coordinating between the patient/caregiver and the relevant hospital/centre	ಇಲ್ಲದಿದ್ದರೆ, ಮೌಲ್ಯಮಾಪನಗಳು ಎಷ್ಟು ಬಾರಿ ನಡೆಯುತ್ತವೆ, ಮತ್ತು ರೋಗಿ/ಆರೈಕೆದಾರರು ಹಾಗೂ ಸಂಬಂಧಿತ ಆಸ್ಪತ್ರೆ/ಕೇಂದ್ರದ ನಡುವೆ ಸಮನ್ವಯ ಮಾಡುವ ವ್ಯಕ್ತಿಯ ವಿವರಗಳು
+Do not attempt resuscitation (DNAR)	ಪುನರುಜ್ಜೀವನ ಮಾಡಬೇಡಿ (DNAR)

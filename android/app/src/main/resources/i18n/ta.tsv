@@ -6183,3 +6183,12 @@ Care near you	உங்கள் அருகில் பராமரிப்�
 Step ${step + 1} of $count	படி ${step + 1} / $count
 See all (${items.size})	அனைத்தும் பார்க்கவும் (${items.size})
 Past visits	கடந்த சந்திப்புகள்
+Caregiver consensus	பராமரிப்பவர்களின் ஒருமித்த முடிவு
+The patient has capacity but has asked caregivers to decide with the team. Record the patient’s own words:	நோயாளிக்கு முடிவெடுக்கும் திறன் உண்டு, ஆனால் குழுவுடன் சேர்ந்து பராமரிப்பவர்கள் முடிவெடுக்கக் கேட்டுள்ளார். நோயாளியின் சொந்த வார்த்தைகளைப் பதிவுசெய்யுங்கள்:
+No directive and no recorded prior wishes. Decisions will be made in the patient’s best interests through caregiver consensus with the team.	வழிகாட்டுதலோ முன்பு பதிவுசெய்த விருப்பமோ இல்லை. குழுவுடன் பராமரிப்பவர்களின் ஒருமித்த முடிவின் மூலம், நோயாளியின் நலனுக்காக முடிவுகள் எடுக்கப்படும்.
+The caregiver has asked that the patient not be told. Discussed with the caregiver that the patient may ask directly and will not be lied to. Caregiver understands: Yes / Not yet resolved	நோயாளியிடம் சொல்ல வேண்டாம் என்று பராமரிப்பவர்கள் கேட்டுள்ளனர். நோயாளி நேரடியாகக் கேட்கலாம், அவரிடம் பொய் சொல்லப்படாது என்று பராமரிப்பவர்களுடன் பேசப்பட்டது. பராமரிப்பவர்கள் புரிந்துகொண்டனர்: ஆம் / இன்னும் தீரவில்லை
+DO NOT ATTEMPT RESUSCITATION (DNAR).	உயிர்ப்பிக்க முயல வேண்டாம் (DNAR).
+Caregivers who must be informed before any major decision (name, relation, phone)	பெரிய முடிவுக்கு முன் தெரிவிக்க வேண்டிய பராமரிப்பவர்கள் (பெயர், உறவு, தொலைபேசி)
+Caregivers who were attempted to be contacted, but were unavailable	தொடர்புகொள்ள முயன்றும் கிடைக்காத பராமரிப்பவர்கள்
+If not, what is the frequency of assessments, and the details of the person coordinating between the patient/caregiver and the relevant hospital/centre	இல்லையெனில், மதிப்பீடுகள் எத்தனை முறை, நோயாளி/பராமரிப்பவருக்கும் மருத்துவமனை/மையத்துக்கும் இடையே ஒருங்கிணைப்பவரின் விவரம்
+Do not attempt resuscitation (DNAR)	உயிர்ப்பிக்க முயல வேண்டாம் (DNAR)

@@ -334,7 +334,7 @@ object PlanText {
         GoalOfCare.B_CEILING -> Bi("Treat problems that can be reversed, within the limits below, as time-limited trials.", "जो ठीक हो सकता है उसका इलाज, नीचे दी सीमाओं में, तय समय के ट्रायल की तरह।")
         GoalOfCare.C_COMFORT -> Bi("Comfort is the goal. Go to hospital only if comfort cannot be achieved where the patient is.", "आराम ही लक्ष्य है। अस्पताल तभी, जब जहाँ मरीज़ हैं वहाँ आराम न मिल सके।")
     }
-    fun cpr(c: Cpr) = when (c) { Cpr.ATTEMPT -> Bi("Attempt CPR", "CPR करें"); Cpr.DNACPR -> Bi("Do not attempt CPR (DNACPR)", "CPR न करें (DNACPR)") }
+    fun cpr(c: Cpr) = when (c) { Cpr.ATTEMPT -> Bi("Attempt CPR", "CPR करें"); Cpr.DNACPR -> Bi("Do not attempt resuscitation (DNAR)", "पुनर्जीवन का प्रयास न करें (DNAR)") }
     fun cprMeaning(c: Cpr) = when (c) {
         Cpr.ATTEMPT -> Bi("If the heart and breathing stop, try to restart them. Applies only to cardiac arrest.", "दिल और साँस रुकने पर उन्हें फिर शुरू करने की कोशिश। सिर्फ़ दिल रुकने पर लागू।")
         Cpr.DNACPR -> Bi("If the heart stops, allow a natural death. It says nothing about any other treatment.", "दिल रुकने पर स्वाभाविक मृत्यु होने दें। बाकी किसी इलाज के बारे में यह कुछ नहीं कहता।")

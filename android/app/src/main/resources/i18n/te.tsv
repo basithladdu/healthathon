@@ -6186,3 +6186,12 @@ Care near you	మీ దగ్గర సంరక్షణ
 Step ${step + 1} of $count	దశ ${step + 1} / $count
 See all (${items.size})	అన్నీ చూడండి (${items.size})
 Past visits	గత సందర్శనలు
+Caregiver consensus	సంరక్షకుల ఏకాభిప్రాయం
+The patient has capacity but has asked caregivers to decide with the team. Record the patient’s own words:	రోగికి నిర్ణయ సామర్థ్యం ఉంది కానీ బృందంతో కలిసి నిర్ణయించమని సంరక్షకులను కోరారు. రోగి సొంత మాటలను నమోదు చేయండి:
+No directive and no recorded prior wishes. Decisions will be made in the patient’s best interests through caregiver consensus with the team.	ఆదేశం లేదు మరియు నమోదైన ముందస్తు కోరికలు లేవు. బృందంతో సంరక్షకుల ఏకాభిప్రాయం ద్వారా రోగి శ్రేయస్సు కోసం నిర్ణయాలు తీసుకోబడతాయి.
+The caregiver has asked that the patient not be told. Discussed with the caregiver that the patient may ask directly and will not be lied to. Caregiver understands: Yes / Not yet resolved	రోగికి చెప్పవద్దని సంరక్షకులు కోరారు. రోగి నేరుగా అడగవచ్చని మరియు వారికి అబద్ధం చెప్పబడదని సంరక్షకులతో చర్చించబడింది. సంరక్షకులు అర్థం చేసుకున్నారు: అవును / ఇంకా పరిష్కారం కాలేదు
+DO NOT ATTEMPT RESUSCITATION (DNAR).	పునరుజ్జీవనానికి ప్రయత్నించవద్దు (DNAR).
+Caregivers who must be informed before any major decision (name, relation, phone)	ఏదైనా ముఖ్యమైన నిర్ణయానికి ముందు తెలియజేయవలసిన సంరక్షకులు (పేరు, సంబంధం, ఫోన్)
+Caregivers who were attempted to be contacted, but were unavailable	సంప్రదించడానికి ప్రయత్నించినా అందుబాటులో లేని సంరక్షకులు
+If not, what is the frequency of assessments, and the details of the person coordinating between the patient/caregiver and the relevant hospital/centre	లేకపోతే, అంచనాలు ఎంత తరచుగా జరుగుతాయి, మరియు రోగి/సంరక్షకులు మరియు సంబంధిత ఆసుపత్రి/కేంద్రం మధ్య సమన్వయం చేసే వ్యక్తి వివరాలు
+Do not attempt resuscitation (DNAR)	పునరుజ్జీవనానికి ప్రయత్నించవద్దు (DNAR)

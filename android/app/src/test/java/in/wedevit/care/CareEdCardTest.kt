@@ -238,7 +238,7 @@ class CareEdCardTest {
     // ── Offline QR ──
     @Test fun offlineTextIsTheWebSummaryAndFitsAQr() {
         val r = signed().ectprs.single(); val text = EdCardOffline.text(r, null, false, today)
-        listOf("SAHARA ECTPR v1 · Sahara ECTPR v1.0", "Signed emergency care plan", "Asha Rao · UHID UH-1", "Diagnosis: Stage IV lung cancer", "Transfer: Only for the reasons ticked", "CPR: Do not attempt CPR (DNACPR)", "ICU: Time-limited ICU trial", "Decision-maker: Ravi Rao (Son) 9845000000", "Signed: Dr Meera Iyer 2026-10-29", WalletCard.TREAT_LINE.en).forEach { assertTrue(it, text.contains(it)) }
+        listOf("SAHARA ECTPR v1 · Sahara ECTPR v1.0", "Signed emergency care plan", "Asha Rao · UHID UH-1", "Diagnosis: Stage IV lung cancer", "Transfer: Only for the reasons ticked", "CPR: Do not attempt resuscitation (DNAR)", "ICU: Time-limited ICU trial", "Decision-maker: Ravi Rao (Son) 9845000000", "Signed: Dr Meera Iyer 2026-10-29", WalletCard.TREAT_LINE.en).forEach { assertTrue(it, text.contains(it)) }
         assertFalse("address stays off the card", text.contains("12 MG Road"))
         assertTrue(EdCardOffline.forQr(r, null, false, today).toByteArray().size <= 1100)
         // Unanswered is never read as refusal.
