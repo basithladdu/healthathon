@@ -60,7 +60,7 @@ const valueCell = (row: GocFormRow, rtl: boolean, width = 5760, span = 1) => {
 /** The form's own tables (decision-makers, oxygen LEVEL / WHAT IT MEANS / CEILING, Section 19), header row shaded like the docx. */
 const gridTable = (table: GocFormTable, rtl: boolean, border: string) => {
   const n = table.head.length;
-  const widths = n === 3 && table.head[0].length <= 8 ? [1100, 6860, 1400] : n === 3 ? [2800, 3280, 3280] : n === 5 ? [2560, 2000, 1800, 1600, 1400] : Array.from({ length: n }, () => Math.floor(9360 / n));
+  const widths = n === 3 && table.head[0].length > 0 && table.head[0].length <= 8 ? [1100, 6860, 1400] : n === 3 ? [2800, 3280, 3280] : n === 5 ? [2560, 2000, 1800, 1600, 1400] : Array.from({ length: n }, () => Math.floor(9360 / n));
   const lines = (text: string, head: boolean) => text.split('\n').map((line) => {
     const on = line.startsWith('☑');
     return `<w:p><w:pPr>${rtl ? '<w:bidi/>' : ''}<w:spacing w:after="20"/></w:pPr>${run(line, `<w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:cs="Calibri"/>${head || on ? '<w:b/>' : ''}${line.trim() === 'Not discussed' ? '<w:i/><w:color w:val="8D7F74"/>' : ''}<w:sz w:val="${head ? 18 : 20}"/>${rtl ? '<w:rtl/>' : ''}`)}</w:p>`;

@@ -532,6 +532,15 @@ test('the note comes out as a printable page and a Word file in the clinical doc
   assert.equal(crc32(new TextEncoder().encode('123456789')), 0xcbf43926);
 });
 
+test('only the oxygen LEVEL table gets the narrow level layout; the decision-maker table keeps even columns', () => {
+  const doc = buildGocFormDocument(draft(), [], 'en', { reviewedBy: 'Dr Test', reviewedAt: NOW.toISOString() });
+  const html = gocFormHtml(doc);
+  assert.match(html, /<table class="grid levels"><tr><th><div>LEVEL<\/div><\/th>/);
+  assert.match(html, /<table class="grid"><tr><th><div><\/div><\/th><th><div>PRIMARY<\/div><\/th>/);
+  const xml = new TextDecoder().decode(gocFormDocx(doc));
+  assert.equal(xml.split('<w:gridCol w:w="1100"/>').length - 1, 1, 'only the LEVEL table has the narrow first column in the Word file');
+});
+
 test('every heading, field, box and table of Rituparna’s form is in the note, in the form’s order and words', () => {
   const r = draft();
   applyGocDecision(r, 'respCeiling', '1'); r.choices.maxOxygenLpm = 2;

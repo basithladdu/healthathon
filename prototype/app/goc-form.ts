@@ -365,7 +365,7 @@ export const GOC_FORM_CSS = `
 export function gocFormBodyHtml(doc: GocFormDocument, note = ''): string {
   const body = doc.sections.map((section) => `<section><h2><span class="num">${section.id}</span><span>${esc(section.title)}</span></h2>${section.groups.map((group) => {
     const rows = group.rows.length ? `<table class="rows">${group.rows.map((row) => (row.label ? `<tr><th>${esc(row.label)}</th><td>${gocFormCellHtml(row)}</td></tr>` : `<tr><td colspan="2">${gocFormCellHtml(row)}</td></tr>`)).join('')}</table>` : '';
-    const table = group.table ? `<table class="grid${group.table.head.length === 3 && group.table.head[0].length <= 6 ? ' levels' : ''}${group.table.head.length === 4 ? ' sign' : ''}"><tr>${group.table.head.map((cell) => `<th>${cellHtml(cell)}</th>`).join('')}</tr>${group.table.rows.map((cells) => `<tr>${cells.map((cell) => `<td>${cellHtml(cell)}</td>`).join('')}</tr>`).join('')}</table>` : '';
+    const table = group.table ? `<table class="grid${group.table.head.length === 3 && group.table.head[0].length > 0 && group.table.head[0].length <= 6 ? ' levels' : ''}${group.table.head.length === 4 ? ' sign' : ''}"><tr>${group.table.head.map((cell) => `<th>${cellHtml(cell)}</th>`).join('')}</tr>${group.table.rows.map((cells) => `<tr>${cells.map((cell) => `<td>${cellHtml(cell)}</td>`).join('')}</tr>`).join('')}</table>` : '';
     return `${group.title ? `<h3>${esc(group.title)}</h3>` : ''}${rows}${table}`;
   }).join('')}</section>`).join('');
   const extra = note.trim() ? `<section><h2>${esc('Doctor’s note')}</h2><p class="note">${esc(note)}</p></section>` : '';
