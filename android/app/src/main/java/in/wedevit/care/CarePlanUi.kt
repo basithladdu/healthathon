@@ -336,8 +336,9 @@ internal object PlanAdmission {
     // The version register is sorted once per change to the plans, not on every scroll frame.
     val versions = remember(state.ectprs, person.id) { state.ectprs.filter { it.patientId == person.id }.sortedByDescending { it.version } }
     var dialog by rememberSaveable { mutableStateOf("") }
+    val hideBand = LocalHidePageBand.current
     LazyColumn(Modifier.fillMaxSize().testTag("care-plan-home"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item(key = "header", contentType = "header") { PlanHeader(t("Care planning", "देखभाल योजना"), onBack, "care-plan-header") }
+        if (!hideBand) item(key = "header", contentType = "header") { PlanHeader(t("Care planning", "देखभाल योजना"), onBack, "care-plan-header") }
         if (loadProblem) item(key = "load-problem", contentType = "banner") { Surface(color = Peach, shape = RoundedCornerShape(12.dp), modifier = Modifier.animateItem()) { Text(t("Couldn't read the saved plan.", "सहेजी योजना पढ़ी नहीं जा सकी।"), Modifier.padding(12.dp)) } }
         // One family of three clinical documents, each with a one-line plain description.
         item(key = "intro", contentType = "intro") { Text(t("Goals of care discussion, advance care planning and the emergency care plan belong together. All three are clinical documents.", "देखभाल के लक्ष्यों की चर्चा, अग्रिम देखभाल योजना और आपातकालीन देखभाल योजना साथ चलती हैं। तीनों क्लिनिकल दस्तावेज़ हैं।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub, modifier = Modifier.testTag("care-plan-family-intro")) }
@@ -385,10 +386,10 @@ internal object PlanAdmission {
                 }
                 else -> Button(onClick = { if (clinician) dialog = "start" else onStart(false) }, enabled = canEdit, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-start")) { Text(t("Start a plan", "योजना शुरू करें")) }
             }
-            OutlinedButton(onClick = { onPage("card") }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-card-entry")) { Icon(Icons.Default.QrCode, null); Spacer(Modifier.width(8.dp)); Text(t("Pocket emergency card", "जेब में रखने का आपातकालीन कार्ड")) }
+            if (clinician) OutlinedButton(onClick = { onPage("card") }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-card-entry")) { Icon(Icons.Default.QrCode, null); Spacer(Modifier.width(8.dp)); Text(t("Pocket emergency card", "जेब में रखने का आपातकालीन कार्ड")) }
         } }
         if (active != null && transport != null && ReviewReminder.due(active, today)) item(key = "review-reminder", contentType = "reminder") { Box(Modifier.animateItem()) { ReviewReminderCard(active, canEdit, transport) { status -> commit { CarePlanBook.reminded(it, active.id, actor, planNow(), status) } } } }
-        item(key = "amd-tile", contentType = "tile") { FamilyTile(t("Advance care planning", "अग्रिम देखभाल योजना"), Icons.Default.Gavel, FamilyAccent.Plum, Modifier.animateItem()) {
+        if (clinician) item(key = "amd-tile", contentType = "tile") { FamilyTile(t("Advance care planning", "अग्रिम देखभाल योजना"), Icons.Default.Gavel, FamilyAccent.Plum, Modifier.animateItem()) {
             Text(t("The person’s own wishes about future care, written down.", "भविष्य की देखभाल के बारे में व्यक्ति की अपनी इच्छाएँ, लिखित रूप में।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub)
             // How it differs from the doctor's note, in plain words (Dr Sujay, 22 Nov: the three looked like one form).
             Text(if (clinician) t("The patient fills this in, in their own words, and can change it at any time. Your goals-of-care note is different: you write and sign it after the conversation.",
@@ -549,7 +550,7 @@ private fun LazyListScope.patientStep(d: EctprRecord, update: ((EctprRecord) -> 
         Text(t("Sex is as on medical records. Gender is how the patient describes themselves. Often they are the same.", "लिंग वह है जो मेडिकल रिकॉर्ड में लिखा है। जेंडर वह है जैसे मरीज़ खुद को बताते हैं। अक्सर दोनों एक ही होते हैं।"),
             fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub, modifier = Modifier.testTag("plan-sex-gender-hint"))
         CareField(d.patient.uhid, { v -> p { it.copy(uhid = v) } }, t("Hospital number (UHID)", "अस्पताल नंबर (UHID)"), singleLine = true, voice = false)
-        CareField(d.patient.phone, { v -> p { it.copy(phone = v) } }, t("Phone", "फ़ोन"), singleLine = true, voice = false)
+        CarePhoneField(d.patient.phone, { v -> p { it.copy(phone = v) } }, t("Phone", "फ़ोन"), "care-plan-patient-phone", Modifier.fillMaxWidth())
         CareField(d.patient.address, { v -> p { it.copy(address = v) } }, t("Address", "पता"))
         CareField(d.clinical.diagnosis, { v -> c { it.copy(diagnosis = v) } }, t("Diagnosis", "बीमारी"))
         CareField(d.clinical.stage, { v -> c { it.copy(stage = v) } }, t("Stage", "अवस्था"), singleLine = true)
@@ -563,7 +564,7 @@ private fun LazyListScope.patientStep(d: EctprRecord, update: ((EctprRecord) -> 
         SectionTitle(t("Care team", "देखभाल टीम"))
         CareField(d.careTeam.oncologist, { v -> team { it.copy(oncologist = v) } }, t("Main treating doctor", "मुख्य इलाज करने वाले डॉक्टर"), singleLine = true)
         CareField(d.careTeam.palliativePhysician, { v -> team { it.copy(palliativePhysician = v) } }, t("Palliative doctor", "पैलिएटिव डॉक्टर"), singleLine = true)
-        CareField(d.careTeam.palliativePhone24h, { v -> team { it.copy(palliativePhone24h = v) } }, t("Palliative 24-hour phone", "पैलिएटिव 24 घंटे का फ़ोन"), singleLine = true, voice = false)
+        CarePhoneField(d.careTeam.palliativePhone24h, { v -> team { it.copy(palliativePhone24h = v) } }, t("Palliative 24-hour phone", "पैलिएटिव 24 घंटे का फ़ोन"), "care-plan-palliative-phone", Modifier.fillMaxWidth())
         CareField(d.careTeam.localDoctor, { v -> team { it.copy(localDoctor = v) } }, t("Local doctor", "स्थानीय डॉक्टर"), singleLine = true)
     }
 }
@@ -606,7 +607,7 @@ private fun LazyListScope.decisionMakerStep(d: EctprRecord, update: ((EctprRecor
         SectionTitle(if (primary) t("Primary decision-maker", "मुख्य फ़ैसला लेने वाले") else t("Secondary decision-maker", "द्वितीय फ़ैसला लेने वाले"))
         CareField(dm.name, { v -> set { it.copy(name = v) } }, t("Name", "नाम"), singleLine = true)
         CareField(dm.relation, { v -> set { it.copy(relation = v) } }, t("Relation", "रिश्ता"), singleLine = true)
-        CareField(dm.phone24h, { v -> set { it.copy(phone24h = v) } }, t("24-hour phone", "24 घंटे का फ़ोन"), singleLine = true, voice = false)
+        CarePhoneField(dm.phone24h, { v -> set { it.copy(phone24h = v) } }, t("24-hour phone", "24 घंटे का फ़ोन"), "care-plan-dm-phone", Modifier.fillMaxWidth())
         Text(t("ID type", "पहचान-पत्र का प्रकार"), fontWeight = FontWeight.Medium)
         ChipGroup(dm.idType, IdType.entries, PlanText::idType, "dm-${if (primary) "primary" else "alternate"}-id") { v -> set { it.copy(idType = v) } }
         CareField(dm.idLast4.orEmpty(), { v -> set { it.copy(idLast4 = PlanIds.last4(v).ifBlank { null }) } }, t("Last 4 digits of the ID", "पहचान-पत्र के आख़िरी 4 अंक"), singleLine = true, voice = false)

@@ -115,10 +115,12 @@ import java.time.format.DateTimeFormatter
                 }
                 SaharaSecondaryButton(t("All symptoms", "सभी लक्षण"), { quickStart = ""; adding = true }, Modifier.fillMaxWidth().testTag("symptom-add"),
                     icon = Icons.Default.Add, tone = SaharaTone.Rust, navigates = true)
+                SaharaInfoToggle(t("About symptom scores", "लक्षणों के अंकों के बारे में"), "symptom-scale-info", label = t("How scores work", "अंक कैसे काम करते हैं")) {
                 if (pictures) Text(t("You answer with faces: none, a little, a lot or worst. Your care team sees the same answer as a number from 0 to 10.", "आप चेहरों से बताते हैं: बिलकुल नहीं, थोड़ा, बहुत या सबसे ज़्यादा। आपकी देखभाल टीम वही जवाब 0 से 10 के अंक में देखती है।"),
-                    fontSize = 18.sp, lineHeight = 24.sp, color = DoctorCardInk, style = SymptomWords, modifier = Modifier.padding(top = 2.dp).testTag("symptom-scale-faces-note"))
+                    fontSize = 15.sp, lineHeight = 22.sp, color = SaharaColors.Ink, style = SymptomWords, modifier = Modifier.testTag("symptom-scale-faces-note"))
                 Text(t("Symptom ratings use a 0–10 scale in the style of ESAS-r (Edmonton Symptom Assessment System). This is a personal diary, not a scored ESAS-r.", "लक्षणों के अंक ESAS-r (Edmonton Symptom Assessment System) की तरह 0–10 के पैमाने पर हैं। यह निजी डायरी है, अंकित ESAS-r नहीं।"),
-                    fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint, modifier = Modifier.padding(top = 2.dp).testTag("symptom-scale-source"))
+                    fontSize = 13.sp, lineHeight = 18.sp, color = SaharaColors.InkSub, modifier = Modifier.testTag("symptom-scale-source"))
+                }
             }
         }
         if (person != null && hasPainHistory) item(key = "pain-history", contentType = "pain-history") {
@@ -824,15 +826,15 @@ internal fun symptomTreatmentMarkers(entries: List<CareItem>, personId: String):
             if (showEntries) {
             val newest = shownPoints.asReversed()
             Text("${t("Entries", "नोट")} · ${shownPoints.size}", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.padding(top = 4.dp).testTag("$tag-entries"))
-            newest.shownOf(entriesShown).forEachIndexed { i, p ->
-                if (i > 0) HorizontalDivider(color = DoctorHairline)
+            val entryRow: @Composable (DatedRating) -> Unit = { p ->
                 Row(Modifier.fillMaxWidth().heightIn(min = 40.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text("${friendlyWhen(p.date, p.time, hindi)} · ${SymptomDiaryRules.label(SymptomDiaryRules.respondents, p.respondent, hindi)}", fontSize = 14.sp, color = DoctorCardSub, style = SymptomWords, modifier = Modifier.weight(1f))
                     val band = ChartBands.color(p.value)
                     Text("${p.value} · ${ChartBands.word(p.value, hindi)}", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = readableOn(band), modifier = Modifier.background(band, RoundedCornerShape(50)).padding(horizontal = 10.dp, vertical = 4.dp))
                 }
             }
-            SaharaShowOlder(newest.size, entriesShown, tag = "$tag-entries")
+            newest.shownOf(entriesShown).forEachIndexed { i, p -> if (i > 0) HorizontalDivider(color = DoctorHairline); entryRow(p) }
+            SaharaShowOlder(newest, entriesShown, tag = "$tag-entries", title = t("Entries", "नोट"), searchText = { p -> "${friendlyWhen(p.date, p.time, hindi)} ${p.value} ${ChartBands.word(p.value, hindi)}" }, row = entryRow)
             }
         }
     }
@@ -873,12 +875,8 @@ internal fun symptomTreatmentMarkers(entries: List<CareItem>, personId: String):
         // Each chip carries a dot in the colour of that part's latest number, so the worst part stands out before it is opened.
         val latest = remember(entries, personId, parts) { parts.associateWith { SymptomDiaryRules.painPartSeries(entries, personId, it).lastOrNull()?.value } }
         val tick = rememberSaharaTick()
-        FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            parts.forEach { id -> FilterChip(id == part, { if (id != part) tick(); chosen = id }, label = { Text(PainBodyMapRules.label(id, hindi) + (latest[id]?.let { " · $it" } ?: ""), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false) }, shape = CircleShape,
-                leadingIcon = if (latest[id] != null) { { Box(Modifier.size(12.dp).background(ChartBands.color(latest.getValue(id)!!), CircleShape)) } } else null,
-                border = FilterChipDefaults.filterChipBorder(enabled = true, selected = id == part, borderColor = DoctorCardSub.copy(alpha = .45f), selectedBorderColor = DoctorAccent, borderWidth = 1.5.dp, selectedBorderWidth = 2.dp),
-                colors = FilterChipDefaults.filterChipColors(containerColor = Paper, labelColor = DoctorCardInk, selectedContainerColor = lerp(Paper, DoctorAccent, .14f), selectedLabelColor = DoctorCardInk), modifier = Modifier.heightIn(min = 48.dp).testTag("pain-part-chip-$id")) }
-        }
+        SaharaDropdown(t("Body part", "शरीर का हिस्सा"), PainBodyMapRules.label(part, hindi) + (latest[part]?.let { " · $it" } ?: ""), parts.map { id -> SaharaDropdownOption(PainBodyMapRules.label(id, hindi) + (latest[id]?.let { " · $it" } ?: ""), "pain-part-chip-$id", id == part) },
+            tag = "pain-part-select", onPick = { i -> if (parts[i] != part) tick(); chosen = parts[i] })
         AnimatedContent(part, transitionSpec = { SaharaMotion.crossfade() }, label = "part trend") { shownPart -> SymptomPartTrend(entries, personId, shownPart, hindi, compact = true, showEntries = showEntries) }
     }
 }

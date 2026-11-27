@@ -52,7 +52,7 @@ private fun conversationDate(at: Long?, hindi: Boolean) = at?.takeIf { it > 0 }?
                 // The newest five earlier talks, then "Show older" (24 Nov).
                 val earlierShown = rememberShownCount(model.patientId)
                 model.earlierPublished.shownOf(earlierShown).forEach { discussion -> key(model.patientId, discussion.id) { DiscussionReadingCard(discussion, highlighted = false) } }
-                SaharaShowOlder(model.earlierPublished.size, earlierShown, tag = "conversation-earlier")
+                SaharaShowOlder(model.earlierPublished, earlierShown, tag = "conversation-earlier", title = t("Earlier conversations", "पहले की बातचीत")) { discussion -> DiscussionReadingCard(discussion, highlighted = false) }
             }
         }
         model.priorSample?.let { discussion ->

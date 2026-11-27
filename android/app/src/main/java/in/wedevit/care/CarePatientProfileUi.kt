@@ -315,7 +315,7 @@ import kotlin.math.roundToInt
             }
             // The newest five weights, then "Show older" (24 Nov).
             val weightsShown = rememberShownCount()
-            sorted.indices.reversed().toList().shownOf(weightsShown).forEach { i ->
+            val weightRow: @Composable (Int) -> Unit = { i ->
                 val e = sorted[i]; val before = sorted.getOrNull(i - 1)
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Text(e.day.format(format), Modifier.weight(1f), fontSize = 14.sp, color = DoctorCardSub)
@@ -324,7 +324,9 @@ import kotlin.math.roundToInt
                     Text(when { d == null || d == 0.0 -> ""; d > 0 -> " ▲"; else -> " ▼" }, Modifier.widthIn(min = 24.dp), fontSize = 14.sp, color = DoctorAccent)
                 }
             }
-            SaharaShowOlder(sorted.size, weightsShown, tag = "patient-profile-weights")
+            val weightIdx = sorted.indices.reversed().toList()
+            weightIdx.shownOf(weightsShown).forEach { i -> weightRow(i) }
+            SaharaShowOlder(weightIdx, weightsShown, tag = "patient-profile-weights", title = t("Weight history", "वज़न का इतिहास"), searchText = { i -> sorted[i].day.format(format) + " " + CarePatientProfileRules.weightText(sorted[i].kg) }, row = weightRow)
             if (sorted.isEmpty() && kg != null) Text("${CarePatientProfileRules.weightText(kg)} ${t("kg", "किलो")} · ${t("Date not recorded", "तारीख़ दर्ज नहीं")}", fontSize = 14.sp)
         }
     }, confirmButton = { TextButton(onClick = onDismiss) { Text(t("Close", "बंद करें")) } })
@@ -382,8 +384,9 @@ import kotlin.math.roundToInt
                     CarePickerScales.WEIGHT_KG, CarePickerScales.WEIGHT_START, "patient-profile-weight", Modifier.fillMaxWidth(), icon = Icons.Default.MonitorWeight, allowClear = true)
                 CareNumberWheelButton(CarePatientProfileRules.height(height).first?.toDouble(), { height = it?.roundToInt()?.toString().orEmpty(); error = null }, t("Height (cm)", "क़द (सेमी)"), t("cm", "सेमी"),
                     CarePickerScales.HEIGHT_CM, CarePickerScales.HEIGHT_START, "patient-profile-height", Modifier.fillMaxWidth(), icon = Icons.Default.Height, allowClear = true)
-                Text(t("Blood group", "ख़ून का समूह"), fontSize = 14.sp, color = DoctorCardSub)
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { CarePatientProfile.BLOOD.forEach { v -> ProfileChip(blood == v, if (v == "Not known") t("Not known", "पता नहीं") else v) { blood = if (blood == v) "" else v } } }
+                SaharaDropdown(t("Blood group", "ख़ून का समूह"), if (blood == "Not known") t("Not known", "पता नहीं") else blood,
+                    CarePatientProfile.BLOOD.map { v -> SaharaDropdownOption(if (v == "Not known") t("Not known", "पता नहीं") else v, "patient-profile-blood-$v", blood == v) },
+                    tag = "patient-profile-blood", placeholder = t("Choose", "चुनें"), onPick = { i -> blood = CarePatientProfile.BLOOD[i] })
             }
             ProfileStep(3, t("Health", "सेहत")) {
                 ProfileField(illness, { illness = it.take(120) }, t("Main illness / diagnosis", "मुख्य बीमारी / निदान"), Icons.Default.MedicalInformation)

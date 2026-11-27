@@ -187,9 +187,7 @@ object TrendChartRules {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         HorizontalDivider(color = DoctorHairline)
         Text(t("Pain in one body part", "शरीर के एक हिस्से का दर्द"), fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = DoctorCardInk)
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            parts.forEach { id -> FilterChip(id == part, { chosen = id }, label = { Text(PainBodyMapRules.label(id, hindi), maxLines = 1, softWrap = false) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-part-chip-$id")) }
-        }
+        SaharaDropdown(t("Body part", "शरीर का हिस्सा"), PainBodyMapRules.label(part, hindi), parts.map { id -> SaharaDropdownOption(PainBodyMapRules.label(id, hindi), "pain-trend-part-$id", id == part) }, tag = "pain-trend-part", onPick = { i -> chosen = parts[i] })
         PainPartTrend(entries, personId, part, hindi)
     }
 }

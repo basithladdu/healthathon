@@ -314,8 +314,8 @@ internal object DistressCodec {
         Text(if (about != null) t("How much distress has $about felt in the past week, including today?", "पिछले एक हफ़्ते में, आज समेत, $about को कितनी परेशानी रही है?")
             else t("How much distress have you felt in the past week, including today?", "पिछले एक हफ़्ते में, आज समेत, आपको कितनी परेशानी रही है?"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk)
         // Distress vs symptoms (SVK and Sujay, 23 Nov): this is one overall number; each symptom keeps its own 0–10 in the symptom notes.
-        Text(t("This is one number for overall distress. Each symptom (pain, sleep and others) has its own 0–10 score in Symptoms.", "यह कुल परेशानी का एक अंक है। हर लक्षण (दर्द, नींद आदि) का अपना 0–10 अंक लक्षणों में अलग से दिया जाता है।"),
-            fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardSub, modifier = Modifier.testTag("distress-overall-explainer"))
+        SaharaInfoToggle(t("About the distress number", "परेशानी के अंक के बारे में"), "distress-info", label = t("How this differs from symptoms", "यह लक्षणों से कैसे अलग है")) { Text(t("This is one number for overall distress. Each symptom (pain, sleep and others) has its own 0–10 score in Symptoms.", "यह कुल परेशानी का एक अंक है। हर लक्षण (दर्द, नींद आदि) का अपना 0–10 अंक लक्षणों में अलग से दिया जाता है।"),
+            fontSize = 15.sp, lineHeight = 22.sp, color = SaharaColors.Ink, modifier = Modifier.testTag("distress-overall-explainer")) }
         // The chosen number, large, with a plain instruction: nobody should have to guess that the thermometer slides.
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterHorizontally), verticalAlignment = Alignment.CenterVertically) {
             DistressThermometer(score, Modifier.width(112.dp), onPick = onScore)
@@ -403,7 +403,9 @@ private fun distressAbout(t: (String, String) -> String): String =
 
 @Composable private fun DistressSource() {
     val t = careText()
-    Text(t("Source: NCCN Distress Thermometer and Problem List, NCCN Guidelines Version 1.2026 (Distress Management).", "स्रोत: NCCN Distress Thermometer and Problem List, NCCN Guidelines संस्करण 1.2026। हिंदी अनुवाद Sahara का है, NCCN का नहीं।"), fontSize = 13.sp, lineHeight = 17.sp, color = DoctorCardFaint, modifier = Modifier.testTag("distress-source"))
+    SaharaInfoToggle(t("Where this thermometer comes from", "यह थर्मामीटर कहाँ से है"), "distress-source-info", label = t("Source", "स्रोत")) {
+        Text(t("Source: NCCN Distress Thermometer and Problem List, NCCN Guidelines Version 1.2026 (Distress Management).", "स्रोत: NCCN Distress Thermometer and Problem List, NCCN Guidelines संस्करण 1.2026। हिंदी अनुवाद Sahara का है, NCCN का नहीं।"), fontSize = 13.sp, lineHeight = 18.sp, color = SaharaColors.InkSub, modifier = Modifier.testTag("distress-source"))
+    }
 }
 
 /** Thermometer colours: green for 0–3, amber for 4–6, red for 7–10. */
@@ -566,8 +568,7 @@ private val DistressRowHeight = 24.dp
                 pointText = { it.toInt().toString() })
             // The latest answers as one list with dividers: score chip, date, then any ticked problems.
             val answersShown = rememberShownCount(personId)
-            history.shownOf(answersShown).forEachIndexed { i, (item, check) ->
-                if (i > 0) HorizontalDivider(color = DoctorHairline)
+            val answerRow: @Composable (Pair<CareItem, DistressCheck>) -> Unit = { (item, check) ->
                 Row(Modifier.fillMaxWidth().semantics(mergeDescendants = true) {}, verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     DistressScoreChip(check)
                     Column(Modifier.weight(1f)) {
@@ -576,7 +577,8 @@ private val DistressRowHeight = 24.dp
                     }
                 }
             }
-            SaharaShowOlder(history.size, answersShown, tag = "distress-history")
+            history.shownOf(answersShown).forEachIndexed { i, pair -> if (i > 0) HorizontalDivider(color = DoctorHairline); answerRow(pair) }
+            SaharaShowOlder(history, answersShown, tag = "distress-history", title = t("Distress answers", "परेशानी के जवाब"), searchText = { (item, check) -> Instant.ofEpochMilli(item.created).atZone(ZoneId.systemDefault()).format(day) + " " + DistressRules.shownTitle(check, hindi) + " " + DistressRules.summary(check, hindi) }, row = answerRow)
             DistressSource()
         }
     }

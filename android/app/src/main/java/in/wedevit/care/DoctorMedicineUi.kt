@@ -48,7 +48,7 @@ fun doctorMedicinePresentation(dose:SampleMedicineDose,asOf:Long,zone:ZoneId):Do
             Row(Modifier.padding(16.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(12.dp)) {Icon(Icons.Outlined.Schedule,null,tint=Rust,modifier=Modifier.size(24.dp));Text(t("No medicine reports recorded.", "दवा की कोई सूचना दर्ज नहीं।"),fontSize=16.sp,color=DoctorCardInk)}
         }
         val dosesShown=rememberShownCount(doses.firstOrNull()?.patientId)
-        doses.shownOf(dosesShown).forEach {dose ->
+        val doseRow: @Composable (SampleMedicineDose) -> Unit = {dose ->
             val view=doctorMedicinePresentation(dose,asOf,zone)
             val good=view.status=="Taken reported"
             Surface(color=Paper,shape=RoundedCornerShape(16.dp),border=BorderStroke(1.dp,DoctorHairline),modifier=Modifier.fillMaxWidth().testTag("doctor-medicine-${dose.id}")) {
@@ -68,7 +68,8 @@ fun doctorMedicinePresentation(dose:SampleMedicineDose,asOf:Long,zone:ZoneId):Do
                 }
             }
         }
-        SaharaShowOlder(doses.size,dosesShown,tag="doctor-medicine-reports")
+        doses.shownOf(dosesShown).forEach {dose -> doseRow(dose)}
+        SaharaShowOlder(doses,dosesShown,tag="doctor-medicine-reports",title=t("Medicine reports", "दवा की सूचनाएँ"),searchText={"${it.medicineLabel}"},row=doseRow)
     }
 }
 

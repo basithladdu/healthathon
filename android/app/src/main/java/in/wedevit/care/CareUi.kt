@@ -697,10 +697,11 @@ internal fun careTabBack(personShown: Boolean, medicineScanner: Boolean, tab: In
                     }
                     if (notesOpen) Column(Modifier.heightIn(max = 280.dp).verticalScroll(rememberScrollState()).padding(start = 16.dp, end = 16.dp, bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         val gocNotesShown = rememberShownCount("goc-notes")
-                        versions.shownOf(gocNotesShown).forEach { note -> Card(onClick = { onRead(note) }, colors = CardDefaults.cardColors(containerColor = Cream), shape = RoundedCornerShape(14.dp)) {
+                        val gocNoteRow: @Composable (CareVersion) -> Unit = { note -> Card(onClick = { onRead(note) }, colors = CardDefaults.cardColors(containerColor = Cream), shape = RoundedCornerShape(14.dp)) {
                             Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Description, null, tint = Rust); Spacer(Modifier.width(12.dp)); Column(Modifier.weight(1f)) { Text(t("Version ${note.version}", "संस्करण ${note.version}") + if (note.id == versions.first().id) t(" · Latest", " · नया") else t(" · Earlier", " · पुराना"), fontWeight = FontWeight.Bold); Text("${date(note.published)} · ${note.doctor}", style = MaterialTheme.typography.bodySmall) } }
                         } }
-                        SaharaShowOlder(versions.size, gocNotesShown, tag = "goc-notes")
+                        versions.shownOf(gocNotesShown).forEach { gocNoteRow(it) }
+                        SaharaShowOlder(versions, gocNotesShown, tag = "goc-notes", title = t("Goals of care notes", "देखभाल के लक्ष्यों के नोट"), searchText = { "${it.version} ${it.doctor}" }, row = gocNoteRow)
                     }
                 }
             }

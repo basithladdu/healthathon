@@ -114,7 +114,7 @@ object SymptomSummaryRules {
             // The newest five notes, then "Show older" (24 Nov).
             val notesShown = rememberShownCount("$personId:${summary.symptom}")
             live.shownOf(notesShown).forEach { key(it.id) { SymptomNoteCard(it, vm, hindi) } }
-            SaharaShowOlder(live.size, notesShown, tag = "symptom-notes")
+            SaharaShowOlder(live, notesShown, tag = "symptom-notes", title = t("Notes", "नोट"), key = { it.id }) { SymptomNoteCard(it, vm, hindi) }
             TextButton(onClick = onClose, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Close", "बंद करें")) }
         }
     }

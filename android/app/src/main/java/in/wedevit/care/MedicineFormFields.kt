@@ -44,16 +44,9 @@ import androidx.compose.ui.unit.sp
     val t = careText(); val tick = rememberSaharaTick()
     val current = MedicinePhotoFields.canonicalForm(selected)
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        MedicineFieldTitle(t("Form", "रूप"))
-        FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            MedicinePhotoFields.forms.forEach { (english, hindiName) ->
-                val on = current.equals(english, ignoreCase = true)
-                FilterChip(selected = on, enabled = enabled, onClick = { tick(); onSelect(if (on) "" else english) },
-                    label = { Text(t(english, hindiName), fontSize = 15.sp, maxLines = 1, softWrap = false, fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal) },
-                    leadingIcon = if (on) { { Icon(Icons.Default.Check, null, Modifier.size(18.dp)) } } else null,
-                    shape = RoundedCornerShape(50), colors = medicineChipColors(on), modifier = Modifier.saharaSelectBounce(on, .08f).heightIn(min = 48.dp).testTag("$tagPrefix-${english.lowercase()}"))
-            }
-        }
+        SaharaDropdown(t("Form", "रूप"), MedicinePhotoFields.forms.firstOrNull { current.equals(it.first, ignoreCase = true) }?.let { t(it.first, it.second) } ?: current, enabled = enabled,
+            options = MedicinePhotoFields.forms.map { (english, hindiName) -> SaharaDropdownOption(t(english, hindiName), "$tagPrefix-${english.lowercase()}", current.equals(english, ignoreCase = true)) },
+            tag = "$tagPrefix-select", placeholder = t("Choose the form", "रूप चुनें"), onPick = { i -> tick(); onSelect(MedicinePhotoFields.forms[i].first) })
         if (current.isNotBlank() && MedicinePhotoFields.forms.none { it.first == current }) Text(t("Saved as: $current", "ऐसे सहेजा: $current"), fontSize = 14.sp, color = DoctorCardSub)
     }
 }
@@ -68,13 +61,21 @@ import androidx.compose.ui.unit.sp
     val t = careText(); val tick = rememberSaharaTick()
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         MedicineFieldTitle(t("How often", "कितनी बार"))
-        FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            MedicineFrequency.entries.forEach { frequency ->
-                val on = frequency == selected
-                FilterChip(selected = on, enabled = enabled, onClick = { tick(); onSelect(frequency) },
-                    label = { Text(t(frequency.english, frequency.hindi), fontSize = 16.sp, maxLines = 1, softWrap = false, fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal) },
-                    leadingIcon = if (on) { { Icon(Icons.Default.Check, null, Modifier.size(18.dp)) } } else null,
-                    shape = RoundedCornerShape(50), colors = medicineChipColors(on), modifier = Modifier.saharaSelectBounce(on, .08f).heightIn(min = 56.dp).testTag("$tagPrefix-${frequency.name.lowercase()}"))
+        var open by remember { mutableStateOf(false) }
+        ExposedDropdownMenuBox(expanded = open && enabled, onExpandedChange = { if (enabled) open = it }) {
+            OutlinedTextField(value = selected?.let { t(it.english, it.hindi) } ?: "", onValueChange = {}, readOnly = true, enabled = enabled, singleLine = true,
+                placeholder = { Text(t("Choose how often", "चुनें कितनी बार"), fontSize = 16.sp) },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = open && enabled) },
+                textStyle = androidx.compose.ui.text.TextStyle(fontSize = 16.sp), shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth().heightIn(min = 56.dp).testTag(tagPrefix))
+            ExposedDropdownMenu(expanded = open && enabled, onDismissRequest = { open = false }, containerColor = Paper) {
+                MedicineFrequency.entries.forEach { frequency ->
+                    val on = frequency == selected
+                    DropdownMenuItem(text = { Text(t(frequency.english, frequency.hindi), fontSize = 16.sp, fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal, color = SaharaColors.Ink) },
+                        trailingIcon = if (on) { { Icon(Icons.Default.Check, t("Selected", "चुना हुआ"), Modifier.size(18.dp), tint = RustText) } } else null,
+                        onClick = { tick(); open = false; onSelect(frequency) },
+                        modifier = Modifier.heightIn(min = 48.dp).testTag("medicine-frequency-option-${frequency.name.lowercase()}"))
+                }
             }
         }
         if (writtenBefore.isNotBlank()) Text(t("Written before: $writtenBefore", "पहले लिखा था: $writtenBefore"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.testTag("$tagPrefix-written"))

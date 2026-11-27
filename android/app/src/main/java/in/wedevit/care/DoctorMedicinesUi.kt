@@ -109,7 +109,7 @@ private fun medicineTime(at: Long?) = at?.let { DateTimeFormatter.ofPattern("d M
                 item(key="day-$day") {Text(day,fontSize=14.sp,fontWeight=FontWeight.Medium,color=DoctorCardSub,modifier=Modifier.padding(top=4.dp))}
                 items(dayEvents,key={it.id}) {event->MedicineReportCard(event,snapshot.events,System.currentTimeMillis())}
             }
-            if(intake.size>SaharaShowMore.INITIAL) item(key="intake-show-more") {SaharaShowOlder(intake.size,intakeShown,tag="doctor-intake")}
+            if(intake.size>SaharaShowMore.INITIAL) item(key="intake-show-more") {SaharaShowOlder(intake,intakeShown,tag="doctor-intake",title=t("Intake history", "दवा लेने का इतिहास"),searchText={"${it.name} ${medicineDay(it.plannedAt?:it.reportedTakenAt?:it.loggedAt)}"}) {event->MedicineReportCard(event,snapshot.events,System.currentTimeMillis())}}
         } else {
             val excluded=prescriptions?.excludedMedicineIds.orEmpty()
             val groupedIds=prescriptions?.medicines?.map {it.medicineId}?.toSet().orEmpty()

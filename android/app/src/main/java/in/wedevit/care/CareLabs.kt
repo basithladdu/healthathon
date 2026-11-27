@@ -70,11 +70,12 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
             }
             // Newest treatment days first, capped like every history (Show older adds more).
             val daysShown = rememberShownCount(selected, initial = 6)
-            treatmentDays.shownOf(daysShown, initial = 6).forEach { day -> Row(Modifier.fillMaxWidth().then(if (canEdit) Modifier.clickable { editingDay = day } else Modifier).heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
+            val dayRow: @Composable (TreatmentDay) -> Unit = { day -> Row(Modifier.fillMaxWidth().then(if (canEdit) Modifier.clickable { editingDay = day } else Modifier).heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text("${date(day.item.due)} · ${TreatmentDayRules.label(day.category)}", Modifier.weight(1f), color = if (day.category == "Chemotherapy") DoctorStatusWarn else DoctorCardInk)
                 if (canEdit) Icon(Icons.Default.Edit, t("Edit ${day.category} day ${date(day.item.due)}", "${date(day.item.due)} का दिन बदलें"), Modifier.size(18.dp), tint = DoctorCardSub)
             } }
-            SaharaShowOlder(treatmentDays.size, daysShown, initial = 6, tag = "treatment-days")
+            treatmentDays.shownOf(daysShown, initial = 6).forEach { day -> dayRow(day) }
+            SaharaShowOlder(treatmentDays, daysShown, initial = 6, tag = "treatment-days", title = t("Treatment days", "इलाज के दिन"), searchText = { "${date(it.item.due)} ${TreatmentDayRules.label(it.category)}" }, row = dayRow)
             if (canEdit) TextButton(onClick = { addingDay = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("add-treatment-day")) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Add a treatment day", "इलाज का दिन जोड़ें")) }
         } } }
     }
@@ -121,7 +122,7 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
                 // The newest three results; the rest wait behind "Show older" so one test never fills the screen (24 Nov).
                 val resultsShown = rememberShownCount(latest.first.id, initial = 3)
                 values.shownOf(resultsShown, initial = 3).forEach { (item, data) -> LabResultRow(vm, item, data, showDate = true, onEdit = { onEdit(item) }) }
-                SaharaShowOlder(values.size, resultsShown, initial = 3, tag = "lab-results")
+                SaharaShowOlder(values, resultsShown, initial = 3, tag = "lab-results", title = latest.first.title, searchText = { (item, data) -> "${data.rangeText} ${item.title} ${item.detail}" }) { (item, data) -> LabResultRow(vm, item, data, showDate = true, onEdit = { onEdit(item) }) }
             } }
         }
     }
@@ -262,13 +263,9 @@ private fun labRange(data: CareEntry): Pair<Double?, Double?> {
                     OutlinedTextField(high, { high = it }, label = { Text(t("Upper", "ऊपरी")) }, modifier = Modifier.weight(1f), singleLine = true, shape = RoundedCornerShape(14.dp), keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal))
                 }
                 OutlinedTextField(rangeText, { rangeText = it }, label = { Text(t("Or copy the printed range", "या छपी सीमा लिखें")) }, modifier = Modifier.fillMaxWidth(), maxLines = 2, shape = RoundedCornerShape(14.dp))
-                Text(t("Linked report", "जुड़ी रिपोर्ट"), Modifier.padding(top = 8.dp), style = MaterialTheme.typography.labelLarge, color = DoctorCardSub)
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    RecordsChip(selected = reportId.isBlank(), onClick = { reportId = ""; reportName = "" }, label = { Text(t("No report link", "रिपोर्ट नहीं जोड़ी")) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp))
-                    remember(reports, captured) { reports.filter { it.personId == captured } }.forEach { report ->
-                        RecordsChip(selected = reportId == report.id, onClick = { reportId = report.id; reportName = report.name }, label = { Text(report.name, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp))
-                    }
-                }
+                val linkable = remember(reports, captured) { reports.filter { it.personId == captured } }
+                SaharaDropdown(t("Linked report", "जुड़ी रिपोर्ट"), if (reportId.isBlank()) t("No report link", "रिपोर्ट नहीं जोड़ी") else reportName, listOf(SaharaDropdownOption(t("No report link", "रिपोर्ट नहीं जोड़ी"), "lab-report-none", reportId.isBlank())) + linkable.map { SaharaDropdownOption(it.name, "lab-report-${it.id}", reportId == it.id) },
+                    tag = "lab-report-link", modifier = Modifier.padding(top = 8.dp), onPick = { i -> if (i == 0) { reportId = ""; reportName = "" } else { reportId = linkable[i - 1].id; reportName = linkable[i - 1].name } })
                 OutlinedTextField(detail, { detail = it }, label = { Text(t("Report notes (optional)", "रिपोर्ट पर नोट (चाहें तो)")) }, modifier = Modifier.fillMaxWidth(), maxLines = 3, shape = RoundedCornerShape(14.dp))
             }
             val shownError = error.ifBlank { saveError.orEmpty() }

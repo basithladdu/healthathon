@@ -80,7 +80,7 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
     // The mood tapped here; the bloom plays once that mood is really saved (it follows the record, so a failed save shows nothing).
     var tapped by remember { mutableStateOf<String?>(null) }
     Surface(shape = RoundedCornerShape(TodayHero.radius), color = band, contentColor = DoctorCardInk, shadowElevation = 3.dp, border = BorderStroke(1.dp, Color(0xFFE0C8BA)), modifier = Modifier.fillMaxWidth().saharaAppear().saharaPulseGlow(TodayHero.dueBand, TodayHero.radius, active = !done).saharaBloom(tapped != null && today?.title == tapped && tapped != CheckInMood.HARD, SaharaTone.Success.solid, TodayHero.radius).testTag("today-checkin")) { Box(Modifier.background(androidx.compose.ui.graphics.Brush.linearGradient(listOf(Color(0xFFFFE8C2), Color(0xFFFBD8DF), Color(0xFFD2EADF))))) {
-        Column(Modifier.saharaContentSize().padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 6.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.saharaContentSize().padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { HealthCardLabel(HealthCategory.CheckIn, t("Check-in", "रोज़ का हाल"), Modifier.weight(1f)); Text(LocalDate.now().format(careDateFormat("EEE, d MMM", hindi)), fontSize = 13.sp, color = Color(0xFF5E5650)) }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(t("How was today?", "आज का दिन कैसा रहा?"), fontFamily = SaharaTitleFont, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
@@ -244,7 +244,7 @@ internal object CareModules {
     if (label != null) Text("$label · ${saharaCountUp(items.size)}", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub, modifier = Modifier.padding(start = 4.dp, top = 4.dp).a11yHeading())
     SaharaStateSwitch(items.isEmpty(), Modifier.fillMaxWidth(), label = "care-module-$key") { isEmpty -> if (isEmpty) { if (empty.isBlank()) QuietLine(empty) else SaharaCalmEmpty(empty) } else Column(Modifier.saharaContentSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
     (if (capped) items.shownOf(shown) else items).forEachIndexed { i, item -> key(keyOf(item)) { Box(Modifier.saharaStagger(i)) { row(item) } } }
-    if (capped) SaharaShowOlder(items.size, shown, tag = "care-module-$key")
+    if (capped) SaharaShowOlder(items, shown, tag = "care-module-$key", key = keyOf, row = row)
     } }
 }
 

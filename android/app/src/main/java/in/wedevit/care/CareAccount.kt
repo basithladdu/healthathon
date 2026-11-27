@@ -104,7 +104,7 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
         CompositionLocalProvider(LocalCareLanguage provides rootLanguage) { CareLanguageDirection(rootLanguage) {
         SaharaScreenHost(mode, Modifier.fillMaxSize().background(Cream), label = "Sahara root", direction = { _, to -> if (to == "care") SaharaMotion.Direction.Back else SaharaMotion.Direction.Forward }) { shown -> when (shown) {
         "patient-walkthrough" -> patientWalkthroughUser?.let { PatientWalkthroughHost(it, onExit = { patientWalkthroughUser = null }, onSwitch = { patientWalkthroughUser = it }) }
-        "doctor-walkthrough" -> DoctorDemo(onExit = { demoOpen = false; walkthroughPatient = null }, cloud = cloud, initialPatientId = walkthroughPatient, careModel = model, onCareAccount = { accountOpen = true })
+        "doctor-walkthrough" -> DoctorDemo(onExit = { demoOpen = false; walkthroughPatient = null }, cloud = cloud, initialPatientId = walkthroughPatient, careModel = model, onCareAccount = { accountOpen = true }, skipLogin = true)
         "doctor" -> ConnectedDoctorWorkspace(cloud, model, onExit = { doctorOpen = false }, onAccount = { accountOpen = true }, onWalkthrough = { walkthroughPatient = it; demoOpen = true })
         else -> CareApp(model, onAccount = { accountOpen = true }, onDoctorDemo = {
             if (model.recording.value) model.message.value = rt("Stop recording first.", "पहले रिकॉर्डिंग रोकें।")

@@ -173,10 +173,8 @@ import java.time.LocalDate
     SaharaScreenSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = 16.dp).padding(bottom = 32.dp).saharaContentSize().testTag("device-edit-sheet"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(if (existing) t("Edit tube or line", "नली या लाइन बदलें") else t("Add tube or line", "नली या लाइन जोड़ें"), fontFamily = SaharaTitleFont, fontSize = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
-            Text(t("Type", "प्रकार"), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub)
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                CareDeviceType.values().forEach { v -> DevicesChip(type == v, t(v.en, v.hi), Modifier.testTag("device-type-${v.name}")) { type = v } }
-            }
+            SaharaDropdown(t("Type", "प्रकार"), t(type.en, type.hi), CareDeviceType.values().map { v -> SaharaDropdownOption(t(v.en, v.hi), "device-type-${v.name}", type == v) },
+                tag = "device-type-select", onPick = { i -> type = CareDeviceType.values()[i] })
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 DevicesDateButton(t("Date put in", "लगाने की तारीख़"), inserted?.format(fmt), Modifier.weight(1f).testTag("device-inserted")) { picking = "inserted" }
                 DevicesDateButton(t("Next change due", "अगली बार बदलना"), changeDue?.format(fmt), Modifier.weight(1f).testTag("device-change-due")) { picking = "due" }

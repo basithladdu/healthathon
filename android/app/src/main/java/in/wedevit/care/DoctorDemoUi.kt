@@ -93,15 +93,15 @@ private val DoctorMist = Peach
 }
 
 /** A separate walkthrough workspace: no CareModel, account token, Room or network operations. */
-@Composable fun DoctorDemo(onExit: () -> Unit, store: DoctorDemoStore? = null, workflowStore: DoctorWorkflowStore? = null, cloud:CareCloud? = null, enableOnlineAi:Boolean=false, initialPatientId:String?=null, careModel: CareModel? = null, onCareAccount: () -> Unit = {}) {
+@Composable fun DoctorDemo(onExit: () -> Unit, store: DoctorDemoStore? = null, workflowStore: DoctorWorkflowStore? = null, cloud:CareCloud? = null, enableOnlineAi:Boolean=false, initialPatientId:String?=null, careModel: CareModel? = null, onCareAccount: () -> Unit = {}, skipLogin: Boolean = false) {
     var authOpen by remember { mutableStateOf(false) }
     MaterialTheme(colorScheme = saharaColorScheme, shapes = saharaShapes, typography = saharaTypography()) {
-        DoctorWorkspace(onExit, store, workflowStore, if(enableOnlineAi) cloud else null, enableOnlineAi, onSignIn={if(enableOnlineAi) authOpen=true}, initialPatientId=initialPatientId, careModel = careModel, onCareAccount = onCareAccount)
+        DoctorWorkspace(onExit, store, workflowStore, if(enableOnlineAi) cloud else null, enableOnlineAi, onSignIn={if(enableOnlineAi) authOpen=true}, initialPatientId=initialPatientId, careModel = careModel, onCareAccount = onCareAccount, skipLogin = skipLogin)
         if(enableOnlineAi && authOpen && cloud!=null) DoctorAiAccountSheet(cloud,onDismiss={authOpen=false})
     }
 }
 
-@Composable private fun DoctorWorkspace(onExit: () -> Unit, store: DoctorDemoStore?, workflowStore: DoctorWorkflowStore?, cloud:CareCloud?,enableOnlineAi:Boolean,onSignIn:()->Unit,initialPatientId:String?=null, careModel: CareModel? = null, onCareAccount: () -> Unit = {}) { val t = careText();
+@Composable private fun DoctorWorkspace(onExit: () -> Unit, store: DoctorDemoStore?, workflowStore: DoctorWorkflowStore?, cloud:CareCloud?,enableOnlineAi:Boolean,onSignIn:()->Unit,initialPatientId:String?=null, careModel: CareModel? = null, onCareAccount: () -> Unit = {}, skipLogin: Boolean = false) { val t = careText();
     val context = LocalContext.current
     val focus=LocalFocusManager.current
     DisposableEffect(context) {
@@ -118,7 +118,7 @@ private val DoctorMist = Peach
     val workflowAccountId=onlineSession?.value?.userId
     val workflowNamespace=runCatching { doctorWorkflowNamespace(workflowAccountId) }.getOrDefault("doctor-workflow-invalid-session")
     val workflow = workflowStore ?: remember(workflowNamespace) { DoctorWorkflowStore(context.applicationContext,preferencesName=workflowNamespace) }
-    var loggedIn by rememberSaveable { mutableStateOf(initialPatientId != null && demoStore.patients.any { it.id == initialPatientId }) }
+    var loggedIn by rememberSaveable { mutableStateOf(skipLogin || initialPatientId != null && demoStore.patients.any { it.id == initialPatientId }) }
     var tab by rememberSaveable { mutableIntStateOf(0) }
     var feedbackOpen by rememberSaveable(workflowNamespace) { mutableStateOf(false) }
     var patientId by rememberSaveable { mutableStateOf(initialPatientId?.takeIf { requested -> demoStore.patients.any { it.id == requested } }) }
@@ -221,24 +221,33 @@ private val DoctorMist = Peach
             workflowRoute != null -> workflowRoute = null
             patientId != null -> backPatient()
             loggedIn && tab != 0 -> tab = 0
-            loggedIn -> loggedIn = false
+            loggedIn && !skipLogin -> loggedIn = false
             else -> onExit() }
     }
     if (!loggedIn) {
         DemoLogin(onContinue = { loggedIn = true }, onExit = onExit)
         return
     }
+    // Goals of care draws its own single header (back, title, language, steps), so the bar above it is left out while it is open.
+    val gocOwnHeader = (carePersonId != null && !sampleCareOpen && careSection == "GoalsOfCare") || (sampleCareOpen && GocHeaderState.hostGoc)
+    // One header per screen: inside a patient section the title is the page (Documents, Medicines ...) and the patient is the subtitle.
+    val headerSection = if (sampleCareOpen) GocHeaderState.hostSection else if (carePersonId != null) careSection else "Hub"
+    val sectionTab = if (headerSection != "Hub") (doctorPatientTabs + doctorMoreSections).firstOrNull { it.section == headerSection } else null
+    val headerPatientName = if (sampleCareOpen) DoctorTestProfiles.profiles.firstOrNull { DoctorTestProfiles.personId(it) == testCarePerson }?.name.orEmpty() else carePerson?.name.orEmpty()
+    SideEffect { GocHeaderState.ownHeader = gocOwnHeader }
+    DisposableEffect(Unit) { onDispose { GocHeaderState.ownHeader = false } }
     Scaffold(containerColor = DoctorBackground, topBar = {
         // The calm header: cream ground, ink title and icons, a hairline below (as on the family side).
         SaharaStatusBarIcons(lightIcons = false)
-        Surface(color = SaharaColors.Header, contentColor = SaharaColors.OnHeader) { Column(Modifier.statusBarsPadding()) {
+        if (!gocOwnHeader) Surface(color = SaharaColors.Header, contentColor = SaharaColors.OnHeader) { Column(Modifier.statusBarsPadding()) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 if(sampleCareOpen) IconButton(onClick={sampleCareBack?.invoke() ?: run {sampleCareOpen=false}},enabled=!careNavigationBlocked){Icon(Icons.AutoMirrored.Filled.ArrowBack,t("Back to patient care", "मरीज़ की देखभाल पर वापस"))}
                 else if (carePersonId != null) IconButton(onClick = { if (careNestedBack != null) careNestedBack?.invoke() else navigateCare { if (careSection == "Hub") carePersonId = null else careSection = "Hub" } }, enabled = !careNavigationBlocked) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back to patient care", "मरीज़ की देखभाल पर वापस")) }
                 else if (patient != null) IconButton(onClick = ::backPatient,modifier=Modifier.testTag("demo-patient-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, if(reportId!=null) t("Back to reports", "रिपोर्टों पर वापस") else if(progressReportId!=null) t("Back to progress", "प्रगति पर वापस") else if(recordTab=="Hub") t("Back to patients", "मरीज़ों की सूची पर वापस") else t("Back to patient profile", "मरीज़ की प्रोफ़ाइल पर वापस")) }
                 else { Image(saharaImage(R.drawable.sahara_professional_logo, 34.dp), null, Modifier.size(36.dp).clip(CircleShape).background(SaharaColors.Surface).padding(3.dp)); Spacer(Modifier.width(8.dp)) }
                 Column(Modifier.weight(1f)) {
-                    Text(if(sampleCareOpen) DoctorTestProfiles.profiles.firstOrNull {DoctorTestProfiles.personId(it)==testCarePerson}?.name ?: t("Earlier demo care", "पहले की डेमो देखभाल") else if (carePersonId != null) carePerson?.name ?: t("Care profile unavailable", "देखभाल प्रोफ़ाइल उपलब्ध नहीं") else if (patient != null) patient.displayName() else "Sahara", fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 20.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(if (sectionTab != null) t(sectionTab.en, sectionTab.hi) else if(sampleCareOpen) DoctorTestProfiles.profiles.firstOrNull {DoctorTestProfiles.personId(it)==testCarePerson}?.name ?: t("Earlier demo care", "पहले की डेमो देखभाल") else if (carePersonId != null) carePerson?.name ?: t("Care profile unavailable", "देखभाल प्रोफ़ाइल उपलब्ध नहीं") else if (patient != null) patient.displayName() else "Sahara", fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 20.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    if (sectionTab != null) Text(headerPatientName, Modifier.testTag("doctor-header-subtitle"), fontSize = 14.sp, lineHeight = 18.sp, color = SaharaColors.InkSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
                 CareLanguageMenu(compact = true)
                 Spacer(Modifier.width(10.dp))

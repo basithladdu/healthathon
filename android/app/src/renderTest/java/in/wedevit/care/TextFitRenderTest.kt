@@ -99,8 +99,7 @@ abstract class TextFitRenderTest(private val flow: String, private val hindi: Bo
 
     private fun doctor() {
         click("doctor-workspace-entry"); click("doctor-demo-entry")
-        compose.waitUntil(20_000) { has("demo-login") }
-        click("demo-login")
+        compose.waitUntil(20_000) { has("demo-nav-Patients") }
         screen("Doctor home") {}
         screen("Doctor patients") { click("demo-nav-Patients") }
         val patientTag = tags("demo-patient-").firstOrNull { it.removePrefix("demo-patient-") !in setOf("back", "detail", "hub", "search") }

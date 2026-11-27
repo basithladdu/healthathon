@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
@@ -374,6 +375,7 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
     var guideTicked by remember { mutableStateOf(setOf<GocGuideItem>()) }
     // Dr Sujay's doctor-driven topic guide: the doctor taps topics as they are covered; no AI. Start times are seconds from the recording start (-1 = not recording); kept for the session only.
     var guideMe by rememberSaveable { mutableStateOf(true) }
+    var guideOpen by rememberSaveable { mutableStateOf(false) }
     var guideStampText by rememberSaveable(d.id) { mutableStateOf("") }
     var guideNow by rememberSaveable(d.id) { mutableStateOf(-1) }
     var guideCur by rememberSaveable(d.id) { mutableStateOf(0) }
@@ -522,13 +524,14 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
     Column(Modifier.fillMaxSize().testTag("goc-page")) {
     GocBand(t("Goals of care", "देखभाल के लक्ष्य"), d.patient.name, step, signOff != null, onClose)
     // The current topic and its prompts stay in view while the doctor talks and records; it folds to one line.
-    if (stage == GocStage.CAPTURE && guideMe && !busy) GocPinnedGuide(guideState, guideCur, recorderState.recording,
+    if (stage == GocStage.CAPTURE && guideMe && !busy) GocPinnedGuide(guideState, guideCur, recorderState.recording, guideOpen, { guideOpen = !guideOpen },
         onDone = { val next = GocTopicGuide.done(guideState, guideCur, guideSeconds); guideApply(next); GocTopicGuide.next(next.discussed, guideCur, guideRows.size)?.let { guideCur = it } },
         onAllTopics = { guideMe = false },
         onFinish = if (recorderState.recording && recorder != null) ({ recorder.stopAndGet()?.let { transcribe(it) } }) else null)
     SaharaStateSwitch(stage, Modifier.weight(1f), label = "goc stage") { shown ->
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
 
+        if (shown == GocStage.CAPTURE && guideMe && !busy && guideOpen && !GocChecklist.ROWS.indices.all { it in guideState.discussed }) item(key = "guide-details") { GocGuideDetails(guideState, guideCur) }
         if (shown == GocStage.CAPTURE) item(key = "capture") {
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 // Consent: the patient's tick or the family's tick, either is enough (23 Nov); the record button stays off until one is ticked. Hidden while recording (it was given).
@@ -759,7 +762,7 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
             "अगर मरीज़ फ़ैसला न ले सकें, तो जो व्यक्ति टीम के साथ फ़ैसला करेंगे। उनका नाम, रिश्ता और फ़ोन दस्तावेज़ की फ़ैसला लेने वालों की तालिका में जाते हैं।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
         Box(Modifier.testTag("goc-dm-name")) { CareField(dm.name, { v -> setDm { it.copy(name = v) } }, t("Name", "नाम"), singleLine = true) }
         Box(Modifier.testTag("goc-dm-relation")) { CareField(dm.relation, { v -> setDm { it.copy(relation = v) } }, t("Relation", "रिश्ता"), singleLine = true) }
-        Box(Modifier.testTag("goc-dm-phone")) { CareField(dm.phone24h, { v -> setDm { it.copy(phone24h = v) } }, t("24-hour phone", "24 घंटे का फ़ोन"), singleLine = true, voice = false) }
+        Box(Modifier.testTag("goc-dm-phone")) { CarePhoneField(dm.phone24h, { v -> setDm { it.copy(phone24h = v) } }, t("24-hour phone", "24 घंटे का फ़ोन"), "goc-dm-phone-field", Modifier.fillMaxWidth()) }
         Text(t("The patient's own name, phone and address come from their profile. The full care plan holds the rest, such as a second decision-maker and their ID.",
             "मरीज़ का अपना नाम, फ़ोन और पता उनकी प्रोफ़ाइल से आते हैं। बाकी, जैसे दूसरे फ़ैसला लेने वाले और उनकी पहचान, पूरी देखभाल योजना में है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
         val patientLine = listOf(d.patient.name, d.patient.phone).filter(String::isNotBlank).joinToString(" · ")
@@ -770,14 +773,15 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
 /** The page's header: a light indigo wash with back, title (dark ink) and the patient's name, and the three steps (Record, Review, Sign), each named under its bar. */
 @Composable private fun GocBand(title: String, name: String, step: Int, locked: Boolean, onBack: () -> Unit) { val t = careText()
     val labels = listOf(t("Record", "रिकॉर्ड"), t("Review", "समीक्षा"), t("Sign", "हस्ताक्षर"))
-    Surface(color = GocBandColor, contentColor = SaharaColors.Ink, modifier = Modifier.fillMaxWidth().testTag("goc-header")) { Column {
-        Column(Modifier.padding(start = 4.dp, end = 16.dp, top = 4.dp, bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Surface(color = GocBandColor, contentColor = SaharaColors.Ink, modifier = Modifier.fillMaxWidth().testTag("goc-header")) { Column(Modifier.then(if (GocHeaderState.ownHeader) Modifier.statusBarsPadding() else Modifier)) {
+        Column(Modifier.padding(start = 4.dp, end = 16.dp, top = 0.dp, bottom = 0.dp), verticalArrangement = Arrangement.spacedBy(0.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onBack, modifier = Modifier.testTag("goc-header-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस"), tint = SaharaColors.Ink) }
                 Column(Modifier.weight(1f)) {
                     Text(title, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.SemiBold, fontSize = 22.sp, lineHeight = 28.sp, color = SaharaColors.Ink)
                     if (name.isNotBlank()) Text(name, fontSize = 15.sp, lineHeight = 20.sp, color = GocBandSub, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.testTag("goc-header-name"))
                 }
+                if (GocHeaderState.ownHeader) CareLanguageMenu(compact = true)
                 if (locked) Surface(color = GocBandDone, contentColor = Color.White, shape = CircleShape) {
                     Row(Modifier.padding(horizontal = 10.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.Lock, null, Modifier.size(16.dp)); Spacer(Modifier.width(4.dp)); Text(t("Locked", "लॉक"), fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
@@ -785,14 +789,15 @@ private val GocPatientChip get() = SaharaTone.Teal.solid
                 }
             }
             // Segmented step indicator: numbered circles joined by a line; done = green with a tick, current = filled green, next = outlined.
-            Row(Modifier.fillMaxWidth().padding(start = 12.dp, top = 4.dp).testTag("goc-steps"), verticalAlignment = Alignment.Top) {
+            // Compact step indicator, one slim row: small numbered circles with the label beside each, joined by a line; done = green tick, current = filled green, next = outlined.
+            Row(Modifier.fillMaxWidth().height(40.dp).padding(start = 12.dp).testTag("goc-steps"), verticalAlignment = Alignment.CenterVertically) {
                 labels.forEachIndexed { i, label ->
                     val done = i < step || locked; val now = i == step && !locked
-                    if (i > 0) Box(Modifier.weight(1f).padding(top = 15.dp, start = 4.dp, end = 4.dp).height(2.dp).background(if (done || now) SaharaColors.Primary else SaharaColors.Line))
-                    Column(Modifier.widthIn(min = 64.dp).semantics(mergeDescendants = true) {}, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Box(Modifier.size(32.dp).clip(CircleShape).background(if (done || now) SaharaColors.Primary else Color.White).then(if (done || now) Modifier else Modifier.border(1.5.dp, SaharaColors.LineStrong, CircleShape)), contentAlignment = Alignment.Center) {
-                            if (done) Icon(Icons.Default.Check, null, Modifier.size(18.dp), tint = Color.White)
-                            else Text("${i + 1}", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = if (now) Color.White else SaharaColors.InkSub)
+                    if (i > 0) Box(Modifier.weight(1f).padding(horizontal = 6.dp).height(2.dp).background(if (done || now) SaharaColors.Primary else SaharaColors.Line))
+                    Row(Modifier.semantics(mergeDescendants = true) {}, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Box(Modifier.size(22.dp).clip(CircleShape).background(if (done || now) SaharaColors.Primary else Color.White).then(if (done || now) Modifier else Modifier.border(1.5.dp, SaharaColors.LineStrong, CircleShape)), contentAlignment = Alignment.Center) {
+                            if (done) Icon(Icons.Default.Check, null, Modifier.size(14.dp), tint = Color.White)
+                            else Text("${i + 1}", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = if (now) Color.White else SaharaColors.InkSub)
                         }
                         Text(label, fontSize = 14.sp, lineHeight = 18.sp, fontWeight = if (now) FontWeight.Bold else FontWeight.Medium, color = if (now) SaharaColors.Ink else SaharaColors.InkSub, maxLines = 1, softWrap = false,
                             modifier = if (now) Modifier.testTag("goc-step-now") else Modifier)
@@ -988,3 +993,6 @@ private fun clock(seconds: Int) ="${seconds / 60}:${(seconds % 60).toString().pa
         }
     }
 }
+
+/** True while the host screen has left out its own top bar for Goals of care, so the page's header carries the language picker and the status-bar space. */
+internal object GocHeaderState { var ownHeader by androidx.compose.runtime.mutableStateOf(false); var hostGoc by androidx.compose.runtime.mutableStateOf(false); var hostSection by androidx.compose.runtime.mutableStateOf("Hub") }

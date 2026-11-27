@@ -400,7 +400,7 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
             Text(t("Family doctor (optional)", "पारिवारिक डॉक्टर (वैकल्पिक)"), fontWeight = FontWeight.Medium)
             CareField(c.familyPhysician.name, { v -> c = c.copy(familyPhysician = c.familyPhysician.copy(name = v)) }, t("Name", "नाम"), singleLine = true)
             CareField(c.familyPhysician.registrationNo, { v -> c = c.copy(familyPhysician = c.familyPhysician.copy(registrationNo = v)) }, t("Registration number", "पंजीकरण नंबर"), singleLine = true, voice = false)
-            CareField(c.familyPhysician.phone, { v -> c = c.copy(familyPhysician = c.familyPhysician.copy(phone = v)) }, t("Phone", "फ़ोन"), singleLine = true, voice = false)
+            CarePhoneField(c.familyPhysician.phone, { v -> c = c.copy(familyPhysician = c.familyPhysician.copy(phone = v)) }, t("Phone", "फ़ोन"), "care-plan-physician-phone", Modifier.fillMaxWidth())
             CareField(c.custodianBody, { v -> c = c.copy(custodianBody = v) }, t("Local body that keeps advance care planning records (custodian)", "स्थानीय निकाय जो अग्रिम देखभाल योजना रखता है (संरक्षक)"), singleLine = true, placeholder = t("Municipality or panchayat", "नगरपालिका या पंचायत"))
         }
         PlanCard {
@@ -427,8 +427,8 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
         }
         CareField(dhr.name, { onChange(dhr.copy(name = it)) }, t("Full name", "पूरा नाम"), singleLine = true)
         CareField(dhr.relation, { onChange(dhr.copy(relation = it)) }, t("Relation", "रिश्ता"), singleLine = true)
-        CareField(dhr.phone, { onChange(dhr.copy(phone = it)) }, t("Mobile number", "मोबाइल नंबर"), singleLine = true, voice = false)
-        CareField(dhr.phoneAlt, { onChange(dhr.copy(phoneAlt = it)) }, t("Other number (optional)", "दूसरा नंबर (वैकल्पिक)"), singleLine = true, voice = false)
+        CarePhoneField(dhr.phone, { onChange(dhr.copy(phone = it)) }, t("Mobile number", "मोबाइल नंबर"), "care-plan-dhr-phone", Modifier.fillMaxWidth())
+        CarePhoneField(dhr.phoneAlt, { onChange(dhr.copy(phoneAlt = it)) }, t("Other number (optional)", "दूसरा नंबर (वैकल्पिक)"), "care-plan-dhr-phone-alt", Modifier.fillMaxWidth())
         PlanDateField(dhr.dob, t("Date of birth (optional)", "जन्म तिथि (वैकल्पिक)"), { onChange(dhr.copy(dob = it)) }, latest = today)
         CareField(dhr.email, { onChange(dhr.copy(email = it)) }, t("Email (optional)", "ईमेल (वैकल्पिक)"), singleLine = true, voice = false)
         AmdIdFields(dhr.idType, dhr.idLast4, "amd-dhr-$index-id", { onChange(dhr.copy(idType = it)) }, { onChange(dhr.copy(idLast4 = it)) })
@@ -478,7 +478,7 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
         listOf(0, 1).forEach { i -> val n = i + 1; val x = e.witnesses[i]
             Text(t("Witness $n", "गवाह $n"), fontWeight = FontWeight.Medium)
             CareField(x.name, { v -> w0({ it.copy(name = v) }, i) }, t("Full name", "पूरा नाम"), singleLine = true)
-            CareField(x.phone, { v -> w0({ it.copy(phone = v) }, i) }, t("Mobile", "मोबाइल"), singleLine = true, voice = false)
+            CarePhoneField(x.phone, { v -> w0({ it.copy(phone = v) }, i) }, t("Mobile", "मोबाइल"), "care-plan-witness-phone", Modifier.fillMaxWidth())
             CareField(x.address, { v -> w0({ it.copy(address = v) }, i) }, t("Address", "पता"), singleLine = true)
         }
         // Required before "Mark as signed": how the paper was read to the person, who read it and who saw it.

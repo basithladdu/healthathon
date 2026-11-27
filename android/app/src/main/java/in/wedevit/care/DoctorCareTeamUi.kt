@@ -117,7 +117,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                 CareField(name, { name = it }, t("Name", "नाम"), singleLine = true)
                 CareField(relationship, { relationship = it }, t("Relationship or care role", "रिश्ता या देखभाल में भूमिका"), singleLine = true)
                 CareContactRules.roles.forEach { value -> Row { RadioButton(role == value, { role = value }); Text(value.replaceFirstChar { it.uppercase() }, Modifier.padding(top = 12.dp)) } }
-                CareField(phone, { phone = it }, t("Phone", "फ़ोन"), singleLine = true, voice = false)
+                CarePhoneField(phone, { phone = it }, if (role == "clinician") t("Doctor or hospital number (mobile or landline)", "डॉक्टर या अस्पताल का नंबर (मोबाइल या लैंडलाइन)") else t("Phone", "फ़ोन"), "care-team-contact-phone", Modifier.fillMaxWidth())
                 error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
             }
         }, confirmButton = { TextButton(onClick = { vm.saveCareContact(contact.copy(name = name, relationship = relationship, role = role, phone = phone), account) { editing = null } }, enabled = !busy && name.isNotBlank() && relationship.isNotBlank()) { Text(t("Save", "सहेजें")) } }, dismissButton = { TextButton(onClick = { editing = null }, enabled = !busy) { Text(t("Cancel", "रद्द करें")) } })

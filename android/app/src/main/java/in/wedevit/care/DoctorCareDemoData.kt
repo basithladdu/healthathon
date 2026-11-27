@@ -178,6 +178,8 @@ internal object DoctorCareDemoData {
     DisposableEffect(vm) {onDispose {vm.closeDoctorDemo();onNavigationBlockedChange(false);onHeaderBackChange(null)}}
     SideEffect {if(closing || (!ready&&error==null))onNavigationBlockedChange(true)}
     LaunchedEffect(vm,attempt,initialPersonId) {try {if(DoctorTestProfiles.contains(initialPersonId)) DoctorTestProfiles.seed(vm,context) else DoctorCareDemoData.seed(vm,context);vm.select(initialPersonId);vm.refreshCareContacts();vm.refreshMedicineHistory();ready=true;onNavigationBlockedChange(false)}catch(e:Exception){if(e is CancellationException)throw e;android.util.Log.e("SaharaSeed","walkthrough load failed",e);error="Practice could not open. Your own profiles were not changed.";onNavigationBlockedChange(false)}}
+    SideEffect {GocHeaderState.hostGoc = section=="GoalsOfCare"; GocHeaderState.hostSection = section}
+    DisposableEffect(Unit) {onDispose{GocHeaderState.hostGoc = false; GocHeaderState.hostSection = "Hub"}}
     DisposableEffect(section) {onHeaderBackChange(back);onDispose{onHeaderBackChange(null)}}
     SaharaBackHandler(enabled=!childBlocked&&!closing&&(ready||error!=null||closeFailed)) {back()}
     if(closing) Column(Modifier.padding(20.dp)){SaharaProgressBar(null);Text(if(DoctorTestProfiles.contains(initialPersonId)) "Saving this discussion…" else "Saving your practice draft…")}

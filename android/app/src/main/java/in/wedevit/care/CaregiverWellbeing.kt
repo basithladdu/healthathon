@@ -206,7 +206,14 @@ private val zbiAnswerHi = listOf("कभी नहीं", "शायद ही 
                         }
                     }
                 } }
-                SaharaShowOlder(journal.size, journalShown, initial = 2, tag = "journal")
+                SaharaShowOlder(journal, journalShown, initial = 2, tag = "journal", title = t("Journal", "डायरी"), searchText = { it.text }) { n ->
+                    Surface(shape = RoundedCornerShape(14.dp), color = Paper, modifier = Modifier.fillMaxWidth()) {
+                        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Text(java.time.Instant.ofEpochMilli(n.at).atZone(java.time.ZoneId.systemDefault()).format(fmt), fontSize = 14.sp, color = DoctorCardSub)
+                            Text(n.text, fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk)
+                        }
+                    }
+                }
             } }
         }
     }

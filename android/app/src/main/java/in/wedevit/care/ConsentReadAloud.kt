@@ -259,27 +259,20 @@ private fun consentProblemText(t: (String, String) -> String, p: ConsentReadingP
     var other by rememberSaveable(tag) { mutableStateOf(people.isEmpty()) }
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(title, fontSize = 18.sp, lineHeight = 24.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.a11yHeading())
-        if (people.isNotEmpty()) FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            people.forEachIndexed { i, p ->
-                FilterChip(selected = !other && known == p, onClick = { other = false; onPick(p.name, p.relation) }, enabled = enabled,
-                    label = { Text(p.name + if (p.relation.isNotBlank()) " · " + ConsentReadingRules.relationLabel(t, p.relation) else "", fontSize = 17.sp, modifier = Modifier.padding(vertical = 8.dp)) },
-                    leadingIcon = if (!other && known == p) { { Icon(Icons.Default.CheckCircle, null, Modifier.size(18.dp)) } } else null,
-                    modifier = Modifier.heightIn(min = 48.dp).testTag("$tag-person-$i"))
-            }
-            FilterChip(selected = other, onClick = { other = true; if (known != null) onPick("", "") }, enabled = enabled,
-                label = { Text(t("Someone else", "कोई और"), fontSize = 17.sp, modifier = Modifier.padding(vertical = 8.dp)) }, modifier = Modifier.heightIn(min = 48.dp).testTag("$tag-other"))
+        if (people.isNotEmpty()) {
+            val labels = people.map { p -> p.name + if (p.relation.isNotBlank()) " · " + ConsentReadingRules.relationLabel(t, p.relation) else "" }
+            val elseLabel = t("Someone else", "कोई और")
+            val opts = people.mapIndexed { i, _ -> SaharaDropdownOption(labels[i], "$tag-person-$i", !other && known == people[i]) } + SaharaDropdownOption(elseLabel, "$tag-other", other)
+            SaharaDropdown(title, if (other) elseLabel else known?.let { labels[people.indexOf(it)] }.orEmpty(), opts, tag = "$tag-select", enabled = enabled, placeholder = t("Choose a person", "व्यक्ति चुनें"),
+                onPick = { i -> if (i < people.size) { other = false; onPick(people[i].name, people[i].relation) } else { other = true; if (known != null) onPick("", "") } })
         }
         // Someone else: a short name and a relationship tap. Someone on the record without a relationship: the taps only.
         AnimatedVisibility(other || known?.relation?.isBlank() == true, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) {
             Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (other) CareField(name, { onPick(it.take(ConsentReadingRules.NAME_MAX), relation) }, t("Name", "नाम"), singleLine = true)
-                Text(t("Relationship to the patient", "मरीज़ से रिश्ता"), fontSize = 16.sp, color = DoctorCardSub)
-                FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    ConsentReadingRules.RELATIONS.forEach { r ->
-                        FilterChip(selected = relation == r, onClick = { onPick(name, if (relation == r) "" else r) }, enabled = enabled,
-                            label = { Text(ConsentReadingRules.relationLabel(t, r), fontSize = 17.sp, modifier = Modifier.padding(vertical = 8.dp)) }, modifier = Modifier.heightIn(min = 48.dp).testTag("$tag-relation-$r"))
-                    }
-                }
+                SaharaDropdown(t("Relationship to the patient", "मरीज़ से रिश्ता"), if (relation.isBlank()) "" else ConsentReadingRules.relationLabel(t, relation),
+                    ConsentReadingRules.RELATIONS.map { r -> SaharaDropdownOption(ConsentReadingRules.relationLabel(t, r), "$tag-relation-$r", relation == r) },
+                    tag = "$tag-relation-select", enabled = enabled, placeholder = t("Choose", "चुनें"), onPick = { i -> onPick(name, ConsentReadingRules.RELATIONS[i]) })
             }
         }
     }

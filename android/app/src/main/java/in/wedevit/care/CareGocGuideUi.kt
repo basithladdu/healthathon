@@ -287,49 +287,55 @@ private fun sectionTitle(section: String): Pair<String, String> = when (section)
  * The topic, what to decide and what to say stay in view; the arrow folds it to one line. After the last topic it says so,
  * and while recording offers to stop and review, so the final step is never a Done that does nothing.
  */
-@Composable internal fun GocPinnedGuide(state: GocGuideState, cur: Int, recording: Boolean, onDone: () -> Unit, onAllTopics: () -> Unit, onFinish: (() -> Unit)?) {
+@Composable internal fun GocPinnedGuide(state: GocGuideState, cur: Int, recording: Boolean, open: Boolean, onToggle: () -> Unit, onDone: () -> Unit, onAllTopics: () -> Unit, onFinish: (() -> Unit)?) {
     val t = careText(); val hindi = careHindi()
     val rows = GocChecklist.ROWS
     val discussed = state.discussed
-    val idx = cur.coerceIn(rows.indices); val row = rows[idx]; val text = GUIDE_TEXT[idx]
+    val idx = cur.coerceIn(rows.indices); val row = rows[idx]
     val next = GocTopicGuide.next(discussed + idx, idx, rows.size)
     val allDone = rows.indices.all { it in discussed }
-    var open by rememberSaveable { mutableStateOf(true) }
-    var marked by rememberSaveable(idx) { mutableStateOf(setOf<Int>()) }
     Surface(color = Color.White, shadowElevation = 3.dp, modifier = Modifier.fillMaxWidth().testTag("goc-guide-card")) { Column {
-        Column(Modifier.padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(Modifier.padding(start = 16.dp, end = 8.dp, top = 4.dp, bottom = 8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(if (allDone) "${rows.size} ${t("of", "में से")} ${rows.size}" else "${t("Topic", "विषय")} ${idx + 1} ${t("of", "में से")} ${rows.size}", fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.SemiBold, color = SaharaColors.InkSub)
-                if (!allDone) { Spacer(Modifier.width(8.dp)); GocSectionChip(row.section) }
-                Spacer(Modifier.weight(1f))
-                IconButton(onClick = { open = !open }, modifier = Modifier.size(48.dp).testTag("goc-guide-fold")) {
+                Column(Modifier.weight(1f)) {
+                    Text(if (allDone) "${rows.size} ${t("of", "में से")} ${rows.size}" else "${t("Topic", "विषय")} ${idx + 1} ${t("of", "में से")} ${rows.size} · ${row.section}", fontSize = 13.sp, lineHeight = 16.sp, fontWeight = FontWeight.SemiBold, color = SaharaColors.InkSub)
+                    Text(if (allDone) t("All topics covered", "सभी विषयों पर बात हो गई") else row.title.pick(hindi), Modifier.testTag("goc-guide-topic"), fontSize = 17.sp, lineHeight = 22.sp, fontWeight = FontWeight.SemiBold, color = SaharaColors.Ink, fontFamily = SaharaTitleFont, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                }
+                if (!allDone) IconButton(onClick = onToggle, modifier = Modifier.size(48.dp).testTag("goc-guide-fold")) {
                     Icon(if (open) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, if (open) t("Collapse", "बंद करें") else t("Expand", "खोलें"), tint = SaharaColors.PrimaryPressed)
                 }
             }
-            LinearProgressIndicator(progress = { if (allDone) 1f else (idx + 1).toFloat() / rows.size }, modifier = Modifier.fillMaxWidth().padding(end = 8.dp).height(4.dp).clip(CircleShape), color = SaharaColors.Primary, trackColor = SaharaColors.Line, gapSize = 0.dp, drawStopIndicator = {})
-            Text(if (allDone) t("All topics covered", "सभी विषयों पर बात हो गई") else row.title.pick(hindi), Modifier.padding(end = 8.dp).testTag("goc-guide-topic"), fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.SemiBold, color = SaharaColors.Ink, fontFamily = SaharaTitleFont)
-            if (open && !allDone) Column(Modifier.fillMaxWidth().padding(end = 8.dp).heightIn(max = 190.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("${t("Decide:", "तय करना है:")} ${t(text.decide.first, text.decide.second)}", fontSize = 15.sp, lineHeight = 22.sp, color = SaharaColors.InkSub)
-                text.say.forEach { (en, hi) -> GocQuoteRow(t(en, hi), 15) }
-                FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    text.answers.forEachIndexed { n, (en, hi) -> GocAnswerChip(t(en, hi), n in marked) { marked = if (n in marked) marked - n else marked + n } }
-                }
-            }
+            LinearProgressIndicator(progress = { if (allDone) 1f else (idx + 1).toFloat() / rows.size }, modifier = Modifier.fillMaxWidth().padding(end = 8.dp).height(3.dp).clip(CircleShape), color = SaharaColors.Primary, trackColor = SaharaColors.Line, gapSize = 0.dp, drawStopIndicator = {})
             if (allDone) Text(if (recording) t("Every topic is marked. Stop the recording when you are ready, then review.", "हर विषय पर निशान लग गया। जब तैयार हों, रिकॉर्डिंग रोकें, फिर समीक्षा करें।")
                 else t("Every topic is marked.", "हर विषय पर निशान लग गया।"), fontSize = 14.sp, lineHeight = 20.sp, color = SaharaColors.InkSub, modifier = Modifier.padding(end = 8.dp).announce())
-            Column(Modifier.fillMaxWidth().padding(end = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (!allDone) Button(onClick = onDone, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = SaharaColors.Primary, contentColor = Color.White), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("goc-guide-done")) {
-                    Text(if (next == null) t("Done", "हो गया") else "${t("Done", "हो गया")} · ${t("Next", "अगला")}: ${rows[next].title.pick(hindi)}", fontSize = 16.sp, lineHeight = 21.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, maxLines = 2)
-                } else if (onFinish != null) Button(onClick = onFinish, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = SaharaColors.Primary, contentColor = Color.White), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("goc-guide-finish")) {
-                    Text(t("Stop and review", "रोकें और समीक्षा करें"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
+            Row(Modifier.fillMaxWidth().padding(end = 8.dp, top = 2.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                OutlinedButton(onClick = onAllTopics, shape = RoundedCornerShape(14.dp), contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp), border = BorderStroke(1.5.dp, SaharaColors.PrimaryPressed), colors = ButtonDefaults.outlinedButtonColors(contentColor = SaharaColors.PrimaryPressed), modifier = Modifier.weight(.4f).heightIn(min = 48.dp).testTag("goc-guide-all")) {
+                    Text(t("All topics", "सभी विषय"), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                 }
-                OutlinedButton(onClick = onAllTopics, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, SaharaColors.PrimaryPressed), colors = ButtonDefaults.outlinedButtonColors(contentColor = SaharaColors.PrimaryPressed), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("goc-guide-all")) {
-                    Text(t("All topics", "सभी विषय"), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
+                if (!allDone) Button(onClick = onDone, shape = RoundedCornerShape(14.dp), contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp), colors = ButtonDefaults.buttonColors(containerColor = SaharaColors.Primary, contentColor = Color.White), modifier = Modifier.weight(.6f).heightIn(min = 48.dp).testTag("goc-guide-done")) {
+                    Text(if (next == null) t("Done", "हो गया") else "${t("Done", "हो गया")} · ${t("Next", "अगला")}: ${rows[next].title.pick(hindi)}", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                } else if (onFinish != null) Button(onClick = onFinish, shape = RoundedCornerShape(14.dp), contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp), colors = ButtonDefaults.buttonColors(containerColor = SaharaColors.Primary, contentColor = Color.White), modifier = Modifier.weight(.6f).heightIn(min = 48.dp).testTag("goc-guide-finish")) {
+                    Text(t("Stop and review", "रोकें और समीक्षा करें"), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                 }
             }
         }
         HorizontalDivider(color = DoctorHairline)
     } }
+}
+
+/** What the pinned topic bar folds away: what to decide, what to say and the answer chips. It scrolls with the page, not pinned. */
+@Composable internal fun GocGuideDetails(state: GocGuideState, cur: Int) {
+    val t = careText()
+    val rows = GocChecklist.ROWS
+    val idx = cur.coerceIn(rows.indices); val text = GUIDE_TEXT[idx]
+    var marked by rememberSaveable(idx) { mutableStateOf(setOf<Int>()) }
+    Column(Modifier.fillMaxWidth().testTag("goc-guide-details"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text("${t("Decide:", "तय करना है:")} ${t(text.decide.first, text.decide.second)}", fontSize = 15.sp, lineHeight = 22.sp, color = SaharaColors.InkSub)
+        text.say.forEach { (en, hi) -> GocQuoteRow(t(en, hi), 15) }
+        FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            text.answers.forEachIndexed { n, (en, hi) -> GocAnswerChip(t(en, hi), n in marked) { marked = if (n in marked) marked - n else marked + n } }
+        }
+    }
 }
 
 @Composable private fun TopicTile(row: GocChecklistRow, idx: Int, state: GocGuideState, seconds: Int, modifier: Modifier, onClick: () -> Unit) {

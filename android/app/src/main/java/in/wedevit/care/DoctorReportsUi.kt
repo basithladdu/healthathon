@@ -51,7 +51,7 @@ import androidx.compose.ui.unit.sp
             }
         }
         val reportsShown = rememberShownCount("$query:${category?.name}")
-        visible.shownOf(reportsShown).forEach { report ->
+        val reportRow: @Composable (DoctorReportSummary) -> Unit = { report ->
             Surface(onClick = { onOpenReport(report.id) }, color = Paper, contentColor = Ink, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("report-open-${report.id}")) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -63,7 +63,8 @@ import androidx.compose.ui.unit.sp
                 }
             }
         }
-        SaharaShowOlder(visible.size, reportsShown, tag = "doctor-reports")
+        visible.shownOf(reportsShown).forEach { report -> reportRow(report) }
+        SaharaShowOlder(visible, reportsShown, tag = "doctor-reports", title = t("Reports", "रिपोर्टें"), searchText = { "${it.title} ${it.category.label} ${it.summary}" }, row = reportRow)
     }
 }
 

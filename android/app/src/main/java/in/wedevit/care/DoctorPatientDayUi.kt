@@ -264,9 +264,10 @@ private fun doctorToolLabel(label: String, hindi: Boolean) = careTr(hindi, label
     val shown = checks.filter { c -> (picked.isEmpty() || doctorMood(c.title) in picked) && (needle.isEmpty() || c.title.contains(needle, true) || c.detail.contains(needle, true)) }
     // The newest five updates, then "Show older" (24 Nov: the list kept growing).
     val checksShown = rememberShownCount("$personId:$needle:$moodKeys")
+    val hideBand = LocalHidePageBand.current
     val grouped = shown.shownOf(checksShown).groupBy { java.time.YearMonth.from(Instant.ofEpochMilli(it.created).atZone(zone)) }
     LazyColumn(Modifier.fillMaxSize().imePadding().testTag("doctor-checkin-history"), contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 96.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item {
+        if (!hideBand) item {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Heading(t("Symptoms & distress", "लक्षण और परेशानी"), 26); Spacer(Modifier.weight(1f))
             }
@@ -305,7 +306,7 @@ private fun doctorToolLabel(label: String, hindi: Boolean) = careTr(hindi, label
                 item(key = "month-$month") { Text(month.format(DateTimeFormatter.ofPattern("MMMM yyyy")), Modifier.padding(top = 8.dp).testTag("doctor-checkin-month-$month"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub) }
                 items(list, key = { it.id }) { check -> DoctorCheckInCard(check, zone, now) { detail = check } }
             }
-            if (shown.size > SaharaShowMore.INITIAL) item(key = "doctor-checkins-show-more") { SaharaShowOlder(shown.size, checksShown, tag = "doctor-checkins") }
+            if (shown.size > SaharaShowMore.INITIAL) item(key = "doctor-checkins-show-more") { SaharaShowOlder(shown, checksShown, tag = "doctor-checkins", title = t("Check-ins", "रोज़ का हाल"), searchText = { "${it.title} ${it.detail}" }, key = { it.id }) { check -> DoctorCheckInCard(check, zone, now) { detail = check } } }
         }
     }
     detail?.let { check -> AlertDialog(onDismissRequest = { detail = null }, title = { Text(check.title) }, text = { Column(Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) { Text(doctorRecordedTime(check.created, zone)); Text(CareEntryCodec.readable(check.detail).ifBlank { t("No additional details recorded.", "और कोई जानकारी दर्ज नहीं।") }) } }, confirmButton = { TextButton(onClick = { detail = null }) { Text(t("Close", "बंद करें")) } }) }

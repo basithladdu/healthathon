@@ -253,6 +253,8 @@ fun Modifier.saharaAccentBar(tone: SaharaTone): Modifier = drawWithContent {
 @Composable fun SaharaSectionBand(title: String, tone: SaharaTone, modifier: Modifier = Modifier, onBack: (() -> Unit)? = null, subtitle: String? = null,
     backTag: String? = null, trailing: (@Composable RowScope.() -> Unit)? = null) {
     val t = careText()
+    // Inside the doctor's patient sections the screen's one header already names the page and the patient, so the band keeps only its action.
+    if (LocalHidePageBand.current) { if (trailing != null) Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) { trailing() }; return }
     // Softer (Dr Sujay's video, 22 Nov: solid bands felt dark and scary): the section's light wash with its dark ink, a thin edge in the section colour.
     // Premium pass (24 Nov, owner: "cards and cards"): a flat page header on the ground, not another box. Back sits first.
     Surface(modifier.fillMaxWidth().saharaAppear(), color = Color.Transparent, contentColor = tone.ink) {
@@ -269,6 +271,9 @@ fun Modifier.saharaAccentBar(tone: SaharaTone): Modifier = drawWithContent {
         }
     }
 }
+
+/** True inside the doctor's patient sections: page bands (big titles) are left out because the host header is the one header. */
+val LocalHidePageBand = androidx.compose.runtime.compositionLocalOf { false }
 
 /** The one action on a section band: a solid white button with the section's ink label, so it still reads as a button on the colour. */
 @Composable fun SaharaBandButton(text: String, onClick: () -> Unit, tone: SaharaTone, modifier: Modifier = Modifier, icon: ImageVector? = null, enabled: Boolean = true) {

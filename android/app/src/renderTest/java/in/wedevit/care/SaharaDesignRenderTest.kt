@@ -38,7 +38,7 @@ abstract class SaharaDesignRenderBase {
     protected fun doctorHome() {
         click("welcome-patient-family"); click("welcome-panel-back")
         click("doctor-workspace-entry"); click("doctor-demo-entry")
-        runCatching { click("demo-login") }
+        // Demo opens the doctor side directly (no login screen).
         compose.waitUntil(60_000) { compose.onAllNodes(tagged("demo-nav-Home")).fetchSemanticsNodes().isNotEmpty() }
         settle()
     }

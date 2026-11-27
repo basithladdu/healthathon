@@ -247,8 +247,7 @@ internal fun doctorLabRange(data: CareEntry): Pair<Double?, Double?> {
             Box(Modifier.weight(1f).fillMaxHeight().testTag("doctor-patient-pane-detail")) { DoctorPatientSectionContent(vm, personId, shown, care) }
         } else if (section == "Hub") hub(false, null)
         else Column(Modifier.fillMaxSize()) {
-            if (shown !in setOf("GoalsOfCare", "CarePlan")) { DoctorPatientSectionBar(shown, onSection)
-            HorizontalDivider(color = DoctorHairline) }
+            // No section strip: the host header carries the page title and the patient (one header per screen).
             // Tab change: the new tab fades in and drifts from the side it sits on in the row. One instance only, so its saved state stays single.
             val order = doctorPatientTabs.indexOfFirst { it.section == shown }
             var last by remember { mutableIntStateOf(order) }
@@ -261,7 +260,7 @@ internal fun doctorLabRange(data: CareEntry): Pair<Double?, Double?> {
 }
 
 @Composable private fun DoctorPatientSectionContent(vm: CareModel, personId: String, section: String, care: @Composable (String) -> Unit) {
-    if (section == "Labs") DoctorLabsTab(vm, personId) else care(section)
+    androidx.compose.runtime.CompositionLocalProvider(LocalHidePageBand provides true) { if (section == "Labs") DoctorLabsTab(vm, personId) else care(section) }
 }
 
 /** Lab reports tab: one row per test, newest result first (red when outside the printed range). Tap a row for its trend over the range. */

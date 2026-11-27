@@ -139,11 +139,9 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
                         SegmentedButton(selected = kind == CareCaregiverKind.PAID_CARER, onClick = { kind = CareCaregiverKind.PAID_CARER; relation = ""; code = "" }, shape = SegmentedButtonDefaults.itemShape(1, 2), modifier = Modifier.heightIn(min = 52.dp).testTag("invite-kind-carer"),
                             icon = { Icon(Icons.Default.MedicalServices, null, Modifier.size(18.dp)) }) { Text(t("Nurse / paid carer", "नर्स / वेतन पर देखभाल करने वाले")) }
                     }
-                    if (kind == CareCaregiverKind.FAMILY) FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { CareRelations.forEach { r ->
-                        FilterChip(selected = relation == r, onClick = { relation = if (relation == r) "" else r }, modifier = Modifier.heightIn(min = 48.dp), shape = RoundedCornerShape(50),
-                            label = { Text(careTr(hindi, r, CareRelationsHindi[r] ?: r), softWrap = false) }, leadingIcon = if (relation == r) { { Icon(Icons.Default.Check, null, Modifier.size(16.dp)) } } else null,
-                            colors = FilterChipDefaults.filterChipColors(containerColor = Paper, selectedContainerColor = FamilyAccent.Leaf, selectedLabelColor = Color.White, selectedLeadingIconColor = Color.White))
-                    } }
+                    if (kind == CareCaregiverKind.FAMILY) SaharaDropdown(t("Relationship", "रिश्ता"), if (relation.isBlank()) "" else careTr(hindi, relation, CareRelationsHindi[relation] ?: relation),
+                        CareRelations.map { r -> SaharaDropdownOption(careTr(hindi, r, CareRelationsHindi[r] ?: r), "add-family-relation-$r", relation == r) },
+                        tag = "add-family-relation", placeholder = t("Choose", "चुनें"), onPick = { i -> relation = CareRelations[i] })
                     // Access: one two-way switch (view is the default), not two cards.
                     SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().testTag("invite-access")) {
                         SegmentedButton(selected = !canAdd, onClick = { canAdd = false; code = "" }, shape = SegmentedButtonDefaults.itemShape(0, 2), modifier = Modifier.heightIn(min = 52.dp).testTag("invite-access-view"),
