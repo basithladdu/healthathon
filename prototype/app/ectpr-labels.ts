@@ -159,7 +159,7 @@ export function cprLabel(record: EctprRecord, lang: CareLang): string {
     const reason = c.dnacprReason === 'FUTILITY' ? t('clinical futility', 'इलाज बेअसर होगा')
       : c.dnacprReason === 'PATIENT_REFUSAL' ? t('patient refusal', 'मरीज़ ने मना किया')
       : c.dnacprReason === 'BURDEN_OUTWEIGHS_BENEFIT' ? t('burden outweighs benefit', 'नुकसान फ़ायदे से ज़्यादा') : '';
-    return `${t('Do not attempt CPR (DNACPR)', 'CPR न करें (DNACPR)')}${reason ? ` — ${reason}` : ''}`;
+    return `${t('Do not attempt resuscitation (DNAR)', 'पुनर्जीवन का प्रयास न करें (DNAR)')}${reason ? ` — ${reason}` : ''}`;
   }
   return noPreferenceStandardCare(lang);
 }

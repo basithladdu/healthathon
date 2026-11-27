@@ -61,7 +61,7 @@ const TRANSFER_REASONS: Array<[TransferReason, string, string]> = [
   ['CAREGIVER_RESPITE', 'Caregiver unable to cope — respite admission', 'देखभाल करने वाला संभाल नहीं पा रहा — राहत के लिए भर्ती'],
 ];
 const AUTHORITY: Array<[AuthorityBasis, string, string]> = [
-  ['NAMED_BY_PATIENT', 'Named by patient', 'मरीज़ द्वारा नामित'], ['NEXT_OF_KIN', 'Family consensus', 'परिवार की सहमति'],
+  ['NAMED_BY_PATIENT', 'Named by patient', 'मरीज़ द्वारा नामित'], ['NEXT_OF_KIN', 'Caregiver consensus', 'देखभाल करने वालों की सहमति'],
   ['NAMED_IN_AMD', 'Named in AMD', 'AMD में नामित'], ['COURT_APPOINTED', 'Court-appointed', 'अदालत द्वारा नियुक्त'],
 ];
 /** The oxygen / ventilation table, LEVEL / WHAT IT MEANS FOR THE PATIENT / CEILING, word for word. */
@@ -109,7 +109,7 @@ export function buildGocFormDocument(record: EctprRecord, rows: Row[], lang: Car
   // Section II
   const capacityTicks = [
     tk(cap.status === 'HAS', 'The patient has capacity for these decisions and has completed this record themselves.', 'मरीज़ में इन फ़ैसलों की क्षमता है और उन्होंने यह रिकॉर्ड ख़ुद भरा।'),
-    tk(cap.status === 'HAS_DELEGATED', 'The patient has capacity but has asked family to decide with the team. Record the patient’s own words:', 'मरीज़ में क्षमता है, पर उन्होंने परिवार से टीम के साथ फ़ैसला करने को कहा। मरीज़ के अपने शब्द:', cap.status === 'HAS_DELEGATED' ? cap.basis : ''),
+    tk(cap.status === 'HAS_DELEGATED', 'The patient has capacity but has asked caregivers to decide with the team. Record the patient’s own words:', 'मरीज़ में क्षमता है, पर उन्होंने देखभाल करने वालों से टीम के साथ फ़ैसला करने को कहा। मरीज़ के अपने शब्द:', cap.status === 'HAS_DELEGATED' ? cap.basis : ''),
     tk(cap.status === 'FLUCTUATES', 'Capacity fluctuates. Assessed by: ____ on ____. Re-assess before acting on any section.', 'क्षमता बदलती रहती है। किसने जाँचा: ____ कब: ____। किसी भी भाग पर अमल से पहले दोबारा जाँचें।', cap.status === 'FLUCTUATES' ? [cap.assessor, cap.assessedOn].filter(Boolean).join(' · ') : ''),
     tk(cap.status === 'LACKS', 'The patient lacks capacity for these decisions. Basis of assessment (understand / retain / weigh / communicate):', 'मरीज़ में इन फ़ैसलों की क्षमता नहीं है। जाँच का आधार (समझना / याद रखना / तौलना / बताना):', cap.status === 'LACKS' ? cap.basis : ''),
   ];
@@ -121,20 +121,18 @@ export function buildGocFormDocument(record: EctprRecord, rows: Row[], lang: Car
     tk(Boolean(amd && /gazett/i.test(amd.attestor)), '    Attested by Gazetted Officer', '    राजपत्रित अधिकारी ने सत्यापित किया', amd && !/notary|gazett/i.test(amd.attestor) ? amd.attestor : ''),
     tk(false, '    With two witnesses? Yes / No. If yes, this ECTPR must be read as subordinate to it — the directive governs; this record operationalises it.', '    दो गवाहों के साथ? हाँ / नहीं। अगर हाँ, तो यह ECTPR उसके अधीन है — डायरेक्टिव ही मान्य है; यह रिकॉर्ड उसे लागू करता है।'),
     tk(dir?.kind === 'PRIOR_WISHES', 'There is no directive, but the patient previously expressed clear wishes. Recorded here, with who heard them and when:', 'कोई डायरेक्टिव नहीं, पर मरीज़ ने पहले साफ़ इच्छाएँ बताई थीं। यहाँ दर्ज, किसने और कब सुनीं:', dir?.kind === 'PRIOR_WISHES' ? dir.note : ''),
-    tk(dir?.kind === 'NONE', 'No directive and no recorded prior wishes. Decisions will be made in the patient’s best interests through family consensus with the team.', 'न डायरेक्टिव, न पहले की दर्ज इच्छाएँ। फ़ैसले मरीज़ के हित में, परिवार और टीम की सहमति से होंगे।'),
+    tk(dir?.kind === 'NONE', 'No directive and no recorded prior wishes. Decisions will be made in the patient’s best interests through caregiver consensus with the team.', 'न डायरेक्टिव, न पहले की दर्ज इच्छाएँ। फ़ैसले मरीज़ के हित में, देखभाल करने वालों और टीम की सहमति से होंगे।'),
   ];
   // The plan stores only "knows the diagnosis" (yes / no): the prognosis box and "does not wish to know" stay empty, never guessed.
   const knowsTicks = [
     tk(false, 'The patient knows the diagnosis and the prognosis.', 'मरीज़ बीमारी और आगे क्या होगा, दोनों जानते हैं।'),
     tk(v.patientKnows === true, 'The patient knows the diagnosis but not the prognosis.', 'मरीज़ बीमारी जानते हैं, पर आगे क्या होगा यह नहीं।'),
-    tk(v.familyAskedNotToTell, 'The family has asked that the patient not be told. Discussed with the family that the patient may ask directly and will not be lied to. Family understands: Yes / Not yet resolved', 'परिवार ने कहा कि मरीज़ को न बताया जाए। परिवार से बात हुई कि मरीज़ सीधे पूछ सकते हैं और उनसे झूठ नहीं बोला जाएगा। परिवार समझता है: हाँ / अभी तय नहीं', v.familyAskedNotToTell ? v.directQuestionPlan : ''),
+    tk(v.familyAskedNotToTell, 'The caregiver has asked that the patient not be told. Discussed with the caregiver that the patient may ask directly and will not be lied to. Caregiver understands: Yes / Not yet resolved', 'देखभाल करने वाले ने कहा कि मरीज़ को न बताया जाए। देखभाल करने वाले से बात हुई कि मरीज़ सीधे पूछ सकते हैं और उनसे झूठ नहीं बोला जाएगा। देखभाल करने वाले समझते हैं: हाँ / अभी तय नहीं', v.familyAskedNotToTell ? v.directQuestionPlan : ''),
     tk(false, 'The patient has said they do not wish to know details and has delegated:', 'मरीज़ ने कहा कि वे विस्तार नहीं जानना चाहते और यह सौंपा:'),
   ];
   const outcomes = v.unacceptableOutcomes.map((item) => withoutSoundCaptions(item).trim()).filter(Boolean);
   const other = outcomes.filter((o) => !GOC_UNACCEPTABLE_OUTCOMES.some(([en, hi]) => same(o, en) || same(o, hi)));
   const outcomeTicks = [...GOC_UNACCEPTABLE_OUTCOMES.map(([en, hi]) => tk(outcomes.some((o) => same(o, en) || same(o, hi)), en, hi)), tk(other.length > 0, 'Other:', 'अन्य:', other.join('; '))];
-  const firstTick = (ticks: GocFormTick[]) => ticks.find((x) => x.on);
-  const summary = (ticks: GocFormTick[]) => { const on = firstTick(ticks); return on ? `${on.text.replace(/:$/, '')}${on.detail ? ` ${on.detail}` : ''}` : nd; };
 
   // Section III
   const tr = c.hospitalTransfer;
@@ -145,7 +143,7 @@ export function buildGocFormDocument(record: EctprRecord, rows: Row[], lang: Car
     tk(false, '    Other:', '    अन्य:'),
     tk(tr?.kind === 'NO', 'NO — the patient is to be cared for where they are.', 'नहीं — मरीज़ की देखभाल वहीं होगी जहाँ वे हैं।'),
   ];
-  const cprTicks = [tk(c.cpr === 'ATTEMPT', 'ATTEMPT CPR.', 'CPR करें।'), tk(c.cpr === 'DNACPR', 'DO NOT ATTEMPT CPR (DNACPR).', 'CPR न करें (DNACPR)।')];
+  const cprTicks = [tk(c.cpr === 'ATTEMPT', 'ATTEMPT CPR.', 'CPR करें।'), tk(c.cpr === 'DNACPR', 'DO NOT ATTEMPT RESUSCITATION (DNAR).', 'पुनर्जीवन का प्रयास न करें (DNAR)।')];
   const reason = c.dnacprReason === 'FUTILITY' ? t('clinical futility', 'इलाज बेअसर') : c.dnacprReason === 'PATIENT_REFUSAL' ? t('patient refusal', 'मरीज़ ने मना किया') : c.dnacprReason === 'BURDEN_OUTWEIGHS_BENEFIT' ? t('burden outweighs benefit', 'नुकसान फ़ायदे से ज़्यादा') : '';
   const ceilingSet = c.respCeiling !== null && c.respCeiling !== undefined;
   const oxygenTable: GocFormTable = { head: [t('LEVEL', 'स्तर'), t('WHAT IT MEANS FOR THE PATIENT', 'मरीज़ के लिए इसका मतलब'), t('CEILING', 'सबसे ऊँचा स्तर')], rows: GOC_OXYGEN_LEVELS.map(([level, en, hi, meanEn, meanHi]) => [
@@ -203,23 +201,20 @@ export function buildGocFormDocument(record: EctprRecord, rows: Row[], lang: Car
         field(t('Additional space for the team – Surgical oncology, radiation oncology, etc.', 'टीम के लिए और जगह – सर्जिकल ऑन्कोलॉजी, रेडिएशन ऑन्कोलॉजी आदि'), record.careTeam.extraTeam.join('; ')),
         field(t('Additional option to add a local physician who can be briefed about the care and part of the team', 'स्थानीय डॉक्टर जिन्हें देखभाल के बारे में बताया जा सके और जो टीम में हों'), record.careTeam.localDoctor),
       ] },
-      { title: t('Family/Friend details', 'परिवार/दोस्तों की जानकारी'), rows: [
+      { title: t('Caregiver details', 'देखभाल करने वालों की जानकारी'), rows: [
         field(t('Members present for discussion and relationship with the patient', 'बातचीत में मौजूद सदस्य और मरीज़ से रिश्ता'), (record.decisionMakers.presentAtDiscussion ?? []).join('; ')),
         field(t('Language preferred', 'पसंद की भाषा'), p.languagePref),
       ] },
       { title: t('Primary decision maker and contact details · Secondary decision maker and contact details', 'मुख्य फ़ैसला लेने वाले और संपर्क · द्वितीय फ़ैसला लेने वाले और संपर्क'), rows: [], table: dmTable },
-      { title: t('Family members who must be informed before any major decision (name, relation, phone)', 'जिन परिवार वालों को किसी बड़े फ़ैसले से पहले बताना ज़रूरी है (नाम, रिश्ता, फ़ोन)'), rows: [
+      { title: t('Caregivers who must be informed before any major decision (name, relation, phone)', 'जिन देखभाल करने वालों को किसी बड़े फ़ैसले से पहले बताना ज़रूरी है (नाम, रिश्ता, फ़ोन)'), rows: [
         field(t('Name, relation, phone', 'नाम, रिश्ता, फ़ोन'), record.decisionMakers.familyToInform.join('; ')),
-        field(t('Family/friends who were attempted to be contacted, but were unavailable', 'परिवार/दोस्त जिनसे संपर्क की कोशिश हुई, पर नहीं मिले'), (record.decisionMakers.attemptedContact ?? []).join('; ')),
+        field(t('Caregivers who were attempted to be contacted, but were unavailable', 'देखभाल करने वाले जिनसे संपर्क की कोशिश हुई, पर नहीं मिले'), (record.decisionMakers.attemptedContact ?? []).join('; ')),
       ] },
     ] },
     { id: 'II', title: t('Section II – Preliminary medical information and patient values', 'भाग II – शुरुआती चिकित्सा जानकारी और मरीज़ के मूल्य'), groups: [
       { title: '', rows: [
         field(t('Primary diagnosis and stage', 'मुख्य बीमारी और स्टेज'), [record.clinical.diagnosis, record.clinical.stage].filter(Boolean).join(' · ')),
         field(t('Functional status – ECOG', 'काम करने की क्षमता – ECOG'), record.clinical.ecog === null ? '' : String(record.clinical.ecog)),
-        { label: t('Patient’s capacity', 'मरीज़ की क्षमता'), value: summary(capacityTicks), open: !firstTick(capacityTicks) },
-        { label: t('Existing medical directives', 'पहले के चिकित्सा निर्देश'), value: summary(directiveTicks), open: !firstTick(directiveTicks) },
-        { label: t('What the patient knows', 'मरीज़ क्या जानते हैं'), value: summary(knowsTicks), open: !firstTick(knowsTicks) },
       ] },
       { title: t('The patient’s capacity, now', 'मरीज़ की अभी की क्षमता'), rows: [boxes('', capacityTicks, nd)] },
       { title: t('Existing directives', 'पहले के निर्देश'), rows: [boxes('', directiveTicks, nd)] },
@@ -235,7 +230,7 @@ export function buildGocFormDocument(record: EctprRecord, rows: Row[], lang: Car
     { id: 'III', title: t('Section III – Decisive Actions', 'भाग III – निर्णायक फ़ैसले'), groups: [
       { title: t('Home care (if relevant)', 'घर पर देखभाल (अगर लागू हो)'), rows: [
         boxes(t('Should the patient be brought to the hospital? (To inform any doctor that has been called to the home for evaluation)', 'क्या मरीज़ को अस्पताल लाया जाए? (घर पर जाँच के लिए बुलाए गए किसी भी डॉक्टर को बताने के लिए)'), transferTicks, status('hospitalTransfer'), tr ? transferLabel(tr, lang) : ''),
-        field(t('If not, what is the frequency of assessments, and the details of the person coordinating between the patient/family and the relevant hospital/centre', 'अगर नहीं, तो जाँच कितनी बार होगी, और मरीज़/परिवार और अस्पताल/केंद्र के बीच तालमेल रखने वाले व्यक्ति की जानकारी'), [h?.assessmentFrequency, h?.coordinator].filter(Boolean).join(' · ')),
+        field(t('If not, what is the frequency of assessments, and the details of the person coordinating between the patient/caregiver and the relevant hospital/centre', 'अगर नहीं, तो जाँच कितनी बार होगी, और मरीज़/देखभाल करने वाले और अस्पताल/केंद्र के बीच तालमेल रखने वाले व्यक्ति की जानकारी'), [h?.assessmentFrequency, h?.coordinator].filter(Boolean).join(' · ')),
         field(t('If a non-governmental organisation has been taking care of the patients, contact details of their representative + declaration confirming consultation with the NGO', 'अगर कोई ग़ैर-सरकारी संस्था मरीज़ की देखभाल कर रही है, तो उसके प्रतिनिधि का संपर्क + संस्था से सलाह की पुष्टि'), h?.ngoContact ? `${h.ngoContact}${h.ngoConsulted ? ` · ${box(true)} ${t('NGO consulted', 'संस्था से सलाह ली गई')}` : ''}` : ''),
         field(t('Had they been previously admitted to any hospital for the current condition?', 'क्या इसी बीमारी के लिए पहले किसी अस्पताल में भर्ती हुए थे?'), h?.previousAdmission === true ? `${t('Yes', 'हाँ')}${h.previousAdmissionDetails ? `: ${h.previousAdmissionDetails}` : ''}` : h?.previousAdmission === false ? t('No', 'नहीं') : ''),
       ] },
@@ -257,7 +252,7 @@ export function buildGocFormDocument(record: EctprRecord, rows: Row[], lang: Car
         boxes(t('Nasogastric (Ryle’s) tube', 'नाक की नली (राइल्स ट्यूब)'), ngTicks, status('ng'), ng ? ngLabel(ng, lang) : ''),
         boxes(t('Gastrostomy (PEG)', 'पेट की नली (PEG)'), pegTicks, status('peg'), c.feeding.peg ? pegLabel(c.feeding.peg, lang) : ''),
       ] },
-      { title: t('Goal of care', 'देखभाल का लक्ष्य'), rows: [boxes(t('A, B or C', 'A, B या C'), goalTicks, status('goalOfCare'), c.goalOfCare ? goalLabel(c.goalOfCare, lang) : '')] },
+      { title: t('Goal of care', 'देखभाल का लक्ष्य'), rows: [boxes('', goalTicks, status('goalOfCare'), c.goalOfCare ? goalLabel(c.goalOfCare, lang) : '')] },
     ] },
     { id: 'IV', title: t('Section IV – Signatures and declarations', 'भाग IV – हस्ताक्षर और घोषणाएँ'), groups: [
       { title: t('Patient', 'मरीज़'), rows: [], table: { head: [declaration19, t('Signature / thumb impression', 'हस्ताक्षर / अँगूठे का निशान'), t('Name in capitals', 'बड़े अक्षरों में नाम'), t('Date', 'तारीख़')], rows: [
@@ -286,7 +281,7 @@ export function buildGocFormDocument(record: EctprRecord, rows: Row[], lang: Car
   ];
   const lead = [
     t('Goals-of-care conversation note, in the order of the clinical document', 'देखभाल के लक्ष्यों की बातचीत का नोट, क्लिनिकल दस्तावेज़ के क्रम में'),
-    record.status === 'DRAFT' ? t('For the doctor, and the patient or family, to read together and sign below.', 'डॉक्टर और मरीज़ या परिवार साथ पढ़ें और नीचे साइन करें।') : `${t('Version', 'संस्करण')} ${record.version}`,
+    record.status === 'DRAFT' ? t('For the doctor, and the patient or caregiver, to read together and sign below.', 'डॉक्टर और मरीज़ या देखभाल करने वाले साथ पढ़ें और नीचे साइन करें।') : `${t('Version', 'संस्करण')} ${record.version}`,
     `${t('Reviewed by', 'समीक्षा करने वाले')}: ${meta.reviewedBy || nd} · ${meta.reviewedAt.slice(0, 10)}`,
     ...(meta.notDiscussed?.length ? [`${nd}: ${meta.notDiscussed.join('; ')}`] : []),
   ];

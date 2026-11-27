@@ -528,7 +528,7 @@ test('the note comes out as a printable page and a Word file in the clinical doc
   assert.deepEqual([...bytes.slice(0, 4)], [0x50, 0x4b, 0x03, 0x04]);
   const text = new TextDecoder().decode(bytes);
   assert.match(text, /word\/document\.xml/);
-  assert.match(text, /Do not attempt CPR \(DNACPR\)/);
+  assert.match(text, /Do not attempt resuscitation \(DNAR\)/);
   assert.equal(crc32(new TextEncoder().encode('123456789')), 0xcbf43926);
 });
 
@@ -551,16 +551,16 @@ test('every heading, field, box and table of Rituparna’s form is in the note, 
   const form = [
     'Section I – General information', 'Patient details', 'Age, Sex, Gender', 'Physician details', 'Primary Oncologist name and hospital – and contact',
     'Palliative care physician name and hospital – and contact', 'Additional space for the team – Surgical oncology, radiation oncology, etc.',
-    'Additional option to add a local physician', 'Family/Friend details', 'Members present for discussion and relationship with the patient', 'Language preferred',
-    'PRIMARY', 'SECONDARY', 'Relationship to patient', 'Phone (must be reachable 24 h)', 'ID type & number', 'Basis for authority', 'Named by patient', 'Family consensus', 'Named in AMD', 'Court-appointed',
-    'Family members who must be informed before any major decision (name, relation, phone)', 'attempted to be contacted, but were unavailable',
-    'Section II – Preliminary medical information and patient values', 'Primary diagnosis and stage', 'Functional status – ECOG', 'Patient’s capacity', 'Existing medical directives',
+    'Additional option to add a local physician', 'Caregiver details', 'Members present for discussion and relationship with the patient', 'Language preferred',
+    'PRIMARY', 'SECONDARY', 'Relationship to patient', 'Phone (must be reachable 24 h)', 'ID type & number', 'Basis for authority', 'Named by patient', 'Caregiver consensus', 'Named in AMD', 'Court-appointed',
+    'Caregivers who must be informed before any major decision (name, relation, phone)', 'attempted to be contacted, but were unavailable',
+    'Section II – Preliminary medical information and patient values', 'Primary diagnosis and stage', 'Functional status – ECOG',
     '2.1  The patient’s capacity, now', 'Capacity fluctuates.', 'Basis of assessment (understand / retain / weigh / communicate)', '2.2  Existing directives', 'Attested by Notary', 'Gazetted Officer',
     'with two witnesses', 'No directive and no recorded prior wishes.', '2.3  What the patient knows', 'The patient knows the diagnosis and the prognosis.', 'will not be lied to',
     'do not wish to know details and has delegated', '2.4  In their own words', 'The most distressing physical symptom right now is', 'What matters most to me / to them is',
     'What I am most afraid of is', 'Unfinished things that matter', '2.5  Outcomes that would be unacceptable', 'Exhausting the family’s savings', 'Other:',
     'Section III – Decisive Actions', 'Home care (if relevant)', 'Should the patient be brought to the hospital?', 'YES — for any significant deterioration.', '☑ ONLY FOR THE FOLLOWING', '☑     Pain that cannot be controlled at home',
-    'Caregiver unable to cope — respite admission', 'NO — the patient is to be cared for where they are.', 'frequency of assessments', 'non-governmental organisation', 'previously admitted', 'Should CPR be performed?', 'ATTEMPT CPR.', 'DO NOT ATTEMPT CPR (DNACPR).', 'Reason recorded (clinical futility / patient refusal / burden outweighs benefit)',
+    'Caregiver unable to cope — respite admission', 'NO — the patient is to be cared for where they are.', 'frequency of assessments', 'non-governmental organisation', 'previously admitted', 'Should CPR be performed?', 'ATTEMPT CPR.', 'DO NOT ATTEMPT RESUSCITATION (DNAR).', 'Reason recorded (clinical futility / patient refusal / burden outweighs benefit)',
     'Discussed with (patient / surrogate / both)', 'What is the level of oxygen/ventilatory support', '| LEVEL | WHAT IT MEANS FOR THE PATIENT | CEILING |', 'Low-flow oxygen up to 2 L/min', '| 1 | Nasal prongs / simple face mask',
     'Intubation and invasive mechanical ventilation', 'Other parameters', 'Dialysis or CRRT', 'Only if the renal failure is judged reversible', 'Others', 'Requirement of ICU?',
     'Vasopressors / inotropes', 'Short trial only, up to ______ hours', 'no escalation beyond ____ agents', '3.6  Feeding',
@@ -578,6 +578,19 @@ test('every heading, field, box and table of Rituparna’s form is in the note, 
   }
   assert.match(note, /\| 1 \| [^|]* \| ☑ \|/, 'the ceiling box is ticked in the oxygen table');
   for (const gone of ['Common Cause', 'withholding', 'Primary and Secondary Boards', 'Composition of the Boards']) assert.ok(!lower.includes(gone.toLowerCase()), `removed section must not print: ${gone}`);
+});
+
+test('team decisions (27 Nov): caregiver wording, DNAR, no repeated summary rows, goal of care in one column', () => {
+  const r = draft();
+  applyGocDecision(r, 'cpr', 'DNACPR'); applyGocDecision(r, 'goalOfCare', 'C_COMFORT');
+  const doc = buildGocFormDocument(r, [], 'en', { reviewedBy: 'Dr Test', reviewedAt: NOW.toISOString() });
+  const note = gocFormText(doc);
+  for (const old of ['Family/Friend details', 'Family members who must be informed', 'Family/friends who were attempted', 'Family consensus', 'asked family to decide', 'patient or family', 'DNACPR']) assert.ok(!note.includes(old), `old wording still prints: ${old}`);
+  assert.match(note, /Do not attempt resuscitation \(DNAR\)/);
+  assert.deepEqual(doc.sections[1].groups[0].rows.map((row) => row.label), ['Primary diagnosis and stage', 'Functional status – ECOG']);
+  const goal = doc.sections[2].groups.find((g) => g.title.includes('Goal of care'));
+  assert.equal(goal.rows[0].label, '', 'goal of care spans the full width');
+  assert.match(gocFormHtml(doc), /<tr><td colspan="2"><div class="val">C · Prioritise comfort/);
 });
 
 import { gocNeedsSpeakers, gocSuggestedValue, GOC_DECISION_FIELDS } from '../app/goc-extract.ts';
