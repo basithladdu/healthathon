@@ -51,6 +51,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -775,29 +776,40 @@ private suspend fun loadHomeVisits(context: android.content.Context): List<HomeV
             }
         }
         // Visits and drafts are read from the device just after the first frame; they fade in and the rows below glide down instead of jumping.
+        // Coming up and Pick up where you left off (owner, 27 Nov): one compact card each with slim rows, the nearest 3,
+        // and "Show more (N)" that expands the rest in place ("Show less" folds them back).
         if (visits.isNotEmpty()) {
             item(key = "home-coming-up") { Box(Modifier.animateItem()) { DoctorSection(t("Coming up", "आने वाला"), Modifier.padding(top = 12.dp)) } }
-            items(visits.take(4), key = { "home-visit-${it.key}" }) { v ->
-                Surface(onClick = onSchedule, color = Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.animateItem().fillMaxWidth().heightIn(min = 72.dp).semantics(mergeDescendants = true) { contentDescription = t("${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} at ${demoTime(v.due)}. Opens the schedule.", "${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} को ${demoTime(v.due)}. समय-सूची खोलता है।") }) {
-                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                        Column(Modifier.widthIn(min = 76.dp)) { Text(demoTime(v.due), fontSize = 15.sp, fontWeight = FontWeight.Medium, color = DoctorAccent, softWrap = false); Text(demoDate(v.due).format(DateTimeFormatter.ofPattern("EEE d MMM")), fontSize = 14.sp, color = DoctorCardSub, softWrap = false) }
-                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) { Text(v.profile.name, fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk); Text(v.kind, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis) }
-                        Icon(Icons.Default.ChevronRight, null, tint = DoctorAccent)
+            item(key = "home-coming-up-list") { Box(Modifier.animateItem()) {
+                DoctorHomeCompactList(visits, "home-visits", { "home-visit-${it.key}" }) { v, last ->
+                    Row(Modifier.fillMaxWidth().clickable(onClick = onSchedule).heightIn(min = 56.dp).padding(horizontal = 16.dp, vertical = 10.dp)
+                        .semantics(mergeDescendants = true) { contentDescription = t("${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} at ${demoTime(v.due)}. Opens the schedule.", "${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} को ${demoTime(v.due)}. समय-सूची खोलता है।") },
+                        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Column(Modifier.widthIn(min = 72.dp)) { Text(demoDate(v.due).format(DateTimeFormatter.ofPattern("EEE d MMM")), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorAccent, softWrap = false); Text(demoTime(v.due), fontSize = 13.sp, color = DoctorCardSub, softWrap = false) }
+                        Text(buildString { append(v.profile.name); append(" · "); append(v.kind) }, Modifier.weight(1f), fontSize = 15.sp, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Icon(Icons.Default.ChevronRight, null, Modifier.size(20.dp), tint = DoctorCardSub)
                     }
+                    if (!last) HorizontalDivider(Modifier.padding(start = 16.dp), color = DoctorHairline)
                 }
-            }
+            } }
         }
         if (pending.isNotEmpty()) {
             item(key = "home-pick-up") { Box(Modifier.animateItem()) { DoctorSection(t("Pick up where you left off", "जहाँ छोड़ा था, वहीं से जारी रखें"), Modifier.padding(top = 12.dp)) } }
-            items(pending, key = { it.key }) { c ->
-                Surface(onClick = { onPending(c) }, color = if (c.section == "Visits") DoctorCardVisit else DoctorCardConversation, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.animateItem().fillMaxWidth().heightIn(min = 72.dp).testTag("home-conversation-${c.key}").semantics(mergeDescendants = true) { contentDescription = "${c.profile.name}: ${c.title}. ${c.detail}. Opens ${c.section.lowercase()}." }) {
-                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                        Icon(if (c.section == "Visits") Icons.Default.CalendarMonth else Icons.Default.Forum, null, tint = DoctorAccent)
-                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) { Text(c.profile.name, fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk); Text(if (c.section == "Conversations") t("Unsigned note", "बिना हस्ताक्षर का नोट") else c.title, fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardInk); Text(c.detail, fontSize = 14.sp, color = DoctorCardSub) }
-                        Icon(Icons.Default.ChevronRight, null, tint = DoctorAccent)
+            item(key = "home-pick-up-list") { Box(Modifier.animateItem()) {
+                DoctorHomeCompactList(pending, "home-pending", { it.key }) { c, last ->
+                    Row(Modifier.fillMaxWidth().clickable { onPending(c) }.heightIn(min = 56.dp).padding(horizontal = 16.dp, vertical = 10.dp).testTag("home-conversation-${c.key}")
+                        .semantics(mergeDescendants = true) { contentDescription = "${c.profile.name}: ${c.title}. ${c.detail}. Opens ${c.section.lowercase()}." },
+                        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Icon(if (c.section == "Visits") Icons.Default.CalendarMonth else Icons.Default.Forum, null, Modifier.size(20.dp), tint = DoctorAccent)
+                        Column(Modifier.weight(1f)) {
+                            Text(c.profile.name + " · " + (if (c.section == "Conversations") t("Unsigned note", "बिना हस्ताक्षर का नोट") else c.title), fontSize = 15.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(c.detail, fontSize = 13.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        }
+                        Icon(Icons.Default.ChevronRight, null, Modifier.size(20.dp), tint = DoctorCardSub)
                     }
+                    if (!last) HorizontalDivider(Modifier.padding(start = 16.dp), color = DoctorHairline)
                 }
-            }
+            } }
         }
         item { DoctorSection(t("Requests", "अनुरोध"), Modifier.padding(top = 12.dp)) }
         if (newRequests.isEmpty()) item { Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) { Icon(Icons.Default.CheckCircle, null, Modifier.size(20.dp), tint = DoctorStatusGood); Text(t("No requests", "कोई अनुरोध नहीं"), fontSize = 15.sp, color = DoctorCardSub) } }
@@ -812,5 +824,25 @@ private suspend fun loadHomeVisits(context: android.content.Context): List<HomeV
             }
         }
         item { TextButton(onClick = onRequests, modifier = Modifier.heightIn(min = 48.dp).testTag("workflow-open-requests")) { Text(t("All requests", "सभी अनुरोध")); Icon(Icons.Default.ChevronRight, null) } }
+    }
+}
+
+
+/** One white card of slim rows: the first [initial], then "Show more (N)" expands the rest in place; "Show less" folds them back. */
+@Composable private fun <T> DoctorHomeCompactList(items: List<T>, tag: String, key: (T) -> Any, initial: Int = 3, row: @Composable (T, Boolean) -> Unit) {
+    val t = careText()
+    var expanded by rememberSaveable(tag) { mutableStateOf(false) }
+    val shown = if (expanded) items else items.take(initial)
+    Surface(color = Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag(tag)) {
+        Column(Modifier.animateContentSize()) {
+            shown.forEachIndexed { i, item -> androidx.compose.runtime.key(key(item)) { row(item, i == shown.lastIndex && items.size <= initial) } }
+            if (items.size > initial) {
+                HorizontalDivider(color = DoctorHairline)
+                TextButton(onClick = { expanded = !expanded }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("$tag-more")) {
+                    Text(if (expanded) t("Show less", "कम दिखाएँ") else t("Show more (${items.size - initial})", "और दिखाएँ (${items.size - initial})"), color = DoctorAccent, fontWeight = FontWeight.SemiBold)
+                    Icon(if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, tint = DoctorAccent)
+                }
+            }
+        }
     }
 }
