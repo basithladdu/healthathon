@@ -281,7 +281,7 @@ class CarePlanRulesTest {
             dnacprReason = DnacprReason.BURDEN_OUTWEIGHS_BENEFIT, dnacprDecidedBy = DnacprDecidedBy("Dr Iyer", "KMC-1", "2026-10-29"), respCeiling = 2, icu = Icu(IcuKind.NO), goalOfCare = GoalOfCare.C_COMFORT) })
         val rows = EdView.rows(r, NOT_RECORDED).associateBy { it.key }
         assertTrue(rows.getValue("TRANSFER").value.en.contains("Uncontrolled pain"))
-        assertTrue(rows.getValue("CPR").value.en.contains("DNACPR")); assertTrue(rows.getValue("CPR").flag)
+        assertTrue(rows.getValue("CPR").value.en.contains("(DNAR)")); assertTrue(rows.getValue("CPR").flag)
         assertTrue(rows.getValue("RESP_CEILING").value.en.startsWith("2 ·"))
         assertTrue(rows.getValue("GOAL").value.en.contains("comfort"))
         assertTrue(rows.getValue("TEAM").value.en.contains("KMC-12345"))
