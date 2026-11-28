@@ -10,7 +10,7 @@ loadFonts();
 
 /** The film's 66 frames, or longer so the last word lands (12 + 5 per word + 22) and the full title holds 20 frames before the 14-frame fade. */
 const framesFor = (name: string) => Math.max(66, 68 + 5 * name.split(' ').length);
-const TITLES: Array<[number, string]> = [[2, 'Goals of care discussion'], [3, 'Symptom tracking'], [4, 'Patient emergency QR card'], [5, 'Upload and ask your documents'], [6, 'Simple mode for older and non-tech-savvy people']];
+const TITLES: Array<[number, string]> = [[2, 'Goals of care discussion'], [3, 'Symptom tracking'], [4, 'Patient emergency QR card'], [5, 'Upload and ask your documents'], [6, 'Simple mode for older and non-tech-savvy people'], [7, 'Palliative care and oral morphine centres near you'], [8, 'Medicine reminders']];
 
 /** ChapterScene's look and timing, laid out top-down so a two-line title pushes the underline below it. */
 const SectionTitle: React.FC<{n: number; name: string; frames: number}> = ({n, name, frames}) => {
