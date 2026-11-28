@@ -25,7 +25,7 @@ const Bg: React.FC<{t: number; children: React.ReactNode}> = ({t, children}) => 
   <div style={{position: 'absolute', inset: 0, overflow: 'hidden', background: `linear-gradient(160deg, ${P.cream}, ${P.creamWarm})`}}>
     <Blob x={260 + Math.sin(t * 0.5) * 50} y={180} r={340} color="rgba(159,209,184,0.40)" blur={90} />
     <Blob x={1660 + Math.cos(t * 0.4) * 50} y={880} r={380} color="rgba(224,160,64,0.22)" blur={100} />
-    <div style={{position: 'absolute', inset: 0, transform: `scale(${1.03 - 0.03 * easeOutCubic(ramp(t, 0, 0.6)) + 0.003 * t})`}}>{children}</div>
+    <div style={{position: 'absolute', inset: 0, transform: `scale(${1.03 - 0.03 * easeOutCubic(ramp(t, 0, 0.6))})`}}>{children}</div>
   </div>
 );
 

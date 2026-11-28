@@ -13,7 +13,7 @@ export type SP = {t: number};
 const Bg: React.FC<{t: number; a?: string; b?: string; dark?: boolean; children: React.ReactNode; zoom?: boolean}> = ({t, a, b, dark, children, zoom = true}) => {
   const c1 = a ?? (dark ? P.night1 : P.cream);
   const c2 = b ?? (dark ? P.night0 : P.creamWarm);
-  const z = zoom ? 1.03 - 0.03 * easeOutCubic(ramp(t, 0, 0.6)) + 0.003 * t : 1;
+  const z = zoom ? 1.03 - 0.03 * easeOutCubic(ramp(t, 0, 0.6)) : 1;
   return (
     <div style={{position: 'absolute', inset: 0, overflow: 'hidden', background: `linear-gradient(160deg, ${c1}, ${c2})`}}>
       <Blob x={260 + Math.sin(t * 0.5) * 50} y={180} r={340} color={dark ? 'rgba(95,227,192,0.10)' : 'rgba(159,209,184,0.40)'} blur={90} />

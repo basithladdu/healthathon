@@ -29,7 +29,8 @@ export const Captions: React.FC = () => {
           padding: '10px 26px 12px',
           borderRadius: 14,
           opacity: a,
-          maxWidth: 1500,
+          maxWidth: 1800,
+          whiteSpace: 'nowrap',
           textAlign: 'center',
           letterSpacing: 0.2,
         }}

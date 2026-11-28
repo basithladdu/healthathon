@@ -27,7 +27,7 @@ const Bg: React.FC<{t: number; dark?: boolean; children: React.ReactNode}> = ({t
   <div style={{position: 'absolute', inset: 0, overflow: 'hidden', background: dark ? `linear-gradient(160deg, ${P.night1}, ${P.night0})` : `linear-gradient(160deg, ${P.cream}, ${P.creamWarm})`}}>
     <Blob x={260 + Math.sin(t * 0.4) * 40} y={180} r={340} color={dark ? 'rgba(95,227,192,0.10)' : 'rgba(159,209,184,0.40)'} blur={90} />
     <Blob x={1660 + Math.cos(t * 0.3) * 40} y={880} r={380} color={dark ? 'rgba(242,179,94,0.10)' : 'rgba(224,160,64,0.22)'} blur={100} />
-    <div style={{position: 'absolute', inset: 0, transform: `scale(${1.02 - 0.02 * easeOutCubic(ramp(t, 0, 0.8)) + 0.0015 * t})`}}>{children}</div>
+    <div style={{position: 'absolute', inset: 0, transform: `scale(${1.02 - 0.02 * easeOutCubic(ramp(t, 0, 0.8))})`}}>{children}</div>
   </div>
 );
 const Phone: React.FC<{h: number; children: React.ReactNode; style?: React.CSSProperties}> = ({h, children, style}) => (
