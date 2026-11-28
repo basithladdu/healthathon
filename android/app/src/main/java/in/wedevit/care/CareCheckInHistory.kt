@@ -85,21 +85,6 @@ private fun checkInTone(kind: String): SaharaTone = when (kind) {
 }
 private fun checkInDotColor(kind: String): Color = checkInTone(kind).solid
 
-/** A small rounded label (mood, symptom notes, distress score) for the one-line check-in rows. */
-@Composable private fun CheckInChip(text: String, fill: Color, ink: Color, tag: String) =
-    Text(text, color = ink, fontSize = 13.sp, lineHeight = 16.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis,
-        modifier = Modifier.background(fill, RoundedCornerShape(50)).padding(horizontal = 10.dp, vertical = 4.dp).testTag(tag))
-
-/** A day's small chips: its mood, how many symptom notes, its distress score; the number of entries when there is nothing else. */
-@Composable private fun CheckInDayChips(d: CheckInDay) {
-    val t = careText(); val hindi = careHindi()
-    d.mood?.let { val tone = checkInTone(it); CheckInChip(checkInMoodLabel(it, hindi), tone.wash, tone.ink, "checkin-chip-mood") }
-    d.symptomNotes.takeIf { it > 0 }?.let { n -> CheckInChip(if (n == 1) t("1 symptom note", "1 लक्षण नोट") else t("$n symptom notes", "$n लक्षण नोट"), SaharaSection.Symptoms.wash, SaharaSection.Symptoms.ink, "checkin-chip-symptoms") }
-    d.distressScore?.takeIf { d.distressAnswered }?.let { s -> val band = ChartBands.color(s); CheckInChip(t("Distress $s/10", "परेशानी $s/10"), band, readableOn(band), "checkin-chip-distress") }
-    if (d.mood == null && d.symptomNotes == 0 && !d.distressAnswered)
-        CheckInChip(if (d.items.size == 1) t("1 entry", "1 नोट") else t("${d.items.size} entries", "${d.items.size} नोट"), Cream, DoctorCardInk, "checkin-chip-entries")
-}
-
 /**
  * One entry of a day as a single line (24 Nov: "we don't need big cards"): time, what it was, its number as a small chip. Tapping
  * the line opens the usual full card under it (edit, remove, graph); tapping again closes it.
@@ -129,7 +114,7 @@ private fun checkInDotColor(kind: String): Color = checkInTone(kind).solid
             Box(Modifier.size(8.dp).background(dot, CircleShape))
             Text(time, fontSize = 13.sp, color = DoctorCardSub, maxLines = 1, softWrap = false)
             Text(label, fontSize = 15.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-            score?.let { s -> val band = ChartBands.color(s); CheckInChip("$s/10", band, readableOn(band), "checkin-entry-score-${item.id}") }
+            score?.let { s -> Text("$s/10", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, softWrap = false, modifier = Modifier.testTag("checkin-entry-score-${item.id}")) }
             SaharaChevron(open, if (open) t("Hide details", "जानकारी छिपाएँ") else t("Show details", "जानकारी देखें"), Modifier.size(20.dp))
         }
         AnimatedVisibility(open, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) { Box(Modifier.padding(top = 4.dp, bottom = 6.dp)) { CareRow(item, vm) } }
@@ -165,31 +150,32 @@ private fun checkInDotColor(kind: String): Color = checkInTone(kind).solid
     val hasDistress = remember(checkins, personId) { DistressRules.history(checkins, personId).isNotEmpty() }
     val tick = rememberSaharaTick()
     if (hasDistress) {
-        OutlinedButton(onClick = { tick(); showDistress = !showDistress }, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.5.dp, SaharaSection.CheckIns.solid),
-            colors = ButtonDefaults.outlinedButtonColors(containerColor = Paper), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("checkin-distress-toggle")) {
-            Text(if (showDistress) t("Hide distress graph", "परेशानी का ग्राफ़ छिपाएँ") else t("See distress graph", "परेशानी का ग्राफ़ देखें"), color = DoctorCardInk, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
-            SaharaChevron(showDistress, null, tint = DoctorCardInk)
+        OutlinedButton(onClick = { tick(); showDistress = !showDistress }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("checkin-distress-toggle")) {
+            Text(if (showDistress) t("Hide distress graph", "परेशानी का ग्राफ़ छिपाएँ") else t("See distress graph", "परेशानी का ग्राफ़ देखें"), fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+            SaharaChevron(showDistress, null)
         }
         AnimatedVisibility(showDistress, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) { DistressHistoryCard(checkins, personId) }
     }
     if (days.isEmpty()) { SaharaCalmEmpty(t("No check-ins yet.", "अभी कोई हाल नहीं लिखा।")); return }
     val today = LocalDate.now()
     val week = remember(days, today) { CheckInDays.lastWeek(days, today) }
-    Text(t("Last 7 days", "पिछले 7 दिन"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading().testTag("checkin-week-title"))
-    if (week.isEmpty()) Text(t("No check-ins in the last 7 days.", "पिछले 7 दिनों में कोई हाल नहीं लिखा।"), fontSize = 15.sp, color = DoctorCardSub, modifier = Modifier.testTag("checkin-week-empty"))
-    else Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().saharaAppear().testTag("checkin-days")) {
+    Text(t("Last 7 days", "पिछले 7 दिन"), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary, modifier = Modifier.a11yHeading().testTag("checkin-week-title"))
+    if (week.isEmpty()) Text(t("No check-ins in the last 7 days.", "पिछले 7 दिनों में कोई हाल नहीं लिखा।"), fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.testTag("checkin-week-empty"))
+    else Column(Modifier.fillMaxWidth().testTag("checkin-days")) {
         Column {
             week.forEachIndexed { i, d ->
-                if (i > 0) HorizontalDivider(color = DoctorHairline)
+                if (i > 0) HorizontalDivider()
                 val dayKey = d.day.toString(); val open = openDay == dayKey
                 // One line per day: the day, then small chips (24 Nov: "reduce the cards, we don't need big cards").
                 Row(Modifier.fillMaxWidth().saharaStagger(i).heightIn(min = 52.dp).clickable(role = Role.Button) { tick(); openDay = if (open) "" else dayKey }.padding(horizontal = 12.dp, vertical = 6.dp).testTag("checkin-day-$dayKey"),
                     verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.size(10.dp).background(checkInDotColor(CheckInDays.dotKind(d)), CircleShape))
                     Spacer(Modifier.width(10.dp))
-                    Text(checkInDayLabel(d.day), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.widthIn(max = 130.dp))
-                    Spacer(Modifier.width(10.dp))
-                    FlowRow(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { CheckInDayChips(d) }
+                    // The day, and one plain line under it (owner, 25 Nov: no pills).
+                    Column(Modifier.weight(1f)) {
+                        Text(checkInDayLabel(d.day), fontWeight = FontWeight.SemiBold, fontSize = 17.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(checkInDayLine(d), fontSize = 15.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    }
                     SaharaChevron(open, if (open) t("Hide details", "जानकारी छिपाएँ") else t("Show details", "जानकारी देखें"))
                 }
                 AnimatedVisibility(open, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) {
@@ -210,12 +196,12 @@ private fun checkInDotColor(kind: String): Color = checkInTone(kind).solid
     AnimatedVisibility(pickedDay != null, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) {
       SaharaStateSwitch(pickedDay ?: lastDay, label = "checkin-picked-day") { shownDay -> shownDay?.let { day ->
         val d = byDay[day]
-        Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("checkin-picked-day")) {
-            Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(checkInDayLabel(day), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.a11yHeading())
-                if (d == null) Text(t("Nothing noted this day.", "इस दिन कुछ नहीं लिखा गया।"), fontSize = 15.sp, color = DoctorCardSub)
+        Column(Modifier.fillMaxWidth().testTag("checkin-picked-day")) {
+            Column(Modifier.padding(vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(checkInDayLabel(day), fontWeight = FontWeight.SemiBold, fontSize = 17.sp, modifier = Modifier.a11yHeading())
+                if (d == null) Text(t("Nothing noted this day.", "इस दिन कुछ नहीं लिखा गया।"), fontSize = 15.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 else {
-                    FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { CheckInDayChips(d) }
+                    Text(checkInDayLine(d), fontSize = 15.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Column { d.items.forEach { key(it.id) { CheckInEntryRow(it, vm) } } }
                 }
             }

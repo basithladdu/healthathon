@@ -2,32 +2,26 @@ package `in`.wedevit.care
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Policy
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
@@ -113,9 +107,12 @@ internal object ResearchConsentRules {
     }
 }
 
-/** Settings > Privacy and data: the research opt-in, a short summary of the person's data choices, and the privacy policy. */
+/**
+ * More > Privacy and data, a pushed page (back arrow, bottom bar hidden): the research opt-in as one switch row, the person's data
+ * choices with Share, and the privacy policy, which opens inside the app ([PrivacyPolicyPage]).
+ */
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
-@Composable internal fun PrivacyAndDataScreen(vm: CareModel, person: Person, canChange: Boolean, onDismiss: () -> Unit) {
+@Composable internal fun PrivacyAndDataPage(vm: CareModel, person: Person, canChange: Boolean, onBack: () -> Unit) {
     val t = careText(); val context = LocalContext.current
     val namespace = vm.storageNamespace
     val revision by ResearchConsentStore.revision.collectAsStateWithLifecycle()
@@ -150,58 +147,46 @@ internal object ResearchConsentRules {
     // Built once per change (and language), not on every recomposition; the share button sends the same text.
     val readLine = remember(choice?.reading, lang) { choice?.reading?.let { ConsentReadingRules.summary(it, t) } }
     val summary = remember(person.name, allowed, changedOn, lang, readLine) { ResearchConsentRules.summary(person.name, allowed, changedOn, t, readLine) }
-    SaharaScreenSheet(onDismissRequest = onDismiss, containerColor = SaharaColors.Ground) {
-        Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 32.dp).testTag("privacy-data"), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            SaharaBackRow(onDismiss, title = t("Privacy and data", "निजता और डेटा"), tag = "privacy-data-back")
-            // The research opt-in: its own card, off by default.
-            Surface(shape = RoundedCornerShape(SaharaRadius.Lg), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().saharaAppear()) {
-                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Surface(shape = RoundedCornerShape(10.dp), color = SaharaTone.Indigo.solid, contentColor = Color.White, modifier = Modifier.size(36.dp)) { Box(contentAlignment = Alignment.Center) { Icon(Icons.Default.Science, null, Modifier.size(20.dp)) } }
-                        Spacer(Modifier.width(12.dp))
-                        Text(t("Medical research", "चिकित्सा शोध"), Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 20.sp, color = DoctorCardInk)
-                    }
-                    Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Text(t("Allow my data, with my name and contact details removed, to be used for medical research by my care team", "मेरा डेटा, मेरा नाम और संपर्क जानकारी हटाकर, मेरी देखभाल टीम के चिकित्सा शोध में इस्तेमाल किया जा सकता है"),
-                            Modifier.weight(1f), fontSize = 17.sp, lineHeight = 24.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
-                        Spacer(Modifier.width(12.dp))
-                        SaharaSwitch(checked = allowed, enabled = changeable, onCheckedChange = { on ->
-                            // A light tick when the question opens; the confirming buzz only when the choice is really saved.
-                            if (on) { tick(); reading = null; readingRound++; confirm = true }
-                            else save(false, null)
-                        }, modifier = Modifier.testTag("privacy-research-switch").semantics {
-                            contentDescription = t("Medical research", "चिकित्सा शोध")
-                            stateDescription = if (allowed) t("Allowed", "अनुमति है") else t("Not allowed", "अनुमति नहीं है")
-                        })
-                    }
-                    Text(t("Off unless you switch it on. You can switch it off at any time, and your care does not change either way.", "जब तक आप चालू न करें, यह बंद रहता है। आप इसे कभी भी बंद कर सकते हैं, और दोनों हालात में आपकी देखभाल नहीं बदलती।"),
-                        fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardSub)
-                    if (!canChange) Text(t("Only the patient or family can change this.", "इसे सिर्फ़ मरीज़ या परिवार बदल सकते हैं।"), fontSize = 14.sp, color = DoctorCardSub)
-                    else if (!canSave) Text(t("Only someone who can edit this care record can change this.", "इसे सिर्फ़ वही बदल सकते हैं जो इस देखभाल रिकॉर्ड में बदलाव कर सकते हैं।"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.testTag("privacy-research-no-edit"))
-                }
-            }
-            // The data-choices summary, which can be shared as text.
-            Surface(shape = RoundedCornerShape(SaharaRadius.Lg), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().saharaAppear()) {
-                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(t("Your data choices", "आपके डेटा विकल्प"), Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 20.sp, color = DoctorCardInk)
-                    Text(summary, Modifier.testTag("privacy-data-summary"), fontSize = 16.sp, lineHeight = 23.sp, color = DoctorCardInk)
-                    TextButton(onClick = {
-                        open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, summary), t("Share my data choices", "मेरे डेटा विकल्प भेजें")))
-                    }, modifier = Modifier.heightIn(min = 48.dp).testTag("privacy-data-share")) {
-                        Icon(Icons.Default.Share, null, Modifier.size(20.dp), tint = RustText); Spacer(Modifier.width(8.dp))
-                        Text(t("Share my data choices", "मेरे डेटा विकल्प भेजें"), color = RustText, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-                    }
-                }
-            }
-            SaharaListRow(t("Privacy policy", "निजता नीति"), Modifier.testTag("privacy-data-policy"), icon = Icons.Default.Policy, tone = SaharaTone.Indigo,
-                onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url)))) })
+    // The policy replaces this page while it is open (its own back arrow and system back return here).
+    var policy by rememberSaveable { mutableStateOf(false) }
+    if (policy) PrivacyPolicyPage(onBack = { policy = false })
+    else SaharaPage(t("Privacy and data", "निजता और डेटा"), onBack = onBack, backTag = "privacy-data-back", listModifier = Modifier.testTag("privacy-data")) {
+        // The research opt-in: one switch row, off by default. The whole row toggles; switching on asks first (read aloud).
+        item(key = "research", contentType = "switch") { Column(Modifier.fillMaxWidth()) {
+            val state = if (allowed) t("Allowed", "अनुमति है") else t("Not allowed", "अनुमति नहीं है")
+            SaharaRow(t("Medical research", "चिकित्सा शोध"),
+                Modifier.toggleable(allowed, enabled = changeable, role = Role.Switch, onValueChange = { on ->
+                    // A light tick when the question opens; the confirming buzz only when the choice is really saved.
+                    if (on) { tick(); reading = null; readingRound++; confirm = true }
+                    else save(false, null)
+                }).semantics { stateDescription = state },
+                supporting = t("Allow my data, with my name and contact details removed, to be used for medical research by my care team", "मेरा डेटा, मेरा नाम और संपर्क जानकारी हटाकर, मेरी देखभाल टीम के चिकित्सा शोध में इस्तेमाल किया जा सकता है"),
+                supportingMaxLines = 4, icon = Icons.Default.Science, enabled = changeable, chevron = false,
+                trailing = { Switch(checked = allowed, onCheckedChange = null, enabled = changeable, modifier = Modifier.testTag("privacy-research-switch")) })
+            if (!canChange) Text(t("Only the patient or family can change this.", "इसे सिर्फ़ मरीज़ या परिवार बदल सकते हैं।"), Modifier.padding(horizontal = 16.dp), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            else if (!canSave) Text(t("Only someone who can edit this care record can change this.", "इसे सिर्फ़ वही बदल सकते हैं जो इस देखभाल रिकॉर्ड में बदलाव कर सकते हैं।"), Modifier.padding(horizontal = 16.dp).testTag("privacy-research-no-edit"), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        } }
+        // The data-choices summary as plain text, and the row that shares it.
+        item(key = "choices-label", contentType = "label") { SaharaGroupLabel(t("Your data choices", "आपके डेटा विकल्प")) }
+        item(key = "choices", contentType = "text") {
+            Text(summary, Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).testTag("privacy-data-summary"), fontSize = 16.sp, lineHeight = 24.sp, color = MaterialTheme.colorScheme.onSurface)
+        }
+        item(key = "share", contentType = "row") {
+            SaharaRow(t("Share my data choices", "मेरे डेटा विकल्प भेजें"), Modifier.testTag("privacy-data-share"), icon = Icons.Default.Share, chevron = false, onClick = {
+                open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, summary), t("Share my data choices", "मेरे डेटा विकल्प भेजें")))
+            })
+        }
+        item(key = "divider", contentType = "divider") { androidx.compose.material3.HorizontalDivider(Modifier.padding(vertical = 8.dp)) }
+        // The policy opens inside the app; only its last line links to the website.
+        item(key = "policy", contentType = "row") {
+            SaharaRow(t("Privacy policy", "निजता नीति"), Modifier.testTag("privacy-data-policy"), icon = Icons.Default.Description, onClick = { policy = true })
         }
     }
     // The consent text is read to the person first (clinical note point 11), like every other confirmation in the app.
     val consentText = t("Allow my data, with my name and contact details removed, to be used for medical research by my care team", "मेरा डेटा, मेरा नाम और संपर्क जानकारी हटाकर, मेरी देखभाल टीम के चिकित्सा शोध में इस्तेमाल किया जा सकता है") + "\n" +
         t("Your name and contact details are removed first. You can switch this off at any time in Privacy and data.", "पहले आपका नाम और संपर्क जानकारी हटा दी जाती है। आप इसे कभी भी 'निजता और डेटा' में बंद कर सकते हैं।")
-    if (confirm) AlertDialog(onDismissRequest = { confirm = false }, containerColor = Paper, modifier = Modifier.saharaDialogEnter().testTag("privacy-research-confirm"),
-        title = { Text(t("Allow research use?", "शोध के लिए इस्तेमाल की अनुमति दें?"), fontSize = 22.sp, fontWeight = FontWeight.Bold) },
+    if (confirm) AlertDialog(onDismissRequest = { confirm = false }, modifier = Modifier.testTag("privacy-research-confirm"),
+        title = { Text(t("Allow research use?", "शोध के लिए इस्तेमाल की अनुमति दें?")) },
         text = { Column(Modifier.heightIn(max = 520.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(t("Your name and contact details are removed first. You can switch this off at any time in Privacy and data.", "पहले आपका नाम और संपर्क जानकारी हटा दी जाती है। आप इसे कभी भी 'निजता और डेटा' में बंद कर सकते हैं।"), fontSize = 17.sp, lineHeight = 24.sp)
             ConsentReadAloudStep(consentText, "research-${person.id}-$readingRound", if (owner) person.name else "", readers, onChange = { reading = it }, modifier = Modifier.testTag("privacy-research-read-aloud"))

@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -946,37 +947,38 @@ private enum class VoiceStage { READY, RECORDING, RECORDED }
 // ---------------------------------------------------------------- The switch in More
 
 /**
- * The "Simple mode" row in More's settings: patient and family switch it for the selected patient, on this phone only.
- * Under it, for the family: the photos on the Call buttons, the message "Read to me" reads, and one-tap calling.
+ * The "Simple mode" row in More's settings: patient and family switch it for the selected patient, on this phone only. A plain
+ * switch row (the whole row toggles). Switching it on also takes the person to Today, where Simple Mode now shows (CareApp does the
+ * jump). Under it, while on: the message "Read to me" reads, the photos on the Call buttons, and one-tap calling.
  */
 @Composable fun SimpleModeSwitchRow(vm: CareModel, person: Person) {
     val t = careText(); val context = LocalContext.current
     val role by vm.viewRole.collectAsStateWithLifecycle(); val items by vm.items.collectAsStateWithLifecycle()
+    val revision by SimpleModeStore.revision.collectAsStateWithLifecycle()
     val age = remember(items, person.id) { PatientProfileCodec.latest(items, person.id)?.let { PatientProfileCodec.decode(it.detail)?.age } }
-    val on = rememberSimpleModeOn(vm.storageNamespace, person.id, SimpleModeRules.autoOn(age, patientOwnView = !CareFamilyRules.isFamily(role, false)))
+    val byAge = SimpleModeRules.autoOn(age, patientOwnView = !CareFamilyRules.isFamily(role, false))
+    val on = rememberSimpleModeOn(vm.storageNamespace, person.id, byAge)
+    // Said when only the age default switched it on, so it never looks random.
+    val onByAge = remember(revision, vm.storageNamespace, person.id, byAge, on) { on && byAge && !SimpleModeStore.hasChoice(context, vm.storageNamespace, person.id) }
     val haptic = rememberSaharaHaptic()
     val change: (Boolean) -> Unit = { value ->
         SimpleModeStore.setOn(context, vm.storageNamespace, person.id, value); haptic()
-        if (value) vm.message.value = t("Simple mode is on. Open Today to see it.", "सरल मोड चालू है। देखने के लिए आज खोलें।")
+        if (value) vm.message.value = t("Simple mode is on. Tap Full app at the bottom to come back.", "सरल मोड चालू है। वापस आने के लिए नीचे पूरा ऐप दबाएँ।")
     }
+    val state = if (on) t("On", "चालू") else t("Off", "बंद")
     Column(Modifier.fillMaxWidth()) {
-        Row(Modifier.fillMaxWidth().heightIn(min = 60.dp).padding(start = 16.dp, end = 12.dp, top = 8.dp, bottom = 8.dp).testTag("more-simple-mode"), verticalAlignment = Alignment.CenterVertically) {
-            Surface(shape = RoundedCornerShape(10.dp), color = SaharaTone.Teal.solid, contentColor = Color.White, modifier = Modifier.size(36.dp)) { Box(contentAlignment = Alignment.Center) { Icon(Icons.Default.TouchApp, null, Modifier.size(20.dp)) } }
-            Spacer(Modifier.width(16.dp))
-            Column(Modifier.weight(1f)) {
-                Text(t("Simple mode", "सरल मोड"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
-                Text(t("Four big buttons that speak, for ${person.name}", "${person.name} के लिए बोलने वाले चार बड़े बटन"), fontSize = 14.sp, color = DoctorCardSub)
-            }
-            Switch(checked = on, onCheckedChange = change, modifier = Modifier.testTag("more-simple-mode-switch").semantics { contentDescription = t("Simple mode", "सरल मोड") },
-                colors = SwitchDefaults.colors(checkedTrackColor = SaharaColors.Primary))
-        }
+        SaharaRow(t("Simple mode", "सरल मोड"),
+            Modifier.testTag("more-simple-mode").toggleable(on, role = Role.Switch, onValueChange = change).semantics { stateDescription = state },
+            supporting = if (onByAge) t("On because you are 60 or older", "आपकी उम्र 60 या ज़्यादा है, इसलिए चालू है") else t("Four big buttons that speak, for ${person.name}", "${person.name} के लिए बोलने वाले चार बड़े बटन"),
+            icon = Icons.Default.TouchApp, chevron = false,
+            trailing = { Switch(checked = on, onCheckedChange = null, modifier = Modifier.testTag("more-simple-mode-switch")) })
         // The family's set-up for Simple Mode opens under the switch while it is on.
         AnimatedVisibility(on, enter = SaharaMotion.expand, exit = SaharaMotion.collapse, label = "more-simple-mode-setup") {
             Column(Modifier.fillMaxWidth()) {
                 SimpleReadAloudMessageRow(vm, person)
                 SimpleCallPhotosPanel(vm, person)
                 Text(t("Photos stay on this phone. Set them on the phone the patient uses.", "फ़ोटो इसी फ़ोन पर रहती हैं। इन्हें मरीज़ वाले फ़ोन पर लगाएँ।"),
-                    Modifier.padding(start = 68.dp, end = 12.dp, bottom = 8.dp), fontSize = 14.sp, color = DoctorCardSub)
+                    Modifier.padding(start = 68.dp, end = 12.dp, bottom = 8.dp), fontSize = 14.sp, color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant)
                 SimpleOneTapCallRow()
             }
         }

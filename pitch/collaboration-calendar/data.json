@@ -1,18 +1,18 @@
 {
  "stats": {
-  "commits": 638,
-  "basith": 588,
-  "awaiz": 50,
-  "build_days": 49,
+  "commits": 658,
+  "basith": 600,
+  "awaiz": 58,
+  "build_days": 53,
   "first": "2026-08-07",
-  "last": "2026-11-23",
-  "ins": 445801,
-  "dels": 41357,
+  "last": "2026-11-27",
+  "ins": 501981,
+  "dels": 45402,
   "clin_commits": 16,
-  "team_meetings": 7,
+  "team_meetings": 9,
   "mentor": 3,
-  "reviews": 10,
-  "releases": 3,
+  "reviews": 9,
+  "releases": 4,
   "chat": 925,
   "chat_days": 48,
   "chat_people": {
@@ -26,7 +26,8 @@
   "chat_eng": 251,
   "ai_sessions": 176,
   "ai_days": 16,
-  "active_days": 69
+  "active_days": 73,
+  "meetings_reviews": 18
  },
  "days": {
   "2026-08-01": {
@@ -293,7 +294,7 @@
     {
      "kind": "milestone",
      "label": "Team group starts",
-     "detail": "Doctors and engineers start the group chat"
+     "detail": "Doctors and engineers start working as one group"
     }
    ]
   },
@@ -582,7 +583,7 @@
    "events": [
     {
      "kind": "review",
-     "label": "Dr Shirin's review",
+     "label": "Shirin's review",
      "detail": "One care calendar, fewer clicks"
     }
    ]
@@ -1055,13 +1056,7 @@
    "chat_clin": 14,
    "chat_eng": 2,
    "ai": 0,
-   "events": [
-    {
-     "kind": "review",
-     "label": "Legal review",
-     "detail": "Legal comments on the form"
-    }
-   ]
+   "events": []
   },
   "2026-11-01": {
    "commits": 7,
@@ -1095,7 +1090,7 @@
     {
      "kind": "meet",
      "label": "Team meeting",
-     "detail": "Transcript saved, changes built 4 Nov"
+     "detail": "Changes built 4 Nov"
     }
    ]
   },
@@ -1141,7 +1136,7 @@
     {
      "kind": "milestone",
      "label": "Final submission pack",
-     "detail": "Brief and deck with Dr Sujay's edits"
+     "detail": "Brief and deck, Dr Sujay's edits"
     }
    ]
   },
@@ -1309,7 +1304,7 @@
     {
      "kind": "review",
      "label": "Video reviews",
-     "detail": "Dr Sujay's two videos; notes from Dr Shirin and Dr Sharada"
+     "detail": "Dr Sujay's videos; Shirin's and Dr Sharada's notes"
     },
     {
      "kind": "meet",
@@ -1340,29 +1335,41 @@
    ]
   },
   "2026-11-24": {
-   "commits": 0,
-   "basith": 0,
+   "commits": 2,
+   "basith": 2,
    "awaiz": 0,
    "chat": 0,
    "chat_clin": 0,
    "chat_eng": 0,
    "ai": 0,
-   "events": []
+   "events": [
+    {
+     "kind": "meet",
+     "label": "Team meeting",
+     "detail": "Screen by screen, with the doctors"
+    }
+   ]
   },
   "2026-11-25": {
-   "commits": 0,
-   "basith": 0,
+   "commits": 1,
+   "basith": 1,
    "awaiz": 0,
    "chat": 0,
    "chat_clin": 0,
    "chat_eng": 0,
    "ai": 0,
-   "events": []
+   "events": [
+    {
+     "kind": "release",
+     "label": "Sahara 0.8.2",
+     "detail": "Simple Mode, 6 more languages"
+    }
+   ]
   },
   "2026-11-26": {
-   "commits": 0,
+   "commits": 3,
    "basith": 0,
-   "awaiz": 0,
+   "awaiz": 3,
    "chat": 0,
    "chat_clin": 0,
    "chat_eng": 0,
@@ -1370,14 +1377,20 @@
    "events": []
   },
   "2026-11-27": {
-   "commits": 0,
-   "basith": 0,
-   "awaiz": 0,
+   "commits": 14,
+   "basith": 9,
+   "awaiz": 5,
    "chat": 0,
    "chat_clin": 0,
    "chat_eng": 0,
    "ai": 0,
-   "events": []
+   "events": [
+    {
+     "kind": "meet",
+     "label": "Pitch rehearsal",
+     "detail": "Deck and demo plan, in person"
+    }
+   ]
   },
   "2026-11-28": {
    "commits": 0,

@@ -138,7 +138,10 @@ object NearbyHelp {
         } else "geo:0,0?q=" + enc(c.name + " " + c.address)
     }
 
-    /** The one number on the Nearby call bar. It opens the dialler filled in (ACTION_DIAL); the app never places the call. */
+    /**
+     * The national emergency number. It opens the dialler filled in (ACTION_DIAL); the app never places the call.
+     * 25 Nov: no longer a chip on the Nearby map screen (the owner wanted the room for the map); kept here for the tests and any screen that dials it.
+     */
     const val EMERGENCY_CALL = "112"
 
     /** Services a centre's listing names, in chip order, for the coloured tags on its card. */

@@ -248,27 +248,26 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
                         OnboardingChoice(SignupRole.FAMILY, t("I'm caring for someone", "मैं किसी की देखभाल कर रहा/रही हूँ"), t("Family member or carer", "परिवार का सदस्य या देखभाल करने वाले"), Icons.Default.People, SaharaTone.Leaf, "welcome-family"),
                         OnboardingChoice(SignupRole.DOCTOR, t("I'm a doctor or nurse", "मैं डॉक्टर या नर्स हूँ"), t("We check your registration number first", "पहले हम आपकी पंजीकरण संख्या जाँचते हैं"), Icons.Default.MedicalServices, SaharaTone.Indigo, "doctor-workspace-entry"),
                     ).forEachIndexed { index, choice -> OnboardingChoiceCard(choice, index, selected = chosen == choice.key, enabled = !locked, large = large) { pick(choice.key) } }
+                    Row(Modifier.fillMaxWidth().padding(top = 4.dp).testTag("welcome-privacy-line"), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.VerifiedUser, null, Modifier.size(20.dp), tint = SaharaTone.Leaf.solid)
+                        Spacer(Modifier.width(10.dp))
+                        Text(t("We never ask for Aadhaar, date of birth or gender to sign up.", "साइन अप के लिए हम कभी आधार, जन्मतिथि या लिंग नहीं माँगते।"),
+                            Modifier.weight(1f), color = SaharaColors.InkSub, fontSize = 15.sp, lineHeight = 21.sp)
+                    }
                 }
                 OnboardingStep.Account -> OnboardingPage {
                     OnboardingHero(SaharaLottieKind.Document, SaharaTone.Indigo, compact = true)
                     StepHeading(t("Do you want an account?", "क्या आप खाता बनाना चाहते हैं?"),
                         t("With an account, your records are kept safe if you change phones, and family and doctors can join you.", "खाते के साथ, फ़ोन बदलने पर भी आपके रिकॉर्ड सुरक्षित रहते हैं, और परिवार व डॉक्टर आपसे जुड़ सकते हैं।"))
-                    // The clinic's invite link is the main way in (older-patients doc, point 1): it comes first and largest and opens
-                    // the account form with its invite card on top (ClinicInviteFirst in CareAccount.kt); email and password come second.
-                    OnboardingChoiceCard(OnboardingChoice("invite", t("I have an invite link from my clinic", "मेरे पास क्लिनिक से निमंत्रण लिंक है"),
-                        t("Your nurse or doctor sends it on WhatsApp or SMS.", "आपकी नर्स या डॉक्टर इसे WhatsApp या SMS पर भेजते हैं।"), Icons.Default.Link, SaharaTone.Teal, "welcome-invite-link"),
-                        0, selected = false, enabled = !locked, large = true) {
-                        haptic.performHapticFeedback(HapticFeedbackType.SegmentTick)
-                        if (accountContent == null) onAccount() else go(OnboardingStep.SignUp)
-                    }
-                    Text(t("No invite link?", "निमंत्रण लिंक नहीं है?"), Modifier.padding(top = 4.dp).a11yHeading(), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = SaharaColors.InkSub)
+                    // Plain choices only (owner, 25 Nov: no separate "invite from my clinic" choice). A tapped invite link still opens
+                    // Sahara and joins by itself after sign-in.
                     val choices = buildList {
                         if (CareEmailAvailability.ready) add(OnboardingChoice("create", t("Create an account", "खाता बनाएँ"), t("Email and password", "ईमेल और पासवर्ड"), Icons.Default.PersonAdd, SaharaTone.Rust, "welcome-create-account"))
                         add(OnboardingChoice("signin", t("I already have an account", "मेरा पहले से खाता है"), t("Sign in", "साइन इन"), Icons.Default.AccountCircle, SaharaTone.Indigo, "welcome-account"))
                         add(OnboardingChoice("local", t("Continue without an account", "बिना खाते के आगे बढ़ें"), t("Your records stay on this phone", "आपके रिकॉर्ड इसी फ़ोन पर रहेंगे"), Icons.Default.PhoneAndroid, SaharaTone.Leaf, "welcome-add-person"))
                     }
                     choices.forEachIndexed { index, choice ->
-                        OnboardingChoiceCard(choice, index + 1, selected = false, enabled = !locked, large = false) {
+                        OnboardingChoiceCard(choice, index, selected = false, enabled = !locked, large = false) {
                             haptic.performHapticFeedback(HapticFeedbackType.SegmentTick)
                             when (choice.key) {
                                 "create" -> if (accountContent == null) onAccount() else go(OnboardingStep.SignUp)
@@ -366,6 +365,8 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
                 OnboardingStep.Finish -> OnboardingFinish(name.trim(), answers(), profileError)
             }
         }
+        // No dock on "Who are you?": all three choices fit on the screen; the dock slides back for the next steps.
+        androidx.compose.animation.AnimatedVisibility(step != OnboardingStep.Role, enter = SaharaMotion.expand, exit = SaharaMotion.collapse, label = "onboarding-dock") {
         OnboardingDock(step) { dockStep ->
             when (dockStep) {
                 OnboardingStep.Intro -> Column(verticalArrangement = Arrangement.spacedBy(14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -376,12 +377,7 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
                         if (last) go(OnboardingStep.Role) else scope.launch { pager.animateScrollToPage(pager.currentPage + 1) }
                     }
                 }
-                OnboardingStep.Role -> Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.VerifiedUser, null, Modifier.size(22.dp), tint = SaharaColors.OnBand)
-                    Spacer(Modifier.width(10.dp))
-                    Text(t("We never ask for Aadhaar, date of birth or gender to sign up. Only an email and a password.", "साइन अप के लिए हम कभी आधार, जन्मतिथि या लिंग नहीं माँगते। सिर्फ़ ईमेल और पासवर्ड।"),
-                        Modifier.weight(1f), color = SaharaColors.OnBandSub, fontSize = 14.sp, lineHeight = 20.sp)
-                }
+                OnboardingStep.Role -> Unit // The privacy line sits in the page under the three choices (owner, 25 Nov: the dock hid "I'm a doctor or nurse").
                 OnboardingStep.Account -> TextButton(onClick = { runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url))).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } },
                     modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp), colors = ButtonDefaults.textButtonColors(contentColor = SaharaColors.OnBand)) {
                     Icon(Icons.Default.Policy, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(t("Privacy policy", "निजता नीति"), fontWeight = FontWeight.SemiBold)
@@ -420,6 +416,7 @@ internal fun CareModel.addPersonWithProfile(name: String, profile: CarePatientPr
                 }
                 OnboardingStep.SignIn, OnboardingStep.SignUp -> Unit
             }
+        }
         }
     }
 }

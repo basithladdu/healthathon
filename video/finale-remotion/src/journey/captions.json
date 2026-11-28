@@ -1,0 +1,512 @@
+[
+{
+"text": "It's three in the morning, in an emergency room",
+"s": 0,
+"e": 3.25
+},
+{
+"text": "A doctor is meeting a woman with cancer for the first time",
+"s": 3.25,
+"e": 6.482
+},
+{
+"text": "And nobody in that room knows what she wants",
+"s": 6.482,
+"e": 9.839
+},
+{
+"text": "So her family has to have the hardest",
+"s": 9.839,
+"e": 11.839
+},
+{
+"text": "conversation of their lives, all over again",
+"s": 11.839,
+"e": 15.296
+},
+{
+"text": "In India, ninety-eight percent of people with advanced",
+"s": 16.009,
+"e": 19.018
+},
+{
+"text": "cancer don't get the palliative care they need",
+"s": 19.018,
+"e": 22.25
+},
+{
+"text": "Yes, you heard that right",
+"s": 22.25,
+"e": 24.571
+},
+{
+"text": "Ninety-eight",
+"s": 24.571,
+"e": 26.089
+},
+{
+"text": "That's why we built Sahara",
+"s": 26.089,
+"e": 28.036
+},
+{
+"text": "It's an app for people with cancer",
+"s": 28.036,
+"e": 29.661
+},
+{
+"text": "and for the families who look after them",
+"s": 29.661,
+"e": 32.464
+},
+{
+"text": "We're five people who met at Health-a-thon",
+"s": 32.464,
+"e": 35.214
+},
+{
+"text": "Basith and Awaiz run a software company called WeDevIT",
+"s": 35.214,
+"e": 39.482
+},
+{
+"text": "Dr Sujay is from IISc, Bengaluru",
+"s": 39.482,
+"e": 43.482
+},
+{
+"text": "Dr Sharada is from AIIMS, Mangalagiri",
+"s": 43.482,
+"e": 46.625
+},
+{
+"text": "And Shirin is a final-year medical student",
+"s": 46.625,
+"e": 49.339
+},
+{
+"text": "Back in August, we had our first team meeting",
+"s": 49.339,
+"e": 52.25
+},
+{
+"text": "And Dr Sujay told us something that stayed with all of us",
+"s": 52.25,
+"e": 55.911
+},
+{
+"text": "Patients do tell you what they want at the end of life",
+"s": 55.911,
+"e": 58.643
+},
+{
+"text": "But nobody writes it down",
+"s": 58.643,
+"e": 60.411
+},
+{
+"text": "And in an emergency, nobody can find it",
+"s": 60.411,
+"e": 64.018
+},
+{
+"text": "So we did what technical people do",
+"s": 64.018,
+"e": 66.089
+},
+{
+"text": "We built everything",
+"s": 66.089,
+"e": 67.554
+},
+{
+"text": "Screen after screen, all for doctors",
+"s": 67.554,
+"e": 70.482
+},
+{
+"text": "Then we asked ourselves one question",
+"s": 70.482,
+"e": 73.232
+},
+{
+"text": "Why would a family install all this?",
+"s": 73.232,
+"e": 75.321
+},
+{
+"text": "So we pivoted, towards the patient and the family",
+"s": 75.321,
+"e": 79.207
+},
+{
+"text": "And we kept one thing at the centre: the goals of care talk",
+"s": 79.813,
+"e": 84.232
+},
+{
+"text": "That's when the doctor, the patient and the family sit",
+"s": 84.232,
+"e": 87.393
+},
+{
+"text": "down together, and decide what kind of care she wants",
+"s": 87.393,
+"e": 91.161
+},
+{
+"text": "With everyone's consent, the doctor records that talk",
+"s": 91.161,
+"e": 95.107
+},
+{
+"text": "AI writes out who said what",
+"s": 95.107,
+"e": 97.393
+},
+{
+"text": "For Indian languages, we use Sarvam AI",
+"s": 97.393,
+"e": 100.804
+},
+{
+"text": "Then the AI checks that nothing important was missed",
+"s": 100.804,
+"e": 104.268
+},
+{
+"text": "It goes through thirteen topics",
+"s": 104.268,
+"e": 105.75
+},
+{
+"text": "taken from India's end-of-life care guidelines",
+"s": 105.75,
+"e": 108.286
+},
+{
+"text": "written by the national critical",
+"s": 108.286,
+"e": 109.946
+},
+{
+"text": "care and palliative care societies",
+"s": 109.946,
+"e": 112.671
+},
+{
+"text": "Then the AI turns the conversation",
+"s": 113.295,
+"e": 115.268
+},
+{
+"text": "into a goals of care document",
+"s": 115.268,
+"e": 117.768
+},
+{
+"text": "That's a clinical record of her wishes",
+"s": 117.768,
+"e": 120.143
+},
+{
+"text": "Does she want CPR?",
+"s": 120.143,
+"e": 121.786
+},
+{
+"text": "A ventilator?",
+"s": 121.786,
+"e": 122.929
+},
+{
+"text": "Intensive care?",
+"s": 122.929,
+"e": 124.286
+},
+{
+"text": "And where does she want to be cared for?",
+"s": 124.286,
+"e": 126.946
+},
+{
+"text": "Nothing is final until the doctor",
+"s": 126.946,
+"e": 128.714
+},
+{
+"text": "reads it, corrects it, and signs it",
+"s": 128.714,
+"e": 131.929
+},
+{
+"text": "Then the family signs too, and it's locked",
+"s": 131.929,
+"e": 135.207
+},
+{
+"text": "We also took legal advice on the",
+"s": 135.759,
+"e": 137.536
+},
+{
+"text": "wording and the format of that document",
+"s": 137.536,
+"e": 140.0
+},
+{
+"text": "But goals of care is only the start",
+"s": 140.0,
+"e": 142.779
+},
+{
+"text": "Sahara stays with the family, every single day",
+"s": 143.42,
+"e": 146.768
+},
+{
+"text": "Patients track their symptoms",
+"s": 146.768,
+"e": 148.643
+},
+{
+"text": "They rate how they're feeling on a distress thermometer",
+"s": 148.643,
+"e": 151.232
+},
+{
+"text": "and they mark where it hurts on a body map",
+"s": 151.232,
+"e": 154.161
+},
+{
+"text": "Their doctor can see how it's changing over time",
+"s": 154.161,
+"e": 157.107
+},
+{
+"text": "There's a mood journal, for the days",
+"s": 157.107,
+"e": 158.464
+},
+{
+"text": "that are hard to put into words",
+"s": 158.464,
+"e": 160.429
+},
+{
+"text": "They take a photo of a prescription, or a medicine strip",
+"s": 160.429,
+"e": 164.196
+},
+{
+"text": "AI works out the medicines",
+"s": 164.196,
+"e": 165.339
+},
+{
+"text": "and reminds them about every dose",
+"s": 165.339,
+"e": 168.179
+},
+{
+"text": "They upload their reports",
+"s": 168.179,
+"e": 169.357
+},
+{
+"text": "and ask a question in plain words",
+"s": 169.357,
+"e": 172.554
+},
+{
+"text": "AI answers, and shows the exact",
+"s": 172.554,
+"e": 174.929
+},
+{
+"text": "line in the report it came from",
+"s": 174.929,
+"e": 176.946
+},
+{
+"text": "Their next hospital visit is scheduled right in the app",
+"s": 176.946,
+"e": 180.457
+},
+{
+"text": "Family members get their own login",
+"s": 181.045,
+"e": 182.429
+},
+{
+"text": "so everyone stays in the loop",
+"s": 182.429,
+"e": 185.071
+},
+{
+"text": "There's an emergency SOS button",
+"s": 185.071,
+"e": 187.571
+},
+{
+"text": "And a QR card that carries the patient's",
+"s": 187.571,
+"e": 190.125
+},
+{
+"text": "wishes, contacts and medicines",
+"s": 190.125,
+"e": 193.0
+},
+{
+"text": "We also scraped public listings",
+"s": 193.0,
+"e": 194.893
+},
+{
+"text": "and put over sixteen hundred",
+"s": 194.893,
+"e": 196.536
+},
+{
+"text": "palliative care centres, from across India, on one map",
+"s": 196.536,
+"e": 200.679
+},
+{
+"text": "It even shows where to find oral morphine",
+"s": 200.679,
+"e": 203.75
+},
+{
+"text": "And there's a community",
+"s": 203.75,
+"e": 205.143
+},
+{
+"text": "so no family goes through this alone",
+"s": 205.143,
+"e": 207.982
+},
+{
+"text": "Families don't talk in just one language",
+"s": 207.982,
+"e": 210.446
+},
+{
+"text": "So Sahara understands English, Hindi, Telugu",
+"s": 210.446,
+"e": 214.589
+},
+{
+"text": "Urdu and Kannada, even when they're mixed in one sentence",
+"s": 214.589,
+"e": 218.696
+},
+{
+"text": "Now, back to that emergency room",
+"s": 218.696,
+"e": 220.857
+},
+{
+"text": "One scan of her QR card, and the",
+"s": 220.857,
+"e": 222.875
+},
+{
+"text": "doctor knows exactly what she wanted",
+"s": 222.875,
+"e": 225.554
+},
+{
+"text": "Oh, wait. Late one night, something hit us",
+"s": 225.554,
+"e": 229.232
+},
+{
+"text": "We kept asking how the patient feels",
+"s": 229.232,
+"e": 231.571
+},
+{
+"text": "Nobody was asking her daughter",
+"s": 231.571,
+"e": 233.232
+},
+{
+"text": "So caregivers get their own wellbeing",
+"s": 233.232,
+"e": 235.187
+},
+{
+"text": "check too, and someone to call",
+"s": 235.187,
+"e": 238.464
+},
+{
+"text": "All of this took three months",
+"s": 238.464,
+"e": 240.732
+},
+{
+"text": "We had a lot of meetings with our doctors",
+"s": 240.732,
+"e": 243.125
+},
+{
+"text": "We met our mentor for a review",
+"s": 243.125,
+"e": 245.161
+},
+{
+"text": "And we ran a survey of doctors and hospitals",
+"s": 245.161,
+"e": 248.232
+},
+{
+"text": "We saved our work to GitHub almost six hundred times",
+"s": 248.232,
+"e": 252.125
+},
+{
+"text": "Each of those is called a commit",
+"s": 252.125,
+"e": 254.482
+},
+{
+"text": "It's one more improvement to the app",
+"s": 254.482,
+"e": 256.661
+},
+{
+"text": "It's built with free and open-source tools",
+"s": 256.661,
+"e": 259.107
+},
+{
+"text": "and it runs on a cloud server",
+"s": 259.107,
+"e": 261.482
+},
+{
+"text": "When Sahara got shortlisted",
+"s": 261.482,
+"e": 263.143
+},
+{
+"text": "we rebuilt it as a full Android app",
+"s": 263.143,
+"e": 265.875
+},
+{
+"text": "And it's live on Google Play today",
+"s": 265.875,
+"e": 269.214
+},
+{
+"text": "Sahara. Care that follows what matters to the patient",
+"s": 269.214,
+"e": 273.118
+}
+]

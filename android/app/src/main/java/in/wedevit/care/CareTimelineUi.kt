@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -99,7 +100,6 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
     val monthFormat = remember(hindi, lang) { DateTimeFormatter.ofPattern("MMMM yyyy", careLocale(hindi)) }
     // Newest months first; older months wait behind "Show older" so the page stays short (24 Nov).
     val monthsShown = rememberShownCount("$person:$filterName")
-    SaharaBackHandler { onClose() }
     val tick = rememberSaharaTick()
     fun canOpen(e: TimelineEvent) = when (e.source) {
         TimelineSource.REPORT -> reports.any { it.id == e.sourceId }; TimelineSource.CALENDAR -> onCalendarAt != null; TimelineSource.LAB_HISTORY -> onLabs != null
@@ -113,11 +113,10 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
     fun dateText(e: TimelineEvent) = date(e.epoch) + if (e.dateIsFileDate) t(" (date added)", " (जोड़ने की तारीख़)") else ""
     fun description(e: TimelineEvent) = listOf(dateText(e), timelineHeadline(e, t), t("From: ", "स्रोत: ") + timelineSource(e, t)).joinToString(". ")
 
-    LazyColumn(Modifier.fillMaxSize().testTag("care-timeline"), contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            SaharaBackButton(onClose, tag = "timeline-back")
-            Column(Modifier.weight(1f)) { Heading(t("Care timeline", "देखभाल की समय-रेखा"), 28) }
-        } }
+    // A stock Material page (25 Nov redesign): the title and back arrow in the top bar, which also wires system back.
+    val dir = LocalLayoutDirection.current
+    SaharaPageScaffold(t("Care timeline", "देखभाल की समय-रेखा"), onBack = onClose, backTag = "timeline-back") { bar ->
+    LazyColumn(Modifier.fillMaxSize().testTag("care-timeline"), contentPadding = saharaPadding(bar, PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 32.dp), dir), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             val tiles = listOf(
                 GlanceTile(t("Last chemotherapy", "आख़िरी कीमो"), summary.chemo, "chemo", Icons.Default.Vaccines, SaharaTone.Rose),
@@ -207,6 +206,7 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
                 }
             }
         }
+    }
     }
 }
 

@@ -383,11 +383,13 @@ internal suspend fun markMedicineDose(context: Context, vm: CareModel, item: Car
  * (green all taken, red something not taken, blue a side effect noted; two can show), month arrows (or a swipe), and the chosen
  * day's dose reports under the grid, with that day's side-effect notes. Opens on today.
  */
-@Composable private fun MedicineHistorySheet(item: CareItem, vm: CareModel, onDismiss: () -> Unit) {
+@Composable internal fun MedicineHistorySheet(item: CareItem, vm: CareModel, onDismiss: () -> Unit) {
     val t = careText(); val hindi = careHindi()
     val events by vm.medicineEvents.collectAsStateWithLifecycle()
     val allItems by vm.allItems.collectAsStateWithLifecycle()
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
+    // Who reported a dose and when it was logged is for the care team (owner, 25 Nov); patients and family see the answer only.
+    val clinician by vm.clinician.collectAsStateWithLifecycle()
     var sideEffect by rememberSaveable(item.id) { mutableStateOf(false) }
     val doses = medicineDosesFor(item, vm)
     val context = LocalContext.current
@@ -435,8 +437,8 @@ internal suspend fun markMedicineDose(context: Context, vm: CareModel, item: Car
                     Text(if (mine.isEmpty()) t("No reports yet.", "अभी कोई जानकारी नहीं।") else t("Nothing reported on this day.", "इस दिन कुछ दर्ज नहीं।"), fontSize = 16.sp, color = DoctorCardInk)
                 }
             }
-            cappedItems(dayReports, reportsShown, key = { it.id }, tag = "medicine-history") { CompactMedicineReport(it, mine, now) }
-            medicineSideEffectItems(daySideEffects, vm)
+            cappedItems(dayReports, reportsShown, key = { it.id }, tag = "medicine-history") { CompactMedicineReport(it, mine, now, clinician) }
+            medicineSideEffectItems(daySideEffects, vm, showReporter = clinician)
             if (canEdit) item(key = "history-side-effect-action") { OutlinedButton(onClick = { sideEffect = true }, shape = RoundedCornerShape(14.dp), modifier = Modifier.animateItem().fillMaxWidth().padding(top = 12.dp).heightIn(min = 48.dp).testTag("care-medicine-history-side-effect")) { Icon(Icons.Default.ErrorOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Side effect?", "कोई दुष्प्रभाव?"), fontSize = 16.sp) } }
             if (vm.cloud != null) item(key = "history-refresh") { TextButton(onClick = vm::refreshMedicineHistory, modifier = Modifier.animateItem().fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Refresh history", "इतिहास ताज़ा करें"), fontSize = 15.sp) } }
         }
@@ -521,7 +523,7 @@ private val doseClock = DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneId.sys
 private const val FAMILY_ONLY_NOTE = "Family report only. Not confirmed as taken or checked by anyone else."
 
 /** One compact card per report: status badge and main time, then one muted reporter line. */
-@Composable private fun CompactMedicineReport(event: MedicineIntakeEvent, all: List<MedicineIntakeEvent>, now: Long) {
+@Composable private fun CompactMedicineReport(event: MedicineIntakeEvent, all: List<MedicineIntakeEvent>, now: Long, clinician: Boolean = true) {
     val t = careText()
     val status = MedicineHistoryRules.status(event, all, now)
     val lang = careLanguage()
@@ -554,7 +556,7 @@ private const val FAMILY_ONLY_NOTE = "Family report only. Not confirmed as taken
             Text(main, Modifier.weight(1f), fontSize = 15.sp, color = DoctorCardInk)
             if (MedicineHistoryRules.loggedByFamily(event)) SymptomLoggedByFamilyChip(careHindi(), "medicine-report-family-${event.id}")
         }
-        Text(t("Reported by ", "बताने वाले: ") + event.reporter.ifBlank { t("Not recorded", "दर्ज नहीं") } + " · " + t("Logged: ", "दर्ज: ") + reportTime.format(Instant.ofEpochMilli(event.loggedAt)), Modifier.padding(top = 8.dp), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
+        if (clinician) Text(t("Reported by ", "बताने वाले: ") + event.reporter.ifBlank { t("Not recorded", "दर्ज नहीं") } + " · " + t("Logged: ", "दर्ज: ") + reportTime.format(Instant.ofEpochMilli(event.loggedAt)), Modifier.padding(top = 8.dp), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
         if (event.note.isNotBlank() && event.note != FAMILY_ONLY_NOTE && !event.note.startsWith("Planned dose.") && event.plannedAt == null) Text(if (event.note == MedicineDoses.AS_NEEDED_NOTE) t("As-needed dose taken.", "ज़रूरत पड़ने पर ली गई खुराक।") else noteShown, Modifier.padding(top = 4.dp), fontSize = 15.sp, color = DoctorCardInk)
     }
 }

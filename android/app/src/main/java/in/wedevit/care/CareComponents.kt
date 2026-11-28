@@ -14,8 +14,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.WbSunny as OutlinedSunny
 import androidx.compose.material.icons.outlined.Forum as OutlinedForum
-import androidx.compose.material.icons.outlined.Place as OutlinedPlace
-import androidx.compose.material.icons.outlined.MoreHoriz as OutlinedMore
+import androidx.compose.material.icons.outlined.Medication as OutlinedMedication
+import androidx.compose.material.icons.outlined.Person as OutlinedPerson
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -45,67 +45,41 @@ import androidx.compose.ui.unit.sp
         colors = CardDefaults.cardColors(containerColor = color), border = BorderStroke(1.dp, SaharaColors.Line), content = content)
 }
 
-@Composable fun CareNavigation(selected: Int, clinician: Boolean, onSelect: (Int) -> Unit) {
-    // [keys] stay English for test tags; [labels] follow the family's English/Hindi choice.
-    val t = careText()
-    // Patient and family: Today, Care (all care tools), Help (emergency numbers and care nearby), More. The doctor view adds Talk.
-    val keys = if (clinician) listOf("Today", "Talk", "Care", "Help", "More") else listOf("Today", "Care", "Help", "More")
-    val labels = (if (clinician) listOf(t("Today", "आज"), t("Talk", "बातचीत")) else listOf(t("Today", "आज"))) + listOf(t("Care", "देखभाल"), t("Help", "मदद"), t("More", "और"))
-    val routes = if (clinician) listOf(0, 1, 2, 3, 4) else listOf(0, 2, 3, 4)
-    // Documents and a patient's conversations page are opened from All care tools, so Care stays lit while they are open.
-    fun lit(route: Int) = selected == route || (route == 2 && (selected == 5 || (!clinician && selected == 1)))
-    // Selected tab: the filled icon; others: the outlined one (Care keeps its heart outline / filled heart).
-    val selectedIcons = (if (clinician) listOf(Icons.Default.WbSunny, Icons.Default.Forum) else listOf(Icons.Default.WbSunny)) + listOf(Icons.Default.Favorite, Icons.Default.Place, Icons.Default.MoreHoriz)
-    val restIcons = (if (clinician) listOf(Icons.Outlined.OutlinedSunny, Icons.Outlined.OutlinedForum) else listOf(Icons.Outlined.OutlinedSunny)) + listOf(Icons.Default.FavoriteBorder, Icons.Outlined.OutlinedPlace, Icons.Outlined.OutlinedMore)
-    val current = routes.indexOfFirst { lit(it) }
-    // Premium pass (22 Nov): a floating, softly elevated bar with rounded ends above the system navigation, and one light sage pill
-    // that slides under the selected tab (icon filled, label bold dark sage on it). Light wash, not a solid fill, after "dark and scary".
-    // A light tick when the person moves to another tab (follows the phone's touch-feedback setting); none on the tab already open.
-    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
-    Box(Modifier.fillMaxWidth().navigationBarsPadding().padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 10.dp)) {
-        Surface(Modifier.fillMaxWidth().shadow(SaharaElevation.Floating, RoundedCornerShape(SaharaRadius.Hero), ambientColor = SaharaColors.Shadow, spotColor = SaharaColors.Shadow),
-            shape = RoundedCornerShape(SaharaRadius.Hero), color = SaharaColors.Surface, border = BorderStroke(1.dp, SaharaColors.Line)) {
-            Row(Modifier.fillMaxWidth().padding(NavInset).saharaNavPill(current, labels.size, gap = 4.dp).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                labels.forEachIndexed { index, label ->
-                    val active = index == current
-                    val tint by animateColorAsState(if (active) SaharaColors.NavOnPill else SaharaColors.InkSub, SaharaSprings.fastEffects(), label = "selected-tab-icon")
-                    Column(Modifier.weight(1f).testTag("nav-${keys[index]}").clip(RoundedCornerShape(NavInner))
-                        .selectable(selected = active, role = Role.Tab, onClick = {
-                            if (!active) runCatching { haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.SegmentTick) }
-                            onSelect(routes[index])
-                        }).heightIn(min = 60.dp).padding(vertical = 6.dp, horizontal = 2.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                        // Outlined and filled icons cross-fade softly instead of swapping in one frame (instant when motion is off).
-                        Crossfade(active, animationSpec = SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "nav-icon") { on ->
-                            Icon(if (on) selectedIcons[index] else restIcons[index], null, Modifier.size(24.dp), tint = tint)
-                        }
-                        Spacer(Modifier.height(4.dp))
-                        SaharaFitText(label, style = MaterialTheme.typography.labelMedium.copy(fontSize = cappedLabelSize(14f)), fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
-                            color = tint, maxLines = 2, min = 11f)
-                    }
-                }
-            }
-        }
-    }
+/** The bottom tab a route belongs to: Medicines (13) has its own tab; the Care tools and every page opened from them light Care. */
+internal fun careNavRoute(route: Int, clinician: Boolean): Int = when {
+    route == 13 -> 13
+    route == 1 && clinician -> 1
+    route == 1 || route == 2 || route == 3 || route in 5..12 -> 2
+    else -> route
 }
 
-/** The bar's inner padding, and the tab/pill radius that keeps the corners concentric with the bar (outer radius minus the inset). */
-private val NavInset = 6.dp
-private val NavInner = SaharaRadius.Hero - NavInset
-
-/** The bottom bar's selected marker: one rounded light-sage pill the size of a tab that slides to [index] (hidden at -1). [gap] is the space between tabs. */
-@Composable private fun Modifier.saharaNavPill(index: Int, count: Int, gap: androidx.compose.ui.unit.Dp): Modifier {
-    if (count <= 0) return this
-    // Springs, so a quick second tap carries on from where the pill is instead of restarting from rest (no visible overshoot).
-    val x by animateFloatAsState(index.coerceAtLeast(0).toFloat(), SaharaSprings.spatial(), label = "navPillX")
-    val shown by animateFloatAsState(if (index in 0 until count) 1f else 0f, SaharaSprings.effects(), label = "navPillAlpha")
-    val rtl = androidx.compose.ui.platform.LocalLayoutDirection.current == androidx.compose.ui.unit.LayoutDirection.Rtl
-    val pill = SaharaColors.NavPill
-    return drawBehind {
-        if (shown <= 0f) return@drawBehind
-        val g = gap.toPx(); val cell = (size.width + g) / count; val w = cell - g
-        val left = if (rtl) size.width - cell * x - w else cell * x
-        val r = NavInner.toPx()
-        drawRoundRect(pill.copy(alpha = shown), topLeft = androidx.compose.ui.geometry.Offset(left, 0f), size = androidx.compose.ui.geometry.Size(w, size.height), cornerRadius = androidx.compose.ui.geometry.CornerRadius(r, r))
+/**
+ * The bottom bar (25 Nov, owner: "looks AI-generated"): a stock Material 3 NavigationBar with its default colours. Patient and
+ * family get Today, Medicines, Care and More; the doctor view adds Talk second. Help (route 3) left the bar: Care near me is in the
+ * Care grid and in the SOS sheet. [selected] is the route shown (sub-pages light the tab they belong to, see [careNavRoute]).
+ */
+@Composable fun CareNavigation(selected: Int, clinician: Boolean, onSelect: (Int) -> Unit) {
+    // [keys] stay English for test tags; [labels] follow the family's language choice.
+    val t = careText()
+    val keys = if (clinician) listOf("Today", "Talk", "Medicines", "Care", "More") else listOf("Today", "Medicines", "Care", "More")
+    val labels = (if (clinician) listOf(t("Today", "आज"), t("Talk", "बातचीत")) else listOf(t("Today", "आज"))) + listOf(t("Medicines", "दवाइयाँ"), t("Care", "देखभाल"), t("More", "और"))
+    val routes = if (clinician) listOf(0, 1, 13, 2, 4) else listOf(0, 13, 2, 4)
+    val selectedIcons = (if (clinician) listOf(Icons.Default.WbSunny, Icons.Default.Forum) else listOf(Icons.Default.WbSunny)) + listOf(Icons.Default.Medication, Icons.Default.Favorite, Icons.Default.Person)
+    val restIcons = (if (clinician) listOf(Icons.Outlined.OutlinedSunny, Icons.Outlined.OutlinedForum) else listOf(Icons.Outlined.OutlinedSunny)) + listOf(Icons.Outlined.OutlinedMedication, Icons.Default.FavoriteBorder, Icons.Outlined.OutlinedPerson)
+    val current = careNavRoute(selected, clinician)
+    // A light tick when the person moves to another tab (follows the phone's touch-feedback setting); none on the tab already open.
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+    NavigationBar {
+        labels.forEachIndexed { index, label ->
+            val active = routes[index] == current
+            NavigationBarItem(selected = active, alwaysShowLabel = true, modifier = Modifier.testTag("nav-${keys[index]}"),
+                onClick = {
+                    if (!active) runCatching { haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.SegmentTick) }
+                    onSelect(routes[index])
+                },
+                icon = { Icon(if (active) selectedIcons[index] else restIcons[index], null) },
+                label = { SaharaFitText(label, style = MaterialTheme.typography.labelMedium.copy(fontSize = cappedLabelSize(14f)), fontWeight = if (active) FontWeight.Bold else FontWeight.Medium, maxLines = 1, min = 11f) })
+        }
     }
 }
 

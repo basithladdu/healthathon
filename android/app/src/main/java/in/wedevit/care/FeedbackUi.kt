@@ -101,7 +101,9 @@ internal enum class FeedbackSendState { NONE, LOCAL, SENDING, SENT, QUEUED }
     // With unsaved changes back opens the discard question and the screen stays, so a plain BackHandler (no "leaving" preview).
     androidx.activity.compose.BackHandler(dirty) { close() }
     val expression by animateFloatAsState(score, tween(120), label = "feedback expression")
-    val wash by animateColorAsState(if (score <= .5f) lerp(Peach, Cream, score * 2f) else lerp(Cream, SaharaSoftBlue, (score - .5f) * 2f), tween(160), label = "feedback warmth")
+    // The patient check-in sits on the plain page colour (25 Nov redesign: no tinted wash); app feedback keeps its warmth.
+    val ground = MaterialTheme.colorScheme.background
+    val wash by animateColorAsState(if (checkIn) ground else if (score <= .5f) lerp(Peach, Cream, score * 2f) else lerp(Cream, SaharaSoftBlue, (score - .5f) * 2f), tween(160), label = "feedback warmth")
     val label = if (checkIn) CheckInMood.title(score) else FeedbackRules.label(score)
     val shownLabel = if (checkIn) checkInMoodLabel(label, careHindi()) else when (label) { "Not great" -> t("Not great", "अच्छा नहीं"); "Okay" -> t("Okay", "ठीक"); else -> t("Good", "अच्छा") }
     val limit = if (checkIn) CheckInMood.noteLimit else FeedbackRules.noteLimit
@@ -153,11 +155,12 @@ internal enum class FeedbackSendState { NONE, LOCAL, SENDING, SENT, QUEUED }
             Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 moods.forEach { (name, value) ->
                     val on = label == name
-                    val tone = when (value) { 0f -> SaharaTone.Rose; .5f -> SaharaTone.Marigold; else -> SaharaTone.Teal }
-                    val fill by animateColorAsState(if (on) tone.solid else Paper, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "checkin-mood")
+                    // Stock colours (25 Nov redesign): the chosen mood on the tonal container with an accent ring, the others plain.
+                    val scheme = MaterialTheme.colorScheme
+                    val fill by animateColorAsState(if (on) scheme.secondaryContainer else scheme.surface, SaharaMotion.tween(SaharaMotion.SELECT_MS), label = "checkin-mood")
                     val press = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
-                    Surface(selected = on, onClick = { score = value; saved = false; error = null }, shape = RoundedCornerShape(SaharaRadius.Md), color = fill, contentColor = if (on) tone.onSolid else tone.ink,
-                        border = BorderStroke(2.dp, tone.solid), interactionSource = press, modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = 64.dp).saharaPress(press).testTag("checkin-mood-$value")) {
+                    Surface(selected = on, onClick = { score = value; saved = false; error = null }, shape = RoundedCornerShape(SaharaRadius.Md), color = fill, contentColor = if (on) scheme.onSecondaryContainer else scheme.onSurface,
+                        border = BorderStroke(if (on) 2.dp else 1.dp, if (on) scheme.primary else scheme.outlineVariant), interactionSource = press, modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = 64.dp).saharaPress(press).testTag("checkin-mood-$value")) {
                         Column(Modifier.padding(horizontal = 6.dp, vertical = 10.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                             CareMoodFace(value, Modifier.size(40.dp).saharaSelectBounce(on, .2f).clearAndSetSemantics { })
                             Spacer(Modifier.height(6.dp))
@@ -199,11 +202,7 @@ internal enum class FeedbackSendState { NONE, LOCAL, SENDING, SENT, QUEUED }
             icon = if (saved && (checkIn || sendState == FeedbackSendState.SENT || sendState == FeedbackSendState.LOCAL)) Icons.Outlined.CheckCircle else null, modifier = Modifier.fillMaxWidth().testTag("feedback-save"))
         if (savedCheckIn) Text(t("Check-in saved", "आज का हाल सहेज लिया"), Modifier.padding(top = 8.dp).announce(), color = DoctorStatusGood, fontWeight = FontWeight.SemiBold)
         Spacer(Modifier.height(12.dp))
-        // Saved: the tick, and for an okay or good day a soft bloom of petals around it. A hard day gets only the quiet tick.
-        if (checkIn && saved) Box(contentAlignment = Alignment.Center) {
-            if (SaharaMotion.enabled && CheckInMood.title(score) != CheckInMood.HARD) SaharaLottie(SaharaLottieKind.Bloom, Modifier.size(132.dp))
-            SaharaLottie(SaharaLottieKind.Success, Modifier.size(96.dp))
-        }
+        // Saved: the button's tick and "Check-in saved" say it (25 Nov redesign: no decorative animation inside the app).
         if (account != null && sendState == FeedbackSendState.QUEUED) TextButton(onClick = { send(account) }, modifier = Modifier.heightIn(min = 48.dp).testTag("feedback-retry")) { Text(t("Try again", "फिर कोशिश करें"), color = RustText) }
         // The check-in also asks about distress and links to a symptom note: secondary, so below the main action, without a card around them.
         if (checkIn && careModel != null) Column(Modifier.fillMaxWidth().testTag("checkin-extras"), verticalArrangement = Arrangement.spacedBy(8.dp)) {

@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Build
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -37,6 +38,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
@@ -51,17 +55,23 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 
 /** How many centres the Nearby list and its map show at first, and how many each "Show more" tap adds. */
 internal const val NEARBY_PAGE = 10
 
+/** How much of the centres sheet shows over the map at first: the handle, the "N centres" line and about one and a half rows. */
+internal val NEARBY_SHEET_PEEK = 160.dp
+
 /**
- * Nearby (3 Nov 2026 review): the map first, framed on the person's location when the phone shares it; one "Call 112" bar;
- * searchable state, district and service pickers; coloured service tags on each card; the source and fine print behind info icons.
+ * Nearby (25 Nov 2026, owner on his phone: "the map is very small … too much space … the map needs to be bigger"): the map fills
+ * the screen edge to edge; one small search pill floats over it with a filter icon inside (state, district, service and the layers
+ * open in one sheet); the centres sit in a sheet at the foot that shows "N centres" and a row and a half, and drags up for the list.
+ * Tapping a centre, in the list or on the map, opens its card with Call and Directions. No "Call 112" or "All India" chip here.
  * The location is read on the phone only, to frame the map and order the list. It is never saved or sent.
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
-@Composable fun NearbyScreen(centres: List<Centre>, vm: CareModel? = null) {
+@Composable fun NearbyScreen(centres: List<Centre>, vm: CareModel? = null, onBack: (() -> Unit)? = null) {
     var search by rememberSaveable { mutableStateOf("") }; var service by rememberSaveable { mutableStateOf(NearbyHelp.ALL_SERVICES) }
     val allLayers = NearbyHelp.layerOptions.joinToString(",")
     var layerKey by rememberSaveable { mutableStateOf(allLayers) }; val layers = layerKey.split(",").toSet()
@@ -70,8 +80,8 @@ internal const val NEARBY_PAGE = 10
     LaunchedEffect(vm) { vm?.loadCentreSuggestions() }
     var state by rememberSaveable { mutableStateOf(NearbyHelp.ALL_INDIA) }
     var district by rememberSaveable { mutableStateOf("") }
-    var chosen by remember { mutableStateOf<List<Centre>>(emptyList()) }
-    val focus = LocalFocusManager.current; val t = careText(); val context = LocalContext.current
+    var picked by remember { mutableStateOf<List<Centre>>(emptyList()) }
+    val focus = LocalFocusManager.current; val t = careText()
     val location = nearbyRememberLocation()
     val optionLabel = nearbyOptionLabel()
     val states = remember(centres) { centres.map { it.state }.filter(String::isNotBlank).distinct().sorted() }
@@ -90,76 +100,86 @@ internal const val NEARBY_PAGE = 10
     var filtersOpen by rememberSaveable { mutableStateOf(false) }
     var mapExpanded by rememberSaveable { mutableStateOf(false) }
     val filterCount = listOf(service != NearbyHelp.ALL_SERVICES, state != NearbyHelp.ALL_INDIA, district.isNotBlank(), layerKey != allLayers).count { it }
-    // First screen at 360 x 800: title, Call 112, search with one Filters button, a short map, and the first centre. Filters live in one sheet.
-    LazyColumn(Modifier.fillMaxSize().saharaScreenEnter().testTag("nearby-list"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        // The teal Help band: title and place on the colour, the count badge and the info button beside it.
-        item { SaharaSectionBand(t("Find care", "देखभाल केंद्र खोजें"), SaharaSection.Help, subtitle = listOf(optionLabel(state), district).filter(String::isNotBlank).joinToString(" · ")) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    // The count is a badge, not part of the sentence.
-                    FamilyPill(t("${visible.size} ${if (visible.size == 1) "centre" else "centres"}", "${visible.size} केंद्र"), if (visible.isEmpty()) FamilyTone.NEUTRAL else FamilyTone.INFO, Modifier.testTag("nearby-count"))
-                    NearbyInfoButton(t("About this list", "इस सूची के बारे में"), Modifier.testTag("nearby-about"), tint = SaharaSection.Help.onSolid) {
-                        Text(t("Directory listings. Call to confirm services, availability and cost.", "यह सूची से ली गई जानकारी है। सेवा, उपलब्धता और ख़र्च फ़ोन करके पक्का करें।"))
-                        val coverage = CentreLocation.coverage(listed)
-                        if (coverage.approximate > 0) Text(t("Approximate locations © GeoNames (CC BY 4.0)", "अनुमानित जगहें © GeoNames (CC BY 4.0)"), style = MaterialTheme.typography.labelSmall)
+    val scaffold = rememberBottomSheetScaffoldState()
+    val scope = rememberCoroutineScope()
+    val sheetUp = scaffold.bottomSheetState.currentValue == SheetValue.Expanded
+    val toggleSheet: () -> Unit = { scope.launch { if (sheetUp) scaffold.bottomSheetState.partialExpand() else scaffold.bottomSheetState.expand() } }
+    // Back closes the centre card first, then lowers the list; only then does it leave the screen.
+    BackHandler(enabled = picked.isNotEmpty() || sheetUp) { if (picked.isNotEmpty()) picked = emptyList() else scope.launch { scaffold.bottomSheetState.partialExpand() } }
+    Box(Modifier.fillMaxSize().saharaScreenEnter()) {
+        BottomSheetScaffold(
+            sheetContent = {
+                // The open list leaves a strip of map at the top, so it is clear the map is still there.
+                Column(Modifier.fillMaxWidth().fillMaxHeight(.88f).testTag("nearby-sheet")) {
+                    Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).padding(start = 16.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text(t("${visible.size} ${if (visible.size == 1) "centre" else "centres"}", "${visible.size} केंद्र"), Modifier.testTag("nearby-count").a11yHeading(),
+                            fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 18.sp, color = DoctorCardInk, maxLines = 1)
+                        val place = listOf(if (state == NearbyHelp.ALL_INDIA) "" else optionLabel(state), district).filter(String::isNotBlank).joinToString(" · ")
+                        Text(if (place.isBlank()) "" else " · $place", Modifier.weight(1f), fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        NearbyInfoButton(t("About this list", "इस सूची के बारे में"), Modifier.testTag("nearby-about"), tint = DoctorCardSub) {
+                            Text(t("Directory listings. Call to confirm services, availability and cost.", "यह सूची से ली गई जानकारी है। सेवा, उपलब्धता और ख़र्च फ़ोन करके पक्का करें।"))
+                            val coverage = CentreLocation.coverage(listed)
+                            if (coverage.approximate > 0) Text(t("Approximate locations © GeoNames (CC BY 4.0)", "अनुमानित जगहें © GeoNames (CC BY 4.0)"), style = MaterialTheme.typography.labelSmall)
+                        }
+                    }
+                    LazyColumn(Modifier.fillMaxWidth().weight(1f).testTag("nearby-list"), contentPadding = PaddingValues(start = 8.dp, end = 8.dp, bottom = 24.dp)) {
+                        // Empty results: one line and one way out.
+                        if (visible.isEmpty()) item(key = "nearby-empty") {
+                            Column(Modifier.fillMaxWidth().padding(vertical = 12.dp).testTag("nearby-empty"), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Text(t("No centres found", "कोई केंद्र नहीं मिला"), fontSize = 16.sp, color = DoctorCardInk)
+                                if (filtersOn) OutlinedButton(onClick = clear, shape = RoundedCornerShape(12.dp), modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Clear filters", "सभी चुनाव हटाएँ"), color = RustText) }
+                            }
+                        }
+                        items(listed, key = { it.id }) { c ->
+                            Column(Modifier.animateItem()) {
+                                NearbyCentreRow(c, here) { focus.clearFocus(); picked = listOf(c) }
+                                HorizontalDivider(Modifier.padding(start = 32.dp), color = DoctorHairline)
+                            }
+                        }
+                        if (visible.size > listed.size) item(key = "nearby-show-more") {
+                            TextButton(onClick = { shown += NEARBY_PAGE }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("nearby-show-more")) {
+                                Text(t("Show more", "और दिखाएँ"), color = RustText, fontWeight = FontWeight.SemiBold)
+                            }
+                        }
+                        // Suggesting needs an account; signed out, the button would only lead to a "sign in" dead end, so it is not shown.
+                        if (vm?.cloud != null) item(key = "nearby-suggest") {
+                            SaharaSecondaryButton(t("Suggest a centre", "केंद्र सुझाएँ"), onClick = { suggesting = true }, icon = Icons.Default.AddLocationAlt, tone = SaharaTone.Marigold,
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp).testTag("nearby-suggest-centre"))
+                        }
+                        if (suggestions.isNotEmpty()) item { Box(Modifier.padding(horizontal = 8.dp)) { CentreSuggestionList(suggestions) } }
                     }
                 }
-        } }
-        item(key = "nearby-call") {
-            // One slim row: the 112 chip and a small region chip. The state list opens from the chip; district and service stay under Filters.
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                NearbyCallBar()
-                NearbyPicker(t("Region", "क्षेत्र"), state, listOf(NearbyHelp.ALL_INDIA) + states, optionLabel, "nearby-region-chip", Modifier.weight(1f), onSelect = { if (state != it) district = ""; state = it }, compact = true)
-            }
-        }
-        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            OutlinedTextField(value = search, onValueChange = { search = it }, placeholder = { Text(t("Name, place or PIN", "नाम, जगह या पिन"), maxLines = 1, overflow = TextOverflow.Ellipsis) }, leadingIcon = { Icon(Icons.Default.Search, null) }, trailingIcon = { if (search.isNotEmpty()) IconButton(onClick = { search = "" }) { Icon(Icons.Default.Close, t("Clear search", "खोज मिटाएँ")) } }, shape = RoundedCornerShape(12.dp), modifier = Modifier.weight(1f).heightIn(min = 52.dp), singleLine = true, textStyle = LocalTextStyle.current.copy(fontSize = 15.sp),
-                colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper, focusedBorderColor = Rust, cursorColor = Rust),
-                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Search), keyboardActions = androidx.compose.foundation.text.KeyboardActions(onSearch = { focus.clearFocus() }))
-            Spacer(Modifier.width(8.dp))
-            // State, district, service and the two layers: one named button, with how many are on.
-            val filterPress = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
-            Surface(onClick = { focus.clearFocus(); filtersOpen = true }, shape = RoundedCornerShape(12.dp), color = if (filterCount > 0) SaharaTone.Indigo.solid else Paper, contentColor = if (filterCount > 0) Color.White else SaharaTone.Indigo.ink,
-                border = androidx.compose.foundation.BorderStroke(2.dp, SaharaTone.Indigo.solid), interactionSource = filterPress, modifier = Modifier.heightIn(min = 52.dp).saharaPress(filterPress).testTag("nearby-filters")) {
-                Row(Modifier.fillMaxHeight().padding(horizontal = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Tune, null, Modifier.size(20.dp)); Spacer(Modifier.width(6.dp))
-                    Text(if (filterCount > 0) t("Filters · $filterCount", "चुनाव · $filterCount") else t("Filters", "चुनाव"), fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
+            },
+            scaffoldState = scaffold,
+            sheetPeekHeight = NEARBY_SHEET_PEEK,
+            sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+            sheetContainerColor = Cream,
+            sheetContentColor = DoctorCardInk,
+            sheetShadowElevation = 8.dp,
+            sheetDragHandle = { NearbySheetHandle(sheetUp, toggleSheet) },
+            containerColor = SaharaColors.Ground,
+        ) { _ ->
+            Box(Modifier.fillMaxSize()) {
+                // One map at a time: while the full-screen map is open this one steps aside.
+                if (mapExpanded) Box(Modifier.fillMaxSize().background(SaharaColors.Well))
+                else CentreMap(listed, userLocation = here, onLocate = location.ask, onExpand = { focus.clearFocus(); mapExpanded = true }, fill = true, edgeToEdge = false, zoomButtons = true,
+                    overlayPadding = PaddingValues(top = 64.dp, bottom = NEARBY_SHEET_PEEK)) { focus.clearFocus(); picked = it }
+                // A visible Back at the top left (older patients do not know the back gesture), then the search pill.
+                Row(Modifier.align(Alignment.TopCenter).fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    if (onBack != null) {
+                        Surface(onClick = onBack, shape = CircleShape, color = Paper, contentColor = Ink, shadowElevation = 4.dp, modifier = Modifier.size(48.dp).testTag("nearby-back")) {
+                            Box(contentAlignment = Alignment.Center) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस"), Modifier.size(24.dp)) }
+                        }
+                        Spacer(Modifier.width(8.dp))
+                    }
+                    NearbySearchPill(search, { search = it }, filterCount, onFilters = { focus.clearFocus(); filtersOpen = true }, modifier = Modifier.weight(1f))
                 }
             }
-        } }
-        // The map, short enough that the first centre shows below it. When nothing has a map spot, the list still has Directions.
-        if (listed.any { it.latitude != null && it.longitude != null }) item(key = "nearby-map") {
-            // Drag and pinch inside the box; "Expand map" opens it full screen. While the full map is open the small one steps aside
-            // (one map at a time), so its place stays the same size and the list does not jump.
-            Column(Modifier.clip(RoundedCornerShape(12.dp))) {
-                if (mapExpanded) Box(Modifier.fillMaxWidth().height(220.dp).background(SaharaColors.Well))
-                else CentreMap(listed, userLocation = here, height = 220.dp, onLocate = location.ask, onExpand = { focus.clearFocus(); mapExpanded = true }) { chosen = it }
-            }
         }
-        // Empty results: one icon, one line, one way out.
-        if (visible.isEmpty()) item(key = "nearby-empty") { SurfaceCard {
-            Column(Modifier.fillMaxWidth().testTag("nearby-empty"), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                SaharaLottie(SaharaLottieKind.MapPin)
-                Text(t("No centres found", "कोई केंद्र नहीं मिला"), fontSize = 16.sp, color = DoctorCardInk)
-                if (filtersOn) OutlinedButton(onClick = clear, shape = RoundedCornerShape(12.dp), modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Clear filters", "सभी चुनाव हटाएँ"), color = RustText) }
-            }
-        } }
-        items(listed, key = { it.id }) { c -> Box(Modifier.animateItem().saharaStagger(listed.indexOf(c))) { NearbyCentreCard(c, here) } }
-        if (visible.size > listed.size) item(key = "nearby-show-more") {
-            OutlinedButton(onClick = { shown += NEARBY_PAGE }, shape = RoundedCornerShape(12.dp), border = androidx.compose.foundation.BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("nearby-show-more")) {
-                Text(t("Show more", "और दिखाएँ"), color = RustText, fontWeight = FontWeight.SemiBold)
-            }
-        }
-        // Suggesting needs an account; signed out, the button would only lead to a "sign in" dead end, so it is not shown.
-        if (vm?.cloud != null) item(key = "nearby-suggest") {
-            SaharaSecondaryButton(t("Suggest a centre", "केंद्र सुझाएँ"), onClick = { suggesting = true }, icon = Icons.Default.AddLocationAlt, tone = SaharaTone.Marigold, modifier = Modifier.fillMaxWidth().testTag("nearby-suggest-centre"))
-        }
-        if (suggestions.isNotEmpty()) item { CentreSuggestionList(suggestions) }
-    }
-    if (chosen.isNotEmpty()) SaharaScreenSheet(onDismissRequest = { chosen = emptyList() }, containerColor = Cream) {
-        // Several centres can share one approximate area pin; the sheet lists all of them.
-        LazyColumn(Modifier.padding(start = 16.dp, end = 16.dp), contentPadding = PaddingValues(bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            if (chosen.size > 1) item { Text(t("${chosen.size} centres here", "यहाँ ${chosen.size} केंद्र"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading()) }
-            items(chosen, key = { it.id }) { Box(Modifier.saharaStagger(chosen.indexOf(it))) { NearbyCentreCard(it, here) } }
+        // The tapped centre (a row or a pin): name, place, address, phone, Call and Directions, over the sheet.
+        androidx.compose.animation.AnimatedVisibility(picked.isNotEmpty(), Modifier.align(Alignment.BottomCenter),
+            enter = fadeIn(tween(SaharaMotion.ms(SaharaMotion.SELECT_MS))), exit = fadeOut(tween(SaharaMotion.ms(SaharaMotion.SELECT_MS)))) {
+            CentreMapPeek(picked, here, onClose = { picked = emptyList() }, insets = false)
         }
     }
     if (filtersOpen) NearbyFilterSheet(state, district, service, layers, states, districts, optionLabel, visible.size, filtersOn,
@@ -167,6 +187,59 @@ internal const val NEARBY_PAGE = 10
         onLayer = { layer -> layerKey = NearbyHelp.layerOptions.filter { it in NearbyHelp.toggleLayer(layers, layer) }.joinToString(",") }, onClear = clear, onDismiss = { filtersOpen = false })
     if (suggesting && vm != null) CentreSuggestionSheet(vm, if (state == NearbyHelp.ALL_INDIA) "" else state) { suggesting = false }
     if (mapExpanded) NearbyFullMap(listed, here, onLocate = location.ask, onClose = { mapExpanded = false })
+}
+
+/** The one-line search over the map: a magnifier, the text, a clear button while there is text, and the filter icon (with how many are on). */
+@Composable fun NearbySearchPill(search: String, onSearch: (String) -> Unit, filterCount: Int, onFilters: () -> Unit, modifier: Modifier = Modifier) {
+    val t = careText(); val focus = LocalFocusManager.current
+    Surface(shape = RoundedCornerShape(50), color = Paper, contentColor = DoctorCardInk, shadowElevation = 4.dp, modifier = modifier.widthIn(max = 560.dp).fillMaxWidth().height(48.dp).testTag("nearby-search")) {
+        Row(Modifier.padding(start = 14.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Default.Search, null, Modifier.size(20.dp), tint = DoctorCardSub)
+            Spacer(Modifier.width(8.dp))
+            Box(Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
+                if (search.isEmpty()) Text(t("Name, place or PIN", "नाम, जगह या पिन"), fontSize = 15.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                BasicTextField(value = search, onValueChange = onSearch, singleLine = true, textStyle = TextStyle(fontSize = 15.sp, color = DoctorCardInk), cursorBrush = SolidColor(Rust),
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Search),
+                    keyboardActions = androidx.compose.foundation.text.KeyboardActions(onSearch = { focus.clearFocus() }), modifier = Modifier.fillMaxWidth().testTag("nearby-search-field"))
+            }
+            if (search.isNotEmpty()) IconButton(onClick = { onSearch("") }, modifier = Modifier.size(40.dp)) { Icon(Icons.Default.Close, t("Clear search", "खोज मिटाएँ"), Modifier.size(20.dp), tint = DoctorCardSub) }
+            // State, district, service and the two layers: one icon, with a badge for how many are on.
+            Box {
+                IconButton(onClick = onFilters, modifier = Modifier.size(40.dp).testTag("nearby-filters")) {
+                    Icon(Icons.Default.Tune, if (filterCount > 0) t("Filters · $filterCount", "चुनाव · $filterCount") else t("Filters", "चुनाव"), Modifier.size(22.dp),
+                        tint = if (filterCount > 0) SaharaTone.Indigo.solid else Ink)
+                }
+                if (filterCount > 0) Badge(Modifier.align(Alignment.TopEnd), containerColor = SaharaTone.Indigo.solid, contentColor = Color.White) { Text("$filterCount") }
+            }
+        }
+    }
+}
+
+/** The grip at the top of the centres sheet. Dragging moves the sheet; a tap opens or lowers the list. */
+@Composable private fun NearbySheetHandle(open: Boolean, onToggle: () -> Unit) {
+    val t = careText()
+    Box(Modifier.fillMaxWidth().height(24.dp).clickable(role = Role.Button, onClickLabel = if (open) t("Show the map", "नक्शा दिखाएँ") else t("Show the list", "सूची दिखाएँ"), onClick = onToggle)
+        .testTag("nearby-sheet-handle"), contentAlignment = Alignment.Center) {
+        Box(Modifier.size(width = 36.dp, height = 4.dp).background(DoctorHairline, RoundedCornerShape(50)))
+    }
+}
+
+/** One compact centre row in the sheet: the layer colour, the name, then place and distance on one line. A tap opens its card. */
+@Composable fun NearbyCentreRow(c: Centre, here: Pair<Double, Double>?, onClick: () -> Unit) {
+    val t = careText(); val layer = NearbyHelp.layerOf(c)
+    Row(Modifier.fillMaxWidth().heightIn(min = 60.dp).clip(RoundedCornerShape(12.dp)).clickable(role = Role.Button, onClick = onClick).padding(horizontal = 8.dp, vertical = 8.dp).testTag("centre-row-${c.id}"),
+        verticalAlignment = Alignment.CenterVertically) {
+        Box(Modifier.size(12.dp).background(Color(NearbyHelp.layerColor(layer)), CircleShape).testTag("centre-layer-$layer"))
+        Spacer(Modifier.width(12.dp))
+        Column(Modifier.weight(1f)) {
+            Text(c.name, fontSize = 16.sp, lineHeight = 21.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            val km = here?.let { NearbyHelp.distanceKm(c, it.first, it.second) }
+            val place = listOf(c.city, c.state).filter(String::isNotBlank).distinct().joinToString(" · ")
+            val line = listOfNotNull(place.ifBlank { null }, km?.let { k -> val n = Math.round(k).coerceAtLeast(1); if (CentreLocation.approximate(c)) t("about $n km", "लगभग $n किमी") else t("$n km", "$n किमी") }).joinToString(" · ")
+            if (line.isNotBlank()) Text(line, fontSize = 14.sp, lineHeight = 19.sp, color = RustText, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+        Icon(Icons.Default.ChevronRight, null, tint = DoctorCardSub)
+    }
 }
 
 /**
@@ -193,13 +266,13 @@ internal const val NEARBY_PAGE = 10
 }
 
 /**
- * The small card over the full map for the tapped pin: name, place and distance, the phone as listed, then Call (the dialler,
+ * The small card over the map for the tapped pin or centre row: name, place and distance, the address, the phone as listed, then Call (the dialler,
  * filled in) and Directions (Google Maps navigation). Several centres on one area pin list one after another; it scrolls.
  */
-@Composable private fun CentreMapPeek(chosen: List<Centre>, here: Pair<Double, Double>?, onClose: () -> Unit) {
+@Composable private fun CentreMapPeek(chosen: List<Centre>, here: Pair<Double, Double>?, onClose: () -> Unit, insets: Boolean = true) {
     val t = careText()
     Surface(shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp), color = SaharaColors.Surface, contentColor = DoctorCardInk, shadowElevation = 12.dp,
-        modifier = Modifier.fillMaxWidth().navigationBarsPadding().heightIn(max = 420.dp).testTag("centre-map-peek")) {
+        modifier = Modifier.fillMaxWidth().then(if (insets) Modifier.navigationBarsPadding() else Modifier).heightIn(max = 420.dp).testTag("centre-map-peek")) {
         Column(Modifier.verticalScroll(rememberScrollState()).padding(start = 20.dp, end = 8.dp, top = 8.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(if (chosen.size > 1) t("${chosen.size} centres here", "यहाँ ${chosen.size} केंद्र") else t("About this centre", "इस केंद्र के बारे में"),
@@ -214,6 +287,7 @@ internal const val NEARBY_PAGE = 10
                     val place = listOf(c.city, c.state).filter(String::isNotBlank).distinct().joinToString(" · ")
                     val placeLine = listOfNotNull(place.ifBlank { null }, km?.let { k -> val n = Math.round(k).coerceAtLeast(1); if (CentreLocation.approximate(c)) t("about $n km", "लगभग $n किमी") else t("$n km", "$n किमी") }).joinToString(" · ")
                     if (placeLine.isNotBlank()) Text(placeLine, color = RustText, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    if (c.address.isNotBlank()) Text(c.address, fontSize = 14.sp, lineHeight = 19.sp, color = DoctorCardSub, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     if (hasPhone) Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.Phone, null, Modifier.size(18.dp), tint = DoctorCardSub); Spacer(Modifier.width(8.dp))
                         Text(c.phone, fontSize = 16.sp, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
@@ -274,21 +348,6 @@ internal const val NEARBY_PAGE = 10
         NearbyHelp.LAYER_MORPHINE -> t("Morphine listed", "मॉर्फ़ीन सूची में"); NearbyHelp.LAYER_PALLIATIVE -> t("Palliative care", "पैलिएटिव देखभाल")
         else -> o
     } }
-}
-
-/** One slim chip: tapping it opens the phone's dialler with 112 filled in (ACTION_DIAL). The person presses call; the app never calls. */
-@Composable fun NearbyCallBar() {
-    val t = careText(); val context = LocalContext.current
-    Surface(onClick = { open(context, Intent(Intent.ACTION_DIAL, Uri.parse(NearbyHelp.dialUri(NearbyHelp.EMERGENCY_CALL)))) }, shape = RoundedCornerShape(50), color = Peach,
-        modifier = Modifier.height(44.dp).testTag("emergency-112")) {
-        Row(Modifier.padding(start = 6.dp, end = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-            Surface(shape = CircleShape, color = Rust, contentColor = Color.White, modifier = Modifier.size(32.dp)) {
-                Box(contentAlignment = Alignment.Center) { Icon(Icons.Default.Call, null, Modifier.size(18.dp)) }
-            }
-            Spacer(Modifier.width(8.dp))
-            Text(t("Call 112", "112 पर फ़ोन करें"), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Ink, maxLines = 1, softWrap = false)
-        }
-    }
 }
 
 /**

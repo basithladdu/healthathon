@@ -7,7 +7,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
@@ -124,8 +124,8 @@ internal fun gocMillis(at: String?): Long? {
         Surface(color = Cream, modifier = Modifier.fillMaxSize().testTag("goc-family-reader")) {
             Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp).navigationBarsPadding(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = onClose, modifier = Modifier.size(48.dp).testTag("goc-family-reader-close")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) }
                     Text(t("Goals-of-care note", "देखभाल के लक्ष्यों का नोट"), Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 22.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
-                    IconButton(onClick = onClose, modifier = Modifier.testTag("goc-family-reader-close")) { Icon(Icons.Default.Close, t("Close", "बंद करें")) }
                 }
                 Text(t("Version ${d.record.version}", "संस्करण ${d.record.version}") + " · " + d.at.take(10) + " · " + doctorGocStatus(d), fontSize = 14.sp, color = DoctorCardSub)
                 Text(t("Read only. Only your doctor can change this note.", "सिर्फ़ पढ़ने के लिए। इस नोट को सिर्फ़ आपके डॉक्टर बदल सकते हैं।"), fontSize = 14.sp, color = DoctorCardSub)

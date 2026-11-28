@@ -1,0 +1,19 @@
+[
+{"kind": "evidence2", "atF": 774, "durF": 405},
+{"kind": "whofor", "atF": 966, "durF": 255},
+{"kind": "hold", "atF": 1472, "durF": 75},
+{"kind": "hold", "atF": 2388, "durF": 75},
+{"kind": "safety", "atF": 4192, "durF": 375},
+{"kind": "tools", "atF": 4704, "durF": 330},
+{"kind": "morphine", "atF": 6106, "durF": 180},
+{"kind": "hold", "atF": 6230, "durF": 75},
+{"kind": "sarvam23", "atF": 6552, "durF": 210},
+{"kind": "whisper", "atF": 6552, "durF": 240},
+{"kind": "hold", "atF": 7145, "durF": 75},
+{"kind": "process2", "atF": 7440, "durF": 360},
+{"kind": "cut", "atF": 7553, "durF": 138},
+{"kind": "others", "atF": 7835, "durF": 300},
+{"kind": "pilot", "atF": 8067, "durF": 240},
+{"kind": "pays", "atF": 8067, "durF": 195},
+{"kind": "tagline", "atF": 8067, "durF": 180}
+]

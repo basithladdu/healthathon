@@ -6120,3 +6120,63 @@ This text is in another language, so the phone cannot read it out exactly. Ask s
 The phone can only read text written in the app language. Choose “Someone read it to me”.	ਫ਼ੋਨ ਸਿਰਫ਼ ਐਪ ਦੀ ਭਾਸ਼ਾ ਵਿੱਚ ਲਿਖੀ ਲਿਖਤ ਹੀ ਪੜ੍ਹ ਸਕਦਾ ਹੈ। “ਕਿਸੇ ਨੇ ਮੈਨੂੰ ਪੜ੍ਹ ਕੇ ਸੁਣਾਇਆ” ਚੁਣੋ।
 This phone has no voice for the app language. Choose “Someone read it to me”.	ਇਸ ਫ਼ੋਨ ਵਿੱਚ ਐਪ ਦੀ ਭਾਸ਼ਾ ਦੀ ਆਵਾਜ਼ ਨਹੀਂ ਹੈ। “ਕਿਸੇ ਨੇ ਮੈਨੂੰ ਪੜ੍ਹ ਕੇ ਸੁਣਾਇਆ” ਚੁਣੋ।
 Only someone who can edit this care record can change this.	ਇਸ ਨੂੰ ਸਿਰਫ਼ ਉਹੀ ਬਦਲ ਸਕਦੇ ਹਨ ਜੋ ਇਸ ਦੇਖਭਾਲ ਰਿਕਾਰਡ ਵਿੱਚ ਬਦਲਾਅ ਕਰ ਸਕਦੇ ਹਨ।
+Show the map	ਨਕਸ਼ਾ ਦਿਖਾਓ
+Show the list	ਸੂਚੀ ਦਿਖਾਓ
+${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} at ${demoTime(v.due)}. Opens their visits.	${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} ਨੂੰ ${demoTime(v.due)} ਵਜੇ। ਉਨ੍ਹਾਂ ਦੀਆਂ ਮੁਲਾਕਾਤਾਂ ਖੋਲ੍ਹਦਾ ਹੈ।
+Practice cards have no web link. Sign in to your own account to make one.	ਅਭਿਆਸ ਵਾਲੇ ਕਾਰਡਾਂ ਦਾ ਵੈੱਬ ਲਿੰਕ ਨਹੀਂ ਹੁੰਦਾ। ਲਿੰਕ ਬਣਾਉਣ ਲਈ ਆਪਣੇ ਖਾਤੇ ਨਾਲ ਸਾਈਨ ਇਨ ਕਰੋ।
+Web link is ready. Scanning the QR now opens this card on sahara.wedevit.in.	ਵੈੱਬ ਲਿੰਕ ਤਿਆਰ ਹੈ। ਹੁਣ QR ਸਕੈਨ ਕਰਨ ਤੇ ਇਹ ਕਾਰਡ sahara.wedevit.in ਤੇ ਖੁੱਲ੍ਹੇਗਾ।
+Making the web link…	ਵੈੱਬ ਲਿੰਕ ਬਣ ਰਿਹਾ ਹੈ…
+Make web link	ਵੈੱਬ ਲਿੰਕ ਬਣਾਓ
+We never ask for Aadhaar, date of birth or gender to sign up.	ਸਾਈਨ ਅੱਪ ਲਈ ਅਸੀਂ ਕਦੇ ਆਧਾਰ, ਜਨਮ ਮਿਤੀ ਜਾਂ ਲਿੰਗ ਨਹੀਂ ਪੁੱਛਦੇ।
+Big buttons that speak. Tap Full app at the bottom to come back.	ਬੋਲਣ ਵਾਲੇ ਵੱਡੇ ਬਟਨ। ਵਾਪਸ ਆਉਣ ਲਈ ਹੇਠਾਂ ਪੂਰੀ ਐਪ ਦਬਾਓ।
+Switch on	ਚਾਲੂ ਕਰੋ
+Switch to Simple mode?	ਸੌਖੇ ਮੋਡ 'ਤੇ ਜਾਣਾ ਹੈ?
+$clock dose	$clock ਦੀ ਖੁਰਾਕ
+Hard	ਔਖਾ
+Mark $medicine taken	$medicine ਲਈ ਗਈ ਦਰਜ ਕਰੋ
+No check-in	ਕੋਈ ਚੈੱਕ-ਇਨ ਨਹੀਂ
+Not marked yet	ਅਜੇ ਦਰਜ ਨਹੀਂ
+Open on the website	ਵੈੱਬਸਾਈਟ 'ਤੇ ਖੋਲ੍ਹੋ
+This policy is shown in English.	ਇਹ ਨੀਤੀ ਅੰਗਰੇਜ਼ੀ ਵਿੱਚ ਦਿਖਾਈ ਗਈ ਹੈ।
+new	ਨਵੇਂ
+symptom noted	ਲੱਛਣ ਦਰਜ ਹੋਇਆ
+Caring for	ਇਨ੍ਹਾਂ ਦੀ ਦੇਖਭਾਲ
+Feeling very upset?	ਬਹੁਤ ਪਰੇਸ਼ਾਨ ਹੋ?
+Mark all taken	ਸਭ ਲਈਆਂ ਦਰਜ ਕਰੋ
+Note a side effect	ਮਾੜਾ ਅਸਰ ਦਰਜ ਕਰੋ
+Reminder times	ਯਾਦ ਕਰਾਉਣ ਦੇ ਸਮੇਂ
+Tell the doctor: 1 side effect	ਡਾਕਟਰ ਨੂੰ ਦੱਸੋ: 1 ਮਾੜਾ ਅਸਰ
+Tell the doctor: $count side effects	ਡਾਕਟਰ ਨੂੰ ਦੱਸੋ: $count ਮਾੜੇ ਅਸਰ
+Past medicines	ਪਹਿਲਾਂ ਦੀਆਂ ਦਵਾਈਆਂ
+Scan a prescription or strip	ਪਰਚੀ ਜਾਂ ਪੱਤਾ ਸਕੈਨ ਕਰੋ
+Type it in	ਖੁਦ ਲਿਖੋ
+When needed	ਲੋੜ ਪੈਣ 'ਤੇ
+Took one	ਇੱਕ ਲਈ
+All done for today	ਅੱਜ ਦੀਆਂ ਸਾਰੀਆਂ ਦਵਾਈਆਂ ਹੋ ਗਈਆਂ
+Next: $slot	ਅਗਲੀ: $slot
+$count medicines	$count ਦਵਾਈਆਂ
+marked taken	ਲਈ ਗਈ ਦਰਜ ਹੋਈ
+Care near me	ਨੇੜੇ ਦੇਖਭਾਲ
+Requests to doctor	ਡਾਕਟਰ ਨੂੰ ਬੇਨਤੀਆਂ
+No check-ins this week	ਇਸ ਹਫ਼ਤੇ ਕੋਈ ਚੈੱਕ-ਇਨ ਨਹੀਂ
+1 check-in this week	ਇਸ ਹਫ਼ਤੇ 1 ਚੈੱਕ-ਇਨ
+$checkedDays check-ins this week	ਇਸ ਹਫ਼ਤੇ $checkedDays ਚੈੱਕ-ਇਨ
+symptoms on 1 day	1 ਦਿਨ ਲੱਛਣ
+symptoms on $symptomDays days	$symptomDays ਦਿਨ ਲੱਛਣ
+Simple mode is on. Tap Full app at the bottom to come back.	ਸੌਖਾ ਮੋਡ ਚਾਲੂ ਹੈ। ਵਾਪਸ ਆਉਣ ਲਈ ਹੇਠਾਂ ਪੂਰੀ ਐਪ ਦਬਾਓ।
+On because you are 60 or older	ਤੁਹਾਡੀ ਉਮਰ 60 ਜਾਂ ਵੱਧ ਹੈ, ਇਸ ਲਈ ਚਾਲੂ ਹੈ
+Family and sharing	ਪਰਿਵਾਰ ਅਤੇ ਸਾਂਝ
+Search patients	ਮਰੀਜ਼ ਖੋਜੋ
+Record a goals-of-care talk	ਦੇਖਭਾਲ ਦੇ ਟੀਚਿਆਂ ਦੀ ਗੱਲਬਾਤ ਰਿਕਾਰਡ ਕਰੋ
+Choose the patient	ਮਰੀਜ਼ ਚੁਣੋ
+$done of $total	$total ਵਿੱਚੋਂ $done
+$done of $total visits done today	ਅੱਜ $total ਵਿੱਚੋਂ $done ਮੁਲਾਕਾਤਾਂ ਪੂਰੀਆਂ
+visits today	ਅੱਜ ਦੀਆਂ ਮੁਲਾਕਾਤਾਂ
+visits	ਮੁਲਾਕਾਤਾਂ
+See schedule	ਸਮਾਂ-ਸੂਚੀ ਵੇਖੋ
+Hard days	ਔਖੇ ਦਿਨ
+Needs you	ਤੁਹਾਡੀ ਉਡੀਕ ਵਿੱਚ
+Nothing waiting	ਕੁਝ ਬਾਕੀ ਨਹੀਂ
+Verify your registration	ਆਪਣੀ ਰਜਿਸਟ੍ਰੇਸ਼ਨ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ
+Are you still caring for $caringName?	ਕੀ ਤੁਸੀਂ ਅਜੇ ਵੀ $caringName ਦੀ ਦੇਖਭਾਲ ਕਰ ਰਹੇ ਹੋ?
+How is $caringName feeling today?	$caringName ਅੱਜ ਕਿਵੇਂ ਮਹਿਸੂਸ ਕਰ ਰਹੇ ਹਨ?

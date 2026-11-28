@@ -6123,3 +6123,63 @@ This text is in another language, so the phone cannot read it out exactly. Ask s
 The phone can only read text written in the app language. Choose “Someone read it to me”.	فون صرف ایپ کی زبان میں لکھا متن پڑھ سکتا ہے۔ “کسی نے مجھے پڑھ کر سنایا” چنیں۔
 This phone has no voice for the app language. Choose “Someone read it to me”.	اس فون میں ایپ کی زبان کی آواز نہیں ہے۔ “کسی نے مجھے پڑھ کر سنایا” چنیں۔
 Only someone who can edit this care record can change this.	اسے صرف وہی بدل سکتے ہیں جو اس دیکھ بھال کے ریکارڈ میں تبدیلی کر سکتے ہیں۔
+Show the map	نقشہ دکھائیں
+Show the list	فہرست دکھائیں
+${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} at ${demoTime(v.due)}. Opens their visits.	${v.profile.name}، ${v.kind}، ${demoDay(demoDate(v.due))} کو ${demoTime(v.due)} بجے۔ ان کی ملاقاتیں کھولتا ہے۔
+Practice cards have no web link. Sign in to your own account to make one.	مشق والے کارڈ کا ویب لنک نہیں ہوتا۔ لنک بنانے کے لیے اپنے اکاؤنٹ سے سائن ان کریں۔
+Web link is ready. Scanning the QR now opens this card on sahara.wedevit.in.	ویب لنک تیار ہے۔ اب QR اسکین کرنے پر یہ کارڈ sahara.wedevit.in پر کھلے گا۔
+Making the web link…	ویب لنک بن رہا ہے…
+Make web link	ویب لنک بنائیں
+We never ask for Aadhaar, date of birth or gender to sign up.	سائن اپ کے لیے ہم کبھی آدھار، تاریخ پیدائش یا جنس نہیں مانگتے۔
+Big buttons that speak. Tap Full app at the bottom to come back.	بولنے والے بڑے بٹن۔ واپس آنے کے لیے نیچے پوری ایپ دبائیں۔
+Switch on	آن کریں
+Switch to Simple mode?	آسان موڈ پر جائیں؟
+$clock dose	$clock کی خوراک
+Hard	مشکل
+Mark $medicine taken	$medicine لی گئی درج کریں
+No check-in	کوئی چیک اِن نہیں
+Not marked yet	ابھی درج نہیں
+Open on the website	ویب سائٹ پر کھولیں
+This policy is shown in English.	یہ پالیسی انگریزی میں دکھائی گئی ہے۔
+new	نئے
+symptom noted	علامت درج ہوئی
+Caring for	ان کی دیکھ بھال
+Feeling very upset?	بہت پریشان ہیں؟
+Mark all taken	سب لی گئی درج کریں
+Note a side effect	مضر اثر درج کریں
+Reminder times	یاد دہانی کے اوقات
+Tell the doctor: 1 side effect	ڈاکٹر کو بتائیں: 1 مضر اثر
+Tell the doctor: $count side effects	ڈاکٹر کو بتائیں: $count مضر اثرات
+Past medicines	پرانی دوائیں
+Scan a prescription or strip	نسخہ یا پتہ اسکین کریں
+Type it in	خود لکھیں
+When needed	ضرورت پڑنے پر
+Took one	ایک لی
+All done for today	آج کی سب دوائیں ہو گئیں
+Next: $slot	اگلی: $slot
+$count medicines	$count دوائیں
+marked taken	لی گئی درج ہوئی
+Care near me	میرے قریب دیکھ بھال
+Requests to doctor	ڈاکٹر سے درخواستیں
+No check-ins this week	اس ہفتے کوئی چیک اِن نہیں
+1 check-in this week	اس ہفتے 1 چیک اِن
+$checkedDays check-ins this week	اس ہفتے $checkedDays چیک اِن
+symptoms on 1 day	1 دن علامات
+symptoms on $symptomDays days	$symptomDays دن علامات
+Simple mode is on. Tap Full app at the bottom to come back.	آسان موڈ آن ہے۔ واپس آنے کے لیے نیچے پوری ایپ دبائیں۔
+On because you are 60 or older	آپ کی عمر 60 یا زیادہ ہے، اس لیے آن ہے
+Family and sharing	خاندان اور شیئرنگ
+Search patients	مریض تلاش کریں
+Record a goals-of-care talk	نگہداشت کے مقاصد کی گفتگو ریکارڈ کریں
+Choose the patient	مریض منتخب کریں
+$done of $total	$total میں سے $done
+$done of $total visits done today	آج $total میں سے $done دورے مکمل
+visits today	آج کے دورے
+visits	دورے
+See schedule	شیڈول دیکھیں
+Hard days	مشکل دن
+Needs you	آپ کے منتظر
+Nothing waiting	کچھ باقی نہیں
+Verify your registration	اپنی رجسٹریشن کی تصدیق کریں
+Are you still caring for $caringName?	کیا آپ اب بھی $caringName کی دیکھ بھال کر رہے ہیں؟
+How is $caringName feeling today?	$caringName آج کیسا محسوس کر رہے ہیں؟

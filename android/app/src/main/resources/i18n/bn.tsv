@@ -6120,3 +6120,63 @@ This text is in another language, so the phone cannot read it out exactly. Ask s
 The phone can only read text written in the app language. Choose “Someone read it to me”.	ফোন শুধু অ্যাপের ভাষায় লেখা লেখাই পড়তে পারে। “কেউ আমাকে পড়ে শুনিয়েছেন” বেছে নিন।
 This phone has no voice for the app language. Choose “Someone read it to me”.	এই ফোনে অ্যাপের ভাষার কণ্ঠ নেই। “কেউ আমাকে পড়ে শুনিয়েছেন” বেছে নিন।
 Only someone who can edit this care record can change this.	এই যত্নের রেকর্ড যিনি বদলাতে পারেন, শুধু তিনিই এটি বদলাতে পারেন।
+Show the map	মানচিত্র দেখান
+Show the list	তালিকা দেখান
+${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} at ${demoTime(v.due)}. Opens their visits.	${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} ${demoTime(v.due)}-এ। তাঁর ভিজিটগুলি খোলে।
+Practice cards have no web link. Sign in to your own account to make one.	অনুশীলনের কার্ডে ওয়েব লিংক থাকে না। লিংক তৈরি করতে নিজের অ্যাকাউন্টে সাইন ইন করুন।
+Web link is ready. Scanning the QR now opens this card on sahara.wedevit.in.	ওয়েব লিংক তৈরি। এখন QR স্ক্যান করলে এই কার্ড sahara.wedevit.in-এ খুলবে।
+Making the web link…	ওয়েব লিংক তৈরি হচ্ছে…
+Make web link	ওয়েব লিংক তৈরি করুন
+We never ask for Aadhaar, date of birth or gender to sign up.	সাইন আপের জন্য আমরা কখনো Aadhaar, জন্মতারিখ বা লিঙ্গ চাই না।
+Big buttons that speak. Tap Full app at the bottom to come back.	কথা বলা বড় বোতাম। ফিরে আসতে নিচে পুরো অ্যাপ চাপুন।
+Switch on	চালু করুন
+Switch to Simple mode?	সহজ মোডে যাবেন?
+$clock dose	$clock-এর ডোজ
+Hard	কঠিন
+Mark $medicine taken	$medicine নেওয়া হয়েছে চিহ্নিত করুন
+No check-in	কোনো চেক-ইন নেই
+Not marked yet	এখনও চিহ্নিত হয়নি
+Open on the website	ওয়েবসাইটে খুলুন
+This policy is shown in English.	এই নীতিটি ইংরেজিতে দেখানো হয়েছে।
+new	নতুন
+symptom noted	উপসর্গ লেখা হয়েছে
+Caring for	এঁর যত্ন
+Feeling very upset?	খুব মন খারাপ লাগছে?
+Mark all taken	সব নেওয়া হয়েছে চিহ্নিত করুন
+Note a side effect	পার্শ্বপ্রতিক্রিয়া লিখুন
+Reminder times	মনে করানোর সময়
+Tell the doctor: 1 side effect	ডাক্তারকে বলুন: 1 পার্শ্বপ্রতিক্রিয়া
+Tell the doctor: $count side effects	ডাক্তারকে বলুন: $count পার্শ্বপ্রতিক্রিয়া
+Past medicines	আগের ওষুধ
+Scan a prescription or strip	প্রেসক্রিপশন বা স্ট্রিপ স্ক্যান করুন
+Type it in	নিজে লিখুন
+When needed	দরকার হলে
+Took one	একটা নিয়েছি
+All done for today	আজকের সব হয়ে গেছে
+Next: $slot	পরেরটি: $slot
+$count medicines	$count ওষুধ
+marked taken	নেওয়া হয়েছে বলে চিহ্নিত
+Care near me	কাছাকাছি যত্ন
+Requests to doctor	ডাক্তারের কাছে অনুরোধ
+No check-ins this week	এই সপ্তাহে কোনো চেক-ইন নেই
+1 check-in this week	এই সপ্তাহে 1টি চেক-ইন
+$checkedDays check-ins this week	এই সপ্তাহে $checkedDays টি চেক-ইন
+symptoms on 1 day	1 দিন উপসর্গ
+symptoms on $symptomDays days	$symptomDays দিন উপসর্গ
+Simple mode is on. Tap Full app at the bottom to come back.	সহজ মোড চালু হয়েছে। ফিরে আসতে নিচে পুরো অ্যাপ চাপুন।
+On because you are 60 or older	আপনার বয়স 60 বা তার বেশি, তাই চালু আছে
+Family and sharing	পরিবার ও শেয়ার করা
+Search patients	রোগী খুঁজুন
+Record a goals-of-care talk	যত্নের লক্ষ্য নিয়ে আলোচনা রেকর্ড করুন
+Choose the patient	রোগী বেছে নিন
+$done of $total	$total-এর মধ্যে $done
+$done of $total visits done today	আজ $total ভিজিটের মধ্যে $done সম্পন্ন
+visits today	আজকের ভিজিট
+visits	ভিজিট
+See schedule	সময়সূচি দেখুন
+Hard days	কঠিন দিন
+Needs you	আপনার অপেক্ষায়
+Nothing waiting	কিছু বাকি নেই
+Verify your registration	আপনার নিবন্ধন যাচাই করুন
+Are you still caring for $caringName?	আপনি কি এখনও $caringName এর দেখাশোনা করছেন?
+How is $caringName feeling today?	$caringName আজ কেমন আছেন?

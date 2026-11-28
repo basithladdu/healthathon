@@ -14,9 +14,14 @@ import java.time.LocalDate
 class CareHindiCoverageTest {
     private val screens = mapOf(
         "CareOnboarding.kt" to listOf("Welcome", "IntroPage", "OnboardingFinish", "BrandOverlay"),
-        "CareUi.kt" to listOf("CareApp", "Today", "CareList", "CareRow", "More", "AddPerson", "AddPersonContent", "AddCareItem", "Talk", "NoteReader", "AudioPlayback", "InfoDisclosure", "RawTranscriptPanel"),
+        "CareUi.kt" to listOf("CareApp", "CareRow", "AddPerson", "AddPersonContent", "AddCareItem", "Talk", "NoteReader", "AudioPlayback", "InfoDisclosure", "RawTranscriptPanel"),
+        // Step 0 of the 25 Nov redesign moved Today, the Care tools hub and More into their own files; SaharaAppKit.kt holds the shared page pieces.
+        "CareTodayScreen.kt" to listOf("Today", "TodayCheckIn", "TodayMoodFace", "TodayNextDose", "TodayDoseUndo", "ClinicianToday"),
+        "CareHubScreen.kt" to listOf("CareList"),
+        "CareMoreScreen.kt" to listOf("More"),
+        "SaharaAppKit.kt" to listOf("SaharaPage", "DoseToggle", "DoseRow", "DoseSheet", "SosTopButton", "PersonAvatarButton", "SaharaPersonAction", "SaharaLanguageSheet", "InAppDocumentPage"),
         "CentreMap.kt" to listOf("CentreMap"),
-        "NearbyScreen.kt" to listOf("NearbyScreen", "NearbyFilterSheet", "NearbyCallBar", "NearbyInfoButton", "NearbyPicker", "NearbyCentreCard"),
+        "NearbyScreen.kt" to listOf("NearbyScreen", "NearbySearchPill", "NearbySheetHandle", "NearbyCentreRow", "NearbyFilterSheet", "NearbyInfoButton", "NearbyPicker", "NearbyCentreCard"),
         "CentreSuggestion.kt" to listOf("CentreSuggestionSheet", "CentreSuggestionList"),
         "CareDocuments.kt" to listOf("CareDocuments"),
         "CareDocumentReviewUi.kt" to listOf("CareDocumentReview"),

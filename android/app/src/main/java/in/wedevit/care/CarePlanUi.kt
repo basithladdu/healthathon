@@ -1,4 +1,4 @@
-@file:OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+@file:OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class, androidx.compose.material3.ExperimentalMaterial3Api::class)
 package `in`.wedevit.care
 
 import android.content.Context
@@ -197,10 +197,13 @@ internal fun planStepOf(field: String): Int = when {
 }
 
 @Composable internal fun PlanHeader(title: String, onBack: () -> Unit, tag: String) { val t = careText()
-    Row(Modifier.fillMaxWidth().testTag(tag), verticalAlignment = Alignment.CenterVertically) {
-        IconButton(onClick = onBack, modifier = Modifier.testTag("$tag-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) }
-        Spacer(Modifier.width(4.dp)); Heading(title, 26)
-    }
+    // A stock Material top app bar (25 Nov redesign): title left, back arrow, default colours. It sits as the list's first item,
+    // so the plan's many pages keep their own lists; the app shell already keeps the status bar clear.
+    TopAppBar(title = { Text(title, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.a11yHeading()) },
+        modifier = Modifier.fillMaxWidth().testTag(tag),
+        navigationIcon = { IconButton(onClick = onBack, modifier = Modifier.size(48.dp).testTag("$tag-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) } },
+        windowInsets = WindowInsets(0),
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent))
 }
 
 /** Always on: clinical spec §6 / Sahaara §1. */
@@ -474,7 +477,7 @@ internal object PlanAdmission {
     androidx.activity.compose.BackHandler(step > 0) { step--; shown = emptyList() }
     Column(Modifier.fillMaxSize().testTag("ectpr-wizard")) {
         Row(Modifier.fillMaxWidth().padding(start = 4.dp, end = 16.dp, top = 4.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = ::tryLeave, modifier = Modifier.testTag("ectpr-wizard-close")) { Icon(Icons.Default.Close, t("Close", "बंद करें")) }
+            IconButton(onClick = ::tryLeave, modifier = Modifier.size(48.dp).testTag("ectpr-wizard-close")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) }
             // Which plan, whose, and the step by its name, so a step never shows as a bare number.
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(t("Emergency care plan", "आपातकालीन देखभाल योजना") + (personName.ifBlank { d.patient.name }.takeIf { it.isNotBlank() }?.let { " · $it" } ?: ""), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub)

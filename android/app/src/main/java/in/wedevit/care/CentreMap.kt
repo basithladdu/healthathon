@@ -55,11 +55,18 @@ import org.maplibre.geojson.Point
  * closest centres, shows a "you are here" dot, and offers a button to come back to it.
  * 24 Nov (clinical meeting: "work like Google Maps"): one finger drags and two fingers pinch to zoom inside the box (a double tap
  * zooms in too), with + / − buttons for anyone who cannot pinch; turning and tilting stay off so the map never ends up sideways.
- * [onExpand] adds "Expand map" (top left), which opens the full-screen map; [fill] makes the map fill its parent instead of [height].
+ * [onExpand] adds a small "Expand map" icon (top left), which opens the full-screen map; [fill] makes the map fill its parent instead of [height].
+ * [edgeToEdge] keeps the buttons clear of the system bars (the full-screen map runs under them); [zoomButtons] adds + / −.
+ * [overlayPadding] is the room taken by things drawn over the map (25 Nov Nearby: the search pill on top, the centres sheet below):
+ * the buttons, the attribution and the camera's centre all move inside it, so nothing important hides under the sheet.
  */
 @Composable fun CentreMap(centres: List<Centre>, userLocation: Pair<Double, Double>? = null, height: Dp = 260.dp, onLocate: (() -> Unit)? = null,
-    onExpand: (() -> Unit)? = null, fill: Boolean = false, tag: String = "centre-map", onSelect: (List<Centre>) -> Unit) {
+    onExpand: (() -> Unit)? = null, fill: Boolean = false, tag: String = "centre-map", edgeToEdge: Boolean = fill, zoomButtons: Boolean = fill,
+    overlayPadding: PaddingValues = PaddingValues(0.dp), onSelect: (List<Centre>) -> Unit) {
     val context = LocalContext.current; val t = careText()
+    val density = androidx.compose.ui.platform.LocalDensity.current
+    val padTop = with(density) { overlayPadding.calculateTopPadding().roundToPx() }
+    val padBottom = with(density) { overlayPadding.calculateBottomPadding().roundToPx() }
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val currentCentres by rememberUpdatedState(centres)
     val select by rememberUpdatedState(onSelect)
@@ -97,6 +104,12 @@ import org.maplibre.geojson.Point
                 ready.uiSettings.isTiltGesturesEnabled = false
                 ready.setMinZoomPreference(3.0)
                 ready.setMaxZoomPreference(18.0)
+                if (padTop > 0 || padBottom > 0) {
+                    // The camera's centre sits in the open part of the map, and the © link stays above the sheet.
+                    ready.moveCamera(CameraUpdateFactory.paddingTo(0.0, padTop.toDouble(), 0.0, padBottom.toDouble()))
+                    ready.uiSettings.setAttributionMargins(ready.uiSettings.attributionMarginLeft, ready.uiSettings.attributionMarginTop,
+                        ready.uiSettings.attributionMarginRight, ready.uiSettings.attributionMarginBottom + padBottom)
+                }
                 ready.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), zoom))
                 ready.addOnCameraIdleListener {
                     ready.cameraPosition.target?.let { latitude = it.latitude; longitude = it.longitude }
@@ -187,13 +200,13 @@ import org.maplibre.geojson.Point
     Box((if (fill) Modifier.fillMaxSize() else Modifier.fillMaxWidth().height(height)).testTag(tag).semantics { stateDescription = if (failed) t("Map unavailable", "नक्शा उपलब्ध नहीं") else if (loaded) t("Map ready", "नक्शा तैयार") else t("Loading map", "नक्शा खुल रहा है") }) {
         key(retry) { AndroidView(factory = { view }, modifier = Modifier.fillMaxSize()) }
         // Full screen, the buttons keep clear of the status and navigation bars; the map itself runs under them.
-        Box(Modifier.fillMaxSize().then(if (fill) Modifier.systemBarsPadding() else Modifier)) { CentreMapControls(loaded, failed, fill, centres, userLocation, onLocate, onExpand, tag,
+        Box(Modifier.fillMaxSize().then(if (edgeToEdge) Modifier.systemBarsPadding() else Modifier).padding(overlayPadding)) { CentreMapControls(loaded, failed, zoomButtons, centres, userLocation, onLocate, onExpand, tag,
             onRetry = { failed = false; loaded = false; retry++ }, onMove = ::move) }
     }
 }
 
-/** The buttons over the map: retry, Show all, Expand, the legend, + / − (full screen only: the small box has no room) and locate me. */
-@Composable private fun BoxScope.CentreMapControls(loaded: Boolean, failed: Boolean, fill: Boolean, centres: List<Centre>, userLocation: Pair<Double, Double>?,
+/** The buttons over the map: retry, Show all, Expand, the legend, + / − (only when [zoomButtons]: a small box has no room) and locate me. */
+@Composable private fun BoxScope.CentreMapControls(loaded: Boolean, failed: Boolean, zoomButtons: Boolean, centres: List<Centre>, userLocation: Pair<Double, Double>?,
     onLocate: (() -> Unit)?, onExpand: (() -> Unit)?, tag: String, onRetry: () -> Unit, onMove: (org.maplibre.android.camera.CameraUpdate) -> Unit) {
     val t = careText()
     if (!loaded && !failed) CircularProgressIndicator(Modifier.size(28.dp).align(Alignment.Center), color = Rust)
@@ -208,11 +221,10 @@ import org.maplibre.geojson.Point
         val located = centres.filter { it.latitude != null && it.longitude != null }
         if (loaded && located.isNotEmpty()) FilledTonalButton(onClick = { onMove(bounds(located)) }, shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Paper, contentColor = Ink),
             modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).heightIn(min = 48.dp)) { Text(t("Show all", "सभी दिखाएँ"), fontWeight = FontWeight.SemiBold) }
-        // "Expand map": the same map full screen, with the same pins and the locate button (shown even while the tiles load or fail).
-        if (onExpand != null) FilledTonalButton(onClick = onExpand, shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Paper, contentColor = Ink),
-            contentPadding = PaddingValues(horizontal = 12.dp), modifier = Modifier.align(Alignment.TopStart).padding(8.dp).heightIn(min = 48.dp).testTag("$tag-expand")) {
-            Icon(Icons.Default.OpenInFull, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp))
-            Text(t("Expand map", "बड़ा नक्शा"), fontWeight = FontWeight.SemiBold, maxLines = 1)
+        // "Expand map": a small round icon (25 Nov: the map itself is big now); the same map full screen, with the same pins and the
+        // locate button (shown even while the tiles load or fail).
+        if (onExpand != null) Box(Modifier.align(Alignment.TopStart).padding(8.dp)) {
+            CentreMapRoundButton(Icons.Default.OpenInFull, t("Expand map", "बड़ा नक्शा"), "$tag-expand", onExpand)
         }
         // Legend: the pin colours, because the layer tiles now sit in the Filters sheet.
         if (loaded) Surface(Modifier.align(Alignment.BottomStart).padding(8.dp).testTag("centre-map-legend"), shape = RoundedCornerShape(12.dp), color = Paper.copy(alpha = .94f)) {
@@ -226,7 +238,7 @@ import org.maplibre.geojson.Point
             }
         }
         Column(Modifier.align(Alignment.BottomEnd).padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            if (loaded && fill) {
+            if (loaded && zoomButtons) {
                 CentreMapRoundButton(Icons.Default.Add, t("Zoom in", "पास से देखें"), "$tag-zoom-in") { onMove(CameraUpdateFactory.zoomIn()) }
                 CentreMapRoundButton(Icons.Default.Remove, t("Zoom out", "दूर से देखें"), "$tag-zoom-out") { onMove(CameraUpdateFactory.zoomOut()) }
             }

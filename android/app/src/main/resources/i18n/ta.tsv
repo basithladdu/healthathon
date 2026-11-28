@@ -6120,3 +6120,63 @@ This text is in another language, so the phone cannot read it out exactly. Ask s
 The phone can only read text written in the app language. Choose “Someone read it to me”.	ஃபோன் செயலியின் மொழியில் எழுதிய உரையை மட்டுமே படிக்க முடியும். “ஒருவர் எனக்குப் படித்துக் காட்டினார்” என்பதைத் தேர்ந்தெடுங்கள்.
 This phone has no voice for the app language. Choose “Someone read it to me”.	இந்த ஃபோனில் செயலியின் மொழிக்கான குரல் இல்லை. “ஒருவர் எனக்குப் படித்துக் காட்டினார்” என்பதைத் தேர்ந்தெடுங்கள்.
 Only someone who can edit this care record can change this.	இந்தப் பராமரிப்புப் பதிவைத் திருத்தக்கூடியவர் மட்டுமே இதை மாற்ற முடியும்.
+Show the map	வரைபடத்தைக் காட்டு
+Show the list	பட்டியலைக் காட்டு
+${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} at ${demoTime(v.due)}. Opens their visits.	${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} அன்று ${demoTime(v.due)}. அவர்களின் வருகைகளைத் திறக்கும்.
+Practice cards have no web link. Sign in to your own account to make one.	பயிற்சி அட்டைகளுக்கு இணைய இணைப்பு இல்லை. இணைப்பை உருவாக்க உங்கள் சொந்தக் கணக்கில் உள்நுழையவும்.
+Web link is ready. Scanning the QR now opens this card on sahara.wedevit.in.	இணைய இணைப்பு தயார். இப்போது QR-ஐ ஸ்கேன் செய்தால் இந்த அட்டை sahara.wedevit.in இல் திறக்கும்.
+Making the web link…	இணைய இணைப்பு உருவாகிறது…
+Make web link	இணைய இணைப்பை உருவாக்கு
+We never ask for Aadhaar, date of birth or gender to sign up.	பதிவு செய்ய ஆதார், பிறந்த தேதி, பாலினம் எதையும் கேட்பதில்லை.
+Big buttons that speak. Tap Full app at the bottom to come back.	பேசும் பெரிய பொத்தான்கள். திரும்ப வர கீழே முழு செயலியைத் தட்டவும்.
+Switch on	இயக்கு
+Switch to Simple mode?	எளிய முறைக்கு மாறவா?
+$clock dose	$clock டோஸ்
+Hard	கடினம்
+Mark $medicine taken	$medicine எடுத்ததாகக் குறிக்கவும்
+No check-in	செக்-இன் இல்லை
+Not marked yet	இன்னும் குறிக்கவில்லை
+Open on the website	இணையதளத்தில் திறக்கவும்
+This policy is shown in English.	இந்தக் கொள்கை ஆங்கிலத்தில் காட்டப்படுகிறது.
+new	புதியவை
+symptom noted	அறிகுறி பதிவானது
+Caring for	இவரின் பராமரிப்பு
+Feeling very upset?	மிகவும் மனம் கலங்கியுள்ளீர்களா?
+Mark all taken	அனைத்தையும் எடுத்ததாகக் குறிக்கவும்
+Note a side effect	பக்கவிளைவைப் பதிவு செய்யவும்
+Reminder times	நினைவூட்டல் நேரங்கள்
+Tell the doctor: 1 side effect	மருத்துவரிடம் சொல்லுங்கள்: 1 பக்கவிளைவு
+Tell the doctor: $count side effects	மருத்துவரிடம் சொல்லுங்கள்: $count பக்கவிளைவுகள்
+Past medicines	முந்தைய மருந்துகள்
+Scan a prescription or strip	மருந்துச்சீட்டு அல்லது அட்டையை ஸ்கேன் செய்யவும்
+Type it in	தட்டச்சு செய்யவும்
+When needed	தேவைப்படும்போது
+Took one	ஒன்று எடுத்தேன்
+All done for today	இன்றைக்கு எல்லாம் முடிந்தது
+Next: $slot	அடுத்தது: $slot
+$count medicines	$count மருந்துகள்
+marked taken	எடுத்ததாகக் குறிக்கப்பட்டது
+Care near me	எனக்கு அருகில் பராமரிப்பு
+Requests to doctor	மருத்துவரிடம் கோரிக்கைகள்
+No check-ins this week	இந்த வாரம் செக்-இன் இல்லை
+1 check-in this week	இந்த வாரம் 1 செக்-இன்
+$checkedDays check-ins this week	இந்த வாரம் $checkedDays செக்-இன்கள்
+symptoms on 1 day	1 நாள் அறிகுறிகள்
+symptoms on $symptomDays days	$symptomDays நாட்கள் அறிகுறிகள்
+Simple mode is on. Tap Full app at the bottom to come back.	எளிய முறை இயக்கத்தில் உள்ளது. திரும்ப வர கீழே முழு செயலியைத் தட்டவும்.
+On because you are 60 or older	உங்கள் வயது 60 அல்லது அதற்கு மேல் என்பதால் இயக்கத்தில் உள்ளது
+Family and sharing	குடும்பம் மற்றும் பகிர்வு
+Search patients	நோயாளிகளைத் தேடு
+Record a goals-of-care talk	பராமரிப்பு இலக்குகள் உரையாடலைப் பதிவு செய்யவும்
+Choose the patient	நோயாளியைத் தேர்ந்தெடுக்கவும்
+$done of $total	$total இல் $done
+$done of $total visits done today	இன்று $total வருகைகளில் $done முடிந்தன
+visits today	இன்றைய வருகைகள்
+visits	வருகைகள்
+See schedule	அட்டவணையைப் பார்
+Hard days	கடினமான நாட்கள்
+Needs you	உங்களுக்காகக் காத்திருப்பவை
+Nothing waiting	எதுவும் நிலுவையில் இல்லை
+Verify your registration	உங்கள் பதிவைச் சரிபார்க்கவும்
+Are you still caring for $caringName?	நீங்கள் இன்னும் $caringName அவர்களைக் கவனித்துக்கொள்கிறீர்களா?
+How is $caringName feeling today?	$caringName இன்று எப்படி இருக்கிறார்?

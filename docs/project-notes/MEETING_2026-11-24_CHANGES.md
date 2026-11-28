@@ -4,7 +4,7 @@ Source: Gemini notes of the call (Sujay, Sharada, Shirin, Awaiz, Basith) + Basit
 "cards and cards and cards, buttons and type forms", "typing the time", "no back button", "history getting too long on all routes",
 "reduce card sizes which keep expanding", "Lottie on everything in onboarding".
 
-Status (24 Nov, 23:00): built into the app; [ ] to do · [x] done · [~] partly / needs a decision
+Status (27 Nov): [ ] to do · [x] done · [~] partly / needs a decision. 0.8.2 (on main, e0ecf83) has everything marked [x]; the native redesign (Today, Medicines, Care, More, doctor home) is built in code and being installed.
 
 ## UI (owner, 24 Nov evening)
 - [x] Soft hairline instead of dark card borders; no bold borders (Sujay 01:09)
@@ -26,7 +26,7 @@ Status (24 Nov, 23:00): built into the app; [ ] to do · [x] done · [~] partly 
 - [x] Next-of-kin number, doctor number and medicines on the card
 - [x] Contacts and medicines as a clean one-page table
 - [x] QR opens the website copy (not a phone note) so nobody can edit it — the offline text QR is gone
-- [~] Live only after the database migration `20261124120000_emergency_card_versions.sql` is applied and the website is deployed
+- [~] Website deployed (25 Nov). The versions migration `20261124120000_emergency_card_versions.sql` is with Awaiz (HANDOFF.md, 25 Nov). Until then the QR still opens the web copy, and updating the card keeps the same link so printed cards keep working
 - [x] "Not the current version" warning when a newer card exists; valid 3 months
 - [x] No browser location tracking for whoever scans it (the page never asked; now says so)
 
@@ -55,7 +55,24 @@ Status (24 Nov, 23:00): built into the app; [ ] to do · [x] done · [~] partly 
 ## Help (map)
 - [x] Map opens full screen and zooms like Google Maps; a centre gives directions and its phone number (01:15)
 
-## Needs a decision (not started)
-- [~] "All languages" in settings (00:57): the app has English, Hindi, Telugu, Kannada, Urdu. Each new language means translating ~2,000 strings.
-- [~] Online meetings (pitched for the 5 lakh funding, not for the finale build)
-- [~] DPDP Act consent for research use (Sujay + Basith research)
+## Also said in the full transcript (added 25 Nov)
+- [x] Doctor field reads "Contact number (doctor or hospital)" (00:28)
+- [x] Distress thermometer stands out from the symptoms, with "This is your overall distress, not one problem." (00:52-00:53)
+- [x] Back goes to the page you came from (00:55)
+- [x] "As needed" medicines (morphine) on the medicine calendar (01:01)
+- [x] Strength = number + unit buttons; times on a scroll wheel like the iPhone, no letters accepted (01:02)
+- [x] Check-ins: smaller cards (01:04)
+- [x] Visit icons by type, no location pin for a family meeting (01:05)
+- [x] Care tool colours not random (01:07)
+- [x] Bold borders gone except where needed (01:09)
+- [x] "What we do with your data" kept on the patient's care planning (00:43)
+- [x] Emergency card: "still the same?" renew after 3 months (00:35)
+- [x] Simple Mode: notice when switched on by age; SOS looks different; journal and symptoms reachable (01:19-01:21)
+- [x] Caregiver: distress and wellbeing above medicines, heart beats (01:22)
+- [ ] Test the prescription scan and lab/PET reports with real documents (Dr Sharada sends them) (01:14)
+- [~] Who opened the QR / location: decided "leave it for now" (00:38)
+
+## Decided after the meeting
+- [x] All languages (00:57): Tamil, Malayalam, Marathi, Bengali, Gujarati and Punjabi added next to English, Hindi, Telugu, Kannada, Urdu (machine-drafted; clinician check before pilot)
+- [x] DPDP research consent (00:47): opt-in switch in Settings > Privacy and data, off by default, on the patient record
+- [~] Online meetings: after the hackathon (pitched for the 5 lakh funding)

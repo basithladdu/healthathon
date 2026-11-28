@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
@@ -154,12 +155,15 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
             AddDocOption(t("Upload a file", "फ़ाइल अपलोड करें"), Icons.Default.UploadFile, SaharaSoftBlue, Modifier.testTag("document-upload")) { addSheet = false; addReport() }
         }
     }
-    LazyColumn(Modifier.fillMaxSize().saharaScreenEnter().testTag("documents-list"), state = listState, contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        // The marigold Documents band, with Add as a white button on it (it glows while there is nothing yet).
-        item { SaharaSectionBand(t("Documents", "कागज़ात"), SaharaSection.Documents, onBack = onBack, backTag = "documents-back") {
-            // The doctor reads the patient's documents; adding them stays with the patient and family (Dr Sujay, 22 Nov).
-            if (canEdit && !clinician) SaharaBandButton(t("Add document", "कागज़ जोड़ें"), onClick = { addSheet = true }, tone = SaharaSection.Documents, icon = Icons.Default.Add, enabled = !busy, modifier = Modifier.saharaPulseGlow(color = SaharaColors.Surface, corner = SaharaRadius.Md, active = reports.isEmpty()).testTag("document-add"))
-        } }
+    // A stock Material page (25 Nov redesign): title and back arrow in the top bar; Add document is the page's floating button.
+    // The doctor reads the patient's documents; adding them stays with the patient and family (Dr Sujay, 22 Nov).
+    val dir = LocalLayoutDirection.current
+    val atTop by remember(listState) { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
+    // Embedded (no back: the doctor's patient view) the page sits below other headers, so its bar adds no status-bar space.
+    SaharaPageScaffold(t("Documents", "कागज़ात"), modifier = if (onBack == null) Modifier.consumeWindowInsets(WindowInsets.statusBars) else Modifier, onBack = onBack, large = false, backTag = "documents-back",
+        fab = if (canEdit && !clinician) ({ ExtendedFloatingActionButton(text = { Text(t("Add document", "कागज़ जोड़ें")) }, icon = { Icon(Icons.Default.Add, null) },
+            onClick = { if (!busy) addSheet = true }, expanded = atTop, modifier = Modifier.testTag("document-add")) }) else null) { bar ->
+    LazyColumn(Modifier.fillMaxSize().testTag("documents-list"), state = listState, contentPadding = saharaPadding(bar, PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 96.dp), dir), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         // Timeline and Ask as two slim buttons (they open their own screens), so the list starts in the first screenful.
         item { Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             SaharaSecondaryButton(t("Care timeline", "देखभाल की समय-रेखा"), onClick = { timeline = true }, icon = Icons.Default.Timeline, tone = SaharaTone.Marigold, navigates = true, modifier = Modifier.weight(1f).fillMaxHeight().testTag("care-timeline-open"))
@@ -282,6 +286,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
             }
         }
         if (search.isBlank() && filter != "Reports") item { TextButton(onClick = onTalk, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Forum, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(if (clinician) t("Start a conversation", "बातचीत शुरू करें") else t("Talk with your doctor", "अपने डॉक्टर से बात करें")) } }
+    }
     }
     if (docProblem.isNotBlank()) SaharaDialog(docProblem, onDismiss = { docProblem = "" }, tone = SaharaTone.Error)
     remove?.let { report -> AlertDialog(onDismissRequest = { if (!busy) remove = null }, title = { Text(t("Remove this report?", "यह रिपोर्ट हटाएँ?")) }, text = { Text(report.name) },

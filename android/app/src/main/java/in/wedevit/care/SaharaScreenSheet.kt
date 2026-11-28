@@ -12,9 +12,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -33,7 +34,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 
 /**
- * Stands in for ModalBottomSheet everywhere: a full screen that slides up, with a close button, and nothing to drag
+ * Stands in for ModalBottomSheet everywhere: a full screen that slides up, with a back arrow at the top left, and nothing to drag
  * (users found the drag-down sheet confusing and easy to close by accident). Same parameters, so call sites only change the name.
  * [sheetState] and [dragHandle] are accepted and ignored.
  */
@@ -55,7 +56,7 @@ import androidx.compose.ui.window.DialogProperties
             Surface(Modifier.fillMaxSize(), color = containerColor) {
                 Column(modifier.fillMaxSize().systemBarsPadding().imePadding().padding(top = 8.dp)) {
                     Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = onDismissRequest, modifier = Modifier.testTag("screen-sheet-close")) { Icon(Icons.Default.Close, t("Close", "बंद करें")) }
+                        IconButton(onClick = onDismissRequest, modifier = Modifier.size(48.dp).testTag("screen-sheet-close")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) }
                     }
                     HorizontalDivider(color = DoctorHairline)
                     Column(Modifier.weight(1f).fillMaxWidth()) { content() }

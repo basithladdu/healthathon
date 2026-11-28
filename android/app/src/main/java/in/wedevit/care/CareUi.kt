@@ -22,6 +22,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.ListAlt
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.*
@@ -68,14 +69,14 @@ import java.time.*
 import java.time.format.DateTimeFormatter
 
 // Older names for the Sahara colour system (SaharaPalette.kt); new code reads SaharaColors and SaharaTone.
-val Ink = SaharaColors.Ink
-val Cream = SaharaColors.Ground
-val Paper = SaharaColors.Surface
-val Rust = SaharaColors.Primary
+val Ink get() = SaharaColors.Ink
+val Cream get() = SaharaColors.Ground
+val Paper get() = SaharaColors.Surface
+val Rust get() = SaharaColors.Primary
 val Gold = SaharaTone.Gold.solid
 val Sage = SaharaTone.Leaf.wash
 val Mint = SaharaTone.Teal.wash
-val Peach = SaharaColors.PrimaryWash
+val Peach get() = SaharaColors.PrimaryWash
 /** The welcome panel is the header band: deep oxblood with white text. */
 internal val WelcomePanelOrange = SaharaColors.Band
 internal val WelcomePanelInk = SaharaColors.OnBand
@@ -115,10 +116,27 @@ internal val saharaColorScheme = lightColorScheme(primary = SaharaColors.Primary
 internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.Sm), small = RoundedCornerShape(SaharaRadius.Pill),
     medium = RoundedCornerShape(SaharaRadius.Md), large = RoundedCornerShape(SaharaRadius.Lg), extraLarge = RoundedCornerShape(SaharaRadius.Hero))
 
+/**
+ * Material You (25 Nov, owner: "looks AI-generated"): on Android 12+ the app takes the phone's own dynamic colours, so it looks like
+ * the rest of the phone; older phones (and Robolectric tests) keep Sahara's calm green scheme. SaharaColors follows the same choice.
+ */
+internal fun saharaDynamicColorAvailable(): Boolean =
+    android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S && android.os.Build.FINGERPRINT != "robolectric"
+
+internal fun saharaThemeColors(context: android.content.Context): ColorScheme {
+    val dynamic = if (saharaDynamicColorAvailable()) runCatching { dynamicLightColorScheme(context) }.getOrNull() else null
+    SaharaColors.bind(dynamic)
+    return dynamic ?: saharaColorScheme
+}
+
 @Composable fun CareTheme(content: @Composable () -> Unit) {
-    SaharaMotion.bind(LocalContext.current)
+    val context = LocalContext.current
+    SaharaMotion.bind(context)
+    // Re-read on a configuration change (a new wallpaper changes the dynamic colours).
+    val configuration = LocalConfiguration.current
+    val colors = remember(context, configuration) { saharaThemeColors(context) }
     // MaterialTheme(motionScheme=) is internal in Material3 1.4; stock pieces keep Material's own calm defaults.
-    MaterialTheme(colorScheme = saharaColorScheme, shapes = saharaShapes, typography = saharaTypography()) { SaharaRippleTheme(content) }
+    MaterialTheme(colorScheme = colors, shapes = saharaShapes, typography = saharaTypography()) { SaharaRippleTheme(content) }
 }
 
 @Composable fun CareApp(vm: CareModel, onAccount: () -> Unit, onDoctorDemo: () -> Unit = {}, onDoctorWorkspace: (() -> Unit)? = null,
@@ -198,7 +216,8 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
     val simpleRole by vm.viewRole.collectAsStateWithLifecycle(); val simpleItems by vm.items.collectAsStateWithLifecycle()
     val simpleAge = remember(simpleItems, selected) { PatientProfileCodec.latest(simpleItems, selected)?.let { PatientProfileCodec.decode(it.detail)?.age } }
     val simpleByAge = SimpleModeRules.autoOn(simpleAge, patientOwnView = !clinician && !CareFamilyRules.isFamily(simpleRole, clinician))
-    val simpleOn = rememberSimpleModeOn(vm.storageNamespace, selected, simpleByAge) && !clinician && walkthrough == null
+    // Root-cause fix (25 Nov): Simple Mode also works in the demo walkthrough (it was gated out here and its switch hidden in More).
+    val simpleOn = rememberSimpleModeOn(vm.storageNamespace, selected, simpleByAge) && !clinician
     val simpleShown = simpleOn && person != null && tab == 0 && !medicineScanner
     // The language name stays beside the icon on the welcome screen up to 1.3x text, so the choice is easy to find before sign-in.
     val compactWelcomeHeader = LocalConfiguration.current.screenWidthDp < 340 || LocalDensity.current.fontScale > 1.3f
@@ -231,7 +250,41 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
         onOpenTodayHandled()
     }
     val overlay = when { !peopleLoaded -> "starting"; dialog == "checkin" -> "checkin"; dialog == "distress" -> "distress"; feedbackOpen -> "feedback"; remindersOpen -> "reminders"; sharedWorkspaceOpen -> "shared"; else -> "" }
-    CompositionLocalProvider(LocalCareLanguage provides language) {
+    // The page shell (SaharaAppKit.kt): pages switch tab, open a page, go back or hide the bottom bar through it, without new parameters.
+    val shell = remember { SaharaShell() }
+    shell.switchTab = { switchTab(it) }; shell.open = { go(it) }; shell.back = { back() }
+    // Turning Simple Mode on anywhere (More, the avatar menu, Today) jumps to Today, so the person sees it at once.
+    var simpleWasOn by remember(selected) { mutableStateOf<Boolean?>(null) }
+    LaunchedEffect(simpleOn, selected) {
+        val before = simpleWasOn; simpleWasOn = simpleOn
+        if (before == false && simpleOn && tab != 0) { kotlinx.coroutines.delay(300); switchTab(0) }
+    }
+    val appContext = LocalContext.current
+    var simpleAsk by rememberSaveable { mutableStateOf(false) }
+    var languageSheet by rememberSaveable { mutableStateOf(false) }
+    // Refresh problems are a snackbar with Retry (the old peach banner sat over the page).
+    LaunchedEffect(refreshError) {
+        val error = refreshError ?: return@LaunchedEffect
+        if (snackbar.showSnackbar(error, actionLabel = t("Retry", "फिर कोशिश करें"), duration = SnackbarDuration.Long) == SnackbarResult.ActionPerformed) vm.refresh()
+    }
+    // What the old header held (person switcher, invite, walkthrough user, language, Simple Mode) now opens from the avatar in each root page's top bar.
+    val walkthroughItems: List<SheetAction> = if (walkthrough == null) emptyList() else PatientWalkthrough.users.map { option ->
+        SheetAction("${option.name} — " + (if (option.role == "Family") t("Family", "परिवार") else t("Patient", "मरीज़")),
+            if (option.role == "Family") Icons.Default.PeopleOutline else Icons.Default.PersonOutline, "walkthrough-switch-${option.key}") { if (activeRecording) vm.stopRecording(); onSwitchWalkthrough(option.key) }
+    } + SheetAction(t("Leave demo", "डेमो से बाहर जाएँ"), Icons.AutoMirrored.Filled.Logout, "leave-walkthrough") { if (activeRecording) vm.stopRecording(); onLeaveWalkthrough() }
+    val personMenu = person?.let { shown -> PersonMenu(
+        people = if (walkthrough != null) listOf(shown) else people, selectedId = selected,
+        onSelect = { vm.select(it); reading = null },
+        onAddPerson = if (walkthrough == null) ({ dialog = "person" }) else null,
+        onInvite = if (walkthrough == null && !clinician && isOwnerTop) ({ inviteFamilyOpen = true }) else null,
+        onLanguage = { languageSheet = true },
+        onSimpleMode = if (!clinician && !simpleOn) ({ simpleAsk = true }) else null,
+        walkthroughItems = walkthroughItems,
+        caption = when (role) { "Family" -> t("Family", "परिवार"); "Patient" -> t("Patient", "मरीज़"); else -> null },
+        inviteLabel = if (vm.cloud == null) t("Add family", "परिवार जोड़ें") else t("Invite family", "परिवार को बुलाएँ"),
+        enabled = !activeRecording) }
+    CompositionLocalProvider(LocalCareLanguage provides language, LocalSaharaSnackbar provides snackbar, LocalSaharaSnackbarHosted provides true,
+        LocalSaharaShell provides shell, LocalSaharaPersonMenu provides personMenu) {
     Box(Modifier.fillMaxSize().background(Cream)) {
     // Leaving the walkthrough changes the walkthrough host around CareApp, so this handler sits outside the care hosts and previews that one.
     SaharaBackHandler(overlay.isEmpty() && walkthrough != null && !medicineScanner && tab == 0 && !activeRecording) { onLeaveWalkthrough() }
@@ -246,55 +299,33 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
     else -> {
     // Stopping a recording keeps this screen, so a plain BackHandler (no "leaving" preview). Back to the previous tab is in the "Care tab" host below.
     androidx.activity.compose.BackHandler(careTabBack(person != null, medicineScanner, tab, activeRecording) == CareTabBack.STOP_RECORDING) { vm.stopRecording() }
-    // Calm header (22 Nov premium pass): flat on the cream with a hairline at rest; once the page scrolls under it, it lifts to
-    // paper with a soft warm shadow and the hairline fades. Tracks how far the current page has scrolled from its top.
-    var headerScroll by remember { mutableFloatStateOf(0f) }
-    LaunchedEffect(tab, selected) { headerScroll = 0f }
-    val headerScrollWatch = remember { object : androidx.compose.ui.input.nestedscroll.NestedScrollConnection {
-        override fun onPostScroll(consumed: androidx.compose.ui.geometry.Offset, available: androidx.compose.ui.geometry.Offset, source: androidx.compose.ui.input.nestedscroll.NestedScrollSource): androidx.compose.ui.geometry.Offset {
-            headerScroll = (headerScroll + consumed.y).coerceIn(-100_000f, 0f); return androidx.compose.ui.geometry.Offset.Zero }
-    } }
-    // Scrolling only changes this flag when it flips, so the scaffold does not recompose on every scroll frame; the lift itself is
-    // read in the draw phase (shadow, colour and hairline below), so its animation never recomposes the top bar either.
-    val headerLifted by remember { derivedStateOf { headerScroll < -8f } }
-    val headerLift = animateFloatAsState(if (person != null && headerLifted) 1f else 0f, SaharaSprings.effects(), label = "header-lift")
-    Scaffold(Modifier.nestedScroll(headerScrollWatch), containerColor = Cream, snackbarHost = { CareToastHost(snackbar) }, topBar = {
-        // Inside a person's care the top bar is the calm cream header (ink text, hairline below); the welcome screen keeps its own ground.
-        if (!medicineScanner && !simpleShown) Surface(Modifier.then(if (person != null) Modifier
-                .graphicsLayer { shadowElevation = SaharaElevation.Raised.toPx() * headerLift.value; shape = RectangleShape; clip = false; ambientShadowColor = SaharaColors.Shadow; spotShadowColor = SaharaColors.Shadow }
-                .drawBehind { drawRect(androidx.compose.ui.graphics.lerp(SaharaColors.Header, SaharaColors.Surface, headerLift.value)) } else Modifier),
-            color = Color.Transparent, contentColor = if (person != null) SaharaColors.OnHeader else Ink) { Column {
-        if (person != null) SaharaStatusBarIcons(lightIcons = false)
-        Row(Modifier.statusBarsPadding().fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            Image(saharaImage(R.drawable.sahara_professional_logo, 44.dp), null, Modifier.size(44.dp).then(if (person != null) Modifier.clip(CircleShape).background(SaharaColors.Surface).padding(3.dp) else Modifier), contentScale = ContentScale.Fit)
-            Spacer(Modifier.width(4.dp))
-            Column(Modifier.weight(1f).padding(vertical = 8.dp, horizontal = 2.dp)) {
-                    // At large text with a person chip, the logo alone names the app instead of a cut "Sa…".
-                    if (person == null || androidx.compose.ui.platform.LocalDensity.current.fontScale < 1.3f)
+    val inCare = person != null
+    // Stock bottom bar on the root tabs only; pushed pages (and module pages, through SaharaHideBottomBar) hide it like any Android detail screen.
+    val barVisible = inCare && !medicineScanner && !simpleShown && careBottomBarRoute(tab, clinician) && !shell.bottomBarHidden
+    // Inside a person's care each page draws its own top app bar and status-bar inset (SaharaPage); the welcome screen keeps its header.
+    Scaffold(containerColor = Cream, contentWindowInsets = if (inCare) WindowInsets(0) else ScaffoldDefaults.contentWindowInsets,
+        snackbarHost = { CareToastHost(snackbar, if (inCare && !barVisible) Modifier.navigationBarsPadding() else Modifier) }, topBar = {
+        if (!inCare) Surface(color = Color.Transparent, contentColor = Ink) {
+            Row(Modifier.statusBarsPadding().fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                Image(saharaImage(R.drawable.sahara_professional_logo, 44.dp), null, Modifier.size(44.dp), contentScale = ContentScale.Fit)
+                Spacer(Modifier.width(4.dp))
+                Column(Modifier.weight(1f).padding(vertical = 8.dp, horizontal = 2.dp)) {
                     Text(androidx.compose.ui.res.stringResource(R.string.app_name), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 22.sp, lineHeight = 28.sp, color = LocalContentColor.current, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis)
+                }
+                // The one language choice on the welcome and sign-in screens; inside care it is in the avatar menu and in More.
+                CareLanguageMenu(compact = compactWelcomeHeader)
             }
-            // The one language choice, on the header of every family-side screen (welcome and sign-in included).
-            CareLanguageMenu(compact = compactWelcomeHeader || person != null)
-            if (person != null && walkthrough != null) WalkthroughUserMenu(walkthrough, onSwitch = { if (activeRecording) vm.stopRecording(); onSwitchWalkthrough(it) }, onLeave = { if (activeRecording) vm.stopRecording(); onLeaveWalkthrough() })
-            // The person's name and role sit in the top bar; switching, adding a person and inviting family are in its menu.
-            if (person != null && walkthrough == null) CareTopPersonMenu(person.name, when (role) { "Family" -> t("Family", "परिवार"); "Patient" -> t("Patient", "मरीज़"); else -> "" },
-                people.map { it.id to it.name }, selected, enabled = !activeRecording,
-                onSelect = { vm.select(it); reading = null }, onAdd = { dialog = "person" }, canAdd = true,
-                onInvite = { inviteFamilyOpen = true }, canInvite = !clinician && isOwnerTop,
-                inviteLabel = if (vm.cloud == null) t("Add family", "परिवार जोड़ें") else t("Invite family", "परिवार को बुलाएँ"))
-        }
-        if (person != null) Box(Modifier.fillMaxWidth().height(1.dp).drawBehind { drawRect(SaharaColors.HeaderLine.copy(alpha = 1f - headerLift.value)) })
-        }
         }
     }, bottomBar = {
-        if (person != null && !medicineScanner && !simpleShown) CareNavigation(CareNavTrail.rootTab(tabTrail, tab), clinician) { next ->
+        if (barVisible) CareNavigation(CareNavTrail.rootTab(tabTrail, tab), clinician) { next ->
             if (activeRecording && next != 1) vm.stopRecording()
             switchTab(next)
         }
-        else if (person == null) Spacer(Modifier.fillMaxWidth().windowInsetsBottomHeight(WindowInsets.navigationBars).background(WelcomePanelOrange).testTag("welcome-navigation-backdrop"))
+        else if (!inCare) Spacer(Modifier.fillMaxWidth().windowInsetsBottomHeight(WindowInsets.navigationBars).background(WelcomePanelOrange).testTag("welcome-navigation-backdrop"))
     }) { padding ->
         Box(Modifier.padding(padding).consumeWindowInsets(padding).imePadding().fillMaxSize()) {
-            if (medicineScanner && person != null) MedicineScanner(vm, onClose = { medicineScanner = false }, onAccount = onAccount)
+            if (inCare) SaharaStatusBarIcons(lightIcons = false)
+            if (medicineScanner && person != null) Box(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) { MedicineScanner(vm, onClose = { medicineScanner = false }, onAccount = onAccount) }
             else if (person == null) Welcome(onAccount = onAccount, onStart = { dialog = "person" }, onSharedWorkspace = onDoctorWorkspace ?: { sharedWorkspaceOpen = true }, onDoctorDemo = onDoctorDemo, onPatientWalkthrough = onPatientWalkthrough,
                 accountContent = welcomeAccountContent, doctorContent = welcomeDoctorContent, onPanelChanged = onWelcomePanelChanged,
                 // First run (CareOnboarding.kt): one question per screen; the last one adds the person with any optional profile details.
@@ -303,13 +334,14 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
                 // Inside the tab host whose target back() changes, so the swipe previews the leaving tab (not the whole app).
                 SaharaBackHandler(careTabBack(true, medicineScanner, tab, activeRecording) == CareTabBack.PREVIOUS_TAB) { back() }
                 screens.SaveableStateProvider("$shownId:$shownTab") {
-                Box(Modifier.fillMaxSize()) { when (shownTab) {
-                    0 -> if (simpleOn) CareSimpleMode(vm) else Today(vm, clinician, onTalk = { go(1) }, onCare = { careFilter = it; go(2) }, onNearby = { go(3) }, onAdd = { if (canEdit) dialog = it else vm.message.value = askOwner }, onRead = { reading = it }, onCalendar = { openCalendar() }, onWorkflow = { go(7) }, onLabs = { go(8) }, onSharedWorkspace = { go(7) }, onSymptoms = { go(9) }, onInviteFamily = { inviteFamilyOpen = true }, onCalendarAt = ::openCalendar,
+                // SaharaPage screens draw their own status-bar and navigation-bar insets; the rest keep the system bars clear here.
+                Box(Modifier.fillMaxSize().then(if (careRouteOwnsInsets(shownTab, clinician, simpleOn)) Modifier else Modifier.statusBarsPadding().navigationBarsPadding())) { when (shownTab) {
+                    0 -> if (simpleOn) CareSimpleMode(vm) else Today(vm, clinician, onTalk = { go(1) }, onCare = { if (it == "Medicines") switchTab(13) else { careFilter = it; go(2) } }, onNearby = { go(3) }, onAdd = { if (canEdit) dialog = it else vm.message.value = askOwner }, onRead = { reading = it }, onCalendar = { openCalendar() }, onWorkflow = { go(7) }, onLabs = { go(8) }, onSharedWorkspace = { go(7) }, onSymptoms = { go(9) }, onInviteFamily = { inviteFamilyOpen = true }, onCalendarAt = ::openCalendar,
                         onCheckInWords = { if (canEdit) dialog = "checkin" else vm.message.value = askOwner }, onDistress = { if (canEdit) dialog = "distress" else vm.message.value = askOwner }, onSymptomNote = { symptomAddPending = true; go(9) }, onCarePlan = { go(10) }, viewerName = walkthrough?.takeIf { it.role == "Family" }?.name.orEmpty(),
                         onCarePlanFromSos = { go(10, reopen = "sos") }, sosReopen = sosReopen, onSosReopened = { sosReopen = false }, onCommunity = { go(11) })
                     1 -> Talk(vm, clinician && canEdit, onRead = { reading = it }, onRequestConversation = { go(7) }, onLeave = { back() })
                     2 -> CareList(vm, initialFilter = careFilter, onReadNote = { reading = it }, onCalendar = { openCalendar() }, onCalendarAt = ::openCalendar, onWorkflow = { go(7) }, onLabs = { go(8) }, onSymptoms = { go(9) }, onCommunity = { go(11) }, onDevices = { go(12) }, onExit = { back() },
-                        onDocuments = { go(5) }, onCarePlan = if (clinician) ({ go(10) }) else null, title = t("All care tools", "देखभाल के सभी साधन"),
+                        onDocuments = { go(5) }, onCarePlan = if (clinician) ({ go(10) }) else null,
                         onAdd = { if (canEdit) dialog = it else vm.message.value = askOwner },
                         onScanPrescription = {
                             if (canEdit) {
@@ -317,29 +349,39 @@ internal val saharaShapes = Shapes(extraSmall = RoundedCornerShape(SaharaRadius.
                                 medicineScanner = true
                             } else vm.message.value = askOwner
                         })
-                    3 -> NearbyScreen(vm.centres, vm)
-                    5 -> CareDocuments(vm, onRead = { reading = it }, onTalk = { go(1) }, onCalendarAt = ::openCalendar, onLabs = { go(8) }, onCare = { careFilter = "All"; go(2) })
-                    6 -> CareCalendar(vm, onWorkflow = { go(7) }, initialDay = calendarDay)
-                    7 -> CareWorkflows(vm, onTalk = { go(1) })
-                    8 -> CareLabs(vm)
+                    3 -> NearbyScreen(vm.centres, vm, onBack = { back() })
+                    5 -> CareDocuments(vm, onRead = { reading = it }, onTalk = { go(1) }, onCalendarAt = ::openCalendar, onLabs = { go(8) }, onCare = { careFilter = "All"; go(2) }, onBack = { back() })
+                    6 -> CareCalendar(vm, onWorkflow = { go(7) }, initialDay = calendarDay, onBack = { back() })
+                    7 -> CareWorkflows(vm, onTalk = { go(1) }, onBack = { back() })
+                    8 -> CareLabs(vm, onBack = { back() })
                     9 -> CareSymptomDiary(vm, onBack = { back() }, startAdding = symptomAddPending, onStartAddingHandled = { symptomAddPending = false })
                     10 -> CarePlanScreen(vm, clinician, onBack = { back() })
                     11 -> CareCommunityScreen(vm.cloud, onAccount = onAccount, onBack = { back() }, practice = vm.demoMode)
                     12 -> CareDevicesScreen(onBack = { back() }, namespace = vm.storageNamespace, personId = selected)
+                    // The Medicines tab (MedicinesPage.kt): the dose ring, today's doses with a round tick, Add as a FAB.
+                    13 -> MedicinesPage(vm,
+                        onScan = { if (canEdit) { medicineScannerPerson = selected; medicineScanner = true } else vm.message.value = askOwner },
+                        onAdd = { if (canEdit) dialog = "medicine" else vm.message.value = askOwner },
+                        onReminders = { if (activeRecording) vm.stopRecording(); remindersOpen = true })
                     else -> More(vm, person, onAccount = onAccount, onDelete = { dialog = "delete" }, onCalendar = { openCalendar() }, onWorkflow = { go(7) }, onLabs = { go(8) }, walkthrough = walkthrough != null, onFeedback = { if (activeRecording) vm.stopRecording(); feedbackOpen = true }, onReminders = { if (activeRecording) vm.stopRecording(); remindersOpen = true }, onSharedWorkspace = { if (activeRecording) vm.stopRecording(); openDoctorWorkspace() }, onDocuments = { if (activeRecording) vm.stopRecording(); go(5) }, onCarePlan = { if (activeRecording) vm.stopRecording(); go(10) }, onDevices = { if (activeRecording) vm.stopRecording(); go(12) }, onInviteFamily = if (!clinician && isOwnerTop) ({ if (activeRecording) vm.stopRecording(); inviteFamilyOpen = true }) else null)
                 } }
             } }
-            refreshError?.let { error -> Surface(Modifier.align(Alignment.TopCenter).fillMaxWidth(), color = Peach) { Row(Modifier.padding(start = 16.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.ErrorOutline, null, Modifier.size(20.dp), tint = RustText); Text(error, Modifier.weight(1f).padding(12.dp).announce(), style = MaterialTheme.typography.bodySmall, color = Ink); TextButton(onClick = vm::refresh, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Retry", "फिर कोशिश करें"), color = RustText, fontWeight = FontWeight.Bold) } } } }
-            if (person != null) CareSyncStatusLine(syncWaiting, syncKept, busy || refreshing, vm::sendPending, Modifier.align(Alignment.BottomCenter))
-            SaharaTopProgress(busy || refreshing, Modifier.fillMaxWidth().align(Alignment.TopCenter))
+            if (person != null) CareSyncStatusLine(syncWaiting, syncKept, busy || refreshing, vm::sendPending, Modifier.align(Alignment.BottomCenter).then(if (!barVisible) Modifier.navigationBarsPadding() else Modifier))
+            SaharaTopProgress(busy || refreshing, Modifier.fillMaxWidth().align(Alignment.TopCenter).then(if (inCare) Modifier.statusBarsPadding() else Modifier))
         }
     }
+    if (languageSheet) SaharaLanguageSheet(onDismiss = { languageSheet = false })
+    if (simpleAsk) AlertDialog(onDismissRequest = { simpleAsk = false }, modifier = Modifier.testTag("simple-mode-confirm"),
+        title = { Text(t("Switch to Simple mode?", "सरल मोड चालू करें?")) },
+        text = { Text(t("Big buttons that speak. Tap Full app at the bottom to come back.", "बोलने वाले बड़े बटन। वापस आने के लिए नीचे पूरा ऐप दबाएँ।")) },
+        confirmButton = { TextButton(onClick = { simpleAsk = false; SimpleModeStore.setOn(appContext, vm.storageNamespace, selected, true) }, modifier = Modifier.heightIn(min = 48.dp).testTag("simple-mode-confirm-yes")) { Text(t("Switch on", "चालू करें"), fontWeight = FontWeight.Bold) } },
+        dismissButton = { TextButton(onClick = { simpleAsk = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Not now", "अभी नहीं")) } })
     if (inviteFamilyOpen) AddFamilySheet(vm, onDismiss = { inviteFamilyOpen = false }, onSignIn = onAccount)
     if (dialog == "person") AddPerson(onDismiss = { dialog = "" }, busy = busy || refreshing, error = actionError, onSave = { vm.addPerson(it) { dialog = "" } })
     if (dialog in listOf("medicine", "visit", "task", "journal")) AddCareItem(dialog, vm, onDismiss = { dialog = "" })
     if (dialog == "delete") AlertDialog(onDismissRequest = { dialog = "" }, title = { Text(t("Remove ${person?.name}'s records?", "${person?.name} के रिकॉर्ड हटाएँ?")) },
         text = { Text(if (vm.cloud != null) t("This removes them for everyone and can't be undone.", "यह सबके लिए हट जाएगा। इसे वापस नहीं लाया जा सकता।") else t("This can't be undone.", "इसे वापस नहीं किया जा सकता।")) },
-        confirmButton = { Button(onClick = { val removedId = person?.id; vm.removePerson { (0..12).forEach { screens.removeState("$removedId:$it") }; dialog = "" } }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error, contentColor = MaterialTheme.colorScheme.onError)) { Text(t("Remove records", "रिकॉर्ड हटाएँ"), fontWeight = FontWeight.Bold) } },
+        confirmButton = { Button(onClick = { val removedId = person?.id; vm.removePerson { (0..13).forEach { screens.removeState("$removedId:$it") }; dialog = "" } }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error, contentColor = MaterialTheme.colorScheme.onError)) { Text(t("Remove records", "रिकॉर्ड हटाएँ"), fontWeight = FontWeight.Bold) } },
         dismissButton = { TextButton(onClick = { dialog = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Keep records", "रिकॉर्ड रखें")) } })
     reading?.let { note -> NoteReader(vm, note, onDismiss = { reading = null }) }
     }
@@ -365,160 +407,13 @@ internal fun careTabBack(personShown: Boolean, medicineScanner: Boolean, tab: In
 
 // The welcome flow (Welcome, its steps and welcomeRolesStacked) lives in CareOnboarding.kt.
 
-/**
- * Today, the landing page. It points to pages rather than holding everything (3 Nov meeting): greeting and date, SOS with
- * the QR card one tap away, then the day's direct actions (the one-tap check-in, today's medicines), the summary, goals of
- * care, Up next, then page shortcuts.
- * Patient and family differ (see [CareFamilyRules]): family sees "Caring for <name>", the patient's summary first, their
- * own caregiver check, the to-do list and caregiver tips; the patient's own check-in stays with the patient.
- */
-@Composable fun Today(vm: CareModel, clinician: Boolean, onTalk: () -> Unit, onCare: (String) -> Unit, onNearby: () -> Unit, onAdd: (String) -> Unit, onRead: (CareVersion) -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}, onSharedWorkspace: () -> Unit = {}, onSymptoms: () -> Unit = {}, onInviteFamily: () -> Unit = {}, onCalendarAt: (Long) -> Unit = { onCalendar() }, onCheckInWords: () -> Unit = {}, onSymptomNote: () -> Unit = onSymptoms, onDistress: () -> Unit = {}, onCarePlan: () -> Unit = {},
-    onCarePlanFromSos: () -> Unit = onCarePlan, sosReopen: Boolean = false, onSosReopened: () -> Unit = {}, onCommunity: () -> Unit = {}, viewerName: String = "") {
-    val todayPeople by vm.people.collectAsStateWithLifecycle(); val role by vm.viewRole.collectAsStateWithLifecycle()
-    val items by vm.items.collectAsStateWithLifecycle(); val versions by vm.versions.collectAsStateWithLifecycle()
-    val selectedPerson by vm.selected.collectAsStateWithLifecycle(); val loadedFor by vm.itemsLoadedFor.collectAsStateWithLifecycle()
-    val loaded = loadedFor == selectedPerson; val canEdit by vm.canEdit.collectAsStateWithLifecycle()
-    val latest = versions.firstOrNull()
-    val today = LocalDate.now()
-    val dayStart = today.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-    val hindi = careHindi(); val t = careText()
-    val family = CareFamilyRules.isFamily(role, clinician)
-    val personName = todayPeople.firstOrNull { it.id == selectedPerson }?.name.orEmpty()
-    // SOS opens one sheet with the emergency numbers, the emergency QR card and the emergency plan.
-    var sosOpen by rememberSaveable { mutableStateOf(false) }
-    var afterDeathOpen by rememberSaveable { mutableStateOf(false) }
-    LaunchedEffect(sosReopen) { if (sosReopen) { sosOpen = true; onSosReopened() } }
-    val showSummary = !clinician && selectedPerson.isNotBlank()
-    if (sosOpen) SaharaScreenSheet(onDismissRequest = { sosOpen = false }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Paper) {
-        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 16.dp, end = 16.dp, bottom = 32.dp)) {
-            EmergencyNumbersCard()
-            Spacer(Modifier.height(12.dp))
-            EmergencyCardOnToday(vm, onRead)
-            // 24 Nov meeting: the patient side keeps one emergency card and Goals of care; no separate care-plan entry here.
-            // Family and carers only: the patient is never shown anything about their own death.
-            if (family) { Spacer(Modifier.height(20.dp)); AfterDeathEntry { afterDeathOpen = true } }
-        }
-    }
-    if (afterDeathOpen) AfterDeathGuideSheet { afterDeathOpen = false }
-    // Caregiving changes (SVK, 23 Nov), family and carers only: the quiet check-in, pause, or "no longer caregiving" (records kept).
-    val caregiving = if (family && selectedPerson.isNotBlank()) rememberCaregivingStatus(vm, selectedPerson) else null
-    val caregivingDue = caregiving != null && loaded && caregiving.due(caregivingLastLogged(items, selectedPerson))
-    var caregivingCheckIn by rememberSaveable(selectedPerson) { mutableStateOf(false) }
-    var caregivingSheet by rememberSaveable(selectedPerson) { mutableStateOf(false) }
-    LaunchedEffect(caregivingDue) { if (caregivingDue) caregivingCheckIn = true }
-    val archived = caregiving != null && CaregivingStatusRules.archived(caregiving.status)
-    val caregivingName = personName.ifBlank { t("the patient", "मरीज़") }
-    if (caregivingSheet && caregiving != null) SaharaScreenSheet(onDismissRequest = { caregivingSheet = false }, containerColor = Cream) {
-        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp)) { CaregivingCheckInCard(caregiving, caregivingName, asked = false) { caregivingSheet = false } }
-    }
-    val hour = java.time.LocalTime.now().hour
-    // Worked out once per change of the list (not on every recomposition), so Today scrolls without redoing the sorting.
-    val medicines = remember(items, today) { CareDailyFlow.medicinesForToday(items, today) }
-    val visits = remember(items, dayStart) { CareTodayRules.upcomingVisits(items, dayStart) }
-    val tasks = remember(items) { items.filter { it.kind == "task" && !CareEntryCodec.isStructured(it.detail) }.sortedBy { it.doneOn.isNotBlank() } }
-    val todayCheckIn = remember(items, dayStart) { CareTodayRules.todayCheckIn(items, dayStart) }
-    val todayDistress = remember(items, selectedPerson, dayStart) { DistressRules.today(items, selectedPerson, dayStart) }
-    val journalNotes = remember(items) { items.filter { it.kind == "journal" && !PatientProfileCodec.isStructured(it.detail) && !SideEffectCodec.isStructured(it.detail) && !ResearchConsentCodec.isStructured(it.detail) } }
-    // Signed in: pull the list down to refresh (Material 3), as well as the Refresh button in the header.
-    SaharaPullRefresh(vm.refreshing, vm::refresh, enabled = vm.cloud != null) {
-    // A soft warm wash behind Today so the white and tinted cards stand off the ground.
-    LazyColumn(Modifier.fillMaxSize().background(SaharaBackdrop).saharaScreenEnter().testTag("today-list"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item(key = "today-header", contentType = "header") { Row(saharaTodayItem(Modifier.fillMaxWidth()).saharaStagger(0), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
-                Text(CareTodayRules.greetingLine(hour, hindi, personName, patient = !family && !clinician, viewerName = if (family) viewerName else ""), Modifier.a11yHeading().testTag("today-greeting"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 22.sp, lineHeight = 28.sp, color = DoctorCardInk)
-                Text(today.format(careDateFormat("EEEE, d MMMM", hindi)), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub, modifier = Modifier.padding(top = 2.dp).testTag("today-date"))
-                // Family only: who they are caring for, as a soft chip under the date.
-                // Fades in once the person's name has loaded, instead of popping in under the date.
-                AnimatedVisibility(family && personName.isNotBlank(), enter = SaharaMotion.enter, exit = SaharaMotion.exit) { Surface(shape = RoundedCornerShape(50), color = SaharaApricot, modifier = Modifier.padding(top = 8.dp)) {
-                    Row(Modifier.padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.FavoriteBorder, null, Modifier.size(16.dp), tint = RustText); Spacer(Modifier.width(6.dp))
-                        Text(t("Caring for $personName", "$personName की देखभाल"), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = RustText, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.testTag("today-caring-for"))
-                    }
-                } }
-            }
-            // A labelled button, not a bare arrow icon nobody can name.
-            if (vm.cloud != null) TextButton(onClick = vm::refresh, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Icon(Icons.Default.Refresh, null, Modifier.size(20.dp)); Spacer(Modifier.width(6.dp)); Text(t("Refresh", "रिफ़्रेश करें")) }
-        } }
-        if (!clinician) item(key = "today-sos", contentType = "sos") { Box(saharaTodayItem().saharaStagger(1)) { CareSosBar(onSos = { sosOpen = true }) } }
-        if (caregiving != null && caregivingCheckIn) item(key = "caregiving-checkin", contentType = "caregiving") { Box(saharaTodayItem()) { CaregivingCheckInCard(caregiving, caregivingName, asked = true) { caregivingCheckIn = false } } }
-        else if (caregiving != null && caregiving.status.state != CaregivingState.ACTIVE) item(key = "caregiving-status", contentType = "caregiving") { Box(saharaTodayItem()) { CaregivingStatusCard(caregiving, caregivingName) } }
-        // Patient: SOS, the check-in (the one main action), today's medicines, the at-a-glance register, then All care tools.
-        // Family: SOS, how the patient is doing, medicines, to-dos, their own check, then All care tools. Everything else is in the Care tab.
-        val summary: androidx.compose.foundation.lazy.LazyListScope.() -> Unit = {
-            if (showSummary) item(key = "patient-summary", contentType = "summary") { Box(saharaTodayItem()) { PatientSummaryCard(vm, onSymptoms = if (family) onSymptomNote else onSymptoms,
-                onVisit = { v -> if (v == null || v.due == 0L) onCalendar() else onCalendarAt(v.due) }, onAddVisit = if (canEdit) ({ onAdd("visit") }) else null,
-                onGoals = { note -> if (note != null) onRead(note) else onTalk() }, onCarePlan = onCarePlan) } }
-        }
-        // Family: their own distress + wellbeing check sits above the medicines so it is not missed (Sujay, 24 Nov meeting 01:21).
-        if (family) { summary(); if (!archived) item(key = "family-check", contentType = "family-check") { Box(saharaTodayItem()) { FamilyCaregiverCheckCard(vm, personName.ifBlank { t("the patient", "मरीज़") }) } } }
-        else if (!clinician && canEdit) item(key = "today-checkin", contentType = "checkin") { Box(saharaTodayItem()) { TodayCheckInBar(vm, onOpen = onCheckInWords, onSymptom = onSymptomNote, onDistress = onDistress) } }
-        val medicineSection: androidx.compose.foundation.lazy.LazyListScope.() -> Unit = {
-            // The doses card under the title carries the one "x of y taken" count.
-            // One small header link instead of a second full-width button under the doses (owner, 24 Nov: too many buttons).
-            item(key = "medicines-open", contentType = "section-header") { SaharaSectionHeader(t("Medicines", "दवाइयाँ"), saharaTodayItem().saharaStagger(3).testTag("today-medicines-title"), tone = SaharaTone.Plum,
-                actionLabel = t("Open", "खोलें"), onAction = { onCare("Medicines") }, icon = careIcon("medicine")) }
-            item(key = "today-doses", contentType = "doses") { Box(saharaTodayItem().saharaStagger(4)) { TodayDosesCard(vm) } }
-            if (medicines.isEmpty() && loaded && canEdit) item(key = "medicines-add", contentType = "add-button") { SaharaSecondaryButton(t("Add a medicine", "दवा जोड़ें"), { onAdd("medicine") }, saharaTodayItem(Modifier.fillMaxWidth()), icon = Icons.Default.Add, tone = SaharaTone.Plum) }
-        }
-        // No longer caregiving: Today goes quiet (no doses or to-dos); the records stay and open from All care tools.
-        if (!clinician && !archived) medicineSection()
-        if (!clinician && !family) summary()
-        if (!clinician) {
-            // View-only family see the patient's own check-in for today (they cannot change it).
-            if (!canEdit) {
-                todayCheckIn?.let { item(key = "today-checkin-seen", contentType = "care-row") { Box(saharaTodayItem()) { CareRow(it, vm) } } }
-                todayDistress?.let { item(key = "today-distress-seen", contentType = "care-row") { Box(saharaTodayItem()) { CareRow(it, vm) } } }
-            }
-            if (family && !archived) {
-                item(key = "todo-title", contentType = "section-header") { SaharaSectionHeader(t("To do", "करने के काम"), saharaTodayItem().testTag("today-todo-title"), tone = CareToolGroupTone.Daily, actionLabel = t("Open to do", "काम खोलें"), onAction = { onCare("To do") }, icon = careIcon("task")) }
-                if (tasks.isEmpty() && loaded) item(key = "todo-empty", contentType = "empty") { Box(saharaTodayItem()) { SurfaceCard { Text(CareTodayRules.emptyText("tasks", canEdit, hindi), color = DoctorCardSub) } } }
-                itemsIndexed(tasks.take(3), key = { _, it -> it.id }, contentType = { _, _ -> "care-row" }) { i, it -> Box(saharaTodayItem().saharaStagger(5 + i)) { CareRow(it, vm) } }
-                if (canEdit) item(key = "todo-add", contentType = "add-button") { SaharaSecondaryButton(t("Add task", "काम जोड़ें"), { onAdd("task") }, saharaTodayItem(Modifier.fillMaxWidth()), icon = Icons.Default.Add, tone = CareToolGroupTone.Daily) }
-            }
-            item(key = "all-care-tools", contentType = "all-care-tools") { Box(saharaTodayItem().saharaStagger(6)) { TodayAllCareTools { onCare("All") } } }
-            if (caregiving != null && caregiving.status.state == CaregivingState.ACTIVE && !caregivingCheckIn) item(key = "caregiving-change", contentType = "caregiving") { Box(saharaTodayItem()) { CaregivingChangeRow { caregivingSheet = true } } }
-            return@LazyColumn
-        }
-        // Doctor view (clinician) below: unchanged.
-        item(key = "goals-of-care") { ActionCard(SaharaTone.Marigold.wash, Modifier.testTag("today-goals-of-care"), onClick = onTalk) {
-            Row(Modifier.fillMaxWidth().heightIn(min = 64.dp).padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                Surface(shape = RoundedCornerShape(12.dp), color = SaharaTone.Marigold.solid) { Icon(Icons.Default.Description, null, Modifier.padding(8.dp).size(22.dp), tint = SaharaTone.Marigold.onSolid) }
-                Spacer(Modifier.width(12.dp))
-                Column(Modifier.weight(1f)) { Heading(t("Let's talk", "बात करें"), 22) }
-                Icon(Icons.AutoMirrored.Filled.ArrowForward, t("Start talking", "बात शुरू करें"), Modifier.size(22.dp), tint = DoctorCardInk)
-            }
-        } }
-        if (clinician && latest != null) item(key = "latest-note", contentType = "action-card") { ActionCard(Paper, onClick = { onRead(latest) }) {
-            Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Description, null, tint = Rust); Spacer(Modifier.width(12.dp)); Column(Modifier.weight(1f)) { Text(t("Latest care note", "सबसे नया देखभाल नोट"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium); Text("${date(latest.published)} · ${latest.doctor}", style = MaterialTheme.typography.bodySmall); Text(ReviewWorkflow.label(latest), style = MaterialTheme.typography.labelSmall, color = RustText) }; Icon(Icons.AutoMirrored.Filled.ArrowForward, t("Read note", "नोट पढ़ें"), Modifier.size(20.dp)) }
-        } }
-        item(key = "daily-shortcuts", contentType = "shortcuts") { DailyCareShortcuts(onCalendar, onWorkflow, onLabs) }
-        item(key = "workflow-summary", contentType = "workflow") { WorkflowSummary(vm, onWorkflow) }
-        todayCheckIn?.let { checkin -> item(key = "today-checkin-row", contentType = "care-row") { Box(saharaTodayItem()) { CareRow(checkin, vm) } } }
-        todayDistress?.let { item(key = "today-distress-row", contentType = "care-row") { Box(saharaTodayItem()) { CareRow(it, vm) } } }
-        item(key = "up-next-title", contentType = "section-title") { SectionTitle(t("Up next", "आगे क्या है"), if (canEdit && visits.isNotEmpty()) t("Add visit", "मुलाक़ात जोड़ें") else null) { onAdd("visit") } }
-        if (visits.isEmpty() && loaded) item(key = "up-next-empty", contentType = "action-card") { ActionCard(SaharaSoftBlue, saharaTodayItem(Modifier.fillMaxWidth()), onClick = { if (canEdit) onAdd("visit") else onCalendar() }) {
-            Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                Surface(shape = CircleShape, color = Paper) { Icon(Icons.Default.Event, null, Modifier.padding(10.dp).size(24.dp), tint = DoctorAccent) }
-                Spacer(Modifier.width(12.dp)); Text(CareTodayRules.emptyText("visits", canEdit, hindi), Modifier.weight(1f), fontSize = 16.sp, color = DoctorCardInk)
-                Icon(if (canEdit) Icons.Default.Add else Icons.Default.ChevronRight, null, tint = DoctorAccent)
-            }
-        } }
-        itemsIndexed(visits.take(2), key = { _, v -> "up-next-${v.id}" }, contentType = { _, _ -> "up-next" }) { index, v -> Box(saharaTodayItem()) {
-            CareUpNextCard(v, CareTodayRules.whenLabel(v.due, today, hindi), if (index == 0) SaharaSoftBlue else SaharaApricot) { if (v.due == 0L) onCalendar() else onCalendarAt(v.due) }
-        } }
-        medicineSection()
-        item(key = "todo-title", contentType = "section-title") { SectionTitle(t("To do", "करने के काम"), if (canEdit) t("Add task", "काम जोड़ें") else null) { onAdd("task") } }
-        if (tasks.isEmpty() && loaded) item(key = "todo-empty", contentType = "empty") { SurfaceCard { Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Checklist, null, Modifier.size(22.dp), tint = DoctorAccent); Spacer(Modifier.width(12.dp)); Text(CareTodayRules.emptyText("tasks", canEdit, hindi), color = DoctorCardSub) } } }
-        // Today stays short (24 Nov meeting): the latest few, then "See all".
-        items(tasks.take(3), key = { it.id }, contentType = { "care-row" }) { Box(saharaTodayItem()) { CareRow(it, vm) } }
-        if (tasks.size > 3) item(key = "todo-see-all", contentType = "see-all") { TextButton(onClick = { onCare("To do") }, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Text(t("See all", "सब देखें")) } }
-        item(key = "journal-title", contentType = "section-title") { SectionTitle(t("Journal", "डायरी"), t("Write a note", "नोट लिखें")) { onAdd("journal") } }
-        val notes = journalNotes
-        if (notes.isEmpty() && loaded) item(key = "journal-empty", contentType = "empty") { SurfaceCard { Text(CareTodayRules.emptyText("journal", canEdit, hindi), color = DoctorCardSub) } }
-        items(notes.take(2), key = { it.id }, contentType = { "care-row" }) { Box(saharaTodayItem()) { CareRow(it, vm) } }
-    }
-    }
-}
+/** Routes that show the bottom bar: the root tabs (Today, Medicines, Care, More) and, for the doctor view, Talk. */
+internal fun careBottomBarRoute(tab: Int, clinician: Boolean): Boolean = tab == 0 || tab == 2 || tab == 4 || tab == 13 || (tab == 1 && clinician)
+
+/** Routes drawn as a SaharaPage, which pads the status and navigation bars itself (edge to edge). The clinician Today and Simple Mode do not. */
+internal fun careRouteOwnsInsets(tab: Int, clinician: Boolean, simpleOn: Boolean): Boolean = tab == 2 || tab == 4 || tab == 13 || (tab == 0 && !clinician && !simpleOn)
+
+// Today lives in CareTodayScreen.kt, the Care tools hub (CareList) in CareHubScreen.kt and More in CareMoreScreen.kt.
 
 @Composable fun Talk(vm: CareModel, clinician: Boolean, onRead: (CareVersion) -> Unit, onRequestConversation: (() -> Unit)? = null, onInteractionActiveChange: (Boolean) -> Unit = {}, doctorPresentation: Boolean = false, onDoctorBack: (() -> Unit)? = null, onDoctorStartNew: (() -> Unit)? = null, onDoctorCaptureChange: (Boolean) -> Unit = {}, onLeave: () -> Unit = {}) { val t = careText(); val talkNotesShown = rememberShownCount("talk-notes");
     val draft by vm.draft.collectAsStateWithLifecycle(); val versions by vm.versions.collectAsStateWithLifecycle()
@@ -1009,112 +904,6 @@ internal fun careTabBack(personShown: Boolean, medicineScanner: Boolean, tab: In
     }
 }
 
-/**
- * The Care tab: every care page in one plain grouped list (icon, name, one short line, chevron). Each row opens its page and Back
- * returns here. A row whose page is not passed in (the doctor's embedded view) is left out. [title] is "All care tools" in the family app.
- */
-@Composable fun CareList(vm: CareModel, onAdd: (String) -> Unit, onScanPrescription: () -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}, initialFilter: String = "All", onReadNote: (CareVersion) -> Unit = {}, onSymptoms: () -> Unit = {}, onCalendarAt: (Long) -> Unit = { onCalendar() },
-    onCommunity: (() -> Unit)? = null, onDevices: (() -> Unit)? = null, onExit: (() -> Unit)? = null, onDocuments: (() -> Unit)? = null, onCarePlan: (() -> Unit)? = null, title: String? = null) {
-    val entries by vm.items.collectAsStateWithLifecycle(); val everything by vm.allItems.collectAsStateWithLifecycle(); val versions by vm.versions.collectAsStateWithLifecycle()
-    val listState = rememberLazyListState(); val target = CareModules.moduleFor(initialFilter)
-    // Grouped once per change of the entries, not on every recomposition (opening a module, scrolling, a count animating).
-    val shown = remember(entries) { entries.filter { !CareEntryCodec.isStructured(it.detail) || isDoctorStructuredVisit(it) } }
-    val (currentMeds, pastMeds) = remember(everything, shown) { CareModules.splitMedicines(everything.filter { !CareEntryCodec.isStructured(it.detail) }, shown) }
-    val now = remember(entries) { System.currentTimeMillis() }; val (upcoming, pastVisits) = remember(shown, now) { CareModules.splitVisits(shown.filter { it.kind == "visit" }, now) }
-    val tasks = remember(shown) { shown.filter { it.kind == "task" } }; val checkins = remember(shown) { shown.filter { it.kind == "checkin" } }
-    val journal = remember(shown) { shown.filter { it.kind == "journal" && !SideEffectCodec.isStructured(it.detail) && !PatientProfileCodec.isStructured(it.detail) && !ResearchConsentCodec.isStructured(it.detail) } }
-    val selectedPerson by vm.selected.collectAsStateWithLifecycle(); val loadedFor by vm.itemsLoadedFor.collectAsStateWithLifecycle()
-    val canAdd by vm.canEdit.collectAsStateWithLifecycle()
-    // A row opens its module on its own screen; Back returns to the list. [initialFilter] can open one directly.
-    var openModule by rememberSaveable(target) { mutableStateOf(target) }
-    // Opening from Today ("Open medicines") always lands on that section, even if it was closed here before.
-    LaunchedEffect(target) { if (target != null) openModule = target }
-    // A module opened straight from another page (Today's "Open medicines") goes back to that page, not to the list.
-    fun closeModule() { if (target != null && openModule == target && onExit != null) onExit() else openModule = null }
-    val t = careText()
-    // [name] stays English: it is the module's key and test tag; only [title] is shown.
-    val tiles = listOf(
-        CareModuleTile("Conversations", t("Goals of care notes", "देखभाल के लक्ष्यों के नोट"), "", SaharaLavender, R.drawable.conversation_recent_art, versions.size) {
-            CareModuleList("conversations", versions, t("No saved conversations yet.", "अभी कोई सहेजी हुई बातचीत नहीं।"), keyOf = { it.id }) { CareConversationRow(it, onReadNote) }
-        },
-        CareModuleTile("Medicines", t("Medicines", "दवाइयाँ"), "", SaharaSoftBlue, R.drawable.care_medicines_art, currentMeds.size + pastMeds.size) {
-                if (currentMeds.isEmpty() && pastMeds.isEmpty()) { SaharaLottie(SaharaLottieKind.Pill, Modifier.fillMaxWidth()); QuietLine(t("No medicines yet.", "अभी कोई दवा नहीं।")) } else {
-                    MedicineModuleList(vm, currentMeds, pastMeds)
-                }
-                MedicineScanAction(onScanPrescription) { onAdd("medicine") }
-                SideEffectsToRaiseCard(vm)
-        },
-        CareModuleTile("Visits", t("Visits", "मुलाक़ातें"), "", SaharaApricot, R.drawable.conversation_history_art, upcoming.size + pastVisits.size) {
-                // How visits get here (22 Nov review: "does the doctor add them or do we?").
-                Text(if (canAdd) t("Visits your doctor schedules appear here. You can also add one yourself.", "डॉक्टर जो मुलाक़ात तय करते हैं, वह यहाँ दिखती है। आप ख़ुद भी जोड़ सकते हैं।")
-                    else t("Visits your doctor schedules appear here.", "डॉक्टर जो मुलाक़ात तय करते हैं, वह यहाँ दिखती है।"), fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardSub, modifier = Modifier.testTag("care-visits-how"))
-                if (canAdd) CareModuleAddButton(t("Add a visit", "मुलाक़ात जोड़ें"), "care-module-add-visit") { onAdd("visit") }
-                CareVisitsModule(vm, upcoming, pastVisits, onCalendarAt)
-        },
-        CareModuleTile("To do", t("To do", "करने के काम"), "", SaharaSoftGold, R.drawable.care_notes_illustration, tasks.size) {
-            if (canAdd) CareModuleAddButton(t("Add a to-do", "नया काम जोड़ें"), "care-module-add-task") { onAdd("task") }
-            CareTodoModule(vm, tasks)
-        },
-        CareModuleTile("Check-ins", t("Check-ins", "रोज़ का हाल"), "", Mint, R.drawable.wellbeing_checkin_illustration, checkins.size) {
-            // One short row per day (22 Nov review); a day opens to show its entries.
-            CheckInHistoryModule(checkins, selectedPerson, vm)
-        },
-        CareModuleTile("Journal", t("Journal", "डायरी"), "", Peach, R.drawable.conversation_record_art, journal.size) {
-            if (canAdd) CareModuleAddButton(t("Add a journal entry", "डायरी में लिखें"), "care-module-add-journal") { onAdd("journal") }
-            CareModuleList("journal", journal, t("No journal notes yet.", "डायरी में अभी कोई नोट नहीं।"), keyOf = { it.id }) { CareRow(it, vm) }
-        },
-    )
-    val opened = tiles.firstOrNull { it.name == openModule }.takeIf { loadedFor == selectedPerson }
-    val byName = tiles.associateBy { it.name }
-    // 24 Nov meeting ("why some blue, some purple?"): one tone per group, so the colour says which kind of tool it is.
-    // Every day = teal, Medicines = plum, Visits and records = indigo, Plans and support = marigold (see [CareToolGroupTone]).
-    fun module(name: String, tone: SaharaTone): CareToolRow? = byName[name]?.let { tile -> CareToolRow(tile.title, careModuleIcon(name), tone, "care-module-${tile.key}-toggle",
-        if (tile.count == 0) t("Nothing yet", "अभी कुछ नहीं") else "${tile.count}") { openModule = name } }
-    fun page(label: String, icon: ImageVector, tone: SaharaTone, tag: String, open: (() -> Unit)?): CareToolRow? = open?.let { CareToolRow(label, icon, tone, tag, null, it) }
-    val daily = CareToolGroupTone.Daily; val meds = CareToolGroupTone.Medicines; val records = CareToolGroupTone.Records; val plans = CareToolGroupTone.Planning
-    val groups = listOf(
-        Triple(t("Every day", "हर दिन"), daily, listOfNotNull(page(t("Symptoms", "लक्षण"), Icons.Default.MonitorHeart, daily, "symptom-tracker-entry", onSymptoms), module("Check-ins", daily), module("Journal", daily), module("To do", daily))),
-        Triple(t("Medicines", "दवाइयाँ"), meds, listOfNotNull(module("Medicines", meds))),
-        Triple(t("Visits and records", "मुलाक़ातें और रिकॉर्ड"), records, listOfNotNull(module("Visits", records), page(t("Calendar", "कैलेंडर"), Icons.Default.CalendarMonth, records, "shortcut-calendar", onCalendar),
-            page(t("Documents", "कागज़ात"), Icons.Default.FolderOpen, records, "care-tool-documents", onDocuments), page(t("Lab history", "जाँच रिपोर्टें"), Icons.Default.Science, records, "shortcut-labs", onLabs))),
-        Triple(t("Plans and support", "योजना और सहारा"), plans, listOfNotNull(module("Conversations", plans), page(t("Emergency plan", "आपातकालीन योजना"), Icons.Default.LocalHospital, plans, "care-tool-plan", onCarePlan),
-            page(t("Tubes and lines", "नलियाँ और लाइनें"), Icons.Default.Healing, plans, "shortcut-devices", onDevices), page(t("Community", "समुदाय"), Icons.Default.Groups, plans, "shortcut-community", onCommunity))),
-    ).filter { it.third.isNotEmpty() }
-    // A module slides in from the list and slides back out on Back (with the predictive back preview), like a native page;
-    // the list keeps its scroll position underneath.
-    SaharaScreenHost(opened?.name, Modifier.fillMaxSize(), label = "care-module",
-        direction = { from, to -> if (from == null && to != null) SaharaMotion.Direction.Forward else if (from != null && to == null) SaharaMotion.Direction.Back else SaharaMotion.Direction.Switch }) { shownName ->
-    val shownTile = shownName?.let { name -> byName[name] }
-    if (shownTile != null) CareModuleScreen(shownTile) { closeModule() } else
-    LazyColumn(Modifier.fillMaxSize().saharaScreenEnter().testTag("care-list"), state = listState, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        // One title and the one main action (Add) on top; then the list.
-        item(key = "care-tools-header", contentType = "header") { Row(saharaTodayItem(Modifier.fillMaxWidth()), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.weight(1f)) { Heading(title ?: t("Daily care", "रोज़ की देखभाल"), 26) }
-            CareAddMenuButton(onAdd, onScanPrescription)
-        } }
-        groups.forEachIndexed { g, (group, groupTone, rows) -> item(key = "care-group-$group", contentType = "care-group") {
-            Column(saharaTodayItem(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                // Each group's name sits on a light pill of its colour (wash, ink text, hairline edge; was solid until the 22 Nov premium pass); its register takes the matching wash and edge bar.
-                // Premium pass (24 Nov): a quiet group label above one white list, like a settings page.
-                Text(group, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = SaharaColors.InkSub, modifier = Modifier.padding(start = 4.dp).a11yHeading())
-                SaharaRegister(tone = groupTone) { rows.forEachIndexed { index, row ->
-                    if (index > 0) HorizontalDivider(color = SaharaColors.Line, modifier = Modifier.padding(start = 60.dp, end = 12.dp))
-                    SaharaListRow(row.label, Modifier.saharaStagger(g * 3 + index).testTag(row.tag), detail = row.detail, icon = row.icon, tone = row.tone, onClick = row.onClick)
-                } }
-            }
-        } }
-    }
-    }
-}
-
-/** The clear "+ Add" at the top of a module page (To do, Journal, Visits), so another entry is always one tap away (22 Nov review). */
-@Composable internal fun CareModuleAddButton(label: String, tag: String, onClick: () -> Unit) {
-    SaharaSecondaryButton(label, onClick = onClick, icon = Icons.Default.Add, modifier = Modifier.fillMaxWidth().testTag(tag))
-}
-
-/** One row of All care tools: a module of this tab or another page. [detail] is the module's count. */
-private class CareToolRow(val label: String, val icon: ImageVector, val tone: SaharaTone, val tag: String, val detail: String?, val onClick: () -> Unit)
-
 /** The emergency numbers (tap to open the dialler) and a hospitals map link. Shown in Nearby and in Today's SOS sheet. */
 @Composable fun EmergencyNumbersCard() {
     val t = careText(); val context = LocalContext.current
@@ -1176,101 +965,6 @@ private class CareToolRow(val label: String, val icon: ImageVector, val tone: Sa
     }
     if (delete) AlertDialog(onDismissRequest = { delete = false }, title = { Text(t("Remove this entry?", "यह जानकारी हटाएँ?")) }, text = { Text(item.title) }, confirmButton = { Button(onClick = { if (canEditCareContext(vm, item.personId, capturedAccount)) vm.remove(item); delete = false }, enabled = !busy && canEdit, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error, contentColor = MaterialTheme.colorScheme.onError)) { Text(t("Remove", "हटाएँ")) } }, dismissButton = { TextButton(onClick = { delete = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Keep", "रखें")) } })
     if (editing) AddCareItem(item.kind, vm, onDismiss = { editing = false }, initial = item)
-}
-
-@Composable fun More(vm: CareModel, person: Person, onAccount: () -> Unit, onDelete: () -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}, onFeedback: () -> Unit = {}, onReminders: () -> Unit = {}, onSharedWorkspace: () -> Unit = {}, onDocuments: () -> Unit = {}, doctorEmbedded: Boolean = false, walkthrough: Boolean = false, onCarePlan: (() -> Unit)? = null, onDevices: (() -> Unit)? = null, onInviteFamily: (() -> Unit)? = null) {
-    val owner by vm.isOwner.collectAsStateWithLifecycle()
-    val context = LocalContext.current; val versions by vm.versions.collectAsStateWithLifecycle(); val acks by vm.acknowledgements.collectAsStateWithLifecycle()
-    val t = careText()
-    val clinicianView by vm.clinician.collectAsStateWithLifecycle()
-    val email = vm.cloud?.session?.collectAsStateWithLifecycle()?.value?.email.orEmpty()
-    var about by rememberSaveable { mutableStateOf(false) }
-    var privacy by rememberSaveable { mutableStateOf(false) }
-    // An Android settings page: the person's profile at the top, then one plain grouped list. Every row is a title, one short line and a chevron.
-    LazyColumn(Modifier.fillMaxSize().saharaScreenEnter().testTag("more-list"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        if (doctorEmbedded || clinicianView) item(key = "more-heading", contentType = "heading") { Heading(if (doctorEmbedded) t("Daily care & tools", "रोज़ की देखभाल और साधन") else t("More", "और"), 26) }
-        else item(key = "more-profile", contentType = "profile") { PatientProfileCard(vm, person) }
-        if (!doctorEmbedded && !walkthrough) item(key = "more-account-group", contentType = "group") { MoreGroup(t("Account", "खाता"), Modifier.animateItem()) {
-            MoreRow(Icons.Default.AccountCircle, FamilyAccent.Leaf, if (vm.cloud == null) t("Sign in", "साइन इन") else t("Account and sharing", "खाता और साझा करना"),
-                if (vm.cloud == null) t("Share care with family", "परिवार के साथ देखभाल साझा करें") else email, Modifier.saharaStagger(1).testTag("more-account"), onAccount)
-            // Inviting family is one tap from here, not hidden in the header's person menu.
-            if (onInviteFamily != null && vm.cloud != null && owner) MoreRow(Icons.Default.PersonAdd, FamilyAccent.Leaf, t("Invite family", "परिवार को बुलाएँ"), t("Send a link on WhatsApp", "व्हाट्सऐप पर लिंक भेजें"), Modifier.saharaStagger(2).testTag("more-invite-family"), onInviteFamily)
-        } }
-        // Patients and family reach Documents, Calendar, Lab history, the emergency plan and tubes and lines from All care tools (the Care tab),
-        // so those rows are only here for doctors. More keeps the account, settings and help.
-        val shortcutsElsewhere = !doctorEmbedded && !clinicianView
-        val exportNotes = {
-            val text = versions.joinToString("\n\n──────────\n\n") { v -> NoteRules.text(v, acks.filter { it.versionId == v.id && it.contentHash == v.contentHash }) }
-            open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), t("Export care notes", "देखभाल नोट भेजें")))
-        }
-        if (!shortcutsElsewhere) item(key = "more-care-group", contentType = "group") { MoreGroup(t("Care", "देखभाल"), Modifier.animateItem()) {
-            MoreRow(Icons.Default.FolderOpen, SaharaSection.Documents.solid, t("Documents", "दस्तावेज़"), "", Modifier.saharaStagger(3).testTag("more-documents-entry"), onDocuments)
-            if (onCarePlan != null) MoreRow(Icons.Default.LocalHospital, SaharaSection.Emergency.solid, t("Emergency plan", "आपातकालीन योजना"), t("Goals of care, advance care planning, emergency card", "देखभाल के लक्ष्यों की चर्चा, अग्रिम देखभाल योजना, आपातकालीन कार्ड"), Modifier.saharaStagger(4).testTag("more-care-plan-entry"), onCarePlan)
-            if (onDevices != null && !clinicianView) MoreRow(Icons.Default.Healing, FamilyAccent.Plum, t("Tubes and lines", "नलियाँ और लाइनें"), "", Modifier.saharaStagger(5).testTag("more-devices"), onDevices)
-            MoreRow(Icons.Default.CalendarMonth, SaharaSection.Visits.solid, t("Calendar", "कैलेंडर"), "", Modifier.saharaStagger(6).testTag("more-calendar"), onCalendar)
-            MoreRow(Icons.Default.Science, SaharaSection.Labs.solid, t("Lab history", "जाँच का इतिहास"), "", Modifier.saharaStagger(7).testTag("more-labs"), onLabs)
-            MoreRow(Icons.Default.Share, FamilyAccent.Brick, t("Export care notes", "देखभाल नोट भेजें"), t("${versions.size} saved", "${versions.size} सहेजे गए"), Modifier.saharaStagger(8).testTag("more-export-notes"), enabled = versions.isNotEmpty(), onClick = exportNotes)
-        } }
-        item(key = "more-settings-group", contentType = "group") { MoreGroup(t("Settings", "सेटिंग"), Modifier.animateItem()) {
-            // Language opens the same menu as the header, from a full-width row.
-            Row(Modifier.fillMaxWidth().heightIn(min = 60.dp).padding(start = 16.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                MoreIcon(Icons.Default.Translate, FamilyAccent.Teal); Spacer(Modifier.width(16.dp))
-                Text(t("Language", "भाषा"), Modifier.weight(1f), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
-                CareLanguageMenu(contentColor = RustText)
-            }
-            if (!doctorEmbedded && !clinicianView && !walkthrough) SimpleModeSwitchRow(vm, person)
-            // Doctors and nurses do not switch Simple Mode on, but they can write the message the patient's "Read to me" button reads.
-            else if ((doctorEmbedded || clinicianView) && !walkthrough) SimpleReadAloudMessageRow(vm, person, clinician = true)
-            if (!walkthrough) MoreRow(Icons.Default.NotificationsNone, FamilyAccent.Marigold, t("Notifications", "सूचनाएँ"), t("Medicine and visit reminders", "दवा और मुलाक़ात के रिमाइंडर"), Modifier.saharaStagger(9).testTag("more-reminders"), onReminders)
-            MoreRow(Icons.Default.Lock, FamilyAccent.Plum, t("Privacy and data", "निजता और डेटा"), t("Research choice and privacy policy", "शोध का विकल्प और निजता नीति"), Modifier.saharaStagger(10).testTag("more-privacy"), { privacy = true })
-            if (shortcutsElsewhere) MoreRow(Icons.Default.Share, FamilyAccent.Brick, t("Export care notes", "देखभाल नोट भेजें"), t("${versions.size} saved", "${versions.size} सहेजे गए"), Modifier.saharaStagger(11).testTag("more-export-notes"), enabled = versions.isNotEmpty(), onClick = exportNotes)
-        } }
-        item(key = "more-help-group", contentType = "group") { MoreGroup(t("Help", "मदद"), Modifier.animateItem()) {
-            if (!walkthrough) MoreRow(Icons.Default.SentimentSatisfiedAlt, FamilyAccent.Leaf, t("Send feedback", "राय भेजें"), "", Modifier.saharaStagger(12).testTag("patient-feedback-entry"), onFeedback)
-            if (doctorEmbedded) MoreRow(Icons.Default.Groups, FamilyAccent.Teal, t("Shared care", "साझा देखभाल"), "", Modifier, onSharedWorkspace)
-            else if (!walkthrough) MoreRow(Icons.Default.MedicalServices, FamilyAccent.Teal, t("I'm a doctor", "मैं डॉक्टर हूँ"), "", Modifier.saharaStagger(13).testTag("more-doctor-workspace-entry"), onSharedWorkspace)
-            MoreRow(Icons.Default.Info, FamilyAccent.Brick, t("About", "ऐप के बारे में"), t("Version ${BuildConfig.VERSION_NAME}", "संस्करण ${BuildConfig.VERSION_NAME}"), Modifier.saharaStagger(14).testTag("more-about"), { about = true })
-        } }
-        if (owner && !walkthrough) item(key = "more-delete", contentType = "action") { TextButton(onClick = onDelete, modifier = Modifier.animateItem().heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Icon(Icons.Default.DeleteOutline, null); Spacer(Modifier.width(8.dp)); Text(t("Remove this person's records", "इस व्यक्ति के रिकॉर्ड हटाएँ")) } }
-    }
-    // Privacy and data (CarePrivacyDataUi.kt): the research opt-in and the privacy policy.
-    if (privacy) PrivacyAndDataScreen(vm, person, canChange = !clinicianView && !doctorEmbedded) { privacy = false }
-    // About is a standard dialog, not an unfolding card at the bottom of the list.
-    if (about) AlertDialog(onDismissRequest = { about = false }, containerColor = Paper, modifier = Modifier.saharaDialogEnter().testTag("more-about-dialog"),
-        title = { Text(androidx.compose.ui.res.stringResource(R.string.app_name), fontWeight = FontWeight.Bold) },
-        text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(androidx.compose.ui.res.stringResource(R.string.app_full_name))
-            Text(t(MedicineNames.ATTRIBUTION, "दवा के नाम: CDCI (NRCeS / C-DAC), CC BY 4.0"), style = MaterialTheme.typography.bodySmall)
-            TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse("https://creativecommons.org/licenses/by/4.0/"))) }, contentPadding = PaddingValues(0.dp), modifier = Modifier.heightIn(min = 48.dp)) { Text(t("CC BY 4.0 licence", "CC BY 4.0 लाइसेंस")) }
-            Text(t("Version ${BuildConfig.VERSION_NAME}", "संस्करण ${BuildConfig.VERSION_NAME}"), style = MaterialTheme.typography.bodySmall)
-        } },
-        confirmButton = { TextButton(onClick = { about = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Close", "बंद करें"), fontWeight = FontWeight.Bold) } })
-}
-
-/** A titled group of settings rows on one card, rows split by inset dividers. */
-@Composable private fun MoreGroup(title: String, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
-    Column(modifier.saharaAppear(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(title, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = RustText, modifier = Modifier.padding(start = 4.dp).a11yHeading())
-        Surface(shape = RoundedCornerShape(12.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(vertical = 2.dp), content = content) }
-    }
-}
-
-@Composable private fun MoreIcon(icon: ImageVector, accent: Color) {
-    Surface(shape = RoundedCornerShape(10.dp), color = accent, contentColor = Color.White, modifier = Modifier.size(36.dp)) { Box(contentAlignment = Alignment.Center) { Icon(icon, null, Modifier.size(20.dp)) } }
-}
-
-/** One settings row: a solid coloured icon, a title, an optional short line and a chevron. */
-@Composable private fun MoreRow(icon: ImageVector, accent: Color, title: String, subtitle: String, modifier: Modifier, onClick: () -> Unit, enabled: Boolean = true) {
-    val press = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
-    Row(modifier.fillMaxWidth().heightIn(min = 60.dp).clickable(press, LocalIndication.current, enabled = enabled, role = Role.Button, onClick = onClick).saharaPress(press).padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        MoreIcon(icon, if (enabled) accent else DoctorCardFaint)
-        Spacer(Modifier.width(16.dp))
-        Column(Modifier.weight(1f)) {
-            Text(title, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = if (enabled) DoctorCardInk else DoctorCardSub)
-            if (subtitle.isNotBlank()) Text(subtitle, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        }
-        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, Modifier.size(22.dp), tint = DoctorCardSub)
-    }
 }
 
 @Composable fun AddPerson(onDismiss: () -> Unit, busy: Boolean, error: String?, onSave: (String) -> Unit) {

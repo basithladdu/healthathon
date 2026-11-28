@@ -111,7 +111,7 @@ private val SeverityTints = listOf(ChartBands.Mild, ChartBands.Moderate, ChartBa
 }
 
 /** One side-effect note as a card body: effect, severity, when, who reported it, and whether it was discussed. */
-@Composable fun SideEffectSummary(entry: SideEffectEntry, showMedicine: Boolean, trailing: (@Composable ColumnScope.() -> Unit)? = null) {
+@Composable fun SideEffectSummary(entry: SideEffectEntry, showMedicine: Boolean, showReporter: Boolean = true, trailing: (@Composable ColumnScope.() -> Unit)? = null) {
     val t = careText(); val hindi = careHindi(); val n = entry.note
     Column(Modifier.fillMaxWidth().testTag("side-effect-${entry.item.id}"), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         if (showMedicine) Text(n.medicineName, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
@@ -123,29 +123,31 @@ private val SeverityTints = listOf(ChartBands.Mild, ChartBands.Moderate, ChartBa
             if (severity.isNotBlank()) { Surface(shape = RoundedCornerShape(50), color = bg) { Text(severity, Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = fg, maxLines = 1) }; Spacer(Modifier.width(8.dp)) }
             Text(date(n.happenedAt) + (if (n.stoppedTaking) " · " + t("Stopped", "बंद किया") else ""), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = if (n.severity == "severe") RustText else DoctorCardSub, modifier = Modifier.weight(1f))
         }
-        Text(t("Reported by ", "बताने वाले: ") + n.reporter.ifBlank { t("Not recorded", "दर्ज नहीं") } + " · " + (if (n.discussedAt > 0) t("Discussed ", "बात हो चुकी ") + date(n.discussedAt) + n.discussedBy.takeIf { it.isNotBlank() }?.let { " · $it" }.orEmpty() else t("Not discussed yet", "अभी बात नहीं हुई")), fontSize = 14.sp, color = DoctorCardSub)
+        // Who reported it is for the care team (owner, 25 Nov); patients and family see only when it was discussed.
+        if (!showReporter) { if (n.discussedAt > 0) Text(t("Discussed ", "बात हो चुकी ") + date(n.discussedAt), fontSize = 14.sp, color = DoctorCardSub) }
+        else Text(t("Reported by ", "बताने वाले: ") + n.reporter.ifBlank { t("Not recorded", "दर्ज नहीं") } + " · " + (if (n.discussedAt > 0) t("Discussed ", "बात हो चुकी ") + date(n.discussedAt) + n.discussedBy.takeIf { it.isNotBlank() }?.let { " · $it" }.orEmpty() else t("Not discussed yet", "अभी बात नहीं हुई")), fontSize = 14.sp, color = DoctorCardSub)
         trailing?.invoke(this)
     }
 }
 
-@Composable private fun MarkDiscussedButton(entry: SideEffectEntry, vm: CareModel, who: String) {
+@Composable internal fun MarkDiscussedButton(entry: SideEffectEntry, vm: CareModel, who: String) {
     val t = careText(); val busy by vm.busy.collectAsStateWithLifecycle(); val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     val capturedAccount = remember(entry.item.id) { vm.accountNamespace }
     if (entry.note.discussedAt == 0L && canEdit) TextButton(onClick = { if (canEditCareContext(vm, entry.item.personId, capturedAccount)) vm.updateItem(SideEffectLog.markDiscussed(entry, who, System.currentTimeMillis())) {} }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp).testTag("side-effect-discussed-${entry.item.id}")) { Text(t("Mark discussed", "बात हो गई"), color = DoctorAccent) }
 }
 
 /** Under one medicine's History: every side effect noted for it, newest first. */
-fun androidx.compose.foundation.lazy.LazyListScope.medicineSideEffectItems(entries: List<SideEffectEntry>, vm: CareModel, shown: androidx.compose.runtime.MutableIntState? = null) {
+fun androidx.compose.foundation.lazy.LazyListScope.medicineSideEffectItems(entries: List<SideEffectEntry>, vm: CareModel, shown: androidx.compose.runtime.MutableIntState? = null, showReporter: Boolean = true) {
     if (entries.isEmpty()) return
     item(key = "side-effects-heading") { val t = careText(); Text(t("Side effects noted", "दर्ज दुष्प्रभाव"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 18.sp, color = DoctorCardInk, modifier = Modifier.a11yHeading().padding(top = 12.dp)) }
-    if (shown != null) cappedItems(entries, shown, key = { "side-effect-${it.item.id}" }, tag = "side-effects") { e -> SurfaceCard(Paper) { SideEffectSummary(e, showMedicine = false) { MarkDiscussedButton(e, vm, SideEffectRules.reporterFor(vm.viewRole.value)) } } }
-    else items(entries.size, key = { "side-effect-${entries[it].item.id}" }) { i -> val e = entries[i]; SurfaceCard(Paper) { SideEffectSummary(e, showMedicine = false) { MarkDiscussedButton(e, vm, SideEffectRules.reporterFor(vm.viewRole.value)) } } }
+    if (shown != null) cappedItems(entries, shown, key = { "side-effect-${it.item.id}" }, tag = "side-effects") { e -> SurfaceCard(Paper) { SideEffectSummary(e, showMedicine = false, showReporter = showReporter) { MarkDiscussedButton(e, vm, SideEffectRules.reporterFor(vm.viewRole.value)) } } }
+    else items(entries.size, key = { "side-effect-${entries[it].item.id}" }) { i -> val e = entries[i]; SurfaceCard(Paper) { SideEffectSummary(e, showMedicine = false, showReporter = showReporter) { MarkDiscussedButton(e, vm, SideEffectRules.reporterFor(vm.viewRole.value)) } } }
 }
 
 /** Patient/family Medicines section: unresolved side effects since the last doctor visit, ready to raise with the doctor. */
 @Composable fun SideEffectsToRaiseCard(vm: CareModel) {
     val t = careText()
-    val all by vm.allItems.collectAsStateWithLifecycle(); val person by vm.selected.collectAsStateWithLifecycle()
+    val all by vm.allItems.collectAsStateWithLifecycle(); val person by vm.selected.collectAsStateWithLifecycle(); val clinician by vm.clinician.collectAsStateWithLifecycle()
     val now = remember(all) { System.currentTimeMillis() }
     val entries = remember(all, person) { SideEffectLog.entries(all, person) }
     val last = remember(all, person, now) { SideEffectLog.lastVisitAt(all, person, now) }
@@ -155,14 +157,14 @@ fun androidx.compose.foundation.lazy.LazyListScope.medicineSideEffectItems(entri
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(t("Side effects to raise", "बताने वाले दुष्प्रभाव"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
             // One surface, notes separated by dividers (no card inside a card).
-            open.forEachIndexed { i, e -> key(e.item.id) { if (i > 0) HorizontalDivider(color = DoctorHairline); SideEffectSummary(e, showMedicine = true) { MarkDiscussedButton(e, vm, SideEffectRules.reporterFor(vm.viewRole.value)) } } }
+            open.forEachIndexed { i, e -> key(e.item.id) { if (i > 0) HorizontalDivider(color = DoctorHairline); SideEffectSummary(e, showMedicine = true, showReporter = clinician) { MarkDiscussedButton(e, vm, SideEffectRules.reporterFor(vm.viewRole.value)) } } }
         }
     }
 }
 
 /** A side-effect note in the Journal list. */
 @Composable fun SideEffectEntryCard(item: CareItem, vm: CareModel) {
-    val t = careText(); val canEdit by vm.canEdit.collectAsStateWithLifecycle(); val busy by vm.busy.collectAsStateWithLifecycle()
+    val t = careText(); val canEdit by vm.canEdit.collectAsStateWithLifecycle(); val busy by vm.busy.collectAsStateWithLifecycle(); val clinician by vm.clinician.collectAsStateWithLifecycle()
     var delete by rememberSaveable(item.id) { mutableStateOf(false) }
     val capturedAccount = remember(item.id) { vm.accountNamespace }
     val note = remember(item.detail) { SideEffectCodec.decode(item.detail) }
@@ -170,7 +172,7 @@ fun androidx.compose.foundation.lazy.LazyListScope.medicineSideEffectItems(entri
         if (note == null) Text(t("Couldn't read this note.", "यह नोट पढ़ा नहीं जा सका।"), color = DoctorCardSub)
         else {
             Surface(shape = RoundedCornerShape(50), color = SaharaSoftBlue, modifier = Modifier.padding(bottom = 4.dp)) { Text(t("Side effect", "दुष्प्रभाव"), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk) }
-            SideEffectSummary(SideEffectEntry(item, note), showMedicine = true) { MarkDiscussedButton(SideEffectEntry(item, note), vm, SideEffectRules.reporterFor(vm.viewRole.value)) }
+            SideEffectSummary(SideEffectEntry(item, note), showMedicine = true, showReporter = clinician) { MarkDiscussedButton(SideEffectEntry(item, note), vm, SideEffectRules.reporterFor(vm.viewRole.value)) }
         }
         if (canEdit) TextButton(onClick = { delete = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("care-remove-${item.id}")) { Text(t("Remove", "हटाएँ"), color = RustText) }
     }

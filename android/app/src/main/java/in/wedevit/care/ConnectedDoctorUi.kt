@@ -175,20 +175,23 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
     androidx.activity.compose.BackHandler { back() }
     val homeTabsShown = !navigationBlocked && nestedBack == null && !isolatedDemo && !shared && selection == null
     SaharaBackHandler(homeTabsShown && tab == 0) { back() }
-    Scaffold(containerColor = Cream, topBar = { SaharaStatusBarIcons(lightIcons = false); Column { TopAppBar(title = { Column { Text(if (isolatedDemo) DoctorTestProfiles.profiles.firstOrNull {DoctorTestProfiles.personId(it)==testCarePerson}?.name ?: t("Earlier demo care", "पहले की डेमो देखभाल") else realPatient?.name ?: patient?.name ?: if (selection != null) t("Patient record", "मरीज़ का रिकॉर्ड") else if (shared) t("Shared care", "साझा देखभाल") else t("Sahara", "सहारा"), fontFamily = SaharaTitleFont, fontSize = 22.sp, maxLines = 1, overflow = TextOverflow.Ellipsis) } }, navigationIcon = { IconButton(onClick = ::back, enabled = !navigationBlocked) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) } }, actions = { CareLanguageMenu(compact = true, contentColor = SaharaColors.OnHeader) },
+    // Home draws its own large title-left top bar (DoctorHomeScreen), so the workspace bar and its insets step aside there.
+    val homeShown = !isolatedDemo && !shared && selection == null && tab == 0 && !earlierWorkspace
+    SaharaStatusBarIcons(lightIcons = false)
+    Scaffold(containerColor = MaterialTheme.colorScheme.background, contentWindowInsets = if (homeShown) WindowInsets(0) else ScaffoldDefaults.contentWindowInsets, topBar = { if (!homeShown) Column { TopAppBar(title = { Column { Text(if (isolatedDemo) DoctorTestProfiles.profiles.firstOrNull {DoctorTestProfiles.personId(it)==testCarePerson}?.name ?: t("Earlier demo care", "पहले की डेमो देखभाल") else realPatient?.name ?: patient?.name ?: if (selection != null) t("Patient record", "मरीज़ का रिकॉर्ड") else if (shared) t("Shared care", "साझा देखभाल") else t("Sahara", "सहारा"), fontFamily = SaharaTitleFont, fontSize = 22.sp, maxLines = 1, overflow = TextOverflow.Ellipsis) } }, navigationIcon = { IconButton(onClick = ::back, enabled = !navigationBlocked) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) } }, actions = { CareLanguageMenu(compact = true, contentColor = SaharaColors.OnHeader) },
         colors = TopAppBarDefaults.topAppBarColors(containerColor = DoctorBand, titleContentColor = SaharaColors.OnHeader, navigationIconContentColor = SaharaColors.OnHeader, actionIconContentColor = SaharaColors.OnHeader))
         HorizontalDivider(color = SaharaColors.HeaderLine) } }, bottomBar = {
-        NavigationBar(Modifier.saharaNavIndicator(if (selection != null || shared || isolatedDemo) 1 else tab, 4, DoctorTones.Rust.solid, gap = 8.dp), containerColor = Paper) { listOf(t("Home", "होम") to Icons.Default.Home,t("Patients", "मरीज़") to Icons.Default.People,t("Schedule", "शेड्यूल") to Icons.Default.CalendarMonth,t("Account", "खाता") to Icons.Default.Person).forEachIndexed { index, (label, icon) -> NavigationBarItem(selected = if (selection != null || shared || isolatedDemo) index == 1 else tab == index, enabled = !navigationBlocked, onClick = { navigate { tab = index; selection = null; shared = false; isolatedDemo = false; nestedBack = null } }, icon = { Icon(icon, null) }, label = { Text(label, maxLines = 1, softWrap = false) },
-            colors = NavigationBarItemDefaults.colors(selectedIconColor = SaharaColors.NavOnPill, selectedTextColor = SaharaColors.NavOnPill, indicatorColor = SaharaColors.NavPill, unselectedIconColor = DoctorCardSub, unselectedTextColor = DoctorCardSub)) } }
+        NavigationBar { listOf(t("Home", "होम") to Icons.Default.Home,t("Patients", "मरीज़") to Icons.Default.People,t("Schedule", "शेड्यूल") to Icons.Default.CalendarMonth,t("Account", "खाता") to Icons.Default.Person).forEachIndexed { index, (label, icon) -> NavigationBarItem(selected = if (selection != null || shared || isolatedDemo) index == 1 else tab == index, enabled = !navigationBlocked, onClick = { navigate { tab = index; selection = null; shared = false; isolatedDemo = false; nestedBack = null } }, icon = { Icon(icon, null) }, label = { SaharaFitText(label, maxLines = 1, min = 11f) }) } }
     }) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding)) {
-            if (busy) SaharaProgressBar(null)
-            cardNotice?.let { message -> Surface(color = DoctorCardVisit) { Row(Modifier.fillMaxWidth().padding(start = 16.dp, top = 4.dp, bottom = 4.dp).testTag("doctor-emergency-card-notice"), verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding)) {
+            // On Home these notices are rows at the top of the list instead (see the home tab below).
+            if (busy && !homeShown) SaharaProgressBar(null)
+            if (!homeShown) cardNotice?.let { message -> Surface(color = DoctorCardVisit) { Row(Modifier.fillMaxWidth().padding(start = 16.dp, top = 4.dp, bottom = 4.dp).testTag("doctor-emergency-card-notice"), verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.QrCode, null, Modifier.size(20.dp), tint = DoctorCardInk); Spacer(Modifier.width(10.dp))
                 Text(message, Modifier.weight(1f).announce(), fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardInk)
                 IconButton(onClick = { cardNotice = null }, modifier = Modifier.size(48.dp).testTag("doctor-emergency-card-notice-close")) { Icon(Icons.Default.Close, t("Dismiss", "हटाएँ"), tint = DoctorCardInk) }
             } } }
-            error?.let { message -> Surface(color = Peach) { Row(Modifier.fillMaxWidth().padding(12.dp)) { Text(message, Modifier.weight(1f).announce()); TextButton(onClick = ::refresh, enabled = !busy) { Text(t("Retry", "फिर कोशिश करें"), color = RustText) } } } }
+            if (!homeShown) error?.let { message -> Surface(color = Peach) { Row(Modifier.fillMaxWidth().padding(12.dp)) { Text(message, Modifier.weight(1f).announce()); TextButton(onClick = ::refresh, enabled = !busy) { Text(t("Retry", "फिर कोशिश करें"), color = RustText) } } } }
             if (isolatedDemo) DoctorCareDemoHost(onExit = { isolatedDemo = false; nestedBack = null; navigationBlocked = false;testInitialSection="Hub" }, onNavigationBlockedChange = { navigationBlocked = it }, onHeaderBackChange = { nestedBack = it },initialPersonId=testCarePerson,initialSection=testInitialSection)
             else if (shared) EmbeddedSharedCare(vm, onAccount, { shared = false }, onNavigationBlockedChange = { navigationBlocked = it })
             else if (realPatientId != null) {
@@ -244,19 +247,33 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
             } else SaharaScreenHost(tab, Modifier.fillMaxSize(), label = "doctorTabs", direction = { from, to -> if (to > from) SaharaMotion.Direction.Forward else SaharaMotion.Direction.Back }) { shownTab ->
                 SaharaBackHandler(homeTabsShown && shownTab != 0) { back() }
                 when(shownTab) {
-                0 -> CompositionLocalProvider(LocalSaharaStagger provides remember { SaharaStagger() }) { SaharaPullRefresh(vm.refreshing, { vm.refresh(); checkClinician() }, enabled = !earlierWorkspace) { LazyColumn(Modifier.fillMaxSize().background(SaharaBackdrop).testTag("doctor-home"), state = homeList, contentPadding = PaddingValues(start = 16.dp, top = 12.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Text(LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, d MMMM", careLocale(hindi))), Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
-                        if (!earlierWorkspace) IconButton(onClick = { vm.refresh(); checkClinician() }, enabled = !realRefreshing, modifier = Modifier.size(48.dp).testTag("doctor-home-refresh")) { if (realRefreshing) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp, color = DoctorAccent) else Icon(Icons.Default.Refresh, t("Refresh records", "रिकॉर्ड रिफ़्रेश करें"), tint = DoctorAccent) } } }
-                    if (earlierWorkspace) {
-                        item { ConnectedCard(t("Demo records", "डेमो रिकॉर्ड")) { TextButton(onClick = { requestsOpen = true }) { Text(t("Requests", "अनुरोध")) }; TextButton(onClick = { tab = 2 }) { Text(t("Schedule", "शेड्यूल")) }; TextButton(onClick = { earlierWorkspace = false }) { Text(t("Close", "बंद करें")) } } }
-                    } else {
-                        val showVerification = verification != DoctorConnectedHome.Verification.APPROVED
-                        if (showVerification) item { DoctorVerificationCard(verification, clinician?.note.orEmpty(), clinicianCheckedAt, clinicianChecking, clinicianError, hindi, ::checkClinician, ::openShared) }
-                        realRefreshError?.let { item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Text(it, Modifier.weight(1f).announce(), color = MaterialTheme.colorScheme.error); TextButton(onClick = { vm.refresh(); checkClinician() }, enabled = !realRefreshing, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Retry", "फिर कोशिश करें"), color = RustText) } } } }
-                        doctorConnectedHomeItems(realPeople, allItems, System.currentTimeMillis(), hindi, onVisit = { openReal(it); section = "Visits" }, onProgress = { openReal(it); section = "Progress" }, onPatients = { tab = 1 },
-                            onScrollTo = { index -> scope.launch { homeList.animateScrollToItem(index) } }, firstIndex = 1 + (if (showVerification) 1 else 0) + (if (realRefreshError != null) 1 else 0))
-                    }
-                } } }
+                0 -> if (earlierWorkspace) LazyColumn(Modifier.fillMaxSize().testTag("doctor-home"), contentPadding = PaddingValues(16.dp)) {
+                    item { ConnectedCard(t("Demo records", "डेमो रिकॉर्ड")) { TextButton(onClick = { requestsOpen = true }) { Text(t("Requests", "अनुरोध")) }; TextButton(onClick = { tab = 2 }) { Text(t("Schedule", "शेड्यूल")) }; TextButton(onClick = { earlierWorkspace = false }) { Text(t("Close", "बंद करें")) } } }
+                } else {
+                    // Home (25 Nov owner override): the shared DoctorHomeScreen. Pull to refresh replaces the refresh button; the
+                    // verification, emergency-card and error notices are plain rows at the top.
+                    val banners = listOfNotNull(
+                        cardNotice?.let { message -> DoctorHomeBanner("doctor-emergency-card-notice", message, null, Icons.Default.QrCode, trailing = {
+                            IconButton(onClick = { cardNotice = null }, modifier = Modifier.size(48.dp).testTag("doctor-emergency-card-notice-close")) { Icon(Icons.Default.Close, t("Dismiss", "हटाएँ")) } }) },
+                        error?.let { message -> DoctorHomeBanner("doctor-home-error", message, null, Icons.Default.ErrorOutline, alert = true, trailing = {
+                            TextButton(onClick = ::refresh, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Retry", "फिर कोशिश करें")) } }) },
+                        if (verification != DoctorConnectedHome.Verification.APPROVED) DoctorHomeBanner("doctor-verification-card",
+                            if (verification == DoctorConnectedHome.Verification.NOT_SUBMITTED) t("Verify your registration", "अपना पंजीकरण सत्यापित करें") else DoctorConnectedHome.verificationTitle(verification, hindi),
+                            clinicianError ?: clinician?.note?.takeIf { it.isNotBlank() && (verification == DoctorConnectedHome.Verification.REJECTED || verification == DoctorConnectedHome.Verification.SUSPENDED) },
+                            if (verification == DoctorConnectedHome.Verification.PENDING || verification == DoctorConnectedHome.Verification.UNKNOWN) Icons.Default.HourglassTop else Icons.Default.Warning,
+                            alert = clinicianError != null || verification == DoctorConnectedHome.Verification.REJECTED || verification == DoctorConnectedHome.Verification.SUSPENDED,
+                            onClick = if (verification == DoctorConnectedHome.Verification.PENDING || verification == DoctorConnectedHome.Verification.UNKNOWN) null else ({ openShared() }),
+                            trailing = { TextButton(onClick = ::checkClinician, enabled = !clinicianChecking, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-verification-check")) {
+                                Text(if (clinicianChecking) t("Checking…", "देखा जा रहा है…") else t("Check again", "फिर से देखें")) } }) else null,
+                        realRefreshError?.let { message -> DoctorHomeBanner("doctor-home-refresh-error", message, null, Icons.Default.ErrorOutline, alert = true, trailing = {
+                            TextButton(onClick = { vm.refresh(); checkClinician() }, enabled = !realRefreshing, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Retry", "फिर कोशिश करें")) } }) },
+                    )
+                    DoctorHomeScreen(doctorConnectedHomeState(realPeople, allItems, System.currentTimeMillis(), hindi, banners, onVisit = { openReal(it); section = "Visits" },
+                            onProgress = { openReal(it); section = "Progress" }, onPatients = { tab = 1 }, onSchedule = { tab = 2 }),
+                        avatarName = email, onSearch = { tab = 1 }, onAccount = { tab = 3 }, talkPatients = realPeople.map { it.id to it.name },
+                        onTalk = { openReal(it); section = "GoalsOfCare" }, onScheduleVisit = { tab = 2 }, onAddPatient = { tab = 1 },
+                        listTag = "doctor-home", modifier = Modifier.testTag("doctor-home-refresh"), listState = homeList, refreshing = realRefreshing, onRefresh = { vm.refresh(); checkClinician() })
+                }
                 1 -> {
                     val shown = DoctorConnectedHome.search(realPeople, patientQuery)
                     val t = { en: String, hi: String -> careTr(hindi, en, hi) }

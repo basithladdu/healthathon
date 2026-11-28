@@ -22,6 +22,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -46,15 +47,13 @@ import java.time.LocalDate
     var saveError by remember { mutableStateOf(false) }
     val today = LocalDate.now()
     fun persist(next: List<CareDevice>): Boolean = runCatching { store.save(personId, next) }.isSuccess.also { ok -> saveError = !ok; if (ok) devices = next }
-    SaharaBackHandler(onBack = onBack)
-    // The add action is one labelled button pinned at the bottom (reachable however long the list is), not after the last card.
-    Box(Modifier.fillMaxSize()) {
-    LazyColumn(Modifier.fillMaxSize().saharaScreenEnter().testTag("devices-screen"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 96.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack, modifier = Modifier.size(48.dp).testTag("devices-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) }
-            Spacer(Modifier.width(4.dp))
-            Heading(t("Tubes and lines", "नलियाँ और लाइनें"), 26)
-        } }
+    // A stock Material page (25 Nov redesign): title and back arrow in the top bar (it wires system back too); the add action is
+    // the page's floating button, reachable however long the list is.
+    val dir = LocalLayoutDirection.current
+    SaharaPageScaffold(t("Tubes and lines", "नलियाँ और लाइनें"), onBack = onBack, backTag = "devices-back",
+        fab = { ExtendedFloatingActionButton(text = { Text(t("Add tube or line", "नली या लाइन जोड़ें")) }, icon = { Icon(Icons.Default.Add, null) },
+            onClick = { editing = CareDevice() }, modifier = Modifier.testTag("devices-add")) }) { bar ->
+    LazyColumn(Modifier.fillMaxSize().testTag("devices-screen"), contentPadding = saharaPadding(bar, PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 96.dp), dir), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         if (CareDeviceRules.tellCareTeam(devices, today)) item { DevicesTellTeam(phone) { open(context, Intent(Intent.ACTION_DIAL, Uri.parse(NearbyHelp.dialUri(phone)))) } }
         // Empty state: icon, one line, and the one action (the add button sits inside it, so it is never shown twice).
         if (devices.isEmpty()) item { Surface(shape = RoundedCornerShape(12.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("devices-empty")) {
@@ -65,8 +64,6 @@ import java.time.LocalDate
         } }
         items(CareDeviceRules.sorted(devices), key = { it.id }) { d -> DevicesCard(d, today, hindi, onCheck = { checking = d }, onEdit = { editing = d }) }
     }
-    SaharaPrimaryButton(t("Add tube or line", "नली या लाइन जोड़ें"), onClick = { editing = CareDevice() }, icon = Icons.Default.Add, tone = SaharaTone.Teal,
-        modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(horizontal = 16.dp, vertical = 16.dp).testTag("devices-add"))
     }
     if (saveError) SaharaDialog(t("Couldn't save. Try again.", "सहेजा नहीं जा सका। फिर कोशिश करें।"), onDismiss = { saveError = false }, tone = SaharaTone.Error)
     editing?.let { d ->

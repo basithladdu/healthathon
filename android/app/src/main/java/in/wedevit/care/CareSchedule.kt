@@ -17,6 +17,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -83,9 +84,12 @@ fun calendarShows(item: CareItem, showMedicines: Boolean = false): Boolean = sho
     val personEntries = remember(entries, person) { entries.filter { it.personId == person } }
     val visible = remember(personEntries, day, filter) { calendarItems(personEntries, day).filter { filter == "All" || calendarCategory(it) == filter } }
     val undated = remember(personEntries, showMedicines) { if (showMedicines) personEntries.filter { it.kind == "medicine" && it.due == 0L } else emptyList() }
-    LazyColumn(Modifier.fillMaxSize().testTag("care-calendar"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        // Title first, then the doctor's extra entry link under it.
-        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { if (onBack != null) { SaharaBackButton(onBack, tag = "calendar-back"); Spacer(Modifier.width(4.dp)) }; Heading(t("Calendar", "कैलेंडर")); Spacer(Modifier.weight(1f)); if (canEdit) FilledTonalIconButton(onClick = { if (onAddDoctorVisit != null) onAddDoctorVisit() else adding = true }, modifier = Modifier.size(48.dp), colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = Gold)) { Icon(Icons.Default.Add, t("Add to calendar", "कैलेंडर में जोड़ें")) } } }
+    // A stock Material page (25 Nov redesign): title, back arrow and Add in the top bar; the doctor's extra entry link stays under it.
+    val dir = LocalLayoutDirection.current
+    // Embedded (no back: the doctor's patient view) the page sits below other headers, so its bar adds no status-bar space.
+    SaharaPageScaffold(t("Calendar", "कैलेंडर"), modifier = if (onBack == null) Modifier.consumeWindowInsets(WindowInsets.statusBars) else Modifier, onBack = onBack, large = false, backTag = "calendar-back",
+        actions = { if (canEdit) IconButton(onClick = { if (onAddDoctorVisit != null) onAddDoctorVisit() else adding = true }, modifier = Modifier.size(48.dp).testTag("calendar-add")) { Icon(Icons.Default.Add, t("Add to calendar", "कैलेंडर में जोड़ें")) } }) { bar ->
+    LazyColumn(Modifier.fillMaxSize().testTag("care-calendar"), contentPadding = saharaPadding(bar, PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 32.dp), dir), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         if (onAddDoctorVisit != null && canEdit) item { TextButton(onClick = { adding = true }, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Add other", "और जोड़ें")) } }
         item(key = "calendar-grid", contentType = "grid") { CareCalendarGrid(personEntries, day, weekView, { weekView = it }, { dayString = it.toString() }) }
         // The picked day and "Back to today" share one row.
@@ -115,6 +119,7 @@ fun calendarShows(item: CareItem, showMedicines: Boolean = false): Boolean = sho
             item(key = "undated-title", contentType = "title") { Box(Modifier.animateItem()) { SectionTitle(t("Medicines without a date", "बिना तारीख़ की दवाएँ")) } }
             items(undated, key = { "undated-${it.id}" }, contentType = { "entry" }) { item -> Box(Modifier.animateItem()) { CalendarEntryCard(vm, item, day, onEdit = { editing = item }) } }
         }
+    }
     }
     if (adding) CareScheduleEditor(vm, defaultDate = careEpoch(day)) { adding = false }
     editing?.let { item ->

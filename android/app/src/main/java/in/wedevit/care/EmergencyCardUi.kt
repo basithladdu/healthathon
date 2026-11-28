@@ -69,6 +69,7 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import com.google.zxing.qrcode.encoder.Encoder
 import com.google.zxing.qrcode.encoder.QRCode
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -87,13 +88,26 @@ internal class EmergencyCardStore(context: Context, namespace: String) {
     private fun folder(personId: String) = File(root, personId.also { require(it.matches(Regex("[A-Za-z0-9-]+"))) })
     fun load(personId: String): EmergencyCardRecord? = if (personId.isBlank()) null else preferences.getString(personId, null)?.let { runCatching { EmergencyCardRecord.decode(it) }.getOrNull() }
     fun save(record: EmergencyCardRecord) {
-        check(preferences.edit().putString(record.personId, record.encode()).commit()) { "The card could not be saved on this phone." }
+        val edit = preferences.edit().putString(record.personId, record.encode())
+        record.link?.let { edit.putString(linkKey(record.personId), encodeLink(it)) }
+        check(edit.commit()) { "The card could not be saved on this phone." }
         folder(record.personId).listFiles()?.filter { it.name != pdf(record).name }?.forEach(File::delete)
     }
+    /**
+     * The last web link this phone made for the person, kept apart from the card. A new card starts without a link (each
+     * version gets its own token once 20261124120000 is applied); until then the server can only update one link in place,
+     * so the new card is put behind this same link and every QR already printed keeps working.
+     */
+    fun lastLink(personId: String): EmergencyLink? = preferences.getString(linkKey(personId), null)?.let { raw -> runCatching { val l = org.json.JSONObject(raw); val created = l.getLong("createdAt")
+        EmergencyLink(l.getString("token").also { EmergencyLinkRules.url(it) }, created, l.getLong("expiresAt"), l.optInt("version", 1).coerceAtLeast(1), l.optLong("publishedAt", created)) }.getOrNull() }
+    /** After the family turns the link off (or the server says it is off), so it is never brought back. */
+    fun forgetLink(personId: String) { preferences.edit().remove(linkKey(personId)).commit() }
+    private fun linkKey(personId: String) = "$personId#link"
+    private fun encodeLink(l: EmergencyLink) = org.json.JSONObject().put("token", l.token).put("createdAt", l.createdAt).put("expiresAt", l.expiresAt).put("version", l.version).put("publishedAt", l.publishedAt).toString()
     /** The link part of the name makes a new link produce a new PDF. */
     fun pdf(record: EmergencyCardRecord) = File(folder(record.personId), "sahara-emergency-card-${record.number}-${record.id}${record.link?.let { "-" + it.token.take(8) }.orEmpty()}.pdf")
     fun lockedPdf(record: EmergencyCardRecord) = File(folder(record.personId), "sahara-emergency-card-${record.number}-locked.pdf")
-    fun removePerson(personId: String) { preferences.edit().remove(personId).commit(); folder(personId).deleteRecursively() }
+    fun removePerson(personId: String) { preferences.edit().remove(personId).remove(linkKey(personId)).commit(); folder(personId).deleteRecursively() }
 }
 
 internal object EmergencyLinkQr {
@@ -315,15 +329,51 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
         val api = client ?: return c
         val payload = c.webCard(source)
         val next = try {
-            if (fresh) c.copy(link = api.create(c.personId, payload)) else c.copy(link = api.publish(c.personId, payload, c.link))
+            // A new card has no link of its own yet; before 20261124120000 the server can only update the one live link,
+            // so the last link this phone made is the one to update (printed QRs keep working instead of turning "off").
+            if (fresh) c.copy(link = api.create(c.personId, payload))
+            else c.copy(link = api.publish(c.personId, payload, c.link ?: withContext(Dispatchers.IO) { store.lastLink(c.personId) }))
         } catch (e: EmergencyLinkException) {
-            if (e.problem == EmergencyLinkProblem.LINK_OFF && c.link != null) withContext(Dispatchers.IO) { keep(c.copy(link = null)) }.also { record = c.copy(link = null) }
+            if (e.problem == EmergencyLinkProblem.LINK_OFF) withContext(Dispatchers.IO) { store.forgetLink(c.personId); if (c.link != null) keep(c.copy(link = null)) }.also { if (c.link != null) record = c.copy(link = null) }
             throw e
         }
         if (next !== c) withContext(Dispatchers.IO) { keep(next) }
         linkProblem = null
         linkStatus = runCatching { api.status(c.personId) }.getOrNull()
         return next
+    }
+
+    /** True when the card's QR opens a live web copy (a link that the server said is off does not count). */
+    fun hasLiveLink(c: EmergencyCardRecord) = c.link != null && linkProblem != EmergencyLinkProblem.LINK_OFF
+
+    /** "Make web link": puts the card on sahara.wedevit.in so the QR opens it. A link that was turned off gets a new one. */
+    fun makeLink() = scope.launch {
+        val c = record ?: return@launch
+        if (linkBusy || blocked != null) return@launch
+        linkBusy = true
+        try { record = syncLink(c, fresh = linkProblem == EmergencyLinkProblem.LINK_OFF); savedTap(); done = t("Web link is ready. Scanning the QR now opens this card on sahara.wedevit.in.", "वेब लिंक तैयार है। अब QR स्कैन करने पर यह कार्ड sahara.wedevit.in पर खुलेगा।") }
+        catch (e: EmergencyLinkException) { linkProblem = e.problem; alert = t(e.problem.en, e.problem.hi) }
+        catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; linkProblem = EmergencyLinkProblem.OFFLINE; alert = t(EmergencyLinkProblem.OFFLINE.en, EmergencyLinkProblem.OFFLINE.hi) }
+        finally { linkBusy = false }
+    }
+
+    /**
+     * Before the card is shared or printed: makes the web link first when there is none, so the paper carries a QR. If that
+     * fails the paper is still made (it says plainly that it has no QR), and never with a QR the server has turned off.
+     */
+    suspend fun forPaper(card: EmergencyCardRecord): EmergencyCardRecord {
+        if (hasLiveLink(card)) return card
+        // The link may be being made right now (a new card makes it by itself): wait for that instead of printing without a QR.
+        if (linkBusy) kotlinx.coroutines.withTimeoutOrNull(20_000L) { snapshotFlow { linkBusy }.first { !it } }
+        val c = record?.takeIf { it.id == card.id } ?: card
+        if (hasLiveLink(c)) return c
+        val dead = c.copy(link = null)
+        if (blocked != null || client == null || linkBusy) return dead
+        linkBusy = true
+        return try { syncLink(c, fresh = linkProblem == EmergencyLinkProblem.LINK_OFF).also { record = it } }
+        catch (e: EmergencyLinkException) { linkProblem = e.problem; dead }
+        catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; linkProblem = EmergencyLinkProblem.OFFLINE; dead }
+        finally { linkBusy = false }
     }
 
     // Someone else's profile (the patient's doctor): read where the web link was opened. Errors leave it hidden.
@@ -342,7 +392,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
         try {
             // Not straight after the family turned the link off: a new link then waits for "Make a new link".
             if (c.link == null) { if (linkProblem != EmergencyLinkProblem.LINK_OFF) record = syncLink(c, fresh = false) }
-            else { val s = client.status(c.personId); linkStatus = s; if (!s.live) linkProblem = EmergencyLinkProblem.LINK_OFF }
+            else { val s = client.status(c.personId); linkStatus = s; if (!s.live) { linkProblem = EmergencyLinkProblem.LINK_OFF; withContext(Dispatchers.IO) { store.forgetLink(c.personId) } } }
         } catch (e: EmergencyLinkException) { linkProblem = e.problem }
         catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; linkProblem = EmergencyLinkProblem.OFFLINE }
         finally { linkBusy = false }
@@ -365,15 +415,17 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
             } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; alert = t("Couldn't save the locked PDF. Try again.", "PDF सहेजा नहीं जा सका।") }
         }
     }
-    fun share(c: EmergencyCardRecord, password: String? = null) = scope.launch {
+    fun share(card: EmergencyCardRecord, password: String? = null) = scope.launch {
         try {
+            val c = forPaper(card)
             val file = withContext(Dispatchers.IO) { val plain = ensurePdf(c); if (password == null) plain else store.lockedPdf(c).also { it.writeBytes(PdfPasswordLock.lock(plain.readBytes(), password)) } }
             val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
             context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("application/pdf").putExtra(Intent.EXTRA_STREAM, uri).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), t("Share the emergency card", "आपातकालीन कार्ड साझा करें")))
         } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; alert = t("No app to share with.", "साझा करने के लिए ऐप नहीं है।") }
     }
-    fun print(c: EmergencyCardRecord) = scope.launch {
+    fun print(card: EmergencyCardRecord) = scope.launch {
         try {
+            val c = forPaper(card)
             val file = withContext(Dispatchers.IO) { ensurePdf(c) }
             val manager = context.getSystemService(Context.PRINT_SERVICE) as PrintManager
             manager.print("Sahara emergency card ${c.number}", PdfFilePrintAdapter(file, "Sahara-emergency-card-${c.number}.pdf"), null)
@@ -429,15 +481,24 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
     } else {
         // Compared once per change to the card or its sources, not on every recomposition.
         val stale = remember(card, source, ready) { ready && runCatching { card.outOfDate(source) }.getOrDefault(false) }
-        val link = card.link
+        val link = card.link?.takeIf { hasLiveLink(card) }
+        val shownQr = linkQr?.takeIf { link != null }
         // The QR stays on white for scanners; the card's solid red edge says Emergency.
         Surface(shape = RoundedCornerShape(12.dp), color = Paper, border = androidx.compose.foundation.BorderStroke(2.dp, SaharaSection.Emergency.solid), modifier = Modifier.fillMaxWidth().testTag("emergency-card")) {
             Column(Modifier.saharaContentSize().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 // The QR is only ever the web link (24 Nov): the page reads the card from the server.
-                if (linkQr != null) QrImage(linkQr, t("Emergency web link QR code", "आपातकालीन वेब लिंक QR कोड"), Modifier.fillMaxWidth().widthIn(max = 240.dp).clickable(onClickLabel = t("Show full screen", "पूरी स्क्रीन पर दिखाएँ")) { fullScreen = true }.testTag("emergency-card-qr"))
-                else Box(Modifier.fillMaxWidth().widthIn(max = 240.dp).aspectRatio(1f).border(2.dp, DoctorHairline, RoundedCornerShape(12.dp)).padding(16.dp).testTag("emergency-card-no-qr"), contentAlignment = Alignment.Center) {
-                    if (linkBusy) CircularProgressIndicator(Modifier.size(24.dp), strokeWidth = 2.dp, color = Rust)
-                    else Text(t("No QR yet: it needs the web link.", "अभी QR नहीं है: इसके लिए वेब लिंक चाहिए।"), fontSize = 15.sp, color = DoctorCardSub, textAlign = TextAlign.Center)
+                // A link the server says is off is never shown as a QR: it would open "The family turned this link off".
+                if (shownQr != null) QrImage(shownQr, t("Emergency web link QR code", "आपातकालीन वेब लिंक QR कोड"), Modifier.fillMaxWidth().widthIn(max = 240.dp).clickable(onClickLabel = t("Show full screen", "पूरी स्क्रीन पर दिखाएँ")) { fullScreen = true }.testTag("emergency-card-qr"))
+                else Column(Modifier.fillMaxWidth().widthIn(max = 280.dp).heightIn(min = 200.dp).border(2.dp, DoctorHairline, RoundedCornerShape(12.dp)).padding(16.dp).testTag("emergency-card-no-qr"),
+                    horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)) {
+                    if (linkBusy) {
+                        CircularProgressIndicator(Modifier.size(24.dp), strokeWidth = 2.dp, color = Rust)
+                        Text(t("Making the web link…", "वेब लिंक बन रहा है…"), fontSize = 15.sp, color = DoctorCardSub, textAlign = TextAlign.Center)
+                    } else {
+                        Text(t("No QR yet: it needs the web link.", "अभी QR नहीं है: इसके लिए वेब लिंक चाहिए।"), fontSize = 15.sp, color = DoctorCardSub, textAlign = TextAlign.Center)
+                        (blocked ?: linkProblem)?.let { why -> Text(t(why.en, why.hi), fontSize = 14.sp, color = DoctorStatusWarn, textAlign = TextAlign.Center, modifier = Modifier.testTag("emergency-card-no-qr-why")) }
+                        if (blocked == null) SaharaPrimaryButton(t("Make web link", "वेब लिंक बनाएँ"), onClick = { makeLink() }, icon = Icons.Default.QrCode, enabled = !busy, modifier = Modifier.fillMaxWidth().testTag("emergency-make-link"))
+                    }
                 }
                 if (name.isNotBlank()) Text(name, fontWeight = FontWeight.Bold, fontSize = 22.sp, color = Ink, textAlign = TextAlign.Center, modifier = Modifier.testTag("emergency-card-name"))
                 Text(t("Scan in an emergency", "आपातकाल में स्कैन करें"), fontSize = 16.sp, color = DoctorCardSub, textAlign = TextAlign.Center)
@@ -461,7 +522,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
                 if (!checking) FamilyPill(when { link != null && problem == null -> t("Web link on", "वेब लिंक चालू"); stale -> t("Out of date", "पुराना है"); else -> t("No web link", "वेब लिंक नहीं") },
                     when { stale -> FamilyTone.WAIT; link != null && problem == null -> FamilyTone.GOOD; else -> FamilyTone.NEUTRAL }, Modifier.testTag("emergency-card-status"))
                 if (checking) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = Rust)
-                else if (problem != null) Column(Modifier.fillMaxWidth().background(DoctorStatusWarnBg, RoundedCornerShape(12.dp)).padding(12.dp).testTag("emergency-link-problem")) {
+                else if (problem != null && link != null) Column(Modifier.fillMaxWidth().background(DoctorStatusWarnBg, RoundedCornerShape(12.dp)).padding(12.dp).testTag("emergency-link-problem")) {
                     Text(t(problem.en, problem.hi), fontSize = 14.sp, color = DoctorStatusWarn)
                     if (problem == EmergencyLinkProblem.OFFLINE || problem == EmergencyLinkProblem.NOT_SET_UP || problem == EmergencyLinkProblem.LINK_OFF) TextButton(onClick = {
                         scope.launch {
@@ -493,7 +554,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
                         confirmLinkOff = false
                         scope.launch {
                             linkBusy = true
-                            try { client?.revoke(card.personId); val off = card.copy(link = null); withContext(Dispatchers.IO) { keep(off) }; record = off; linkProblem = EmergencyLinkProblem.LINK_OFF; done = t("Web link turned off", "वेब लिंक बंद हो गया") }
+                            try { client?.revoke(card.personId); val off = card.copy(link = null); withContext(Dispatchers.IO) { store.forgetLink(card.personId); keep(off) }; record = off; linkProblem = EmergencyLinkProblem.LINK_OFF; done = t("Web link turned off", "वेब लिंक बंद हो गया") }
                             catch (e: EmergencyLinkException) { alert = t(e.problem.en, e.problem.hi) }
                             catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; alert = t(EmergencyLinkProblem.OFFLINE.en, EmergencyLinkProblem.OFFLINE.hi) }
                             finally { linkBusy = false }
@@ -502,7 +563,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
                     dismissButton = { TextButton(onClick = { confirmLinkOff = false }) { Text(t("Keep it on", "चालू रखें")) } })
             }
         }
-        if (fullScreen && linkQr != null) EmergencyQrFullScreen(linkQr, card) { fullScreen = false }
+        if (fullScreen && shownQr != null) EmergencyQrFullScreen(shownQr, card) { fullScreen = false }
         if (confirmNewLink) AlertDialog(onDismissRequest = { confirmNewLink = false },
             title = { Text(t("Replace the web link?", "लिंक बदलें?")) },
             text = { Text(t("Every card printed with the old link will stop opening. Print the new card.", "पुराने लिंक वाले सभी छपे कार्ड खुलना बंद हो जाएँगे। नया कार्ड छापें।")) },

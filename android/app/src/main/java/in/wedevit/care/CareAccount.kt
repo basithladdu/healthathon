@@ -32,6 +32,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.layout.layout
+import androidx.compose.foundation.selection.selectable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -160,11 +162,11 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
     if (session != null) androidx.compose.ui.window.Dialog(onDismissRequest = { if (!busy) onDismiss() }, properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
         val shown = remember { androidx.compose.animation.core.MutableTransitionState(false).apply { targetState = true } }
         androidx.compose.animation.AnimatedVisibility(shown, enter = SaharaMotion.enter + androidx.compose.animation.slideInHorizontally(SaharaMotion.tween(SaharaMotion.ENTER_MS, easing = SaharaMotion.Emphasized)) { it / 12 }) {
-            Scaffold(containerColor = Cream, modifier = Modifier.fillMaxSize().testTag("account-page"), topBar = {
-                TopAppBar(title = { Text(t("Account", "खाता"), fontWeight = FontWeight.Bold) },
-                    navigationIcon = { IconButton(onClick = { if (!busy) onDismiss() }, enabled = !busy, modifier = Modifier.testTag("account-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) } },
-                    actions = { CareLanguageMenu(compact = true) }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Cream))
-            }) { padding -> Box(Modifier.padding(padding).padding(top = 8.dp)) { AccountContent(cloud, vm, onDismiss, heading = "", onBusyChange = { busy = it }, banner = banner, onInvite = onInvite, onDeleted = onDeleted, onDoctorWorkspace = onDoctorWorkspace) } }
+            Scaffold(containerColor = MaterialTheme.colorScheme.background, modifier = Modifier.fillMaxSize().testTag("account-page"), topBar = {
+                TopAppBar(title = { Text(t("Account", "खाता")) },
+                    navigationIcon = { IconButton(onClick = { if (!busy) onDismiss() }, enabled = !busy, modifier = Modifier.size(48.dp).testTag("account-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) } },
+                    actions = { CareLanguageMenu(compact = true) }, colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background))
+            }) { padding -> Box(Modifier.padding(padding)) { AccountContent(cloud, vm, onDismiss, heading = "", onBusyChange = { busy = it }, banner = banner, onInvite = onInvite, onDeleted = onDeleted, onDoctorWorkspace = onDoctorWorkspace) } }
         }
     }
     else SaharaScreenSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
@@ -215,6 +217,7 @@ private fun clipboardText(context: android.content.Context): String? = (context.
     val inviteStore = remember { careInviteStore(context) }
     var removing by remember { mutableStateOf<CareMember?>(null) }
     var signingOut by remember { mutableStateOf(false) }
+    var policyOpen by rememberSaveable { mutableStateOf(false) }
     var deleting by remember { mutableStateOf(false) }
     var deleteUnderstood by remember { mutableStateOf(false) }
     var deletionByEmail by remember { mutableStateOf(false) }
@@ -257,16 +260,9 @@ private fun clipboardText(context: android.content.Context): String? = (context.
     fun day(ms: Long) = java.time.Instant.ofEpochMilli(ms).atZone(java.time.ZoneId.systemDefault()).format(careDateFormat(CARE_SHORT_DATE, hindi))
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = 16.dp).padding(bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             if (heading != "") Heading(heading ?: if (session == null) if (create) t("Create an account", "खाता बनाएँ") else t("Sign in", "साइन इन करें") else t("Your account", "आपका खाता"), if (session == null) 24 else 28)
-            banner?.let { Surface(color = Mint, shape = RoundedCornerShape(14.dp)) { Text(it, Modifier.fillMaxWidth().padding(16.dp), fontWeight = FontWeight.Medium) } }
+            banner?.let { Text(it, Modifier.fillMaxWidth().padding(vertical = 4.dp), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.primary) }
             if (session == null) {
-                // The clinic's invite link is the main way in (owner's point 1): it comes first and largest; email and password come second.
-                if (onInvite != null) {
-                    ClinicInviteFirst(ready = banner != null, enabled = !busy, onPaste = {
-                        val pasted = clipboardText(context)
-                        if (CareInviteLink.parse(pasted) != null) { onInvite(pasted.orEmpty()); error = null; if (signupIntent == null) create = true; true } else false
-                    })
-                    Text(t("Or sign in with email", "या ईमेल से साइन इन करें"), Modifier.padding(top = 8.dp).a11yHeading(), fontWeight = FontWeight.SemiBold, fontSize = 18.sp, color = DoctorCardInk)
-                }
+                // The plain account form (owner, 25 Nov: no invite-first card). A tapped invite link still arrives as [banner] and joins after sign-in.
                 if (create && signupIntent?.role.isNullOrBlank()) SignupRolePicker(signupRole) { signupRole = it }
                 if (create) Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable { signupAgreed = !signupAgreed }.testTag("signup-agree"), verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(checked = signupAgreed, onCheckedChange = { signupAgreed = it })
@@ -298,43 +294,33 @@ private fun clipboardText(context: android.content.Context): String? = (context.
                     TextButton(onClick = { create = !create; error = null; notice = null }, enabled = !busy && (create || CareEmailAvailability.ready), modifier = Modifier.heightIn(min = 48.dp)) { Text(if (create) t("Already have an account? Sign in", "पहले से खाता है? साइन इन करें") else t("Create an account", "खाता बनाएँ"), fontWeight = FontWeight.SemiBold) }
                 }
             } else {
-                // Who is signed in, with refresh beside it: one row instead of a line and a separate button.
-                Surface(shape = RoundedCornerShape(12.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().saharaAppear()) {
-                    Row(Modifier.padding(start = 16.dp, end = 4.dp, top = 4.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.AccountCircle, null, Modifier.size(28.dp), tint = Rust); Spacer(Modifier.width(12.dp))
-                        Text(session!!.email, Modifier.weight(1f), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        IconButton(onClick = { vm.refresh(); onDismiss() }, enabled = !busy, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Refresh, t("Refresh", "ताज़ा करें"), tint = Rust) }
-                    }
-                }
-                if (onDoctorWorkspace != null && SignupRole.get(context) == SignupRole.DOCTOR) Surface(shape = RoundedCornerShape(16.dp), color = SaharaTone.Indigo.wash, modifier = Modifier.fillMaxWidth().testTag("account-doctor-verify")) {
-                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(t("Finish your doctor verification", "डॉक्टर सत्यापन पूरा करें"), fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
-                        Text(t("Add your medical council and registration number. The Sahara team checks it, usually within a day, before you can see patients.",
-                            "अपनी मेडिकल काउंसिल और पंजीकरण संख्या जोड़ें। मरीज़ों को देखने से पहले Sahara टीम इसे जाँचती है, आम तौर पर एक दिन में।"), fontSize = 14.sp, color = DoctorCardInk)
-                        SaharaPrimaryButton(t("Open doctor workspace", "डॉक्टर वर्कस्पेस खोलें"), onClick = { onDoctorWorkspace() }, tone = SaharaTone.Indigo, modifier = Modifier.fillMaxWidth())
-                    }
-                }
+                // Who is signed in, with refresh beside it: one plain row.
+                SaharaRow(session!!.email, Modifier.accountBleed(), icon = Icons.Default.AccountCircle, chevron = false,
+                    trailing = { IconButton(onClick = { vm.refresh(); onDismiss() }, enabled = !busy, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Refresh, t("Refresh", "ताज़ा करें")) } })
+                if (onDoctorWorkspace != null && SignupRole.get(context) == SignupRole.DOCTOR) SaharaRow(t("Finish your doctor verification", "डॉक्टर सत्यापन पूरा करें"),
+                    Modifier.accountBleed().testTag("account-doctor-verify"),
+                    supporting = t("Add your medical council and registration number. The Sahara team checks it, usually within a day, before you can see patients.",
+                        "अपनी मेडिकल काउंसिल और पंजीकरण संख्या जोड़ें। मरीज़ों को देखने से पहले Sahara टीम इसे जाँचती है, आम तौर पर एक दिन में।"),
+                    supportingMaxLines = 4, icon = Icons.Default.MedicalServices, onClick = { onDoctorWorkspace() })
                 if (owner && selected.isNotBlank()) {
-                    // Who can see this care: the one main action (invite family) first, then one register of people and invitations.
-                    Row(Modifier.fillMaxWidth().testTag("account-care-team"), verticalAlignment = Alignment.CenterVertically) {
-                        SaharaSectionHeader(t("Family and care team", "परिवार और देखभाल टीम"), Modifier.weight(1f), tone = SaharaTone.Leaf, icon = Icons.Default.Groups)
-                        if (membersLoaded) FamilyPill(t("${members.size} joined", "${members.size} जुड़े"), if (members.isEmpty()) FamilyTone.NEUTRAL else FamilyTone.GOOD)
-                    }
-                    SaharaPrimaryButton(t("Invite family", "परिवार को बुलाएँ"), onClick = { addFamily = true }, enabled = !busy, tone = SaharaTone.Leaf, icon = Icons.Default.PersonAdd, modifier = Modifier.fillMaxWidth().testTag("account-invite-family"))
-                    SaharaSecondaryButton(t("Invite doctor", "डॉक्टर को बुलाएँ"), onClick = { inviteDoctor = true; invite = "" }, enabled = !busy, tone = SaharaTone.Indigo, icon = Icons.Default.MedicalServices, modifier = Modifier.fillMaxWidth().testTag("account-invite-doctor"))
-                    if (membersLoaded || invites.isNotEmpty()) SaharaRegister {
-                        if (membersLoaded && members.isEmpty()) Text(t("Nobody has joined yet.", "अभी तक कोई नहीं जुड़ा।"), Modifier.padding(horizontal = 16.dp, vertical = 14.dp), fontSize = 15.sp, color = DoctorCardSub)
+                    // Who can see this care: the two invite rows first, then the people and invitations as plain rows.
+                    SaharaGroupLabel(t("Family and care team", "परिवार और देखभाल टीम"), Modifier.accountBleed().testTag("account-care-team"))
+                    SaharaRow(t("Invite family", "परिवार को बुलाएँ"), Modifier.accountBleed().testTag("account-invite-family"), icon = Icons.Default.PersonAdd, enabled = !busy, onClick = { addFamily = true })
+                    SaharaRow(t("Invite doctor", "डॉक्टर को बुलाएँ"), Modifier.accountBleed().testTag("account-invite-doctor"), icon = Icons.Default.MedicalServices, enabled = !busy, onClick = { inviteDoctor = true; invite = "" })
+                    if (membersLoaded || invites.isNotEmpty()) Column(Modifier.fillMaxWidth()) {
+                        if (membersLoaded && members.isEmpty()) Text(t("Nobody has joined yet.", "अभी तक कोई नहीं जुड़ा।"), Modifier.padding(vertical = 14.dp), fontSize = 15.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         members.forEachIndexed { index, member ->
                             val detail = memberDetails?.firstOrNull { it.userId == member.userId }; val now = System.currentTimeMillis()
-                            if (index > 0) HorizontalDivider(color = DoctorHairline)
+                            if (index > 0) HorizontalDivider()
                             var menu by remember(member.userId) { mutableStateOf(false) }
-                            Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(start = 16.dp, end = 4.dp, top = 6.dp, bottom = 6.dp).saharaAppear(), verticalAlignment = Alignment.CenterVertically) {
-                                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                    Text(member.email, fontSize = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                    // Access level as a badge; dates on one quiet line.
-                                    FamilyPill(if (member.canEdit) t("Can make changes", "बदलाव कर सकते हैं") else t("Can read", "सिर्फ़ पढ़ सकते हैं"), if (member.canEdit) FamilyTone.GOOD else FamilyTone.INFO)
-                                    listOfNotNull(detail?.joinedAt?.takeIf { it > 0 }?.let { t("joined ${day(it)}", "${day(it)} को जुड़े") },
-                                        detail?.expiresAt?.takeIf { it > 0 }?.let { if (it > now) t("access until ${day(it)}", "${day(it)} तक पहुँच") else t("access ended ${day(it)}", "${day(it)} को पहुँच ख़त्म") }).joinToString(" · ").takeIf(String::isNotBlank)?.let { Text(it, fontSize = 14.sp, color = DoctorCardSub) }
+                            Row(Modifier.fillMaxWidth().heightIn(min = 72.dp).padding(end = 0.dp, top = 6.dp, bottom = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                    Text(member.email, fontSize = 17.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                    // Access level and dates on one plain line (no badge).
+                                    listOfNotNull(if (member.canEdit) t("Can make changes", "बदलाव कर सकते हैं") else t("Can read", "सिर्फ़ पढ़ सकते हैं"),
+                                        detail?.joinedAt?.takeIf { it > 0 }?.let { t("joined ${day(it)}", "${day(it)} को जुड़े") },
+                                        detail?.expiresAt?.takeIf { it > 0 }?.let { if (it > now) t("access until ${day(it)}", "${day(it)} तक पहुँच") else t("access ended ${day(it)}", "${day(it)} को पहुँच ख़त्म") }).joinToString(" · ")
+                                        .let { Text(it, fontSize = 15.sp, color = MaterialTheme.colorScheme.onSurfaceVariant) }
                                 }
                                 // Every change for this person sits in one menu: one button per row instead of three.
                                 Box {
@@ -351,40 +337,38 @@ private fun clipboardText(context: android.content.Context): String? = (context.
                                 }
                             }
                         }
-                        if (invites.isNotEmpty()) { if (membersLoaded) HorizontalDivider(color = DoctorHairline); val now = System.currentTimeMillis(); invites.forEach { e ->
+                        if (invites.isNotEmpty()) { if (membersLoaded) HorizontalDivider(); val now = System.currentTimeMillis(); invites.forEach { e ->
                             val status = CareInviteLog.status(e, openInvites, memberDetails, now)
-                            // Register row: who, a status dot (joined / waiting / closed), and Cancel while it is still open.
-                            val tone = when (status.state) { CareInviteState.JOINED -> FamilyTone.GOOD; CareInviteState.OPEN, CareInviteState.UNTRACKED, CareInviteState.UNKNOWN -> FamilyTone.WAIT; else -> FamilyTone.NEUTRAL }
+                            // One plain row: who and the status in words, and Cancel while it is still open.
                             val full = CareInviteLog.label(e, status, now, hindi, members.firstOrNull { it.userId == status.memberId }?.email.orEmpty())
                             val who = full.substringBefore(" · ").takeIf { e.name.isNotBlank() || e.relation.isNotBlank() }
-                            Row(Modifier.fillMaxWidth().heightIn(min = 52.dp).padding(start = 16.dp, end = 4.dp).saharaAppear(), verticalAlignment = Alignment.CenterVertically) {
-                                Box(Modifier.size(10.dp).clip(androidx.compose.foundation.shape.CircleShape).background(tone.ink)); Spacer(Modifier.width(10.dp))
-                                Text(full, Modifier.weight(1f).padding(vertical = 4.dp), fontSize = 15.sp, fontWeight = if (who != null) FontWeight.Medium else FontWeight.Normal, color = DoctorCardInk)
-                                if (status.state == CareInviteState.OPEN) TextButton(onClick = { val person = selected; val acct = session!!.userId; run { cloud.cancelInvite(e.inviteId); inviteStore.save(acct, inviteStore.all(acct).filterNot { it.inviteId == e.inviteId }); inviteTick++; if (vm.selected.value == person) notice = t("Invitation cancelled.", "निमंत्रण रद्द हुआ।") } }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें"), color = RustText) }
+                            Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Text(full, Modifier.weight(1f).padding(vertical = 4.dp), fontSize = 15.sp, fontWeight = if (who != null) FontWeight.Medium else FontWeight.Normal, color = MaterialTheme.colorScheme.onSurface)
+                                if (status.state == CareInviteState.OPEN) TextButton(onClick = { val person = selected; val acct = session!!.userId; run { cloud.cancelInvite(e.inviteId); inviteStore.save(acct, inviteStore.all(acct).filterNot { it.inviteId == e.inviteId }); inviteTick++; if (vm.selected.value == person) notice = t("Invitation cancelled.", "निमंत्रण रद्द हुआ।") } }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें")) }
                             }
                         } }
                     }
                     CareContactManager(vm, selected)
                 }
-                SaharaSectionHeader(t("Join someone's care", "किसी की देखभाल से जुड़ें"), tone = SaharaTone.Teal, icon = Icons.Default.GroupAdd)
+                SaharaGroupLabel(t("Join someone's care", "किसी की देखभाल से जुड़ें"), Modifier.accountBleed())
                 CareField(code, { code = CareInviteLink.parse(it)?.code ?: it.trim().take(4000) }, t("Invite code", "निमंत्रण कोड"), singleLine = true, voice = false)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SaharaSecondaryButton(t("Paste invite", "निमंत्रण चिपकाएँ"), onClick = { val pasted = clipboardText(context); val invite = CareInviteLink.parse(pasted); if (invite != null) { code = invite.code; error = null; notice = null } else { notice = null; error = t("No invite copied.", "कोई निमंत्रण कॉपी नहीं हुआ।") } }, enabled = !busy, icon = Icons.Default.ContentPaste, tone = SaharaTone.Teal, modifier = Modifier.weight(1f))
-                    SaharaPrimaryButton(t("Join", "जुड़ें"), onClick = { run { val before = vm.people.value.map { it.id }.toSet(); try { cloud.join(code) } catch (e: Exception) { if (e is CancellationException) throw e; throw IllegalArgumentException(careJoinFailureMessage(e.message, hindi), e) }; code = ""; val added = vm.joinedRefresh(before); notice = added?.name?.let { t("You can now see $it's care.", "अब आप $it की देखभाल देख सकते हैं।") } ?: t("You can now see their care.", "अब आप उनकी देखभाल देख सकते हैं।") } }, enabled = !busy && code.trim().length == 48, tone = SaharaTone.Teal, modifier = Modifier.weight(1f))
+                    SaharaSecondaryButton(t("Paste invite", "निमंत्रण चिपकाएँ"), onClick = { val pasted = clipboardText(context); val invite = CareInviteLink.parse(pasted); if (invite != null) { code = invite.code; error = null; notice = null } else { notice = null; error = t("No invite copied.", "कोई निमंत्रण कॉपी नहीं हुआ।") } }, enabled = !busy, icon = Icons.Default.ContentPaste, modifier = Modifier.weight(1f))
+                    SaharaPrimaryButton(t("Join", "जुड़ें"), onClick = { run { val before = vm.people.value.map { it.id }.toSet(); try { cloud.join(code) } catch (e: Exception) { if (e is CancellationException) throw e; throw IllegalArgumentException(careJoinFailureMessage(e.message, hindi), e) }; code = ""; val added = vm.joinedRefresh(before); notice = added?.name?.let { t("You can now see $it's care.", "अब आप $it की देखभाल देख सकते हैं।") } ?: t("You can now see their care.", "अब आप उनकी देखभाल देख सकते हैं।") } }, enabled = !busy && code.trim().length == 48, modifier = Modifier.weight(1f))
                 }
-                // Account housekeeping: one plain list at the bottom, sign out first, the irreversible step last.
-                SaharaSectionHeader(t("Your account", "आपका खाता"), tone = SaharaTone.Rust, icon = Icons.Default.ManageAccounts)
-                SaharaRegister {
-                    SaharaListRow(t("Privacy policy", "निजता नीति"), icon = Icons.Default.Policy, tone = SaharaTone.Indigo, onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url)))) })
-                    HorizontalDivider(color = DoctorHairline)
-                    SaharaListRow(t("Sign out", "साइन आउट करें"), Modifier.testTag("account-sign-out"), icon = Icons.AutoMirrored.Filled.Logout, tone = SaharaTone.Rust, onClick = { if (!busy) signingOut = true })
-                    HorizontalDivider(color = DoctorHairline)
-                    SaharaListRow(t("Delete account", "खाता मिटाएँ"), icon = Icons.Default.DeleteOutline, tone = SaharaTone.Error, onClick = { if (!busy) { deleteUnderstood = false; deleting = true } })
-                    if (deletionByEmail) { HorizontalDivider(color = DoctorHairline); SaharaListRow(t("Request deletion by email", "ईमेल से मिटाने का अनुरोध भेजें"), icon = Icons.Default.MailOutline, tone = SaharaTone.Error, onClick = { if (!busy) open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.delete_account_url)))) }) }
-                }
+                // Account housekeeping: plain rows at the bottom, sign out first, the irreversible step last (in the error colour).
+                SaharaGroupLabel(t("Your account", "आपका खाता"), Modifier.accountBleed())
+                SaharaRow(t("Privacy policy", "निजता नीति"), Modifier.accountBleed(), icon = Icons.Default.Description, onClick = { policyOpen = true })
+                SaharaRow(t("Sign out", "साइन आउट करें"), Modifier.accountBleed().testTag("account-sign-out"), icon = Icons.AutoMirrored.Filled.Logout, chevron = false, onClick = { if (!busy) signingOut = true })
+                SaharaRow(t("Delete account", "खाता मिटाएँ"), Modifier.accountBleed(), icon = Icons.Default.DeleteOutline, tone = SaharaTone.Error, headlineColor = MaterialTheme.colorScheme.error, chevron = false,
+                    onClick = { if (!busy) { deleteUnderstood = false; deleting = true } })
+                if (deletionByEmail) SaharaRow(t("Request deletion by email", "ईमेल से मिटाने का अनुरोध भेजें"), Modifier.accountBleed(), icon = Icons.Default.MailOutline, tone = SaharaTone.Error, headlineColor = MaterialTheme.colorScheme.error,
+                    onClick = { if (!busy) open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.delete_account_url)))) })
             }
-            if (session == null) TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url)))) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Privacy policy", "निजता नीति"), color = DoctorCardSub) }
+            // The policy opens inside the app (it used to leave for the browser).
+            if (session == null) TextButton(onClick = { policyOpen = true }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Privacy policy", "निजता नीति")) }
         }
+    if (policyOpen) PrivacyPolicyDialog(onDismiss = { policyOpen = false })
     // Results and errors come as a short dialog, signed in or out, so they are never missed below the fold or the keyboard.
     error?.let { SaharaDialog(it, onDismiss = { error = null }, tone = SaharaTone.Error) }
     if (error == null) notice?.let { SaharaDialog(it, onDismiss = { notice = null }, tone = if (session == null) SaharaTone.Info else SaharaTone.Success) }
@@ -392,9 +376,8 @@ private fun clipboardText(context: android.content.Context): String? = (context.
         // Invite a doctor: what they may see and for how long, then one button; the link to share replaces the button when it is made.
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 24.dp).saharaScreenEnter().testTag("account-doctor-sheet"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                SaharaIconChip(Icons.Default.MedicalServices, SaharaTone.Indigo); Spacer(Modifier.width(12.dp))
-                Text(t("Invite doctor", "डॉक्टर को बुलाएँ"), Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 22.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-                IconButton(onClick = { inviteDoctor = false; invite = "" }, enabled = !busy, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Close, t("Close", "बंद करें"), tint = DoctorCardSub) }
+                Text(t("Invite doctor", "डॉक्टर को बुलाएँ"), Modifier.weight(1f).a11yHeading(), style = MaterialTheme.typography.titleLarge)
+                IconButton(onClick = { inviteDoctor = false; invite = "" }, enabled = !busy, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Close, t("Close", "बंद करें")) }
             }
             PatientIdForDoctor(selected)
             Text(t("Access", "पहुँच"), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, color = DoctorCardInk)
@@ -408,10 +391,10 @@ private fun clipboardText(context: android.content.Context): String? = (context.
             Text(t("Days", "दिन"), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, color = DoctorCardInk)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { listOf(1, 7, 30, 90).forEach { d -> AccessChip(doctorDays == d, t("$d days", "$d दिन")) { doctorDays = d; invite = "" } } }
             if (invite.isEmpty()) SaharaPrimaryButton(t("Create invite", "निमंत्रण बनाएँ"), onClick = { val person = selected; val account = session!!.userId; val doctor = inviteDoctor; run { val before = cloud.openInvites(person); val code = if (doctor) cloud.inviteAccess(person, "clinician", doctorEdit, mapOf("careNote" to doctorNotes, "calendar" to doctorCalendar, "reports" to doctorReports, "costs" to doctorCosts), doctorDays, expectedAccountId = account) else cloud.invite(person, allowChanges, allowCareTeam); if (vm.selected.value == person && cloud.session.value?.userId == account && vm.isOwner.value) { invite = code; inviteStore.logCreated(cloud, account, person, "", "", if (doctor) "clinician" else "family", before); inviteTick++ } } },
-                enabled = !busy && (!inviteDoctor || doctorNotes || doctorCalendar || doctorReports || doctorCosts), busy = busy, tone = SaharaTone.Indigo, icon = Icons.Default.Link, modifier = Modifier.fillMaxWidth().testTag("account-doctor-create"))
-            else Column(Modifier.saharaAppear(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                FamilyPill(t("Expires in 3 days", "3 दिन में बंद होगा"), FamilyTone.GOOD)
-                SaharaPrimaryButton(t("Share invite", "निमंत्रण भेजें"), onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, CareInviteLink.shareText(people.firstOrNull { it.id == selected }?.name.orEmpty(), invite)), t("Share", "भेजें"))) }, tone = SaharaTone.Indigo, icon = Icons.Default.Share, modifier = Modifier.fillMaxWidth().testTag("account-doctor-share"))
+                enabled = !busy && (!inviteDoctor || doctorNotes || doctorCalendar || doctorReports || doctorCosts), busy = busy, icon = Icons.Default.Link, modifier = Modifier.fillMaxWidth().testTag("account-doctor-create"))
+            else Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(t("Expires in 3 days", "3 दिन में बंद होगा"), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                SaharaPrimaryButton(t("Share invite", "निमंत्रण भेजें"), onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, CareInviteLink.shareText(people.firstOrNull { it.id == selected }?.name.orEmpty(), invite)), t("Share", "भेजें"))) }, icon = Icons.Default.Share, modifier = Modifier.fillMaxWidth().testTag("account-doctor-share"))
                 androidx.compose.foundation.text.selection.SelectionContainer { Text(invite, style = MaterialTheme.typography.bodySmall, color = DoctorCardSub, maxLines = 2, overflow = TextOverflow.Ellipsis) }
             }
         }
@@ -465,52 +448,30 @@ internal val LocalSignupIntent = staticCompositionLocalOf<SignupIntent?> { null 
         Triple(SignupRole.DOCTOR, t("I'm a doctor or nurse", "मैं डॉक्टर या नर्स हूँ"), t("We check your registration number first", "पहले हम आपकी पंजीकरण संख्या जाँचते हैं")),
     ).forEach { (value, title, sub) ->
         val chosen = role == value
-        Surface(shape = RoundedCornerShape(14.dp), color = if (chosen) Mint else Paper, border = BorderStroke(if (chosen) 2.dp else 1.dp, if (chosen) Rust else DoctorHairline),
-            modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).clickable { onRole(value) }.testTag("signup-role-$value")) {
-            Row(Modifier.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) { Text(title, fontWeight = FontWeight.SemiBold, color = DoctorCardInk); Text(sub, fontSize = 13.sp, color = DoctorCardSub) }
-                if (chosen) Icon(Icons.Default.Check, null, tint = Rust)
-            }
-        }
+        // A plain radio list (no tinted boxes): the whole row selects.
+        ListItem(headlineContent = { Text(title, fontWeight = FontWeight.Medium) }, supportingContent = { Text(sub) },
+            leadingContent = { RadioButton(selected = chosen, onClick = null) },
+            colors = ListItemDefaults.colors(containerColor = androidx.compose.ui.graphics.Color.Transparent),
+            modifier = Modifier.accountBleed().fillMaxWidth().heightIn(min = 72.dp)
+                .selectable(chosen, role = androidx.compose.ui.semantics.Role.RadioButton) { onRole(value) }.testTag("signup-role-$value"))
     }
     Text(t("We never ask for Aadhaar, date of birth or gender to sign up. Only an email and a password.", "साइन अप के लिए हम कभी आधार, जन्मतिथि या लिंग नहीं माँगते। सिर्फ़ ईमेल और पासवर्ड।"),
-        fontSize = 13.sp, color = DoctorCardSub)
+        fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+}
+
+/** One access choice as a stock filter chip with a tick when on; at least 48dp tall. */
+@Composable private fun AccessChip(selected: Boolean, label: String, onClick: () -> Unit) {
+    FilterChip(selected = selected, onClick = onClick, label = { Text(label, fontSize = 14.sp) }, modifier = Modifier.heightIn(min = 48.dp),
+        leadingIcon = if (selected) { { Icon(Icons.Default.Check, null, Modifier.size(16.dp)) } } else null)
 }
 
 /**
- * The first thing a signed-out person sees: "I have an invite link from my clinic". The nurse or doctor makes the invite; the
- * family taps the link in WhatsApp or SMS once (Sahara opens by itself), or copies it and taps this button. [ready] is true once
- * an invite is waiting. [onPaste] reads a copied link and returns whether it was an invite.
+ * Lets a full-width list row (a ListItem with its own 16dp inset) sit inside the account form's 16dp-padded column, so its icon and
+ * text line up with every other Android list instead of being inset twice.
  */
-@Composable private fun ClinicInviteFirst(ready: Boolean, enabled: Boolean, onPaste: () -> Boolean) {
-    val t = careText(); var help by rememberSaveable { mutableStateOf(false) }
-    Surface(shape = RoundedCornerShape(SaharaRadius.Lg), color = SaharaTone.Teal.wash, border = BorderStroke(1.dp, SaharaTone.Teal.solid.copy(alpha = .5f)), modifier = Modifier.fillMaxWidth().saharaAppear().testTag("account-clinic-invite")) {
-        Column(Modifier.saharaContentSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            androidx.compose.animation.AnimatedContent(ready, transitionSpec = { SaharaMotion.crossfade() }, label = "clinic-invite") { has ->
-                if (has) Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.CheckCircle, null, Modifier.size(36.dp), tint = SaharaTone.Success.solid); Spacer(Modifier.width(12.dp))
-                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(t("Your clinic's invite is ready", "आपके क्लिनिक का निमंत्रण तैयार है"), fontWeight = FontWeight.SemiBold, fontSize = 18.sp, color = DoctorCardInk)
-                        Text(t("Make your account once below. After that you stay signed in on this phone.", "नीचे एक बार अपना खाता बनाएँ। उसके बाद आप इस फ़ोन पर साइन इन रहते हैं।"), fontSize = 16.sp, color = DoctorCardInk)
-                    }
-                } else Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    SaharaPrimaryButton(t("I have an invite link from my clinic", "मेरे पास क्लिनिक से निमंत्रण लिंक है"), onClick = { help = !onPaste() }, enabled = enabled, tone = SaharaTone.Teal, icon = Icons.Default.Link,
-                        modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp).testTag("account-clinic-invite-button"))
-                    androidx.compose.animation.AnimatedVisibility(help, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) {
-                        Text(t("Open the message from your nurse or doctor and tap the link once. Sahara opens by itself. Or copy the link, come back and tap this button again.",
-                            "अपनी नर्स या डॉक्टर का संदेश खोलें और लिंक पर एक बार टैप करें। Sahara अपने आप खुल जाएगा। या लिंक कॉपी करें, वापस आएँ और यह बटन फिर दबाएँ।"),
-                            fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.announce().testTag("account-clinic-invite-help"))
-                    }
-                    if (!help) Text(t("Your nurse or doctor sends it on WhatsApp or SMS.", "आपकी नर्स या डॉक्टर इसे WhatsApp या SMS पर भेजते हैं।"), fontSize = 16.sp, color = DoctorCardSub)
-                }
-            }
-        }
-    }
-}
-
-/** One access choice as a chip with a tick when on; at least 48dp tall. */
-@Composable private fun AccessChip(selected: Boolean, label: String, onClick: () -> Unit) {
-    FilterChip(selected = selected, onClick = onClick, label = { Text(label, fontSize = 14.sp) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp),
-        leadingIcon = if (selected) { { Icon(Icons.Default.Check, null, Modifier.size(16.dp)) } } else null,
-        colors = FilterChipDefaults.filterChipColors(containerColor = Paper, selectedContainerColor = Mint, selectedLabelColor = DoctorCardInk, selectedLeadingIconColor = Rust))
+private fun Modifier.accountBleed(): Modifier = layout { measurable, constraints ->
+    val extra = 32.dp.roundToPx()
+    if (!constraints.hasBoundedWidth) { val p = measurable.measure(constraints); return@layout layout(p.width, p.height) { p.place(0, 0) } }
+    val p = measurable.measure(constraints.copy(minWidth = (constraints.minWidth + extra).coerceAtLeast(0), maxWidth = constraints.maxWidth + extra))
+    layout((p.width - extra).coerceAtLeast(0), p.height) { p.place(-extra / 2, 0) }
 }

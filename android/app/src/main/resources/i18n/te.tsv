@@ -6123,3 +6123,63 @@ This text is in another language, so the phone cannot read it out exactly. Ask s
 The phone can only read text written in the app language. Choose “Someone read it to me”.	ఫోన్ యాప్ భాషలో రాసిన పాఠ్యాన్ని మాత్రమే చదవగలదు. “ఎవరో నాకు చదివి వినిపించారు” ఎంచుకోండి.
 This phone has no voice for the app language. Choose “Someone read it to me”.	ఈ ఫోన్‌లో యాప్ భాష కోసం గొంతు లేదు. “ఎవరో నాకు చదివి వినిపించారు” ఎంచుకోండి.
 Only someone who can edit this care record can change this.	ఈ సంరక్షణ రికార్డును మార్చగలిగేవారు మాత్రమే దీన్ని మార్చగలరు.
+Show the map	మ్యాప్ చూపించు
+Show the list	జాబితా చూపించు
+${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} at ${demoTime(v.due)}. Opens their visits.	${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} ${demoTime(v.due)} కి. వారి సందర్శనలను తెరుస్తుంది.
+Practice cards have no web link. Sign in to your own account to make one.	ప్రాక్టీస్ కార్డులకు వెబ్ లింక్ ఉండదు. లింక్ చేయడానికి మీ సొంత ఖాతాతో సైన్ ఇన్ చేయండి.
+Web link is ready. Scanning the QR now opens this card on sahara.wedevit.in.	వెబ్ లింక్ సిద్ధంగా ఉంది. ఇప్పుడు QR స్కాన్ చేస్తే ఈ కార్డు sahara.wedevit.in లో తెరుచుకుంటుంది.
+Making the web link…	వెబ్ లింక్ తయారవుతోంది…
+Make web link	వెబ్ లింక్ చేయండి
+We never ask for Aadhaar, date of birth or gender to sign up.	సైన్ అప్ కోసం మేము ఎప్పుడూ ఆధార్, పుట్టిన తేదీ లేదా లింగం అడగము.
+Big buttons that speak. Tap Full app at the bottom to come back.	పెద్ద బటన్లు మాట్లాడతాయి. తిరిగి రావడానికి కింద పూర్తి యాప్ నొక్కండి.
+Switch on	ఆన్ చేయండి
+Switch to Simple mode?	సులభ మోడ్‌కు మారాలా?
+$clock dose	$clock మోతాదు
+Hard	కష్టం
+Mark $medicine taken	$medicine తీసుకున్నట్లు గుర్తించండి
+No check-in	చెక్-ఇన్ లేదు
+Not marked yet	ఇంకా గుర్తించలేదు
+Open on the website	వెబ్‌సైట్‌లో తెరవండి
+This policy is shown in English.	ఈ విధానం ఆంగ్లంలో చూపబడింది.
+new	కొత్తవి
+symptom noted	లక్షణం నమోదైంది
+Caring for	వీరి సంరక్షణ
+Feeling very upset?	చాలా బాధగా ఉందా?
+Mark all taken	అన్నీ తీసుకున్నట్లు గుర్తించండి
+Note a side effect	దుష్ప్రభావం నమోదు చేయండి
+Reminder times	గుర్తుచేసే సమయాలు
+Tell the doctor: 1 side effect	డాక్టర్‌కు చెప్పండి: 1 దుష్ప్రభావం
+Tell the doctor: $count side effects	డాక్టర్‌కు చెప్పండి: $count దుష్ప్రభావాలు
+Past medicines	గతంలో వాడిన మందులు
+Scan a prescription or strip	ప్రిస్క్రిప్షన్ లేదా స్ట్రిప్‌ను స్కాన్ చేయండి
+Type it in	టైప్ చేయండి
+When needed	అవసరమైనప్పుడు
+Took one	ఒకటి వేసుకున్నాను
+All done for today	ఈరోజుకు అన్నీ అయిపోయాయి
+Next: $slot	తదుపరి: $slot
+$count medicines	$count మందులు
+marked taken	తీసుకున్నట్లు గుర్తించబడింది
+Care near me	నా దగ్గర సంరక్షణ
+Requests to doctor	డాక్టర్‌కు అభ్యర్థనలు
+No check-ins this week	ఈ వారం చెక్-ఇన్‌లు లేవు
+1 check-in this week	ఈ వారం 1 చెక్-ఇన్
+$checkedDays check-ins this week	ఈ వారం $checkedDays చెక్-ఇన్‌లు
+symptoms on 1 day	1 రోజు లక్షణాలు
+symptoms on $symptomDays days	$symptomDays రోజులు లక్షణాలు
+Simple mode is on. Tap Full app at the bottom to come back.	సులభ మోడ్ ఆన్ అయింది. తిరిగి రావడానికి కింద పూర్తి యాప్ నొక్కండి.
+On because you are 60 or older	మీ వయసు 60 లేదా అంతకంటే ఎక్కువ కాబట్టి ఆన్‌లో ఉంది
+Family and sharing	కుటుంబం మరియు పంచుకోవడం
+Search patients	రోగులను వెతకండి
+Record a goals-of-care talk	సంరక్షణ లక్ష్యాల సంభాషణను రికార్డ్ చేయండి
+Choose the patient	రోగిని ఎంచుకోండి
+$done of $total	$total లో $done
+$done of $total visits done today	ఈరోజు $total సందర్శనల్లో $done పూర్తయ్యాయి
+visits today	ఈరోజు సందర్శనలు
+visits	సందర్శనలు
+See schedule	షెడ్యూల్ చూడండి
+Hard days	కష్టమైన రోజులు
+Needs you	మీ కోసం వేచి ఉన్నవి
+Nothing waiting	ఏదీ పెండింగ్‌లో లేదు
+Verify your registration	మీ రిజిస్ట్రేషన్‌ను ధృవీకరించండి
+Are you still caring for $caringName?	మీరు ఇంకా $caringName ను చూసుకుంటున్నారా?
+How is $caringName feeling today?	$caringName ఈ రోజు ఎలా ఉన్నారు?

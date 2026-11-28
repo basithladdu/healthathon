@@ -50,11 +50,17 @@ class DoctorHomeRenderTest {
             val base = LocalDensity.current
             CompositionLocalProvider(LocalDensity provides Density(base.density, fontScale)) {
                 CareTheme {
-                    LazyColumn(Modifier.fillMaxSize().background(Cream), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        doctorConnectedHomeItems(listOf(asha, ravi, meena), items, now, hindi, {}, {}, {})
-                        item { DoctorPatientSectionBar("CarePlan", {}) }
-                        item { DoctorPatientNavigationTiles({}) }
-                        listOf(asha, ravi, meena).forEach { p -> item { DoctorPatientListCard(p.name, DoctorConnectedHome.patientCode(p.id), {}, pill = doctorPatientStatus(p, items, now, hindi)) } }
+                    Column(Modifier.fillMaxSize().background(Cream)) {
+                        // Home is a whole page now (25 Nov: the shared DoctorHomeScreen with its own top bar), so it gets the top of the frame.
+                        Box(Modifier.fillMaxWidth().height(820.dp)) {
+                            DoctorHomeScreen(doctorConnectedHomeState(listOf(asha, ravi, meena), items, now, hindi, emptyList(), {}, {}, {}, {}), "Dr Test",
+                                {}, {}, emptyList(), {}, {}, {}, "doctor-home")
+                        }
+                        LazyColumn(Modifier.weight(1f).fillMaxWidth(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            item { DoctorPatientSectionBar("CarePlan", {}) }
+                            item { DoctorPatientNavigationTiles({}) }
+                            listOf(asha, ravi, meena).forEach { p -> item { DoctorPatientListCard(p.name, DoctorConnectedHome.patientCode(p.id), {}, pill = doctorPatientStatus(p, items, now, hindi)) } }
+                        }
                     }
                 }
             }

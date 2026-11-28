@@ -1,6 +1,16 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 package `in`.wedevit.care
 
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -193,6 +203,89 @@ internal fun doctorTilesPaired(widthDp: Float, fontScale: Float): Boolean = widt
 /** Text that wraps only between words. */
 internal val DoctorWholeWords = TextStyle(lineBreak = LineBreak.Heading, hyphens = Hyphens.None)
 
+/** How many rows a Home section shows before "See all" (owner, 25 Nov: "too much scrolling, too many cards"). */
+internal const val DOCTOR_HOME_ROWS = 3
+
+/** One count in [DoctorCountStrip]: a real number, its label, and where a tap goes. */
+internal class DoctorCount(val label: String, val count: Int?, val tone: DoctorTone, val tag: String, val note: String? = null, val onClick: () -> Unit)
+
+/**
+ * The day's counts as one compact strip (25 Nov declutter): one card with equal cells split by hairlines, instead of a
+ * grid of big tiles. All cells sit in one row when the labels fit at this text size; otherwise two per row. Each cell is a 64 dp button.
+ */
+@Composable internal fun DoctorCountStrip(cells: List<DoctorCount>, modifier: Modifier = Modifier) {
+    BoxWithConstraints(modifier.fillMaxWidth()) {
+        val perRow = if (maxWidth.value / LocalDensity.current.fontScale.coerceAtLeast(1f) >= 80f * cells.size) cells.size else 2
+        Surface(Modifier.fillMaxWidth().saharaAppear(), shape = RoundedCornerShape(SaharaRadius.Lg), color = Paper, border = BorderStroke(1.dp, DoctorHairline)) {
+            Column {
+                cells.chunked(perRow).forEachIndexed { r, row ->
+                    if (r > 0) HorizontalDivider(color = DoctorHairline)
+                    Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
+                        row.forEachIndexed { i, cell ->
+                            if (i > 0) VerticalDivider(color = DoctorHairline)
+                            Column(Modifier.weight(1f).fillMaxHeight().heightIn(min = 64.dp).clickable(role = Role.Button, onClick = cell.onClick).testTag(cell.tag)
+                                .semantics(mergeDescendants = true) { contentDescription = "${cell.count ?: "—"} ${cell.label}" + (cell.note?.let { ", $it" } ?: "") }
+                                .padding(horizontal = 6.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                                Text(cell.count?.let { "${doctorCountUp(it)}" } ?: "—", fontSize = 22.sp, lineHeight = 26.sp, fontWeight = FontWeight.Bold, color = cell.tone.ink, style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"))
+                                Text(cell.label, fontSize = 13.sp, lineHeight = 17.sp, color = DoctorCardSub, textAlign = TextAlign.Center, maxLines = 2, style = DoctorWholeWords)
+                                cell.note?.let { Text(it, fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Bold, color = DoctorTones.Attention.ink, maxLines = 1) }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/** A Home section's header: title with its count, and an optional "See all" link on the right. 48 dp, no card. */
+@Composable internal fun DoctorGroupHeader(title: String, count: Int, modifier: Modifier = Modifier, actionLabel: String? = null, actionTag: String? = null, onAction: (() -> Unit)? = null) {
+    Row(modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text(if (count > 0) "$title · $count" else title, Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 18.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 2, style = DoctorWholeWords)
+        if (actionLabel != null && onAction != null) TextButton(onClick = onAction, modifier = Modifier.heightIn(min = 48.dp).then(if (actionTag != null) Modifier.testTag(actionTag) else Modifier)) {
+            Text(actionLabel, color = RustText, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false); Icon(Icons.Default.ChevronRight, null, Modifier.size(18.dp), tint = RustText)
+        }
+    }
+}
+
+/** One white card holding a section's rows split by hairlines (25 Nov declutter), instead of one card per row. */
+@Composable internal fun DoctorGroupedList(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+    Surface(modifier.fillMaxWidth().saharaAppear(), shape = RoundedCornerShape(SaharaRadius.Lg), color = Paper, border = BorderStroke(1.dp, DoctorHairline)) { Column(content = content) }
+}
+
+/** Rows of a grouped list with a hairline between them. */
+@Composable internal fun <T> ColumnScope.DoctorGroupRows(rows: List<T>, row: @Composable (T) -> Unit) {
+    rows.forEachIndexed { i, item -> if (i > 0) HorizontalDivider(Modifier.padding(start = 12.dp), color = DoctorHairline); row(item) }
+}
+
+/** One line in a grouped list: a time (or an icon, or the name's initial), the name, one detail line, an optional pill, a chevron. 56 dp at least. */
+@Composable internal fun DoctorGroupRow(title: String, detail: String, onClick: () -> Unit, modifier: Modifier = Modifier, lead: String? = null, leadTone: DoctorTone = DoctorTones.Indigo, icon: ImageVector? = null, pill: Pair<String, DoctorTone>? = null, description: String? = null) {
+    Row(modifier.fillMaxWidth().heightIn(min = 56.dp).clickable(role = Role.Button, onClick = onClick)
+        .semantics(mergeDescendants = true) { if (description != null) contentDescription = description }
+        .padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        when {
+            lead != null -> Text(lead, Modifier.widthIn(min = 64.dp), fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Bold, color = leadTone.ink, style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"))
+            icon != null -> Icon(icon, null, Modifier.size(22.dp), tint = DoctorAccent)
+            else -> { val tone = DoctorTones.forName(title); Box(Modifier.size(36.dp).background(tone.wash, CircleShape).border(1.dp, tone.solid, CircleShape), contentAlignment = Alignment.Center) { Text(title.trim().take(1).uppercase(), color = tone.ink, fontWeight = FontWeight.Bold, fontSize = 16.sp) } }
+        }
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(1.dp)) {
+            Text(title, fontSize = 16.sp, lineHeight = 21.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            if (detail.isNotBlank()) Text(detail, fontSize = 14.sp, lineHeight = 19.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+        pill?.let { DoctorPill(it.first, it.second) }
+        Icon(Icons.Default.ChevronRight, null, Modifier.size(20.dp), tint = DoctorCardSub)
+    }
+}
+
+/** "See all (n)" / "Show fewer" under a grouped list that holds more than [DOCTOR_HOME_ROWS] rows. */
+@Composable internal fun DoctorSeeAllToggle(total: Int, open: Boolean, hindi: Boolean, tag: String, onToggle: () -> Unit) {
+    if (total <= DOCTOR_HOME_ROWS) return
+    HorizontalDivider(color = DoctorHairline)
+    TextButton(onClick = onToggle, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag(tag)) {
+        Text(if (open) careTr(hindi, "Show fewer", "कम दिखाएँ") else careTr(hindi, "See all", "सब देखें") + " ($total)", color = RustText, fontWeight = FontWeight.SemiBold)
+    }
+}
+
 /** Compact register row: coloured initial, name, one line of detail, status pill. 64dp tall at most text sizes. [section]: the list's colour, as the row's wash and edge. */
 @Composable internal fun DoctorRegisterRow(name: String, detail: String, onClick: () -> Unit, modifier: Modifier = Modifier, pill: Pair<String, DoctorTone>? = null, lead: String? = null, section: DoctorTone? = null) {
     val press = remember { MutableInteractionSource() }
@@ -221,78 +314,251 @@ internal fun doctorPatientStatus(person: Person, items: List<CareItem>, now: Lon
     return if (check.title == DoctorReportedMood.HARD.title) careTr(hindi, "Hard day", "मुश्किल दिन") to DoctorTones.Attention else null
 }
 
+// ───────────────────────────── Doctor Home (25 Nov, owner: "looks AI-generated") ─────────────────────────────
+// One screen for the walkthrough and the signed-in workspace, so the two never drift: a large title-left top bar, one visits
+// ring with three stat lines, the next visit, then plain grouped rows. No cards, no pills, no tinted boxes.
+
+/** One row on doctor Home: a time in a 72dp lead column ([lead]) or a plain [icon]. [alert]: the supporting line is in the error colour (a hard day). */
+internal class DoctorHomeLine(val tag: String, val headline: String, val supporting: String?, val onClick: () -> Unit,
+    val lead: String? = null, val icon: ImageVector? = null, val alert: Boolean = false)
+
+/** A number beside the ring. A tap scrolls to the group [scrollTo] when that group is shown, otherwise runs [onClick]. [alert]: red when above 0. */
+internal class DoctorHomeStat(val count: Int?, val label: String, val tag: String, val alert: Boolean = false, val scrollTo: String? = null, val onClick: () -> Unit = {})
+
+/** The next visit: time (or date) over "Next", the patient, one detail line and an Open button. */
+internal class DoctorHomeNext(val time: String, val name: String, val detail: String, val onOpen: () -> Unit)
+
+/** A plain row above the ring for something that needs attention (verification, a notice, an error). Colour only when [alert]. */
+internal class DoctorHomeBanner(val tag: String, val headline: String, val supporting: String?, val icon: ImageVector, val alert: Boolean = false,
+    val onClick: (() -> Unit)? = null, val trailing: (@Composable () -> Unit)? = null)
+
 /**
- * Doctor Home: three real counts as tiles (each jumps to its list below), then the Today queue, what is coming up and the week's check-ins.
- * [firstIndex] is how many list items the caller drew above, so the Check-ins tile can scroll to its section.
+ * Rows under one label. [action] puts a text button on the label (tag [actionTag]); otherwise, when there are more rows than [cap],
+ * the label gets "See all", which opens a sheet of every row (nothing expands in place). A group with no rows shows [empty] (and
+ * [emptyAction]) or, when [empty] is null, is not drawn.
  */
-internal fun LazyListScope.doctorConnectedHomeItems(people: List<Person>, items: List<CareItem>, now: Long, hindi: Boolean, onVisit: (String) -> Unit, onProgress: (String) -> Unit, onPatients: () -> Unit,
-    onScrollTo: (Int) -> Unit = {}, firstIndex: Int = 0, zone: ZoneId = ZoneId.systemDefault()) {
-    val t = { en: String, hi: String -> careTr(hindi, en, hi) }
-    val today = Instant.ofEpochMilli(now).atZone(zone).toLocalDate()
-    val visits = DoctorConnectedHome.upcomingVisits(people, items, now, zone)
-    val (todayVisits, laterVisits) = visits.partition { it.item.due > 0 && Instant.ofEpochMilli(it.item.due).atZone(zone).toLocalDate() == today }
-    val checks = DoctorConnectedHome.recentCheckIns(people, items, now)
-    val (todayChecks, weekChecks) = checks.partition { Instant.ofEpochMilli(it.second.created).atZone(zone).toLocalDate() == today }
-    val hard = checks.count { it.second.title == DoctorReportedMood.HARD.title }
-    // Index of the Check-ins section: tiles (1) + Today title (1) + today rows or empty (>=1) + coming-up block.
-    val todayRows = (todayVisits.size + todayChecks.size).coerceAtLeast(1)
-    val laterRows = if (laterVisits.isEmpty()) 0 else 1 + laterVisits.take(5).size
-    val checksIndex = firstIndex + 2 + todayRows + laterRows
-    val todayIndex = firstIndex + 1
-    val laterIndex = if (laterVisits.isEmpty()) checksIndex else firstIndex + 2 + todayRows
-    // Each tile is a count that jumps to its own list on this page. Patients is not repeated here: the bottom bar opens it.
-    item(key = "home-tiles") {
-        BoxWithConstraints {
-            val paired = doctorTilesPaired(maxWidth.value, LocalDensity.current.fontScale)
-            val tiles: List<@Composable (Modifier) -> Unit> = listOf(
-                { m -> DoctorStatTile(Icons.Default.Today, todayVisits.size, t("Visits today", "आज की विज़िट"), DoctorTones.Indigo, { if (people.isEmpty()) onPatients() else onScrollTo(todayIndex) }, "doctor-home-tile-today", m) },
-                { m -> DoctorStatTile(Icons.Default.EventAvailable, laterVisits.size, t("Coming up", "आगे की विज़िट"), DoctorTones.Plum, { if (people.isEmpty()) onPatients() else onScrollTo(laterIndex) }, "doctor-home-tile-upcoming", m) },
-                { m -> DoctorStatTile(Icons.Default.Favorite, checks.size, t("Check-ins, 7 days", "हालचाल, 7 दिन"), DoctorTones.Teal, { if (people.isEmpty()) onPatients() else onScrollTo(checksIndex) }, "doctor-home-tile-checkins", m,
-                    pill = if (hard > 0) t("$hard hard", "$hard मुश्किल") to DoctorTones.Attention else null) },
-            )
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                if (paired) tiles.chunked(2).forEach { pair -> Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) { pair.forEach { it(Modifier.weight(1f).fillMaxHeight().saharaStagger(tiles.indexOf(it))) } } }
-                else tiles.forEachIndexed { i, tile -> tile(Modifier.fillMaxWidth().saharaStagger(i)) }
+internal class DoctorHomeGroup(val key: String, val title: String, val rows: List<DoctorHomeLine>, val action: String? = null, val actionTag: String? = null,
+    val onAction: (() -> Unit)? = null, val cap: Int = Int.MAX_VALUE, val empty: String? = null, val emptyAction: String? = null, val onEmptyAction: (() -> Unit)? = null)
+
+/** Everything doctor Home shows. [visitsDone] / [visitsTotal]: today's visits (null while loading). The ring scrolls to [ringScrollTo] or runs [onRing]. */
+internal class DoctorHomeState(val title: String, val banners: List<DoctorHomeBanner>, val visitsDone: Int?, val visitsTotal: Int?, val ringTag: String,
+    val ringScrollTo: String?, val onRing: () -> Unit, val stats: List<DoctorHomeStat>, val next: DoctorHomeNext?, val groups: List<DoctorHomeGroup>)
+
+/** The groups Home draws, in order (empty groups without an empty line are left out). */
+internal fun doctorHomeShownGroups(state: DoctorHomeState): List<DoctorHomeGroup> = state.groups.filter { it.rows.isNotEmpty() || it.empty != null }
+
+/** The list index of a group: the banners are one item, the ring one, the next visit one. -1 when the group is not shown. */
+internal fun doctorHomeGroupIndex(state: DoctorHomeState, key: String?): Int {
+    val i = doctorHomeShownGroups(state).indexOfFirst { it.key == key }
+    if (key == null || i < 0) return -1
+    return (if (state.banners.isEmpty()) 0 else 1) + 1 + (if (state.next == null) 0 else 1) + i
+}
+
+/**
+ * Doctor Home. Top bar actions: search (opens Patients), language, the doctor's initials (opens Account). The "New" button opens a
+ * sheet: record a goals-of-care talk (then a patient picker), schedule a visit, add a patient. [listTag] goes on the list.
+ */
+@Composable internal fun DoctorHomeScreen(state: DoctorHomeState, avatarName: String, onSearch: () -> Unit, onAccount: () -> Unit,
+    talkPatients: List<Pair<String, String>>, onTalk: (String) -> Unit, onScheduleVisit: () -> Unit, onAddPatient: () -> Unit, listTag: String,
+    modifier: Modifier = Modifier, listState: LazyListState = rememberLazyListState(), refreshing: Boolean? = null, onRefresh: () -> Unit = {}) {
+    val t = careText()
+    val scope = rememberCoroutineScope()
+    var newOpen by rememberSaveable { mutableStateOf(false) }
+    var talkOpen by rememberSaveable { mutableStateOf(false) }
+    var allOf by rememberSaveable { mutableStateOf<String?>(null) }
+    val groups = doctorHomeShownGroups(state)
+    val go: (String?, () -> Unit) -> Unit = { key, fallback ->
+        val index = doctorHomeGroupIndex(state, key)
+        if (index >= 0) scope.launch { listState.animateScrollToItem(index) } else fallback()
+    }
+    SaharaPage(state.title, modifier, large = true, listState = listState, listModifier = Modifier.testTag(listTag), refreshing = refreshing, onRefresh = onRefresh,
+        actions = {
+            IconButton(onClick = onSearch, modifier = Modifier.testTag("doctor-home-search")) { Icon(Icons.Default.Search, t("Search patients", "मरीज़ खोजें")) }
+            CareLanguageMenu(compact = true)
+            IconButton(onClick = onAccount, modifier = Modifier.testTag("doctor-home-account")) { DoctorInitials(avatarName, t("Account", "खाता")) }
+        },
+        fab = { expanded -> ExtendedFloatingActionButton(text = { Text(t("New", "नया")) }, icon = { Icon(Icons.Default.Add, null) }, onClick = { newOpen = true },
+            modifier = Modifier.testTag("doctor-home-new"), expanded = expanded) }) {
+        if (state.banners.isNotEmpty()) item(key = "home-banners") {
+            Column(Modifier.fillMaxWidth()) {
+                state.banners.forEach { b ->
+                    SaharaRow(b.headline, Modifier.testTag(b.tag), supporting = b.supporting, supportingColor = if (b.alert) MaterialTheme.colorScheme.error else Color.Unspecified,
+                        icon = b.icon, tone = if (b.alert) SaharaTone.Error else SaharaTone.Neutral, trailing = b.trailing, onClick = b.onClick, chevron = false)
+                }
+                HorizontalDivider()
+            }
+        }
+        item(key = "home-hero") { DoctorHomeHero(state, go) }
+        state.next?.let { next -> item(key = "home-next") {
+            SaharaRow(next.name, Modifier.testTag("doctor-home-next"), supporting = next.detail, chevron = false,
+                leading = { DoctorHomeTime(next.time, t("Next", "अगली"), accent = true) },
+                trailing = { FilledTonalButton(onClick = next.onOpen, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-home-next-open")) { Text(t("Open", "खोलें")) } })
+        } }
+        groups.forEach { group -> item(key = "home-group-${group.key}") { DoctorHomeGroupBlock(group) { allOf = group.key } } }
+    }
+    if (newOpen) SaharaActionSheet(t("New", "नया"), listOfNotNull(
+        if (talkPatients.isNotEmpty()) SheetAction(t("Record a goals-of-care talk", "देखभाल के लक्ष्यों की बातचीत रिकॉर्ड करें"), Icons.Default.Mic, "doctor-home-new-talk") { talkOpen = true } else null,
+        SheetAction(t("Schedule a visit", "विज़िट तय करें"), Icons.Default.CalendarMonth, "doctor-home-new-visit", onClick = onScheduleVisit),
+        SheetAction(t("Add a patient", "मरीज़ जोड़ें"), Icons.Default.PersonAdd, "doctor-home-new-patient", onClick = onAddPatient),
+    ), onDismiss = { newOpen = false })
+    if (talkOpen) SaharaActionSheet(t("Choose the patient", "मरीज़ चुनें"), talkPatients.map { (id, name) -> SheetAction(name, Icons.Default.Person, "doctor-home-talk-$id") { onTalk(id) } },
+        onDismiss = { talkOpen = false })
+    groups.firstOrNull { it.key == allOf }?.let { group ->
+        SaharaActionSheet(group.title, group.rows.map { r -> SheetAction(r.headline, r.icon ?: Icons.Default.Event, "${r.tag}-all",
+            supporting = listOfNotNull(r.lead, r.supporting).joinToString(" · ").ifBlank { null }, onClick = r.onClick) }, onDismiss = { allOf = null })
+    }
+}
+
+/** The doctor's initials in a 36dp tonal circle (the Account button). */
+@Composable private fun DoctorInitials(name: String, description: String) {
+    val initials = name.substringBefore('@').split(' ', '.', '_').filter { it.isNotBlank() && !it.equals("dr", ignoreCase = true) }
+        .mapNotNull { it.firstOrNull()?.uppercaseChar() }.take(2).joinToString("").ifBlank { "?" }
+    Surface(shape = CircleShape, color = MaterialTheme.colorScheme.secondaryContainer, contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        modifier = Modifier.size(36.dp).clearAndSetSemantics { contentDescription = description }) {
+        Box(contentAlignment = Alignment.Center) { Text(initials, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold, maxLines = 1) }
+    }
+}
+
+/** A time in the 72dp lead column, with an optional small line under it. [accent]: larger and in the primary colour (the next visit). */
+@Composable private fun DoctorHomeTime(time: String, under: String?, accent: Boolean) {
+    Column(Modifier.widthIn(min = 72.dp)) {
+        Text(time, fontSize = if (accent) 18.sp else 15.sp, lineHeight = if (accent) 22.sp else 20.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
+            color = if (accent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface, style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"))
+        if (under != null) Text(under, fontSize = 12.sp, lineHeight = 16.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
+    }
+}
+
+/** The one visual anchor: the visits ring (primary colour) and up to three stat lines beside it; stacked at very large text. */
+@Composable private fun DoctorHomeHero(state: DoctorHomeState, go: (String?, () -> Unit) -> Unit) {
+    val t = careText()
+    val scheme = MaterialTheme.colorScheme
+    val done = state.visitsDone; val total = state.visitsTotal
+    val progress = if (done != null && total != null && total > 0) done.toFloat() / total else 0f
+    val centre = when { done == null || total == null -> "—"; total == 0 -> "0"; else -> t("$done of $total", "$total में से $done") }
+    val described = when { done == null || total == null -> t("Visits today", "आज की विज़िट"); else -> t("$done of $total visits done today", "आज $total में से $done विज़िट पूरी") }
+    // The ring is a fixed 120dp, so its centre text does not grow with the font scale (the ring's description carries the numbers).
+    val density = LocalDensity.current
+    val big = with(density) { 24.dp.toSp() }; val small = with(density) { 13.dp.toSp() }
+    val ring: @Composable () -> Unit = {
+        SaharaRing(listOf(RingArc(progress)), described, Modifier.testTag(state.ringTag), size = 120.dp, onClick = { go(state.ringScrollTo, state.onRing) }) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(centre, fontSize = big, lineHeight = big * 1.2f, fontWeight = FontWeight.Bold, maxLines = 1, color = scheme.onSurface)
+                Text(if (total == 0) t("visits today", "आज विज़िट") else t("visits", "विज़िट"), fontSize = small, lineHeight = small * 1.3f, maxLines = 1, color = scheme.onSurfaceVariant)
             }
         }
     }
-    if (people.isEmpty()) return
-    item(key = "home-today-title") { DoctorHomeSection(t("Today", "आज"), todayVisits.size + todayChecks.size, DoctorTones.Indigo, Icons.Default.Today) }
-    if (todayVisits.isEmpty() && todayChecks.isEmpty()) item(key = "home-today-empty") { DoctorHomeEmpty(Icons.Default.EventAvailable, t("Nothing due today", "आज कुछ तय नहीं")) }
-    items(todayVisits, key = { "home-today-${it.item.id}" }) { visit ->
-        DoctorRegisterRow(visit.person.name, visit.item.title, { onVisit(visit.person.id) }, Modifier.saharaStagger(3 + todayVisits.indexOf(visit)), lead = doctorTimeOrDay(visit.item, hindi, zone), section = DoctorTones.Indigo)
-    }
-    items(todayChecks, key = { "home-today-check-${it.second.id}" }) { (person, check) ->
-        DoctorRegisterRow(person.name, checkInMoodLabel(check.title, hindi), { onProgress(person.id) }, Modifier.saharaStagger(3 + todayVisits.size + todayChecks.indexOfFirst { it.second.id == check.id }), lead = DateTimeFormatter.ofPattern("h:mm a", careLocale(hindi)).withZone(zone).format(Instant.ofEpochMilli(check.created)),
-            pill = if (check.title == DoctorReportedMood.HARD.title) t("Hard day", "मुश्किल दिन") to DoctorTones.Attention else null, section = DoctorTones.Indigo)
-    }
-    if (laterVisits.isNotEmpty()) {
-        item(key = "home-visits-title") { DoctorHomeSection(t("Coming up", "आगे की विज़िट"), laterVisits.size, DoctorTones.Plum, Icons.Default.EventAvailable) }
-        items(laterVisits.take(5), key = { "home-visit-${it.item.id}" }) { visit ->
-            DoctorRegisterRow(visit.person.name, "${doctorWhen(visit.item, hindi, zone)} · ${visit.item.title}", { onVisit(visit.person.id) }, Modifier.saharaStagger(4 + todayRows + laterVisits.indexOf(visit)), section = DoctorTones.Plum)
+    val stats: @Composable ColumnScope.() -> Unit = {
+        state.stats.forEach { s ->
+            val red = s.alert && (s.count ?: 0) > 0
+            Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clip(RoundedCornerShape(12.dp)).clickable(role = Role.Button) { go(s.scrollTo, s.onClick) }.testTag(s.tag)
+                .semantics(mergeDescendants = true) { contentDescription = "${s.count ?: "—"} ${s.label}" }.padding(horizontal = 8.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+                Text(s.count?.toString() ?: "—", Modifier.widthIn(min = 32.dp), fontSize = 22.sp, lineHeight = 26.sp, fontWeight = FontWeight.Bold,
+                    color = if (red) scheme.error else scheme.onSurface, style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"))
+                Spacer(Modifier.width(12.dp))
+                Text(s.label, Modifier.weight(1f), fontSize = 16.sp, lineHeight = 20.sp, color = if (red) scheme.error else scheme.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis, style = DoctorWholeWords)
+            }
         }
     }
-    item(key = "home-checks-title") { DoctorHomeSection(t("Check-ins", "हालचाल"), weekChecks.size, DoctorTones.Teal, Icons.Default.Favorite) }
-    if (weekChecks.isEmpty()) item(key = "home-checks-empty") { DoctorHomeEmpty(Icons.Default.Favorite, t("No other check-ins this week", "इस हफ़्ते और कोई हालचाल नहीं")) }
-    items(weekChecks, key = { "home-check-${it.second.id}" }) { (person, check) ->
-        DoctorRegisterRow(person.name, "${checkInMoodLabel(check.title, hindi)} · ${DateTimeFormatter.ofPattern("d MMM, h:mm a", careLocale(hindi)).withZone(zone).format(Instant.ofEpochMilli(check.created))}", { onProgress(person.id) },
-            pill = if (check.title == DoctorReportedMood.HARD.title) t("Hard day", "मुश्किल दिन") to DoctorTones.Attention else null, section = DoctorTones.Teal)
+    if (density.fontScale >= 1.5f) Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).testTag("doctor-home-hero"), horizontalAlignment = Alignment.CenterHorizontally) {
+        ring(); Spacer(Modifier.height(12.dp)); Column(Modifier.fillMaxWidth(), content = stats)
+    } else Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).testTag("doctor-home-hero"), verticalAlignment = Alignment.CenterVertically) {
+        ring(); Spacer(Modifier.width(16.dp)); Column(Modifier.weight(1f), content = stats)
     }
 }
+
+/** A group: the label (Material settings style, with its action) and plain rows; no card. */
+@Composable private fun DoctorHomeGroupBlock(group: DoctorHomeGroup, onAll: () -> Unit) {
+    val t = careText()
+    val capped = group.rows.size > group.cap
+    val action = group.action ?: if (capped) t("See all", "सब देखें") else null
+    Column(Modifier.fillMaxWidth()) {
+        Row(Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp, top = 24.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(group.title, Modifier.weight(1f).a11yHeading(), style = MaterialTheme.typography.titleSmall.copy(fontSize = 16.sp), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
+            if (action != null) TextButton(onClick = { group.onAction?.invoke() ?: onAll() }, modifier = Modifier.heightIn(min = 48.dp).then(if (group.actionTag != null) Modifier.testTag(group.actionTag) else Modifier)) { Text(action) }
+        }
+        group.rows.take(group.cap).forEach { r ->
+            val lead: (@Composable () -> Unit)? = if (r.lead != null) ({ DoctorHomeTime(r.lead, null, accent = false) }) else null
+            SaharaRow(r.headline, Modifier.testTag(r.tag), supporting = r.supporting, supportingColor = if (r.alert) MaterialTheme.colorScheme.error else Color.Unspecified,
+                icon = r.icon, leading = lead, onClick = r.onClick)
+        }
+        if (group.rows.isEmpty() && group.empty != null) Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(start = 16.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(group.empty, Modifier.weight(1f).testTag("doctor-home-${group.key}-empty"), fontSize = 16.sp, lineHeight = 22.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            if (group.emptyAction != null) TextButton(onClick = { group.onEmptyAction?.invoke() }, modifier = Modifier.heightIn(min = 48.dp)) { Text(group.emptyAction) }
+        }
+    }
+}
+
+/** Today's visits across the doctor's patients: (completed, all not cancelled). Feeds the Home ring. */
+internal fun doctorVisitsToday(people: List<Person>, items: List<CareItem>, now: Long, zone: ZoneId = ZoneId.systemDefault()): Pair<Int, Int> {
+    val ids = people.map { it.id }.toSet()
+    val today = Instant.ofEpochMilli(now).atZone(zone).toLocalDate()
+    val status = items.filter { it.personId in ids && it.kind == "visit" && it.due > 0 && Instant.ofEpochMilli(it.due).atZone(zone).toLocalDate() == today &&
+        (!CareEntryCodec.isStructured(it.detail) || isDoctorStructuredVisit(it)) }.map { CareEntryCodec.decode(it.detail)?.status }.filter { it != "cancelled" }
+    return status.count { it == "completed" } to status.size
+}
+
+/**
+ * Signed-in doctor Home from real connected patients only: the ring (today's visits), stat lines (coming up, hard days, patients), the
+ * next visit, then Today (visits and check-ins), Coming up (4 rows, the rest on Schedule) and Check-ins this week (4 rows, the rest in a sheet).
+ */
+internal fun doctorConnectedHomeState(people: List<Person>, items: List<CareItem>, now: Long, hindi: Boolean, banners: List<DoctorHomeBanner>,
+    onVisit: (String) -> Unit, onProgress: (String) -> Unit, onPatients: () -> Unit, onSchedule: () -> Unit, zone: ZoneId = ZoneId.systemDefault()): DoctorHomeState {
+    val t = { en: String, hi: String -> careTr(hindi, en, hi) }
+    val locale = careLocale(hindi)
+    val today = Instant.ofEpochMilli(now).atZone(zone).toLocalDate()
+    fun day(item: CareItem) = Instant.ofEpochMilli(item.due).atZone(zone).toLocalDate()
+    val visits = DoctorConnectedHome.upcomingVisits(people, items, now, zone)
+    val next = visits.firstOrNull { it.item.due > 0 }
+    val (todayVisits, laterVisits) = visits.partition { it.item.due > 0 && day(it.item) == today }
+    val checks = DoctorConnectedHome.recentCheckIns(people, items, now)
+    val (todayChecks, weekChecks) = checks.partition { Instant.ofEpochMilli(it.second.created).atZone(zone).toLocalDate() == today }
+    fun hard(check: CareItem) = check.title == DoctorReportedMood.HARD.title
+    val clock = DateTimeFormatter.ofPattern("h:mm a", locale).withZone(zone)
+    val (done, total) = doctorVisitsToday(people, items, now, zone)
+    val todayRows = todayVisits.filter { it !== next }.map { v -> DoctorHomeLine("home-today-${v.item.id}", v.person.name, v.item.title, { onVisit(v.person.id) }, lead = doctorTimeOrDay(v.item, hindi, zone)) } +
+        todayChecks.map { (person, check) -> DoctorHomeLine("home-today-check-${check.id}", person.name, checkInMoodLabel(check.title, hindi), { onProgress(person.id) },
+            lead = clock.format(Instant.ofEpochMilli(check.created)), alert = hard(check)) }
+    val laterRows = laterVisits.filter { it !== next }.map { v -> DoctorHomeLine("home-visit-${v.item.id}", v.person.name, "${doctorWhen(v.item, hindi, zone)} · ${v.item.title}", { onVisit(v.person.id) }, icon = Icons.Default.Event) }
+    val weekRows = weekChecks.map { (person, check) -> DoctorHomeLine("home-check-${check.id}", person.name,
+        "${checkInMoodLabel(check.title, hindi)} · ${DateTimeFormatter.ofPattern("d MMM", locale).withZone(zone).format(Instant.ofEpochMilli(check.created))}", { onProgress(person.id) },
+        icon = Icons.Default.FavoriteBorder, alert = hard(check)) }
+    val groups = if (people.isEmpty()) listOf(DoctorHomeGroup("today", t("Today", "आज"), emptyList(), empty = t("No patients yet", "अभी कोई मरीज़ नहीं"),
+        emptyAction = t("Add a patient", "मरीज़ जोड़ें"), onEmptyAction = onPatients))
+    else listOf(
+        DoctorHomeGroup("today", t("Today", "आज"), todayRows, action = t("See schedule", "शेड्यूल देखें"), actionTag = "home-today-schedule", onAction = onSchedule,
+            empty = if (todayVisits.isEmpty() && todayChecks.isEmpty()) t("Nothing due today", "आज कुछ तय नहीं") else null, emptyAction = t("Schedule a visit", "विज़िट तय करें"), onEmptyAction = onSchedule),
+        DoctorHomeGroup("coming", t("Coming up", "आगे की विज़िट"), laterRows, action = if (laterRows.size > DOCTOR_HOME_LIST) t("See all", "सब देखें") else null,
+            actionTag = "home-visits-all", onAction = onSchedule, cap = DOCTOR_HOME_LIST),
+        DoctorHomeGroup("checks", t("Check-ins this week", "इस हफ़्ते के हालचाल"), weekRows, actionTag = "home-checks-all", cap = DOCTOR_HOME_LIST,
+            empty = t("No check-ins this week", "इस हफ़्ते कोई हालचाल नहीं")),
+    )
+    val homeNext = next?.let { v ->
+        val isToday = day(v.item) == today
+        DoctorHomeNext(if (isToday) doctorTimeOrDay(v.item, hindi, zone) else DateTimeFormatter.ofPattern("d MMM", locale).withZone(zone).format(Instant.ofEpochMilli(v.item.due)),
+            v.person.name, if (isToday) v.item.title else "${doctorWhen(v.item, hindi, zone)} · ${v.item.title}") { onVisit(v.person.id) }
+    }
+    return DoctorHomeState(today.format(DateTimeFormatter.ofPattern("EEEE, d MMMM", locale)), banners, done, total, "doctor-home-tile-today",
+        ringScrollTo = "today", onRing = if (people.isEmpty()) onPatients else onSchedule,
+        stats = listOf(
+            DoctorHomeStat(laterVisits.size, t("Coming up", "आगे की विज़िट"), "doctor-home-tile-upcoming", scrollTo = "coming", onClick = onSchedule),
+            DoctorHomeStat(checks.count { hard(it.second) }, t("Hard days", "मुश्किल दिन"), "doctor-home-tile-checkins", alert = true, scrollTo = "checks", onClick = onPatients),
+            DoctorHomeStat(people.size, t("Patients", "मरीज़"), "doctor-home-tile-patients", onClick = onPatients),
+        ),
+        next = homeNext, groups = groups)
+}
+
+/** How many rows a Home group shows before "See all". */
+internal const val DOCTOR_HOME_LIST = 4
 
 /** "10:30 AM" for a timed visit today, otherwise "Today". */
 private fun doctorTimeOrDay(item: CareItem, hindi: Boolean, zone: ZoneId): String =
     if (CareEntryCodec.decode(item.detail)?.timed == true) DateTimeFormatter.ofPattern("h:mm a", careLocale(hindi)).withZone(zone).format(Instant.ofEpochMilli(item.due)) else careTr(hindi, "Today", "आज")
 
-/** Section title with a tone bar and count: scannable at a glance. */
-@Composable private fun DoctorHomeSection(title: String, count: Int, tone: DoctorTone, icon: ImageVector) {
-    SaharaSectionHeader(if (count > 0) "$title · $count" else title, Modifier.padding(top = 8.dp), tone = tone, icon = icon)
-}
-
-/** One line with an icon for an empty list. */
-@Composable private fun DoctorHomeEmpty(icon: ImageVector, text: String) {
-    Row(Modifier.fillMaxWidth().background(Paper, RoundedCornerShape(14.dp)).border(1.dp, DoctorHairline, RoundedCornerShape(14.dp)).padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        Icon(icon, null, tint = DoctorTones.Teal.ink, modifier = Modifier.saharaFloat().size(20.dp))
+/** One quiet line with an icon for an empty list (no card: 25 Nov declutter). */
+@Composable internal fun DoctorHomeEmpty(icon: ImageVector, text: String) {
+    Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Icon(icon, null, tint = DoctorTones.Teal.ink, modifier = Modifier.size(20.dp))
         Text(text, fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardSub)
     }
 }

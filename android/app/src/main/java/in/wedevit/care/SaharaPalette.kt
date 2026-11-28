@@ -12,18 +12,19 @@ import androidx.compose.ui.graphics.luminance
  * (3.25:1, bold or large text only), ink on its wash >= 5:1, body text 4.5:1, icons and control edges 3:1.
  */
 object SaharaColors {
-    // Ground and ink
-    val Ground = Color(0xFFFFF8EE)
-    val Surface = Color(0xFFFFFDF9)
-    val Well = Color(0xFFEFE7DF)
-    val Ink = Color(0xFF382E29)
-    val InkSub = Color(0xFF4A3E36)
-    val InkFaint = Color(0xFF5E5249)
+    // Ground and ink. The roles that follow the theme are vars: on Android 12+ CareTheme binds them to the phone's Material You
+    // (dynamic) colours, so older screens that read SaharaColors match the stock Material pieces; otherwise they keep these defaults.
+    var Ground = Color(0xFFFFF8EE); private set
+    var Surface = Color(0xFFFFFDF9); private set
+    var Well = Color(0xFFEFE7DF); private set
+    var Ink = Color(0xFF382E29); private set
+    var InkSub = Color(0xFF4A3E36); private set
+    var InkFaint = Color(0xFF5E5249); private set
     /** Decorative dividers only. */
-    val Line = Color(0xFFE6D8CC)
+    var Line = Color(0xFFE6D8CC); private set
     /** Edges of cards, tiles and controls: 3:1 on cream and paper (WCAG 1.4.11), so a tappable card reads as one. */
-    val Edge = Color(0xFF9C887B)
-    val LineStrong = Color(0xFF8D7B70)
+    var Edge = Color(0xFF9C887B); private set
+    var LineStrong = Color(0xFF8D7B70); private set
 
     // Header band (welcome panel): deep sage green with white text (7:1).
     val Band = Color(0xFF335F50)
@@ -33,17 +34,17 @@ object SaharaColors {
 
     // Calm header (7 Nov): the screen's own cream ground, dark ink text, a hairline below. Replaces the maroon band on the top bar;
     // [Band] stays for the welcome panel. Ink on Ground is above 7:1.
-    val Header = Ground
-    val OnHeader = Ink
-    val OnHeaderSub = InkSub
-    val HeaderRaised = Well
-    val HeaderLine = Line
+    val Header: Color get() = Ground
+    val OnHeader: Color get() = Ink
+    val OnHeaderSub: Color get() = InkSub
+    val HeaderRaised: Color get() = Well
+    val HeaderLine: Color get() = Line
 
     // Primary: soft sage green for buttons, white text (5.4:1, and 4.9:1 as small text on cream); Pressed is the darker step.
-    val Primary = Color(0xFF3B7562)
-    val PrimaryPressed = Color(0xFF2C5A4A)
-    val PrimaryWash = Color(0xFFDDEBE3)
-    val OnPrimary = Color.White
+    var Primary = Color(0xFF3B7562); private set
+    var PrimaryPressed = Color(0xFF2C5A4A); private set
+    var PrimaryWash = Color(0xFFDDEBE3); private set
+    var OnPrimary = Color.White; private set
 
     // Status: never reuse a section accent for these.
     val Success = Color(0xFF3F7A52); val SuccessWash = Color(0xFFDDEDE2)
@@ -53,22 +54,36 @@ object SaharaColors {
     val Info = Color(0xFF43709F); val InfoWash = Color(0xFFE1ECF6)
 
     /** Round 3: the soft warm wash behind Today, so white and tinted cards stand off it (ink keeps >= 7:1). */
-    val GroundWarm = Color(0xFFFBF1E3)
+    var GroundWarm = Color(0xFFFBF1E3); private set
 
     // Premium pass (22 Nov): a barely-there warm gradient on the main screens (cream under the header to a warmer foot), a soft warm
     // shadow for floating surfaces instead of Material's grey, and the selected nav pill as a light sage wash with dark sage icon and label.
     /** Shadow tint for cards and the floating bar: warm brown, not grey, so elevation reads soft on cream. */
     val Shadow = Color(0xFF5A3E2B)
     /** Selected bottom-tab pill: light sage wash; the icon and label on it use [NavOnPill] (about 6:1). */
-    val NavPill = PrimaryWash
-    val NavOnPill = PrimaryPressed
+    var NavPill = Color(0xFFDDEBE3); private set
+    var NavOnPill = Color(0xFF2C5A4A); private set
+
+    private val defaults = listOf(Ground, Surface, Well, Ink, InkSub, InkFaint, Line, Edge, LineStrong, Primary, PrimaryPressed, PrimaryWash, OnPrimary, GroundWarm, NavPill, NavOnPill)
+
+    /**
+     * Follows the phone's Material You colours ([dynamic], Android 12+) or, with null, goes back to Sahara's own calm green scheme.
+     * Called by CareTheme before any screen reads these. Status colours, SOS red and the section tones never change.
+     */
+    fun bind(dynamic: androidx.compose.material3.ColorScheme?) {
+        val v = if (dynamic == null) defaults else listOf(dynamic.surface, dynamic.surfaceContainerLowest, dynamic.surfaceContainerHighest, dynamic.onSurface,
+            dynamic.onSurfaceVariant, dynamic.onSurfaceVariant, dynamic.outlineVariant, dynamic.outline, dynamic.outline, dynamic.primary, dynamic.onPrimaryContainer,
+            dynamic.primaryContainer, dynamic.onPrimary, dynamic.surfaceContainerLow, dynamic.secondaryContainer, dynamic.onSecondaryContainer)
+        Ground = v[0]; Surface = v[1]; Well = v[2]; Ink = v[3]; InkSub = v[4]; InkFaint = v[5]; Line = v[6]; Edge = v[7]; LineStrong = v[8]
+        Primary = v[9]; PrimaryPressed = v[10]; PrimaryWash = v[11]; OnPrimary = v[12]; GroundWarm = v[13]; NavPill = v[14]; NavOnPill = v[15]
+    }
 }
 
 /**
  * The calm warm backdrop for the main family and doctor screens: [SaharaColors.Ground] under the header (so the two meet without a
  * seam) easing to [SaharaColors.GroundWarm] at the foot. Ink stays >= 7:1 on every stop.
  */
-val SaharaBackdrop: androidx.compose.ui.graphics.Brush =
+val SaharaBackdrop: androidx.compose.ui.graphics.Brush get() =
     androidx.compose.ui.graphics.Brush.verticalGradient(0f to SaharaColors.Ground, .35f to SaharaColors.Ground, 1f to SaharaColors.GroundWarm)
 
 /**
@@ -120,12 +135,12 @@ internal val DoctorCardReport get() = SaharaColors.Surface
 internal val DoctorCardMint = SaharaTone.Teal.wash
 
 /** Text tiers: solid colours, never alpha-blended ink (faded text on a Redmi, 4 Nov). */
-internal val DoctorCardInk = SaharaColors.Ink
-internal val DoctorCardSub = SaharaColors.InkSub
-internal val DoctorCardFaint = SaharaColors.InkFaint
+internal val DoctorCardInk get() = SaharaColors.Ink
+internal val DoctorCardSub get() = SaharaColors.InkSub
+internal val DoctorCardFaint get() = SaharaColors.InkFaint
 // Premium pass (24 Nov, owner: "cards and cards"): card edges are a soft hairline; controls keep the stronger Edge.
-internal val DoctorHairline = SaharaColors.Line
-internal val DoctorAccent = SaharaColors.Primary
+internal val DoctorHairline get() = SaharaColors.Line
+internal val DoctorAccent get() = SaharaColors.Primary
 
 /** Status tints for intake, visits and review stages: the text and icon colour is each status tone's ink (>= 5:1 on its wash). */
 internal val DoctorStatusGood get() = SaharaTone.Success.ink
@@ -136,7 +151,7 @@ internal val DoctorStatusRest get() = SaharaTone.Error.ink
 internal val DoctorStatusRestBg = SaharaColors.ErrorWash
 
 /** Rust text and icons on white or on any section wash (>= 5.5:1). */
-internal val RustText = SaharaColors.PrimaryPressed
+internal val RustText get() = SaharaColors.PrimaryPressed
 
 /** White or dark ink, whichever reads better on a coloured fill such as a pain-strength block. */
 internal fun readableOn(fill: Color): Color {

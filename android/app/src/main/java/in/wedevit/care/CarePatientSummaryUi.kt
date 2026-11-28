@@ -35,60 +35,11 @@ import java.time.LocalTime
 import java.time.ZoneId
 
 /**
- * "Rahul at a glance": a short, read-only register on Today for patient and family. Every line comes from entries already on the
- * phone and every row opens the page it names (trailing chevron). A read-only family member sees the same rows; [onAddVisit] is null for them.
- */
-@OptIn(ExperimentalLayoutApi::class)
-@Composable fun PatientSummaryCard(vm: CareModel, onSymptoms: () -> Unit, onVisit: (CareItem?) -> Unit, onAddVisit: (() -> Unit)?, onGoals: (CareVersion?) -> Unit, onCarePlan: () -> Unit) {
-    val t = careText(); val hindi = careHindi(); val context = LocalContext.current
-    val items by vm.items.collectAsStateWithLifecycle(); val versions by vm.versions.collectAsStateWithLifecycle()
-    val people by vm.people.collectAsStateWithLifecycle(); val selected by vm.selected.collectAsStateWithLifecycle()
-    val name = people.firstOrNull { it.id == selected }?.name.orEmpty().ifBlank { t("Care", "देखभाल") }
-    val role by vm.viewRole.collectAsStateWithLifecycle()
-    var visitDialog by rememberSaveable { mutableStateOf(false) }
-    val today = LocalDate.now()
-    val store = remember(vm.storageNamespace) { CarePlanStore(context.applicationContext, vm.storageNamespace) }
-    val plans = remember(selected) { runCatching { store.load(selected).ectprs }.getOrDefault(emptyList()) }
-    val summary = remember(items, versions, selected, plans, today) { CarePatientSummaryRules.build(items, versions, selected, plans, today) }
-    val visit = summary.nextVisit
-    val visitLine = when {
-        visit != null -> CareTodayRules.whenLabel(visit.due, today, hindi) + visit.title.takeIf { it.isNotBlank() }?.let { " · $it" }.orEmpty()
-        onAddVisit != null -> t("None planned · Add a visit", "कोई तय नहीं · मुलाक़ात जोड़ें")
-        else -> CarePatientSummaryRules.nextVisit(null, hindi)
-    }
-    val note = summary.latestNote
-    // Four rows, always open; each names its page. Medicines have their own section on Today, so they are not repeated here.
-    // A light teal wash header with the patient's initial; each row below sits on its own section's wash.
-    // Family: the one thing they do most is first and big. (The patient has it on the check-in card above.)
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-    if (role == "Family") Button(onClick = onSymptoms, shape = RoundedCornerShape(SaharaRadius.Md), colors = ButtonDefaults.buttonColors(containerColor = SaharaTone.Teal.solid, contentColor = SaharaTone.Teal.onSolid), modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp).saharaAppear().testTag("summary-note-symptom")) {
-        Icon(Icons.Default.Healing, null, Modifier.size(24.dp)); Spacer(Modifier.width(10.dp)); Text(t("Note a symptom", "तबीयत का नोट लिखें"), fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
-    }
-    // Calm wash header (22 Nov premium pass): the solid teal strip read dark; now a light teal wash with dark ink and a teal initial.
-    Surface(Modifier.fillMaxWidth().saharaAppear().testTag("patient-summary"), shape = RoundedCornerShape(SaharaRadius.Lg), color = SaharaColors.Surface,
-        border = BorderStroke(1.dp, SaharaColors.Line)) { Column {
-        Row(Modifier.fillMaxWidth().background(SaharaTone.Teal.wash).padding(horizontal = 14.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Surface(shape = CircleShape, color = SaharaTone.Teal.solid, modifier = Modifier.size(40.dp)) { Box(contentAlignment = Alignment.Center) { Text(name.take(1).uppercase(), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = SaharaTone.Teal.onSolid) } }
-            Spacer(Modifier.width(12.dp))
-            Text(t("$name at a glance", "$name एक नज़र में"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = SaharaColors.Ink, maxLines = 2, modifier = Modifier.weight(1f).semantics { heading() })
-        }
-        Column(Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        GlanceRow(Icons.Default.Healing, SaharaSection.Symptoms, t("Pain and symptoms", "दर्द और लक्षण"), summary.symptoms.firstOrNull()?.let { CarePatientSummaryRules.symptomLine(it, hindi) } ?: CarePatientSummaryRules.noSymptoms(hindi), "summary-symptoms", onSymptoms)
-        GlanceRow(Icons.Default.Event, SaharaSection.Visits, t("Next visit", "अगली मुलाक़ात"), visitLine, "summary-visit") { if (visit == null && onAddVisit != null) visitDialog = true else onVisit(visit) }
-        GlanceRow(Icons.Default.Description, SaharaSection.GoalsOfCare, t("Goals of care", "देखभाल के लक्ष्य"), CarePatientSummaryRules.noteLine(note, note?.let { date(it.published) }.orEmpty(), hindi), "today-goals-of-care") { onGoals(note) }
-        // 24 Nov meeting: no separate "Emergency plan" row on the patient side; Goals of care (above) covers it.
-        }
-    } }
-    }
-    if (visitDialog) QuickVisitDialog(vm, onDismiss = { visitDialog = false })
-}
-
-/**
  * Next visit from Today: only the day and time are needed (tomorrow 10:00 is filled in). Doctor or hospital and place are optional and
  * stay behind "More details".
  */
 @OptIn(ExperimentalLayoutApi::class)
-@Composable private fun QuickVisitDialog(vm: CareModel, onDismiss: () -> Unit) {
+@Composable internal fun QuickVisitDialog(vm: CareModel, onDismiss: () -> Unit) {
     val t = careText(); val context = LocalContext.current
     val person by vm.selected.collectAsStateWithLifecycle(); val busy by vm.busy.collectAsStateWithLifecycle()
     val capturedPerson = remember { person }; val capturedAccount = remember { vm.accountNamespace }
@@ -129,18 +80,4 @@ import java.time.ZoneId
         if (!canEditCareContext(vm, capturedPerson, capturedAccount)) { vm.message.value = t("Care access changed. Reopen this person's records before saving.", "देखभाल की अनुमति बदल गई है। सहेजने से पहले इस व्यक्ति के रिकॉर्ड फिर से खोलें।"); onDismiss() }
         else vm.saveItem("visit", who.trim().ifBlank { t("Doctor visit", "डॉक्टर से मुलाक़ात") }, place.trim(), LocalDateTime.of(chosen, LocalTime.of(hour, minute)).atZone(zone).toInstant().toEpochMilli(), done = onDismiss)
     }) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Save visit", "मुलाक़ात सहेजें"), fontWeight = FontWeight.SemiBold) } }, dismissButton = { TextButton(onClick = onDismiss, enabled = !busy) { Text(t("Cancel", "रद्द करें")) } })
-}
-
-/** The last row on Today: the one way into every other care page (the Care tab). */
-@Composable fun TodayAllCareTools(onOpen: () -> Unit) {
-    val t = careText()
-    SaharaRegister(tone = SaharaTone.Rust) { SaharaListRow(t("All care tools", "देखभाल के सभी साधन"), Modifier.testTag("today-all-care-tools"), detail = t("Medicines, visits, documents, labs and more", "दवाइयाँ, मुलाक़ातें, कागज़ात, जाँच और बाक़ी सब"),
-        icon = Icons.Default.Apps, tone = SaharaTone.Rust, onClick = onOpen) }
-}
-
-/** One glance row: its section's wash with a solid edge, a solid icon chip, the title, today's line and a chevron; the whole row opens its page. */
-@Composable private fun GlanceRow(icon: ImageVector, tone: SaharaTone, title: String, subtitle: String, tag: String, onClick: () -> Unit) {
-    val shape = RoundedCornerShape(SaharaRadius.Md)
-    // Premium pass (24 Nov): plain rows inside the one summary card, not a coloured box per row; the icon chip keeps the colour.
-    SaharaListRow(title, Modifier.clip(shape).testTag(tag), detail = subtitle, icon = icon, tone = tone, onClick = onClick)
 }

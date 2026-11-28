@@ -32,6 +32,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -84,12 +85,10 @@ import java.time.format.DateTimeFormatter
     // Patients read saved numbers as faces and words; family and the care team keep 0-10 (SymptomScaleRules).
     val role by vm.viewRole.collectAsStateWithLifecycle()
     val pictures = SymptomScaleRules.picturesByDefault(role)
-    SaharaBackHandler(onBack = onBack)
-    LazyColumn(Modifier.fillMaxSize().testTag("symptom-diary"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item(key = "band", contentType = "band") {
-            // One title on the rose Symptoms band, the person's name as its single subtitle line.
-            SaharaSectionBand(t("Symptoms", "लक्षण"), SaharaSection.Symptoms, onBack = onBack, subtitle = person?.name)
-        }
+    // A stock Material page (25 Nov redesign): the title and the back arrow sit in the top bar, which also wires system back.
+    val dir = LocalLayoutDirection.current
+    SaharaPageScaffold(t("Symptoms", "लक्षण"), onBack = onBack, backTag = "symptom-diary-back") { bar ->
+    LazyColumn(Modifier.fillMaxSize().testTag("symptom-diary"), contentPadding = saharaPadding(bar, PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 32.dp), dir), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         // The distress thermometer first, in its own warm block (24 Nov): it is one overall score, not one more symptom.
         if (canEdit && person != null) item(key = "distress") {
             val dayStart = remember { LocalDate.now().atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli() }
@@ -155,6 +154,7 @@ import java.time.format.DateTimeFormatter
         }
         // Prefixed: a typed "Other" symptom name must never clash with the fixed row keys above ("band", "distress", "sort", ...).
         items(shown, key = { "symptom:${it.symptom}" }, contentType = { "symptom-summary" }) { s -> Box(Modifier.animateItem().saharaAppear()) { SymptomSummaryCard(s, hindi, pictures = pictures) { openSymptom = s.symptom } } }
+    }
     }
     summaries.firstOrNull { it.symptom == openSymptom }?.let { s -> SymptomDetailSheet(s, entries, vm, hindi, onClose = { openSymptom = "" }) }
     if (adding && person != null) SymptomNoteEditor(vm, hindi, startSymptom = quickStart.ifBlank { null }, onClose = { adding = false; quickStart = "" })

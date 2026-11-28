@@ -293,7 +293,7 @@ class CareFlowTest {
         ui.onNodeWithText("Clear filters").performClick()
         ui.onNodeWithTag("nearby-count").assertTextContains("${vm.centres.size} centres") // the count is a badge beside the title now
         ui.onNode(hasSetTextAction()).performTextInput("Aster")
-        ui.onNodeWithTag("nearby-list").performScrollToNode(hasTestTag("centre-map"))
+        // The map fills the screen behind the centres sheet (25 Nov), so there is nothing to scroll to.
         ui.waitUntil(30000) { ui.onAllNodes(SemanticsMatcher.expectValue(androidx.compose.ui.semantics.SemanticsProperties.StateDescription, "Map ready")).fetchSemanticsNodes().isNotEmpty() }
         screenshot("centre-map-loaded")
         ui.onNodeWithTag("centre-map").performTouchInput { click(center) }

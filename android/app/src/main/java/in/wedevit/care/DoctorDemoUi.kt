@@ -95,7 +95,10 @@ private val DoctorMist = Peach
 /** A separate walkthrough workspace: no CareModel, account token, Room or network operations. */
 @Composable fun DoctorDemo(onExit: () -> Unit, store: DoctorDemoStore? = null, workflowStore: DoctorWorkflowStore? = null, cloud:CareCloud? = null, enableOnlineAi:Boolean=false, initialPatientId:String?=null, careModel: CareModel? = null, onCareAccount: () -> Unit = {}) {
     var authOpen by remember { mutableStateOf(false) }
-    MaterialTheme(colorScheme = saharaColorScheme, shapes = saharaShapes, typography = saharaTypography()) {
+    // The same Material You colours as the rest of the app (Sahara green on older phones), not a fixed scheme.
+    val themeContext = LocalContext.current; val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+    val colors = remember(themeContext, configuration) { saharaThemeColors(themeContext) }
+    MaterialTheme(colorScheme = colors, shapes = saharaShapes, typography = saharaTypography()) {
         DoctorWorkspace(onExit, store, workflowStore, if(enableOnlineAi) cloud else null, enableOnlineAi, onSignIn={if(enableOnlineAi) authOpen=true}, initialPatientId=initialPatientId, careModel = careModel, onCareAccount = onCareAccount)
         if(enableOnlineAi && authOpen && cloud!=null) DoctorAiAccountSheet(cloud,onDismiss={authOpen=false})
     }
@@ -104,15 +107,6 @@ private val DoctorMist = Peach
 @Composable private fun DoctorWorkspace(onExit: () -> Unit, store: DoctorDemoStore?, workflowStore: DoctorWorkflowStore?, cloud:CareCloud?,enableOnlineAi:Boolean,onSignIn:()->Unit,initialPatientId:String?=null, careModel: CareModel? = null, onCareAccount: () -> Unit = {}) { val t = careText();
     val context = LocalContext.current
     val focus=LocalFocusManager.current
-    DisposableEffect(context) {
-        var owner = context
-        while (owner is ContextWrapper && owner !is Activity) owner = owner.baseContext
-        val window = (owner as? Activity)?.window
-        val controller = window?.let { WindowCompat.getInsetsController(it, it.decorView) }
-        val previous = controller?.isAppearanceLightStatusBars
-        controller?.isAppearanceLightStatusBars = false // light icons on the dark header band
-        onDispose { if (previous != null) controller?.isAppearanceLightStatusBars = previous }
-    }
     val demoStore = store ?: remember { DoctorDemoStore(context.applicationContext) }
     val onlineSession=cloud?.session?.collectAsState()
     val workflowAccountId=onlineSession?.value?.userId
@@ -158,7 +152,8 @@ private val DoctorMist = Peach
     var homePending by remember {mutableStateOf<List<HomeCarePending>>(emptyList())}
     var homeVisits by remember {mutableStateOf<List<HomeVisit>>(emptyList())}
     var homeLoaded by remember {mutableStateOf(false)} // until the first device read finishes, the visit and draft tiles show "—" instead of a false 0
-    LaunchedEffect(sampleCareOpen) {if(!sampleCareOpen) {careFromHome=false; homePending=loadHomeCarePending(context); homeVisits=loadHomeVisits(context); homeLoaded=true}}
+    var homeToday by remember {mutableStateOf<Pair<Int, Int>?>(null)} // today's visits for the Home ring: (completed, not cancelled)
+    LaunchedEffect(sampleCareOpen) {if(!sampleCareOpen) {careFromHome=false; homePending=loadHomeCarePending(context); homeVisits=loadHomeVisits(context); homeToday=loadHomeToday(context); homeLoaded=true}}
     var sampleCareBack by remember {mutableStateOf<(() -> Unit)?>(null)}
     val embeddedCareStates = rememberSaveableStateHolder()
     val carePerson = carePeople.firstOrNull { it.id == carePersonId }
@@ -228,9 +223,11 @@ private val DoctorMist = Peach
         DemoLogin(onContinue = { loggedIn = true }, onExit = onExit)
         return
     }
-    Scaffold(containerColor = DoctorBackground, topBar = {
+    // Home draws its own large title-left top bar (DoctorHomeScreen), so the workspace header and its insets step aside there.
+    val homeShown = !sampleCareOpen && carePersonId == null && workflowRoute == null && patientId == null && tab == 0
+    SaharaStatusBarIcons(lightIcons = false)
+    Scaffold(containerColor = MaterialTheme.colorScheme.background, contentWindowInsets = if (homeShown) WindowInsets(0) else ScaffoldDefaults.contentWindowInsets, topBar = { if (!homeShown) {
         // The calm header: cream ground, ink title and icons, a hairline below (as on the family side).
-        SaharaStatusBarIcons(lightIcons = false)
         Surface(color = SaharaColors.Header, contentColor = SaharaColors.OnHeader) { Column(Modifier.statusBarsPadding()) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 if(sampleCareOpen) IconButton(onClick={sampleCareBack?.invoke() ?: run {sampleCareOpen=false}},enabled=!careNavigationBlocked){Icon(Icons.AutoMirrored.Filled.ArrowBack,t("Back to patient care", "मरीज़ की देखभाल पर वापस"))}
@@ -245,22 +242,22 @@ private val DoctorMist = Peach
                 if (!sampleCareOpen && patient == null && carePersonId == null) DoctorAvatar("Meera", 34)
             }
             HorizontalDivider(color = SaharaColors.HeaderLine)
-        } }
+        } } }
     }, bottomBar = {
-        NavigationBar(Modifier.saharaNavIndicator(if (sampleCareOpen || patientId != null || carePersonId != null) 1 else tab, 4, gap = 8.dp), containerColor = Paper, tonalElevation = 0.dp) {
+        NavigationBar {
             val labels = listOf("Home", "Patients", "Schedule", "Account")
             val icons = listOf(Icons.Default.Home, Icons.Default.PeopleOutline, Icons.Default.CalendarMonth, Icons.Default.PersonOutline)
             labels.forEachIndexed { i, label -> NavigationBarItem(selected = if (sampleCareOpen || patientId != null || carePersonId != null) i == 1 else tab == i, enabled = !careNavigationBlocked, onClick = { navigateCare { sampleCareOpen=false;tab = i; carePersonId = null; patientId = null; progressReportId=null;reportId=null;workflowRoute=null; notice = null } },
-                icon = { Icon(icons[i], null) }, label = { Text(when (label) { "Home" -> t("Home", "होम"); "Patients" -> t("Patients", "मरीज़"); "Schedule" -> t("Schedule", "समय-सूची"); else -> t("Account", "खाता") }) }, modifier = Modifier.testTag("demo-nav-$label"),
-                colors = NavigationBarItemDefaults.colors(indicatorColor = SaharaColors.NavPill, selectedIconColor = SaharaColors.NavOnPill, selectedTextColor = SaharaColors.NavOnPill, unselectedIconColor = SaharaColors.InkSub, unselectedTextColor = SaharaColors.InkSub)) }
+                icon = { Icon(icons[i], null) }, label = { SaharaFitText(when (label) { "Home" -> t("Home", "होम"); "Patients" -> t("Patients", "मरीज़"); "Schedule" -> t("Schedule", "समय-सूची"); else -> t("Account", "खाता") }, maxLines = 1, min = 11f) }, modifier = Modifier.testTag("demo-nav-$label")) }
         }
     }) { padding ->
         Column(Modifier.padding(padding).consumeWindowInsets(padding).fillMaxSize()) {
-            notice?.let { message -> Row(Modifier.fillMaxWidth().background(DoctorCardVisit).padding(start = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+            // On Home the notice is a row at the top of the list instead.
+            if (!homeShown) notice?.let { message -> Row(Modifier.fillMaxWidth().background(DoctorCardVisit).padding(start = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text(message, Modifier.weight(1f).announce(), style = MaterialTheme.typography.bodyMedium, color = DoctorInk)
                 IconButton(onClick = { notice = null }) { Icon(Icons.Default.Close, t("Dismiss status", "सूचना हटाएँ")) }
             } }
-            if(earlierWorkspace && !sampleCareOpen && patientId==null && carePersonId==null) Row(Modifier.fillMaxWidth().padding(horizontal=20.dp),verticalAlignment=Alignment.CenterVertically){Text(t("Earlier demo workspace", "पहले का डेमो वर्कस्पेस"),Modifier.weight(1f));TextButton(onClick={earlierWorkspace=false;workflowRoute=null;tab=0}){Text(t("Return to current workspace", "मौजूदा वर्कस्पेस पर लौटें"))}}
+            if(earlierWorkspace && !sampleCareOpen && patientId==null && carePersonId==null) Row(Modifier.fillMaxWidth().then(if (homeShown) Modifier.statusBarsPadding() else Modifier).padding(horizontal=20.dp),verticalAlignment=Alignment.CenterVertically){Text(t("Earlier demo workspace", "पहले का डेमो वर्कस्पेस"),Modifier.weight(1f));TextButton(onClick={earlierWorkspace=false;workflowRoute=null;tab=0}){Text(t("Return to current workspace", "मौजूदा वर्कस्पेस पर लौटें"))}}
             if(sampleCareOpen) DoctorCareDemoHost(onExit={tab=if(careFromHome) 0 else 1;sampleCareOpen=false;testInitialSection="Hub"},onNavigationBlockedChange={careNavigationBlocked=it},onHeaderBackChange={sampleCareBack=it},initialPersonId=testCarePerson,initialSection=testInitialSection,backLeavesFromInitialSection=careFromHome)
             else if (carePersonId != null && careModel != null) {
                 if (carePerson == null) Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) { Text(t("This care profile is unavailable", "यह देखभाल प्रोफ़ाइल उपलब्ध नहीं है"), style = MaterialTheme.typography.titleLarge); TextButton(onClick = { carePersonId = null }) { Text(t("Back to patients", "मरीज़ों की सूची पर वापस")) } }
@@ -297,8 +294,15 @@ private val DoctorMist = Peach
                     progressReports=progressReports,onOpenReport={progressReportId=it},listState=when(recordTab) {"Progress"->progressListState;"Reports"->reportsListState;else->null},
                     reports=reports,reportQuery=reportQuery,reportCategory=reportCategory,onReportQuery={reportQuery=it},onReportCategory={reportCategory=it},onReportOpen={focus.clearFocus();reportId=it},
                     conversations=DoctorConversationsData.build(shownPatient.id,workflow.versions(shownPatient.id),workflow.draft(shownPatient.id),System.currentTimeMillis()))
-                destination.second == 0 && earlierWorkspace -> DemoHome(demoStore.patients, appointments, ::openPatient, onSchedule = { tab = 2 }, onAdd = { creatingFor = demoStore.patients.first().id }, workflow = workflow, onRequests={workflowRoute="requests"}, onDraft={workflowRoute=it;patientId=it;recordTab="Conversations"})
-                destination.second == 0 -> DoctorHomeWorkday(DoctorTestProfiles.profiles.map { DoctorTestProfiles.personId(it) }.let { ids -> ids.size + carePeople.count { it.id !in ids } }, demoStore.patients, homePending, homeVisits, homeLoaded, workflow, onPatients={tab=1}, onSchedule={tab=2}, onProfile={p->navigateCare {testCarePerson=DoctorTestProfiles.personId(p);testInitialSection="Hub";sampleCareOpen=true}}, onPending={c->navigateCare {testCarePerson=DoctorTestProfiles.personId(c.profile);testInitialSection=c.section;careFromHome=true;sampleCareOpen=true}}, onConversation={id->workflowRoute=id}, onRequests={workflowRoute="requests"})
+                // One Home for the walkthrough (the old DemoHome of the earlier workspace is retired; nothing opened it any more).
+                destination.second == 0 -> DoctorHomeWorkday(DoctorTestProfiles.profiles.map { DoctorTestProfiles.personId(it) }.let { ids -> ids.size + carePeople.count { it.id !in ids } }, demoStore.patients, homePending, homeVisits, homeToday, homeLoaded, workflow,
+                    banners = listOfNotNull(notice?.let { message -> DoctorHomeBanner("doctor-home-notice", message, null, Icons.Default.Info, trailing = {
+                        IconButton(onClick = { notice = null }, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Close, t("Dismiss status", "सूचना हटाएँ")) } }) }),
+                    onPatients={tab=1}, onSchedule={tab=2}, onAccount={tab=3},
+                    onAddPatient={ if (careModel != null && careModel.cloud == null) addingCarePerson = true else tab = 1 },
+                    onPending={c->navigateCare {testCarePerson=DoctorTestProfiles.personId(c.profile);testInitialSection=c.section;careFromHome=true;sampleCareOpen=true}},
+                    onTalk={p->navigateCare {testCarePerson=DoctorTestProfiles.personId(p);testInitialSection="Conversations";careFromHome=true;sampleCareOpen=true}},
+                    onConversation={id->workflowRoute=id}, onRequests={workflowRoute="requests"})
                 destination.second == 1 -> { var patientQuery by rememberSaveable { mutableStateOf("") }
                 // Search matches the patient's name and the family names shown under it.
                 val q = patientQuery.trim().lowercase()
@@ -381,34 +385,6 @@ private val DoctorMist = Peach
     }
 }
 
-@Composable private fun DemoHome(patients: List<DoctorDemoPatient>, appointments: List<DoctorDemoAppointment>, onPatient: (String) -> Unit, onSchedule: () -> Unit, onAdd: () -> Unit, workflow:DoctorWorkflowStore, onRequests:()->Unit, onDraft:(String)->Unit) { val t = careText();
-    val today = LocalDate.now()
-    val agenda = appointments.filter { demoDate(it.startMillis) == today }.sortedBy { it.startMillis }
-    val next = appointments.firstOrNull { it.status == "Scheduled" && it.startMillis > System.currentTimeMillis() }
-    LazyColumn(Modifier.fillMaxSize().testTag("demo-home-list"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Text(demoDay(today), color = DoctorMuted, style = MaterialTheme.typography.bodyMedium); Spacer(Modifier.height(4.dp)); DoctorTitle(t("Good day, Dr Meera", "नमस्ते, डॉ. मीरा")) }
-        item { Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            DemoStat(t("Patients", "मरीज़"), patients.size.toString(), DoctorCardProgress, Modifier.weight(1f).testTag("demo-stat-patients"))
-            DemoStat(t("Visits today", "आज की विज़िट"), agenda.size.toString(), DoctorCardVisit, Modifier.weight(1f).testTag("demo-stat-today"))
-            DemoStat(t("Requests", "अनुरोध"), workflow.requests().count { it.status == WorkflowRequestStatus.NEW }.toString(), DoctorCardMedicine, Modifier.weight(1f).testTag("demo-stat-requests"))
-        } }
-        item { Surface(color=Paper,shape=RoundedCornerShape(20.dp),border=BorderStroke(1.dp,DoctorHairline)) { Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) { Row(verticalAlignment=Alignment.CenterVertically) { Icon(Icons.Default.Forum,null,tint=Rust);Spacer(Modifier.width(10.dp));Text(t("Conversation requests", "बातचीत के अनुरोध"),fontWeight=FontWeight.Medium,modifier=Modifier.weight(1f), fontFamily = SaharaTitleFont);Text(workflow.requests().count { it.status==WorkflowRequestStatus.NEW }.toString(),color=Rust,fontWeight=FontWeight.SemiBold) }; TextButton(onClick=onRequests,modifier=Modifier.heightIn(min=48.dp).testTag("workflow-open-requests")) { Text(t("Open requests", "अनुरोध खोलें"));Icon(Icons.Default.ChevronRight,null) } } } }
-        items(workflow.snapshot().drafts.filter { it.updatedAt>0 }.take(2),key={"draft-${it.patientId}"}) { draft -> OutlinedButton(onClick={onDraft(draft.patientId)},modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("workflow-resume-${draft.patientId}")) { Text(t("Resume ${patients.first { it.id==draft.patientId }.displayName()}'s draft", "${patients.first { it.id==draft.patientId }.displayName()} का ड्राफ़्ट जारी रखें")) } }
-        next?.let { visit -> item { Surface(color = DoctorForest, shape = RoundedCornerShape(22.dp), modifier = Modifier.fillMaxWidth().clickable { onPatient(visit.patientId) }) { Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Schedule, null, tint = Color.White.copy(alpha = .8f), modifier = Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Next visit", "अगली विज़िट"), color = Color.White.copy(alpha = .8f), style = MaterialTheme.typography.labelLarge) }
-            Text(patients.first { it.id == visit.patientId }.displayName(), color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
-            Text("${demoDay(demoDate(visit.startMillis))} • ${demoTime(visit.startMillis)}", color = Color.White, fontSize = 14.sp)
-            Text(t("${visit.type} · ${visit.durationMinutes} minutes", "${visit.type} · ${visit.durationMinutes} मिनट"), color = Color.White.copy(alpha = .8f), fontSize = 13.sp)
-        } } } }
-        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Text(t("Today's agenda", "आज की सूची"), fontSize = 19.sp, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f), fontFamily = SaharaTitleFont); TextButton(onClick = onSchedule) { Text(t("View all", "सब देखें")) } } }
-        if (agenda.isEmpty()) item { DemoEmpty(t("Your day is open", "आपका दिन खाली है"), null, t("Schedule visit", "विज़िट तय करें"), onAdd) }
-        items(agenda, key = { it.id }) { visit -> DemoAgendaRow(visit, patients.first { it.id == visit.patientId }, { onPatient(visit.patientId) }) }
-        item { OutlinedButton(onClick = onAdd, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp)) { Icon(Icons.Default.Add, null); Spacer(Modifier.width(8.dp)); Text(t("Schedule visit", "विज़िट तय करें")) } }
-        item { DoctorSection(t("Patient records", "मरीज़ों के रिकॉर्ड")) }
-        items(patients.take(3), key = { it.id }) { DemoPatientRow(it) { onPatient(it.id) } }
-    }
-}
-
 @Composable internal fun DemoPatients(patients: List<DoctorDemoPatient>, onPatient: (String) -> Unit) { val t = careText();
     var query by rememberSaveable { mutableStateOf("") }
     val filtered = patients.filter { "${it.name} ${it.careContext}".contains(query.trim(), ignoreCase = true) }
@@ -433,26 +409,6 @@ private val DoctorMist = Peach
             }
         }
     }
-    }
-}
-
-@Composable private fun DemoPatientRow(patient: DoctorDemoPatient, onOpen: () -> Unit) { val t = careText();
-    Column(Modifier.fillMaxWidth().clickable(onClick = onOpen).heightIn(min = 78.dp).testTag("demo-patient-${patient.id}").padding(vertical = 8.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            DoctorAvatar(patient.displayName())
-            Spacer(Modifier.width(12.dp)); Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) { Text(patient.displayName(), fontSize = 17.sp, fontWeight = FontWeight.SemiBold); Text(t("${patient.age} years · ${patient.careContext}", "${patient.age} साल · ${patient.careContext}"), color = DoctorMuted, fontSize = 14.sp, lineHeight = 20.sp, maxLines = 2, overflow = TextOverflow.Ellipsis) }
-            Icon(Icons.Default.ChevronRight, t("Open ${patient.displayName()}'s record", "${patient.displayName()} का रिकॉर्ड खोलें"), tint = DoctorMuted)
-        }
-        Spacer(Modifier.height(14.dp)); HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-    }
-}
-
-@Composable private fun DemoAgendaRow(visit: DoctorDemoAppointment, patient: DoctorDemoPatient, onOpen: () -> Unit) { val t = careText();
-    Row(Modifier.fillMaxWidth().clickable(onClick = onOpen).heightIn(min = 76.dp).padding(vertical = 8.dp), verticalAlignment = Alignment.Top) {
-        Column(Modifier.widthIn(min = 68.dp, max = 90.dp)) { Text(demoTime(visit.startMillis), fontWeight = FontWeight.SemiBold, fontSize = 15.sp); Text(t("${visit.durationMinutes} min", "${visit.durationMinutes} मिनट"), fontSize = 14.sp, color = DoctorMuted) }
-        Box(Modifier.padding(top = 5.dp).size(7.dp).background(DoctorTeal, CircleShape))
-        Column(Modifier.weight(1f).padding(start = 12.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) { Text(patient.displayName(), fontWeight = FontWeight.SemiBold, fontSize = 17.sp); Text(visit.type, style = MaterialTheme.typography.bodyMedium, color = DoctorMuted); VisitStatus(visit.status) }
-        Icon(Icons.Default.ChevronRight, t("Open ${patient.displayName()}'s record", "${patient.displayName()} का रिकॉर्ड खोलें"), tint = DoctorMuted)
     }
 }
 
@@ -669,15 +625,6 @@ private val DoctorMist = Peach
     }
 }
 
-@Composable private fun DemoStat(label: String, value: String, tint: Color, modifier: Modifier = Modifier) {
-    Surface(color = tint, shape = RoundedCornerShape(20.dp), modifier = modifier.heightIn(min = 76.dp)) {
-        Column(Modifier.padding(horizontal = 14.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text(value, fontSize = 24.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, fontFamily = SaharaTitleFont)
-            Text(label, fontSize = 14.sp, color = DoctorCardSub, lineHeight = 18.sp)
-        }
-    }
-}
-
 @Composable private fun DemoEmpty(title: String, detail: String?, action: String, onAction: () -> Unit, icon: ImageVector = Icons.Default.CalendarToday) {
     Surface(color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.fillMaxWidth().padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -717,91 +664,71 @@ private suspend fun loadHomeVisits(context: android.content.Context): List<HomeV
     }.getOrDefault(emptyList())
 }
 
-/** Home for the doctor walkthrough. Conversation and request rows come only from this device's workflow store and visit list, and always open the person they belong to. */
-@Composable private fun DoctorHomeWorkday(careCount: Int, patients: List<DoctorDemoPatient>, pending: List<HomeCarePending>, visits: List<HomeVisit>, loaded: Boolean, workflow: DoctorWorkflowStore, onPatients: () -> Unit, onSchedule: () -> Unit, onProfile: (DoctorTestProfiles.Profile) -> Unit, onPending: (HomeCarePending) -> Unit, onConversation: (String) -> Unit, onRequests: () -> Unit) { val t = careText();
+/** Today's visits for the listed people, for the Home ring: (completed, not cancelled). (0, 0) when nothing is saved or the read fails. */
+private suspend fun loadHomeToday(context: android.content.Context): Pair<Int, Int> = withContext(Dispatchers.IO) {
+    runCatching {
+        val db = CareDatabase.get(context.applicationContext, CareModel.DOCTOR_DEMO_STORAGE); val today = LocalDate.now()
+        val ids = DoctorTestProfiles.profiles.map { DoctorTestProfiles.personId(it) }.toSet()
+        val status = db.care().allItems().filter { it.personId in ids && it.kind == "visit" && it.due > 0 && demoDate(it.due) == today }
+            .map { CareEntryCodec.decode(it.detail)?.status }.filter { it != "cancelled" }
+        status.count { it == "completed" } to status.size
+    }.getOrDefault(0 to 0)
+}
+
+/**
+ * Home for the doctor walkthrough, drawn by the shared [DoctorHomeScreen] (25 Nov owner override: no cards, no pills). The ring is
+ * today's visits; beside it unsigned notes (opens their sheet), requests and patients. Then the next visit, Today, Needs you
+ * (unsigned notes and new requests) and Coming up. Rows come only from this device's workflow store and visit list, and always open
+ * the person they belong to.
+ */
+@Composable private fun DoctorHomeWorkday(careCount: Int, patients: List<DoctorDemoPatient>, pending: List<HomeCarePending>, visits: List<HomeVisit>, today: Pair<Int, Int>?, loaded: Boolean,
+    workflow: DoctorWorkflowStore, banners: List<DoctorHomeBanner>, onPatients: () -> Unit, onSchedule: () -> Unit, onAccount: () -> Unit, onAddPatient: () -> Unit,
+    onPending: (HomeCarePending) -> Unit, onTalk: (DoctorTestProfiles.Profile) -> Unit, onConversation: (String) -> Unit, onRequests: () -> Unit) { val t = careText(); val hindi = careHindi()
     val byId = patients.associateBy { it.id }
-    val state = workflow.snapshot()
-    val newRequests = state.requests.filter { it.status == WorkflowRequestStatus.NEW && it.patientId in byId }.sortedByDescending { it.createdAt }
+    val newRequests = workflow.snapshot().requests.filter { it.status == WorkflowRequestStatus.NEW && it.patientId in byId }.sortedByDescending { it.createdAt }
     val unsigned = pending.filter { it.section == "Conversations" }
     var unsignedOpen by rememberSaveable { mutableStateOf(false) }
-    if (unsignedOpen) SaharaScreenSheet(onDismissRequest = { unsignedOpen = false }, containerColor = Cream) {
-        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 16.dp, end = 16.dp, bottom = 32.dp).testTag("home-unsigned-notes"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(t("Unsigned notes", "बिना हस्ताक्षर के नोट"), Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-            Text(t("Conversation notes you started but have not signed yet. Open one to finish and sign it.", "बातचीत के वे नोट जो आपने शुरू किए पर अभी हस्ताक्षर नहीं किए। पूरा करने और हस्ताक्षर करने के लिए एक खोलें।"), fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardSub)
-            if (unsigned.isEmpty()) Text(t("No unsigned notes.", "कोई बिना हस्ताक्षर का नोट नहीं।"), fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.testTag("home-unsigned-empty"))
-            unsigned.forEach { c ->
-                Surface(onClick = { unsignedOpen = false; onPending(c) }, color = Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp).testTag("home-unsigned-${c.key}")) {
-                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                        Icon(Icons.Default.Forum, null, tint = DoctorAccent)
-                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) { Text(c.profile.name, fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk); Text(c.detail, fontSize = 14.sp, color = DoctorCardSub) }
-                        Icon(Icons.Default.ChevronRight, null, tint = DoctorAccent)
-                    }
-                }
-            }
+    if (unsignedOpen) ModalBottomSheet(onDismissRequest = { unsignedOpen = false }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
+        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).testTag("home-unsigned-notes")) {
+            Text(t("Unsigned notes", "बिना हस्ताक्षर के नोट"), Modifier.padding(horizontal = 24.dp, vertical = 8.dp).a11yHeading(), style = MaterialTheme.typography.titleLarge)
+            if (unsigned.isEmpty()) Text(t("No unsigned notes.", "कोई बिना हस्ताक्षर का नोट नहीं।"), Modifier.padding(horizontal = 24.dp, vertical = 12.dp).testTag("home-unsigned-empty"),
+                fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            unsigned.forEach { c -> SaharaRow(c.profile.name, Modifier.testTag("home-unsigned-${c.key}"), supporting = c.detail, icon = Icons.Default.Forum, onClick = { unsignedOpen = false; onPending(c) }) }
+            Spacer(Modifier.navigationBarsPadding().height(16.dp))
         }
     }
-    // Premium pass (22 Nov): the same calm warm backdrop as the family Today screen, and a slightly larger date heading.
-    LazyColumn(Modifier.fillMaxSize().background(SaharaBackdrop).testTag("demo-home-list"), contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item {
-            // The date is the heading; the doctor already knows who they are (no "Good evening, Dr …" line).
-            Text(java.time.LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, d MMMM", careLocale(careHindi()))), Modifier.a11yHeading().padding(bottom = 2.dp), fontFamily = SaharaTitleFont, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.SemiBold, letterSpacing = (-0.2).sp, color = DoctorCardInk)
-        }
-        item {
-            // "Unsigned notes" (Dr Sujay, 22 Nov: "Drafts" was unclear): conversation notes started but not yet signed. The tile opens a short list that says so.
-            val tiles = listOf(
-                Triple(t("Patients", "मरीज़"), careCount, Icons.Default.People to DoctorTones.Rust),
-                Triple(t("Visits this week", "इस हफ़्ते की विज़िट"), visits.size.takeIf { loaded }, Icons.Default.CalendarMonth to DoctorTones.Teal),
-                Triple(t("Unsigned notes", "बिना हस्ताक्षर के नोट"), unsigned.size.takeIf { loaded }, Icons.Default.Forum to DoctorTones.Plum),
-                Triple(t("Requests", "अनुरोध"), newRequests.size, Icons.Default.Inbox to DoctorTones.Marigold))
-            val clicks = listOf<() -> Unit>(onPatients, onSchedule, { unsignedOpen = true }, onRequests)
-            BoxWithConstraints {
-                val paired = doctorTilesPaired(maxWidth.value, LocalDensity.current.fontScale)
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    (if (paired) tiles.indices.chunked(2) else tiles.indices.map { listOf(it) }).forEach { row ->
-                        Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) { row.forEach { i -> val tile = tiles[i]
-                            DoctorStatTile(tile.third.first, tile.second, tile.first, tile.third.second, clicks[i], "demo-home-tile-$i", Modifier.weight(1f).fillMaxHeight())
-                        } }
-                    }
-                }
-            }
-        }
-        // Visits and drafts are read from the device just after the first frame; they fade in and the rows below glide down instead of jumping.
-        if (visits.isNotEmpty()) {
-            item(key = "home-coming-up") { Box(Modifier.animateItem()) { DoctorSection(t("Coming up", "आने वाला"), Modifier.padding(top = 12.dp)) } }
-            items(visits.take(4), key = { "home-visit-${it.key}" }) { v ->
-                Surface(onClick = onSchedule, color = Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.animateItem().fillMaxWidth().heightIn(min = 72.dp).semantics(mergeDescendants = true) { contentDescription = t("${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} at ${demoTime(v.due)}. Opens the schedule.", "${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} को ${demoTime(v.due)}. समय-सूची खोलता है।") }) {
-                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                        Column(Modifier.widthIn(min = 76.dp)) { Text(demoTime(v.due), fontSize = 15.sp, fontWeight = FontWeight.Medium, color = DoctorAccent, softWrap = false); Text(demoDate(v.due).format(DateTimeFormatter.ofPattern("EEE d MMM")), fontSize = 14.sp, color = DoctorCardSub, softWrap = false) }
-                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) { Text(v.profile.name, fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk); Text(v.kind, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis) }
-                        Icon(Icons.Default.ChevronRight, null, tint = DoctorAccent)
-                    }
-                }
-            }
-        }
-        if (pending.isNotEmpty()) {
-            item(key = "home-pick-up") { Box(Modifier.animateItem()) { DoctorSection(t("Pick up where you left off", "जहाँ छोड़ा था, वहीं से जारी रखें"), Modifier.padding(top = 12.dp)) } }
-            items(pending, key = { it.key }) { c ->
-                Surface(onClick = { onPending(c) }, color = if (c.section == "Visits") DoctorCardVisit else DoctorCardConversation, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.animateItem().fillMaxWidth().heightIn(min = 72.dp).testTag("home-conversation-${c.key}").semantics(mergeDescendants = true) { contentDescription = "${c.profile.name}: ${c.title}. ${c.detail}. Opens ${c.section.lowercase()}." }) {
-                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                        Icon(if (c.section == "Visits") Icons.Default.CalendarMonth else Icons.Default.Forum, null, tint = DoctorAccent)
-                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) { Text(c.profile.name, fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk); Text(if (c.section == "Conversations") t("Unsigned note", "बिना हस्ताक्षर का नोट") else c.title, fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardInk); Text(c.detail, fontSize = 14.sp, color = DoctorCardSub) }
-                        Icon(Icons.Default.ChevronRight, null, tint = DoctorAccent)
-                    }
-                }
-            }
-        }
-        item { DoctorSection(t("Requests", "अनुरोध"), Modifier.padding(top = 12.dp)) }
-        if (newRequests.isEmpty()) item { Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) { Icon(Icons.Default.CheckCircle, null, Modifier.size(20.dp), tint = DoctorStatusGood); Text(t("No requests", "कोई अनुरोध नहीं"), fontSize = 15.sp, color = DoctorCardSub) } }
-        items(newRequests.take(3), key = { "home-request-${it.id}" }) { r ->
-            val name = byId.getValue(r.patientId).displayName()
-            Surface(onClick = { onConversation(r.patientId) }, color = Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.animateItem().fillMaxWidth().heightIn(min = 72.dp).testTag("home-request-${r.id}").semantics(mergeDescendants = true) { contentDescription = t("Conversation to plan, listed under $name: ${r.reason}. Opens the conversation.", "तय करने वाली बातचीत, $name के नाम: ${r.reason}. बातचीत खोलता है।") }) {
-                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(name, fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-                    Text(r.reason, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                    Text("${demoDay(demoDate(r.createdAt))}, ${demoTime(r.createdAt)}", fontSize = 14.sp, color = DoctorCardSub)
-                }
-            }
-        }
-        item { TextButton(onClick = onRequests, modifier = Modifier.heightIn(min = 48.dp).testTag("workflow-open-requests")) { Text(t("All requests", "सभी अनुरोध")); Icon(Icons.Default.ChevronRight, null) } }
-    }
+    val day = LocalDate.now()
+    val next = visits.firstOrNull()
+    val (todayVisits, laterVisits) = visits.partition { demoDate(it.due) == day }
+    fun visitPending(v: HomeVisit) = HomeCarePending("visit-${v.key}", v.profile, "Visits", v.kind, "${demoDay(demoDate(v.due))} · ${demoTime(v.due)}")
+    val shortDay = DateTimeFormatter.ofPattern("EEE d MMM", careLocale(hindi))
+    val todayRows = todayVisits.filter { it !== next }.map { v -> DoctorHomeLine("home-visit-${v.key}", v.profile.name, v.kind, { onPending(visitPending(v)) }, lead = demoTime(v.due)) }
+    val needsRows = unsigned.take(3).map { c -> DoctorHomeLine("home-conversation-${c.key}", c.profile.name, t("Unsigned note", "बिना हस्ताक्षर का नोट") + " · ${c.detail}", { onPending(c) }, icon = Icons.Default.Forum) } +
+        newRequests.take(3).map { r -> DoctorHomeLine("home-request-${r.id}", byId.getValue(r.patientId).displayName(), r.reason, { onConversation(r.patientId) }, icon = Icons.Default.Inbox) }
+    val laterRows = laterVisits.filter { it !== next }.map { v -> DoctorHomeLine("home-visit-${v.key}", v.profile.name, "${demoDate(v.due).format(shortDay)} · ${demoTime(v.due)} · ${v.kind}", { onPending(visitPending(v)) }, icon = Icons.Default.Event) }
+    val state = DoctorHomeState(day.format(DateTimeFormatter.ofPattern("EEEE, d MMMM", careLocale(hindi))), banners, today?.first, today?.second, "demo-home-tile-1",
+        ringScrollTo = "today", onRing = onSchedule,
+        stats = listOf(
+            DoctorHomeStat(unsigned.size.takeIf { loaded }, t("Unsigned notes", "बिना हस्ताक्षर के नोट"), "demo-home-tile-2") { unsignedOpen = true },
+            DoctorHomeStat(newRequests.size, t("Requests", "अनुरोध"), "demo-home-tile-3", onClick = onRequests),
+            DoctorHomeStat(careCount, t("Patients", "मरीज़"), "demo-home-tile-0", onClick = onPatients),
+        ),
+        next = next?.let { v ->
+            val isToday = demoDate(v.due) == day
+            DoctorHomeNext(if (isToday) demoTime(v.due) else demoDate(v.due).format(DateTimeFormatter.ofPattern("d MMM", careLocale(hindi))), v.profile.name,
+                if (isToday) v.kind else "${demoTime(v.due)} · ${v.kind}") { onPending(visitPending(v)) }
+        },
+        groups = listOf(
+            DoctorHomeGroup("today", t("Today", "आज"), todayRows, action = t("See schedule", "शेड्यूल देखें"), actionTag = "home-today-schedule", onAction = onSchedule,
+                empty = if (loaded && todayVisits.isEmpty()) t("Nothing due today", "आज कुछ तय नहीं") else null, emptyAction = t("Schedule a visit", "विज़िट तय करें"), onEmptyAction = onSchedule),
+            // The label's link is the one way into the full request queue.
+            DoctorHomeGroup("needs", t("Needs you", "आपके लिए"), needsRows, action = t("All requests", "सभी अनुरोध"), actionTag = "workflow-open-requests", onAction = onRequests,
+                empty = t("Nothing waiting", "कुछ बाकी नहीं")),
+            DoctorHomeGroup("coming", t("Coming up", "आने वाला"), laterRows, action = if (laterRows.size > DOCTOR_HOME_LIST) t("See all", "सब देखें") else null,
+                actionTag = "home-coming-up-all", onAction = onSchedule, cap = DOCTOR_HOME_LIST),
+        ))
+    DoctorHomeScreen(state, avatarName = DoctorDemoData.doctorName, onSearch = onPatients, onAccount = onAccount,
+        talkPatients = DoctorTestProfiles.profiles.map { DoctorTestProfiles.personId(it) to it.name },
+        onTalk = { id -> DoctorTestProfiles.profiles.firstOrNull { DoctorTestProfiles.personId(it) == id }?.let(onTalk) },
+        onScheduleVisit = onSchedule, onAddPatient = onAddPatient, listTag = "demo-home-list")
 }

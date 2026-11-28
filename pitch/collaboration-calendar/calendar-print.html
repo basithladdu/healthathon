@@ -1,0 +1,468 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Sahara Collaboration Calendar</title>
+<style>@page { size: A4 landscape; margin: 0; }
+:root {
+  --cream: #FFF8EE; --sage: #3B7562; --sage-d: #2A5A4A; --ink: #23312C; --muted: #6B7A73;
+  --line: #E6DCCB; --wash: #F3EDE0; --indigo: #4B4FA8; --rose: #C2557A; --gold: #C9952B;
+  --h1: #E3EEE7; --h2: #B9D6C6; --h3: #7FB39C; --h4: #3B7562;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--cream); color: var(--ink);
+  font-family: "Inter", "Noto Sans", "Segoe UI", Arial, sans-serif;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.page { width: 297mm; height: 210mm; padding: 10mm 12mm 8mm; overflow: hidden; position: relative;
+  page-break-after: always; break-after: page; background: var(--cream); display: flex; flex-direction: column; }
+.page:last-child { page-break-after: auto; break-after: auto; }
+.muted { color: var(--muted); } .small { font-size: 7pt; margin-top: 3mm; line-height: 1.35; }
+.tag { display: inline-block; background: var(--sage); color: #fff; border-radius: 99px; padding: .4mm 2.6mm;
+  font-size: 7.5pt; font-weight: 700; letter-spacing: .02em; margin-right: 2mm; vertical-align: 1px; }
+.tag.rose { background: var(--rose); }
+
+/* cover */
+.cover { background: linear-gradient(160deg, #FFF8EE 0%, #F4EEDF 60%, #E8F0EA 100%); }
+.brand { font-size: 9pt; color: var(--sage); font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.cover h1 { font-size: 38pt; color: var(--sage-d); margin-top: 6mm; letter-spacing: -.01em; line-height: 1.05; }
+.cover .sub { font-size: 15pt; color: var(--muted); margin-top: 2mm; }
+.tiles { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; grid-template-rows: auto auto; gap: 4mm; margin-top: 8mm; }
+.tile { background: #fff; border: .3mm solid var(--line); border-radius: 4mm; padding: 4mm 5mm; display: flex; flex-direction: column; }
+.tile b { font-size: 26pt; color: var(--sage); line-height: 1; }
+.tile span { font-size: 9.5pt; font-weight: 700; margin-top: 1.5mm; }
+.tile i { font-style: normal; font-size: 8pt; color: var(--muted); margin-top: 1mm; }
+.tile.big { grid-row: span 2; background: var(--sage); border-color: var(--sage); justify-content: center; }
+.tile.big b { font-size: 50pt; color: #fff; } .tile.big span { color: #fff; font-size: 13pt; } .tile.big i { color: #D7E8DE; font-size: 10pt; }
+.tile.rose b { color: var(--rose); } .tile.gold b { color: var(--gold); }
+.story { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; margin-top: 7mm; }
+.step { display: flex; gap: 3mm; font-size: 9.5pt; line-height: 1.4; }
+.step .n { flex: none; width: 7mm; height: 7mm; border-radius: 50%; background: var(--sage); color: #fff;
+  font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 10pt; }
+.team { margin-top: auto; display: flex; gap: 10mm; font-size: 10pt; border-top: .3mm solid var(--line); padding-top: 4mm; }
+
+/* month */
+.mhead { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: .4mm solid var(--sage); padding-bottom: 3mm; }
+.kicker { font-size: 8pt; color: var(--sage); font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+.mhead h2 { font-size: 24pt; color: var(--sage-d); line-height: 1.1; }
+.mnote { font-size: 9pt; color: var(--muted); margin-top: .5mm; }
+.mstats { display: flex; gap: 2.5mm; }
+.mstats div { background: #fff; border: .3mm solid var(--line); border-radius: 2.5mm; padding: 1.6mm 3mm; text-align: center; min-width: 19mm; }
+.mstats b { display: block; font-size: 14pt; color: var(--sage); line-height: 1.1; }
+.mstats span { font-size: 6.5pt; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; }
+.mbody { display: flex; gap: 5mm; margin-top: 3mm; flex: 1; min-height: 0; }
+.grid { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 1fr; grid-template-rows: 5mm; gap: 1.2mm; }
+.wd { font-size: 7pt; font-weight: 700; color: var(--muted); text-transform: uppercase; text-align: center; align-self: end; }
+.cell { border-radius: 2mm; padding: 1.2mm 1.5mm; display: flex; flex-direction: column; border: .25mm solid var(--line);
+  background: #fff; min-height: 0; overflow: hidden; position: relative; }
+.cell.out { background: transparent; border: none; }
+.cell.h1 { background: var(--h1); } .cell.h2 { background: var(--h2); } .cell.h3 { background: var(--h3); color: #fff; }
+.cell.h4 { background: var(--h4); color: #fff; }
+.cell.future { background: var(--wash); border-style: dashed; }
+.top { display: flex; justify-content: space-between; align-items: center; }
+.dn { font-size: 8.5pt; font-weight: 700; }
+.marks { display: flex; gap: .8mm; }
+.mid { display: flex; align-items: baseline; gap: .8mm; margin-top: .3mm; }
+.cnum { font-size: 12pt; font-weight: 800; line-height: 1; }
+.cu { font-size: 6pt; opacity: .8; }
+.lab { font-size: 6.3pt; font-weight: 700; line-height: 1.15; margin-top: .5mm; }
+.h3 .lab, .h4 .lab { color: #fff; }
+.lab.k-review { color: var(--rose); } .lab.k-meet, .lab.k-mentor { color: var(--indigo); }
+.lab.k-release { color: #9A6E14; } .lab.k-milestone { color: var(--sage-d); }
+.h3 .lab, .h4 .lab { color: #fff !important; }
+.meta { margin-top: auto; display: flex; gap: 1.8mm; font-size: 6.3pt; font-weight: 600; }
+.meta span, .lg.chat, .lg.ai { display: inline-flex; align-items: center; gap: .5mm; }
+.ic { width: 2.4mm; height: 2.4mm; }
+.chat { color: #5E6C66; } .ai { color: #7A5AA6; }
+.h3 .chat, .h4 .chat, .h3 .ai, .h4 .ai { color: #fff; }
+.mk { display: inline-block; width: 2.4mm; height: 2.4mm; flex: none; }
+.mk.dot { border-radius: 50%; } .mk.sq { border-radius: .4mm; } .mk.dia { transform: rotate(45deg) scale(.85); border-radius: .3mm; }
+.mk.meet { background: var(--indigo); } .mk.review { background: var(--rose); } .mk.release { background: var(--gold); }
+.mk.mile { background: #fff; border: .5mm solid var(--sage-d); }
+.h3 .mk, .h4 .mk { box-shadow: 0 0 0 .35mm #fff; }
+.cell.dday { background: var(--sage-d); color: #fff; border: .8mm solid var(--gold); box-shadow: 0 0 0 .6mm #fff, 0 0 0 1.2mm var(--gold); }
+.ddbig { font-size: 15pt; font-weight: 900; letter-spacing: .04em; color: #FFE7A8; margin-top: .5mm; line-height: 1; }
+.ddsub { font-size: 6.5pt; font-weight: 700; margin-top: .6mm; line-height: 1.2; }
+.side { width: 64mm; flex: none; background: var(--wash); border-radius: 3mm; padding: 3.5mm 4mm; overflow: hidden; }
+.side h3 { font-size: 10pt; color: var(--sage-d); margin-bottom: 2mm; }
+.evl { list-style: none; }
+.evl li { display: flex; gap: 1.8mm; align-items: flex-start; font-size: 7.4pt; line-height: 1.25; padding: 1.2mm 0; border-bottom: .2mm solid var(--line); }
+.evl .mk { margin-top: .6mm; }
+.ed { flex: none; width: 10mm; font-weight: 700; color: var(--muted); }
+.edt { color: var(--muted); font-size: 6.8pt; }
+.legend { display: flex; flex-wrap: wrap; gap: 1.5mm 4.5mm; align-items: center; font-size: 7pt; color: var(--muted); margin-top: 3mm; }
+.lg { display: inline-flex; align-items: center; gap: 1mm; }
+.sw { display: inline-block; width: 3.4mm; height: 3.4mm; border-radius: .6mm; }
+.sw.h1 { background: var(--h1); } .sw.h2 { background: var(--h2); } .sw.h3 { background: var(--h3); } .sw.h4 { background: var(--h4); }
+.src { margin-left: auto; font-style: italic; }
+
+/* last */
+.timeline { display: flex; justify-content: space-between; position: relative; margin: 6mm 0 2mm; padding-top: 1mm; }
+.timeline::before { content: ""; position: absolute; left: 2mm; right: 2mm; top: 3.2mm; height: .6mm; background: var(--sage); opacity: .35; }
+.ti { width: 18mm; text-align: center; position: relative; }
+.tdot { width: 4.4mm; height: 4.4mm; border-radius: 50%; margin: 0 auto; border: .7mm solid var(--cream); }
+.tdot.k-meet, .tdot.k-mentor { background: var(--indigo); } .tdot.k-review { background: var(--rose); }
+.tdot.k-release { background: var(--gold); } .tdot.k-milestone { background: var(--sage); } .tdot.k-dday { background: var(--sage-d); box-shadow: 0 0 0 .7mm var(--gold); }
+.td { font-size: 7pt; font-weight: 700; margin-top: 1.5mm; color: var(--muted); }
+.tt { font-size: 7pt; line-height: 1.2; margin-top: .5mm; }
+.ti.dd .td, .ti.dd .tt { color: var(--sage-d); font-weight: 800; }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; margin-top: 5mm; }
+.col { background: #fff; border: .3mm solid var(--line); border-radius: 4mm; padding: 4mm 5mm; }
+.col.clin { border-top: 1.2mm solid var(--rose); } .col.eng { border-top: 1.2mm solid var(--sage); }
+.col h3 { font-size: 11pt; color: var(--ink); margin-bottom: 2.5mm; }
+.col ul { list-style: none; } .col li { font-size: 8.6pt; line-height: 1.38; margin-bottom: 1.5mm; padding-left: 3mm; position: relative; }
+.col li::before { content: ""; position: absolute; left: 0; top: 1.8mm; width: 1.3mm; height: 1.3mm; border-radius: 50%; background: var(--muted); }
+.bars { margin-top: 3mm; }
+.bh { font-size: 7pt; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: .04em; margin: 1.8mm 0 1mm; }
+.bar { display: flex; align-items: center; gap: 2mm; font-size: 8pt; margin-bottom: 1mm; }
+.bl { width: 32mm; flex: none; } .bt { flex: 1; height: 3.2mm; background: var(--wash); border-radius: 99px; overflow: hidden; }
+.bf { display: block; height: 100%; border-radius: 99px; } .bf.rose { background: var(--rose); } .bf.sage { background: var(--sage); }
+.bn { width: 10mm; text-align: right; font-weight: 700; }
+.together { margin-top: 4mm; font-size: 9.5pt; background: var(--sage); color: #fff; border-radius: 3mm; padding: 3mm 5mm; }
+.foot { margin-top: auto; font-size: 7pt; color: var(--muted); }
+.pulsebox { margin-top: 4mm; background: #fff; border: .3mm solid var(--line); border-radius: 4mm; padding: 2.5mm 5mm 2mm; }
+.ph { display: flex; gap: 4mm; align-items: center; font-size: 7pt; color: var(--muted); }
+.ph b { font-size: 9pt; color: var(--ink); }
+.pulse { width: 100%; height: auto; display: block; margin-top: 1.5mm; }
+.pv { font-size: 9px; fill: #2A5A4A; text-anchor: middle; font-weight: 700; }
+.wl { display: flex; } .wl span { flex: 1; text-align: center; font-size: 6pt; color: var(--muted); }
+.cover .tiles { margin-top: 10mm; gap: 5mm; } .cover .tile { padding: 5.5mm 6mm; }
+.cover .story { margin-top: 12mm; gap: 7mm; } .cover .step { font-size: 11pt; }
+
+/* ===== deck-style calendar (matches the final-submission "Build Sprint Journey" slide) ===== */
+:root { --dgreen: #173F33; --dmuted: #53655C; --rust: #B75E43; --teal: #157B68; --purple: #7353AC; --blue: #4357C7;
+  --sand: #F6EFE2; --cellline: #DDD5C6; --outcell: #EFEAE0;
+  --h1: #F0F7F3; --h2: #DCEEE4; --h3: #C2E2D1; --h4: #A3D3BA; }
+.page.month { background: var(--sand); }
+.month .mhead h2 { color: var(--dgreen); }
+.grid { gap: 0; grid-template-columns: 13mm repeat(7, 1fr); grid-template-rows: 5.5mm; border: none; }
+.grid .wd { color: var(--dmuted); font-size: 7.5pt; align-self: center; }
+.wk { font-size: 6.8pt; font-weight: 700; color: var(--dmuted); text-align: center; padding-top: 1.5mm; }
+.cell { border-radius: 0; border: .25mm solid var(--cellline); margin: 0 -.25mm -.25mm 0; padding: 1mm 1.2mm; background: #fff; color: var(--dgreen); }
+.cell.out { background: var(--outcell); border: .25mm solid var(--cellline); }
+.cell.out .dn { color: #9A9486; font-weight: 400; }
+.cell.h1 { background: var(--h1); } .cell.h2 { background: var(--h2); } .cell.h3 { background: var(--h3); color: var(--dgreen); } .cell.h4 { background: var(--h4); color: var(--dgreen); }
+.cell.future { background: #FBF8F2; border-style: solid; }
+.cell .dn { font-size: 8.5pt; color: var(--dgreen); }
+.cc { font-size: 6.6pt; font-weight: 800; color: var(--teal); }
+.h4 .cc, .h3 .cc { color: var(--dgreen); }
+.chips { display: flex; flex-direction: column; gap: .8mm; margin-top: .8mm; }
+.chip { border-radius: 99px; color: #fff; font-weight: 700; font-size: 6.1pt; line-height: 1.1; text-align: center;
+  padding: .7mm 1mm; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.chip.c-meet { background: var(--blue); } .chip.c-review { background: var(--purple); }
+.chip.c-mile { background: var(--rust); } .chip.c-built { background: var(--teal); }
+.chip.mini { display: inline-block; font-size: 6pt; padding: .3mm 2mm; margin-right: .8mm; }
+.meta { color: var(--dmuted); }
+.h3 .chat, .h4 .chat { color: var(--dmuted); } .h3 .ai, .h4 .ai { color: #6A4E99; }
+.cell.dday { background: var(--dgreen); border: .9mm solid #E0A93B; color: #fff; box-shadow: none; z-index: 2; margin: -.4mm; }
+.ddc { display: inline-flex; width: 5mm; height: 5mm; border-radius: 50%; background: #1A73E8; color: #fff; font-weight: 800;
+  font-size: 8pt; align-items: center; justify-content: center; }
+.cell.dday .ddbig { font-size: 16pt; color: #FFD98A; margin-top: 1mm; }
+.cell.dday .ddsub { font-size: 6.5pt; }
+.side { background: transparent; padding: 0; width: 66mm; display: flex; flex-direction: column; gap: 2mm; }
+.scard { background: #fff; border-radius: 3mm; padding: 3mm 3.5mm; }
+.scard h3 { color: var(--dgreen); }
+.legend .chip.mini { vertical-align: middle; }
+
+/* ===== impact sheets ===== */
+.impact { background: var(--cream); }
+.igrid { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr 1fr; gap: 6mm; margin-top: 6mm; }
+.itile { background: #fff; border: .4mm solid var(--line); border-radius: 5mm; padding: 6mm 7mm; display: flex; flex-direction: column; justify-content: center; }
+.itile b { font-size: 60pt; line-height: .95; color: var(--sage); font-weight: 900; letter-spacing: -.02em; }
+.itile span { font-size: 16pt; font-weight: 800; margin-top: 3mm; color: var(--dgreen); }
+.itile i { font-style: normal; font-size: 9.5pt; color: var(--muted); margin-top: 2mm; line-height: 1.35; }
+.itile.solid { background: var(--sage); border-color: var(--sage); } .itile.solid b, .itile.solid span { color: #fff; } .itile.solid i { color: #D7E8DE; }
+.itile.rose b { color: var(--purple); } .itile.gold b { color: var(--rust); }
+.ifoot { font-size: 8pt; color: var(--muted); margin-top: 4mm; }
+
+/* ===== medical team ===== */
+.medical { background: var(--sand); }
+.mcols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; margin-top: 5mm; }
+.mcard { background: #fff; border-radius: 4mm; padding: 4mm 5mm; border-top: 1.4mm solid var(--purple); }
+.mcard h3 { font-size: 13pt; color: var(--purple); margin-bottom: 2mm; }
+.mcard ul, .lcard ul { list-style: none; }
+.mcard li { font-size: 8.6pt; line-height: 1.35; padding: 1.1mm 0; border-bottom: .2mm solid var(--line); }
+.mcard li:last-child { border-bottom: none; }
+.mcard li b { color: var(--dgreen); display: inline-block; min-width: 15mm; }
+.mrow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4mm; margin-top: 5mm; }
+.mbox { background: #fff; border-radius: 3mm; padding: 3mm 4mm; border-left: 1.2mm solid var(--teal); }
+.mbox h4 { font-size: 9.5pt; color: var(--dgreen); margin-bottom: 1mm; }
+.mbox p { font-size: 8pt; line-height: 1.38; }
+.tbc { color: var(--rust); font-weight: 700; }
+
+/* ===== legal ===== */
+.legal { background: var(--cream); }
+.legal .lh { font-size: 34pt; font-weight: 900; color: var(--dgreen); letter-spacing: -.01em; }
+.lgrid { display: grid; grid-template-columns: 1fr 1fr 0.8fr; grid-template-rows: auto 1fr; gap: 5mm; margin-top: 5mm; flex: 1; min-height: 0; }
+.lcard { background: #fff; border: .3mm solid var(--line); border-radius: 4mm; padding: 4mm 5mm; }
+.lcard.wide { grid-column: 1 / 4; border-top: 1.4mm solid var(--purple); }
+.lcard h3 { font-size: 11.5pt; color: var(--dgreen); margin-bottom: 2.5mm; display: flex; align-items: center; gap: 2mm; }
+.lcard .date { margin-left: auto; font-size: 8pt; color: var(--muted); font-weight: 600; }
+.ln { width: 6mm; height: 6mm; border-radius: 50%; background: var(--purple); color: #fff; font-size: 9pt; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
+.lcard li { font-size: 8.8pt; line-height: 1.38; margin-bottom: 1.6mm; padding-left: 3.5mm; position: relative; }
+.lcard li::before { content: ""; position: absolute; left: 0; top: 1.7mm; width: 1.5mm; height: 1.5mm; border-radius: 50%; background: var(--purple); }
+.lcard.tbcbox { background: #FFF4E5; border: .4mm dashed var(--rust); }
+.lcard.tbcbox h3 { color: var(--rust); } .lcard.tbcbox li::before { background: var(--rust); }
+/* round 2 fixes */
+.chip { white-space: normal; text-overflow: clip; max-height: 6mm; }
+.mk.meet { background: var(--blue); } .mk.review { background: var(--purple); } .mk.mile { background: var(--rust); border: none; }
+.itile.long b { font-size: 44pt; }
+.mcols { flex: 1; } .mcard { display: flex; flex-direction: column; }
+.mcard li { display: grid; grid-template-columns: 20mm 1fr; font-size: 9.6pt; padding: 1.6mm 0; }
+.mcard li b { min-width: 0; }
+.mcard h3 { font-size: 14pt; }
+.mbox h4 { font-size: 10.5pt; } .mbox p { font-size: 9pt; }
+.medical .foot, .legal .foot { margin-top: 4mm; }
+.lgrid { flex: 1; grid-template-rows: auto 1fr; }
+.lcard li { font-size: 10pt; margin-bottom: 2.2mm; } .lcard li::before { top: 2mm; }
+.lcard h3 { font-size: 13pt; }
+.tdot.k-meet, .tdot.k-mentor { background: var(--blue); } .tdot.k-review { background: var(--purple); }
+.tdot.k-release { background: var(--rust); } .tdot.k-milestone { background: var(--teal); }
+.tile.rose b { color: var(--purple); } .tile.gold b { color: var(--rust); }
+.tag.rose, .bf.rose { background: var(--purple); } .col.clin { border-top-color: var(--purple); }
+.last .timeline { margin-top: 4mm; } .last .split { margin-top: 3mm; } .last .pulsebox { margin-top: 3mm; }
+.last .together { margin-top: 3mm; } .last .foot { margin-top: 2mm; }
+.last .col li { margin-bottom: 1mm; }
+
+/* handout cover (27 Nov) */
+.cover .tiles { margin-top: 6mm; gap: 4mm; } .cover .tile { padding: 4mm 5mm; }
+.tile.live { background: var(--dgreen); border-color: var(--dgreen); }
+.tile.live b { color: #FFD98A; } .tile.live span { color: #fff; } .tile.live .l2 { margin-top: .8mm; }
+.started { display: grid; grid-template-columns: 34mm repeat(5, 1fr); gap: 3mm; margin-top: 6mm; background: #fff;
+  border: .3mm solid var(--line); border-left: 1.4mm solid var(--teal); border-radius: 3mm; padding: 3mm 4mm; align-items: start; }
+.started .sh { font-size: 11pt; font-weight: 800; color: var(--dgreen); line-height: 1.2; }
+.started .sh span { font-size: 8pt; font-weight: 600; color: var(--muted); }
+.started .si { font-size: 8.8pt; line-height: 1.3; border-left: .3mm solid var(--line); padding-left: 3mm; }
+.started .si b { display: block; color: var(--teal); font-size: 10pt; }
+.cover .story { margin-top: 7mm; gap: 7mm; } .cover .step { font-size: 10pt; }
+
+/* 27 Nov round 2: more "what was done", commits secondary, Play card on the cover */
+.cc { font-size: 5.2pt; font-weight: 600; color: #8A968F; } .h4 .cc, .h3 .cc { color: #5F7068; }
+.chips { gap: .55mm; margin-top: .6mm; }
+.chip { font-size: 5.9pt; padding: .55mm 1mm; max-height: 5.6mm; }
+.meta { font-size: 5.6pt; }
+.mstats .sec b { color: var(--muted); font-size: 11pt; padding-top: .8mm; }
+.cover .tiles { grid-template-columns: 1.05fr 1fr 1fr 1fr 1.95fr; }
+.cover .tile.big b { font-size: 44pt; }
+.tile.playcard { grid-column: 5; grid-row: 1 / span 2; justify-content: center; gap: 2.5mm; padding: 4mm 4.5mm; }
+.ph2 { display: flex; align-items: center; gap: 3mm; }
+.play { width: 13mm; height: 13mm; flex: none; }
+.tile .gp { display: block; font-size: 15pt; font-weight: 800; color: #3C4043; margin: 0; line-height: 1.1; }
+.tile .lv { display: block; font-size: 10.5pt; font-weight: 800; color: var(--teal); margin-top: .6mm; }
+.playcard img { width: 100%; border: .3mm solid var(--line); border-radius: 2mm; display: block; }
+.tile.live .l2 { font-size: 11pt; color: #FFD98A; }
+
+/* 28 Nov polish pass: readable at arm's length */
+.brand { font-size: 10pt; } .brand .tn { background: var(--sage-d); color: #fff; border-radius: 99px; padding: .8mm 3.5mm; margin-right: 2.5mm; letter-spacing: .05em; }
+.cover h1 { font-size: 40pt; margin-top: 5mm; } .cover .sub { font-size: 16pt; }
+.cover .tiles { margin-top: 6mm; }
+.cover .tile b { font-size: 30pt; } .cover .tile.big b { font-size: 46pt; }
+.cover .tile span { font-size: 11pt; line-height: 1.2; } .cover .tile i { font-size: 9pt; line-height: 1.3; }
+.cover .tile.big span { font-size: 14pt; } .cover .tile.big i { font-size: 10pt; }
+.tile.playcard { justify-content: flex-start; gap: 3mm; padding: 4.5mm 5mm; }
+.tile.playcard .gp { font-size: 17pt; } .tile.playcard .lv { font-size: 12pt; }
+.play { width: 14mm; height: 14mm; }
+.appicon { margin-left: auto; width: 17mm; height: 17mm; flex: none; border-radius: 4mm;
+  background: url(play-listing.png) no-repeat; background-size: 94.9mm auto; background-position: -72.8mm -1.7mm; }
+.shot { width: 100%; aspect-ratio: 1230 / 440; border: .3mm solid var(--line); border-radius: 2mm;
+  background: url(play-listing.png) no-repeat 0 0; background-size: 174.8% auto; }
+.tile.live .l2 { font-size: 12.5pt; }
+.started { margin-top: 5mm; padding: 3.5mm 4mm; }
+.started .sh { font-size: 12.5pt; } .started .sh span { font-size: 9pt; }
+.started .si { font-size: 9.8pt; } .started .si b { font-size: 11.5pt; }
+.cover .story { margin-top: 5mm; } .cover .step { font-size: 10.5pt; }
+.team5 { margin-top: auto; display: grid; grid-template-columns: 36mm repeat(5, 1fr); gap: 3mm; align-items: stretch;
+  border-top: .3mm solid var(--line); padding-top: 4mm; }
+.th { font-size: 12.5pt; font-weight: 800; color: var(--sage-d); line-height: 1.2; align-self: center; }
+.tp { background: #fff; border: .3mm solid var(--line); border-radius: 3mm; padding: 2.6mm 3.5mm; border-top: 1.2mm solid var(--purple); }
+.tp.tech { border-top-color: var(--sage); }
+.tp b { display: block; font-size: 11pt; color: var(--ink); line-height: 1.2; }
+.tp span { display: block; font-size: 9pt; font-weight: 700; color: var(--purple); margin-top: .8mm; }
+.tp.tech span { color: var(--sage); }
+
+.page.month { padding: 9mm 11mm 7mm; }
+.kicker { font-size: 9pt; } .mhead h2 { font-size: 28pt; } .mnote { font-size: 10.5pt; color: var(--dmuted); }
+.mstats div { min-width: 24mm; padding: 2mm 3.5mm; } .mstats b { font-size: 17pt; } .mstats span { font-size: 7.5pt; }
+.mstats .sec b { font-size: 13pt; padding-top: 1mm; }
+.mbody { gap: 4mm; }
+.grid { grid-template-columns: 11mm repeat(7, 1fr); grid-template-rows: 6mm; }
+.grid .wd { font-size: 8.5pt; } .wk { font-size: 6.6pt; }
+.cell { padding: .9mm 1mm; } .cell .dn { font-size: 10.5pt; line-height: 1; }
+.cc { font-size: 6pt; }
+.chips { gap: .6mm; margin-top: .8mm; }
+.chip { font-size: 7.2pt; line-height: 1.12; border-radius: 1.3mm; padding: .65mm .8mm; max-height: none; }
+.rows6 .chip { font-size: 6.7pt; padding: .5mm .8mm; }
+.meta { font-size: 6.2pt; }
+.side { width: 58mm; }
+.scard { padding: 3mm 3.5mm; } .side h3 { font-size: 12pt; }
+.evl li { font-size: 8.4pt; padding: 1.3mm 0; } .edt { font-size: 7.4pt; } .ed { width: 12mm; }
+.small { font-size: 7.6pt; }
+.legend { font-size: 8.2pt; gap: 1.5mm 5mm; margin-top: 2.5mm; color: var(--dmuted); }
+.chip.mini { font-size: 7pt; padding: .5mm 2mm; border-radius: 1.3mm; }
+.src { font-size: 7.4pt; }
+.cell.dday .ddbig { font-size: 19pt; } .cell.dday .ddsub { font-size: 7.6pt; }
+.ddc { width: 6mm; height: 6mm; font-size: 9.5pt; }
+
+/* polish pass 2 */
+.cover .tiles { grid-template-columns: 1.05fr 1fr 1fr 1fr 1.7fr; gap: 4mm; margin-top: 5mm; }
+.cover .tile { padding: 3.2mm 4.5mm; }
+.cover .tile b { font-size: 27pt; } .cover .tile.big b { font-size: 44pt; }
+.cover .tile span { font-size: 10.5pt; margin-top: 1mm; } .cover .tile i { font-size: 8.6pt; margin-top: .8mm; }
+.tile.playcard { padding: 3.5mm 4.5mm; gap: 2.2mm; justify-content: center; }
+.tile.playcard .gp { font-size: 15pt; white-space: nowrap; } .tile.playcard .lv { font-size: 10.5pt; white-space: nowrap; margin-top: .3mm; }
+.play { width: 11mm; height: 11mm; } .ph2 { gap: 2.5mm; }
+.appicon { width: 13mm; height: 13mm; border-radius: 3mm; background-size: 72.6mm auto; background-position: -55.7mm -1.3mm; }
+.started { margin-top: 4mm; padding: 3mm 4mm; }
+.cover .story { margin-top: 4.5mm; } .cover .step { font-size: 10pt; line-height: 1.35; }
+.team5 { padding-top: 3.5mm; }
+.side { width: 62mm; }
+.evl.long li { font-size: 7.8pt; padding: .9mm 0; } .evl.long .edt { font-size: 7pt; }
+.side .small { margin-top: 1.5mm; }
+.legend { font-size: 8pt; gap: 1.5mm 6mm; }
+
+/* polish pass 3 */
+.side { width: 60mm; }
+.rows6 .chip { font-size: 6.6pt; }
+.legend { font-size: 7.8pt; gap: 1.5mm 4.5mm; }
+
+/* ===== print-saver variant (body.saver): white paper, outlines, low ink ===== */
+.saver, .saver .page, .saver .cover, .saver .page.month { background: #fff; }
+.saver .brand .tn { background: #fff; color: var(--sage-d); border: .5mm solid var(--sage-d); }
+.saver .tile { border: .4mm solid #CFC7B8; }
+.saver .tile.big { background: #fff; border: .9mm solid var(--sage); }
+.saver .tile.big b { color: var(--sage-d); } .saver .tile.big span { color: var(--ink); } .saver .tile.big i { color: var(--muted); }
+.saver .tile.live { background: #fff; border: .9mm solid var(--dgreen); }
+.saver .tile.live b { color: var(--rust); } .saver .tile.live span { color: var(--ink); } .saver .tile.live .l2 { color: var(--teal); }
+.saver .started { border: .4mm solid #CFC7B8; border-left: 1.4mm solid var(--teal); }
+.saver .step .n { background: #fff; color: var(--sage-d); border: .5mm solid var(--sage); }
+.saver .tp { border: .4mm solid #CFC7B8; border-top: 1.2mm solid var(--purple); } .saver .tp.tech { border-top-color: var(--sage); }
+.saver .cell, .saver .cell.h1, .saver .cell.h2, .saver .cell.h3, .saver .cell.h4, .saver .cell.future { background: #fff; border-color: #BDB6A8; }
+.saver .cell.out { background: #fff; } .saver .cell.out .dn { color: #B5B0A6; }
+.saver .heatlg { display: none; }
+.saver .chip { background: #fff; border: .35mm solid currentColor; padding: .4mm .7mm; }
+.saver .chip.c-meet { color: #2F43B5; background: #F3F5FF; } .saver .chip.c-review { color: #5B3D95; background: #F7F3FC; }
+.saver .chip.c-mile { color: #9A452C; background: #FDF4F0; } .saver .chip.c-built { color: #0E5E4F; background: #fff; }
+.saver .cc { color: #6F7B75; }
+.saver .cell.dday { background: #fff; border: 1.1mm solid #E0A93B; color: var(--dgreen); }
+.saver .cell.dday .ddbig { color: var(--rust); }
+.saver .ddc { background: #fff; color: #1A73E8; border: .5mm solid #1A73E8; }
+.saver .scard { border: .4mm solid #CFC7B8; }
+.saver .mstats div { border: .4mm solid #CFC7B8; }
+.saver .mhead { border-bottom-color: var(--dgreen); }
+</style></head><body class="saver">
+
+<section class="page cover">
+  <div class="brand"><span class="tn">Team Zeros and Ones</span> Health-a-thon 2026 Grand Finale · IIT Bombay · 28 Nov 2026</div>
+  <h1>How we built Sahara together</h1>
+  <div class="sub">Clinicians and technologists, August to November 2026</div>
+  <div class="tiles">
+    <div class="tile big"><b>658</b><span>code commits</span><i>7 Aug to 27 Nov, from the git history</i></div>
+    <div class="tile rose"><b>25</b><span>team meetings and doctor reviews</span><i>clinicians and technologists together</i></div>
+    <div class="tile"><b>53</b><span>active build days</span><i>days with code committed</i></div>
+    <div class="tile"><b>3</b><span>mentor and organiser sessions</span><i>webinar, mentor review, finale briefing</i></div>
+    <div class="tile"><b>176</b><span>AI-assisted build sessions</span><i>on 16 days, incl. agent sub-tasks</i></div>
+    <div class="tile gold"><b>4</b><span>Play Store releases</span><i>0.4.1 closed test, 0.7.1 production, 0.8.0, 0.8.2</i></div>
+    <div class="tile live"><b>LIVE</b><span>Live on the website</span><span class="l2">sahara.wedevit.in</span></div>
+    <div class="tile playcard"><div class="ph2"><svg viewBox="0 0 24 24" class="play"><polygon points="3,2 13,12 3,22" fill="#00C3FF"/><polygon points="3,2 16.5,9.5 13,12" fill="#00E676"/><polygon points="3,22 13,12 16.5,14.5" fill="#FF3A44"/><polygon points="16.5,9.5 21,12 16.5,14.5 13,12" fill="#FFD500"/></svg><div><span class="gp">Google Play</span><span class="lv">Live on Google Play</span></div><div class="appicon"></div></div>
+      <div class="shot"></div><i>Play Store listing · production since 9 Nov 2026</i></div>
+  </div>
+  <div class="started">
+    <div class="sh">How it started<br><span>August 2026</span></div>
+    <div class="si"><b>1–3 Aug</b>Doctors and healthcare professionals register</div>
+    <div class="si"><b>15 Aug</b>Tech team registration begins</div>
+    <div class="si"><b>20 Aug</b>Goals-of-care idea (Dr Sujay)</div>
+    <div class="si"><b>22 Aug</b>Matchmaking begins</div>
+    <div class="si"><b>24 Aug</b>First team meeting</div>
+  </div>
+  <div class="story">
+    <div class="step"><span class="n">1</span><div><b>Idea from the bedside.</b> Dr Sujay's goals-of-care concept and the first team meetings in August set the problem: a patient's and caregiver's wishes never reach the emergency room.</div></div>
+    <div class="step"><span class="n">2</span><div><b>Clinician-led reviews.</b> Dr Sharada, Shirin and Dr Sujay wrote the clinical reference, specs and survey, and reviewed every pitch and screen.</div></div>
+    <div class="step"><span class="n">3</span><div><b>Build sprints to field testing.</b> The technologists turned each review into builds, from closed testing in October to production in November and doctors testing on their own phones.</div></div>
+  </div>
+  <div class="team5">
+    <div class="th">Team<br>Zeros and Ones</div>
+    <div class="tp clin"><b>Dr Sujay H S</b><span>Clinician</span></div>
+    <div class="tp clin"><b>Dr Sharada Vinod Kutty</b><span>Clinician</span></div>
+    <div class="tp clin"><b>Shirin Ayub</b><span>Medical student</span></div>
+    <div class="tp tech"><b>Shaik Abdul Basith</b><span>Technologist · tech lead</span></div>
+    <div class="tp tech"><b>Shaik Awaiz</b><span>Technologist</span></div>
+  </div>
+</section>
+<section class="page month">
+  <header class="mhead">
+    <div><div class="kicker">Team Zeros and Ones · How we built Sahara together</div><h2>September 2026</h2><div class="mnote">Clinicians shape the product; the Round 1 pitch comes out of two review meetings.</div></div>
+    <div class="mstats">
+      <div><b>25</b><span>built or done</span></div>
+      <div><b>14</b><span>build days</span></div>
+      <div class="sec"><b>66</b><span>commits</span></div>
+      <div><b>1</b><span>AI sessions</span></div>
+    </div>
+  </header>
+  <div class="mbody">
+    <div class="grid rows5"><div class="wk"></div><div class="wd">MON</div><div class="wd">TUE</div><div class="wd">WED</div><div class="wd">THU</div><div class="wd">FRI</div><div class="wd">SAT</div><div class="wd">SUN</div><div class="wk">Week 5</div><div class="cell out"><span class="dn">31</span></div><div class="cell h0"><div class="top"><span class="dn">1</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">2</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">3</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">4</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">5</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">6</span></div><div class="chips"><div class="chip c-meet">Organisers&#x27; webinar</div></div><div class="meta"></div></div><div class="wk">Week 6</div><div class="cell h0"><div class="top"><span class="dn">7</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h1"><div class="top"><span class="dn">8</span><span class="cc">1 commit</span></div><div class="chips"><div class="chip c-built">First prototype</div></div><div class="meta"></div></div><div class="cell h1"><div class="top"><span class="dn">9</span><span class="cc">1 commit</span></div><div class="chips"><div class="chip c-built">Webinar notes saved</div></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">10</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">11</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">12</span></div><div class="chips"><div class="chip c-review">Clinical draft shared</div></div><div class="meta"></div></div><div class="cell h1"><div class="top"><span class="dn">13</span><span class="cc">1 commit</span></div><div class="chips"><div class="chip c-built">Patient portal</div><div class="chip c-built">Nearby-care map</div></div><div class="meta"></div></div><div class="wk">Week 7</div><div class="cell h1"><div class="top"><span class="dn">14</span><span class="cc">2 commits</span></div><div class="chips"><div class="chip c-built">Care UI refresh</div><div class="chip c-built">Plainer labels</div></div><div class="meta"></div></div><div class="cell h1"><div class="top"><span class="dn">15</span><span class="cc">3 commits</span></div><div class="chips"><div class="chip c-built">Voice dictation</div><div class="chip c-built">Hindi patient portal</div><div class="chip c-built">Offline QR scanner</div></div><div class="meta"></div></div><div class="cell h4"><div class="top"><span class="dn">16</span><span class="cc">22 commits</span></div><div class="chips"><div class="chip c-built">Symptom tracker (ESAS-r)</div><div class="chip c-built">Care journey timeline</div><div class="chip c-built">Home care protocols</div></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">17</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h1"><div class="top"><span class="dn">18</span><span class="cc">3 commits</span></div><div class="chips"><div class="chip c-built">Care map + QR bridge</div><div class="chip c-built">Bleeding crisis guide</div></div><div class="meta"><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>1</span></div></div><div class="cell h0"><div class="top"><span class="dn">19</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">20</span></div><div class="chips"><div class="chip c-review">Shirin&#x27;s review</div></div><div class="meta"></div></div><div class="wk">Week 8</div><div class="cell h3"><div class="top"><span class="dn">21</span><span class="cc">9 commits</span></div><div class="chips"><div class="chip c-meet">Product review call</div><div class="chip c-built">Care map pins</div><div class="chip c-built">Role-based sign-in</div><div class="chip c-built">Caregiver handover</div></div><div class="meta"></div></div><div class="cell h1"><div class="top"><span class="dn">22</span><span class="cc">1 commit</span></div><div class="chips"><div class="chip c-built">Minutes into caregiver brief</div></div><div class="meta"></div></div><div class="cell h1"><div class="top"><span class="dn">23</span><span class="cc">2 commits</span></div><div class="chips"><div class="chip c-meet">Round 1 pitch call</div><div class="chip c-built">Caregiver care flows</div><div class="chip c-built">Web app deployed</div></div><div class="meta"></div></div><div class="cell h3"><div class="top"><span class="dn">24</span><span class="cc">16 commits</span></div><div class="chips"><div class="chip c-review">Dr Sujay&#x27;s feedback</div><div class="chip c-built">Care conversation requests</div><div class="chip c-built">Pitch deck visuals</div></div><div class="meta"></div></div><div class="cell h1"><div class="top"><span class="dn">25</span><span class="cc">2 commits</span></div><div class="chips"><div class="chip c-mile">Round 1 answers</div><div class="chip c-built">Pitch deck reordered</div></div><div class="meta"></div></div><div class="cell h1"><div class="top"><span class="dn">26</span><span class="cc">1 commit</span></div><div class="chips"><div class="chip c-built">App and deck refresh</div></div><div class="meta"></div></div><div class="cell h1"><div class="top"><span class="dn">27</span><span class="cc">2 commits</span></div><div class="chips"><div class="chip c-built">Dr Sharada&#x27;s deck review</div></div><div class="meta"></div></div><div class="wk">Week 9</div><div class="cell h0"><div class="top"><span class="dn">28</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">29</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">30</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell out"><span class="dn">1</span></div><div class="cell out"><span class="dn">2</span></div><div class="cell out"><span class="dn">3</span></div><div class="cell out"><span class="dn">4</span></div></div>
+    <aside class="side">
+      <div class="scard"><h3>Key days</h3>
+      <ul class="evl"><li><span class="ed">6 Sep</span><span class="mk dot meet"></span><span class="et"><b>Organisers&#x27; webinar</b><br><span class="edt">Health-a-thon Connect session</span></span></li><li><span class="ed">12 Sep</span><span class="mk dot review"></span><span class="et"><b>Clinical draft shared</b><br><span class="edt">Dr Sharada&#x27;s clinical reference and Dr Sujay&#x27;s form</span></span></li><li><span class="ed">20 Sep</span><span class="mk dot review"></span><span class="et"><b>Shirin&#x27;s review</b><br><span class="edt">One care calendar, fewer clicks</span></span></li><li><span class="ed">21 Sep</span><span class="mk dot meet"></span><span class="et"><b>Product review call</b><br><span class="edt">Team meeting, minutes saved</span></span></li><li><span class="ed">23 Sep</span><span class="mk dot meet"></span><span class="et"><b>Round 1 pitch call</b><br><span class="edt">Team meeting, minutes saved</span></span></li><li><span class="ed">24 Sep</span><span class="mk dot review"></span><span class="et"><b>Dr Sujay&#x27;s feedback</b><br><span class="edt">Morning feedback on the deck</span></span></li><li><span class="ed">25 Sep</span><span class="mk dot mile"></span><span class="et"><b>Round 1 answers</b><br><span class="edt">Revised portal answers saved</span></span></li></ul></div>
+      <div class="small muted">Teal chips: what was built or done that day, from the git history and project notes.</div><div class="small muted">Sources: git history, meeting minutes, review notes, Play Console dates.</div>
+    </aside>
+  </div>
+  <footer class="legend">
+  <span class="lg heatlg"><span class="sw h1"></span><span class="sw h2"></span><span class="sw h3"></span><span class="sw h4"></span>&nbsp;commits per day (1–3, 4–8, 9–20, 21+)</span>
+  <span class="lg"><span class="chip c-meet mini">Meeting</span>team / mentor / organisers</span>
+  <span class="lg"><span class="chip c-review mini">Doctor</span>doctor review or input</span>
+  <span class="lg"><span class="chip c-mile mini">Milestone</span>release or milestone</span>
+  <span class="lg"><span class="chip c-built mini">Built</span>built or done</span>
+  <span class="lg ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>&nbsp;AI-assisted sessions</span>
+</footer>
+</section>
+<section class="page month">
+  <header class="mhead">
+    <div><div class="kicker">Team Zeros and Ones · How we built Sahara together</div><h2>October 2026</h2><div class="mnote">Shortlisted. The first test build reaches real phones; mentor review; hospital survey.</div></div>
+    <div class="mstats">
+      <div><b>38</b><span>built or done</span></div>
+      <div><b>22</b><span>build days</span></div>
+      <div class="sec"><b>354</b><span>commits</span></div>
+      <div><b>47</b><span>AI sessions</span></div>
+    </div>
+  </header>
+  <div class="mbody">
+    <div class="grid rows5"><div class="wk"></div><div class="wd">MON</div><div class="wd">TUE</div><div class="wd">WED</div><div class="wd">THU</div><div class="wd">FRI</div><div class="wd">SAT</div><div class="wd">SUN</div><div class="wk">Week 9</div><div class="cell out"><span class="dn">28</span></div><div class="cell out"><span class="dn">29</span></div><div class="cell out"><span class="dn">30</span></div><div class="cell h0"><div class="top"><span class="dn">1</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h1"><div class="top"><span class="dn">2</span><span class="cc">1 commit</span></div><div class="chips"><div class="chip c-built">Karnataka care directory</div><div class="chip c-built">Shared hospital reports</div></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">3</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">4</span></div><div class="chips"></div><div class="meta"></div></div><div class="wk">Week 10</div><div class="cell h1"><div class="top"><span class="dn">5</span><span class="cc">1 commit</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">6</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">7</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">8</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h1"><div class="top"><span class="dn">9</span><span class="cc">3 commits</span></div><div class="chips"><div class="chip c-mile">Top 120 shortlist</div><div class="chip c-built">Native Android + map</div></div><div class="meta"></div></div><div class="cell h2"><div class="top"><span class="dn">10</span><span class="cc">8 commits</span></div><div class="chips"><div class="chip c-built">Safe account deletion</div><div class="chip c-built">Medicine organiser</div><div class="chip c-built">Sahara branding</div></div><div class="meta"></div></div><div class="cell h1"><div class="top"><span class="dn">11</span><span class="cc">3 commits</span></div><div class="chips"><div class="chip c-built">Prescription organiser</div><div class="chip c-built">Web features on Android</div></div><div class="meta"></div></div><div class="wk">Week 11</div><div class="cell h0"><div class="top"><span class="dn">12</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h1"><div class="top"><span class="dn">13</span><span class="cc">2 commits</span></div><div class="chips"><div class="chip c-built">Scanner verified</div></div><div class="meta"></div></div><div class="cell h2"><div class="top"><span class="dn">14</span><span class="cc">5 commits</span></div><div class="chips"><div class="chip c-mile">Closed testing 0.4.1</div><div class="chip c-built">Testers invited</div></div><div class="meta"></div></div><div class="cell h1"><div class="top"><span class="dn">15</span><span class="cc">1 commit</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h3"><div class="top"><span class="dn">16</span><span class="cc">18 commits</span></div><div class="chips"><div class="chip c-built">Sahara 0.5 alpha</div><div class="chip c-built">Privacy and safety</div></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">17</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">18</span></div><div class="chips"></div><div class="meta"></div></div><div class="wk">Week 12</div><div class="cell h3"><div class="top"><span class="dn">19</span><span class="cc">14 commits</span></div><div class="chips"><div class="chip c-built">Hospital survey live</div><div class="chip c-built">On-device processing</div><div class="chip c-built">Feedback form</div></div><div class="meta"></div></div><div class="cell h1"><div class="top"><span class="dn">20</span><span class="cc">2 commits</span></div><div class="chips"><div class="chip c-meet">Mentor meeting</div><div class="chip c-built">National care directory</div></div><div class="meta"></div></div><div class="cell h2"><div class="top"><span class="dn">21</span><span class="cc">4 commits</span></div><div class="chips"><div class="chip c-built">Release verified</div><div class="chip c-built">Research archive</div></div><div class="meta"></div></div><div class="cell h1"><div class="top"><span class="dn">22</span><span class="cc">1 commit</span></div><div class="chips"><div class="chip c-built">Daily health workflow</div></div><div class="meta"></div></div><div class="cell h2"><div class="top"><span class="dn">23</span><span class="cc">4 commits</span></div><div class="chips"><div class="chip c-review">Hospital survey</div><div class="chip c-built">Phase 2 deck</div></div><div class="meta"></div></div><div class="cell h3"><div class="top"><span class="dn">24</span><span class="cc">19 commits</span></div><div class="chips"><div class="chip c-built">Symptom diary</div><div class="chip c-built">3D pain locations</div></div><div class="meta"></div></div><div class="cell h1"><div class="top"><span class="dn">25</span><span class="cc">1 commit</span></div><div class="chips"><div class="chip c-built">Symptom tracker</div><div class="chip c-built">Navigation, feedback</div></div><div class="meta"></div></div><div class="wk">Week 13</div><div class="cell h3"><div class="top"><span class="dn">26</span><span class="cc">18 commits</span></div><div class="chips"><div class="chip c-built">Pain body map</div><div class="chip c-built">Motion and loading</div></div><div class="meta"></div></div><div class="cell h4"><div class="top"><span class="dn">27</span><span class="cc">158 commits</span></div><div class="chips"><div class="chip c-built">Hindi + offline speech</div><div class="chip c-built">Accessibility pass</div><div class="chip c-built">In-app account deletion</div></div><div class="meta"></div></div><div class="cell h4"><div class="top"><span class="dn">28</span><span class="cc">45 commits</span></div><div class="chips"><div class="chip c-meet">Team meeting</div><div class="chip c-built">Ask your documents</div><div class="chip c-built">In-app doctor approval</div></div><div class="meta"><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>1</span></div></div><div class="cell h4"><div class="top"><span class="dn">29</span><span class="cc">26 commits</span></div><div class="chips"><div class="chip c-review">Dr Sharada&#x27;s specs</div><div class="chip c-built">Survey admin page</div></div><div class="meta"><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>32</span></div></div><div class="cell h3"><div class="top"><span class="dn">30</span><span class="cc">18 commits</span></div><div class="chips"><div class="chip c-built">Emergency care plan</div><div class="chip c-built">Emergency QR card</div><div class="chip c-built">Telugu, Urdu, Kannada</div></div><div class="meta"><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>14</span></div></div><div class="cell h1"><div class="top"><span class="dn">31</span><span class="cc">2 commits</span></div><div class="chips"><div class="chip c-built">Patient summary</div><div class="chip c-built">Care timeline</div><div class="chip c-built">Side-effect notes</div></div><div class="meta"></div></div><div class="cell out"><span class="dn">1</span></div></div>
+    <aside class="side">
+      <div class="scard"><h3>Key days</h3>
+      <ul class="evl"><li><span class="ed">9 Oct</span><span class="mk dot mile"></span><span class="et"><b>Top 120 shortlist</b><br><span class="edt">Shortlisted from 450+ submissions</span></span></li><li><span class="ed">14 Oct</span><span class="mk dot mile"></span><span class="et"><b>Closed testing 0.4.1</b><br><span class="edt">Play Store closed testing</span></span></li><li><span class="ed">20 Oct</span><span class="mk dot meet"></span><span class="et"><b>Mentor meeting</b><br><span class="edt">Mentor session with test APK</span></span></li><li><span class="ed">23 Oct</span><span class="mk dot review"></span><span class="et"><b>Hospital survey</b><br><span class="edt">Dr Sujay&#x27;s survey follow-up</span></span></li><li><span class="ed">28 Oct</span><span class="mk dot meet"></span><span class="et"><b>Team meeting</b><br><span class="edt">Goals-of-care sign-off decisions</span></span></li><li><span class="ed">29 Oct</span><span class="mk dot review"></span><span class="et"><b>Dr Sharada&#x27;s specs</b><br><span class="edt">Clinical and tech specifications</span></span></li></ul></div>
+      <div class="small muted">Teal chips: what was built or done that day, from the git history and project notes.</div><div class="small muted">Sources: git history, meeting minutes, review notes, Play Console dates.</div>
+    </aside>
+  </div>
+  <footer class="legend">
+  <span class="lg heatlg"><span class="sw h1"></span><span class="sw h2"></span><span class="sw h3"></span><span class="sw h4"></span>&nbsp;commits per day (1–3, 4–8, 9–20, 21+)</span>
+  <span class="lg"><span class="chip c-meet mini">Meeting</span>team / mentor / organisers</span>
+  <span class="lg"><span class="chip c-review mini">Doctor</span>doctor review or input</span>
+  <span class="lg"><span class="chip c-mile mini">Milestone</span>release or milestone</span>
+  <span class="lg"><span class="chip c-built mini">Built</span>built or done</span>
+  <span class="lg ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>&nbsp;AI-assisted sessions</span>
+</footer>
+</section>
+<section class="page month">
+  <header class="mhead">
+    <div><div class="kicker">Team Zeros and Ones · How we built Sahara together</div><h2>November 2026</h2><div class="mnote">Final submission, production release, doctors' device reviews, pitch rehearsal, then the finale.</div></div>
+    <div class="mstats">
+      <div><b>31</b><span>built or done</span></div>
+      <div><b>16</b><span>build days</span></div>
+      <div class="sec"><b>237</b><span>commits</span></div>
+      <div><b>127</b><span>AI sessions</span></div>
+    </div>
+  </header>
+  <div class="mbody">
+    <div class="grid rows6"><div class="wk"></div><div class="wd">MON</div><div class="wd">TUE</div><div class="wd">WED</div><div class="wd">THU</div><div class="wd">FRI</div><div class="wd">SAT</div><div class="wd">SUN</div><div class="wk">Week 13</div><div class="cell out"><span class="dn">26</span></div><div class="cell out"><span class="dn">27</span></div><div class="cell out"><span class="dn">28</span></div><div class="cell out"><span class="dn">29</span></div><div class="cell out"><span class="dn">30</span></div><div class="cell out"><span class="dn">31</span></div><div class="cell h2"><div class="top"><span class="dn">1</span><span class="cc">7 commits</span></div><div class="chips"><div class="chip c-built">Goals-of-care recording</div><div class="chip c-built">Today / Care redesign</div></div><div class="meta"><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>4</span></div></div><div class="wk">Week 14</div><div class="cell h1"><div class="top"><span class="dn">2</span><span class="cc">2 commits</span></div><div class="chips"><div class="chip c-built">Doctor schedule</div><div class="chip c-built">Patient profile</div></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">3</span></div><div class="chips"><div class="chip c-meet">Team meeting</div></div><div class="meta"></div></div><div class="cell h2"><div class="top"><span class="dn">4</span><span class="cc">5 commits</span></div><div class="chips"><div class="chip c-built">Meeting changes</div><div class="chip c-built">8-tap goals of care</div><div class="chip c-built">Clinical document</div></div><div class="meta"><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>17</span></div></div><div class="cell h3"><div class="top"><span class="dn">5</span><span class="cc">19 commits</span></div><div class="chips"><div class="chip c-built">AI + backup models</div><div class="chip c-built">Offline Whisper</div><div class="chip c-built">Final deck v2</div></div><div class="meta"><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>45</span></div></div><div class="cell h4"><div class="top"><span class="dn">6</span><span class="cc">111 commits</span></div><div class="chips"><div class="chip c-built">Community groups</div><div class="chip c-built">910 tests pass</div><div class="chip c-built">Illustrations, animations</div></div><div class="meta"></div></div><div class="cell h4"><div class="top"><span class="dn">7</span><span class="cc">38 commits</span></div><div class="chips"><div class="chip c-mile">Final submission pack</div><div class="chip c-built">Caregiver wellbeing</div><div class="chip c-built">Dr Sujay&#x27;s fixes</div></div><div class="meta"><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>21</span></div></div><div class="cell h3"><div class="top"><span class="dn">8</span><span class="cc">12 commits</span></div><div class="chips"><div class="chip c-built">Sahara 0.7.0 build</div><div class="chip c-built">Final deck and brief</div></div><div class="meta"><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>6</span></div></div><div class="wk">Week 15</div><div class="cell h2"><div class="top"><span class="dn">9</span><span class="cc">6 commits</span></div><div class="chips"><div class="chip c-mile">Production 0.7.1</div><div class="chip c-built">Sahara feature film</div></div><div class="meta"><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>6</span></div></div><div class="cell h1"><div class="top"><span class="dn">10</span><span class="cc">2 commits</span></div><div class="chips"><div class="chip c-built">Sahara journey film</div></div><div class="meta"><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>6</span></div></div><div class="cell h0"><div class="top"><span class="dn">11</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">12</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">13</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">14</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">15</span></div><div class="chips"></div><div class="meta"></div></div><div class="wk">Week 16</div><div class="cell h0"><div class="top"><span class="dn">16</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">17</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">18</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">19</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell h0"><div class="top"><span class="dn">20</span></div><div class="chips"></div><div class="meta"><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>4</span></div></div><div class="cell h1"><div class="top"><span class="dn">21</span><span class="cc">1 commit</span></div><div class="chips"><div class="chip c-review">Dr Sujay&#x27;s photo review</div><div class="chip c-built">Next-visit dialog fix</div></div><div class="meta"><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>2</span></div></div><div class="cell h1"><div class="top"><span class="dn">22</span><span class="cc">3 commits</span></div><div class="chips"><div class="chip c-review">Video reviews</div><div class="chip c-meet">Team meeting</div><div class="chip c-built">Video-review fixes</div></div><div class="meta"><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>13</span></div></div><div class="wk">Week 17</div><div class="cell h3"><div class="top"><span class="dn">23</span><span class="cc">11 commits</span></div><div class="chips"><div class="chip c-meet">Organisers&#x27; briefing</div><div class="chip c-mile">0.8.0 in review</div><div class="chip c-built">First-run care details</div><div class="chip c-built">UI revamp</div></div><div class="meta"><span class="ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>3</span></div></div><div class="cell h1"><div class="top"><span class="dn">24</span><span class="cc">2 commits</span></div><div class="chips"><div class="chip c-meet">Team meeting</div><div class="chip c-built">Simple Mode</div><div class="chip c-built">Calmer UI</div></div><div class="meta"></div></div><div class="cell h1"><div class="top"><span class="dn">25</span><span class="cc">1 commit</span></div><div class="chips"><div class="chip c-mile">Sahara 0.8.2</div><div class="chip c-built">6 more languages</div><div class="chip c-built">Smoother native feel</div></div><div class="meta"></div></div><div class="cell h1"><div class="top"><span class="dn">26</span><span class="cc">3 commits</span></div><div class="chips"><div class="chip c-built">Patient-side redesign</div><div class="chip c-built">Tighter Today cards</div></div><div class="meta"></div></div><div class="cell h3"><div class="top"><span class="dn">27</span><span class="cc">14 commits</span></div><div class="chips"><div class="chip c-meet">Pitch rehearsal</div><div class="chip c-built">Doctor-side redesign</div><div class="chip c-built">Searchable lists</div></div><div class="meta"></div></div><div class="cell dday"><span class="ddc">28</span><div class="ddbig">D-DAY</div><div class="ddsub">Grand Finale · IIT Bombay</div></div><div class="cell h0 future"><div class="top"><span class="dn">29</span></div><div class="chips"></div><div class="meta"></div></div><div class="wk">Week 18</div><div class="cell h0 future"><div class="top"><span class="dn">30</span></div><div class="chips"></div><div class="meta"></div></div><div class="cell out"><span class="dn">1</span></div><div class="cell out"><span class="dn">2</span></div><div class="cell out"><span class="dn">3</span></div><div class="cell out"><span class="dn">4</span></div><div class="cell out"><span class="dn">5</span></div><div class="cell out"><span class="dn">6</span></div></div>
+    <aside class="side">
+      <div class="scard"><h3>Key days</h3>
+      <ul class="evl long"><li><span class="ed">3 Nov</span><span class="mk dot meet"></span><span class="et"><b>Team meeting</b><br><span class="edt">Changes built 4 Nov</span></span></li><li><span class="ed">7 Nov</span><span class="mk dot mile"></span><span class="et"><b>Final submission pack</b><br><span class="edt">Brief and deck, Dr Sujay&#x27;s edits</span></span></li><li><span class="ed">9 Nov</span><span class="mk dot mile"></span><span class="et"><b>Production 0.7.1</b><br><span class="edt">Live on the Play Store</span></span></li><li><span class="ed">21 Nov</span><span class="mk dot review"></span><span class="et"><b>Dr Sujay&#x27;s photo review</b><br><span class="edt">Device test, six screens</span></span></li><li><span class="ed">22 Nov</span><span class="mk dot review"></span><span class="et"><b>Video reviews</b><br><span class="edt">Dr Sujay&#x27;s videos; Shirin&#x27;s and Dr Sharada&#x27;s notes</span></span></li><li><span class="ed">22 Nov</span><span class="mk dot meet"></span><span class="et"><b>Team meeting</b><br><span class="edt">Pitch plan and field-test plan</span></span></li><li><span class="ed">23 Nov</span><span class="mk dot meet"></span><span class="et"><b>Organisers&#x27; briefing</b><br><span class="edt">Finale format and jury</span></span></li><li><span class="ed">23 Nov</span><span class="mk dot mile"></span><span class="et"><b>0.8.0 in review</b><br><span class="edt">Sent to Play Store review</span></span></li><li><span class="ed">24 Nov</span><span class="mk dot meet"></span><span class="et"><b>Team meeting</b><br><span class="edt">Screen by screen, with the doctors</span></span></li><li><span class="ed">25 Nov</span><span class="mk dot mile"></span><span class="et"><b>Sahara 0.8.2</b><br><span class="edt">Simple Mode, 6 more languages</span></span></li><li><span class="ed">27 Nov</span><span class="mk dot meet"></span><span class="et"><b>Pitch rehearsal</b><br><span class="edt">Deck and demo plan, in person</span></span></li><li><span class="ed">28 Nov</span><span class="mk dot mile"></span><span class="et"><b>D-DAY: Grand Finale</b><br><span class="edt">IIT Bombay</span></span></li></ul></div>
+      <div class="small muted">Teal chips: what was built or done that day, from the git history and project notes.</div><div class="small muted">Sources: git history, meeting minutes, review notes, Play Console dates.</div>
+    </aside>
+  </div>
+  <footer class="legend">
+  <span class="lg heatlg"><span class="sw h1"></span><span class="sw h2"></span><span class="sw h3"></span><span class="sw h4"></span>&nbsp;commits per day (1–3, 4–8, 9–20, 21+)</span>
+  <span class="lg"><span class="chip c-meet mini">Meeting</span>team / mentor / organisers</span>
+  <span class="lg"><span class="chip c-review mini">Doctor</span>doctor review or input</span>
+  <span class="lg"><span class="chip c-mile mini">Milestone</span>release or milestone</span>
+  <span class="lg"><span class="chip c-built mini">Built</span>built or done</span>
+  <span class="lg ai"><svg viewBox="0 0 12 12" class="ic"><path d="M6 1l1.3 3.2L10.5 5.5 7.3 6.8 6 10 4.7 6.8 1.5 5.5 4.7 4.2z" fill="currentColor"/></svg>&nbsp;AI-assisted sessions</span>
+</footer>
+</section>
+</body></html>

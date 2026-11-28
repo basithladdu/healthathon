@@ -6120,3 +6120,63 @@ This text is in another language, so the phone cannot read it out exactly. Ask s
 The phone can only read text written in the app language. Choose “Someone read it to me”.	ആപ്പിന്റെ ഭാഷയിൽ എഴുതിയത് മാത്രമേ ഫോണിന് വായിക്കാൻ കഴിയൂ. “ഒരാൾ എനിക്ക് വായിച്ചു തന്നു” തിരഞ്ഞെടുക്കുക.
 This phone has no voice for the app language. Choose “Someone read it to me”.	ഈ ഫോണിൽ ആപ്പിന്റെ ഭാഷയ്ക്കുള്ള ശബ്ദമില്ല. “ഒരാൾ എനിക്ക് വായിച്ചു തന്നു” തിരഞ്ഞെടുക്കുക.
 Only someone who can edit this care record can change this.	ഈ പരിചരണ രേഖ തിരുത്താൻ കഴിയുന്നവർക്ക് മാത്രമേ ഇത് മാറ്റാൻ കഴിയൂ.
+Show the map	മാപ്പ് കാണിക്കുക
+Show the list	പട്ടിക കാണിക്കുക
+${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} at ${demoTime(v.due)}. Opens their visits.	${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} ${demoTime(v.due)}-ന്. അവരുടെ സന്ദർശനങ്ങൾ തുറക്കും.
+Practice cards have no web link. Sign in to your own account to make one.	പരിശീലന കാർഡുകൾക്ക് വെബ് ലിങ്ക് ഇല്ല. ലിങ്ക് ഉണ്ടാക്കാൻ നിങ്ങളുടെ സ്വന്തം അക്കൗണ്ടിൽ സൈൻ ഇൻ ചെയ്യുക.
+Web link is ready. Scanning the QR now opens this card on sahara.wedevit.in.	വെബ് ലിങ്ക് തയ്യാറാണ്. ഇനി QR സ്കാൻ ചെയ്താൽ ഈ കാർഡ് sahara.wedevit.in-ൽ തുറക്കും.
+Making the web link…	വെബ് ലിങ്ക് ഉണ്ടാക്കുന്നു…
+Make web link	വെബ് ലിങ്ക് ഉണ്ടാക്കുക
+We never ask for Aadhaar, date of birth or gender to sign up.	സൈൻ അപ്പ് ചെയ്യാൻ ഞങ്ങൾ ഒരിക്കലും ആധാർ, ജനനത്തീയതി, ലിംഗഭേദം എന്നിവ ചോദിക്കില്ല.
+Big buttons that speak. Tap Full app at the bottom to come back.	സംസാരിക്കുന്ന വലിയ ബട്ടണുകൾ. തിരികെ വരാൻ താഴെ മുഴുവൻ ആപ്പ് ടാപ്പ് ചെയ്യുക.
+Switch on	ഓൺ ചെയ്യുക
+Switch to Simple mode?	ലളിത മോഡിലേക്ക് മാറണോ?
+$clock dose	$clock ഡോസ്
+Hard	ബുദ്ധിമുട്ട്
+Mark $medicine taken	$medicine കഴിച്ചതായി അടയാളപ്പെടുത്തുക
+No check-in	ചെക്ക്-ഇൻ ഇല്ല
+Not marked yet	ഇതുവരെ അടയാളപ്പെടുത്തിയിട്ടില്ല
+Open on the website	വെബ്‌സൈറ്റിൽ തുറക്കുക
+This policy is shown in English.	ഈ നയം ഇംഗ്ലീഷിലാണ് കാണിക്കുന്നത്.
+new	പുതിയവ
+symptom noted	ലക്ഷണം രേഖപ്പെടുത്തി
+Caring for	ഇവരുടെ പരിചരണം
+Feeling very upset?	വളരെ വിഷമമുണ്ടോ?
+Mark all taken	എല്ലാം കഴിച്ചതായി അടയാളപ്പെടുത്തുക
+Note a side effect	പാർശ്വഫലം രേഖപ്പെടുത്തുക
+Reminder times	ഓർമ്മപ്പെടുത്തൽ സമയങ്ങൾ
+Tell the doctor: 1 side effect	ഡോക്ടറോട് പറയുക: 1 പാർശ്വഫലം
+Tell the doctor: $count side effects	ഡോക്ടറോട് പറയുക: $count പാർശ്വഫലങ്ങൾ
+Past medicines	മുമ്പത്തെ മരുന്നുകൾ
+Scan a prescription or strip	കുറിപ്പടിയോ സ്ട്രിപ്പോ സ്കാൻ ചെയ്യുക
+Type it in	ടൈപ്പ് ചെയ്യുക
+When needed	ആവശ്യമുള്ളപ്പോൾ
+Took one	ഒന്ന് കഴിച്ചു
+All done for today	ഇന്നത്തേത് എല്ലാം കഴിഞ്ഞു
+Next: $slot	അടുത്തത്: $slot
+$count medicines	$count മരുന്നുകൾ
+marked taken	കഴിച്ചതായി അടയാളപ്പെടുത്തി
+Care near me	എന്റെ അടുത്തുള്ള പരിചരണം
+Requests to doctor	ഡോക്ടറോടുള്ള അഭ്യർത്ഥനകൾ
+No check-ins this week	ഈ ആഴ്ച ചെക്ക്-ഇൻ ഇല്ല
+1 check-in this week	ഈ ആഴ്ച 1 ചെക്ക്-ഇൻ
+$checkedDays check-ins this week	ഈ ആഴ്ച $checkedDays ചെക്ക്-ഇനുകൾ
+symptoms on 1 day	1 ദിവസം ലക്ഷണങ്ങൾ
+symptoms on $symptomDays days	$symptomDays ദിവസം ലക്ഷണങ്ങൾ
+Simple mode is on. Tap Full app at the bottom to come back.	ലളിത മോഡ് ഓണാണ്. തിരികെ വരാൻ താഴെ മുഴുവൻ ആപ്പ് ടാപ്പ് ചെയ്യുക.
+On because you are 60 or older	നിങ്ങൾക്ക് 60 വയസ്സോ അതിൽ കൂടുതലോ ഉള്ളതിനാൽ ഓണാണ്
+Family and sharing	കുടുംബവും പങ്കിടലും
+Search patients	രോഗികളെ തിരയുക
+Record a goals-of-care talk	പരിചരണ ലക്ഷ്യങ്ങളെക്കുറിച്ചുള്ള സംഭാഷണം റെക്കോർഡ് ചെയ്യുക
+Choose the patient	രോഗിയെ തിരഞ്ഞെടുക്കുക
+$done of $total	$total ൽ $done
+$done of $total visits done today	ഇന്ന് $total സന്ദർശനങ്ങളിൽ $done പൂർത്തിയായി
+visits today	ഇന്നത്തെ സന്ദർശനങ്ങൾ
+visits	സന്ദർശനങ്ങൾ
+See schedule	ഷെഡ്യൂൾ കാണുക
+Hard days	ബുദ്ധിമുട്ടുള്ള ദിവസങ്ങൾ
+Needs you	നിങ്ങളെ കാത്തിരിക്കുന്നവ
+Nothing waiting	ഒന്നും ബാക്കിയില്ല
+Verify your registration	നിങ്ങളുടെ രജിസ്ട്രേഷൻ സ്ഥിരീകരിക്കുക
+Are you still caring for $caringName?	നിങ്ങൾ ഇപ്പോഴും $caringName നെ പരിചരിക്കുന്നുണ്ടോ?
+How is $caringName feeling today?	$caringName ഇന്ന് എങ്ങനെയുണ്ട്?

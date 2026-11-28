@@ -6120,3 +6120,63 @@ This text is in another language, so the phone cannot read it out exactly. Ask s
 The phone can only read text written in the app language. Choose “Someone read it to me”.	ફોન ફક્ત ઍપની ભાષામાં લખેલું લખાણ જ વાંચી શકે છે. “કોઈએ મને વાંચી સંભળાવ્યું” પસંદ કરો.
 This phone has no voice for the app language. Choose “Someone read it to me”.	આ ફોનમાં ઍપની ભાષાનો અવાજ નથી. “કોઈએ મને વાંચી સંભળાવ્યું” પસંદ કરો.
 Only someone who can edit this care record can change this.	આ સંભાળ રેકોર્ડમાં ફેરફાર કરી શકનાર જ આ બદલી શકે છે.
+Show the map	નકશો બતાવો
+Show the list	યાદી બતાવો
+${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} at ${demoTime(v.due)}. Opens their visits.	${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} ${demoTime(v.due)} વાગ્યે. તેમની મુલાકાતો ખોલે છે.
+Practice cards have no web link. Sign in to your own account to make one.	અભ્યાસ કાર્ડમાં વેબ લિંક હોતી નથી. લિંક બનાવવા માટે તમારા પોતાના ખાતાથી સાઇન ઇન કરો.
+Web link is ready. Scanning the QR now opens this card on sahara.wedevit.in.	વેબ લિંક તૈયાર છે. હવે QR સ્કેન કરવાથી આ કાર્ડ sahara.wedevit.in પર ખુલશે.
+Making the web link…	વેબ લિંક બની રહી છે…
+Make web link	વેબ લિંક બનાવો
+We never ask for Aadhaar, date of birth or gender to sign up.	સાઇન અપ માટે અમે ક્યારેય આધાર, જન્મ તારીખ કે જાતિ માંગતા નથી.
+Big buttons that speak. Tap Full app at the bottom to come back.	બોલતા મોટા બટન. પાછા આવવા નીચે પૂરી એપ દબાવો.
+Switch on	ચાલુ કરો
+Switch to Simple mode?	સરળ મોડ પર જવું છે?
+$clock dose	$clock નો ડોઝ
+Hard	મુશ્કેલ
+Mark $medicine taken	$medicine લીધી તરીકે નોંધો
+No check-in	ચેક-ઇન નથી
+Not marked yet	હજી નોંધ્યું નથી
+Open on the website	વેબસાઇટ પર ખોલો
+This policy is shown in English.	આ નીતિ અંગ્રેજીમાં બતાવી છે.
+new	નવા
+symptom noted	લક્ષણ નોંધાયું
+Caring for	આમની સંભાળ
+Feeling very upset?	ખૂબ પરેશાન છો?
+Mark all taken	બધી લીધી તરીકે નોંધો
+Note a side effect	આડઅસર નોંધો
+Reminder times	યાદ અપાવવાનો સમય
+Tell the doctor: 1 side effect	ડૉક્ટરને કહો: 1 આડઅસર
+Tell the doctor: $count side effects	ડૉક્ટરને કહો: $count આડઅસરો
+Past medicines	અગાઉની દવાઓ
+Scan a prescription or strip	પ્રિસ્ક્રિપ્શન અથવા પટ્ટી સ્કેન કરો
+Type it in	જાતે લખો
+When needed	જરૂર પડે ત્યારે
+Took one	એક લીધી
+All done for today	આજની બધી દવાઓ થઈ ગઈ
+Next: $slot	આગળ: $slot
+$count medicines	$count દવાઓ
+marked taken	લીધી તરીકે નોંધાઈ
+Care near me	નજીકમાં સંભાળ
+Requests to doctor	ડૉક્ટરને વિનંતીઓ
+No check-ins this week	આ અઠવાડિયે કોઈ ચેક-ઇન નથી
+1 check-in this week	આ અઠવાડિયે 1 ચેક-ઇન
+$checkedDays check-ins this week	આ અઠવાડિયે $checkedDays ચેક-ઇન
+symptoms on 1 day	1 દિવસ લક્ષણો
+symptoms on $symptomDays days	$symptomDays દિવસ લક્ષણો
+Simple mode is on. Tap Full app at the bottom to come back.	સરળ મોડ ચાલુ છે. પાછા આવવા નીચે પૂરી એપ દબાવો.
+On because you are 60 or older	તમારી ઉંમર 60 કે વધુ હોવાથી ચાલુ છે
+Family and sharing	પરિવાર અને શેરિંગ
+Search patients	દર્દી શોધો
+Record a goals-of-care talk	સંભાળના લક્ષ્યોની વાતચીત રેકોર્ડ કરો
+Choose the patient	દર્દી પસંદ કરો
+$done of $total	$total માંથી $done
+$done of $total visits done today	આજે $total માંથી $done મુલાકાત પૂરી
+visits today	આજની મુલાકાતો
+visits	મુલાકાતો
+See schedule	સમયપત્રક જુઓ
+Hard days	મુશ્કેલ દિવસો
+Needs you	તમારી રાહ જુએ છે
+Nothing waiting	કંઈ બાકી નથી
+Verify your registration	તમારી નોંધણી ચકાસો
+Are you still caring for $caringName?	શું તમે હજી $caringName ની સંભાળ રાખો છો?
+How is $caringName feeling today?	$caringName આજે કેમ છે?

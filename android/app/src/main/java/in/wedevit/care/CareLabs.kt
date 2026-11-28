@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -55,9 +56,12 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
     val treatmentDays = remember(entries, selected) { TreatmentDayRules.days(entries, selected) }
     val groups = remember(entries, selected, query) { labGroups(entries.filter { it.personId == selected && it.title.contains(query.trim(), ignoreCase = true) }) }
     val groupsShown = rememberShownCount("$selected:$query")
-    LazyColumn(Modifier.fillMaxSize().testTag("lab-history"), contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        // The info-blue Labs band; Add sits on it as a white round button.
-        item { SaharaSectionBand(t("Lab history", "जाँच रिपोर्टें"), SaharaSection.Labs, onBack = onBack, backTag = "labs-back") { if (canEdit) FilledTonalIconButton(onClick = { adding = true }, modifier = Modifier.size(48.dp), colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = Paper, contentColor = SaharaSection.Labs.ink)) { Icon(Icons.Default.Add, t("Add a lab result", "जाँच का नतीजा जोड़ें")) } } }
+    // A stock Material page (25 Nov redesign): title, back arrow and Add in the top bar.
+    val dir = LocalLayoutDirection.current
+    // Embedded (no back: the doctor's patient view) the page sits below other headers, so its bar adds no status-bar space.
+    SaharaPageScaffold(t("Lab history", "जाँच रिपोर्टें"), modifier = if (onBack == null) Modifier.consumeWindowInsets(WindowInsets.statusBars) else Modifier, onBack = onBack, large = false, backTag = "labs-back",
+        actions = { if (canEdit) IconButton(onClick = { adding = true }, modifier = Modifier.size(48.dp).testTag("labs-add")) { Icon(Icons.Default.Add, t("Add a lab result", "जाँच का नतीजा जोड़ें")) } }) { bar ->
+    LazyColumn(Modifier.fillMaxSize().testTag("lab-history"), contentPadding = saharaPadding(bar, PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 32.dp), dir), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { OutlinedTextField(query, { query = it }, placeholder = { Text(t("Find a test", "जाँच खोजें")) }, leadingIcon = { Icon(Icons.Default.Search, null) }, trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { query = "" }) { Icon(Icons.Default.Close, t("Clear search", "खोज मिटाएँ")) } }, singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) }
         if (groups.isEmpty()) item(key = "labs-empty", contentType = "empty") { Box(Modifier.animateItem()) { SurfaceCard(SaharaSection.Labs.wash) { SaharaIconChip(Icons.Default.Science, SaharaSection.Labs, size = 52); Spacer(Modifier.height(12.dp)); Text(if (query.isBlank()) t("No results yet", "अभी कोई नतीजा नहीं") else t("No matching results", "कोई नतीजा नहीं मिला"), fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk); if (query.isBlank()) { if (canEdit) TextButton(onClick = { adding = true }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Add a result", "नतीजा जोड़ें")) } } else TextButton(onClick = { query = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Clear search", "खोज मिटाएँ")) } } } }
         cappedItems(groups, groupsShown, key = { values -> "${values.first().first.title.lowercase()}:${values.first().second.unit}" }, tag = "lab-groups") { values -> Box(Modifier.animateItem()) { LabHistoryCard(vm, values, treatmentDays, onEdit = { editing = it }) } }
@@ -77,6 +81,7 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
             SaharaShowOlder(treatmentDays.size, daysShown, initial = 6, tag = "treatment-days")
             if (canEdit) TextButton(onClick = { addingDay = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("add-treatment-day")) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Add a treatment day", "इलाज का दिन जोड़ें")) }
         } } }
+    }
     }
     if (adding) CareLabEditor(vm) { adding = false }
     editing?.let { item -> CareLabEditor(vm, item) { editing = null } }

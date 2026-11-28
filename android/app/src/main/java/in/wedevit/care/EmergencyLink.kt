@@ -47,7 +47,7 @@ enum class EmergencyLinkProblem(val en: String, val hi: String) {
     NOT_SET_UP("Web link not available yet.", "वेब लिंक अभी उपलब्ध नहीं है।"),
     SIGNED_OUT("Sign in to add a web link.", "वेब लिंक के लिए साइन इन करें।"),
     NOT_OWNER("Only the profile owner can make a web link.", "वेब लिंक केवल प्रोफ़ाइल का मालिक बना सकता है।"),
-    WALKTHROUGH("Web links are off in Practice.", "अभ्यास में वेब लिंक बंद हैं।"),
+    WALKTHROUGH("Practice cards have no web link. Sign in to your own account to make one.", "अभ्यास वाले कार्ड का वेब लिंक नहीं होता। लिंक बनाने के लिए अपने खाते से साइन इन करें।"),
     LINK_OFF("This link is off or expired.", "यह लिंक बंद है या समाप्त हो गया है।"),
     OFFLINE("Couldn't connect. Try again.", "कनेक्ट नहीं हो सका। फिर कोशिश करें।"),
 }
@@ -142,7 +142,12 @@ class EmergencyLinkClient(private val cloud: CareCloud) {
     } catch (e: CareHttpException) {
         throw EmergencyLinkException(EmergencyLinkRules.problemFor(e.status).takeUnless { e.status == 400 && e.message.orEmpty().contains("off or expired") } ?: EmergencyLinkProblem.LINK_OFF)
     } catch (e: IllegalArgumentException) {
-        if (e.cause is java.io.IOException) throw EmergencyLinkException(EmergencyLinkProblem.OFFLINE) else throw e
+        // CareCloud: no connection (IOException cause), or no saved sign-in / a different account ("Sign in to continue.").
+        when {
+            e.cause is java.io.IOException -> throw EmergencyLinkException(EmergencyLinkProblem.OFFLINE)
+            e.message.orEmpty().startsWith("Sign in") || e.message.orEmpty().startsWith("The signed-in account") -> throw EmergencyLinkException(EmergencyLinkProblem.SIGNED_OUT)
+            else -> throw e
+        }
     }
 
     /** A new link series (first card or "Replace link"): the old series stops working at once. */

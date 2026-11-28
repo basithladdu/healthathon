@@ -218,3 +218,129 @@ html, body { background: var(--cream); color: var(--ink);
 .last .timeline { margin-top: 4mm; } .last .split { margin-top: 3mm; } .last .pulsebox { margin-top: 3mm; }
 .last .together { margin-top: 3mm; } .last .foot { margin-top: 2mm; }
 .last .col li { margin-bottom: 1mm; }
+
+/* handout cover (27 Nov) */
+.cover .tiles { margin-top: 6mm; gap: 4mm; } .cover .tile { padding: 4mm 5mm; }
+.tile.live { background: var(--dgreen); border-color: var(--dgreen); }
+.tile.live b { color: #FFD98A; } .tile.live span { color: #fff; } .tile.live .l2 { margin-top: .8mm; }
+.started { display: grid; grid-template-columns: 34mm repeat(5, 1fr); gap: 3mm; margin-top: 6mm; background: #fff;
+  border: .3mm solid var(--line); border-left: 1.4mm solid var(--teal); border-radius: 3mm; padding: 3mm 4mm; align-items: start; }
+.started .sh { font-size: 11pt; font-weight: 800; color: var(--dgreen); line-height: 1.2; }
+.started .sh span { font-size: 8pt; font-weight: 600; color: var(--muted); }
+.started .si { font-size: 8.8pt; line-height: 1.3; border-left: .3mm solid var(--line); padding-left: 3mm; }
+.started .si b { display: block; color: var(--teal); font-size: 10pt; }
+.cover .story { margin-top: 7mm; gap: 7mm; } .cover .step { font-size: 10pt; }
+
+/* 27 Nov round 2: more "what was done", commits secondary, Play card on the cover */
+.cc { font-size: 5.2pt; font-weight: 600; color: #8A968F; } .h4 .cc, .h3 .cc { color: #5F7068; }
+.chips { gap: .55mm; margin-top: .6mm; }
+.chip { font-size: 5.9pt; padding: .55mm 1mm; max-height: 5.6mm; }
+.meta { font-size: 5.6pt; }
+.mstats .sec b { color: var(--muted); font-size: 11pt; padding-top: .8mm; }
+.cover .tiles { grid-template-columns: 1.05fr 1fr 1fr 1fr 1.95fr; }
+.cover .tile.big b { font-size: 44pt; }
+.tile.playcard { grid-column: 5; grid-row: 1 / span 2; justify-content: center; gap: 2.5mm; padding: 4mm 4.5mm; }
+.ph2 { display: flex; align-items: center; gap: 3mm; }
+.play { width: 13mm; height: 13mm; flex: none; }
+.tile .gp { display: block; font-size: 15pt; font-weight: 800; color: #3C4043; margin: 0; line-height: 1.1; }
+.tile .lv { display: block; font-size: 10.5pt; font-weight: 800; color: var(--teal); margin-top: .6mm; }
+.playcard img { width: 100%; border: .3mm solid var(--line); border-radius: 2mm; display: block; }
+.tile.live .l2 { font-size: 11pt; color: #FFD98A; }
+
+/* 28 Nov polish pass: readable at arm's length */
+.brand { font-size: 10pt; } .brand .tn { background: var(--sage-d); color: #fff; border-radius: 99px; padding: .8mm 3.5mm; margin-right: 2.5mm; letter-spacing: .05em; }
+.cover h1 { font-size: 40pt; margin-top: 5mm; } .cover .sub { font-size: 16pt; }
+.cover .tiles { margin-top: 6mm; }
+.cover .tile b { font-size: 30pt; } .cover .tile.big b { font-size: 46pt; }
+.cover .tile span { font-size: 11pt; line-height: 1.2; } .cover .tile i { font-size: 9pt; line-height: 1.3; }
+.cover .tile.big span { font-size: 14pt; } .cover .tile.big i { font-size: 10pt; }
+.tile.playcard { justify-content: flex-start; gap: 3mm; padding: 4.5mm 5mm; }
+.tile.playcard .gp { font-size: 17pt; } .tile.playcard .lv { font-size: 12pt; }
+.play { width: 14mm; height: 14mm; }
+.appicon { margin-left: auto; width: 17mm; height: 17mm; flex: none; border-radius: 4mm;
+  background: url(play-listing.png) no-repeat; background-size: 94.9mm auto; background-position: -72.8mm -1.7mm; }
+.shot { width: 100%; aspect-ratio: 1230 / 440; border: .3mm solid var(--line); border-radius: 2mm;
+  background: url(play-listing.png) no-repeat 0 0; background-size: 174.8% auto; }
+.tile.live .l2 { font-size: 12.5pt; }
+.started { margin-top: 5mm; padding: 3.5mm 4mm; }
+.started .sh { font-size: 12.5pt; } .started .sh span { font-size: 9pt; }
+.started .si { font-size: 9.8pt; } .started .si b { font-size: 11.5pt; }
+.cover .story { margin-top: 5mm; } .cover .step { font-size: 10.5pt; }
+.team5 { margin-top: auto; display: grid; grid-template-columns: 36mm repeat(5, 1fr); gap: 3mm; align-items: stretch;
+  border-top: .3mm solid var(--line); padding-top: 4mm; }
+.th { font-size: 12.5pt; font-weight: 800; color: var(--sage-d); line-height: 1.2; align-self: center; }
+.tp { background: #fff; border: .3mm solid var(--line); border-radius: 3mm; padding: 2.6mm 3.5mm; border-top: 1.2mm solid var(--purple); }
+.tp.tech { border-top-color: var(--sage); }
+.tp b { display: block; font-size: 11pt; color: var(--ink); line-height: 1.2; }
+.tp span { display: block; font-size: 9pt; font-weight: 700; color: var(--purple); margin-top: .8mm; }
+.tp.tech span { color: var(--sage); }
+
+.page.month { padding: 9mm 11mm 7mm; }
+.kicker { font-size: 9pt; } .mhead h2 { font-size: 28pt; } .mnote { font-size: 10.5pt; color: var(--dmuted); }
+.mstats div { min-width: 24mm; padding: 2mm 3.5mm; } .mstats b { font-size: 17pt; } .mstats span { font-size: 7.5pt; }
+.mstats .sec b { font-size: 13pt; padding-top: 1mm; }
+.mbody { gap: 4mm; }
+.grid { grid-template-columns: 11mm repeat(7, 1fr); grid-template-rows: 6mm; }
+.grid .wd { font-size: 8.5pt; } .wk { font-size: 6.6pt; }
+.cell { padding: .9mm 1mm; } .cell .dn { font-size: 10.5pt; line-height: 1; }
+.cc { font-size: 6pt; }
+.chips { gap: .6mm; margin-top: .8mm; }
+.chip { font-size: 7.2pt; line-height: 1.12; border-radius: 1.3mm; padding: .65mm .8mm; max-height: none; }
+.rows6 .chip { font-size: 6.7pt; padding: .5mm .8mm; }
+.meta { font-size: 6.2pt; }
+.side { width: 58mm; }
+.scard { padding: 3mm 3.5mm; } .side h3 { font-size: 12pt; }
+.evl li { font-size: 8.4pt; padding: 1.3mm 0; } .edt { font-size: 7.4pt; } .ed { width: 12mm; }
+.small { font-size: 7.6pt; }
+.legend { font-size: 8.2pt; gap: 1.5mm 5mm; margin-top: 2.5mm; color: var(--dmuted); }
+.chip.mini { font-size: 7pt; padding: .5mm 2mm; border-radius: 1.3mm; }
+.src { font-size: 7.4pt; }
+.cell.dday .ddbig { font-size: 19pt; } .cell.dday .ddsub { font-size: 7.6pt; }
+.ddc { width: 6mm; height: 6mm; font-size: 9.5pt; }
+
+/* polish pass 2 */
+.cover .tiles { grid-template-columns: 1.05fr 1fr 1fr 1fr 1.7fr; gap: 4mm; margin-top: 5mm; }
+.cover .tile { padding: 3.2mm 4.5mm; }
+.cover .tile b { font-size: 27pt; } .cover .tile.big b { font-size: 44pt; }
+.cover .tile span { font-size: 10.5pt; margin-top: 1mm; } .cover .tile i { font-size: 8.6pt; margin-top: .8mm; }
+.tile.playcard { padding: 3.5mm 4.5mm; gap: 2.2mm; justify-content: center; }
+.tile.playcard .gp { font-size: 15pt; white-space: nowrap; } .tile.playcard .lv { font-size: 10.5pt; white-space: nowrap; margin-top: .3mm; }
+.play { width: 11mm; height: 11mm; } .ph2 { gap: 2.5mm; }
+.appicon { width: 13mm; height: 13mm; border-radius: 3mm; background-size: 72.6mm auto; background-position: -55.7mm -1.3mm; }
+.started { margin-top: 4mm; padding: 3mm 4mm; }
+.cover .story { margin-top: 4.5mm; } .cover .step { font-size: 10pt; line-height: 1.35; }
+.team5 { padding-top: 3.5mm; }
+.side { width: 62mm; }
+.evl.long li { font-size: 7.8pt; padding: .9mm 0; } .evl.long .edt { font-size: 7pt; }
+.side .small { margin-top: 1.5mm; }
+.legend { font-size: 8pt; gap: 1.5mm 6mm; }
+
+/* polish pass 3 */
+.side { width: 60mm; }
+.rows6 .chip { font-size: 6.6pt; }
+.legend { font-size: 7.8pt; gap: 1.5mm 4.5mm; }
+
+/* ===== print-saver variant (body.saver): white paper, outlines, low ink ===== */
+.saver, .saver .page, .saver .cover, .saver .page.month { background: #fff; }
+.saver .brand .tn { background: #fff; color: var(--sage-d); border: .5mm solid var(--sage-d); }
+.saver .tile { border: .4mm solid #CFC7B8; }
+.saver .tile.big { background: #fff; border: .9mm solid var(--sage); }
+.saver .tile.big b { color: var(--sage-d); } .saver .tile.big span { color: var(--ink); } .saver .tile.big i { color: var(--muted); }
+.saver .tile.live { background: #fff; border: .9mm solid var(--dgreen); }
+.saver .tile.live b { color: var(--rust); } .saver .tile.live span { color: var(--ink); } .saver .tile.live .l2 { color: var(--teal); }
+.saver .started { border: .4mm solid #CFC7B8; border-left: 1.4mm solid var(--teal); }
+.saver .step .n { background: #fff; color: var(--sage-d); border: .5mm solid var(--sage); }
+.saver .tp { border: .4mm solid #CFC7B8; border-top: 1.2mm solid var(--purple); } .saver .tp.tech { border-top-color: var(--sage); }
+.saver .cell, .saver .cell.h1, .saver .cell.h2, .saver .cell.h3, .saver .cell.h4, .saver .cell.future { background: #fff; border-color: #BDB6A8; }
+.saver .cell.out { background: #fff; } .saver .cell.out .dn { color: #B5B0A6; }
+.saver .heatlg { display: none; }
+.saver .chip { background: #fff; border: .35mm solid currentColor; padding: .4mm .7mm; }
+.saver .chip.c-meet { color: #2F43B5; background: #F3F5FF; } .saver .chip.c-review { color: #5B3D95; background: #F7F3FC; }
+.saver .chip.c-mile { color: #9A452C; background: #FDF4F0; } .saver .chip.c-built { color: #0E5E4F; background: #fff; }
+.saver .cc { color: #6F7B75; }
+.saver .cell.dday { background: #fff; border: 1.1mm solid #E0A93B; color: var(--dgreen); }
+.saver .cell.dday .ddbig { color: var(--rust); }
+.saver .ddc { background: #fff; color: #1A73E8; border: .5mm solid #1A73E8; }
+.saver .scard { border: .4mm solid #CFC7B8; }
+.saver .mstats div { border: .4mm solid #CFC7B8; }
+.saver .mhead { border-bottom-color: var(--dgreen); }
